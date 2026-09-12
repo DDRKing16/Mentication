@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useReducer, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { createUrgeSession, reduceUrgeSession, URGE_SURF_DEFAULTS } from "@/lib/urgeSurfSession";
 import { buildUrgeSurfLearningRecord } from "@/lib/urgeSurfState";
 
@@ -103,10 +102,9 @@ function PostRatingStage({ dispatch, onExit }) {
 }
 
 function CompleteStage({ session, dispatch, onExit, onFinish }) {
-  const navigate = useNavigate();
   const totalSeconds = Math.round((session.timer.totalElapsedMs || session.timer.segmentDurationMs) / 1000);
   const nowIntensity = session.postIntensity;
-  return <main className="urge-surf" aria-labelledby="urge-screen-title"><Header backLabel="Leave Urge Surfing" onBack={onExit} onExit={onExit} /><section className="urge-surf__stage urge-surf__complete-stage"><Progress step={5} /><h1 id="urge-screen-title">You kept the choice</h1><p className="urge-surf__prompt">You gave yourself space.</p><div className="urge-surf__before-now"><div><span>Before</span><strong>{session.initialIntensity}<small>/10</small></strong></div><b aria-hidden="true">→</b><div><span>Now <em>optional</em></span><strong className={nowIntensity ? "is-current" : ""}>{nowIntensity ?? "–"}<small>/10</small></strong></div></div><label className="urge-surf__optional-rating"><span>How strong is it now? Optional</span><input type="range" min="1" max="10" value={nowIntensity ?? 5} onChange={(event) => dispatch({ type: "POST_INTENSITY_SELECTED", value: Number(event.target.value) })} /></label><div className="urge-surf__duration-card"><Icon file="ICONS__icon-timer.png" /><strong>{formatDuration(totalSeconds)}</strong><span>{session.timer.completionReason === "stopped" ? "pause ended early" : "not acted on"}</span></div><label className="urge-surf__save-record"><input type="checkbox" checked={session.savePreference} onChange={(event) => dispatch({ type: "SAVE_PREFERENCE_SET", value: event.target.checked })} /><span>Save a small local learning record</span><small>No anchor words, body locations, or voice content are included.</small></label><p className="urge-surf__next-title">What’s next?</p><div className="urge-surf__handoffs"><button type="button" onClick={() => dispatch({ type: "EXTEND_TIMER" })}><Icon file="ICONS__icon-timer.png" /><span><strong>Wait 10 more</strong><small>Extend your Choice Window</small></span></button><button type="button" onClick={() => onFinish("leave")}><Icon file="ICONS__icon-leave.png" /><span><strong>Leave the trigger</strong><small>Step out and reset</small></span></button><button type="button" onClick={() => { dispatch({ type: "COMPLETION_ROUTE_SELECTED", route: "support" }); navigate("/support"); }}><Icon file="ICONS__icon-reach_out.png" /><span><strong>Reach out</strong><small>Talk to someone you trust</small></span></button><button type="button" onClick={() => onFinish("substitute")}><Icon file="ICONS__icon-substitute.png" /><span><strong>Choose a substitute</strong><small>Do something that helps</small></span></button></div><p className="urge-surf__closing">You don’t have to be urge-free<br />to live on purpose.</p></section></main>;
+  return <main className="urge-surf" aria-labelledby="urge-screen-title"><Header backLabel="Leave Urge Surfing" onBack={onExit} onExit={onExit} /><section className="urge-surf__stage urge-surf__complete-stage"><Progress step={5} /><h1 id="urge-screen-title">You kept the choice</h1><p className="urge-surf__prompt">You gave yourself space.</p><div className="urge-surf__before-now"><div><span>Before</span><strong>{session.initialIntensity}<small>/10</small></strong></div><b aria-hidden="true">→</b><div><span>Now <em>optional</em></span><strong className={nowIntensity ? "is-current" : ""}>{nowIntensity ?? "–"}<small>/10</small></strong></div></div><label className="urge-surf__optional-rating"><span>How strong is it now? Optional</span><input type="range" min="1" max="10" value={nowIntensity ?? 5} onChange={(event) => dispatch({ type: "POST_INTENSITY_SELECTED", value: Number(event.target.value) })} /></label><div className="urge-surf__duration-card"><Icon file="ICONS__icon-timer.png" /><strong>{formatDuration(totalSeconds)}</strong><span>{session.timer.completionReason === "stopped" ? "pause ended early" : "not acted on"}</span></div><label className="urge-surf__save-record"><input type="checkbox" checked={session.savePreference} onChange={(event) => dispatch({ type: "SAVE_PREFERENCE_SET", value: event.target.checked })} /><span>Save a small local learning record</span><small>No anchor words, body locations, or voice content are included.</small></label><p className="urge-surf__next-title">What’s next?</p><div className="urge-surf__handoffs"><button type="button" onClick={() => dispatch({ type: "EXTEND_TIMER" })}><Icon file="ICONS__icon-timer.png" /><span><strong>Wait 10 more</strong><small>Extend your Choice Window</small></span></button><button type="button" onClick={() => onFinish("leave")}><Icon file="ICONS__icon-leave.png" /><span><strong>Leave the trigger</strong><small>Step out and reset</small></span></button><button type="button" onClick={() => { dispatch({ type: "COMPLETION_ROUTE_SELECTED", route: "support" }); onFinish("support", "/support"); }}><Icon file="ICONS__icon-reach_out.png" /><span><strong>Reach out</strong><small>Talk to someone you trust</small></span></button><button type="button" onClick={() => onFinish("substitute")}><Icon file="ICONS__icon-substitute.png" /><span><strong>Choose a substitute</strong><small>Do something that helps</small></span></button></div><p className="urge-surf__closing">You don’t have to be urge-free<br />to live on purpose.</p></section></main>;
 }
 
 export default function UrgeSurfExperience({ intervention, answers, onExit, onComplete, onAttemptEvent }) {
@@ -115,7 +113,7 @@ export default function UrgeSurfExperience({ intervention, answers, onExit, onCo
     return Number.isInteger(answers?.intensity) && answers.intensity >= 1 && answers.intensity <= 10 ? reduceUrgeSession(session, { type: "INITIAL_INTENSITY_SET", value: answers.intensity }) : session;
   }, [answers?.intensity]);
   const [session, dispatch] = useReducer(reduceUrgeSession, initialSession);
-  const finish = (action) => {
+  const finish = (action, redirectTo) => {
     const outcome = session.savePreference ? buildUrgeSurfLearningRecord({
       categoryKey: session.categoryKeys[0], windowSeconds: session.timer.segmentDurationMs / 1000,
       intensityBefore: session.initialIntensity, intensityNow: session.postIntensity,
@@ -128,7 +126,7 @@ export default function UrgeSurfExperience({ intervention, answers, onExit, onCo
       completedPercentage: 1,
       timestamp: Date.now(),
     });
-    onComplete?.({ skipReflection: true, outcome, postValue: session.postIntensity ?? null });
+    onComplete?.({ skipReflection: true, outcome, postValue: session.postIntensity ?? null, redirectTo });
   };
   if (session.currentRoute === "urge.voice") return <VoiceStage dispatch={dispatch} />;
   if (session.currentRoute === "urge.body") return <BodyStage session={session} dispatch={dispatch} onExit={onExit} />;

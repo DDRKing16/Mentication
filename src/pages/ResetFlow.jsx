@@ -471,7 +471,7 @@ export default function ResetFlow() {
     };
     // Dedicated premium experiences may own their complete state and return
     // directly home; legacy pathways retain the shared completion screen.
-    if (options.direct) navigate("/", { replace: true });
+    if (options.direct) navigate(options.redirectTo || "/", { replace: true });
     else advance({ phase: "done" });
     sessionStore.create(payload).catch(() => {
       // non-blocking — the experience continues regardless
@@ -685,18 +685,22 @@ export default function ResetFlow() {
           onAttemptEvent={handleAttemptEvent}
           onComplete={(result) => {
             const hasPostValue = result?.postValue != null;
-            const postValue = hasPostValue ? result.postValue : null;
-            commitPendingPulse(postValue, { useFallback: hasPostValue });
-            setEndIntensity(postValue);
             if (result?.skipReflection) {
+              const postValue = hasPostValue ? result.postValue : null;
+              commitPendingPulse(postValue, { useFallback: hasPostValue });
+              setEndIntensity(postValue);
               completeSession({
                 direct: true,
                 silent: true,
                 endIntensityOverride: postValue,
                 interventionOutcome: result.outcome,
+                redirectTo: result.redirectTo,
               });
               return;
             }
+            const postValue = hasPostValue ? result.postValue : lastValue;
+            commitPendingPulse(postValue, { useFallback: !hasPostValue });
+            setEndIntensity(postValue);
             advance({ phase: "reflect" });
           }}
           onExit={() => navigate("/")}
