@@ -4,7 +4,7 @@ import { AlertTriangle, Home, LifeBuoy, RefreshCw } from "lucide-react";
 export default class AppErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, recoveryKey: 0 };
   }
 
   static getDerivedStateFromError() {
@@ -17,16 +17,16 @@ export default class AppErrorBoundary extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
-      this.setState({ hasError: false });
+      this.setState((state) => ({ hasError: false, recoveryKey: state.recoveryKey + 1 }));
     }
   }
 
   recover = (callback) => {
-    this.setState({ hasError: false }, () => callback?.());
+    this.setState((state) => ({ hasError: false, recoveryKey: state.recoveryKey + 1 }), () => callback?.());
   };
 
   render() {
-    if (!this.state.hasError) return this.props.children;
+    if (!this.state.hasError) return <React.Fragment key={this.state.recoveryKey}>{this.props.children}</React.Fragment>;
     return (
       <div className="min-h-screen bg-gradient-to-b from-cream via-background to-background px-6 py-10">
         <div className="mx-auto flex min-h-[80vh] max-w-xl flex-col items-center justify-center text-center">

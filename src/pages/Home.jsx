@@ -36,11 +36,18 @@ export default function Home() {
   const [recommendation, setRecommendation] = useState(null);
   const [momentum, setMomentum] = useState(null);
   const [loadError, setLoadError] = useState("");
+  const clearDerivedState = useCallback(() => {
+    setLastWorked(null);
+    setPersonalBest(null);
+    setRecommendation(null);
+    setMomentum(null);
+  }, []);
 
   const loadSessions = useCallback(async () => {
     try {
       setLoadError("");
       if (!hasCompletedOnboarding()) {
+        clearDerivedState();
         navigate(hasSeenWelcome() ? "/onboarding" : "/welcome", { replace: true });
         return;
       }
@@ -52,7 +59,7 @@ export default function Home() {
     } catch {
       setLoadError("We couldn’t load your local session history. Try again, or open support if you need urgent help.");
     }
-  }, [navigate]);
+  }, [clearDerivedState, navigate]);
   useEffect(() => {
     if (pathname === "/") loadSessions();
   }, [loadSessions, pathname]);

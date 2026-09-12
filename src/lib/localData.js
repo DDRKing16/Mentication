@@ -72,8 +72,12 @@ function listOwnedLocalStorage() {
 
 function listOwnedLocalStorageKeys(local = storage()) {
   if (!local) return [];
-  return Array.from({ length: local.length }, (_, index) => local.key(index))
-    .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
+  const keys = typeof local.length === "number" && typeof local.key === "function"
+    ? Array.from({ length: local.length }, (_, index) => local.key(index))
+    : local.values instanceof Map
+      ? Array.from(local.values.keys())
+      : [];
+  return keys.filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
 }
 
 const LOCAL_DATA_GROUPS = [
