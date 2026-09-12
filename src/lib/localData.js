@@ -79,14 +79,6 @@ function sortSessions(sessions, sort = "-created_date") {
   });
 }
 
-function listOwnedLocalStorage() {
-  const local = storage();
-  if (!local) return {};
-  const keys = listExportableLocalStorageKeys(local)
-    .sort();
-  return Object.fromEntries(keys.map((key) => [key, local.getItem(key)]));
-}
-
 function listOwnedLocalStorageKeys(local = storage()) {
   if (!local) return [];
   const enumerated = typeof local.length === "number" && typeof local.key === "function"
@@ -97,12 +89,13 @@ function listOwnedLocalStorageKeys(local = storage()) {
     .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
 }
 
-function listExportableLocalStorageKeys(local = storage()) {
-  if (!local) return [];
-  const keys = LOCAL_DATA_GROUPS
-    .flatMap((group) => group.keys(local))
-    .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
-  return Array.from(new Set(keys));
+function readStoredJSON(key, fallback) {
+  try {
+    const raw = storage()?.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 const LOCAL_DATA_GROUPS = [
@@ -235,11 +228,25 @@ export async function deleteLocalDataGroup(groupId) {
 }
 
 export function exportLocalAppData() {
+  const local = storage();
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     exportedAt: new Date().toISOString(),
     sessions: readSessions(),
-    localStorage: listOwnedLocalStorage(),
+    onboarding: {
+      hasCompletedOnboarding: local?.getItem(ONBOARDING_KEY) === "1",
+      hasSeenWelcome: local?.getItem(WELCOME_KEY) === "1",
+    },
+    accessibility: readStoredJSON(A11Y_KEY, readStoredJSON(LEGACY_A11Y_KEY, null)),
+    recommendationMemory: readStoredJSON(DISLIKES_KEY, null),
+    thoughtRecords: readStoredJSON(THOUGHT_RECORD_KEY, []),
+    interventionMemory: {
+      preferences: readStoredJSON(FLAGSHIP_KEYS[0], null),
+      active: readStoredJSON(FLAGSHIP_KEYS[1], null),
+      handoffs: readStoredJSON(FLAGSHIP_KEYS[2], null),
+      tomorrowParking: readStoredJSON(FLAGSHIP_KEYS[3], null),
+      nightChannelFeedback: readStoredJSON(FLAGSHIP_KEYS[4], null),
+    },
   };
 }
 

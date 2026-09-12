@@ -23,6 +23,7 @@ export default function Privacy() {
           title="Privacy in Mentication"
           body="The app works without an account, and the information it uses to personalise support stays with you on this device."
           trustItems={["No account", "No trackers", "On-device only"]}
+          backHref="/settings"
         />
         <ShieldCheck className="mt-8 h-10 w-10 text-primary" strokeWidth={1.5} />
         <div className="mt-6 rounded-2xl border border-primary/10 bg-card p-5">

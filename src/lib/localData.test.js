@@ -53,12 +53,12 @@ describe("device-local application data", () => {
     completeOnboarding();
     window.localStorage.setItem("unrelated.product", "keep");
     const exported = exportLocalAppData();
-    expect(exported.schemaVersion).toBe(2);
+    expect(exported.schemaVersion).toBe(3);
     expect(exported.sessions).toHaveLength(1);
-    expect(exported.localStorage["haven.dislikes"]).toBe(JSON.stringify({ byId: { sigh: 1 } }));
-    expect(exported.localStorage.haven_onboarded).toBe("1");
-    expect(exported.localStorage["unrelated.product"]).toBeUndefined();
-    expect(exported.localStorage["mentation.preference"]).toBeUndefined();
+    expect(exported.recommendationMemory).toEqual({ byId: { sigh: 1 } });
+    expect(exported.onboarding).toEqual({ hasCompletedOnboarding: true, hasSeenWelcome: true });
+    expect(exported.thoughtRecords).toEqual([]);
+    expect(exported.interventionMemory.active).toBeNull();
 
     await deleteAllLocalAppData();
 

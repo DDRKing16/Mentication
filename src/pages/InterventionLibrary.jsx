@@ -92,7 +92,7 @@ export default function InterventionLibrary() {
           eyebrow="Intervention library"
           title="Pick any practice"
           body={`${INTERVENTIONS.length} guided practices, including signature reset experiences designed to feel immersive without becoming busy.`}
-          trustItems={["25 practices", "Start in one tap", "Private on this device"]}
+          trustItems={[`${INTERVENTIONS.length} practices`, "Start in one tap", "Private on this device"]}
         />
 
         <div className="relative mt-5">

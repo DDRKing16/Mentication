@@ -19,20 +19,13 @@ export default function PremiumPageHeader({
   const eyebrowTone = dark ? "text-[#DDB977]" : "text-[#7A572E]";
   const titleTone = dark ? "text-cream" : "text-primary";
   const bodyTone = dark ? "text-cream/70" : "text-muted-foreground";
-  const goBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      navigate(-1);
-      return;
-    }
-    navigate(backHref, { replace: true });
-  };
 
   return (
     <header>
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
-          onClick={goBack}
+          onClick={() => navigate(backHref, { replace: true })}
           className={`no-tap flex min-h-11 items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${button}`}
         >
           <ArrowLeft className="h-4 w-4" /> Back

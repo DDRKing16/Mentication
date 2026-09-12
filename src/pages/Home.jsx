@@ -48,11 +48,6 @@ export default function Home() {
     try {
       setLoadError("");
       const sessions = await sessionStore.list("-created_date", 30);
-      if (!hasCompletedOnboarding() && sessions.length === 0) {
-        clearDerivedState();
-        navigate(hasSeenWelcome() ? "/onboarding" : "/welcome", { replace: true });
-        return;
-      }
       setLastWorked(pickLastWorked(sessions));
       setPersonalBest(buildPersonalBest(sessions));
       setRecommendation(buildRecommendation(sessions));
@@ -62,13 +57,19 @@ export default function Home() {
     }
   }, [clearDerivedState, navigate]);
   useEffect(() => {
-    if (pathname === "/") loadSessions();
-  }, [loadSessions, pathname]);
+    if (pathname !== "/") return;
+    if (!hasCompletedOnboarding()) {
+      clearDerivedState();
+      navigate(hasSeenWelcome() ? "/onboarding" : "/welcome", { replace: true });
+      return;
+    }
+    loadSessions();
+  }, [clearDerivedState, loadSessions, navigate, pathname]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
     const refresh = () => {
-      if (pathname === "/") loadSessions();
+      if (pathname === "/" && hasCompletedOnboarding()) loadSessions();
     };
     window.addEventListener(LOCAL_DATA_CHANGED_EVENT, refresh);
     return () => window.removeEventListener(LOCAL_DATA_CHANGED_EVENT, refresh);

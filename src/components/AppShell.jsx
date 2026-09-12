@@ -25,7 +25,7 @@ const TAB_COMPONENTS = {
   "/insights": EffectivenessDashboard,
   "/settings": Settings,
 };
-const PERSISTED_TAB_PATHS = new Set(["/", "/library", "/plan"]);
+const PERSISTED_TAB_PATHS = new Set(["/", "/library", "/plan", "/profile", "/insights", "/settings"]);
 
 const hidden = { display: "none" };
 const visible = { display: "block" };
@@ -42,10 +42,7 @@ export default function AppShell() {
     });
   }, [pathname]);
 
-  const activePath = TAB_COMPONENTS[pathname] ? pathname : null;
-  const renderedTabs = activePath && !PERSISTED_TAB_PATHS.has(activePath)
-    ? [...visitedTabs, activePath]
-    : [...visitedTabs];
+  const renderedTabs = [...visitedTabs];
 
   return (
     <div className="relative min-h-full">
