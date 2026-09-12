@@ -7,7 +7,7 @@ import IntensityDial from "@/components/IntensityDial";
 import ChoiceButtons from "@/components/ChoiceButtons";
 import ResetPlayer from "@/components/ResetPlayer";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
-import FlagshipExperience, { isInteractiveFlagship } from "@/components/FlagshipExperience";
+import FlagshipExperience, { isInteractiveExperience, isInteractiveFlagship } from "@/components/FlagshipExperience";
 import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
 import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
 import UrgeSurfExperience from "@/components/UrgeSurfExperience";
@@ -665,7 +665,7 @@ export default function ResetFlow() {
 
   // ---------- GUIDING ----------
   if (phase === "guiding" && activePathway) {
-    const interactive = activePathway.length === 1 && isInteractiveFlagship(activePathway[0]?.id);
+    const interactive = activePathway.length === 1 && isInteractiveExperience(activePathway[0]?.id);
     if (interactive) {
       const interventionId = activePathway[0]?.id;
       const Experience = interventionId === "factCheck"

@@ -9,7 +9,7 @@ import { clearActiveFlagship, deleteFlagshipMemory, getActiveFlagship, getFlagsh
 import { buildBalancedThought, buildThoughtOrFactLearningRecord, findThinkingTrapLanguage, normaliseThoughtOrFactDraft, suggestThinkingTraps } from "./thoughtOrFactState.js";
 import { INTERVENTIONS, pathwayByIds } from "./interventions.js";
 import { ACTIVE_INTERVENTION_COUNT } from "./final50Catalog.js";
-import { INTERACTIVE_FLAGSHIP_IDS } from "./flagshipExperienceRouting.js";
+import { ENHANCED_GUIDED_IDS, INTERACTIVE_EXPERIENCE_IDS, INTERACTIVE_FLAGSHIP_IDS, isInteractiveExperience } from "./flagshipExperienceRouting.js";
 
 class LocalStorageStub {
   constructor() { this.values = new Map(); }
@@ -60,6 +60,18 @@ describe("elite 17 contract", () => {
     guidedPlayerIds.forEach((id) => {
       expect(INTERVENTIONS.find((item) => item.id === id)?.steps?.length).toBeGreaterThan(0);
     });
+  });
+
+  it("routes selected non-flagship premium practices through the interactive experience system", () => {
+    expect([...ENHANCED_GUIDED_IDS].sort()).toEqual([
+      "checkBasics", "dontSendIt", "nameFeeling", "whatNeed",
+    ].sort());
+    ENHANCED_GUIDED_IDS.forEach((id) => {
+      expect(FLAGSHIP_IDS).not.toContain(id);
+      expect(isInteractiveExperience(id)).toBe(true);
+      expect(INTERVENTIONS.find((item) => item.id === id)?.steps?.length).toBeGreaterThan(0);
+    });
+    expect(new Set(INTERACTIVE_EXPERIENCE_IDS).size).toBe(INTERACTIVE_EXPERIENCE_IDS.length);
   });
 
   it("contains only valid handoff destinations and blocks unsafe handoffs", () => {

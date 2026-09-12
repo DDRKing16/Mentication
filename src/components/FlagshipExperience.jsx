@@ -9,10 +9,10 @@ import { FLAGSHIP_REGISTRY } from "@/lib/flagshipRegistry";
 import { evidenceFor } from "@/lib/flagshipEvidence";
 import { clearActiveFlagship, getActiveFlagship, recordHandoffDecision, rememberFlagshipEvent, saveActiveFlagship, saveTomorrowParkingItem } from "@/lib/flagshipMemory";
 import { recommendHandoff } from "@/lib/flagshipHandoffs";
-import { INTERACTIVE_FLAGSHIP_IDS, isInteractiveFlagship } from "@/lib/flagshipExperienceRouting";
+import { INTERACTIVE_EXPERIENCE_IDS, INTERACTIVE_FLAGSHIP_IDS, isInteractiveExperience, isInteractiveFlagship } from "@/lib/flagshipExperienceRouting";
 import { getInterventionAtmosphere, getInterventionMoment } from "@/lib/interventionExperience";
 
-export { INTERACTIVE_FLAGSHIP_IDS, isInteractiveFlagship };
+export { INTERACTIVE_EXPERIENCE_IDS, INTERACTIVE_FLAGSHIP_IDS, isInteractiveExperience, isInteractiveFlagship };
 
 const OPTIONS = {
   focusBarrier: [
@@ -54,8 +54,47 @@ function movementFor(position, capacity) {
   return "Change the rhythm or direction of your existing movement for a few cycles.";
 }
 
+function feelingSupportFor(feeling) {
+  return {
+    anxious: "We are giving the feeling a name so your system does not have to hold it as unnamed alarm.",
+    sad: "Sadness often softens when it is allowed to be precise instead of diffused through everything.",
+    angry: "Naming anger can separate the signal from the impulse to act on it immediately.",
+    hurt: "Hurt is easier to meet when it is recognised directly, without arguing with it.",
+    ashamed: "Shame shrinks a little when it is brought into words instead of staying hidden and global.",
+    tense: "Tension often carries emotion in the body before the mind finds language for it.",
+    flat: "Flatness is still a real state. Naming it gives you something concrete to respond to.",
+    numb: "Numb still counts as a feeling state. It often means your system is protecting itself.",
+  }[feeling] || "Precision helps the feeling become more workable.";
+}
+
+function needRouteFor(need) {
+  return {
+    space: "Create ten minutes of less input: step away, lower noise, dim the screen or reduce demands.",
+    comfort: "Add one grounded comfort cue: warmth, water, a blanket, slower breathing or a gentler posture.",
+    action: "Choose one small real-world move that changes the situation by even one degree.",
+    connection: "Pick one safe low-pressure signal toward another person, or choose supportive presence instead of explanation.",
+    reassurance: "Write one steadying sentence you would believe from a wise, calm version of yourself.",
+    movement: "Use one minute of matched movement: stretch, walk, sway, shake out tension or change rooms.",
+    rest: "Protect a small pocket of genuine restoration without turning it into total shutdown.",
+    clarity: "Capture the one sentence, task or question that would make the fog thinner.",
+    expression: "Let the emotion leave a trace somewhere safe: voice note, notes app, tears, drawing or music.",
+  }[need] || "Follow the first helpful thread rather than waiting for certainty.";
+}
+
+function basicsActionFor(need) {
+  return {
+    water: "Get a full glass of water and take a few steady sips before deciding anything else.",
+    food: "Have the easiest available snack with protein or carbs - enough to signal fuel, not perfection.",
+    air: "Open a window, step outside briefly or move toward cooler, fresher air if available.",
+    bathroom: "Take the bathroom break now so your body is not carrying that signal in the background.",
+    posture: "Change position, uncurl the body and give your shoulders, jaw and spine a small reset.",
+    quiet: "Reduce one input source: headphones off, tabs closed, brightness lowered or notifications muted.",
+    rest: "Choose a deliberate short reset - lie down, close your eyes or stop demanding output for a few minutes.",
+  }[need] || "Tend to the first body need that is asking the loudest.";
+}
+
 function screensFor(id, data) {
-  const intro = (line, body) => ({ kind: "intro", eyebrow: "FLAGSHIP EXPERIENCE", prompt: line, body });
+  const intro = (line, body) => ({ kind: "intro", eyebrow: "PREMIUM PRACTICE", prompt: line, body });
   const away = (prompt, body) => ({ kind: "away", prompt, body });
   const returning = (prompt, body) => ({ kind: "return", prompt, body, options: OPTIONS.returnStatus.map(([value, label]) => choice(value, label)) });
 
@@ -138,6 +177,34 @@ function screensFor(id, data) {
     away("Carry the movement into real life.", "The app can close. Return when you know whether any more movement became available."),
     returning("Is any more movement available than before?", "We are tracking usable activation, not happiness or performance."),
   ];
+  if (id === "nameFeeling") return [
+    intro("Give the feeling edges.", "This is not about analysing yourself perfectly. It is about turning a blur into something your mind and body can work with."),
+    { prompt: "Which word is closest right now?", body: "Pick the nearest fit, even if it is only roughly right.", options: [choice("anxious", "Anxious"), choice("sad", "Sad"), choice("angry", "Angry"), choice("hurt", "Hurt"), choice("ashamed", "Ashamed"), choice("tense", "Tense"), choice("flat", "Flat"), choice("numb", "Numb")] },
+    { prompt: "How strong is it?", body: feelingSupportFor(data.feeling), options: [choice("low", "Low", "Present but manageable"), choice("medium", "Medium", "Noticeable and shaping the moment"), choice("high", "High", "Loud, heated or hard to ignore"), choice("mixed", "Mixed", "More than one feeling is active")] },
+    { kind: "capture", prompt: "What touched it off, or what is underneath it?", body: "One short sentence is enough. You are naming context, not building a case.", placeholder: "It flared when..." },
+    { kind: "completion", prompt: "Now the feeling is named.", body: "You do not have to solve it in this moment. A named state is easier to meet with the next right support." },
+  ];
+  if (id === "whatNeed") return [
+    intro("Let the feeling point somewhere useful.", "Once a feeling is named, ask what would actually help. The answer does not need to be deep - it just needs direction."),
+    { prompt: "What does this state need most?", options: [choice("space", "Space"), choice("comfort", "Comfort"), choice("action", "Action"), choice("connection", "Connection"), choice("reassurance", "Reassurance"), choice("movement", "Movement"), choice("rest", "Rest"), choice("clarity", "Clarity"), choice("expression", "Expression")] },
+    { kind: "action", prompt: "Follow that thread with one concrete move.", body: "Keep it kind, specific and possible in the next few minutes.", defaultValue: needRouteFor(data.need) },
+    away("Take the smallest version now.", "You can leave the app. This is about meeting the need in real life, not staying in the exercise."),
+    returning("Did meeting the need help at all?", "Even slight relief counts - and useful information counts too."),
+  ];
+  if (id === "dontSendIt") return [
+    intro("Protect the next ten minutes.", "When the message is hot, speed is the enemy. The job is not to decide everything now - only to stop an irreversible send."),
+    { prompt: "What are you about to send or say?", options: [choice("text", "A text or DM"), choice("email", "An email"), choice("comment", "A comment or post"), choice("voice", "A voice note"), choice("live", "Something I want to say right now")] },
+    { prompt: "What does the pause need to protect?", options: [choice("relationship", "The relationship"), choice("self", "Myself"), choice("clarity", "Clarity"), choice("consequences", "Future consequences")] },
+    away("Put the message out of reach for two minutes.", "Lower the phone, unclench the jaw and let three long exhales finish before you decide anything."),
+    { kind: "return", prompt: "What is the wiser next move?", body: "You can choose delay without composing the perfect reply.", options: [choice("wait", "Wait longer"), choice("edit", "Edit it later"), choice("delete", "Delete the draft"), choice("support", "Ask somebody safe to sense-check it")] },
+  ];
+  if (id === "checkBasics") return [
+    intro("Check the body before the story.", "A surprising number of mental states are amplified by simple unmet needs. We are ruling out cheap fixes before doing heavier work."),
+    { prompt: "What is the loudest basic need?", options: [choice("water", "Water"), choice("food", "Food"), choice("air", "Fresh air or temperature"), choice("bathroom", "Bathroom"), choice("posture", "Movement or posture"), choice("quiet", "Less noise or screen"), choice("rest", "Rest")] },
+    { kind: "action", prompt: "Tend to that need first.", body: "Choose the smallest version that is available right now.", defaultValue: basicsActionFor(data.need) },
+    away("Handle the body need now.", "The app can wait. Come back after you have actually done it, even if the shift is small."),
+    returning("Did the state change after meeting the need?", "If not, that is useful too - it means the next reset can target something else with less guessing."),
+  ];
   return [];
 }
 
@@ -152,6 +219,10 @@ function SignatureVisual({ id, step, reducedMotion }) {
   if (id === "changeScene") return <div className="signature doorway"><motion.div {...motionProps}/></div>;
   if (id === "activationMenu") return <div className="signature ignition"><motion.span {...motionProps}/>{[0,1,2,3,4,5].map(i=><i key={i} style={{transform:`rotate(${i*60}deg) translateY(-54px)`}}/>)}</div>;
   if (id === "tomorrowParking") return <div className="signature parking"><div className="night-orbit"/><motion.div className="parked-note" {...motionProps}/></div>;
+  if (id === "nameFeeling") return <div className="signature sorting"><span>NAME</span><span>INTENSITY</span><span>TRIGGER</span></div>;
+  if (id === "whatNeed") return <div className="signature ignition"><motion.span {...motionProps}/>{[0,1,2,3,4].map(i=><i key={i} style={{transform:`rotate(${i*72}deg) translateY(-54px)`}}/>)}</div>;
+  if (id === "dontSendIt") return <div className="signature channel"><div className="channel-point left"/><div className="channel-bridge">{[0,1,2,3].map(i=><span key={i}/>)}</div><div className="channel-point right"/></div>;
+  if (id === "checkBasics") return <div className="signature pulse">{[0,1,2].map(i=><motion.span key={i} style={{animationDelay:`${i*.4}s`}} {...motionProps}/>)}</div>;
   return <div className="signature compress"><div/><div/><div/><motion.span {...motionProps}/></div>;
 }
 
@@ -215,6 +286,8 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
       factCheck: ["", "thought", "classification", "balanced", "completion"], thenWhat: ["", "eligibility", "frame", "meaning", "coping", "presentAction", "completion"],
       countermove: ["", "pull", "pullCheck", "trajectory", "action", "away", "status"], openChannel: ["", "closure", "barrier", "connectionSafety", "bridge", "message", "away", "status"],
       pulseShift: ["", "state", "position", "capacity", "movement", "destination", "away", "status"], tomorrowParking: ["urgency", "parkingItem", "complete"],
+      nameFeeling: ["", "feeling", "intensityBand", "trigger", "completion"], whatNeed: ["", "need", "action", "away", "status"],
+      dontSendIt: ["", "channel", "protection", "away", "status"], checkBasics: ["", "need", "action", "away", "status"],
     }[id] || [];
     const key = current?.key || keys[step] || `step${step}`;
     const next = { ...data, [key]: value };
@@ -278,9 +351,12 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
   const evidence = evidenceFor(id);
   const experienceMeta = getInterventionAtmosphere(intervention, answers?.direction);
   const momentMeta = getInterventionMoment(intervention, current, step);
+  const completed = data.status === "completed"
+    || !data.status
+    || (id === "dontSendIt" && ["wait", "edit", "delete", "support"].includes(data.status));
 
   const finish = () => {
-    rememberFlagshipEvent({ interventionId: id, completed: data.status === "completed" || !data.status, partial: data.status === "partial", barriers: data.status === "couldnt" ? [data.barrier || "could-not-start"] : [] });
+    rememberFlagshipEvent({ interventionId: id, completed, partial: data.status === "partial", barriers: data.status === "couldnt" ? [data.barrier || "could-not-start"] : [] });
     if (id === "tomorrowParking" && data.parkingItem) {
       saveTomorrowParkingItem(data.parkingItem);
     }
@@ -295,10 +371,17 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
   const completionLike = ["completion", "parking-complete"].includes(current.kind) || (current.kind === "return" && !!data.status) || (isLast && !current.options);
   const statusLabel = data.status === "partial" ? "Partly completed is movement." : data.status === "couldnt" ? "This is information about the barrier, not a failure." : data.completionNote;
 
-  const accent = id === "tomorrowParking" ? "#b9c7ff" : id === "countermove" ? "#ffcc78" : "#a6f0c1";
+  const accent = {
+    tomorrowParking: "#b9c7ff",
+    countermove: "#ffcc78",
+    nameFeeling: "#f4b0d8",
+    whatNeed: "#c8b8ff",
+    dontSendIt: "#ffb38c",
+    checkBasics: "#9ee4d8",
+  }[id] || "#a6f0c1";
   return <InterventionControlShell
     id={id}
-    goal={meta?.primaryGoal}
+    goal={meta?.primaryGoal || answers?.direction || intervention?.directions?.[0]}
     title={meta?.displayName || intervention.name}
     stage={Math.min(3, Math.max(1, Math.ceil(((step + 1) / screens.length) * 3)))}
     onBack={() => step ? setStep(step - 1) : onExit?.()}
