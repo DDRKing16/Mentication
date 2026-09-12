@@ -7,7 +7,6 @@ import { recommendHandoff } from "@/lib/flagshipHandoffs";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import InterventionControlShell from "@/components/InterventionControlShell";
 import { getInterventionAtmosphere } from "@/lib/interventionExperience";
-import { NEW_FLAGSHIP_IDS, isNewFlagship } from "@/lib/flagshipExperienceRouting";
 
 const optionClass = "min-h-14 rounded-2xl border border-white/15 bg-white/[0.06] p-4 text-left transition hover:border-[var(--nf-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--nf-accent)]";
 const primaryClass = "min-h-12 w-full rounded-full bg-[var(--nf-accent)] px-5 font-semibold text-slate-950 disabled:opacity-40";
