@@ -16,6 +16,15 @@ const A11Y_KEY = "haven.a11y.v2";
 const DISLIKES_KEY = "haven.dislikes";
 const THOUGHT_RECORD_KEY = "mentation.thought-or-fact.records.v1";
 const LOCAL_DATA_EVENT = "mentation:local-data-changed";
+const KNOWN_APP_KEYS = [
+  SESSION_KEY,
+  ONBOARDING_KEY,
+  WELCOME_KEY,
+  LEGACY_A11Y_KEY,
+  A11Y_KEY,
+  DISLIKES_KEY,
+  THOUGHT_RECORD_KEY,
+];
 const FLAGSHIP_KEYS = [
   "mentation.flagship.preferences.v1",
   "mentation.flagship.active.v1",
@@ -75,12 +84,14 @@ function listOwnedLocalStorage() {
 
 function listOwnedLocalStorageKeys(local = storage()) {
   if (!local) return [];
-  const keys = typeof local.length === "number" && typeof local.key === "function"
+  const enumerated = typeof local.length === "number" && typeof local.key === "function"
     ? Array.from({ length: local.length }, (_, index) => local.key(index))
     : local.values instanceof Map
       ? Array.from(local.values.keys())
       : [];
-  return keys.filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
+  const known = [...KNOWN_APP_KEYS, ...FLAGSHIP_KEYS].filter((key) => local.getItem?.(key) != null);
+  return Array.from(new Set([...enumerated, ...known]))
+    .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
 }
 
 const LOCAL_DATA_GROUPS = [

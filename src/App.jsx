@@ -86,9 +86,10 @@ const MenticationRoutes = () => {
 const RoutedAppBoundary = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const boundaryKey = TAB_PATHS.includes(location.pathname) ? "app" : location.pathname;
   return (
     <AppErrorBoundary
-      resetKey={location.pathname}
+      resetKey={boundaryKey}
       onGoHome={() => navigate("/")}
       onGetSupport={() => navigate("/support")}
     >
