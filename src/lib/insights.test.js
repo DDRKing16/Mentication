@@ -18,7 +18,7 @@ describe("buildMomentumSummary", () => {
       thisWeek: 3,
       streakDays: 3,
       averageShift: 3,
-      bestDirection: "lift",
+      bestDirection: "calm",
       weeklyGoal: 3,
       sessionsToGoal: 0,
     });
