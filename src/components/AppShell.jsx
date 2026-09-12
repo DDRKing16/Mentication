@@ -1,10 +1,10 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import TabBar from "@/components/TabBar";
 const Home = lazy(() => import("@/pages/Home"));
 
-// Tab pages are lazy-loaded and only the active tab route is rendered so hidden
-// tabs do not stay mounted in memory.
+// Tab pages are lazy-loaded on first visit, then kept mounted after that so
+// users keep in-tab state without paying the eager upfront cost for every tab.
 const InterventionLibrary = lazy(() => import("@/pages/InterventionLibrary"));
 const RegulationProfile = lazy(() => import("@/pages/RegulationProfile"));
 const MyPlan = lazy(() => import("@/pages/MyPlan"));
@@ -17,29 +17,43 @@ const PageSpinner = () => (
   </div>
 );
 
+const TAB_COMPONENTS = {
+  "/": Home,
+  "/library": InterventionLibrary,
+  "/plan": MyPlan,
+  "/profile": RegulationProfile,
+  "/insights": EffectivenessDashboard,
+  "/settings": Settings,
+};
+
+const hidden = { display: "none" };
+const visible = { display: "block" };
+
 export default function AppShell() {
   const { pathname } = useLocation();
-  const tabPage = pathname === "/"
-    ? <Home />
-    : pathname === "/library"
-      ? <InterventionLibrary />
-      : pathname === "/plan"
-        ? <MyPlan />
-        : pathname === "/profile"
-          ? <RegulationProfile />
-          : pathname === "/insights"
-            ? <EffectivenessDashboard />
-            : pathname === "/settings"
-              ? <Settings />
-              : null;
+  const [visitedTabs, setVisitedTabs] = useState(() => new Set(["/"]));
+
+  useEffect(() => {
+    if (!TAB_COMPONENTS[pathname]) return;
+    setVisitedTabs((current) => {
+      if (current.has(pathname)) return current;
+      return new Set([...current, pathname]);
+    });
+  }, [pathname]);
 
   return (
     <div className="relative min-h-full">
-      <div className="min-h-full">
-        <Suspense fallback={<PageSpinner />}>
-          {tabPage}
-        </Suspense>
-      </div>
+      {Array.from(visitedTabs).map((tabPath) => {
+        const Component = TAB_COMPONENTS[tabPath];
+        if (!Component) return null;
+        return (
+          <div key={tabPath} style={pathname === tabPath ? visible : hidden} className="min-h-full">
+            <Suspense fallback={<PageSpinner />}>
+              <Component />
+            </Suspense>
+          </div>
+        );
+      })}
       <TabBar />
     </div>
   );

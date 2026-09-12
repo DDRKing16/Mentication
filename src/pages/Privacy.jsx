@@ -1,11 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getLocalDataInventory } from "@/lib/localData";
+import { getLocalDataInventory, LOCAL_DATA_CHANGED_EVENT } from "@/lib/localData";
 
 export default function Privacy() {
   const navigate = useNavigate();
-  const inventory = getLocalDataInventory();
+  const [inventory, setInventory] = useState(() => getLocalDataInventory());
+
+  useEffect(() => {
+    const refresh = () => setInventory(getLocalDataInventory());
+    window.addEventListener(LOCAL_DATA_CHANGED_EVENT, refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.removeEventListener(LOCAL_DATA_CHANGED_EVENT, refresh);
+      window.removeEventListener("focus", refresh);
+    };
+  }, []);
   return (
     <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
       <main className="mx-auto max-w-xl px-5 pb-20 pt-[max(2.5rem,env(safe-area-inset-top))]">

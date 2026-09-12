@@ -11,6 +11,7 @@ const LEGACY_A11Y_KEY = "haven_a11y";
 const A11Y_KEY = "haven.a11y.v2";
 const DISLIKES_KEY = "haven.dislikes";
 const THOUGHT_RECORD_KEY = "mentation.thought-or-fact.records.v1";
+const LOCAL_DATA_EVENT = "mentation:local-data-changed";
 const FLAGSHIP_KEYS = [
   "mentation.flagship.preferences.v1",
   "mentation.flagship.active.v1",
@@ -20,6 +21,11 @@ const FLAGSHIP_KEYS = [
 ];
 
 const storage = () => (typeof window === "undefined" ? null : window.localStorage);
+
+function emitLocalDataChanged() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(LOCAL_DATA_EVENT));
+}
 
 function readSessions() {
   try {
@@ -37,6 +43,7 @@ function writeSessions(sessions) {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: next.length } }));
   }
+  emitLocalDataChanged();
 }
 
 function sortSessions(sessions, sort = "-created_date") {
@@ -143,6 +150,7 @@ export function deleteAllLocalAppData() {
     if (APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
   }
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
+  emitLocalDataChanged();
 }
 
 export function getLocalDataInventory() {
@@ -172,6 +180,7 @@ export async function deleteLocalDataGroup(groupId) {
   }
   const keys = group.keys(local);
   keys.forEach((key) => local.removeItem(key));
+  emitLocalDataChanged();
   return { deleted: true, count: keys.length };
 }
 
@@ -201,3 +210,5 @@ export function downloadLocalAppData(filenamePrefix = "mentation-export") {
     URL.revokeObjectURL(url);
   }
 }
+
+export const LOCAL_DATA_CHANGED_EVENT = LOCAL_DATA_EVENT;
