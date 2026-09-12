@@ -93,6 +93,42 @@ function basicsActionFor(need) {
   }[need] || "Tend to the first body need that is asking the loudest.";
 }
 
+function worryActionFor(type) {
+  return {
+    current: "Name one real-world next step, who will do it, and when it will happen.",
+    future: "Label it hypothetical worry, decide there is no action right now, and return to the next real thing in front of you.",
+    mixed: "Split the real problem from the what-if story, then take one action only on the part that exists now.",
+  }[type] || "Choose the smallest useful response instead of staying in the loop.";
+}
+
+function scheduleActionFor(track) {
+  return {
+    pleasure: "Schedule one genuinely pleasant action with a specific day, time and place.",
+    mastery: "Schedule one small action that creates capability, progress or order you can see.",
+    connection: "Schedule one human contact, shared space or low-pressure signal toward another person.",
+    care: "Schedule one act of physical care: food, movement, showering, sleep protection or going outside.",
+  }[track] || "Schedule one small action that feels possible on a low-capacity day.";
+}
+
+function loopBreakFor(link) {
+  return {
+    activity: "Re-enter one tiny version of the dropped activity for two minutes only.",
+    avoidance: "Approach the safest first edge instead of waiting to feel ready.",
+    isolation: "Create one safe point of connection without forcing a whole conversation.",
+    selfcare: "Restore one body-care action before asking your mind to do more.",
+  }[link] || "Break one link in the loop with the lightest workable action.";
+}
+
+function frictionFixFor(friction) {
+  return {
+    missing: "Put the missing item in reach before you start.",
+    unclear: "Reduce the job to the first visible action that could be done right now.",
+    clutter: "Clear one palm-sized space or one visible distraction, not the whole area.",
+    choices: "Choose one option and treat it as a draft, not a final decision.",
+    interruptions: "Silence one alert or move one interrupting device out of reach.",
+  }[friction] || "Remove one source of friction, then begin before optimising anything else.";
+}
+
 function screensFor(id, data) {
   const intro = (line, body) => ({ kind: "intro", eyebrow: "PREMIUM PRACTICE", prompt: line, body });
   const away = (prompt, body) => ({ kind: "away", prompt, body });
@@ -205,6 +241,41 @@ function screensFor(id, data) {
     away("Handle the body need now.", "The app can wait. Come back after you have actually done it, even if the shift is small."),
     returning("Did the state change after meeting the need?", "If not, that is useful too - it means the next reset can target something else with less guessing."),
   ];
+  if (id === "orienting") return [
+    intro("Rebuild the room around you.", "When alarm gets loud, your system narrows. We are widening it again with simple proof that this moment is here, specific and survivable."),
+    { prompt: "Start with one stable anchor.", body: "Choose the first thing that feels easiest to orient around.", options: [choice("wall", "A wall, doorway or corner"), choice("light", "A light source or window"), choice("object", "A neutral object nearby"), choice("sound", "A steady sound in the room")] },
+    { prompt: "What else is here?", body: "Let your eyes move slowly. You are collecting ordinary details, not hunting for danger.", options: [choice("three", "I can name three visible things"), choice("two", "I can find two so far"), choice("slow", "I need to go slower")] },
+    { kind: "action", prompt: "Finish the orienting sequence.", body: "Use one steady line that proves where and when you are.", defaultValue: "Name three neutral things you can see, feel both feet or seat support, and say quietly: I am here, in this room, and this moment is passing." },
+    { kind: "completion", prompt: "The room is back in view.", body: "You do not need to feel perfect. The goal is that the present moment is bigger than the alarm now." },
+  ];
+  if (id === "solvableWorry") return [
+    intro("Sort the worry by what exists now.", "This is a worry-discrimination practice. We are separating present problems from future simulations so your effort goes to the right place."),
+    { kind: "capture", prompt: "What exact worry is looping?", body: "One sentence only. Name the problem your mind keeps re-opening.", placeholder: "The worry is..." },
+    { prompt: "What kind of worry is it?", options: [choice("current", "Current problem", "There is something real to act on now"), choice("future", "Hypothetical worry", "Mostly a what-if about the future"), choice("mixed", "Mixed", "Part real problem, part imagined spiral")] },
+    { kind: "action", prompt: "Choose the right response for that kind of worry.", body: "The aim is direction, not certainty.", defaultValue: worryActionFor(data.worryType) },
+    { kind: "completion", prompt: "The worry has been sorted.", body: "A present problem gets action. A hypothetical worry gets containment. You do not have to solve both at once." },
+  ];
+  if (id === "activityScheduling") return [
+    intro("Turn motivation into an appointment.", "Mood shifts less from intentions than from contact with scheduled, concrete actions. We are building one activity your future self can actually enter."),
+    { prompt: "What kind of activity would help most?", options: [choice("pleasure", "Pleasure"), choice("mastery", "Mastery"), choice("connection", "Connection"), choice("care", "Physical care")] },
+    { kind: "action", prompt: "Write the smallest version worth scheduling.", body: "Shrink it until it still matters and still feels doable on a low-energy day.", defaultValue: scheduleActionFor(data.activityTrack) },
+    { prompt: "What is the main follow-through risk?", options: [choice("energy", "Low energy"), choice("time", "Time gets swallowed"), choice("avoidance", "I dodge it when the time comes"), choice("forget", "I simply forget")] },
+    { kind: "completion", prompt: "Now make it real outside the app.", body: "Put it in a calendar, reminder, note or visible place. Premium change comes from a scheduled real-world cue, not just a good idea." },
+  ];
+  if (id === "lowMoodLoop") return [
+    intro("Find the loop, not your flaw.", "Low mood often becomes self-reinforcing through avoidance, isolation and shrinking life. We are looking for one break point, not a total transformation."),
+    { prompt: "Which link in the loop is loudest right now?", options: [choice("activity", "Dropped activities"), choice("avoidance", "Avoiding what feels heavy"), choice("isolation", "Withdrawing from people"), choice("selfcare", "Basic care has slipped")] },
+    { prompt: "What keeps that link appealing in the moment?", options: [choice("relief", "It gives quick relief"), choice("protection", "It feels protective"), choice("numb", "It asks less of me"), choice("habit", "It has become automatic")] },
+    { kind: "action", prompt: "Choose the lightest loop-breaker.", body: "We only need a safe two-minute break in the pattern.", defaultValue: loopBreakFor(data.loopLink) },
+    returning("Did that move widen the day at all?", "Even a slight change in direction matters more than a sudden change in mood."),
+  ];
+  if (id === "frictionSweep") return [
+    intro("Make starting easier than drifting.", "Focus problems often live in the environment as much as in the mind. We are clearing one obstacle and one competing cue before asking for willpower."),
+    { prompt: "What is the first friction?", options: [choice("missing", "Something I need is missing"), choice("unclear", "The first step is unclear"), choice("clutter", "Clutter or setup is in the way"), choice("choices", "Too many choices"), choice("interruptions", "Alerts or interruptions")] },
+    { kind: "action", prompt: "Remove that first friction.", body: "One small environmental move is enough.", defaultValue: frictionFixFor(data.frictionType) },
+    { prompt: "What else is likely to pull you off track?", options: [choice("phone", "Phone or messages"), choice("tabs", "Too many tabs or windows"), choice("noise", "Noise or people"), choice("self", "My own urge to switch away")] },
+    { kind: "completion", prompt: "Start before you improve the rest.", body: "The premium move is to begin the task now while the runway is briefly clear." },
+  ];
   return [];
 }
 
@@ -223,6 +294,11 @@ function SignatureVisual({ id, step, reducedMotion }) {
   if (id === "whatNeed") return <div className="signature ignition"><motion.span {...motionProps}/>{[0,1,2,3,4].map(i=><i key={i} style={{transform:`rotate(${i*72}deg) translateY(-54px)`}}/>)}</div>;
   if (id === "dontSendIt") return <div className="signature channel"><div className="channel-point left"/><div className="channel-bridge">{[0,1,2,3].map(i=><span key={i}/>)}</div><div className="channel-point right"/></div>;
   if (id === "checkBasics") return <div className="signature pulse">{[0,1,2].map(i=><motion.span key={i} style={{animationDelay:`${i*.4}s`}} {...motionProps}/>)}</div>;
+  if (id === "orienting") return <div className="signature doorway"><motion.div {...motionProps}/></div>;
+  if (id === "solvableWorry") return <div className="signature sorting"><span>WORRY</span><span>REAL</span><span>NEXT</span></div>;
+  if (id === "activityScheduling") return <div className="signature ignition"><motion.span {...motionProps}/>{[0,1,2,3].map(i=><i key={i} style={{transform:`rotate(${i*90}deg) translateY(-54px)`}}/>)}</div>;
+  if (id === "lowMoodLoop") return <div className="signature timeline">{[0,1,2,3].map((i)=><span key={i} className={i <= Math.min(3, step) ? "active" : ""}/>)}</div>;
+  if (id === "frictionSweep") return <div className="signature compress"><div/><div/><motion.span {...motionProps}/><div/></div>;
   return <div className="signature compress"><div/><div/><div/><motion.span {...motionProps}/></div>;
 }
 
@@ -288,6 +364,9 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
       pulseShift: ["", "state", "position", "capacity", "movement", "destination", "away", "status"], tomorrowParking: ["urgency", "parkingItem", "complete"],
       nameFeeling: ["", "feeling", "intensityBand", "trigger", "completion"], whatNeed: ["", "need", "action", "away", "status"],
       dontSendIt: ["", "channel", "protection", "away", "status"], checkBasics: ["", "need", "action", "away", "status"],
+      orienting: ["", "anchor", "scope", "action", "completion"],
+      solvableWorry: ["", "worry", "worryType", "action", "completion"], activityScheduling: ["", "activityTrack", "action", "risk", "completion"],
+      lowMoodLoop: ["", "loopLink", "loopRelief", "action", "status"], frictionSweep: ["", "frictionType", "action", "driftRisk", "completion"],
     }[id] || [];
     const key = current?.key || keys[step] || `step${step}`;
     const next = { ...data, [key]: value };
@@ -378,6 +457,11 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
     whatNeed: "#c8b8ff",
     dontSendIt: "#ffb38c",
     checkBasics: "#9ee4d8",
+    orienting: "#8ed9ff",
+    solvableWorry: "#f1c77f",
+    activityScheduling: "#9fddff",
+    lowMoodLoop: "#ffb8a5",
+    frictionSweep: "#b8f0c8",
   }[id] || "#a6f0c1";
   return <InterventionControlShell
     id={id}

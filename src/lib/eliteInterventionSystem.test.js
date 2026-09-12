@@ -64,7 +64,7 @@ describe("elite 17 contract", () => {
 
   it("routes selected non-flagship premium practices through the interactive experience system", () => {
     expect([...ENHANCED_GUIDED_IDS].sort()).toEqual([
-      "activityScheduling", "frictionSweep", "lowMoodLoop", "solvableWorry",
+      "frictionSweep", "nameFeeling", "orienting", "solvableWorry",
     ].sort());
     ENHANCED_GUIDED_IDS.forEach((id) => {
       expect(FLAGSHIP_IDS).not.toContain(id);
