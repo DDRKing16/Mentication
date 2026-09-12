@@ -115,9 +115,11 @@ describe("device-local application data", () => {
 
     expect(await deleteLocalDataGroup("accessibility")).toEqual({ deleted: true, count: 1 });
     expect(window.localStorage.getItem("haven.a11y.v2")).toBeNull();
+    expect(events.some((event) => event.type === "mentation:sessions-changed" && event.detail?.count === 0)).toBe(true);
 
     expect(await deleteLocalDataGroup("thoughtRecords")).toEqual({ deleted: true, count: 1 });
     expect(window.localStorage.getItem("mentation.thought-or-fact.records.v1")).toBeNull();
+    expect(events.filter((event) => event.type === "mentation:sessions-changed")).toHaveLength(3);
   });
 
   it("downloads local data with and without document.body", () => {

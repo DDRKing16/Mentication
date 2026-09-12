@@ -185,17 +185,20 @@ export async function deleteLocalDataGroup(groupId) {
   }
   if (group.id === "flagship") {
     const count = deleteFlagshipMemory("all");
+    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: readSessions().length } }));
     emitLocalDataChanged();
     return { deleted: true, count };
   }
   if (group.id === "onboarding") {
     const keys = group.keys(local);
     resetOnboarding();
+    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: readSessions().length } }));
     emitLocalDataChanged();
     return { deleted: true, count: keys.length };
   }
   const keys = group.keys(local);
   keys.forEach((key) => local.removeItem(key));
+  window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: readSessions().length } }));
   emitLocalDataChanged();
   return { deleted: true, count: keys.length };
 }

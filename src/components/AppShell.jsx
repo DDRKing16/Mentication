@@ -25,25 +25,29 @@ const TAB_COMPONENTS = {
   "/insights": EffectivenessDashboard,
   "/settings": Settings,
 };
+const PERSISTED_TAB_PATHS = new Set(["/", "/library", "/plan"]);
 
 const hidden = { display: "none" };
 const visible = { display: "block" };
 
 export default function AppShell() {
   const { pathname } = useLocation();
-  const [visitedTabs, setVisitedTabs] = useState(() => new Set([TAB_COMPONENTS[pathname] ? pathname : "/"]));
+  const [visitedTabs, setVisitedTabs] = useState(() => new Set(TAB_COMPONENTS[pathname] && PERSISTED_TAB_PATHS.has(pathname) ? [pathname] : []));
 
   useEffect(() => {
-    if (!TAB_COMPONENTS[pathname]) return;
+    if (!TAB_COMPONENTS[pathname] || !PERSISTED_TAB_PATHS.has(pathname)) return;
     setVisitedTabs((current) => {
       if (current.has(pathname)) return current;
       return new Set([...current, pathname]);
     });
   }, [pathname]);
 
+  const activePath = TAB_COMPONENTS[pathname] ? pathname : "/";
+  const renderedTabs = Array.from(new Set([...visitedTabs, activePath]));
+
   return (
     <div className="relative min-h-full">
-      {Array.from(visitedTabs).map((tabPath) => {
+      {renderedTabs.map((tabPath) => {
         const Component = TAB_COMPONENTS[tabPath];
         if (!Component) return null;
         return (

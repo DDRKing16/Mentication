@@ -229,12 +229,12 @@ export default function RegulationProfile() {
         <div className="mt-10 rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
           <p className="font-heading text-lg font-medium tracking-tight text-foreground">Your data, your control</p>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Your session history stays on this device. Delete it and your intervention memory at any time.
+            Your session history stays on this device. You can erase it and restart the app's welcome and onboarding flow at any time.
           </p>
           <div className="mt-4 rounded-2xl border border-destructive/15 bg-white/60 p-4">
             <p className="text-sm font-medium text-foreground">{sessions.length} saved session{sessions.length === 1 ? "" : "s"}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {lastSessionDate ? `Last saved ${lastSessionDate}.` : "No saved sessions yet."} Export a copy before erasing everything.
+              {lastSessionDate ? `Last saved ${lastSessionDate}.` : "No saved sessions yet."} Export a copy before erasing everything and restarting from the beginning.
             </p>
             <Button variant="outline" onClick={() => downloadLocalAppData("mentation-backup")} className="mt-3 rounded-full">
               <Download className="mr-2 h-4 w-4" /> Export before erasing
@@ -243,13 +243,13 @@ export default function RegulationProfile() {
           {confirming ? (
             <div className="mt-4 flex flex-wrap gap-2">
               <Button variant="destructive" onClick={deleteAll} disabled={deleting || countdown > 0} className="rounded-full">
-                {deleting ? "Deleting…" : countdown > 0 ? `Erase in ${countdown}…` : "Erase my sessions and start fresh"}
+                {deleting ? "Deleting…" : countdown > 0 ? `Erase in ${countdown}…` : "Erase my data and restart onboarding"}
               </Button>
               <Button variant="ghost" onClick={() => setConfirming(false)} className="rounded-full">Cancel</Button>
             </div>
           ) : (
             <Button variant="outline" onClick={() => setConfirming(true)} className="mt-4 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10">
-              Review before erasing everything
+              Review before erasing and restarting
             </Button>
           )}
         </div>
