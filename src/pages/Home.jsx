@@ -40,11 +40,11 @@ export default function Home() {
   const loadSessions = useCallback(async () => {
     try {
       setLoadError("");
-      const sessions = await sessionStore.list("-created_date", 30);
-      if (sessions.length === 0 && !hasCompletedOnboarding()) {
+      if (!hasCompletedOnboarding()) {
         navigate(hasSeenWelcome() ? "/onboarding" : "/welcome", { replace: true });
         return;
       }
+      const sessions = await sessionStore.list("-created_date", 30);
       setLastWorked(pickLastWorked(sessions));
       setPersonalBest(buildPersonalBest(sessions));
       setRecommendation(buildRecommendation(sessions));

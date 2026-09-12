@@ -48,7 +48,7 @@ export default function RegulationProfile() {
     if (countdown > 0) return;
     setDeleting(true);
     try {
-      deleteAllLocalAppData();
+      await Promise.resolve(deleteAllLocalAppData());
     } catch {
       setError("We couldn’t erase your local data. Try again.");
       setDeleting(false);

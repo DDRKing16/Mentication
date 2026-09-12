@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import TabBar from "@/components/TabBar";
 const Home = lazy(() => import("@/pages/Home"));
 
-// Tab pages are lazy-loaded on first visit, then kept mounted after that so
-// users keep in-tab state without paying the eager upfront cost for every tab.
+// Only the core tabs stay mounted after first visit so users keep in-tab state
+// where it matters without retaining every heavier secondary screen forever.
 const InterventionLibrary = lazy(() => import("@/pages/InterventionLibrary"));
 const RegulationProfile = lazy(() => import("@/pages/RegulationProfile"));
 const MyPlan = lazy(() => import("@/pages/MyPlan"));
@@ -42,8 +42,8 @@ export default function AppShell() {
     });
   }, [pathname]);
 
-  const activePath = TAB_COMPONENTS[pathname] ? pathname : "/";
-  const renderedTabs = Array.from(new Set([...visitedTabs, activePath]));
+  const activePath = TAB_COMPONENTS[pathname] ? pathname : null;
+  const renderedTabs = Array.from(new Set(activePath ? [...visitedTabs, activePath] : [...visitedTabs]));
 
   return (
     <div className="relative min-h-full">
