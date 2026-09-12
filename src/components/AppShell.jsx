@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import TabBar from "@/components/TabBar";
 const Home = lazy(() => import("@/pages/Home"));
 
-// Each tab is mounted once and kept alive (hidden via display:none) so state
-// survives tab switches.
+// Tab pages are lazy-loaded and only the active tab route is rendered so hidden
+// tabs do not stay mounted in memory.
 const InterventionLibrary = lazy(() => import("@/pages/InterventionLibrary"));
 const RegulationProfile = lazy(() => import("@/pages/RegulationProfile"));
 const MyPlan = lazy(() => import("@/pages/MyPlan"));
@@ -29,7 +29,9 @@ export default function AppShell() {
           ? <RegulationProfile />
           : pathname === "/insights"
             ? <EffectivenessDashboard />
-            : <Settings />;
+            : pathname === "/settings"
+              ? <Settings />
+              : null;
 
   return (
     <div className="relative min-h-full">

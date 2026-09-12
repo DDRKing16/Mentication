@@ -158,7 +158,7 @@ export function getLocalDataInventory() {
       unit: group.unit,
       keys,
     };
-  }).filter((group) => group.count > 0 || group.id === "sessions");
+  });
 }
 
 export async function deleteLocalDataGroup(groupId) {
@@ -185,7 +185,7 @@ export function exportLocalAppData() {
 }
 
 export function downloadLocalAppData(filenamePrefix = "mentation-export") {
-  if (typeof document === "undefined" || typeof URL === "undefined") return false;
+  if (typeof document === "undefined" || typeof URL === "undefined" || typeof Blob === "undefined") return false;
   const payload = exportLocalAppData();
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);

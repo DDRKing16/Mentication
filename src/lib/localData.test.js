@@ -67,6 +67,8 @@ describe("device-local application data", () => {
     expect(inventory.find((item) => item.id === "onboarding")?.count).toBe(1);
     expect(inventory.find((item) => item.id === "adaptive")?.count).toBe(1);
     expect(inventory.find((item) => item.id === "flagship")?.count).toBe(1);
+    expect(inventory.find((item) => item.id === "accessibility")?.count).toBe(0);
+    expect(inventory.find((item) => item.id === "thoughtRecords")?.count).toBe(0);
 
     await deleteLocalDataGroup("adaptive");
     expect(window.localStorage.getItem("haven.dislikes")).toBeNull();
