@@ -4,12 +4,13 @@ const HANDOFF_KEY = "mentation.flagship.handoffs.v1";
 const PARKING_KEY = "mentation.tomorrowParking.pending";
 const NIGHT_FEEDBACK_KEY = "mentation.nightChannel.feedback.v1";
 const ACTIVE_TTL_MS = 24 * 60 * 60 * 1000;
+const storage = () => globalThis.localStorage || globalThis.window?.localStorage || null;
 
 const safeParse = (key, fallback) => {
-  try { return JSON.parse(localStorage.getItem(key) || "") || fallback; } catch { return fallback; }
+  try { return JSON.parse(storage()?.getItem(key) || "") || fallback; } catch { return fallback; }
 };
 const save = (key, value) => {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode / quota */ }
+  try { storage()?.setItem(key, JSON.stringify(value)); } catch { /* private mode / quota */ }
 };
 
 const ALLOWED_PREFERENCE_KEYS = new Set([
@@ -58,7 +59,7 @@ export function saveActiveFlagship(state) {
 export function getActiveFlagship() {
   const active = safeParse(ACTIVE_KEY, null);
   if (active?.expiresAt && active.expiresAt < Date.now()) {
-    try { localStorage.removeItem(ACTIVE_KEY); } catch { /* */ }
+    try { storage()?.removeItem(ACTIVE_KEY); } catch { /* */ }
     return null;
   }
   return active;
@@ -67,7 +68,7 @@ export function getActiveFlagship() {
 export function clearActiveFlagship(interventionId) {
   const active = getActiveFlagship();
   if (!interventionId || active?.interventionId === interventionId) {
-    try { localStorage.removeItem(ACTIVE_KEY); } catch { /* */ }
+    try { storage()?.removeItem(ACTIVE_KEY); } catch { /* */ }
   }
 }
 
@@ -95,7 +96,7 @@ export function getTomorrowParkingItem() {
 }
 
 export function clearTomorrowParkingItem() {
-  try { localStorage.removeItem(PARKING_KEY); } catch { /* private mode */ }
+  try { storage()?.removeItem(PARKING_KEY); } catch { /* private mode */ }
 }
 
 export function saveNightChannelFeedbackPrompt(details = {}) {
@@ -107,7 +108,7 @@ export function getNightChannelFeedbackPrompt() {
 }
 
 export function clearNightChannelFeedbackPrompt() {
-  try { localStorage.removeItem(NIGHT_FEEDBACK_KEY); } catch { /* private mode */ }
+  try { storage()?.removeItem(NIGHT_FEEDBACK_KEY); } catch { /* private mode */ }
 }
 
 export function getFlagshipPatternSummary(interventionId) {
@@ -126,8 +127,8 @@ export function deleteFlagshipMemory(scope = "all") {
   let cleared = 0;
   keys.forEach((key) => {
     try {
-      if (localStorage.getItem(key) != null) cleared += 1;
-      localStorage.removeItem(key);
+      if (storage()?.getItem(key) != null) cleared += 1;
+      storage()?.removeItem(key);
     } catch {
       /* private mode */
     }

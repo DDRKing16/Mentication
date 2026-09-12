@@ -61,17 +61,23 @@ describe("device-local application data", () => {
     window.localStorage.setItem("haven_onboarded", "1");
     window.localStorage.setItem("haven.dislikes", JSON.stringify({ byId: { sigh: 1 } }));
     window.localStorage.setItem("mentation.flagship.active.v1", JSON.stringify({ interventionId: "boxV2" }));
+    window.localStorage.setItem("mentation.flagship.preferences.v1", JSON.stringify({ version: 1, events: [] }));
 
     const inventory = getLocalDataInventory();
     expect(inventory.find((item) => item.id === "sessions")?.count).toBe(1);
     expect(inventory.find((item) => item.id === "onboarding")?.count).toBe(1);
     expect(inventory.find((item) => item.id === "adaptive")?.count).toBe(1);
-    expect(inventory.find((item) => item.id === "flagship")?.count).toBe(1);
+    expect(inventory.find((item) => item.id === "flagship")?.count).toBe(2);
     expect(inventory.find((item) => item.id === "accessibility")?.count).toBe(0);
     expect(inventory.find((item) => item.id === "thoughtRecords")?.count).toBe(0);
 
     await deleteLocalDataGroup("adaptive");
     expect(window.localStorage.getItem("haven.dislikes")).toBeNull();
     expect(window.localStorage.getItem("haven_onboarded")).toBe("1");
+
+    const removed = await deleteLocalDataGroup("flagship");
+    expect(removed).toEqual({ deleted: true, count: 2 });
+    expect(window.localStorage.getItem("mentation.flagship.active.v1")).toBeNull();
+    expect(window.localStorage.getItem("mentation.flagship.preferences.v1")).toBeNull();
   });
 });

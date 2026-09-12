@@ -55,7 +55,7 @@ export default function RegulationProfile() {
       return;
     }
     setDeleting(false);
-    navigate("/");
+    navigate("/welcome", { replace: true });
   };
 
   const loadSessions = async () => {

@@ -5,6 +5,7 @@ import { Sparkles, HeartHandshake, ShieldCheck, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { BrandLockup } from "@/components/Logo";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
+import { completeWelcome } from "@/lib/onboarding";
 
 const SLIDES = [
   {
@@ -32,6 +33,7 @@ export default function Welcome() {
   const last = i === SLIDES.length - 1;
 
   const finish = () => {
+    completeWelcome();
     navigate("/onboarding");
   };
 
