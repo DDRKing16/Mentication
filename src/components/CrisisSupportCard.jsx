@@ -5,6 +5,7 @@ import { LifeBuoy, ArrowRight } from "lucide-react";
 export default function CrisisSupportCard({
   title = "Need urgent support?",
   body = "If this feels bigger than a reset, reach a crisis line now.",
+  actionLabel = "Crisis support",
   compact = false,
   dark = false,
   className = "",
@@ -30,7 +31,7 @@ export default function CrisisSupportCard({
         onClick={() => navigate("/support")}
         className={`no-tap mt-4 inline-flex min-h-12 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95 ${button}`}
       >
-        Crisis support <ArrowRight className="h-4 w-4" />
+        {actionLabel} <ArrowRight className="h-4 w-4" />
       </button>
     </div>
   );

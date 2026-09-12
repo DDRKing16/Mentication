@@ -86,9 +86,7 @@ function listOwnedLocalStorageKeys(local = storage()) {
   if (!local) return [];
   const enumerated = typeof local.length === "number" && typeof local.key === "function"
     ? Array.from({ length: local.length }, (_, index) => local.key(index))
-    : local.values instanceof Map
-      ? Array.from(local.values.keys())
-      : [];
+    : Object.keys(local);
   const known = [...KNOWN_APP_KEYS, ...FLAGSHIP_KEYS].filter((key) => local.getItem?.(key) != null);
   return Array.from(new Set([...enumerated, ...known]))
     .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));

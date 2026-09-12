@@ -65,6 +65,7 @@ export default function Onboarding() {
             compact
             title="I need help right now"
             body="If a reset is not enough, reach crisis support immediately."
+            actionLabel="Get help now"
           />
         </div>
 

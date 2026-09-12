@@ -102,6 +102,7 @@ export default function Welcome() {
             compact
             title="In crisis right now?"
             body="Skip the onboarding and reach support immediately."
+            actionLabel="Get help now"
           />
         </div>
       </div>

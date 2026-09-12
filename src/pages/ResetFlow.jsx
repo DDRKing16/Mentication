@@ -1015,7 +1015,7 @@ export default function ResetFlow() {
       ? (isLift ? endIntensity - answers.intensity : answers.intensity - endIntensity)
       : null;
     const helpedOptions = pathwayByIds(usedIds.length ? usedIds : pathway.map((p) => p.id));
-    const lastIntervention = helpedOptions.at(-1) || pathway[0];
+    const lastIntervention = helpedOptions.at(-1) || activePathway?.[0] || pathway[0];
     const reflectionCopy = getInterventionReflection(lastIntervention);
     return (
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">

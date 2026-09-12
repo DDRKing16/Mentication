@@ -43,7 +43,9 @@ export default function AppShell() {
   }, [pathname]);
 
   const activePath = TAB_COMPONENTS[pathname] ? pathname : null;
-  const renderedTabs = Array.from(new Set(activePath ? [...visitedTabs, activePath] : [...visitedTabs]));
+  const renderedTabs = activePath && !PERSISTED_TAB_PATHS.has(activePath)
+    ? [...visitedTabs, activePath]
+    : [...visitedTabs];
 
   return (
     <div className="relative min-h-full">
