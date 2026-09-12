@@ -54,6 +54,14 @@ const REMAIN_CHIPS = [
   { id: "none", label: "Nothing — I’m good", direction: null, whereFelt: null },
 ];
 const REMAIN_MAP = Object.fromEntries(REMAIN_CHIPS.map((c) => [c.id, { direction: c.direction, whereFelt: c.whereFelt }]));
+const SESSION_OPENERS = {
+  calm: "We’ll lower the noise first, then follow whatever helps your system land.",
+  ground: "We’ll make the room and your body easier to trust before asking for more.",
+  reset: "We’ll loosen the mental spiral, then decide what deserves your next attention.",
+  focus: "We’ll reduce friction fast and build one clear lane forward.",
+  lift: "We’ll create a little more movement first, not demand a dramatic mood change.",
+  sleep: "We’ll make the night quieter, softer, and less effortful.",
+};
 
 const RouteSpinner = () => (
   <div className="flex min-h-full items-center justify-center px-6 py-12">
@@ -115,6 +123,7 @@ export default function ResetFlow() {
   const [remaining, setRemaining] = useState(null);
   const [showSwitch, setShowSwitch] = useState(false);
   const startTimeRef = useRef(Date.now());
+  const arrivalTimerRef = useRef(null);
 
   const [effectiveness, setEffectiveness] = useState({});
   const sessionHistoryRef = useRef([]);
@@ -173,6 +182,15 @@ export default function ResetFlow() {
     return entry?.prebuilt ? pathwayByIds(entry.pathway) : buildPathway(answers, effectiveness);
   }, [entry, answers, effectiveness]);
   const pathwayPreview = entry?.prebuilt ? pathway : pathway.slice(0, 1);
+  const leadIntervention = pathway[0] || null;
+  const leadExperience = useMemo(
+    () => (leadIntervention ? getInterventionAtmosphere(leadIntervention, answers.direction) : null),
+    [leadIntervention, answers.direction]
+  );
+  const pathwayNames = useMemo(
+    () => pathwayByIds(usedIds.length ? usedIds : pathway.map((item) => item.id)).map((item) => item.name),
+    [pathway, usedIds]
+  );
   const isThoughtOrFactEntry = entry?.prebuilt && pathway.length === 1 && pathway[0]?.id === "factCheck";
 
   const releaseThoughtVoice = () => {
@@ -187,6 +205,20 @@ export default function ResetFlow() {
   }, [tofVoiceState]);
 
   useEffect(() => () => releaseThoughtVoice(), []);
+  useEffect(() => {
+    if (phase !== "arrival") return undefined;
+    if (typeof window === "undefined") {
+      setPhase("guiding");
+      return undefined;
+    }
+    arrivalTimerRef.current = window.setTimeout(() => setPhase("guiding"), 1800);
+    return () => {
+      if (arrivalTimerRef.current) {
+        window.clearTimeout(arrivalTimerRef.current);
+        arrivalTimerRef.current = null;
+      }
+    };
+  }, [phase]);
 
   const startThoughtVoiceEntry = async () => {
     setTofVoiceSeconds(0);
@@ -357,7 +389,7 @@ export default function ResetFlow() {
     setUsedIds([first.id]);
     setPlanRemaining(Math.max(0, (answers.timeMin || 5) - segmentMinutes([first])));
     setLastValue(answers.intensity ?? 5);
-    advance({ phase: "guiding" });
+    setPhase("arrival");
   };
 
   const onSegmentComplete = () => {
@@ -621,6 +653,35 @@ export default function ResetFlow() {
               ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
               : "Starting with the best-fit practice. The next step will adapt after your check-in."}
           </p>
+          {leadIntervention && leadExperience && (
+            <div className="mt-6 rounded-[2rem] border border-white/60 bg-white/80 p-5 shadow-[0_24px_60px_rgba(15,23,42,0.10)] backdrop-blur-sm">
+              <div className="flex flex-wrap items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                <span className="rounded-full bg-primary/8 px-3 py-1 text-primary">Tailored for this moment</span>
+                {leadExperience.duration ? <span>{leadExperience.duration}</span> : null}
+                <span>Private on this device</span>
+              </div>
+              <h2 className="mt-4 font-heading text-2xl font-medium tracking-tight text-primary text-balance">
+                Start with {leadIntervention.name}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-foreground">
+                {SESSION_OPENERS[answers.direction] || "We’ll start with the most believable next shift."}
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Purpose</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">{leadExperience.purpose}</p>
+                </div>
+                <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Signature</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">{leadExperience.signature}</p>
+                </div>
+                <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">How to use it</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">{leadExperience.bestWhen}</p>
+                </div>
+              </div>
+            </div>
+          )}
           {historyWarning && (
             <div className="mt-5 rounded-2xl border border-border bg-card p-4">
               <p className="text-sm leading-relaxed text-muted-foreground">{historyWarning}</p>
@@ -666,6 +727,49 @@ export default function ResetFlow() {
             </Button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (phase === "arrival" && activePathway?.length) {
+    const current = activePathway[0];
+    const experience = getInterventionAtmosphere(current, answers.direction);
+    return (
+      <div className="flex min-h-full flex-col justify-center bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_36%),linear-gradient(to_bottom,var(--mcn-cream),white)] px-6 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 14, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto w-full max-w-lg rounded-[2rem] border border-white/70 bg-white/80 p-6 text-center shadow-[0_32px_80px_rgba(15,23,42,0.14)] backdrop-blur-md"
+        >
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-teal/30 to-indigo/20">
+            <Sparkles className="h-7 w-7 text-primary" strokeWidth={1.5} />
+          </div>
+          <p className="mt-4 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Settle in</p>
+          <h1 className="mt-3 font-heading text-3xl font-medium tracking-tight text-primary text-balance">
+            We’re starting with {current.name}
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-foreground">
+            {SESSION_OPENERS[answers.direction] || "We’ll start with the strongest next fit for this moment."}
+          </p>
+          <div className="mt-5 grid gap-3 text-left sm:grid-cols-3">
+            <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Purpose</p>
+              <p className="mt-2 text-sm font-medium text-foreground">{experience.purpose}</p>
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Feel for</p>
+              <p className="mt-2 text-sm font-medium text-foreground">{experience.signature}</p>
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Container</p>
+              <p className="mt-2 text-sm font-medium text-foreground">{experience.duration || `~${answers.timeMin} min`}</p>
+            </div>
+          </div>
+          <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+            {current.why}
+          </p>
+        </motion.div>
       </div>
     );
   }
@@ -1108,6 +1212,28 @@ export default function ResetFlow() {
             {reflectionCopy.done} Come back any time you need to.
           </p>
         </div>
+        {pathwayNames.length > 0 && (
+          <div className="w-full max-w-md rounded-[2rem] border border-white/70 bg-white/80 p-5 shadow-[0_20px_50px_rgba(15,23,42,0.10)] backdrop-blur-sm">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Today’s reset</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {pathwayNames.map((name) => (
+                <span key={name} className="rounded-full bg-primary/8 px-3 py-1.5 text-sm font-medium text-primary">
+                  {name}
+                </span>
+              ))}
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-left">
+              <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Started</p>
+                <p className="mt-2 text-lg font-medium text-foreground">{answers.intensity ?? "—"}</p>
+              </div>
+              <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Ended</p>
+                <p className="mt-2 text-lg font-medium text-foreground">{endIntensity ?? "—"}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {weekCount > 0 && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground/80">
