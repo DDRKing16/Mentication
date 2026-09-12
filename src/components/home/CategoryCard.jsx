@@ -1,22 +1,16 @@
+// @ts-check
 import React from "react";
 import { motion } from "framer-motion";
 import CategoryIcon from "@/components/home/CategoryIcons";
 
-// Six subtle, coordinated cream surfaces for the 2×3 grid. Each icon is a thin
-// dark-teal line-art illustration centered in a gold ring, matching the V3
-// reference exactly. Alternating cream / peach backgrounds with a thin muted
-// border and a soft top-left highlight + bottom-right taupe drop shadow for
-// the gentle pressed/lifted depth effect.
 const TINTS = {
-  calm: "bg-white",
-  lift: "bg-[#F7F0E5]",
-  ground: "bg-[#F7F0E5]",
-  sleep: "bg-white",
-  focus: "bg-white",
-  guide: "bg-[#F7F0E5]",
+  calm: "bg-[var(--home-card)]",
+  lift: "bg-[var(--home-card-alt)]",
+  ground: "bg-[var(--home-card-alt)]",
+  sleep: "bg-[var(--home-card)]",
+  focus: "bg-[var(--home-card)]",
+  guide: "bg-[var(--home-card-alt)]",
 };
-const DEPTH =
-  "border border-[#D9D0C7] shadow-[inset_1px_1px_0_rgba(255,255,255,0.65),4px_5px_14px_-4px_rgba(209,198,189,0.75)]";
 
 export default function CategoryCard({ card, index = 0, onClick }) {
   return (
@@ -28,17 +22,17 @@ export default function CategoryCard({ card, index = 0, onClick }) {
       onClick={onClick}
       data-sfx="select"
       className={
-        "no-tap flex flex-col items-center gap-2 rounded-[1.4rem] px-4 py-4 text-center " +
-        DEPTH +
+        "no-tap flex min-h-[11.25rem] flex-col items-center justify-center gap-2.5 rounded-[1.6rem] px-4 py-5 text-center " +
+        "home-category-card " +
         " transition-all duration-500 hover:-translate-y-0.5 active:scale-[0.98] " +
         TINTS[card.tint]
       }
     >
-      <span className="flex h-[72px] w-[72px] items-center justify-center rounded-full ring-1 ring-[#C99646]">
+      <span className="flex h-[76px] w-[76px] items-center justify-center rounded-full text-[var(--home-icon)] ring-1 ring-[var(--home-accent)]">
         <CategoryIcon id={card.tint} className="h-11 w-11" />
       </span>
-      <span className="mt-1 font-heading text-[1.15rem] font-bold leading-tight text-[#0E4536]">{card.label}</span>
-      <span className="text-[0.9rem] leading-snug text-[#0E4536]/75">{card.sub}</span>
+      <span className="mt-1 font-heading text-[1.2rem] font-semibold leading-tight text-[var(--home-ink)]">{card.label}</span>
+      <span className="text-[0.9rem] leading-snug text-[var(--home-muted)]">{card.sub}</span>
     </motion.button>
   );
 }

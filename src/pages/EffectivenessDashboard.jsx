@@ -1,3 +1,4 @@
+// @ts-check
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, MapPin, Loader } from "lucide-react";
@@ -45,6 +46,7 @@ export default function EffectivenessDashboard() {
           </h1>
           <p className="text-sm text-muted-foreground">
             Based on {insights.totalSessions} sessions • {insights.thisWeek} this week
+            {insights.currentStreak > 0 && ` • ${insights.currentStreak}-day streak`}
           </p>
         </motion.div>
 

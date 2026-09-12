@@ -7,7 +7,7 @@ import {
   scoreInterventionV3,
   V3_WEIGHTS,
 } from '@/lib/recommendationV3';
-import { computeEffectivenessInsights } from '@/lib/insights';
+import { computeEffectivenessInsights, computeLocalCalendarStreak } from '@/lib/insights';
 import { FLAGSHIP_IDS, FLAGSHIP_REGISTRY } from '@/lib/flagshipRegistry';
 import { handoffRules, recommendHandoff } from '@/lib/flagshipHandoffs';
 
@@ -484,6 +484,7 @@ describe('recommendation engine v2 basics', () => {
     expect(Array.isArray(insights.contextPatterns)).toBe(true);
     expect(typeof insights.totalSessions).toBe('number');
     expect(typeof insights.thisWeek).toBe('number');
+    expect(typeof insights.currentStreak).toBe('number');
 
     // Verify top interventions have required fields
     insights.topInterventions.forEach((iv) => {
@@ -510,6 +511,35 @@ describe('recommendation engine v2 basics', () => {
     expect(insights.totalSessions).toBe(3);
     // All sessions are within the past 7 days
     expect(insights.thisWeek).toBe(3);
+  });
+
+  it('counts streaks by local calendar day across DST changes', () => {
+    const springForward = [
+      { created_date: '2026-03-08T06:30:00.000Z' },
+      { created_date: '2026-03-09T04:30:00.000Z' },
+      { created_date: '2026-03-10T04:30:00.000Z' },
+    ];
+    expect(computeLocalCalendarStreak(springForward, {
+      now: new Date('2026-03-10T16:00:00.000Z'),
+      timeZone: 'America/New_York',
+    })).toBe(3);
+
+    const fallBack = [
+      { created_date: '2026-11-01T05:30:00.000Z' },
+      { created_date: '2026-11-01T06:30:00.000Z' },
+      { created_date: '2026-11-02T05:30:00.000Z' },
+    ];
+    expect(computeLocalCalendarStreak(fallBack, {
+      now: new Date('2026-11-02T17:00:00.000Z'),
+      timeZone: 'America/New_York',
+    })).toBe(2);
+  });
+
+  it('returns zero when the latest local calendar day is stale', () => {
+    expect(computeLocalCalendarStreak(
+      [{ created_date: '2026-03-07T15:00:00.000Z' }],
+      { now: new Date('2026-03-10T15:00:00.000Z'), timeZone: 'America/New_York' },
+    )).toBe(0);
   });
 
   it('uses different intervention families in different situations and avoids context blind repetition', () => {

@@ -1,3 +1,4 @@
+// @ts-check
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -58,7 +59,9 @@ export default function ResetFlow() {
   const entry = location.state;
   const { allowed, isPremium, loading: quotaLoading } = useFreeQuota();
 
-  const initialPhase = entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions"));
+  const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
+  const startsUrgeSurfing = directEntryPathway.length === 1 && directEntryPathway[0]?.id === "urgeSurf";
+  const initialPhase = startsUrgeSurfing ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [qIndex, setQIndex] = useState(0);
   const [building, setBuilding] = useState(!!entry?.immediate);
@@ -84,6 +87,7 @@ export default function ResetFlow() {
     noBreathing: false,
     noAudio: false,
     bedtime: !!entry?.bedtime,
+    subtype: entry?.subtype ?? null,
   });
 
   const [endIntensity, setEndIntensity] = useState(null);
@@ -98,8 +102,8 @@ export default function ResetFlow() {
   const [unsureBranch, setUnsureBranch] = useState(null);
   const [saving, setSaving] = useState(false);
   // coaching loop state
-  const [activePathway, setActivePathway] = useState(null);
-  const [usedIds, setUsedIds] = useState([]);
+  const [activePathway, setActivePathway] = useState(startsUrgeSurfing ? directEntryPathway : null);
+  const [usedIds, setUsedIds] = useState(startsUrgeSurfing ? directEntryPathway.map((item) => item.id) : []);
   const [planRemaining, setPlanRemaining] = useState(0);
   const [lastValue, setLastValue] = useState(answers.intensity ?? 5);
   const [checkinValue, setCheckinValue] = useState(null);
@@ -160,7 +164,6 @@ export default function ResetFlow() {
   const pathway = useMemo(() => {
     return entry?.prebuilt ? pathwayByIds(entry.pathway) : buildPathway(answers, effectiveness);
   }, [entry, answers, effectiveness]);
-  const pathwayPreview = entry?.prebuilt ? pathway : pathway.slice(0, 1);
   const isThoughtOrFactEntry = entry?.prebuilt && pathway.length === 1 && pathway[0]?.id === "factCheck";
 
   const releaseThoughtVoice = () => {
@@ -560,7 +563,7 @@ export default function ResetFlow() {
             </div>
             <section className="tof-voice__panel" aria-live="polite">
               <div className="tof-voice__pulse"><Mic aria-hidden="true" /></div>
-              <div className="tof-voice__wave" aria-hidden="true">{Array.from({ length: 17 }, (_, index) => <span key={index} style={{ "--wave-delay": index * -0.08 + "s" }} />)}</div>
+              <div className="tof-voice__wave" aria-hidden="true">{Array.from({ length: 17 }, (_, index) => <span key={index} style={{ animationDelay: index * -0.08 + "s" }} />)}</div>
               <time dateTime={"PT" + tofVoiceSeconds + "S"}>{elapsed}</time>
               {isListening ? <button type="button" onClick={stopThoughtVoiceEntry} className="tof-voice__stop"><span aria-hidden="true" />Stop recording</button> : <p className="tof-voice__status">{tofVoiceState === "unavailable" ? "Microphone permission was not granted." : "No recording has been kept."}</p>}
             </section>
@@ -595,45 +598,40 @@ export default function ResetFlow() {
 
     return (
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
-        <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
+        <div className="mx-auto flex min-h-[100dvh] max-w-xl flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8">
           <div className="flex justify-end">
             <FlowHomeButton />
           </div>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">Your reset</p>
-          <h1 className="mt-3 font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
+          <h1 className="mt-3 font-heading text-[1.8rem] font-semibold leading-tight tracking-[-0.025em] text-primary text-balance sm:text-4xl">
             Your {answers.timeMin}-minute reset
           </h1>
-          <p className="mt-3 text-lg text-muted-foreground text-balance">
+          <p className="mt-2 max-w-lg text-[0.98rem] leading-relaxed text-muted-foreground text-balance">
             {entry?.prebuilt
               ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
               : "Starting with the best-fit practice. The next step will adapt after your check-in."}
           </p>
 
-          <div className="mt-10 flex flex-col gap-3">
-            {pathwayPreview.map((iv, i) => (
-              <motion.div
-                key={iv.id}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.08, duration: 0.4 }}
-                className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 soft-depth"
-              >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
-                  {i + 1}
-                </span>
-                <div>
-                  <p className="font-heading text-lg font-medium tracking-tight text-foreground">{iv.name}</p>
-                  <p className="text-sm leading-snug text-muted-foreground">{iv.why}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mt-6 rounded-[1.5rem] border border-border bg-card p-5 soft-depth"
+          >
+            <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <span>First activity</span>
+              <span>{answers.timeMin} min</span>
+            </div>
+            <h2 className="mt-3 font-heading text-[1.35rem] font-semibold tracking-[-0.02em] text-foreground">
+              {pathway[0]?.name}
+            </h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{pathway[0]?.why}</p>
+          </motion.section>
 
           {!entry?.prebuilt && (
             <PreferencesRow answers={answers} setAnswers={setAnswers} />
           )}
 
-          <div className="mt-10 flex justify-center">
+          <div className="mt-auto flex justify-center pt-6">
             <Button
               size="lg"
               onClick={beginGuided}
