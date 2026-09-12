@@ -7,7 +7,7 @@ export const INTERACTIVE_FLAGSHIP_IDS = Object.freeze([
 ]);
 
 export const ENHANCED_GUIDED_IDS = Object.freeze([
-  "orienting", "solvableWorry", "nameFeeling", "frictionSweep", "sigh", "move90", "sensoryWake",
+  "orienting", "solvableWorry", "nameFeeling", "frictionSweep", "sigh", "compassionBreak", "awakeInBedReset", "dropSleepStruggle",
 ]);
 
 export const NEW_FLAGSHIP_IDS = Object.freeze([

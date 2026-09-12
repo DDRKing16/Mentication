@@ -69,30 +69,30 @@ function sighRouteFor(where, style) {
   return `${shape} On each round, ${anchor}.`;
 }
 
-function move90RouteFor(position, style) {
-  const start = {
-    seated: "Stay seated and",
-    standing: "From standing,",
-    lying: "From where you are lying,",
-    already: "Without overthinking it,",
-  }[position] || "From where you are,";
-  const action = {
-    loosen: "roll the shoulders, open the chest and add easy arm movement for ninety seconds.",
-    march: "march in place, shift weight or pace the room with a steady rhythm for ninety seconds.",
-    cross: "use cross-body reaches or taps to wake up both sides of the body for ninety seconds.",
-    shake: "shake out the hands, arms and upper body until the flatness breaks slightly.",
-  }[style] || "add light movement for ninety seconds.";
-  return `${start} ${action}`;
+function compassionPhraseFor(flavour) {
+  return {
+    shame: "This is a painful moment. Shame is here, and I do not need to become it. I can meet myself with steadiness right now.",
+    pressure: "This is hard right now. Struggle is part of being human. I can take the next minute kindly instead of harshly.",
+    lonely: "This hurts, and I am not the only person who has felt this way. May I respond to myself like someone worth caring for.",
+    exhausted: "I am depleted, not broken. This moment asks for warmth and a smaller next step, not a harder attack on myself.",
+  }[flavour] || "This is a painful moment. I can respond with steadiness instead of self-attack.";
 }
 
-function sensoryWakeRouteFor(input) {
+function awakeInBedRouteFor(state) {
   return {
-    cold: "Use a bright temperature cue: cool water on hands or face, a cold glass, or a cooler doorway for thirty to sixty seconds.",
-    light: "Move toward brighter light, lift the gaze and let your eyes take in a little more contrast and distance.",
-    sound: "Play one clear, energising sound or song and let the body respond to it for one minute.",
-    scent: "Use the strongest clean scent available and pair it with one deliberate fuller inhale.",
-    texture: "Wake up the hands with a textured object, quick rubbing, or firmer pressure against fabric or a wall.",
-  }[input] || "Use one bright sensory cue that feels safe and noticeably different from the flat state.";
+    wired: "Get out of bed briefly, keep the light low, and sit somewhere quiet until the urgency to force sleep drops.",
+    frustrated: "Leave the bed for a short calm reset so the bed stops becoming a place for struggle and checking.",
+    alert: "Step out of bed and do one low-light quiet activity until sleepiness returns on its own.",
+  }[state] || "Leave the bed briefly, keep the light low, and return only when the body feels sleepier.";
+}
+
+function dropSleepStruggleRouteFor(mode) {
+  return {
+    clock: "Turn the clock away, unclench the jaw, and let the job become rest rather than measuring sleep.",
+    effort: "Stop trying to force sleep. Let yourself lie down and practise being a resting body instead of a performing sleeper.",
+    frustration: "Notice the fight with wakefulness, soften one muscle group, and say quietly: rest still counts.",
+    scanning: "Release the constant checking. Let attention rest on one neutral anchor instead of monitoring whether sleep is happening.",
+  }[mode] || "Let the effort to force sleep drop, and treat this as rest instead of a test.";
 }
 
 function feelingSupportFor(feeling) {
@@ -261,20 +261,24 @@ function screensFor(id, data) {
     { kind: "action", prompt: "Take three slower off-ramps.", body: "Comfort matters more than size. Stop if breathing work makes you feel worse.", defaultValue: sighRouteFor(data.tensionArea, data.sighStyle) },
     { kind: "completion", prompt: "The body got a clearer safety cue.", body: "Even a small drop in pressure counts. The win is a little more room, not perfect calm." },
   ];
-  if (id === "move90") return [
-    intro("Wake the body before the mood.", "Movement can shift chemistry faster than waiting for motivation. Keep it simple and work with the body you have right now."),
-    { prompt: "Where are you starting from?", options: [choice("seated", "Seated"), choice("standing", "Standing"), choice("lying", "Lying down"), choice("already", "Already moving a little")] },
-    { prompt: "What movement style feels most believable?", options: [choice("loosen", "Loosen and open"), choice("march", "March or pace"), choice("cross", "Cross-body rhythm"), choice("shake", "Shake it out")] },
-    { kind: "action", prompt: "Give it ninety seconds.", body: "The goal is a clean state shift, not a workout.", defaultValue: move90RouteFor(data.startPosition, data.moveStyle) },
-    away("Carry the movement through.", "The app can stay behind you. Return after the ninety seconds to decide what the energy can serve."),
-    returning("Did the movement create any more availability?", "More energy, more willingness, or even a little less heaviness all count."),
+  if (id === "compassionBreak") return [
+    intro("Drop the inner attack first.", "Self-compassion is not letting yourself off the hook. It is reducing the extra damage caused by self-criticism so a helpful next move becomes possible."),
+    { prompt: "What is loudest in the tone toward yourself?", options: [choice("shame", "Shame"), choice("pressure", "Pressure"), choice("lonely", "Loneliness"), choice("exhausted", "Exhaustion")] },
+    { kind: "action", prompt: "Use three steadier phrases.", body: "Say them silently or out loud, slowly enough for the body to register them.", defaultValue: compassionPhraseFor(data.selfTone) },
+    { kind: "completion", prompt: "You changed the tone of the moment.", body: "The goal is not instant relief. It is less inner hostility and a little more room to continue." },
   ];
-  if (id === "sensoryWake") return [
-    intro("Brighten the input, not the pressure.", "When you feel foggy or flat, a sharper sensory cue can create enough contrast to wake the system back up."),
-    { prompt: "Which sense feels easiest to wake up safely?", options: [choice("cold", "Temperature"), choice("light", "Light"), choice("sound", "Sound"), choice("scent", "Scent"), choice("texture", "Touch or texture")] },
-    { kind: "action", prompt: "Use one clean sensory jolt.", body: "Keep it brief, safe and noticeable - not overwhelming.", defaultValue: sensoryWakeRouteFor(data.sensoryInput) },
-    { prompt: "What should that extra brightness serve?", options: [choice("move", "Getting moving"), choice("task", "Starting a task"), choice("care", "Basic self-care"), choice("outside", "Changing rooms or going outside")] },
-    { kind: "completion", prompt: "The flatness has been interrupted.", body: "Use the opened window quickly. The next small move matters more than analysing the feeling." },
+  if (id === "awakeInBedReset") return [
+    intro("Take the struggle out of the bed.", "This is classic stimulus control. If you stay in bed while highly awake and frustrated, the bed can start cueing wakefulness instead of sleep."),
+    { prompt: "What is the wakefulness like right now?", options: [choice("wired", "Wired"), choice("frustrated", "Frustrated"), choice("alert", "Calm but awake")] },
+    { kind: "action", prompt: "Reset the bed-sleep link.", body: "Keep lights low, skip stimulating tasks, and return only when sleepiness rises again.", defaultValue: awakeInBedRouteFor(data.wakeState) },
+    away("Step out of bed briefly.", "Keep the environment quiet and low-light. The point is to stop rehearsing wakefulness in bed."),
+    returning("Did leaving the bed reduce the struggle?", "Even a calmer relationship to wakefulness counts as progress here."),
+  ];
+  if (id === "dropSleepStruggle") return [
+    intro("Stop performing sleep.", "Trying harder to sleep often creates the arousal that keeps sleep away. We are removing the performance pressure first."),
+    { prompt: "What effort is most active?", options: [choice("clock", "Clock-watching"), choice("effort", "Trying hard to sleep"), choice("frustration", "Fighting the frustration"), choice("scanning", "Checking whether sleep is coming")] },
+    { kind: "action", prompt: "Drop the effort, keep the rest.", body: "You are allowed to rest without forcing an outcome.", defaultValue: dropSleepStruggleRouteFor(data.sleepEffort) },
+    { kind: "completion", prompt: "The night is quieter when it stops being a test.", body: "Sleep may come next or later. The premium move is reducing the struggle that keeps the system lit up." },
   ];
   if (id === "nameFeeling") return [
     intro("Give the feeling edges.", "This is not about analysing yourself perfectly. It is about turning a blur into something your mind and body can work with."),
@@ -348,8 +352,9 @@ function SignatureVisual({ id, step, reducedMotion }) {
   if (id === "openChannel") return <div className="signature channel"><div className="channel-point left"/><div className="channel-bridge">{[0,1,2,3].map(i=><span key={i}/>)}</div><div className="channel-point right"/></div>;
   if (id === "pulseShift") return <div className="signature pulse">{[0,1,2,3].map(i=><motion.span key={i} style={{animationDelay:`${i*.35}s`}} {...motionProps}/>)}</div>;
   if (id === "sigh") return <div className="signature pulse">{[0,1,2].map(i=><motion.span key={i} style={{animationDelay:`${i*.45}s`}} {...motionProps}/>)}</div>;
-  if (id === "move90") return <div className="signature gravity"><div className="gravity-mass"/><motion.div className="trajectory t1" {...motionProps}/><div className="trajectory t2"/><div className="moving-point"/></div>;
-  if (id === "sensoryWake") return <div className="signature ignition"><motion.span {...motionProps}/>{[0,1,2,3,4].map(i=><i key={i} style={{transform:`rotate(${i*72}deg) translateY(-54px)`}}/>)}</div>;
+  if (id === "compassionBreak") return <div className="signature sorting"><span>PAIN</span><span>HUMAN</span><span>KINDNESS</span></div>;
+  if (id === "awakeInBedReset") return <div className="signature doorway"><motion.div {...motionProps}/></div>;
+  if (id === "dropSleepStruggle") return <div className="signature parking"><div className="night-orbit"/><motion.div className="parked-note" {...motionProps}/></div>;
   if (id === "thenWhat") return <div className="signature timeline">{[0,1,2,3,4].map((i)=><span key={i} className={i <= Math.min(4, step) ? "active" : ""}/>)}</div>;
   if (id === "testPrediction") return <div className="signature experiment"><div>PREDICTION</div><span/><div>OBSERVATION</div></div>;
   if (id === "factCheck") return <div className="signature sorting"><span>FACT</span><span>MEANING</span><span>NEXT</span></div>;
@@ -428,8 +433,8 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
       factCheck: ["", "thought", "classification", "balanced", "completion"], thenWhat: ["", "eligibility", "frame", "meaning", "coping", "presentAction", "completion"],
       countermove: ["", "pull", "pullCheck", "trajectory", "action", "away", "status"], openChannel: ["", "closure", "barrier", "connectionSafety", "bridge", "message", "away", "status"],
       pulseShift: ["", "state", "position", "capacity", "movement", "destination", "away", "status"], tomorrowParking: ["urgency", "parkingItem", "complete"],
-      sigh: ["", "tensionArea", "sighStyle", "action", "completion"], move90: ["", "startPosition", "moveStyle", "action", "away", "status"],
-      sensoryWake: ["", "sensoryInput", "action", "destination", "completion"],
+      sigh: ["", "tensionArea", "sighStyle", "action", "completion"], compassionBreak: ["", "selfTone", "action", "completion"],
+      awakeInBedReset: ["", "wakeState", "action", "away", "status"], dropSleepStruggle: ["", "sleepEffort", "action", "completion"],
       nameFeeling: ["", "feeling", "intensityBand", "trigger", "completion"], whatNeed: ["", "need", "action", "away", "status"],
       dontSendIt: ["", "channel", "protection", "away", "status"], checkBasics: ["", "need", "action", "away", "status"],
       orienting: ["", "anchor", "scope", "action", "completion"],
@@ -522,8 +527,9 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
     tomorrowParking: "#b9c7ff",
     countermove: "#ffcc78",
     sigh: "#a7d8ff",
-    move90: "#ffd28a",
-    sensoryWake: "#ffe2a8",
+    compassionBreak: "#ffd7d2",
+    awakeInBedReset: "#b8d7ff",
+    dropSleepStruggle: "#c4cafc",
     nameFeeling: "#f4b0d8",
     whatNeed: "#c8b8ff",
     dontSendIt: "#ffb38c",
