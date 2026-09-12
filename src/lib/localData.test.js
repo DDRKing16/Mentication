@@ -8,6 +8,8 @@ import {
   sessionStore,
 } from "./localData.js";
 import { completeOnboarding, completeWelcome, hasCompletedOnboarding, hasSeenWelcome } from "./onboarding.js";
+import { deleteFlagshipMemory } from "./flagshipMemory.js";
+import { resetOnboarding } from "./onboarding.js";
 
 class MemoryStorage {
   constructor() { this.values = new Map(); }
@@ -27,6 +29,8 @@ describe("device-local application data", () => {
       dispatchEvent: () => {},
     };
     globalThis.localStorage = localStorage;
+    resetOnboarding();
+    deleteFlagshipMemory("all");
   });
 
   afterEach(() => {
@@ -45,19 +49,21 @@ describe("device-local application data", () => {
 
   it("exports and erases only application-owned local data", async () => {
     await sessionStore.create({ id: "one", direction: "sleep" });
-    window.localStorage.setItem("mentation.preference", "quiet");
+    window.localStorage.setItem("haven.dislikes", JSON.stringify({ byId: { sigh: 1 } }));
     completeOnboarding();
     window.localStorage.setItem("unrelated.product", "keep");
     const exported = exportLocalAppData();
     expect(exported.schemaVersion).toBe(2);
     expect(exported.sessions).toHaveLength(1);
-    expect(exported.localStorage["mentation.preference"]).toBe("quiet");
+    expect(exported.localStorage["haven.dislikes"]).toBe(JSON.stringify({ byId: { sigh: 1 } }));
     expect(exported.localStorage.haven_onboarded).toBe("1");
+    expect(exported.localStorage["unrelated.product"]).toBeUndefined();
+    expect(exported.localStorage["mentation.preference"]).toBeUndefined();
 
     await deleteAllLocalAppData();
 
     expect(await sessionStore.list()).toEqual([]);
-    expect(window.localStorage.getItem("mentation.preference")).toBeNull();
+    expect(window.localStorage.getItem("haven.dislikes")).toBeNull();
     expect(hasSeenWelcome()).toBe(false);
     expect(hasCompletedOnboarding()).toBe(false);
     expect(window.localStorage.getItem("unrelated.product")).toBe("keep");
