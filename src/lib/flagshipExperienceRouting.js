@@ -10,6 +10,10 @@ export const ENHANCED_GUIDED_IDS = Object.freeze([
   "orienting", "solvableWorry", "nameFeeling", "frictionSweep",
 ]);
 
+export const NEW_FLAGSHIP_IDS = Object.freeze([
+  "reroute", "signalLock", "nightChannel",
+]);
+
 export const INTERACTIVE_EXPERIENCE_IDS = Object.freeze([
   ...INTERACTIVE_FLAGSHIP_IDS,
   ...ENHANCED_GUIDED_IDS,
@@ -17,3 +21,4 @@ export const INTERACTIVE_EXPERIENCE_IDS = Object.freeze([
 
 export const isInteractiveFlagship = (id) => INTERACTIVE_FLAGSHIP_IDS.includes(id);
 export const isInteractiveExperience = (id) => INTERACTIVE_EXPERIENCE_IDS.includes(id);
+export const isNewFlagship = (id) => NEW_FLAGSHIP_IDS.includes(id);

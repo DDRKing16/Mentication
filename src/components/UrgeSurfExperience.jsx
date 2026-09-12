@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { createUrgeSession, reduceUrgeSession, URGE_SURF_DEFAULTS } from "@/lib/urgeSurfSession";
 import { buildUrgeSurfLearningRecord } from "@/lib/urgeSurfState";
+import "@/styles/urge-surfing.css";
 
 const ASSET_ROOT = "/media/interventions/urge-surfing/assets";
 const CATEGORIES = [["send", "Send it", "ICONS__icon-send.png"], ["check", "Check", "ICONS__icon-check.png"], ["use", "Use", "ICONS__icon-use.png"], ["snap", "Snap", "ICONS__icon-snap.png"], ["avoid", "Avoid", "ICONS__icon-avoid.png"]];

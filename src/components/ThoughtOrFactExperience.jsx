@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import "@/styles/thought-or-fact.css";
 import {
   ArrowRight,
   Brain,

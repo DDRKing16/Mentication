@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { lazy, Suspense, useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Sparkles, Check, ArrowRight, ArrowLeft, RotateCcw, X, Mic, Scale, LockKeyhole } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
 import ChoiceButtons from "@/components/ChoiceButtons";
-import ResetPlayer from "@/components/ResetPlayer";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
-import FlagshipExperience, { isInteractiveExperience } from "@/components/FlagshipExperience";
-import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
-import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
-import UrgeSurfExperience from "@/components/UrgeSurfExperience";
 import { warmNarration } from "@/lib/preloadBoxV2";
 import {
   buildPathway,
@@ -36,8 +31,13 @@ import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
 import { getInterventionReflection } from "@/lib/interventionExperience";
-import "@/styles/thought-or-fact.css";
-import "@/styles/urge-surfing.css";
+import { isInteractiveExperience, isNewFlagship } from "@/lib/flagshipExperienceRouting";
+
+const ResetPlayer = lazy(() => import("@/components/ResetPlayer"));
+const FlagshipExperience = lazy(() => import("@/components/FlagshipExperience"));
+const NewFlagshipExperience = lazy(() => import("@/components/NewFlagshipExperiences"));
+const ThoughtOrFactExperience = lazy(() => import("@/components/ThoughtOrFactExperience"));
+const UrgeSurfExperience = lazy(() => import("@/components/UrgeSurfExperience"));
 
 const WHERE_FELT_DEFAULT = { calm: "body", lift: "both", reset: "thoughts", ground: "both", focus: "thoughts", sleep: "body" };
 
@@ -54,6 +54,12 @@ const REMAIN_CHIPS = [
   { id: "none", label: "Nothing — I’m good", direction: null, whereFelt: null },
 ];
 const REMAIN_MAP = Object.fromEntries(REMAIN_CHIPS.map((c) => [c.id, { direction: c.direction, whereFelt: c.whereFelt }]));
+
+const RouteSpinner = () => (
+  <div className="flex min-h-full items-center justify-center px-6 py-12">
+    <div className="h-10 w-10 rounded-full border-4 border-secondary border-t-primary animate-spin" />
+  </div>
+);
 
 export default function ResetFlow() {
   const navigate = useNavigate();
@@ -677,45 +683,49 @@ export default function ResetFlow() {
           ? NewFlagshipExperience
           : FlagshipExperience;
       return (
-        <Experience
-          intervention={activePathway[0]}
-          initialThought={interventionId === "factCheck" ? tofEntryThought : undefined}
-          initialCertainty={interventionId === "factCheck" ? answers.intensity : undefined}
-          answers={{ ...answers, intensity: lastValue }}
-          onAttemptEvent={handleAttemptEvent}
-          onComplete={(result) => {
-            const hasPostValue = result?.postValue != null;
-            if (result?.skipReflection) {
-              const postValue = hasPostValue ? result.postValue : null;
-              commitPendingPulse(postValue, { useFallback: hasPostValue });
+        <Suspense fallback={<RouteSpinner />}>
+          <Experience
+            intervention={activePathway[0]}
+            initialThought={interventionId === "factCheck" ? tofEntryThought : undefined}
+            initialCertainty={interventionId === "factCheck" ? answers.intensity : undefined}
+            answers={{ ...answers, intensity: lastValue }}
+            onAttemptEvent={handleAttemptEvent}
+            onComplete={(result) => {
+              const hasPostValue = result?.postValue != null;
+              if (result?.skipReflection) {
+                const postValue = hasPostValue ? result.postValue : null;
+                commitPendingPulse(postValue, { useFallback: hasPostValue });
+                setEndIntensity(postValue);
+                completeSession({
+                  direct: true,
+                  silent: true,
+                  endIntensityOverride: postValue,
+                  interventionOutcome: result.outcome,
+                  redirectTo: result.redirectTo,
+                });
+                return;
+              }
+              const postValue = hasPostValue ? result.postValue : lastValue;
+              commitPendingPulse(postValue, { useFallback: !hasPostValue });
               setEndIntensity(postValue);
-              completeSession({
-                direct: true,
-                silent: true,
-                endIntensityOverride: postValue,
-                interventionOutcome: result.outcome,
-                redirectTo: result.redirectTo,
-              });
-              return;
-            }
-            const postValue = hasPostValue ? result.postValue : lastValue;
-            commitPendingPulse(postValue, { useFallback: !hasPostValue });
-            setEndIntensity(postValue);
-            advance({ phase: "reflect" });
-          }}
-          onExit={() => navigate("/")}
-        />
+              advance({ phase: "reflect" });
+            }}
+            onExit={() => navigate("/")}
+          />
+        </Suspense>
       );
     }
     return (
-      <ResetPlayer
-        pathway={activePathway}
-        answers={{ ...answers, intensity: lastValue }}
-        effectiveness={effectiveness}
-        onAttemptEvent={handleAttemptEvent}
-        onComplete={onSegmentComplete}
-        onExit={() => navigate("/")}
-      />
+      <Suspense fallback={<RouteSpinner />}>
+        <ResetPlayer
+          pathway={activePathway}
+          answers={{ ...answers, intensity: lastValue }}
+          effectiveness={effectiveness}
+          onAttemptEvent={handleAttemptEvent}
+          onComplete={onSegmentComplete}
+          onExit={() => navigate("/")}
+        />
+      </Suspense>
     );
   }
 
