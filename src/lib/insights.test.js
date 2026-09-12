@@ -1,5 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildMomentumSummary } from "./insights";
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe("buildMomentumSummary", () => {
   it("builds streak, weekly cadence and best direction from session history", () => {
@@ -23,7 +27,6 @@ describe("buildMomentumSummary", () => {
       sessionsToGoal: 0,
     });
 
-    vi.useRealTimers();
   });
 
   it("returns zeroed momentum when there is no usable history", () => {
@@ -48,7 +51,6 @@ describe("buildMomentumSummary", () => {
 
     expect(summary.thisWeek).toBe(1);
 
-    vi.useRealTimers();
   });
 
   it("resets the streak when the latest session is older than yesterday", () => {
@@ -63,6 +65,5 @@ describe("buildMomentumSummary", () => {
 
     expect(summary.streakDays).toBe(0);
 
-    vi.useRealTimers();
   });
 });

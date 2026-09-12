@@ -55,8 +55,13 @@ export default function Settings() {
   const deleteGroup = async (group) => {
     if (!window.confirm(`Delete ${group.label.toLowerCase()} from this device?`)) return;
     await deleteLocalDataGroup(group.id);
-    if (group.id === "flagship") setMemoryCleared(true);
-    setDeletedGroup(group.label);
+    if (group.id === "flagship") {
+      setMemoryCleared(true);
+      setDeletedGroup("");
+    } else {
+      setMemoryCleared(false);
+      setDeletedGroup(group.label);
+    }
     refreshInventory();
   };
 
