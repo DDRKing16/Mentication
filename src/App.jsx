@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import ScrollToTop from './components/ScrollToTop';
@@ -83,6 +83,18 @@ const MenticationRoutes = () => {
   );
 };
 
+const RoutedAppBoundary = ({ children }) => {
+  const navigate = useNavigate();
+  return (
+    <AppErrorBoundary
+      onGoHome={() => navigate("/")}
+      onGetSupport={() => navigate("/support")}
+    >
+      {children}
+    </AppErrorBoundary>
+  );
+};
+
 function App() {
   const { prefs } = useAccessibilityPrefs();
   useSystemDarkMode();
@@ -90,12 +102,12 @@ function App() {
   return (
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>
-        <AppErrorBoundary>
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <ScrollToTop />
-            <MenticationRoutes />
+            <RoutedAppBoundary>
+              <MenticationRoutes />
+            </RoutedAppBoundary>
           </Router>
-        </AppErrorBoundary>
         <Toaster />
       </QueryClientProvider>
     </MotionConfig>

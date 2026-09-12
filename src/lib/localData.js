@@ -1,3 +1,5 @@
+import { deleteFlagshipMemory } from "./flagshipMemory";
+
 // Device-local persistence for Mentication.
 //
 // V1 deliberately has no remote account or application backend. Session data
@@ -218,4 +220,3 @@ export function downloadLocalAppData(filenamePrefix = "mentation-export") {
 }
 
 export const LOCAL_DATA_CHANGED_EVENT = LOCAL_DATA_EVENT;
-import { deleteFlagshipMemory } from "./flagshipMemory";

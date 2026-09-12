@@ -8,7 +8,6 @@ import { deleteAllLocalAppData, downloadLocalAppData, sessionStore } from "@/lib
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
 import { weekCountCutoff } from "@/lib/insights";
 import { usePremium } from "@/hooks/usePremium";
-import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
 import ResetHistory from "@/components/history/ResetHistory";
@@ -49,8 +48,6 @@ export default function RegulationProfile() {
     if (countdown > 0) return;
     setDeleting(true);
     try {
-      await sessionStore.deleteMany();
-      deleteFlagshipMemory("all");
       deleteAllLocalAppData();
     } catch {
       setError("We couldn’t erase your local data. Try again.");
