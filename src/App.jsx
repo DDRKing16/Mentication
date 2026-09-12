@@ -18,6 +18,7 @@ import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirect
 const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
 const Crisis = lazy(() => import('@/pages/Crisis'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
+const Welcome = lazy(() => import('@/pages/Welcome'));
 
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
 
@@ -67,6 +68,7 @@ const MenticationRoutes = () => {
                 <Route path="/settings" element={<></>} />
               </Route>
               <Route path="/reset" element={<ResetFlow />} />
+              <Route path="/welcome" element={<Welcome />} />
               <Route path="/support" element={<Crisis />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="*" element={<PageNotFound />} />

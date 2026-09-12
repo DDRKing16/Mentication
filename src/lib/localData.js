@@ -39,6 +39,15 @@ function sortSessions(sessions, sort = "-created_date") {
   });
 }
 
+function listOwnedLocalStorage() {
+  const local = storage();
+  if (!local) return {};
+  const keys = Array.from({ length: local.length }, (_, index) => local.key(index))
+    .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)))
+    .sort();
+  return Object.fromEntries(keys.map((key) => [key, local.getItem(key)]));
+}
+
 export const sessionStore = Object.freeze({
   async list(sort = "-created_date", limit = 100) {
     return sortSessions(readSessions(), sort).slice(0, Math.max(0, Number(limit) || 0));
@@ -75,8 +84,9 @@ export function deleteAllLocalAppData() {
 
 export function exportLocalAppData() {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     exportedAt: new Date().toISOString(),
     sessions: readSessions(),
+    localStorage: listOwnedLocalStorage(),
   };
 }

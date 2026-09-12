@@ -1,4 +1,65 @@
-import { computeEffectiveness, getIntervention } from "./interventions";
+import { computeEffectiveness, getIntervention, improvementOf } from "./interventions";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function startOfDay(value) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  date.setHours(0, 0, 0, 0);
+  return date.getTime();
+}
+
+export function buildMomentumSummary(sessions = []) {
+  const ordered = [...sessions]
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.created_date || 0).getTime() - new Date(a.created_date || 0).getTime());
+  const totalSessions = ordered.length;
+  const thisWeekCutoff = Date.now() - 7 * DAY_MS;
+  const thisWeek = ordered.filter((session) => new Date(session.created_date || 0).getTime() >= thisWeekCutoff).length;
+  const improvements = ordered.map(improvementOf).filter(Number.isFinite);
+  const averageShift = improvements.length
+    ? +(improvements.reduce((sum, value) => sum + value, 0) / improvements.length).toFixed(1)
+    : 0;
+
+  const dayStarts = [...new Set(ordered.map((session) => startOfDay(session.created_date)).filter(Number.isFinite))];
+  let streakDays = 0;
+  for (let index = 0; index < dayStarts.length; index += 1) {
+    if (index === 0) {
+      streakDays = 1;
+      continue;
+    }
+    if (dayStarts[index - 1] - dayStarts[index] === DAY_MS) streakDays += 1;
+    else break;
+  }
+
+  const directionStats = ordered.reduce((map, session) => {
+    const improvement = improvementOf(session);
+    if (!session?.direction || !Number.isFinite(improvement)) return map;
+    const current = map[session.direction] || { total: 0, count: 0 };
+    current.total += improvement;
+    current.count += 1;
+    map[session.direction] = current;
+    return map;
+  }, {});
+
+  const bestDirection = Object.entries(directionStats)
+    .map(([direction, stats]) => ({
+      direction,
+      count: stats.count,
+      average: stats.total / stats.count,
+    }))
+    .sort((left, right) => right.average - left.average || right.count - left.count)[0]?.direction || null;
+
+  return {
+    totalSessions,
+    thisWeek,
+    streakDays,
+    averageShift,
+    bestDirection,
+    weeklyGoal: 3,
+    sessionsToGoal: Math.max(0, 3 - thisWeek),
+  };
+}
 
 export function computeEffectivenessInsights(sessions = []) {
   const eff = computeEffectiveness(sessions);

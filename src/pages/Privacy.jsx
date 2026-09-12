@@ -31,7 +31,7 @@ export default function Privacy() {
           </section>
           <section>
             <h2 className="font-heading text-xl font-medium text-primary">Your control</h2>
-            <p className="mt-2 text-muted-foreground">Use Profile → Delete all my data to erase session history and intervention memory from this device.</p>
+            <p className="mt-2 text-muted-foreground">Use Settings → Export my data for a local copy, or Profile → Delete all my data to erase session history and intervention memory from this device.</p>
           </section>
         </div>
       </main>

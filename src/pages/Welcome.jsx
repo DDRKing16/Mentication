@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, HeartHandshake, ShieldCheck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandLockup } from "@/components/Logo";
+import { completeOnboarding } from "@/lib/onboarding";
 
 const SLIDES = [
   {
@@ -31,7 +32,7 @@ export default function Welcome() {
   const last = i === SLIDES.length - 1;
 
   const finish = () => {
-    try { localStorage.setItem("haven_onboarded", "1"); } catch { /* */ }
+    completeOnboarding();
     navigate("/reset", { state: { immediate: true, direction: "calm", directionLabel: "Calm down" } });
   };
 
@@ -79,7 +80,7 @@ export default function Welcome() {
                 Try a reset now <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <button
-                onClick={() => { try { localStorage.setItem("haven_onboarded", "1"); } catch { /* */ } navigate("/"); }}
+                onClick={() => { completeOnboarding(); navigate("/"); }}
                 className="no-tap rounded-full py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 I’ll explore first

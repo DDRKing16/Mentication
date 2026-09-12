@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, LifeBuoy, Trash2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, LifeBuoy, Trash2, ShieldCheck, Download } from "lucide-react";
 import { useAccessibility } from "@/lib/accessibility";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
+import { exportLocalAppData } from "@/lib/localData";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -30,6 +31,21 @@ export default function Settings() {
   const { update } = a11y;
   const amb = useAccessibilityPrefs();
   const [memoryCleared, setMemoryCleared] = useState(false);
+  const [exported, setExported] = useState(false);
+
+  const exportData = () => {
+    const payload = exportLocalAppData();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mentation-export-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setExported(true);
+  };
 
   return (
     <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
@@ -143,9 +159,14 @@ export default function Settings() {
             We store as little as possible and never keep raw free-text beyond what you choose to save. Delete your
             session history any time from your Profile.
           </p>
-          <Button variant="outline" onClick={() => navigate("/profile")} className="mt-4 rounded-full">
-            Manage & delete my data
-          </Button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => navigate("/profile")} className="rounded-full">
+              Manage & delete my data
+            </Button>
+            <Button variant="outline" onClick={exportData} className="rounded-full">
+              <Download className="mr-2 h-4 w-4" /> Export my data
+            </Button>
+          </div>
           <Button
             variant="ghost"
             onClick={() => {
@@ -158,6 +179,7 @@ export default function Settings() {
             Delete local intervention memory
           </Button>
           {memoryCleared && <p role="status" className="mt-2 text-sm text-muted-foreground">Local intervention memory deleted.</p>}
+          {exported && <p role="status" className="mt-2 text-sm text-muted-foreground">A local data export was downloaded to this device.</p>}
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">
