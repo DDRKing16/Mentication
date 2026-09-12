@@ -214,14 +214,15 @@ export function downloadLocalAppData(filenamePrefix = "mentation-export") {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+  const body = document.body;
   try {
     link.href = url;
     link.download = `${filenamePrefix}-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(link);
+    if (body) body.appendChild(link);
     link.click();
     return true;
   } finally {
-    link.remove();
+    if (body) link.remove();
     URL.revokeObjectURL(url);
   }
 }

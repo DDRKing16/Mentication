@@ -31,7 +31,7 @@ const visible = { display: "block" };
 
 export default function AppShell() {
   const { pathname } = useLocation();
-  const [visitedTabs, setVisitedTabs] = useState(() => new Set(TAB_COMPONENTS[pathname] ? [pathname] : []));
+  const [visitedTabs, setVisitedTabs] = useState(() => new Set([TAB_COMPONENTS[pathname] ? pathname : "/"]));
 
   useEffect(() => {
     if (!TAB_COMPONENTS[pathname]) return;
