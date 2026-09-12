@@ -45,6 +45,11 @@ function emitSessionsChanged(count) {
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count } }));
 }
 
+function emitDataRefresh(count = readSessions().length) {
+  emitSessionsChanged(count);
+  emitLocalDataChanged();
+}
+
 function readSessions() {
   try {
     const raw = storage()?.getItem(SESSION_KEY);
@@ -180,8 +185,7 @@ export async function deleteAllLocalAppData() {
   }
   deleteFlagshipMemory("all");
   resetOnboarding();
-  emitSessionsChanged(0);
-  emitLocalDataChanged();
+  emitDataRefresh(0);
 }
 
 export function getLocalDataInventory() {
@@ -214,24 +218,20 @@ export async function deleteLocalDataGroup(groupId) {
     writeSessions([]);
     return { deleted: true, count };
   }
+  let count = 0;
   if (group.id === "flagship") {
-    const count = deleteFlagshipMemory("all");
-    emitSessionsChanged(readSessions().length);
-    emitLocalDataChanged();
-    return { deleted: true, count };
-  }
-  if (group.id === "onboarding") {
+    count = deleteFlagshipMemory("all");
+  } else if (group.id === "onboarding") {
     const keys = group.keys(local);
     resetOnboarding();
-    emitSessionsChanged(readSessions().length);
-    emitLocalDataChanged();
-    return { deleted: true, count: keys.length };
+    count = keys.length;
+  } else {
+    const keys = group.keys(local);
+    keys.forEach((key) => local.removeItem(key));
+    count = keys.length;
   }
-  const keys = group.keys(local);
-  keys.forEach((key) => local.removeItem(key));
-  emitSessionsChanged(readSessions().length);
-  emitLocalDataChanged();
-  return { deleted: true, count: keys.length };
+  emitDataRefresh();
+  return { deleted: true, count };
 }
 
 export function exportLocalAppData() {

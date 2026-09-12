@@ -25,4 +25,25 @@ describe("onboarding progress", () => {
     expect(hasSeenWelcome()).toBe(true);
     expect(hasCompletedOnboarding()).toBe(true);
   });
+
+  it("preserves onboarding state changes when storage is unavailable", () => {
+    global.localStorage = {
+      getItem() { throw new Error("storage unavailable"); },
+      setItem() { throw new Error("storage unavailable"); },
+      removeItem() { throw new Error("storage unavailable"); },
+    };
+
+    resetOnboarding();
+    completeWelcome();
+    expect(hasSeenWelcome()).toBe(true);
+    expect(hasCompletedOnboarding()).toBe(false);
+
+    completeOnboarding();
+    expect(hasSeenWelcome()).toBe(true);
+    expect(hasCompletedOnboarding()).toBe(true);
+
+    resetOnboarding();
+    expect(hasSeenWelcome()).toBe(false);
+    expect(hasCompletedOnboarding()).toBe(false);
+  });
 });

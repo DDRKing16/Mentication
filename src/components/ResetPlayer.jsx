@@ -761,7 +761,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               </div>
               {narrate && narrationMissing && (
                 <div className="max-w-md rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-sm text-cream/75">
-                  The guided voice is unavailable for this step, so the experience is continuing in quiet guide-text mode instead.
+                  Audio for this step is unavailable, so this part is continuing in quiet guide-text mode instead.
                 </div>
               )}
             </motion.div>
