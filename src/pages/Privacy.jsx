@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ShieldCheck } from "lucide-react";
 import { getLocalDataInventory, LOCAL_DATA_CHANGED_EVENT } from "@/lib/localData";
+import PremiumPageHeader from "@/components/PremiumPageHeader";
 
 export default function Privacy() {
-  const navigate = useNavigate();
   const [inventory, setInventory] = useState(() => getLocalDataInventory());
 
   useEffect(() => {
@@ -19,14 +18,13 @@ export default function Privacy() {
   return (
     <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
       <main className="mx-auto max-w-xl px-5 pb-20 pt-[max(2.5rem,env(safe-area-inset-top))]">
-        <button onClick={() => navigate(-1)} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back
-        </button>
+        <PremiumPageHeader
+          eyebrow="Privacy"
+          title="Privacy in Mentication"
+          body="The app works without an account, and the information it uses to personalise support stays with you on this device."
+          trustItems={["No account", "No trackers", "On-device only"]}
+        />
         <ShieldCheck className="mt-8 h-10 w-10 text-primary" strokeWidth={1.5} />
-        <h1 className="mt-4 font-heading text-3xl font-medium tracking-tight text-primary">Privacy in Mentication</h1>
-        <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
-          V1 works without an account. Your session history, ratings, preferences and intervention memory stay on this device.
-        </p>
         <div className="mt-6 rounded-2xl border border-primary/10 bg-card p-5">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Zero ads. Zero trackers. Zero accounts.</p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

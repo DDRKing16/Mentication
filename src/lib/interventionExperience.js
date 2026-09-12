@@ -92,6 +92,30 @@ export function getInterventionMoment(iv, step, stepIndex = 0) {
   return { phase, guide, cue };
 }
 
+const SPOTLIGHT_COPY = {
+  boxV2: {
+    eyebrow: "SIGNATURE BREATH",
+    title: "A steady square for your breathing to land on.",
+    ritual: "Let the shape do the counting. You do not need to perform the breath or chase a deeper inhale.",
+    support: "If a hold feels effortful, soften the size of the breath and keep the edges gentle.",
+    integration: "Notice whether your pace, jaw, or attention now has something steadier to return to.",
+  },
+  grounding54321V2: {
+    eyebrow: "SIGNATURE GROUNDING",
+    title: "Let the room become more real than the spiral.",
+    ritual: "Stay concrete and sensory. The point is not to feel calm instantly, only to land on what is actually here.",
+    support: "If one sense feels noisy, borrow another. Sight, touch, sound, scent, and temperature all count.",
+    integration: "Carry forward the sense that felt most believable so attention has a real anchor after the app closes.",
+  },
+  "progressive-muscle-relaxation-v2": {
+    eyebrow: "SIGNATURE BODY RESET",
+    title: "Teach the body the difference between bracing and release.",
+    ritual: "Use only a measured amount of tension. This works best when the release feels more important than the squeeze.",
+    support: "Skip any body area that feels unsafe, painful, or inaccessible. Smaller releases still count.",
+    integration: "Before you move on, notice one region that now feels heavier, warmer, or less defended.",
+  },
+};
+
 const REFLECTION_COPY = {
   boxV2: {
     checkpoint: "Did the steady square give your breathing or attention something reliable to lock onto?",
@@ -180,4 +204,8 @@ const CATEGORY_REFLECTION = {
 
 export function getInterventionReflection(iv) {
   return REFLECTION_COPY[iv?.id] || CATEGORY_REFLECTION[iv?.category] || CATEGORY_REFLECTION.emotion;
+}
+
+export function getInterventionSpotlight(iv) {
+  return SPOTLIGHT_COPY[iv?.id] || null;
 }

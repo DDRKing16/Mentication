@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Phone, LifeBuoy, HeartPulse } from "lucide-react";
+import { Phone, LifeBuoy, HeartPulse } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PremiumPageHeader from "@/components/PremiumPageHeader";
 
 const NUMBERS = [
   { label: "Emergency services", number: "000", note: "If you’re in immediate danger" },
@@ -16,22 +17,20 @@ export default function Crisis() {
   return (
     <div className="min-h-full bg-gradient-to-b from-[hsl(178_40%_9%)] via-[hsl(178_36%_13%)] to-[hsl(178_42%_7%)] text-cream">
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-16">
-        <button
-          onClick={() => navigate(-1)}
-          className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-cream/70 transition-colors hover:text-cream"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back
-        </button>
+        <PremiumPageHeader
+          eyebrow="Immediate support"
+          title="If you’re in crisis right now"
+          body="You do not have to hold this alone. If the moment is bigger than a reset, reach human support now."
+          trustItems={["Direct call buttons", "24/7 options", "Leave the app any time"]}
+          dark
+        />
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-8 text-center">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-destructive/15 text-destructive">
             <LifeBuoy className="h-6 w-6" strokeWidth={1.6} />
           </span>
-          <h1 className="mt-6 font-heading text-[2rem] font-medium leading-tight tracking-tight text-cream text-balance">
-            If you’re in crisis right now
-          </h1>
-          <p className="mx-auto mt-4 max-w-sm text-lg leading-relaxed text-cream/70 text-balance">
-            You don’t have to hold this alone. Reaching out is a sign of strength, and help is one call away.
+          <p className="mx-auto mt-4 max-w-sm text-base leading-relaxed text-cream/70 text-balance">
+            Reaching out is a strong next move. Choose the fastest line that feels right and let another person into the moment.
           </p>
         </motion.div>
 

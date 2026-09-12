@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Search, X, ArrowRight } from "lucide-react";
+import { Search, X, ArrowRight } from "lucide-react";
 import { INTERVENTIONS } from "@/lib/interventions";
+import PremiumPageHeader from "@/components/PremiumPageHeader";
+import { getInterventionSpotlight } from "@/lib/interventionExperience";
 
 const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "sleep"];
 const CATEGORY_LABELS = {
@@ -30,6 +32,7 @@ const FILTERS = [
 
 function Badges({ iv }) {
   const tags = [];
+  if (getInterventionSpotlight(iv)) tags.push("Signature guided");
   if (iv.discreet) tags.push("Discreet");
   if (iv.eyes === "open") tags.push("Eyes open");
   if (iv.bedtime) tags.push("Sleep");
@@ -85,19 +88,12 @@ export default function InterventionLibrary() {
   return (
     <div className="min-h-full bg-background text-foreground">
       <div className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:px-8 safe-top-lg">
-        <header className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Back"
-            className="no-tap flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary active:scale-95"
-          >
-            <ChevronLeft className="h-5 w-5" strokeWidth={1.7} />
-          </button>
-          <div>
-            <h1 className="font-heading text-2xl font-medium tracking-tight">Intervention Library</h1>
-            <p className="text-sm text-muted-foreground">Pick any practice. {INTERVENTIONS.length} in total.</p>
-          </div>
-        </header>
+        <PremiumPageHeader
+          eyebrow="Intervention library"
+          title="Pick any practice"
+          body={`${INTERVENTIONS.length} guided practices, including signature reset experiences designed to feel immersive without becoming busy.`}
+          trustItems={["25 practices", "Start in one tap", "Private on this device"]}
+        />
 
         <div className="relative mt-5">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

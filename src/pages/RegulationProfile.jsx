@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Sparkles, TrendingDown, Repeat, Layers, Download } from "lucide-react";
+import { Sparkles, TrendingDown, Repeat, Layers, Download } from "lucide-react";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
 import { deleteAllLocalAppData, downloadLocalAppData, sessionStore } from "@/lib/localData";
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
@@ -11,6 +11,7 @@ import { usePremium } from "@/hooks/usePremium";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
 import ResetHistory from "@/components/history/ResetHistory";
+import PremiumPageHeader from "@/components/PremiumPageHeader";
 
 export default function RegulationProfile() {
   const navigate = useNavigate();
@@ -112,14 +113,13 @@ export default function RegulationProfile() {
     return (
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
-          <button onClick={() => navigate("/")} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-4 w-4" /> Back
-          </button>
+          <PremiumPageHeader
+            eyebrow="Your regulation profile"
+            title="No resets yet"
+            body="Complete a reset or two and your regulation profile will begin to show what tends to help on this device."
+            trustItems={["Private on this device", "Built from your history", "Delete any time"]}
+          />
           <div className="mt-20 text-center">
-            <h1 className="font-heading text-3xl font-medium tracking-tight text-primary text-balance">No resets yet</h1>
-            <p className="mx-auto mt-3 max-w-sm text-lg text-muted-foreground text-balance">
-              Complete a reset or two and your regulation profile will appear here.
-            </p>
             <Button onClick={() => navigate("/")} className="mt-8 rounded-full">Back to start</Button>
           </div>
         </div>
@@ -131,21 +131,16 @@ export default function RegulationProfile() {
     <PullToRefresh onRefresh={loadSessions}>
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
-          <button onClick={() => navigate("/")} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-4 w-4" /> Back
-          </button>
-
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-6">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">Your regulation profile</p>
-          <h1 className="mt-3 font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
-            What tends to help you
-          </h1>
-          {weekCount > 0 && (
-            <p className="mt-3 text-sm text-muted-foreground">
-              {weekCount} reset{weekCount === 1 ? "" : "s"} this week · {profile.count} overall
-            </p>
-          )}
-        </motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-0">
+            <PremiumPageHeader
+              eyebrow="Your regulation profile"
+              title="What tends to help you"
+              body={weekCount > 0
+                ? `${weekCount} reset${weekCount === 1 ? "" : "s"} this week · ${profile.count} overall`
+                : "A calmer summary of the shifts your resets are creating on this device."}
+              trustItems={["Private on this device", "Built from your history", "Delete any time"]}
+            />
+          </motion.div>
 
         {error && (
           <div className="mt-6 rounded-2xl border border-destructive/20 bg-destructive/5 p-5">

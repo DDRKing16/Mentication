@@ -27,7 +27,7 @@ import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { suspendFeedback, resumeFeedback, haptic, setHapticsEnabled } from "@/lib/feedback";
 import { recordDislike } from "@/lib/preferences";
 import { interventionThemeStyle, paletteForIntervention } from "@/lib/mentationThemes";
-import { getInterventionAtmosphere, getInterventionMoment } from "@/lib/interventionExperience";
+import { getInterventionAtmosphere, getInterventionMoment, getInterventionSpotlight } from "@/lib/interventionExperience";
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
 
@@ -98,6 +98,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   const spokenLine = useMemo(() => (step ? spokenFor(step, iv, answers?.direction) : ""), [step, iv, answers?.direction]);
   const experienceMeta = useMemo(() => getInterventionAtmosphere(iv, answers?.direction), [iv, answers?.direction]);
   const momentMeta = useMemo(() => getInterventionMoment(iv, step, stepIndex), [iv, step, stepIndex]);
+  const spotlightMeta = useMemo(() => getInterventionSpotlight(iv), [iv]);
 
   // ---- narration (natural guide voice) ----
   const { speak, stop: stopVoice, pause: pauseVoice, resume: resumeVoice, preload } = useGuideVoice();
@@ -663,6 +664,20 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                 <p className="intervention-copy-primary mt-2 text-sm font-medium leading-relaxed">{momentMeta.cue}</p>
               </div>
 
+              {spotlightMeta && stepIndex === 0 && (
+                <div className="intervention-themed-surface w-full rounded-[1.75rem] px-5 py-4 text-center backdrop-blur-xl">
+                  <p className="intervention-copy-muted text-[0.68rem] font-medium uppercase tracking-[0.22em]">
+                    {spotlightMeta.eyebrow}
+                  </p>
+                  <h2 className="intervention-copy-primary mt-2 font-heading text-[1.45rem] font-medium leading-tight text-balance">
+                    {spotlightMeta.title}
+                  </h2>
+                  <p className="intervention-copy-muted mt-3 text-sm leading-relaxed text-balance">
+                    {spotlightMeta.ritual}
+                  </p>
+                </div>
+              )}
+
               {isBoxV2 ? (
                 <BoxBreathingV2Stage
                   step={step}
@@ -734,9 +749,15 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                 </p>
               )}
               <div className="intervention-themed-surface max-w-md rounded-[1.75rem] px-4 py-4 text-center backdrop-blur-xl">
-                <p className="intervention-copy-muted text-[0.68rem] font-medium uppercase tracking-[0.18em]">What this is doing</p>
-                <p className="intervention-copy-primary mt-2 text-sm leading-relaxed">{experienceMeta?.why}</p>
-                <p className="intervention-copy-muted mt-2 text-xs leading-relaxed">{experienceMeta?.bestWhen}</p>
+                <p className="intervention-copy-muted text-[0.68rem] font-medium uppercase tracking-[0.18em]">
+                  {spotlightMeta ? (isLastStep ? "Carry this forward" : "How to use this") : "What this is doing"}
+                </p>
+                <p className="intervention-copy-primary mt-2 text-sm leading-relaxed">
+                  {spotlightMeta ? (isLastStep ? spotlightMeta.integration : spotlightMeta.support) : experienceMeta?.why}
+                </p>
+                <p className="intervention-copy-muted mt-2 text-xs leading-relaxed">
+                  {spotlightMeta ? experienceMeta?.why : experienceMeta?.bestWhen}
+                </p>
               </div>
               {narrate && narrationMissing && (
                 <div className="max-w-md rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-sm text-cream/75">

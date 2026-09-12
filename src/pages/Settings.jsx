@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, LifeBuoy, Trash2, ShieldCheck, Download } from "lucide-react";
+import { LifeBuoy, Trash2, ShieldCheck, Download } from "lucide-react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
+import PremiumPageHeader from "@/components/PremiumPageHeader";
 import {
   deleteLocalDataGroup,
   downloadLocalAppData,
@@ -68,15 +69,12 @@ export default function Settings() {
   return (
     <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-28">
-        <button
-          onClick={() => navigate(-1)}
-          className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back
-        </button>
-
-        <h1 className="mt-6 font-heading text-3xl font-medium tracking-tight text-primary">Settings</h1>
-        <p className="mt-2 text-lg text-muted-foreground">Make Mentication work for your body and eyes.</p>
+        <PremiumPageHeader
+          eyebrow="Settings"
+          title="Make Mentication feel right for you"
+          body="Adjust the way the app moves, sounds, reads, and stores support without adding friction."
+          trustItems={["Accessible by default", "On-device controls", "Delete any time"]}
+        />
 
         <div className="mt-8 flex flex-col gap-3">
           <Toggle

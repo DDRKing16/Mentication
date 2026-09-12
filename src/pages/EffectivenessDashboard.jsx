@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, MapPin, Loader, Sparkles } from "lucide-react";
 import { sessionStore } from "@/lib/localData";
 import { buildMomentumSummary, computeEffectivenessInsights } from "@/lib/insights";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
-import FlowHomeButton from "@/components/FlowHomeButton";
+import PremiumPageHeader from "@/components/PremiumPageHeader";
+import PullToRefresh from "@/components/PullToRefresh";
 
 export default function EffectivenessDashboard() {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadInsights = async () => {
+  const loadInsights = useCallback(async () => {
     try {
       setError("");
       const sessions = await sessionStore.list("-created_date", 100);
@@ -22,11 +23,11 @@ export default function EffectivenessDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadInsights();
-  }, []);
+  }, [loadInsights]);
 
   if (loading) {
     return (
@@ -46,7 +47,12 @@ export default function EffectivenessDashboard() {
     return (
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto max-w-xl px-5 pt-6 pb-28">
-          <FlowHomeButton />
+          <PremiumPageHeader
+            eyebrow="Local patterns"
+            title="Your Patterns"
+            body="A private coaching view built from your saved resets on this device."
+            trustItems={["Private on this device", "Updates locally", "No cloud profile"]}
+          />
           <div className="mt-10 rounded-3xl border border-destructive/20 bg-card p-6 text-center">
             <Loader className="mx-auto h-8 w-8 text-primary" />
             <h1 className="mt-4 font-heading text-3xl font-medium text-primary">Insights are unavailable</h1>
@@ -64,20 +70,21 @@ export default function EffectivenessDashboard() {
   const topIntervention = insights.topInterventions[0];
 
   return (
-    <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
-      <div className="mx-auto max-w-xl px-5 pt-6 pb-28">
-        <div className="flex justify-start mb-6">
-          <FlowHomeButton />
-        </div>
+    <PullToRefresh onRefresh={loadInsights}>
+      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+        <div className="mx-auto max-w-xl px-5 pt-6 pb-28">
+          <PremiumPageHeader
+            eyebrow="Local patterns"
+            title="Your Patterns"
+            body={`A private coaching view built from ${insights.totalSessions} saved reset${insights.totalSessions === 1 ? "" : "s"} on this device.`}
+            trustItems={["Private on this device", "Updates locally", "No cloud profile"]}
+          />
 
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="font-heading text-3xl font-medium text-primary mb-2">
-            Your Patterns
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Based on {insights.totalSessions} sessions • {insights.thisWeek} this week
-          </p>
-        </motion.div>
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-8 mt-8">
+            <p className="text-sm text-muted-foreground">
+              {insights.thisWeek} this week
+            </p>
+          </motion.div>
 
         {insights.totalSessions > 0 ? (
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-8 rounded-3xl border border-primary/10 bg-card p-5">
@@ -247,7 +254,8 @@ export default function EffectivenessDashboard() {
           </motion.div>
         )}
 
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 }
