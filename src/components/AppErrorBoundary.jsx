@@ -46,7 +46,9 @@ export default class AppErrorBoundary extends React.Component {
             </button>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                if (typeof window !== "undefined") window.location.reload();
+              }}
               className="no-tap flex h-12 items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-medium text-foreground active:scale-95"
             >
               <RefreshCw className="h-4 w-4" /> Reload app

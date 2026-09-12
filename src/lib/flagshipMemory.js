@@ -123,5 +123,14 @@ export function deleteFlagshipMemory(scope = "all") {
     : scope === "preferences" ? [PREF_KEY, HANDOFF_KEY]
       : scope === "saved" ? [PARKING_KEY, NIGHT_FEEDBACK_KEY]
         : [PREF_KEY, ACTIVE_KEY, HANDOFF_KEY, PARKING_KEY, NIGHT_FEEDBACK_KEY];
-  keys.forEach((key) => { try { localStorage.removeItem(key); } catch { /* private mode */ } });
+  let cleared = 0;
+  keys.forEach((key) => {
+    try {
+      if (localStorage.getItem(key) != null) cleared += 1;
+      localStorage.removeItem(key);
+    } catch {
+      /* private mode */
+    }
+  });
+  return cleared;
 }

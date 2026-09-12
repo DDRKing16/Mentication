@@ -181,8 +181,7 @@ export async function deleteLocalDataGroup(groupId) {
     return { deleted: true, count };
   }
   if (group.id === "flagship") {
-    const count = group.keys(local).length;
-    deleteFlagshipMemory("all");
+    const count = deleteFlagshipMemory("all");
     emitLocalDataChanged();
     return { deleted: true, count };
   }
