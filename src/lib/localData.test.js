@@ -6,6 +6,7 @@ import {
   getLocalDataInventory,
   sessionStore,
 } from "./localData.js";
+import { completeOnboarding, completeWelcome, hasCompletedOnboarding, hasSeenWelcome } from "./onboarding.js";
 
 class MemoryStorage {
   constructor() { this.values = new Map(); }
@@ -58,7 +59,7 @@ describe("device-local application data", () => {
 
   it("builds inventory and deletes specific data groups", async () => {
     await sessionStore.create({ id: "one", direction: "sleep" });
-    window.localStorage.setItem("haven_onboarded", "1");
+    completeWelcome();
     window.localStorage.setItem("haven.dislikes", JSON.stringify({ byId: { sigh: 1 } }));
     window.localStorage.setItem("mentation.flagship.active.v1", JSON.stringify({ interventionId: "boxV2" }));
     window.localStorage.setItem("mentation.flagship.preferences.v1", JSON.stringify({ version: 1, events: [] }));
@@ -79,5 +80,18 @@ describe("device-local application data", () => {
     expect(removed).toEqual({ deleted: true, count: 2 });
     expect(window.localStorage.getItem("mentation.flagship.active.v1")).toBeNull();
     expect(window.localStorage.getItem("mentation.flagship.preferences.v1")).toBeNull();
+  });
+
+  it("clears in-memory onboarding progress when deleting the onboarding group", async () => {
+    completeWelcome();
+    completeOnboarding();
+    expect(hasSeenWelcome()).toBe(true);
+    expect(hasCompletedOnboarding()).toBe(true);
+
+    const removed = await deleteLocalDataGroup("onboarding");
+
+    expect(removed).toEqual({ deleted: true, count: 2 });
+    expect(hasSeenWelcome()).toBe(false);
+    expect(hasCompletedOnboarding()).toBe(false);
   });
 });

@@ -1,4 +1,5 @@
 import { deleteFlagshipMemory } from "./flagshipMemory";
+import { resetOnboarding } from "./onboarding";
 
 // Device-local persistence for Mentication.
 //
@@ -185,6 +186,12 @@ export async function deleteLocalDataGroup(groupId) {
     const count = deleteFlagshipMemory("all");
     emitLocalDataChanged();
     return { deleted: true, count };
+  }
+  if (group.id === "onboarding") {
+    const keys = group.keys(local);
+    resetOnboarding();
+    emitLocalDataChanged();
+    return { deleted: true, count: keys.length };
   }
   const keys = group.keys(local);
   keys.forEach((key) => local.removeItem(key));

@@ -54,6 +54,8 @@ export default function RegulationProfile() {
       setDeleting(false);
       return;
     }
+    setConfirming(false);
+    setCountdown(0);
     setDeleting(false);
     navigate("/welcome", { replace: true });
   };
