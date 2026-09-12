@@ -14,6 +14,7 @@ export default function PremiumPageHeader({
 }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const onHome = location.pathname === homeHref;
   const button = dark
     ? "text-cream/70 hover:bg-white/10 hover:text-cream"
     : "text-muted-foreground hover:bg-primary/5 hover:text-foreground";
@@ -34,6 +35,8 @@ export default function PremiumPageHeader({
         <button
           type="button"
           onClick={() => navigate(homeHref)}
+          disabled={onHome}
+          aria-current={onHome ? "page" : undefined}
           className={`no-tap flex min-h-11 items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${button}`}
         >
           <Home className="h-4 w-4" /> Home

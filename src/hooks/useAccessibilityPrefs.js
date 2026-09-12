@@ -26,7 +26,7 @@ function read() {
 function applyToDocument(prefs) {
   if (typeof document === "undefined") return;
   const el = document.documentElement;
-  el.style.fontSize = `${16 * (prefs.textScale || (prefs.largeText ? 1.15 : 1))}px`;
+  el.style.fontSize = `${16 * (prefs.textScale ?? (prefs.largeText ? 1.15 : 1))}px`;
   el.classList.toggle("reduce-motion", !!prefs.reducedMotion);
   el.classList.toggle("large-text", !!prefs.largeText);
   el.classList.toggle("high-contrast", !!prefs.highContrast);

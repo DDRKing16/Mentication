@@ -1,5 +1,5 @@
 import { deleteFlagshipMemory } from "./flagshipMemory";
-import { resetOnboarding } from "./onboarding";
+import { hasCompletedOnboarding, hasSeenWelcome, resetOnboarding } from "./onboarding";
 
 // Device-local persistence for Mentication.
 //
@@ -234,8 +234,8 @@ export function exportLocalAppData() {
     exportedAt: new Date().toISOString(),
     sessions: readSessions(),
     onboarding: {
-      hasCompletedOnboarding: local?.getItem(ONBOARDING_KEY) === "1",
-      hasSeenWelcome: local?.getItem(WELCOME_KEY) === "1",
+      hasCompletedOnboarding: hasCompletedOnboarding(),
+      hasSeenWelcome: hasSeenWelcome(),
     },
     accessibility: readStoredJSON(A11Y_KEY, readStoredJSON(LEGACY_A11Y_KEY, null)),
     recommendationMemory: readStoredJSON(DISLIKES_KEY, null),

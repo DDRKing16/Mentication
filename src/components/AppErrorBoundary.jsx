@@ -26,11 +26,7 @@ export default class AppErrorBoundary extends React.Component {
   };
 
   render() {
-    if (!this.state.hasError) {
-      return React.isValidElement(this.props.children)
-        ? React.cloneElement(this.props.children, { key: this.state.recoveryKey })
-        : <React.Fragment key={this.state.recoveryKey}>{this.props.children}</React.Fragment>;
-    }
+    if (!this.state.hasError) return <div key={this.state.recoveryKey} style={{ display: "contents" }}>{this.props.children}</div>;
     return (
       <div className="min-h-screen bg-gradient-to-b from-cream via-background to-background px-6 py-10">
         <div className="mx-auto flex min-h-[80vh] max-w-xl flex-col items-center justify-center text-center">
