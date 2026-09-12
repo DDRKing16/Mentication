@@ -15,6 +15,10 @@ export default class AppErrorBoundary extends React.Component {
     // Keep the failure local and private on-device.
   }
 
+  recover = (callback) => {
+    this.setState({ hasError: false }, () => callback?.());
+  };
+
   render() {
     if (!this.state.hasError) return this.props.children;
     return (
@@ -32,14 +36,14 @@ export default class AppErrorBoundary extends React.Component {
           <div className="mt-8 flex w-full max-w-sm flex-col gap-3">
             <button
               type="button"
-              onClick={() => this.props.onGoHome?.()}
+              onClick={() => this.recover(this.props.onGoHome)}
               className="no-tap flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-5 text-base font-medium text-primary-foreground soft-depth active:scale-95"
             >
               <Home className="h-4 w-4" /> Back to start
             </button>
             <button
               type="button"
-              onClick={() => this.props.onGetSupport?.()}
+              onClick={() => this.recover(this.props.onGetSupport)}
               className="no-tap flex h-14 items-center justify-center gap-2 rounded-full border border-destructive/30 bg-destructive/5 px-5 text-base font-medium text-destructive active:scale-95"
             >
               <LifeBuoy className="h-4 w-4" /> Get support now

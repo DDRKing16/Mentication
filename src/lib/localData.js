@@ -9,6 +9,7 @@ const SESSION_KEY = "mentation.sessions.v1";
 const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_"];
 const MAX_SESSIONS = 500;
 const ONBOARDING_KEY = "haven_onboarded";
+const WELCOME_KEY = "haven_welcome_seen";
 const LEGACY_A11Y_KEY = "haven_a11y";
 const A11Y_KEY = "haven.a11y.v2";
 const DISLIKES_KEY = "haven.dislikes";
@@ -86,9 +87,9 @@ const LOCAL_DATA_GROUPS = [
   {
     id: "onboarding",
     label: "Onboarding progress",
-    description: "Whether you completed the welcome flow on this device.",
+    description: "Whether you started or completed the welcome flow on this device.",
     unit: "setting",
-    keys: (local) => (local?.getItem(ONBOARDING_KEY) ? [ONBOARDING_KEY] : []),
+    keys: (local) => [ONBOARDING_KEY, WELCOME_KEY].filter((key) => local?.getItem(key) != null),
   },
   {
     id: "accessibility",
