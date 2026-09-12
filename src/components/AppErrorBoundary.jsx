@@ -15,6 +15,12 @@ export default class AppErrorBoundary extends React.Component {
     // Keep the failure local and private on-device.
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false });
+    }
+  }
+
   recover = (callback) => {
     this.setState({ hasError: false }, () => callback?.());
   };

@@ -2,9 +2,9 @@
 // Presentation only; all flows (direction selection, last-worked replay,
 // time-of-day recommendation) route to the existing /reset entry unchanged.
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BarChart3, Flame, Sparkles } from "lucide-react";
-import { sessionStore } from "@/lib/localData";
+import { LOCAL_DATA_CHANGED_EVENT, sessionStore } from "@/lib/localData";
 import { pickLastWorked, buildPersonalBest } from "@/lib/interventions";
 import { buildRecommendation } from "@/lib/recommend";
 import { buildMomentumSummary } from "@/lib/insights";
@@ -30,6 +30,7 @@ const HOME_GRID = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [lastWorked, setLastWorked] = useState(null);
   const [personalBest, setPersonalBest] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
@@ -52,7 +53,18 @@ export default function Home() {
       setLoadError("We couldn’t load your local session history. Try again, or open support if you need urgent help.");
     }
   }, [navigate]);
-  useEffect(() => { loadSessions(); }, [loadSessions]);
+  useEffect(() => {
+    if (pathname === "/") loadSessions();
+  }, [loadSessions, pathname]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const refresh = () => {
+      if (pathname === "/") loadSessions();
+    };
+    window.addEventListener(LOCAL_DATA_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(LOCAL_DATA_CHANGED_EVENT, refresh);
+  }, [loadSessions, pathname]);
 
   const choose = (card) => {
     if (card.unsure) navigate("/reset", { state: { unsure: true } });
