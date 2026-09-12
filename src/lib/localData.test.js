@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   deleteAllLocalAppData,
   deleteLocalDataGroup,
+  downloadLocalAppData,
   exportLocalAppData,
   getLocalDataInventory,
   sessionStore,
@@ -97,5 +98,73 @@ describe("device-local application data", () => {
     expect(removed).toEqual({ deleted: true, count: 2 });
     expect(hasSeenWelcome()).toBe(false);
     expect(hasCompletedOnboarding()).toBe(false);
+  });
+
+  it("deletes sessions, accessibility, and thought-record groups through their dedicated paths", async () => {
+    const events = [];
+    window.dispatchEvent = (event) => { events.push({ type: event.type, detail: event.detail }); };
+    await sessionStore.create({ id: "one", direction: "calm" });
+    window.localStorage.setItem("haven.a11y.v2", JSON.stringify({ reducedMotion: true }));
+    window.localStorage.setItem("mentation.thought-or-fact.records.v1", JSON.stringify([{ id: "record-1" }]));
+
+    expect(await deleteLocalDataGroup("sessions")).toEqual({ deleted: true, count: 1 });
+    expect(await sessionStore.list()).toEqual([]);
+    expect(events.some((event) => event.type === "mentation:sessions-changed" && event.detail?.count === 0)).toBe(true);
+
+    expect(await deleteLocalDataGroup("accessibility")).toEqual({ deleted: true, count: 1 });
+    expect(window.localStorage.getItem("haven.a11y.v2")).toBeNull();
+
+    expect(await deleteLocalDataGroup("thoughtRecords")).toEqual({ deleted: true, count: 1 });
+    expect(window.localStorage.getItem("mentation.thought-or-fact.records.v1")).toBeNull();
+  });
+
+  it("downloads local data with and without document.body", () => {
+    const originalDocument = globalThis.document;
+    const originalURL = globalThis.URL;
+    const originalBlob = globalThis.Blob;
+    const clicks = [];
+    const appended = [];
+    const revoked = [];
+    const link = {
+      click: () => { clicks.push("clicked"); },
+      remove: () => { clicks.push("removed"); },
+    };
+    globalThis.Blob = class BlobMock {
+      constructor(parts, options) {
+        this.parts = parts;
+        this.type = options.type;
+      }
+    };
+    globalThis.URL = {
+      createObjectURL: () => "blob:test",
+      revokeObjectURL: (value) => { revoked.push(value); },
+    };
+
+    try {
+      globalThis.document = {
+        body: { appendChild: (node) => { appended.push(node); } },
+        createElement: () => link,
+      };
+      expect(downloadLocalAppData("mentation-export")).toBe(true);
+      expect(appended).toEqual([link]);
+      expect(clicks).toContain("clicked");
+      expect(revoked).toEqual(["blob:test"]);
+
+      appended.length = 0;
+      clicks.length = 0;
+      revoked.length = 0;
+      globalThis.document = {
+        body: null,
+        createElement: () => link,
+      };
+      expect(downloadLocalAppData("mentation-export")).toBe(true);
+      expect(appended).toEqual([]);
+      expect(clicks).toContain("clicked");
+      expect(revoked).toEqual(["blob:test"]);
+    } finally {
+      globalThis.document = originalDocument;
+      globalThis.URL = originalURL;
+      globalThis.Blob = originalBlob;
+    }
   });
 });
