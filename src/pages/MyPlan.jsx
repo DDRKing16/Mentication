@@ -117,7 +117,9 @@ export default function MyPlan() {
           <section className="mt-8">
             <p className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[#5F726B]">Today</p>
             <h2 className="mt-1.5 font-heading text-[1.15rem] font-medium text-[#0E4536]">Your reset for today</h2>
-            {ready && recommendation ? (
+            {!ready ? (
+              <div className="mt-3 h-[88px] animate-pulse rounded-[1.5rem] bg-[#1E3C42]/10" />
+            ) : recommendation ? (
               <div className="mt-3">
                 <RecommendedCard
                   title={recommendation.title}
@@ -126,7 +128,9 @@ export default function MyPlan() {
                 />
               </div>
             ) : (
-              <div className="mt-3 h-[88px] animate-pulse rounded-[1.5rem] bg-[#1E3C42]/10" />
+              <p className="mt-3 text-[0.92rem] leading-relaxed text-[#5F726B]">
+                Complete a session and your daily plan will start to take shape here.
+              </p>
             )}
           </section>
 

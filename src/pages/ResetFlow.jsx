@@ -30,7 +30,7 @@ import { weekCountCutoff } from "@/lib/insights";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
-import { getInterventionReflection } from "@/lib/interventionExperience";
+import { getInterventionAtmosphere, getInterventionReflection } from "@/lib/interventionExperience";
 import { isInteractiveExperience, isNewFlagship } from "@/lib/flagshipExperienceRouting";
 
 const ResetPlayer = lazy(() => import("@/components/ResetPlayer"));

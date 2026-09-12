@@ -53,6 +53,7 @@ export default function Home() {
       setRecommendation(buildRecommendation(sessions));
       setMomentum(buildMomentumSummary(sessions));
     } catch {
+      clearDerivedState();
       setLoadError("We couldn’t load your local session history. Try again, or open support if you need urgent help.");
     }
   }, [clearDerivedState, navigate]);

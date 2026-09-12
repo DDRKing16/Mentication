@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowLeft, Home } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PremiumTrustStrip from "@/components/PremiumTrustStrip";
 
 export default function PremiumPageHeader({
@@ -12,6 +12,7 @@ export default function PremiumPageHeader({
   homeHref = "/",
   backHref = "/",
 }) {
+  const location = useLocation();
   const navigate = useNavigate();
   const button = dark
     ? "text-cream/70 hover:bg-white/10 hover:text-cream"
@@ -25,7 +26,7 @@ export default function PremiumPageHeader({
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
-          onClick={() => navigate(backHref, { replace: true })}
+          onClick={() => (location.key !== "default" ? navigate(-1) : navigate(backHref, { replace: true }))}
           className={`no-tap flex min-h-11 items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${button}`}
         >
           <ArrowLeft className="h-4 w-4" /> Back

@@ -50,7 +50,12 @@ export default function AppShell() {
         const Component = TAB_COMPONENTS[tabPath];
         if (!Component) return null;
         return (
-          <div key={tabPath} style={pathname === tabPath ? visible : hidden} className="min-h-full">
+          <div
+            key={tabPath}
+            style={pathname === tabPath ? visible : hidden}
+            aria-hidden={pathname === tabPath ? undefined : true}
+            className="min-h-full"
+          >
             <Suspense fallback={<PageSpinner />}>
               <Component />
             </Suspense>

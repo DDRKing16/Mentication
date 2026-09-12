@@ -43,7 +43,7 @@ export default function EffectivenessDashboard() {
     );
   }
 
-  if (error || !insights) {
+  if (!insights) {
     return (
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto max-w-xl px-5 pt-6 pb-28">
@@ -85,6 +85,13 @@ export default function EffectivenessDashboard() {
               {insights.thisWeek} this week
             </p>
           </motion.div>
+
+          {error && (
+            <div className="mb-6 rounded-3xl border border-destructive/20 bg-destructive/5 p-4">
+              <p className="font-medium text-foreground">Insights are showing the last available local snapshot.</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{error}</p>
+            </div>
+          )}
 
         {insights.totalSessions > 0 ? (
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-8 rounded-3xl border border-primary/10 bg-card p-5">
