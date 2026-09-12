@@ -1,0 +1,1 @@
+const a="haven_onboarded",o="haven_welcome_seen";let t=!1,e=!1;function c(){try{return localStorage.getItem(a)==="1"||localStorage.getItem(o)==="1"||t||e}catch{return t||e}}function l(){t=!0,e=!0;try{localStorage.setItem(a,"1"),localStorage.setItem(o,"1")}catch{}}function r(){e=!0;try{localStorage.setItem(o,"1")}catch{}}export{l as a,r as c,c as h};

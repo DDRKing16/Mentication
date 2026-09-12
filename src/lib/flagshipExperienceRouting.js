@@ -7,7 +7,7 @@ export const INTERACTIVE_FLAGSHIP_IDS = Object.freeze([
 ]);
 
 export const ENHANCED_GUIDED_IDS = Object.freeze([
-  "nameFeeling", "whatNeed", "dontSendIt", "checkBasics",
+  "solvableWorry", "activityScheduling", "lowMoodLoop", "frictionSweep",
 ]);
 
 export const INTERACTIVE_EXPERIENCE_IDS = Object.freeze([

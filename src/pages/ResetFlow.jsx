@@ -7,7 +7,7 @@ import IntensityDial from "@/components/IntensityDial";
 import ChoiceButtons from "@/components/ChoiceButtons";
 import ResetPlayer from "@/components/ResetPlayer";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
-import FlagshipExperience, { isInteractiveExperience, isInteractiveFlagship } from "@/components/FlagshipExperience";
+import FlagshipExperience, { isInteractiveExperience } from "@/components/FlagshipExperience";
 import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
 import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
 import UrgeSurfExperience from "@/components/UrgeSurfExperience";
