@@ -50,6 +50,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // True once the narrator has finished the current step's line, so the step
   // doesn't auto-advance and cut the voice off mid-sentence. Reset per step.
   const [narrationEnded, setNarrationEnded] = useState(true);
+  const [narrationMissing, setNarrationMissing] = useState(false);
   const [transition, setTransition] = useState(null);
   const [showSwitch, setShowSwitch] = useState(false);
   const { current: ambient, set: setAmbient } = useAmbientSound();
@@ -95,7 +96,6 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   const isLastStep = step != null && stepIndex === iv.steps.length - 1;
   const isLastIv = ivIndex === remaining.length - 1;
   const spokenLine = useMemo(() => (step ? spokenFor(step, iv, answers?.direction) : ""), [step, iv, answers?.direction]);
-  const narrationAvailable = !spokenLine || !!getNarration(spokenLine);
   const experienceMeta = useMemo(() => getInterventionAtmosphere(iv, answers?.direction), [iv, answers?.direction]);
   const momentMeta = useMemo(() => getInterventionMoment(iv, step, stepIndex), [iv, step, stepIndex]);
 
@@ -121,13 +121,16 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   }, []);
 
   useEffect(() => {
-    if (!narrate) { stopVoice(); setNarrationEnded(true); return; }
+    if (!narrate) { stopVoice(); setNarrationEnded(true); setNarrationMissing(false); return; }
     if (transition) { speak(transition.sentence, { ...vf, leadMs: 400 }); return; }
     if (step) {
       const spoken = spokenLine;
       const isFirst = ivIndex === 0 && stepIndex === 0;
+      const narration = spoken ? getNarration(spoken) : null;
+      const hasNarrationClip = !spoken || !!narration?.url;
       // No spoken text → nothing to wait for; gating is skipped.
-      setNarrationEnded(!spoken || !narrationAvailable);
+      setNarrationMissing(!!spoken && !hasNarrationClip);
+      setNarrationEnded(!spoken || !hasNarrationClip);
       // Box Breathing V2 instruction step: the instruction frame owns its own
       // aligned narration (word-synced reveal via useBoxV2WordReveal), so the
       // shared narrator is skipped for this one step. The frame calls
@@ -136,7 +139,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       // useWordReveal inside the stage), so the shared narrator is skipped for
       // it — exactly as the Box Breathing V2 instruction step is skipped. The
       // stage calls onNarrationEnd -> setNarrationEnded(true) when done.
-      if (narrationAvailable && !(isBoxV2 && !isBoxV2Paced) && !isGroundingV2 && !isPMRV2) {
+      if (hasNarrationClip && !(isBoxV2 && !isBoxV2Paced) && !isGroundingV2 && !isPMRV2) {
         speak(spoken, {
           ...vf,
           leadMs: isFirst ? vf.leadMs : 250,
@@ -157,7 +160,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     }
     return () => stopVoice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ivIndex, stepIndex, narrate, transition, spokenLine, narrationAvailable]);
+  }, [ivIndex, stepIndex, narrate, transition, spokenLine]);
 
   useEffect(() => () => stopVoice(), []);
 
@@ -735,7 +738,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                 <p className="intervention-copy-primary mt-2 text-sm leading-relaxed">{experienceMeta?.why}</p>
                 <p className="intervention-copy-muted mt-2 text-xs leading-relaxed">{experienceMeta?.bestWhen}</p>
               </div>
-              {narrate && !narrationAvailable && (
+              {narrate && narrationMissing && (
                 <div className="max-w-md rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-sm text-cream/75">
                   The guided voice is unavailable for this step, so the experience is continuing in quiet guide-text mode instead.
                 </div>
