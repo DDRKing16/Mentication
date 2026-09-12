@@ -165,10 +165,11 @@ export const sessionStore = Object.freeze({
 export function deleteAllLocalAppData() {
   const local = storage();
   if (!local) return;
-  const keys = Array.from({ length: local.length }, (_, index) => local.key(index)).filter(Boolean);
+  const keys = listOwnedLocalStorageKeys(local);
   for (const key of keys) {
     if (APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
   }
+  deleteFlagshipMemory("all");
   resetOnboarding();
   emitSessionsChanged(0);
   emitLocalDataChanged();
@@ -176,9 +177,14 @@ export function deleteAllLocalAppData() {
 
 export function getLocalDataInventory() {
   const local = storage();
+  const sessions = readSessions();
   return LOCAL_DATA_GROUPS.map((group) => {
     const keys = group.keys(local);
-    const count = typeof group.count === "function" ? group.count(local) : keys.length;
+    const count = group.id === "sessions"
+      ? sessions.length
+      : typeof group.count === "function"
+        ? group.count(local)
+        : keys.length;
     return {
       id: group.id,
       label: group.label,
