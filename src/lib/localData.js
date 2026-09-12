@@ -31,6 +31,11 @@ function emitLocalDataChanged() {
   window.dispatchEvent(new CustomEvent(LOCAL_DATA_EVENT));
 }
 
+function emitSessionsChanged(count) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count } }));
+}
+
 function readSessions() {
   try {
     const raw = storage()?.getItem(SESSION_KEY);
@@ -44,9 +49,7 @@ function readSessions() {
 function writeSessions(sessions) {
   const next = sessions.slice(0, MAX_SESSIONS);
   storage()?.setItem(SESSION_KEY, JSON.stringify(next));
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: next.length } }));
-  }
+  emitSessionsChanged(next.length);
   emitLocalDataChanged();
 }
 
@@ -158,7 +161,7 @@ export function deleteAllLocalAppData() {
     if (APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
   }
   resetOnboarding();
-  window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
+  emitSessionsChanged(0);
   emitLocalDataChanged();
 }
 
@@ -189,20 +192,20 @@ export async function deleteLocalDataGroup(groupId) {
   }
   if (group.id === "flagship") {
     const count = deleteFlagshipMemory("all");
-    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: readSessions().length } }));
+    emitSessionsChanged(readSessions().length);
     emitLocalDataChanged();
     return { deleted: true, count };
   }
   if (group.id === "onboarding") {
     const keys = group.keys(local);
     resetOnboarding();
-    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: readSessions().length } }));
+    emitSessionsChanged(readSessions().length);
     emitLocalDataChanged();
     return { deleted: true, count: keys.length };
   }
   const keys = group.keys(local);
   keys.forEach((key) => local.removeItem(key));
-  window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: readSessions().length } }));
+  emitSessionsChanged(readSessions().length);
   emitLocalDataChanged();
   return { deleted: true, count: keys.length };
 }
