@@ -1,8 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { X, HeartPulse, ShieldCheck, Lock } from "lucide-react";
 
 export default function WellbeingNotice({ onClose, dark = false }) {
+  const navigate = useNavigate();
   const card = dark ? "bg-[hsl(178_36%_13%)] text-cream border-cream/15" : "bg-card text-foreground border-border";
   const sub = dark ? "text-cream/65" : "text-muted-foreground";
   const inner = dark ? "border-cream/10 bg-white/5" : "border-border bg-background/60";
@@ -37,13 +39,23 @@ export default function WellbeingNotice({ onClose, dark = false }) {
             <li>Reach a crisis line. You don’t have to be alone with this.</li>
             <li>Stay safe. If you can, be with someone you trust.</li>
           </ol>
+          <button
+            type="button"
+            onClick={() => {
+              onClose?.();
+              navigate("/support");
+            }}
+            className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent underline-offset-4 hover:underline"
+          >
+            <ShieldCheck className="h-4 w-4" /> Open crisis numbers
+          </button>
           <a
             href="https://findahelpline.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent underline-offset-4 hover:underline"
+            className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent underline-offset-4 hover:underline"
           >
-            <ShieldCheck className="h-4 w-4" /> Find a crisis line near you
+            Find a crisis line outside Australia
           </a>
         </div>
 

@@ -85,7 +85,7 @@ export default function Home() {
           <FlagshipReturnCard />
 
           {(lastWorked || personalBest) && (
-            <LastWorkedCard subtitle="Repeat your most effective reset" onClick={doLastWorked} overlap />
+            <LastWorkedCard subtitle="Repeat a reset that has worked for you" onClick={doLastWorked} overlap />
           )}
 
           <section className="px-[18px] pt-6">
@@ -110,6 +110,13 @@ export default function Home() {
           )}
 
           <div className="px-[18px]">
+            <button
+              type="button"
+              onClick={() => navigate("/support")}
+              className="no-tap mx-auto mt-8 flex min-h-11 items-center justify-center text-sm font-medium text-[var(--mcn-emerald)]/70 underline-offset-4 hover:text-[var(--mcn-emerald)] hover:underline"
+            >
+              Need urgent support?
+            </button>
             <SafetyFooter dark={false} />
           </div>
 
