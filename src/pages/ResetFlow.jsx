@@ -322,10 +322,11 @@ export default function ResetFlow() {
     return improved ? "better" : "worse";
   };
 
-  const commitPendingPulse = (afterValue = checkinValue ?? lastValue) => {
+  const commitPendingPulse = (afterValue = checkinValue ?? lastValue, { useFallback = true } = {}) => {
     const event = pendingCompletionRef.current;
     if (!event?.interventionId) return effectiveness;
-    const response = pulseResponse(lastValue, afterValue);
+    const resolvedAfterValue = afterValue == null && useFallback ? (checkinValue ?? lastValue) : afterValue;
+    const response = pulseResponse(lastValue, resolvedAfterValue);
     const record = buildAttemptRecord({
       interventionId: event.interventionId,
       mechanism: event.mechanism,
@@ -683,13 +684,15 @@ export default function ResetFlow() {
           answers={{ ...answers, intensity: lastValue }}
           onAttemptEvent={handleAttemptEvent}
           onComplete={(result) => {
-            commitPendingPulse(lastValue);
-            setEndIntensity(lastValue);
+            const hasPostValue = result?.postValue != null;
+            const postValue = hasPostValue ? result.postValue : null;
+            commitPendingPulse(postValue, { useFallback: hasPostValue });
+            setEndIntensity(postValue);
             if (result?.skipReflection) {
               completeSession({
                 direct: true,
                 silent: true,
-                endIntensityOverride: lastValue,
+                endIntensityOverride: postValue,
                 interventionOutcome: result.outcome,
               });
               return;

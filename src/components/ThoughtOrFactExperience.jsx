@@ -491,7 +491,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
     });
     clearActiveFlagship("factCheck");
     onAttemptEvent?.({ interventionId: "factCheck", mechanism: intervention.mechanism, action: "completed", completedPercentage: 1, timestamp: Date.now(), startedAt: startedAt.current });
-    onComplete?.({ skipReflection: true, outcome: { classificationCounts: counts, certaintyBefore: data.certaintyBefore, certaintyAfter: data.certaintyAfter, saved } });
+    onComplete?.({ skipReflection: true, outcome: { classificationCounts: counts, certaintyBefore: data.certaintyBefore, certaintyAfter: data.certaintyAfter, saved }, postValue: data.certaintyAfter });
   };
 
   const handleSave = () => {

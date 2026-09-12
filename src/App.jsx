@@ -85,10 +85,8 @@ const MenticationRoutes = () => {
 
 const RoutedAppBoundary = ({ children }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   return (
     <AppErrorBoundary
-      key={location.pathname}
       onGoHome={() => navigate("/")}
       onGetSupport={() => navigate("/support")}
     >

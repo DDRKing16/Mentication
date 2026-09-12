@@ -46,7 +46,7 @@ describe("device-local application data", () => {
   it("exports and erases only application-owned local data", async () => {
     await sessionStore.create({ id: "one", direction: "sleep" });
     window.localStorage.setItem("mentation.preference", "quiet");
-    window.localStorage.setItem("haven_onboarded", "1");
+    completeOnboarding();
     window.localStorage.setItem("unrelated.product", "keep");
     const exported = exportLocalAppData();
     expect(exported.schemaVersion).toBe(2);
@@ -58,6 +58,8 @@ describe("device-local application data", () => {
 
     expect(await sessionStore.list()).toEqual([]);
     expect(window.localStorage.getItem("mentation.preference")).toBeNull();
+    expect(hasSeenWelcome()).toBe(false);
+    expect(hasCompletedOnboarding()).toBe(false);
     expect(window.localStorage.getItem("unrelated.product")).toBe("keep");
   });
 

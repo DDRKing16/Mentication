@@ -153,6 +153,7 @@ export function deleteAllLocalAppData() {
   for (const key of keys) {
     if (APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
   }
+  resetOnboarding();
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
   emitLocalDataChanged();
 }
