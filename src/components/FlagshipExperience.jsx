@@ -10,6 +10,7 @@ import { evidenceFor } from "@/lib/flagshipEvidence";
 import { clearActiveFlagship, getActiveFlagship, recordHandoffDecision, rememberFlagshipEvent, saveActiveFlagship, saveTomorrowParkingItem } from "@/lib/flagshipMemory";
 import { recommendHandoff } from "@/lib/flagshipHandoffs";
 import { INTERACTIVE_FLAGSHIP_IDS, isInteractiveFlagship } from "@/lib/flagshipExperienceRouting";
+import { getInterventionAtmosphere, getInterventionMoment } from "@/lib/interventionExperience";
 
 export { INTERACTIVE_FLAGSHIP_IDS, isInteractiveFlagship };
 
@@ -275,6 +276,8 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
   };
   const handoff = handoffDismissed ? null : recommendHandoff(id, handoffContext);
   const evidence = evidenceFor(id);
+  const experienceMeta = getInterventionAtmosphere(intervention, answers?.direction);
+  const momentMeta = getInterventionMoment(intervention, current, step);
 
   const finish = () => {
     rememberFlagshipEvent({ interventionId: id, completed: data.status === "completed" || !data.status, partial: data.status === "partial", barriers: data.status === "couldnt" ? [data.barrier || "could-not-start"] : [] });
@@ -311,12 +314,23 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
   >
     <div className="mx-auto flex min-h-[calc(100dvh-170px)] w-full max-w-5xl flex-col px-5 pb-8 pt-3 sm:px-8">
       <div className="grid flex-1 items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
-        <div className="flex min-h-52 items-center justify-center"><SignatureVisual id={id} step={step} reducedMotion={a11y.prefs.reducedMotion}/></div>
+        <div className="flex min-h-52 flex-col items-center justify-center gap-5">
+          <SignatureVisual id={id} step={step} reducedMotion={a11y.prefs.reducedMotion}/>
+          <div className="w-full max-w-sm rounded-[1.75rem] border border-white/12 bg-black/25 p-5 text-left shadow-2xl backdrop-blur-xl">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--flag-accent)]">{experienceMeta.purpose}</p>
+            <p className="mt-2 text-sm font-medium text-white">{experienceMeta.signature}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/68">{experienceMeta.bestWhen}</p>
+          </div>
+        </div>
         <AnimatePresence mode="wait">
           <motion.section aria-live="polite" key={`${id}-${step}`} initial={a11y.prefs.reducedMotion ? {opacity:0} : {opacity:0,y:18}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} className="rounded-[2rem] border border-white/15 bg-[rgba(4,18,31,0.72)] p-6 shadow-2xl backdrop-blur-xl sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--flag-accent)]">{current.eyebrow || `${step + 1} / ${screens.length}`}</p>
             <h1 className="mt-3 font-heading text-3xl font-medium leading-tight sm:text-4xl">{current.prompt}</h1>
             {current.body && <p className="mt-4 text-base leading-relaxed text-white/70">{current.body}</p>}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--flag-accent)]">{momentMeta.phase}</p>
+              <p className="mt-2 text-sm leading-relaxed text-white/78">{momentMeta.cue}</p>
+            </div>
             {current.kind === "intro" && evidence && <details className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-white/65"><summary className="cursor-pointer font-semibold text-white/80">Why this may help</summary><p className="mt-2 leading-relaxed">{evidence.psychoeducation}</p><p className="mt-2 text-xs text-white/45">Evidence fit: {evidence.evidenceGrade}</p></details>}
             {statusLabel && completionLike && <p className="mt-4 rounded-2xl bg-white/[0.07] p-4 text-sm text-white/75">{statusLabel}</p>}
 
@@ -330,7 +344,7 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
 
             {current.kind === "movement" && <div className="mt-6"><div className="rounded-2xl border border-[var(--flag-accent)]/30 bg-white/[0.05] p-5"><p className="text-sm font-semibold text-[var(--flag-accent)]">Accessible movement</p><p className="mt-2 text-white/80">{current.body}</p><p className="mt-3 text-xs text-white/50">Seated and low-mobility alternatives are valid. Stop or skip at any time.</p></div><button onClick={()=>setValue("movement-complete")} className="mt-4 min-h-12 w-full rounded-full bg-[var(--flag-accent)] font-semibold text-slate-950">Continue when ready</button></div>}
 
-            {current.kind === "away" && <div className="mt-6 grid gap-2 sm:grid-cols-2"><button onClick={()=>setStep(step+1)} className="min-h-12 rounded-full bg-[var(--flag-accent)] px-5 font-semibold text-slate-950">I am back</button><button onClick={onExit} className="min-h-12 rounded-full border border-white/20 px-5 text-white/75">Leave app now</button></div>}
+            {current.kind === "away" && <div className="mt-6 grid gap-2 sm:grid-cols-2"><button onClick={()=>setStep(step+1)} className="min-h-12 rounded-full bg-[var(--flag-accent)] px-5 font-semibold text-slate-950">I am back</button><button onClick={onExit} className="min-h-12 rounded-full border border-white/20 px-5 text-white/75">Leave app now</button><p className="sm:col-span-2 text-xs leading-relaxed text-white/45">Your place stays saved on this device while you step away.</p></div>}
 
             {completionLike && <><Handoff rule={handoff} onAccept={()=>launch(handoff.to)} onDismiss={()=>{recordHandoffDecision(id,handoff.to,"dismissed");setHandoffDismissed(true)}}/><button onClick={finish} className="mt-5 min-h-12 w-full rounded-full bg-[var(--flag-accent)] px-5 font-semibold text-slate-950">Finish <Check className="ml-2 inline h-4 w-4"/></button></>}
           </motion.section>

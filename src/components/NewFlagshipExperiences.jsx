@@ -6,6 +6,7 @@ import { clearActiveFlagship, getActiveFlagship, getFlagshipPreferences, recordH
 import { recommendHandoff } from "@/lib/flagshipHandoffs";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import InterventionControlShell from "@/components/InterventionControlShell";
+import { getInterventionAtmosphere } from "@/lib/interventionExperience";
 
 export const NEW_FLAGSHIP_IDS = Object.freeze(["reroute", "signalLock", "nightChannel"]);
 export const isNewFlagship = (id) => NEW_FLAGSHIP_IDS.includes(id);
@@ -34,8 +35,16 @@ function usePersistedExperience(id, initial) {
 function Shell({ id, stage, children, onBack, onExit, dark = false, active = false, paused = false, onPause, onSimplify }) {
   const meta = FLAGSHIP_REGISTRY[id];
   const accent = id === "reroute" ? "#9ef0d0" : id === "signalLock" ? "#ffd36b" : "#9eb6ff";
+  const experienceMeta = getInterventionAtmosphere({ id, why: meta?.primaryMechanism, category: meta?.primaryGoal === "sleep" ? "sleep" : undefined }, meta?.primaryGoal);
   return <InterventionControlShell id={id} goal={meta.primaryGoal} title={meta.displayName} stage={stage} onBack={onBack} onExit={onExit} active={active} paused={paused} onPause={onPause} onSimplify={onSimplify || onBack} simplifyLabel={id === "signalLock" ? "Reduce the target" : "Make this route simpler"} onDifferent={onExit} dark={dark} accent={accent} className={`new-flagship nf-${id} ${dark ? "nf-dark" : ""}`} field={<div className="nf-field" aria-hidden="true"/>}>
-    <div className="mx-auto flex min-h-[calc(100dvh-170px)] w-full max-w-3xl flex-col justify-center px-5 py-6">{children}</div>
+    <div className="mx-auto flex min-h-[calc(100dvh-170px)] w-full max-w-3xl flex-col justify-center px-5 py-6">
+      <div className="mb-5 rounded-[1.75rem] border border-white/12 bg-black/25 px-5 py-4 shadow-2xl backdrop-blur-xl">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--nf-accent)]">{experienceMeta.purpose}</p>
+        <p className="mt-2 text-sm font-medium text-white">{meta?.interactionSignature}</p>
+        <p className="mt-2 text-sm leading-relaxed text-white/65">{meta?.bestWhen}</p>
+      </div>
+      {children}
+    </div>
   </InterventionControlShell>;
 }
 

@@ -35,6 +35,7 @@ import { weekCountCutoff } from "@/lib/insights";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
+import { getInterventionReflection } from "@/lib/interventionExperience";
 import "@/styles/thought-or-fact.css";
 import "@/styles/urge-surfing.css";
 
@@ -717,6 +718,8 @@ export default function ResetFlow() {
     const v = checkinValue ?? lastValue ?? 5;
     const delta = v - lastValue;
     const improved = isLift ? delta : -delta;
+    const lastIntervention = pathwayByIds(usedIds.slice(-1))[0];
+    const reflectionCopy = getInterventionReflection(lastIntervention);
     const implied = remaining ? REMAIN_MAP[remaining] : null;
     const shiftsDir = implied && implied.direction && implied.direction !== answers.direction;
     const dirLabel = (id) => (DIRECTIONS.find((d) => d.id === id) || {}).label || id;
@@ -737,6 +740,13 @@ export default function ResetFlow() {
               <p className="mt-2 text-sm text-muted-foreground">{usedIds.length} practice{usedIds.length === 1 ? "" : "s"} so far{planRemaining > 0 ? ` · ${remMin} min left in your plan` : ""}</p>
             )}
           </motion.div>
+
+          {lastIntervention && (
+            <div className="mt-5 w-full max-w-md rounded-3xl border border-border bg-card p-5 text-center soft-depth">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{lastIntervention.name}</p>
+              <p className="mt-2 text-sm leading-relaxed text-foreground">{reflectionCopy.checkpoint}</p>
+            </div>
+          )}
 
           <div className="mt-4 w-full max-w-md">
             <IntensityDial value={v} onChange={setCheckinValue} direction={answers.direction} compact />
@@ -884,6 +894,8 @@ export default function ResetFlow() {
       ? (isLift ? endIntensity - answers.intensity : answers.intensity - endIntensity)
       : null;
     const helpedOptions = pathwayByIds(usedIds.length ? usedIds : pathway.map((p) => p.id));
+    const lastIntervention = helpedOptions.at(-1) || pathway[0];
+    const reflectionCopy = getInterventionReflection(lastIntervention);
     return (
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto flex min-h-full max-w-xl flex-col items-center px-5 pt-10 pb-28 sm:px-8">
@@ -896,6 +908,13 @@ export default function ResetFlow() {
               One last reflection
             </h1>
           </motion.div>
+
+          {lastIntervention && (
+            <div className="mt-6 w-full max-w-md rounded-3xl border border-border bg-card p-5 text-center soft-depth">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{lastIntervention.name}</p>
+              <p className="mt-2 text-sm leading-relaxed text-foreground">{reflectionCopy.reflect}</p>
+            </div>
+          )}
 
           {improvement != null && (
             <motion.p
@@ -1015,6 +1034,8 @@ export default function ResetFlow() {
   // ---------- DONE ----------
   if (phase === "done") {
     const isLift = answers.direction === "lift";
+    const lastIntervention = pathwayByIds(usedIds.slice(-1))[0] || pathway[0];
+    const reflectionCopy = getInterventionReflection(lastIntervention);
     const imp = answers.intensity != null && endIntensity != null
       ? (isLift ? endIntensity - answers.intensity : answers.intensity - endIntensity)
       : null;
@@ -1067,7 +1088,7 @@ export default function ResetFlow() {
             </motion.p>
           )}
           <p className="mx-auto mt-4 max-w-sm text-lg text-muted-foreground text-balance">
-            That’s the whole practice. Come back any time you need to.
+            {reflectionCopy.done} Come back any time you need to.
           </p>
         </div>
 

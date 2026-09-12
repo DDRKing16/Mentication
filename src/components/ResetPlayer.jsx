@@ -27,6 +27,7 @@ import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { suspendFeedback, resumeFeedback, haptic, setHapticsEnabled } from "@/lib/feedback";
 import { recordDislike } from "@/lib/preferences";
 import { interventionThemeStyle, paletteForIntervention } from "@/lib/mentationThemes";
+import { getInterventionAtmosphere, getInterventionMoment } from "@/lib/interventionExperience";
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
 
@@ -95,6 +96,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   const isLastIv = ivIndex === remaining.length - 1;
   const spokenLine = useMemo(() => (step ? spokenFor(step, iv, answers?.direction) : ""), [step, iv, answers?.direction]);
   const narrationAvailable = !spokenLine || !!getNarration(spokenLine);
+  const experienceMeta = useMemo(() => getInterventionAtmosphere(iv, answers?.direction), [iv, answers?.direction]);
+  const momentMeta = useMemo(() => getInterventionMoment(iv, step, stepIndex), [iv, step, stepIndex]);
 
   // ---- narration (natural guide voice) ----
   const { speak, stop: stopVoice, pause: pauseVoice, resume: resumeVoice, preload } = useGuideVoice();
@@ -608,15 +611,27 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                 setElapsed(0);
               }}
             >
+              {(() => {
+                const transitionMeta = getInterventionAtmosphere(transition.to, answers?.direction);
+                return (
+                  <>
               <span className="intervention-copy-muted text-[0.7rem] font-medium uppercase tracking-[0.24em]">Coming up next</span>
+              <div className="intervention-themed-surface mt-4 inline-flex flex-wrap items-center justify-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-medium uppercase tracking-[0.18em]">
+                <span>{transitionMeta?.purpose}</span>
+                {transitionMeta?.duration && <><span className="opacity-40">•</span><span>{transitionMeta.duration}</span></>}
+              </div>
               <h2 className="intervention-copy-primary mt-5 font-heading text-[2.5rem] font-medium leading-[1.05] tracking-[-0.02em] text-balance sm:text-5xl">
                 {transition.to.name}
               </h2>
               <p className="intervention-copy-muted mt-5 max-w-sm text-lg leading-relaxed text-balance">{transition.sentence}</p>
               <p className="intervention-copy-muted mt-3 text-base leading-relaxed text-balance">{transition.to.why}</p>
+              <p className="intervention-copy-muted mt-4 max-w-sm text-sm leading-relaxed text-balance">{transitionMeta.bestWhen}</p>
               <span className="intervention-copy-muted mt-10 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em]">
                 <span className="intervention-accent-bg h-1 w-1 rounded-full" /> tap to continue
               </span>
+                  </>
+                );
+              })()}
             </motion.div>
           ) : step ? (
             <motion.div
@@ -633,6 +648,18 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="flex w-full max-w-md flex-col items-center gap-6 pb-2"
             >
+              <div className="intervention-themed-surface w-full rounded-[1.75rem] px-4 py-3 backdrop-blur-xl">
+                <div className="intervention-copy-muted flex flex-wrap items-center gap-2 text-[0.68rem] font-medium uppercase tracking-[0.18em]">
+                  <span>{experienceMeta?.purpose}</span>
+                  <span className="opacity-40">•</span>
+                  <span>{momentMeta.phase}</span>
+                  <span className="opacity-40">•</span>
+                  <span>step {stepIndex + 1} of {iv?.steps?.length || 1}</span>
+                  {experienceMeta?.duration && <><span className="opacity-40">•</span><span>{experienceMeta.duration}</span></>}
+                </div>
+                <p className="intervention-copy-primary mt-2 text-sm font-medium leading-relaxed">{momentMeta.cue}</p>
+              </div>
+
               {isBoxV2 ? (
                 <BoxBreathingV2Stage
                   step={step}
@@ -703,9 +730,14 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   {step.body}
                 </p>
               )}
+              <div className="intervention-themed-surface max-w-md rounded-[1.75rem] px-4 py-4 text-center backdrop-blur-xl">
+                <p className="intervention-copy-muted text-[0.68rem] font-medium uppercase tracking-[0.18em]">What this is doing</p>
+                <p className="intervention-copy-primary mt-2 text-sm leading-relaxed">{experienceMeta?.why}</p>
+                <p className="intervention-copy-muted mt-2 text-xs leading-relaxed">{experienceMeta?.bestWhen}</p>
+              </div>
               {narrate && !narrationAvailable && (
                 <div className="max-w-md rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-sm text-cream/75">
-                  Narration is unavailable for this step, so Mentication is staying in guide-text mode.
+                  The guided voice is unavailable for this step, so the experience is continuing in quiet guide-text mode instead.
                 </div>
               )}
             </motion.div>
