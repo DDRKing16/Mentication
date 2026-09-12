@@ -9,12 +9,19 @@ function startOfDay(value) {
   return date.getTime();
 }
 
+export function weekCountCutoff(now = new Date()) {
+  const cutoff = new Date(now);
+  cutoff.setHours(0, 0, 0, 0);
+  cutoff.setDate(cutoff.getDate() - 7);
+  return cutoff.getTime();
+}
+
 export function buildMomentumSummary(sessions = []) {
   const ordered = [...sessions]
     .filter(Boolean)
     .sort((a, b) => new Date(b.created_date || 0).getTime() - new Date(a.created_date || 0).getTime());
   const totalSessions = ordered.length;
-  const thisWeekCutoff = Date.now() - 7 * DAY_MS;
+  const thisWeekCutoff = weekCountCutoff();
   const thisWeek = ordered.filter((session) => new Date(session.created_date || 0).getTime() >= thisWeekCutoff).length;
   const improvements = ordered.map(improvementOf).filter(Number.isFinite);
   const averageShift = improvements.length
@@ -155,7 +162,7 @@ export function computeEffectivenessInsights(sessions = []) {
     contextPatterns: contextPatterns.slice(0, 8),
     totalSessions: sessions.length,
     thisWeek: sessions.filter((s) => {
-      const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const since = weekCountCutoff();
       return new Date(s.created_date).getTime() >= since;
     }).length,
   };

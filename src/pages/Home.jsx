@@ -1,7 +1,7 @@
 // Home — premium emerald/ivory landing matching the Homepage V3 reference.
 // Presentation only; all flows (direction selection, last-worked replay,
 // time-of-day recommendation) route to the existing /reset entry unchanged.
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { BarChart3, Flame, Sparkles } from "lucide-react";
 import { sessionStore } from "@/lib/localData";
@@ -34,7 +34,7 @@ export default function Home() {
   const [recommendation, setRecommendation] = useState(null);
   const [momentum, setMomentum] = useState(null);
 
-  const loadSessions = async () => {
+  const loadSessions = useCallback(async () => {
     const sessions = await sessionStore.list("-created_date", 30);
     if (!hasCompletedOnboarding() && sessions.length === 0) {
       navigate("/welcome", { replace: true });
@@ -44,8 +44,8 @@ export default function Home() {
     setPersonalBest(buildPersonalBest(sessions));
     setRecommendation(buildRecommendation(sessions));
     setMomentum(buildMomentumSummary(sessions));
-  };
-  useEffect(() => { loadSessions().catch(() => {}); }, []);
+  }, [navigate]);
+  useEffect(() => { loadSessions().catch(() => {}); }, [loadSessions]);
 
   const choose = (card) => {
     if (card.unsure) navigate("/reset", { state: { unsure: true } });

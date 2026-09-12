@@ -38,12 +38,12 @@ describe("buildMomentumSummary", () => {
     });
   });
 
-  it("includes a session exactly seven days old in the weekly count", () => {
+  it("includes a session from the start of the day seven days ago in the weekly count", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-09-12T12:00:00.000Z"));
 
     const summary = buildMomentumSummary([
-      { created_date: "2026-09-05T12:00:00.000Z", direction: "calm", intensity_start: 5, intensity_end: 3 },
+      { created_date: "2026-09-05T00:00:00.000Z", direction: "calm", intensity_start: 5, intensity_end: 3 },
     ]);
 
     expect(summary.thisWeek).toBe(1);

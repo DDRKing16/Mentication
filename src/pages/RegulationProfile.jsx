@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, Sparkles, TrendingDown, Repeat, Layers } from "lucide-react";
 import { deleteAllLocalAppData, sessionStore } from "@/lib/localData";
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
+import { weekCountCutoff } from "@/lib/insights";
 import { usePremium } from "@/hooks/usePremium";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import SafetyFooter from "@/components/SafetyFooter";
@@ -37,7 +38,7 @@ export default function RegulationProfile() {
     const sessions = await sessionStore.list("-created_date", 100);
     setProfile(buildProfile(sessions));
     setLastWorked(pickLastWorked(sessions));
-    const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const since = weekCountCutoff();
     setSessions(sessions);
     setWeekCount(sessions.filter((s) => new Date(s.created_date).getTime() >= since).length);
     setLoading(false);

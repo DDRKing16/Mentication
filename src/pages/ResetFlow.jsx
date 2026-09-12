@@ -30,6 +30,7 @@ import { AWAKE_REASONS } from "@/lib/sleep";
 import PreferencesRow from "@/components/PreferencesRow";
 import FlowHomeButton from "@/components/FlowHomeButton";
 import { sessionStore } from "@/lib/localData";
+import { weekCountCutoff } from "@/lib/insights";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
@@ -118,7 +119,7 @@ export default function ResetFlow() {
       if (!mounted) return;
       sessionHistoryRef.current = sessions;
       setEffectiveness(computeEffectiveness(sessions));
-      const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const since = weekCountCutoff();
       setWeekCount(sessions.filter((s) => new Date(s.created_date).getTime() >= since).length);
     }).catch(() => {});
     return () => { mounted = false; };
