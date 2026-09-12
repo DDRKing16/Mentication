@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Sparkles, Check, ArrowRight, ArrowLeft, Rota
 import IntensityDial from "@/components/IntensityDial";
 import ChoiceButtons from "@/components/ChoiceButtons";
 import ResetPlayer from "@/components/ResetPlayer";
+import CrisisSupportCard from "@/components/CrisisSupportCard";
 import FlagshipExperience, { isInteractiveFlagship } from "@/components/FlagshipExperience";
 import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
 import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
@@ -113,6 +114,7 @@ export default function ResetFlow() {
   const attemptLogRef = useRef([]);
   const pendingCompletionRef = useRef(null);
   const [weekCount, setWeekCount] = useState(0);
+  const [historyWarning, setHistoryWarning] = useState("");
   useEffect(() => {
     let mounted = true;
     sessionStore.list("-created_date", 50).then((sessions) => {
@@ -121,7 +123,9 @@ export default function ResetFlow() {
       setEffectiveness(computeEffectiveness(sessions));
       const since = weekCountCutoff();
       setWeekCount(sessions.filter((s) => new Date(s.created_date).getTime() >= since).length);
-    }).catch(() => {});
+    }).catch(() => {
+      if (mounted) setHistoryWarning("Your saved history could not be loaded, so this reset will stay less personalised.");
+    });
     return () => { mounted = false; };
   }, []);
 
@@ -609,6 +613,11 @@ export default function ResetFlow() {
               ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
               : "Starting with the best-fit practice. The next step will adapt after your check-in."}
           </p>
+          {historyWarning && (
+            <div className="mt-5 rounded-2xl border border-border bg-card p-4">
+              <p className="text-sm leading-relaxed text-muted-foreground">{historyWarning}</p>
+            </div>
+          )}
 
           <div className="mt-10 flex flex-col gap-3">
             {pathwayPreview.map((iv, i) => (
@@ -633,6 +642,10 @@ export default function ResetFlow() {
           {!entry?.prebuilt && (
             <PreferencesRow answers={answers} setAnswers={setAnswers} />
           )}
+
+          <div className="mt-6">
+            <CrisisSupportCard compact body="If this feels too big for a reset, support is available right now." />
+          </div>
 
           <div className="mt-10 flex justify-center">
             <Button
@@ -787,6 +800,13 @@ export default function ResetFlow() {
             >
               I’m good — wrap up
             </button>
+            <button
+              type="button"
+              onClick={() => navigate("/support")}
+              className="no-tap w-full rounded-full border border-destructive/30 bg-destructive/5 py-3 text-base font-medium text-destructive transition-all active:scale-95"
+            >
+              I need support instead
+            </button>
 
             <div className="mt-1 w-full">
               <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground/70">Adjust my reset</p>
@@ -902,6 +922,13 @@ export default function ResetFlow() {
               Done <Check className="ml-2 h-5 w-5" />
             </Button>
           </div>
+          <button
+            type="button"
+            onClick={() => navigate("/support")}
+            className="no-tap mt-4 w-full max-w-md rounded-full border border-destructive/30 bg-destructive/5 py-3 text-base font-medium text-destructive transition-all active:scale-95"
+          >
+            This still feels unsafe — get support
+          </button>
 
           <p className="mt-8 text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground/70">Optional reflection</p>
           <div className="mt-4 w-full max-w-md">
@@ -1058,6 +1085,9 @@ export default function ResetFlow() {
           <button onClick={restartSame} className="no-tap rounded-full border border-border bg-card py-3 text-base font-medium text-foreground transition-all hover:border-primary/30 active:scale-95">
             Do it again
           </button>
+          <button onClick={() => navigate("/support")} className="no-tap rounded-full border border-destructive/30 bg-destructive/5 py-3 text-base font-medium text-destructive transition-all active:scale-95">
+            I need support instead
+          </button>
         </div>
       </div>
     );
@@ -1187,6 +1217,11 @@ export default function ResetFlow() {
             <p className="mt-3 text-lg text-muted-foreground text-balance">
               {currentQ.key === "intensity" && answers.direction === "lift" ? "Low to high. An honest first read." : currentQ.sub}
             </p>
+            {currentQ.key === "intensity" && (
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Use the number that fits your body right now. You can change course at any point during the reset.
+              </p>
+            )}
 
             <div className="mt-10 flex flex-1 flex-col items-center">
               {currentQ.render === "intensity" && (

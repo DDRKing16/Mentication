@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Play, Pause, Volume2, VolumeX, Type, Clock, EyeOff, Waves, Moon, Layers,
@@ -11,6 +12,7 @@ import PMRV2Stage from "@/components/PMRV2Stage";
 import {
   suggestSwitch, suggestAdaptiveAlternative, transitionSentence, SWITCH_MODES,
 } from "@/lib/interventions";
+import { getNarration } from "@/lib/narrationService";
 import { spokenFor, voiceFor } from "@/lib/spoken";
 import { useAmbientSound, AMBIENT_OPTIONS } from "@/hooks/useAmbientSound";
 import { useGuideVoice } from "@/hooks/useGuideVoice";
@@ -29,6 +31,7 @@ import { interventionThemeStyle, paletteForIntervention } from "@/lib/mentationT
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
 
 export default function ResetPlayer({ pathway, answers, effectiveness = {}, onComplete, onAttemptEvent, onExit }) {
+  const navigate = useNavigate();
   const [remaining, setRemaining] = useState(pathway);
   const [ivIndex, setIvIndex] = useState(0);
   const [stepIndex, setStepIndex] = useState(0);
@@ -90,6 +93,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   });
   const isLastStep = step != null && stepIndex === iv.steps.length - 1;
   const isLastIv = ivIndex === remaining.length - 1;
+  const spokenLine = useMemo(() => (step ? spokenFor(step, iv, answers?.direction) : ""), [step, iv, answers?.direction]);
+  const narrationAvailable = !spokenLine || !!getNarration(spokenLine);
 
   // ---- narration (natural guide voice) ----
   const { speak, stop: stopVoice, pause: pauseVoice, resume: resumeVoice, preload } = useGuideVoice();
@@ -116,10 +121,10 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     if (!narrate) { stopVoice(); setNarrationEnded(true); return; }
     if (transition) { speak(transition.sentence, { ...vf, leadMs: 400 }); return; }
     if (step) {
-      const spoken = spokenFor(step, iv, answers?.direction);
+      const spoken = spokenLine;
       const isFirst = ivIndex === 0 && stepIndex === 0;
       // No spoken text → nothing to wait for; gating is skipped.
-      setNarrationEnded(!spoken);
+      setNarrationEnded(!spoken || !narrationAvailable);
       // Box Breathing V2 instruction step: the instruction frame owns its own
       // aligned narration (word-synced reveal via useBoxV2WordReveal), so the
       // shared narrator is skipped for this one step. The frame calls
@@ -128,7 +133,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       // useWordReveal inside the stage), so the shared narrator is skipped for
       // it — exactly as the Box Breathing V2 instruction step is skipped. The
       // stage calls onNarrationEnd -> setNarrationEnded(true) when done.
-      if (!(isBoxV2 && !isBoxV2Paced) && !isGroundingV2 && !isPMRV2) {
+      if (narrationAvailable && !(isBoxV2 && !isBoxV2Paced) && !isGroundingV2 && !isPMRV2) {
         speak(spoken, {
           ...vf,
           leadMs: isFirst ? vf.leadMs : 250,
@@ -149,7 +154,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     }
     return () => stopVoice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ivIndex, stepIndex, narrate, transition]);
+  }, [ivIndex, stepIndex, narrate, transition, spokenLine, narrationAvailable]);
 
   useEffect(() => () => stopVoice(), []);
 
@@ -286,12 +291,12 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       if (elapsed >= step.holdSec + 45) goNextStep();
       return;
     }
-    const spoken = narrate ? spokenFor(step, iv, answers?.direction) : "";
+    const spoken = narrate ? spokenLine : "";
     const waitForVoice = !!spoken && !narrationEnded;
     const safetyCap = spoken ? step.holdSec + 45 : step.holdSec;
     if (elapsed >= safetyCap) { goNextStep(); return; }
     if (elapsed >= step.holdSec && !waitForVoice) goNextStep();
-  }, [elapsed, running, transition, step, goNextStep, narrate, narrationEnded, answers?.direction, isBoxV2Paced]);
+  }, [elapsed, running, transition, step, goNextStep, narrate, narrationEnded, spokenLine, isBoxV2Paced]);
 
   // ---- controls ----
   const togglePause = () => {
@@ -698,6 +703,11 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   {step.body}
                 </p>
               )}
+              {narrate && !narrationAvailable && (
+                <div className="max-w-md rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-sm text-cream/75">
+                  Narration is unavailable for this step, so Mentication is staying in guide-text mode.
+                </div>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -739,6 +749,15 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
             {isPMRV2 ? "Next intervention" : "Next"}
           </button>
         </div>
+      </div>
+      <div className="flex items-center justify-center px-6">
+        <button
+          type="button"
+          onClick={() => navigate("/support")}
+          className={"no-tap rounded-full px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-all active:scale-95 " + (lightChrome ? "text-[#1A2E26]/60 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/60 hover:bg-white/10 hover:text-cream")}
+        >
+          Need more than a reset? Get support
+        </button>
       </div>
 
       {/* control dock */}

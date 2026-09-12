@@ -1,36 +1,67 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, Zap, MapPin, Loader } from "lucide-react";
+import { TrendingUp, Zap, MapPin, Loader, Sparkles } from "lucide-react";
 import { sessionStore } from "@/lib/localData";
-import { computeEffectivenessInsights } from "@/lib/insights";
+import { buildMomentumSummary, computeEffectivenessInsights } from "@/lib/insights";
+import CrisisSupportCard from "@/components/CrisisSupportCard";
 import FlowHomeButton from "@/components/FlowHomeButton";
 
 export default function EffectivenessDashboard() {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadInsights = async () => {
+    try {
+      setError("");
+      const sessions = await sessionStore.list("-created_date", 100);
+      const computed = computeEffectivenessInsights(sessions);
+      setInsights({ ...computed, momentum: buildMomentumSummary(sessions) });
+    } catch {
+      setError("We couldn’t load your local insights just now.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadInsights = async () => {
-      try {
-        const sessions = await sessionStore.list("-created_date", 100);
-        const computed = computeEffectivenessInsights(sessions);
-        setInsights(computed);
-      } catch (e) {
-        console.error("Failed to load insights:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadInsights();
   }, []);
 
-  if (loading || !insights) {
+  if (loading) {
     return (
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background flex items-center justify-center">
-        <Loader className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background px-5 pt-6 pb-28">
+        <div className="mx-auto max-w-xl animate-pulse space-y-4">
+          <div className="h-11 w-24 rounded-full bg-card" />
+          <div className="h-10 w-56 rounded-2xl bg-card" />
+          <div className="h-32 rounded-3xl bg-card" />
+          <div className="h-24 rounded-3xl bg-card" />
+          <div className="h-24 rounded-3xl bg-card" />
+        </div>
       </div>
     );
   }
+
+  if (error || !insights) {
+    return (
+      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+        <div className="mx-auto max-w-xl px-5 pt-6 pb-28">
+          <FlowHomeButton />
+          <div className="mt-10 rounded-3xl border border-destructive/20 bg-card p-6 text-center">
+            <Loader className="mx-auto h-8 w-8 text-primary" />
+            <h1 className="mt-4 font-heading text-3xl font-medium text-primary">Insights are unavailable</h1>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{error || "Try again in a moment."}</p>
+            <button onClick={loadInsights} className="no-tap mt-5 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground active:scale-95">
+              Try again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const topDirection = insights.directionStats[0];
+  const topIntervention = insights.topInterventions[0];
 
   return (
     <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
@@ -47,6 +78,36 @@ export default function EffectivenessDashboard() {
             Based on {insights.totalSessions} sessions • {insights.thisWeek} this week
           </p>
         </motion.div>
+
+        {insights.totalSessions > 0 ? (
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-8 rounded-3xl border border-primary/10 bg-card p-5">
+            <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <Sparkles className="h-4 w-4 text-primary" /> Coaching view
+            </p>
+            <h2 className="mt-2 font-heading text-2xl font-medium tracking-tight text-primary">
+              {topDirection ? `${topDirection.direction[0].toUpperCase()}${topDirection.direction.slice(1)} is helping most lately.` : "Your patterns are taking shape."}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {topIntervention
+                ? `${topIntervention.name} is your strongest current practice.`
+                : "Keep completing resets and the app will learn what helps you most."}{" "}
+              {insights.momentum?.sessionsToGoal > 0
+                ? `${insights.momentum.sessionsToGoal} more session${insights.momentum.sessionsToGoal === 1 ? "" : "s"} will complete this week’s rhythm.`
+                : "You’ve already hit your weekly rhythm."}
+            </p>
+          </motion.div>
+        ) : (
+          <div className="mb-8 rounded-3xl border border-border bg-card p-6 text-center">
+            <h2 className="font-heading text-2xl font-medium text-primary">Your insights start after your first few resets</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Complete a couple of sessions and Mentication will begin to highlight what helps you settle, focus, lift, or sleep.
+            </p>
+          </div>
+        )}
+
+        <div className="mb-8">
+          <CrisisSupportCard compact body="If your patterns suggest you need more than a reset today, support is always available." />
+        </div>
 
         {/* Top Interventions */}
         {insights.topInterventions.length > 0 && (
@@ -186,17 +247,6 @@ export default function EffectivenessDashboard() {
           </motion.div>
         )}
 
-        {insights.totalSessions === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <p className="text-muted-foreground">
-              Complete a few sessions to see your personal patterns emerge.
-            </p>
-          </motion.div>
-        )}
       </div>
     </div>
   );

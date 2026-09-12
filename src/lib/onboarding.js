@@ -13,3 +13,9 @@ export function completeOnboarding() {
     localStorage.setItem(KEY, "1");
   } catch { /* storage may be unavailable */ }
 }
+
+export function resetOnboarding() {
+  try {
+    localStorage.removeItem(KEY);
+  } catch { /* storage may be unavailable */ }
+}

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, HeartHandshake, ShieldCheck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandLockup } from "@/components/Logo";
-import { completeOnboarding } from "@/lib/onboarding";
+import CrisisSupportCard from "@/components/CrisisSupportCard";
 
 const SLIDES = [
   {
@@ -32,8 +32,7 @@ export default function Welcome() {
   const last = i === SLIDES.length - 1;
 
   const finish = () => {
-    completeOnboarding();
-    navigate("/reset", { state: { immediate: true, direction: "calm", directionLabel: "Calm down" } });
+    navigate("/onboarding");
   };
 
   return (
@@ -77,14 +76,8 @@ export default function Welcome() {
           {last ? (
             <div className="flex flex-col gap-2.5">
               <Button size="lg" onClick={finish} className="h-16 w-full rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95">
-                Try a reset now <ArrowRight className="ml-2 h-5 w-5" />
+                Choose what you need <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <button
-                onClick={() => { completeOnboarding(); navigate("/"); }}
-                className="no-tap rounded-full py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                I’ll explore first
-              </button>
             </div>
           ) : (
             <div className="flex items-center justify-between">
@@ -99,6 +92,11 @@ export default function Welcome() {
               </Button>
             </div>
           )}
+          <CrisisSupportCard
+            compact
+            title="In crisis right now?"
+            body="Skip the onboarding and reach support immediately."
+          />
         </div>
       </div>
     </div>

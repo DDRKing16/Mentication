@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import { useLocation } from "react-router-dom";
 import TabBar from "@/components/TabBar";
-import Home from "@/pages/Home";
+const Home = lazy(() => import("@/pages/Home"));
 
 // Each tab is mounted once and kept alive (hidden via display:none) so state
 // survives tab switches.
@@ -17,44 +17,27 @@ const PageSpinner = () => (
   </div>
 );
 
-const hidden = { display: "none" };
-const visible = { display: "block" };
-
 export default function AppShell() {
   const { pathname } = useLocation();
+  const tabPage = pathname === "/"
+    ? <Home />
+    : pathname === "/library"
+      ? <InterventionLibrary />
+      : pathname === "/plan"
+        ? <MyPlan />
+        : pathname === "/profile"
+          ? <RegulationProfile />
+          : pathname === "/insights"
+            ? <EffectivenessDashboard />
+            : <Settings />;
 
   return (
     <div className="relative min-h-full">
-      <div style={pathname === "/" ? visible : hidden} className="min-h-full">
-        <Home />
-      </div>
-      <div style={pathname === "/library" ? visible : hidden} className="min-h-full">
+      <div className="min-h-full">
         <Suspense fallback={<PageSpinner />}>
-          <InterventionLibrary />
+          {tabPage}
         </Suspense>
       </div>
-      <>
-          <div style={pathname === "/plan" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <MyPlan />
-            </Suspense>
-          </div>
-          <div style={pathname === "/profile" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <RegulationProfile />
-            </Suspense>
-          </div>
-          <div style={pathname === "/insights" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <EffectivenessDashboard />
-            </Suspense>
-          </div>
-          <div style={pathname === "/settings" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <Settings />
-            </Suspense>
-          </div>
-      </>
       <TabBar />
     </div>
   );

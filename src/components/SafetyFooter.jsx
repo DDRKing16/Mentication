@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { ShieldCheck, Accessibility } from "lucide-react";
+import { ShieldCheck, Accessibility, LifeBuoy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import WellbeingNotice from "@/components/WellbeingNotice";
 import AccessibilityPanel from "@/components/AccessibilityPanel";
 
 export default function SafetyFooter({ dark = false }) {
+  const navigate = useNavigate();
   const [safety, setSafety] = useState(false);
   const [a11y, setA11y] = useState(false);
   const tone = dark ? "text-cream/55 hover:text-cream" : "text-muted-foreground hover:text-foreground";
@@ -18,6 +20,10 @@ export default function SafetyFooter({ dark = false }) {
         <span className={dot}>·</span>
         <button onClick={() => setA11y(true)} className={"no-tap flex items-center gap-1.5 font-medium transition-colors " + tone}>
           <Accessibility className="h-4 w-4" strokeWidth={1.7} /> Accessibility
+        </button>
+        <span className={dot}>·</span>
+        <button onClick={() => navigate("/support")} className={"no-tap flex items-center gap-1.5 font-medium transition-colors " + tone}>
+          <LifeBuoy className="h-4 w-4" strokeWidth={1.7} /> Crisis support
         </button>
       </div>
       {safety && <WellbeingNotice onClose={() => setSafety(false)} dark={dark} />}

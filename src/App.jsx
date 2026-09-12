@@ -6,9 +6,11 @@ import { lazy, Suspense, useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import ScrollToTop from './components/ScrollToTop';
 import AppShell from '@/components/AppShell';
+import AppErrorBoundary from '@/components/AppErrorBoundary';
 import { MotionConfig, AnimatePresence, motion } from 'framer-motion';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import { useSystemDarkMode } from '@/hooks/useSystemDarkMode';
+import { AccessibilityProvider } from '@/lib/accessibility';
 import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
 
@@ -19,6 +21,7 @@ const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
 const Crisis = lazy(() => import('@/pages/Crisis'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Welcome = lazy(() => import('@/pages/Welcome'));
+const Onboarding = lazy(() => import('@/pages/Onboarding'));
 
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
 
@@ -69,6 +72,7 @@ const MenticationRoutes = () => {
               </Route>
               <Route path="/reset" element={<ResetFlow />} />
               <Route path="/welcome" element={<Welcome />} />
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/support" element={<Crisis />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="*" element={<PageNotFound />} />
@@ -87,10 +91,14 @@ function App() {
   return (
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <ScrollToTop />
-          <MenticationRoutes />
-        </Router>
+        <AccessibilityProvider>
+          <AppErrorBoundary>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <ScrollToTop />
+              <MenticationRoutes />
+            </Router>
+          </AppErrorBoundary>
+        </AccessibilityProvider>
         <Toaster />
       </QueryClientProvider>
     </MotionConfig>

@@ -6,6 +6,18 @@
 const SESSION_KEY = "mentation.sessions.v1";
 const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_"];
 const MAX_SESSIONS = 500;
+const ONBOARDING_KEY = "haven_onboarded";
+const LEGACY_A11Y_KEY = "haven_a11y";
+const A11Y_KEY = "haven.a11y.v2";
+const DISLIKES_KEY = "haven.dislikes";
+const THOUGHT_RECORD_KEY = "mentation.thought-or-fact.records.v1";
+const FLAGSHIP_KEYS = [
+  "mentation.flagship.preferences.v1",
+  "mentation.flagship.active.v1",
+  "mentation.flagship.handoffs.v1",
+  "mentation.tomorrowParking.pending",
+  "mentation.nightChannel.feedback.v1",
+];
 
 const storage = () => (typeof window === "undefined" ? null : window.localStorage);
 
@@ -42,11 +54,62 @@ function sortSessions(sessions, sort = "-created_date") {
 function listOwnedLocalStorage() {
   const local = storage();
   if (!local) return {};
-  const keys = Array.from({ length: local.length }, (_, index) => local.key(index))
-    .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)))
+  const keys = listOwnedLocalStorageKeys(local)
     .sort();
   return Object.fromEntries(keys.map((key) => [key, local.getItem(key)]));
 }
+
+function listOwnedLocalStorageKeys(local = storage()) {
+  if (!local) return [];
+  return Array.from({ length: local.length }, (_, index) => local.key(index))
+    .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
+}
+
+const LOCAL_DATA_GROUPS = [
+  {
+    id: "sessions",
+    label: "Session history",
+    description: "Completed resets, timing, intensity check-ins, and outcome ratings.",
+    unit: "session",
+    keys: (local) => (local?.getItem(SESSION_KEY) ? [SESSION_KEY] : []),
+    count: () => readSessions().length,
+  },
+  {
+    id: "onboarding",
+    label: "Onboarding progress",
+    description: "Whether you completed the welcome flow on this device.",
+    unit: "setting",
+    keys: (local) => (local?.getItem(ONBOARDING_KEY) ? [ONBOARDING_KEY] : []),
+  },
+  {
+    id: "accessibility",
+    label: "Accessibility & sound preferences",
+    description: "Motion, contrast, caption, layout, and ambient sound defaults.",
+    unit: "preference",
+    keys: (local) => [LEGACY_A11Y_KEY, A11Y_KEY].filter((key) => local?.getItem(key) != null),
+  },
+  {
+    id: "adaptive",
+    label: "Recommendation memory",
+    description: "Local dislikes used to avoid suggesting practices that were not helping.",
+    unit: "memory",
+    keys: (local) => (local?.getItem(DISLIKES_KEY) ? [DISLIKES_KEY] : []),
+  },
+  {
+    id: "thoughtRecords",
+    label: "Thought records",
+    description: "Saved Thought or Fact entries kept only on this device.",
+    unit: "record",
+    keys: (local) => (local?.getItem(THOUGHT_RECORD_KEY) ? [THOUGHT_RECORD_KEY] : []),
+  },
+  {
+    id: "flagship",
+    label: "Intervention memory",
+    description: "Saved return points, handoffs, and in-progress intervention preferences.",
+    unit: "memory",
+    keys: (local) => FLAGSHIP_KEYS.filter((key) => local?.getItem(key) != null),
+  },
+];
 
 export const sessionStore = Object.freeze({
   async list(sort = "-created_date", limit = 100) {
@@ -82,6 +145,36 @@ export function deleteAllLocalAppData() {
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
 }
 
+export function getLocalDataInventory() {
+  const local = storage();
+  return LOCAL_DATA_GROUPS.map((group) => {
+    const keys = group.keys(local);
+    const count = typeof group.count === "function" ? group.count(local) : keys.length;
+    return {
+      id: group.id,
+      label: group.label,
+      description: group.description,
+      count,
+      unit: group.unit,
+      keys,
+    };
+  }).filter((group) => group.count > 0 || group.id === "sessions");
+}
+
+export async function deleteLocalDataGroup(groupId) {
+  const local = storage();
+  const group = LOCAL_DATA_GROUPS.find((entry) => entry.id === groupId);
+  if (!local || !group) return { deleted: false, count: 0 };
+  if (group.id === "sessions") {
+    const count = readSessions().length;
+    writeSessions([]);
+    return { deleted: true, count };
+  }
+  const keys = group.keys(local);
+  keys.forEach((key) => local.removeItem(key));
+  return { deleted: true, count: keys.length };
+}
+
 export function exportLocalAppData() {
   return {
     schemaVersion: 2,
@@ -89,4 +182,22 @@ export function exportLocalAppData() {
     sessions: readSessions(),
     localStorage: listOwnedLocalStorage(),
   };
+}
+
+export function downloadLocalAppData(filenamePrefix = "mentation-export") {
+  if (typeof document === "undefined" || typeof URL === "undefined") return false;
+  const payload = exportLocalAppData();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  try {
+    link.href = url;
+    link.download = `${filenamePrefix}-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    return true;
+  } finally {
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
 }

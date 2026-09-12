@@ -7,7 +7,9 @@ import {
 } from "lucide-react";
 import { HOME_CARDS } from "@/lib/interventions";
 import SafetyFooter from "@/components/SafetyFooter";
+import CrisisSupportCard from "@/components/CrisisSupportCard";
 import { BrandLockup } from "@/components/Logo";
+import { completeOnboarding } from "@/lib/onboarding";
 
 const ICONS = { CloudRain, Sun, RefreshCw, Anchor, Target, Moon, HelpCircle };
 
@@ -15,12 +17,15 @@ export default function Onboarding() {
   const navigate = useNavigate();
 
   const choose = (card) => {
+    completeOnboarding();
     if (card.unsure) navigate("/reset", { state: { unsure: true } });
     else navigate("/reset", { state: { direction: card.direction, directionLabel: card.label } });
   };
 
-  const immediate = () =>
+  const immediate = () => {
+    completeOnboarding();
     navigate("/reset", { state: { immediate: true, direction: "calm", directionLabel: "Calm down" } });
+  };
 
   return (
     <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
@@ -44,18 +49,26 @@ export default function Onboarding() {
             />
           </div>
           <h1 className="mt-8 font-heading text-[2.4rem] font-medium leading-[1.05] tracking-tight text-primary text-balance sm:text-5xl">
-            Come back to yourself,<br />in a few minutes.
+            Choose what you need,<br />then let’s begin.
           </h1>
           <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-muted-foreground text-balance">
-            Personalised, guided resets for whatever you’re in. Try one now — no account needed.
+            Step 2 of 2. Pick the closest fit — you’ll start your first reset right away.
           </p>
         </motion.div>
 
+        <div className="mt-8">
+          <CrisisSupportCard
+            compact
+            title="I need help right now"
+            body="If a reset is not enough, reach crisis support immediately."
+          />
+        </div>
+
         <button
           onClick={immediate}
-          className="no-tap mx-auto mt-8 flex items-center gap-2 rounded-full border border-destructive/30 bg-destructive/5 px-5 py-2.5 text-sm font-medium text-destructive transition-all hover:bg-destructive/10 active:scale-95"
+          className="no-tap mx-auto mt-4 flex items-center gap-2 rounded-full border border-destructive/30 bg-destructive/5 px-5 py-2.5 text-sm font-medium text-destructive transition-all hover:bg-destructive/10 active:scale-95"
         >
-          <LifeBuoy className="h-4 w-4" strokeWidth={1.8} /> I need help right now
+          <LifeBuoy className="h-4 w-4" strokeWidth={1.8} /> Start a calming reset now
         </button>
 
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
@@ -85,7 +98,7 @@ export default function Onboarding() {
         <div className="mt-10 text-center">
           <p className="text-sm text-muted-foreground">Everything in V1 is available without an account.</p>
           <button
-            onClick={() => navigate("/library")}
+            onClick={() => { completeOnboarding(); navigate("/library"); }}
             className="no-tap mt-2 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium text-foreground transition-all hover:border-primary/30 active:scale-95"
           >
             Explore the library <ArrowRight className="h-4 w-4" />

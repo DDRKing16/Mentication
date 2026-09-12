@@ -5,7 +5,8 @@ import { useAccessibility } from "@/lib/accessibility";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
-import { exportLocalAppData } from "@/lib/localData";
+import CrisisSupportCard from "@/components/CrisisSupportCard";
+import { deleteLocalDataGroup, downloadLocalAppData, getLocalDataInventory } from "@/lib/localData";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -32,22 +33,24 @@ export default function Settings() {
   const amb = useAccessibilityPrefs();
   const [memoryCleared, setMemoryCleared] = useState(false);
   const [exported, setExported] = useState(false);
+  const [inventory, setInventory] = useState(() => getLocalDataInventory());
+  const [deletedGroup, setDeletedGroup] = useState("");
 
   const exportData = () => {
-    const payload = exportLocalAppData();
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    try {
-      link.href = url;
-      link.download = `mentation-export-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(link);
-      link.click();
-      setExported(true);
-    } finally {
-      link.remove();
-      URL.revokeObjectURL(url);
+    if (downloadLocalAppData()) setExported(true);
+  };
+
+  const refreshInventory = () => setInventory(getLocalDataInventory());
+
+  const deleteGroup = async (group) => {
+    if (!window.confirm(`Delete ${group.label.toLowerCase()} from this device?`)) return;
+    await deleteLocalDataGroup(group.id);
+    if (group.id === "flagship") {
+      deleteFlagshipMemory("all");
+      setMemoryCleared(true);
     }
+    setDeletedGroup(group.label);
+    refreshInventory();
   };
 
   return (
@@ -144,14 +147,8 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-border bg-card p-5">
-          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            <LifeBuoy className="h-4 w-4" /> Need urgent support?
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">If you’re in crisis, reach a support line now.</p>
-          <Button variant="outline" onClick={() => navigate("/support")} className="mt-4 rounded-full">
-            Crisis support
-          </Button>
+        <div className="mt-10">
+          <CrisisSupportCard />
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">
@@ -183,6 +180,33 @@ export default function Settings() {
           </Button>
           {memoryCleared && <p role="status" className="mt-2 text-sm text-muted-foreground">Local intervention memory deleted.</p>}
           {exported && <p role="status" className="mt-2 text-sm text-muted-foreground">A local data export was downloaded to this device.</p>}
+          {deletedGroup && <p role="status" className="mt-2 text-sm text-muted-foreground">{deletedGroup} cleared from this device.</p>}
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-border bg-card p-5">
+          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            <LifeBuoy className="h-4 w-4" /> Data stored on this device
+          </p>
+          <div className="mt-4 space-y-3">
+            {inventory.map((group) => (
+              <div key={group.id} className="rounded-2xl border border-border bg-background/60 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-foreground">{group.label}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{group.description}</p>
+                    <p className="mt-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground/70">
+                      {group.count} {group.unit}{group.count === 1 ? "" : "s"}
+                    </p>
+                  </div>
+                  {group.count > 0 && (
+                    <Button variant="ghost" onClick={() => deleteGroup(group)} className="rounded-full text-muted-foreground">
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">

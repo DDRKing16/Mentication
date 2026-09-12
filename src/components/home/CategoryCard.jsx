@@ -27,6 +27,7 @@ export default function CategoryCard({ card, index = 0, onClick }) {
       transition={{ delay: index * 0.05, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       onClick={onClick}
       data-sfx="select"
+      aria-label={`${card.label}. ${card.sub}`}
       className={
         "no-tap flex flex-col items-center gap-2 rounded-[1.4rem] px-4 py-4 text-center " +
         DEPTH +

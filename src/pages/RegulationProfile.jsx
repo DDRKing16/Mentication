@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Sparkles, TrendingDown, Repeat, Layers } from "lucide-react";
-import { deleteAllLocalAppData, sessionStore } from "@/lib/localData";
+import { ChevronLeft, Sparkles, TrendingDown, Repeat, Layers, Download } from "lucide-react";
+import CrisisSupportCard from "@/components/CrisisSupportCard";
+import { deleteAllLocalAppData, downloadLocalAppData, sessionStore } from "@/lib/localData";
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
 import { weekCountCutoff } from "@/lib/insights";
 import { usePremium } from "@/hooks/usePremium";
@@ -18,32 +19,64 @@ export default function RegulationProfile() {
   const [lastWorked, setLastWorked] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const [deleting, setDeleting] = useState(false);
   const [weekCount, setWeekCount] = useState(0);
   const [sessions, setSessions] = useState([]);
+  const [error, setError] = useState("");
   const { isPremium } = usePremium();
+  const lastSessionDate = useMemo(() => sessions[0]?.created_date ? new Date(sessions[0].created_date).toLocaleDateString() : null, [sessions]);
+
+  useEffect(() => {
+    if (!confirming) {
+      setCountdown(0);
+      return;
+    }
+    setCountdown(3);
+    const timer = setInterval(() => {
+      setCountdown((value) => {
+        if (value <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return value - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [confirming]);
 
   const deleteAll = async () => {
+    if (countdown > 0) return;
     setDeleting(true);
     try {
       await sessionStore.deleteMany();
       deleteFlagshipMemory("all");
       deleteAllLocalAppData();
-    } catch { /* */ }
+    } catch {
+      setError("We couldn’t erase your local data. Try again.");
+      setDeleting(false);
+      return;
+    }
     setDeleting(false);
     navigate("/");
   };
 
   const loadSessions = async () => {
-    const sessions = await sessionStore.list("-created_date", 100);
-    setProfile(buildProfile(sessions));
-    setLastWorked(pickLastWorked(sessions));
-    const since = weekCountCutoff();
-    setSessions(sessions);
-    setWeekCount(sessions.filter((s) => new Date(s.created_date).getTime() >= since).length);
-    setLoading(false);
+    try {
+      setError("");
+      const sessions = await sessionStore.list("-created_date", 100);
+      setProfile(buildProfile(sessions));
+      setLastWorked(pickLastWorked(sessions));
+      const since = weekCountCutoff();
+      setSessions(sessions);
+      setWeekCount(sessions.filter((s) => new Date(s.created_date).getTime() >= since).length);
+    } catch {
+      setError("We couldn’t load your local profile from this device.");
+    } finally {
+      setLoading(false);
+    }
   };
-  useEffect(() => { loadSessions().catch(() => setLoading(false)); }, []);
+  useEffect(() => { loadSessions(); }, []);
 
   const doLastWorked = () => {
     const s = lastWorked;
@@ -65,8 +98,13 @@ export default function RegulationProfile() {
 
   if (loading) {
     return (
-      <div className="flex min-h-full items-center justify-center">
-        <div className="h-8 w-8 rounded-full border-4 border-secondary border-t-primary animate-spin" />
+      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background px-5 pt-10">
+        <div className="mx-auto max-w-xl animate-pulse space-y-4">
+          <div className="h-6 w-24 rounded-full bg-secondary/70" />
+          <div className="h-10 w-56 rounded-2xl bg-secondary/70" />
+          <div className="h-40 rounded-3xl bg-card" />
+          <div className="h-24 rounded-3xl bg-card" />
+        </div>
       </div>
     );
   }
@@ -109,6 +147,18 @@ export default function RegulationProfile() {
             </p>
           )}
         </motion.div>
+
+        {error && (
+          <div className="mt-6 rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
+            <p className="font-heading text-lg font-medium tracking-tight text-foreground">We couldn’t open your profile</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{error}</p>
+            <Button variant="outline" onClick={loadSessions} className="mt-4 rounded-full">Try again</Button>
+          </div>
+        )}
+
+        <div className="mt-6">
+          <CrisisSupportCard compact body="If you need more than a reset right now, support is always available." />
+        </div>
 
         {/* typical change */}
         <div className="mt-8 rounded-2xl border border-border bg-card p-6 soft-depth">
@@ -182,16 +232,25 @@ export default function RegulationProfile() {
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             Your session history stays on this device. Delete it and your intervention memory at any time.
           </p>
+          <div className="mt-4 rounded-2xl border border-destructive/15 bg-white/60 p-4">
+            <p className="text-sm font-medium text-foreground">{sessions.length} saved session{sessions.length === 1 ? "" : "s"}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {lastSessionDate ? `Last saved ${lastSessionDate}.` : "No saved sessions yet."} Export a copy before erasing everything.
+            </p>
+            <Button variant="outline" onClick={() => downloadLocalAppData("mentation-backup")} className="mt-3 rounded-full">
+              <Download className="mr-2 h-4 w-4" /> Export before erasing
+            </Button>
+          </div>
           {confirming ? (
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button variant="destructive" onClick={deleteAll} disabled={deleting} className="rounded-full">
-                {deleting ? "Deleting…" : "Yes, delete everything"}
+              <Button variant="destructive" onClick={deleteAll} disabled={deleting || countdown > 0} className="rounded-full">
+                {deleting ? "Deleting…" : countdown > 0 ? `Erase in ${countdown}…` : "Erase my sessions and start fresh"}
               </Button>
               <Button variant="ghost" onClick={() => setConfirming(false)} className="rounded-full">Cancel</Button>
             </div>
           ) : (
             <Button variant="outline" onClick={() => setConfirming(true)} className="mt-4 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10">
-              Delete all my data
+              Review before erasing everything
             </Button>
           )}
         </div>

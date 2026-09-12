@@ -43,16 +43,20 @@ export default function IntensityDial({ value, onChange, mood = false, direction
   const key = direction || (mood ? "lift" : "calm");
   const scale = SCALES[key] || SCALES.calm;
   const sliderClass = `reset-slider h-3 w-full cursor-pointer rounded-full bg-gradient-to-r ${scale.gradient} outline-none`;
+  const descriptor = scale.words[v] ?? "—";
 
   return (
     <div className={"flex flex-col items-center " + (compact ? "gap-3" : "gap-6")}>
+      <p className="text-center text-sm leading-relaxed text-muted-foreground">
+        1 is mild, 5 is moderate, 9 is intense. There’s no wrong answer.
+      </p>
       <div className="flex items-end gap-1.5">
         <span className={"font-heading font-medium leading-none tracking-tight text-primary tabular-nums " + (compact ? "text-6xl" : "text-7xl")}>
           {v}
         </span>
         <span className="mb-2 text-lg font-medium text-muted-foreground">/10</span>
       </div>
-      <span className="font-heading text-xl text-indigo italic">{scale.words[v] ?? "—"}</span>
+      <span aria-live="polite" className="font-heading text-xl text-indigo italic">{descriptor}</span>
 
       <div className="mt-2 w-full max-w-md">
         <input
@@ -63,11 +67,20 @@ export default function IntensityDial({ value, onChange, mood = false, direction
           value={v}
           onChange={(e) => onChange(Number(e.target.value))}
           aria-label="How intense is it right now"
+          aria-valuemin={0}
+          aria-valuemax={10}
+          aria-valuenow={v}
+          aria-valuetext={`${v} out of 10, ${descriptor}`}
           className={sliderClass}
         />
         <div className="mt-3 flex justify-between text-xs font-medium text-muted-foreground">
           <span>{scale.left}</span>
           <span>{scale.right}</span>
+        </div>
+        <div className="mt-2 flex justify-between text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+          <span>1 mild</span>
+          <span>5 moderate</span>
+          <span>9 intense</span>
         </div>
       </div>
 

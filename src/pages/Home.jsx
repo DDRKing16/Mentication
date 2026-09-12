@@ -9,6 +9,7 @@ import { pickLastWorked, buildPersonalBest } from "@/lib/interventions";
 import { buildRecommendation } from "@/lib/recommend";
 import { buildMomentumSummary } from "@/lib/insights";
 import { hasCompletedOnboarding } from "@/lib/onboarding";
+import CrisisSupportCard from "@/components/CrisisSupportCard";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
 import HomeHero from "@/components/home/HomeHero";
@@ -33,19 +34,25 @@ export default function Home() {
   const [personalBest, setPersonalBest] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [momentum, setMomentum] = useState(null);
+  const [loadError, setLoadError] = useState("");
 
   const loadSessions = useCallback(async () => {
-    const sessions = await sessionStore.list("-created_date", 30);
-    if (!hasCompletedOnboarding() && sessions.length === 0) {
-      navigate("/welcome", { replace: true });
-      return;
+    try {
+      setLoadError("");
+      const sessions = await sessionStore.list("-created_date", 30);
+      if (!hasCompletedOnboarding() && sessions.length === 0) {
+        navigate("/welcome", { replace: true });
+        return;
+      }
+      setLastWorked(pickLastWorked(sessions));
+      setPersonalBest(buildPersonalBest(sessions));
+      setRecommendation(buildRecommendation(sessions));
+      setMomentum(buildMomentumSummary(sessions));
+    } catch {
+      setLoadError("We couldn’t load your local session history. Try again, or open support if you need urgent help.");
     }
-    setLastWorked(pickLastWorked(sessions));
-    setPersonalBest(buildPersonalBest(sessions));
-    setRecommendation(buildRecommendation(sessions));
-    setMomentum(buildMomentumSummary(sessions));
   }, [navigate]);
-  useEffect(() => { loadSessions().catch(() => {}); }, [loadSessions]);
+  useEffect(() => { loadSessions(); }, [loadSessions]);
 
   const choose = (card) => {
     if (card.unsure) navigate("/reset", { state: { unsure: true } });
@@ -92,6 +99,26 @@ export default function Home() {
           <HomeHero onProfile={() => navigate("/profile")} onInsights={() => navigate("/insights")} />
 
           <FlagshipReturnCard />
+
+          <section className="px-[18px] pt-6">
+            <CrisisSupportCard compact />
+          </section>
+
+          {loadError && (
+            <section className="px-[18px] pt-6">
+              <div className="rounded-[1.75rem] border border-destructive/20 bg-white/80 p-5">
+                <p className="font-heading text-xl font-medium tracking-tight text-primary">We couldn’t open your history</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{loadError}</p>
+                <button
+                  type="button"
+                  onClick={loadSessions}
+                  className="no-tap mt-4 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground active:scale-95"
+                >
+                  Try again
+                </button>
+              </div>
+            </section>
+          )}
 
           {(lastWorked || personalBest) && (
             <LastWorkedCard subtitle="Repeat your most effective reset" onClick={doLastWorked} overlap />

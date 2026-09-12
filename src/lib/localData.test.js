@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { deleteAllLocalAppData, exportLocalAppData, sessionStore } from "./localData.js";
+import {
+  deleteAllLocalAppData,
+  deleteLocalDataGroup,
+  exportLocalAppData,
+  getLocalDataInventory,
+  sessionStore,
+} from "./localData.js";
 
 class MemoryStorage {
   constructor() { this.values = new Map(); }
@@ -48,5 +54,22 @@ describe("device-local application data", () => {
     expect(await sessionStore.list()).toEqual([]);
     expect(window.localStorage.getItem("mentation.preference")).toBeNull();
     expect(window.localStorage.getItem("unrelated.product")).toBe("keep");
+  });
+
+  it("builds inventory and deletes specific data groups", async () => {
+    await sessionStore.create({ id: "one", direction: "sleep" });
+    window.localStorage.setItem("haven_onboarded", "1");
+    window.localStorage.setItem("haven.dislikes", JSON.stringify({ byId: { sigh: 1 } }));
+    window.localStorage.setItem("mentation.flagship.active.v1", JSON.stringify({ interventionId: "boxV2" }));
+
+    const inventory = getLocalDataInventory();
+    expect(inventory.find((item) => item.id === "sessions")?.count).toBe(1);
+    expect(inventory.find((item) => item.id === "onboarding")?.count).toBe(1);
+    expect(inventory.find((item) => item.id === "adaptive")?.count).toBe(1);
+    expect(inventory.find((item) => item.id === "flagship")?.count).toBe(1);
+
+    await deleteLocalDataGroup("adaptive");
+    expect(window.localStorage.getItem("haven.dislikes")).toBeNull();
+    expect(window.localStorage.getItem("haven_onboarded")).toBe("1");
   });
 });
