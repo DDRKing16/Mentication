@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  LifeBuoy, ArrowRight,
+  LifeBuoy, ArrowRight, Sparkles,
   CloudRain, Sun, RefreshCw, Anchor, Target, Moon, HelpCircle,
 } from "lucide-react";
 import { HOME_CARDS } from "@/lib/interventions";
@@ -52,10 +52,16 @@ export default function Onboarding() {
         </motion.div>
 
         <button
-          onClick={immediate}
+          onClick={() => navigate("/support")}
           className="no-tap mx-auto mt-8 flex items-center gap-2 rounded-full border border-destructive/30 bg-destructive/5 px-5 py-2.5 text-sm font-medium text-destructive transition-all hover:bg-destructive/10 active:scale-95"
         >
           <LifeBuoy className="h-4 w-4" strokeWidth={1.8} /> I need help right now
+        </button>
+        <button
+          onClick={immediate}
+          className="no-tap mx-auto mt-3 flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/10 active:scale-95"
+        >
+          <Sparkles className="h-4 w-4" strokeWidth={1.8} /> Start a short calming reset
         </button>
 
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
