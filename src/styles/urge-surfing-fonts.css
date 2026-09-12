@@ -1,0 +1,36 @@
+/* Mentication type system: clean interface language, with Fraunces held for
+   emotionally significant readings rather than used as general chrome. */
+.urge-surf { font-family: var(--font-body); letter-spacing: .005em; }
+.urge-surf__bar > span,
+.urge-surf__title h1,
+.urge-surf__ride-title h1 { font-family: var(--font-clean); font-weight: 500; letter-spacing: .15em; }
+.urge-surf__bar > span { font-size: .72rem; }
+.urge-surf__title h1,
+.urge-surf__ride-title h1 { font-size: .98rem; }
+.urge-surf__ring strong,
+.urge-surf__now strong,
+.urge-surf__dial strong,
+.urge-surf__compare strong,
+.urge-surf__time-card strong,
+.urge-surf__anchor input,
+.urge-surf__safety-card h1 { font-family: var(--font-display); }
+.urge-surf__say,
+.urge-surf__feel,
+.urge-surf__choose,
+.urge-surf__ride-copy { font-family: var(--font-body); font-weight: 500; }
+.urge-surf__urge-options span,
+.urge-surf__body-options button,
+.urge-surf__hint,
+.urge-surf__ring span,
+.urge-surf__now span,
+.urge-surf__compare span,
+.urge-surf__next-label,
+.urge-surf__time-card span,
+.urge-surf__outcomes strong,
+.urge-surf__outcomes small,
+.urge-surf__next,
+.urge-surf__finish,
+.urge-surf__start,
+.urge-surf__ride-actions button,
+.urge-surf__trace,
+.urge-surf__why { font-family: var(--font-clean); font-weight: 600; }

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "interventionCount": 17,
+  "boardCount": 17,
+  "assetCount": 17,
+  "pdf": "output/pdf/mentation-elite-intervention-library.pdf",
+  "files": [
+    {
+      "path": "intervention-library/final/assets/box-breathing-existing-hero.png",
+      "sha256": "20ee52908aa25df6298f6a06b0950f60288bcf97d0bff24e0bec14f62638c09d"
+    },
+    {
+      "path": "intervention-library/final/assets/change-scene-existing-screens.png",
+      "sha256": "459b731e03b4fb86b6b298b85bb519c37167954a3d787dbf060f65b9997ad729"
+    },
+    {
+      "path": "intervention-library/final/assets/countermove-existing-screen.png",
+      "sha256": "546d661bca9f1e6bf63bb6498fe95c68ce258061ebc5b3292b236da7eb2acc53"
+    },
+    {
+      "path": "intervention-library/final/assets/grounding-existing-system.png",
+      "sha256": "be390038b9a08be23194f02e81d35d2545cc54ffd33719868d494b8e3fd3ccb2"
+    },
+    {
+      "path": "intervention-library/final/assets/ignition-point-hero.png",
+      "sha256": "19a5ab6181bcabcb23e8570b731b083805f82c077783302cd3135941b6d1c584"
+    },
+    {
+      "path": "intervention-library/final/assets/next-easiest-step-existing-screens.png",
+      "sha256": "93be8865c6fc23e1a97cd26f50ca76d016cb6931354235885064b7dcabcd4c58"
+    },
+    {
+      "path": "intervention-library/final/assets/night-channel-hero.png",
+      "sha256": "1d58b7e273ad02ee7da580242e3a23749060dd5ad26cb597e546ddeb789fab97"
+    },
+    {
+      "path": "intervention-library/final/assets/open-channel-hero.png",
+      "sha256": "5b7375a96909360598e91266cd124beb6c478f1cb8e8fc2ffe546d958477275c"
+    },
+    {
+      "path": "intervention-library/final/assets/pmr-neutral-body.png",
+      "sha256": "79f25f55df2f12190adf3eb3acb64fe3306299f4a921c8cb6cef35aeb72b92f7"
+    },
+    {
+      "path": "intervention-library/final/assets/pulse-shift-hero.png",
+      "sha256": "1016ebd2f08e7769e51382af1bacfbde73a1212d2cca18dd580062a168c51243"
+    },
+    {
+      "path": "intervention-library/final/assets/reroute-hero.png",
+      "sha256": "b826e6117f8f10e1af5c140cc828fd315ae1601a8b5c39f57d6d55c3f7d003b2"
+    },
+    {
+      "path": "intervention-library/final/assets/signal-lock-hero.png",
+      "sha256": "5bbf99ac49fc136d313c8f44f87b1a374d47d25d7d3ca11cc63d679b7e7d906f"
+    },
+    {
+      "path": "intervention-library/final/assets/test-prediction-existing-screens.png",
+      "sha256": "b211d51049566b075725c6678502664ec06fc1d7291132ca4fdbef0c31f15a3d"
+    },
+    {
+      "path": "intervention-library/final/assets/then-what-existing-hero.png",
+      "sha256": "4f8953b28c0f992f38f5587de6edf24cf8cbf19c1d07dedfbd94a0f1a3a0ba76"
+    },
+    {
+      "path": "intervention-library/final/assets/thought-or-fact-existing-system.png",
+      "sha256": "bdae3efa84162f0727860afd14cdbdcfb1744b1a9fe1d95af63280b8cd9859f9"
+    },
+    {
+      "path": "intervention-library/final/assets/tomorrow-parking-lot-existing-screens.png",
+      "sha256": "9c43e16f3f73b880b14f41b4c648ba1af5d6af7195b9f71e44e7f100821b50b2"
+    },
+    {
+      "path": "intervention-library/final/assets/urge-surfing-existing-system.png",
+      "sha256": "87273befa0939579a3f704e008d4be0acb7dfef18e21f6ef4190845ce5071289"
+    },
+    {
+      "path": "intervention-library/final/boards/5-4-3-2-1-grounding-elite-board.png",
+      "sha256": "cb79cbf84c7eef347c1e12bb5e61932e1f07ceefff8647d99368d92f58845bc9"
+    },
+    {
+      "path": "intervention-library/final/boards/box-breathing-elite-board.png",
+      "sha256": "56af4c2eb03ed4e7405cdb5d13aba5bf27f6d1666ab075c8681ed392480c02ee"
+    },
+    {
+      "path": "intervention-library/final/boards/change-the-scene-elite-board.png",
+      "sha256": "a9bc13b9900e08485ecc3076d1e57ac3b718348a0cbcca271c9fe6f55e492ea2"
+    },
+    {
+      "path": "intervention-library/final/boards/countermove-elite-board.png",
+      "sha256": "1478b6cd79813486b02d1b13f0204ef02f45ddc835ba8a5f867c59ce4c80ad7c"
+    },
+    {
+      "path": "intervention-library/final/boards/ignition-point-elite-board.png",
+      "sha256": "bc6d08d41270d4ab43000d7d6979613d3b34a19c7affe0d8cf078b5185514e97"
+    },
+    {
+      "path": "intervention-library/final/boards/next-easiest-step-elite-board.png",
+      "sha256": "82b69be08fad1ae4c451b89a4e52e9add6b3c4ce7cb1baf255ee9640976642dc"
+    },
+    {
+      "path": "intervention-library/final/boards/night-channel-elite-board.png",
+      "sha256": "dba5f046d3d2520575fc08b250c5ea99418bbcad6f08836115e4d44c3151640b"
+    },
+    {
+      "path": "intervention-library/final/boards/open-channel-elite-board.png",
+      "sha256": "fd69434ceec1d53e8c380559e5d208b8ce0756b8c54fb85ca57643df3d21a8c5"
+    },
+    {
+      "path": "intervention-library/final/boards/progressive-muscle-relaxation-elite-board.png",
+      "sha256": "ea90279458a4a8c0c08bbeffe4a0df37488009412e8b878c5ce682fdc607fbc3"
+    },
+    {
+      "path": "intervention-library/final/boards/pulse-shift-elite-board.png",
+      "sha256": "8dfebc28cb6bcd1e1a30597b88eb0d5cc32833b0ac4eeaa7f4b6a434b8261219"
+    },
+    {
+      "path": "intervention-library/final/boards/reroute-elite-board.png",
+      "sha256": "ad880d1a5c28891b0d5f3e20627b0610f8d82635e403bf862e31902f2cacc396"
+    },
+    {
+      "path": "intervention-library/final/boards/signal-lock-elite-board.png",
+      "sha256": "303af747e4208385637fae7560ef60956628cb94ad3f0850f03d699ca7dda72e"
+    },
+    {
+      "path": "intervention-library/final/boards/test-the-prediction-elite-board.png",
+      "sha256": "60a3f104406eda0b0f26959fe1db9a2f5050d9f117b3617bc73c2efd2ce9de64"
+    },
+    {
+      "path": "intervention-library/final/boards/then-what-elite-board.png",
+      "sha256": "ab64547f27581bbecf3a5a3be1da92157b4bd57bc00a9eaa4f05e05d1f634a01"
+    },
+    {
+      "path": "intervention-library/final/boards/thought-or-fact-elite-board.png",
+      "sha256": "4a878cfc5f13c9a92055893a0eab8920b8886c5931fb579e382fe0df3d50b24e"
+    },
+    {
+      "path": "intervention-library/final/boards/tomorrow-parking-lot-elite-board.png",
+      "sha256": "c0961c5460cd6e6e0fae831f8060c6798cd1430a89c77bf15308515bc0edd833"
+    },
+    {
+      "path": "intervention-library/final/boards/urge-surfing-elite-board.png",
+      "sha256": "e1d756503c40055209efc1abe3d24146c877f32e21e06b8db901e87f9fa80d23"
+    }
+  ]
+}

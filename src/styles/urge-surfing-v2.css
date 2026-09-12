@@ -1,0 +1,32 @@
+.urge-surf-v2 .urge-surf__screen { padding-inline: max(1.5rem, env(safe-area-inset-left)); }
+.urge-surf-v2__voice { display:inline-flex; min-height:2.75rem; align-items:center; gap:.45rem; margin:.7rem 0; border:0; background:transparent; color:var(--gold); font:500 .86rem var(--font-clean); }
+.urge-surf-v2__voice svg { width:1.2rem; color:var(--teal); }
+.urge-surf-v2__regions { display:flex; width:min(100%,21rem); flex-wrap:wrap; justify-content:center; gap:.38rem; margin:-.65rem 0 .25rem; border:0; padding:0; }
+.urge-surf-v2__regions legend { width:100%; margin-bottom:.35rem; color:rgb(243 232 210 / .68); font:.67rem var(--font-clean); letter-spacing:.08em; text-transform:uppercase; }
+.urge-surf-v2__regions button { min-height:2.75rem; border:1px solid rgb(185 147 80 / .42); border-radius:999px; background:rgb(4 16 20 / .35); color:var(--gold); padding:0 .7rem; font:.68rem var(--font-clean); text-transform:capitalize; }
+.urge-surf-v2__regions button.is-selected { border-color:var(--teal); background:rgb(88 207 199 / .12); color:#f3e8d2; }
+.urge-surf-v2 .urge-surf__anchor { min-height:5.3rem; }
+.urge-surf-v2 .urge-surf__anchor textarea { width:100%; min-height:3.2rem; resize:vertical; border:0; outline:0; background:transparent; color:#f3e8d2; font:italic 1rem/1.45 var(--font-display); text-align:center; }
+.urge-surf-v2__counter { width:min(100%,18rem); margin:.25rem 0 0; color:rgb(243 232 210 / .5); font:.65rem var(--font-clean); text-align:right; }
+.urge-surf-v2 .urge-surf__why:disabled { opacity:.48; }
+.urge-surf-v2__rating { display:grid; width:min(100%,20rem); grid-template-columns:repeat(5,1fr); gap:.55rem; margin:2rem 0 1rem; }
+.urge-surf-v2__rating button { min-height:3.1rem; border:1px solid rgb(185 147 80 / .43); border-radius:.65rem; background:rgb(4 16 20 / .4); color:#f3e8d2; font:500 1rem var(--font-display); }
+.urge-surf-v2__rating button.is-selected { border-color:var(--teal); background:rgb(88 207 199 / .14); box-shadow:inset 0 0 0 1px var(--teal); }
+.urge-surf-v2__skip,.urge-surf-v2__text-button { min-height:2.75rem; border:0; background:none; color:rgb(243 232 210 / .68); font:.76rem var(--font-clean); text-decoration:underline; text-underline-offset:4px; }
+.urge-surf-v2__rating-missing { width:min(100%,18rem); margin:1.5rem 0 1rem; border:1px solid rgb(185 147 80 / .34); border-radius:.7rem; color:rgb(243 232 210 / .76); padding:.85rem; font:.78rem/1.45 var(--font-body); }
+.urge-surf-v2__overlay { position:fixed; inset:0; z-index:20; display:grid; place-items:end center; background:rgb(0 0 0 / .58); padding:1rem; }
+.urge-surf-v2__overlay section { position:relative; width:min(100%,25rem); border:1px solid rgb(185 147 80 / .45); border-radius:1.15rem; background:#0d302c; color:#f3e8d2; padding:1.5rem; box-shadow:0 1.5rem 4rem rgb(0 0 0 / .45); text-align:center; }
+.urge-surf-v2__overlay section>p:first-of-type { color:var(--gold); font:.66rem var(--font-clean); letter-spacing:.13em; }
+.urge-surf-v2__overlay h2 { margin:.7rem 0; font:500 1.45rem/1.15 var(--font-display); text-transform:capitalize; }
+.urge-surf-v2__overlay section>p:last-of-type { color:rgb(243 232 210 / .76); font:.84rem/1.45 var(--font-body); }
+.urge-surf-v2__overlay section>button:not(.urge-surf-v2__close) { width:100%; min-height:3.1rem; margin-top:.7rem; border:1px solid rgb(185 147 80 / .6); border-radius:.65rem; background:#17483f; color:#f3e8d2; font:600 .78rem var(--font-clean); }
+.urge-surf-v2__overlay .urge-surf-v2__text-button { background:transparent; border-color:transparent; }
+.urge-surf-v2__close { position:absolute; right:.7rem; top:.7rem; display:grid; width:2.75rem; height:2.75rem; place-items:center; border:0; background:none; color:#f3e8d2; }
+.urge-surf-v2__close svg { width:1.1rem; }
+.urge-surf-v2__waveform { display:flex; height:1.2rem; align-items:center; justify-content:center; gap:3px; margin:1.2rem 0; }
+.urge-surf-v2__waveform i { width:2px; height:calc(18% + (var(--i, 1) * 0%)); background:var(--teal); }
+.urge-surf-v2__waveform i:nth-child(3n) { height:85%; }.urge-surf-v2__waveform i:nth-child(4n) { height:48%; }
+.urge-surf-v2 .urge-surf__title h1,
+.urge-surf-v2 .urge-surf__ride-title h1 { font-family:var(--font-display); font-weight:450; letter-spacing:.055em; }
+@media (min-width:431px) { .urge-surf-v2 .urge-surf__screen { max-width:27rem; margin-inline:auto; } }
+@media (prefers-reduced-motion:reduce) { .urge-surf-v2__overlay { transition:none; } }

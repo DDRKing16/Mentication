@@ -1,0 +1,33 @@
+/* Urge Surfing tokens from the approved build specification. */
+.urge-surf {
+  --gold: #b99350;
+  --gold-dim: #7a572e;
+  --teal: #58cfc7;
+  background: radial-gradient(ellipse at 50% -10%, #0d302c 0%, #071b1a 57%, #041014 100%);
+  color: #f3e8d2;
+}
+
+.urge-surf__ocean {
+  background: radial-gradient(circle at 50% 32%, rgb(88 207 199 / .12), transparent 30%), linear-gradient(180deg, rgb(13 75 67 / .16), rgb(4 16 20 / .72));
+}
+
+.urge-surf__brand { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; }
+.urge-surf__brand .h-5 { border-radius: 22%; box-shadow: 0 0 0 1px rgb(243 232 210 / .16); }
+.urge-surf__brand b { font: 500 .68rem/1 var(--font-clean); letter-spacing: .16em; }
+.urge-surf__title h1,
+.urge-surf__ride-title h1 { color: #f3e8d2; font-weight: 500; letter-spacing: .12em; }
+.urge-surf__title p,
+.urge-surf__say,
+.urge-surf__feel,
+.urge-surf__choose,
+.urge-surf__ride-copy { color: rgb(243 232 210 / .84); }
+.urge-surf__hint,
+.urge-surf__complete-copy { color: rgb(243 232 210 / .68); }
+.urge-surf__next,
+.urge-surf__finish,
+.urge-surf__start { border-color: rgb(185 147 80 / .82); background: linear-gradient(135deg, #7a572e, #3f2c19); }
+.urge-surf__urge-options button,
+.urge-surf__body-options button,
+.urge-surf__outcomes button { border-color: rgb(185 147 80 / .48); }
+.urge-surf__urge-options button.is-selected,
+.urge-surf__body-options button.is-selected { border-color: #58cfc7; background: rgb(88 207 199 / .12); }

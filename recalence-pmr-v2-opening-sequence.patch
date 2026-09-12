@@ -1,0 +1,440 @@
+diff --git a/src/components/PMRV2Stage.jsx b/src/components/PMRV2Stage.jsx
+index d84cc3a..70e3b06 100644
+--- a/src/components/PMRV2Stage.jsx
++++ b/src/components/PMRV2Stage.jsx
+@@ -233,6 +233,39 @@ function RipplePoints({ region, stepIndex }) {
+   ));
+ }
+ 
++function IntroArrival({ stepIndex, backReached, handsReached, settledReached, readyReached }) {
++  return (
++    <div key={`intro-arrival-${stepIndex}`} className="pmr-v2-intro-arrival" aria-hidden="true">
++      <div className="pmr-v2-intro-scan" />
++
++      {backReached && <div className="pmr-v2-intro-support pmr-v2-intro-support--back" />}
++
++      {handsReached && (
++        <>
++          <div className="pmr-v2-intro-support pmr-v2-intro-support--left-hand" />
++          <div className="pmr-v2-intro-support pmr-v2-intro-support--right-hand" />
++        </>
++      )}
++
++      {settledReached && (
++        <>
++          <div className="pmr-v2-intro-support pmr-v2-intro-support--hips" />
++          <div className="pmr-v2-intro-support pmr-v2-intro-support--left-foot" />
++          <div className="pmr-v2-intro-support pmr-v2-intro-support--right-foot" />
++          <div className="pmr-v2-intro-whole-pulse" />
++        </>
++      )}
++
++      {readyReached && (
++        <>
++          <div className="pmr-v2-intro-ready pmr-v2-intro-ready--left" />
++          <div className="pmr-v2-intro-ready pmr-v2-intro-ready--right" />
++        </>
++      )}
++    </div>
++  );
++}
++
+ function BodyFigure({
+   region,
+   phase,
+@@ -241,6 +274,7 @@ function BodyFigure({
+   reducedMotion,
+   stepIndex,
+   markerPoints,
++  introState,
+ }) {
+   const activeRegion = region === "whole" ? null : region;
+   const settled = new Set(released);
+@@ -329,6 +363,10 @@ function BodyFigure({
+         >
+           <div className="pmr-v2-base-light" />
+ 
++          {phase === "intro" && !reducedMotion && (
++            <IntroArrival stepIndex={stepIndex} {...introState} />
++          )}
++
+           {BODY_REGIONS.map((name) => (
+             <GlowBoxes
+               key={name}
+@@ -371,10 +409,12 @@ function BodyFigure({
+ }
+ 
+ function SectionProgress({ region, phase }) {
+-  const activeSection = phase === "intro" ? 0 : SECTION_FOR_REGION[region] ?? 3;
++  const activeSection = phase === "intro" ? -1 : SECTION_FOR_REGION[region] ?? 3;
++  const progressLabel =
++    activeSection >= 0 ? `${SECTION_LABELS[activeSection]} stage` : "Preparing to begin";
+ 
+   return (
+-    <div className="pmr-v2-section-progress" aria-label={`${SECTION_LABELS[activeSection]} stage`}>
++    <div className="pmr-v2-section-progress" aria-label={progressLabel}>
+       {SECTION_LABELS.map((label, index) => (
+         <div
+           key={label}
+@@ -479,6 +519,21 @@ export default function PMRV2Stage({
+     [tokens]
+   );
+ 
++  const introBackCueWordIndex = useMemo(
++    () => findPMRCue(tokens, ["back", "supported"]),
++    [tokens]
++  );
++
++  const introHandsCueWordIndex = useMemo(
++    () => findPMRCue(tokens, ["hands"]),
++    [tokens]
++  );
++
++  const introLapCueWordIndex = useMemo(
++    () => findPMRCue(tokens, ["lap"]),
++    [tokens]
++  );
++
+   const faceFocus = useMemo(() => {
+     if (region !== "face" || phase !== "release") return "jaw";
+ 
+@@ -510,6 +565,31 @@ export default function PMRV2Stage({
+   const markerPoints =
+     region === "face" ? FACE_FOCUS_MARKERS[faceFocus] : REGION_MARKERS[region];
+ 
++  const introState = useMemo(() => {
++    const narratedCueReached = (cueIndex, fallbackProgress) => {
++      if (!narrate || cueIndex == null) return phaseProgress >= fallbackProgress;
++      return visibleCount > cueIndex;
++    };
++
++    return {
++      backReached:
++        phase === "intro" && narratedCueReached(introBackCueWordIndex, 0.2),
++      handsReached:
++        phase === "intro" && narratedCueReached(introHandsCueWordIndex, 0.36),
++      settledReached:
++        phase === "intro" && narratedCueReached(introLapCueWordIndex, 0.56),
++      readyReached: phase === "intro" && phaseProgress >= 0.82,
++    };
++  }, [
++    phase,
++    narrate,
++    phaseProgress,
++    visibleCount,
++    introBackCueWordIndex,
++    introHandsCueWordIndex,
++    introLapCueWordIndex,
++  ]);
++
+   useEffect(() => {
+     const key = `${stepIndex}:${phase}:${region}`;
+     if (previousStep.current === key) return;
+@@ -533,6 +613,7 @@ export default function PMRV2Stage({
+         reducedMotion={a11y.prefs.reducedMotion}
+         stepIndex={stepIndex}
+         markerPoints={markerPoints}
++        introState={introState}
+       />
+ 
+       <div className="pmr-v2-copy">
+diff --git a/src/components/ResetPlayer.jsx b/src/components/ResetPlayer.jsx
+index a476326..871e108 100644
+--- a/src/components/ResetPlayer.jsx
++++ b/src/components/ResetPlayer.jsx
+@@ -582,7 +582,13 @@ export default function ResetPlayer({ pathway, answers, onComplete, onExit }) {
+                   spoken={spokenFor(step, iv, answers?.direction)}
+                   onNarrationEnd={() => setNarrationEnded(true)}
+                   onNextBodyPart={nextPMRStageIndex >= 0 ? nextPMRBodyPart : undefined}
+-                  nextBodyPartLabel={step?.phase === "return" ? "Finish" : "Next body part"}
++                  nextBodyPartLabel={
++                    step?.phase === "intro"
++                      ? "Start with hands"
++                      : step?.phase === "return"
++                        ? "Finish"
++                        : "Next body part"
++                  }
+                 />
+               ) : (
+                 <StageVisual
+diff --git a/src/index.css b/src/index.css
+index 7b71ee1..06e0b55 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -1120,6 +1120,185 @@ html.reduce-motion .grounding-orb-glow { animation: none !important; opacity: 0.
+     linear-gradient(180deg, rgba(220, 244, 226, 0.06), rgba(50, 158, 117, 0.02) 48%, rgba(228, 197, 127, 0.035));
+ }
+ 
++/* PMR opening — a single seven-second arrival sequence. */
++.pmr-v2-figure.is-intro .pmr-v2-body-wrap {
++  animation: pmr-v2-intro-body-arrive 1.1s var(--pmr-ease) both;
++}
++
++.pmr-v2-figure.is-intro .pmr-v2-figure-halo {
++  animation: pmr-v2-intro-halo-settle 7s var(--pmr-ease) both;
++}
++
++.pmr-v2-figure.is-intro .pmr-v2-floor-glow {
++  animation: pmr-v2-intro-floor-arrive 2.2s var(--pmr-ease) both;
++}
++
++.pmr-v2-intro-arrival {
++  position: absolute;
++  inset: 0;
++  z-index: 3;
++  pointer-events: none;
++}
++
++.pmr-v2-intro-scan {
++  position: absolute;
++  top: -15%;
++  left: 11%;
++  width: 78%;
++  height: 16%;
++  border-radius: 50%;
++  background: linear-gradient(
++    180deg,
++    transparent,
++    rgba(235, 246, 225, 0.2) 28%,
++    rgba(247, 232, 184, 0.82) 52%,
++    rgba(146, 225, 180, 0.2) 72%,
++    transparent
++  );
++  filter: blur(8px);
++  mix-blend-mode: screen;
++  opacity: 0;
++  animation: pmr-v2-intro-scan-down 3.2s var(--pmr-ease) 0.35s both;
++}
++
++.pmr-v2-intro-support,
++.pmr-v2-intro-ready,
++.pmr-v2-intro-whole-pulse {
++  position: absolute;
++  border-radius: 50%;
++  pointer-events: none;
++}
++
++.pmr-v2-intro-support {
++  background: radial-gradient(
++    closest-side,
++    rgba(250, 239, 202, 0.94),
++    rgba(168, 228, 190, 0.48) 44%,
++    rgba(89, 178, 137, 0.12) 72%,
++    transparent 92%
++  );
++  filter: blur(8px);
++  opacity: 0;
++  animation: pmr-v2-intro-support-bloom 1.45s var(--pmr-ease) both;
++}
++
++.pmr-v2-intro-support--back {
++  top: 17%;
++  left: 29%;
++  width: 42%;
++  height: 17%;
++}
++
++.pmr-v2-intro-support--left-hand {
++  top: 44%;
++  left: 13%;
++  width: 15%;
++  height: 14%;
++}
++
++.pmr-v2-intro-support--right-hand {
++  top: 44%;
++  left: 72%;
++  width: 15%;
++  height: 14%;
++}
++
++.pmr-v2-intro-support--hips {
++  top: 44%;
++  left: 35%;
++  width: 30%;
++  height: 16%;
++}
++
++.pmr-v2-intro-support--left-foot {
++  top: 87%;
++  left: 36%;
++  width: 13%;
++  height: 11%;
++}
++
++.pmr-v2-intro-support--right-foot {
++  top: 87%;
++  left: 51%;
++  width: 13%;
++  height: 11%;
++}
++
++.pmr-v2-intro-whole-pulse {
++  inset: 3% 9% 2%;
++  background: radial-gradient(
++    ellipse at 50% 45%,
++    rgba(244, 237, 204, 0.34),
++    rgba(128, 215, 166, 0.16) 48%,
++    transparent 78%
++  );
++  filter: blur(13px);
++  opacity: 0;
++  animation: pmr-v2-intro-whole-settle 2.15s var(--pmr-ease) both;
++}
++
++.pmr-v2-intro-ready {
++  top: 43%;
++  width: 17%;
++  height: 16%;
++  background: radial-gradient(
++    closest-side,
++    rgba(255, 225, 216, 0.94),
++    rgba(246, 139, 127, 0.48) 45%,
++    transparent 84%
++  );
++  filter: blur(7px);
++  opacity: 0;
++  animation: pmr-v2-intro-hands-ready 1.25s var(--pmr-ease) both;
++}
++
++.pmr-v2-intro-ready--left { left: 12%; }
++.pmr-v2-intro-ready--right { left: 71%; }
++
++@keyframes pmr-v2-intro-body-arrive {
++  0% { opacity: 0.18; transform: translateX(-50%) scale(0.955); filter: blur(5px); }
++  58% { opacity: 0.82; }
++  100% { opacity: 1; transform: translateX(-50%) scale(1); filter: blur(0); }
++}
++
++@keyframes pmr-v2-intro-halo-settle {
++  0% { opacity: 0.16; transform: scale(0.82); filter: blur(15px); }
++  18% { opacity: 0.72; transform: scale(1.04); filter: blur(23px); }
++  56% { opacity: 0.88; transform: scale(1.08); filter: blur(25px); }
++  100% { opacity: 0.72; transform: scale(1); filter: blur(20px); }
++}
++
++@keyframes pmr-v2-intro-floor-arrive {
++  0% { opacity: 0; transform: translateX(-50%) scaleX(0.55); }
++  100% { opacity: 0.72; transform: translateX(-50%) scaleX(1); }
++}
++
++@keyframes pmr-v2-intro-scan-down {
++  0% { opacity: 0; transform: translateY(0) scaleX(0.82); }
++  14% { opacity: 0.82; }
++  76% { opacity: 0.68; }
++  100% { opacity: 0; transform: translateY(690%) scaleX(1.04); }
++}
++
++@keyframes pmr-v2-intro-support-bloom {
++  0% { opacity: 0; transform: scale(0.72); }
++  38% { opacity: 0.86; transform: scale(0.94); }
++  68% { opacity: 0.5; transform: scale(1.08); }
++  100% { opacity: 0.16; transform: scale(1.14); }
++}
++
++@keyframes pmr-v2-intro-whole-settle {
++  0% { opacity: 0; transform: scale(0.94); }
++  48% { opacity: 0.62; transform: scale(1.025); }
++  100% { opacity: 0.2; transform: scale(1); }
++}
++
++@keyframes pmr-v2-intro-hands-ready {
++  0% { opacity: 0; transform: scale(0.76); }
++  48% { opacity: 0.86; transform: scale(1.02); }
++  100% { opacity: 0.34; transform: scale(1.1); }
++}
++
+ .pmr-v2-glow {
+   position: absolute;
+   border-radius: 50%;
+@@ -1393,7 +1572,7 @@ html.reduce-motion
+   min-height: 2.75rem;
+   max-width: 23rem;
+   margin: 0.52rem 0 0;
+-  color: rgba(222, 232, 217, 0.69);
++  color: rgba(226, 236, 222, 0.78);
+   font-size: 0.90rem;
+   line-height: 1.55;
+   text-wrap: balance;
+@@ -1416,8 +1595,8 @@ html.reduce-motion
+   justify-content: center;
+   gap: 0.34rem;
+   padding-top: 0.45rem;
+-  border-top: 1px solid rgba(157, 206, 176, 0.12);
+-  color: rgba(212, 228, 213, 0.28);
++  border-top: 1px solid rgba(157, 206, 176, 0.18);
++  color: rgba(216, 231, 217, 0.38);
+   font-size: 0.57rem;
+   letter-spacing: 0.035em;
+   transition: color 800ms var(--pmr-ease), border-color 800ms var(--pmr-ease);
+@@ -1428,7 +1607,7 @@ html.reduce-motion
+   height: 0.28rem;
+   flex: 0 0 auto;
+   border-radius: 999px;
+-  background: rgba(143, 197, 163, 0.28);
++  background: rgba(143, 197, 163, 0.38);
+   transition: background 800ms var(--pmr-ease), box-shadow 800ms var(--pmr-ease);
+ }
+ 
+@@ -1482,6 +1661,8 @@ html.reduce-motion
+ }
+ 
+ @media (prefers-reduced-motion: reduce) {
++  .pmr-v2-figure.is-intro .pmr-v2-body-wrap,
++  .pmr-v2-figure.is-intro .pmr-v2-floor-glow,
+   .pmr-v2-figure-halo,
+   .pmr-v2-glow.is-active,
+   .pmr-v2-tension-focus,
+@@ -1495,6 +1676,8 @@ html.reduce-motion
+   .pmr-v2-tension-focus { transition-duration: 0ms !important; }
+ }
+ 
++html.reduce-motion .pmr-v2-figure.is-intro .pmr-v2-body-wrap,
++html.reduce-motion .pmr-v2-figure.is-intro .pmr-v2-floor-glow,
+ html.reduce-motion .pmr-v2-figure-halo,
+ html.reduce-motion .pmr-v2-glow.is-active,
+ html.reduce-motion .pmr-v2-tension-focus,
+@@ -1520,16 +1703,12 @@ html.reduce-motion .pmr-v2-tension-focus { transition-duration: 0ms !important;
+   transform: translateY(clamp(-1.8rem, -2.6vh, -1rem));
+ }
+ 
+-/*
+-  The body currently consumes too much vertical room.
+-  Reduce it slightly — not dramatically — to create space
+-  for the guidance underneath.
+-*/
++/* Keep the body as the primary visual anchor while preserving room for guidance. */
+ .pmr-v2-figure {
+   width: min(65vw, 17.75rem);
+-  height: clamp(11.5rem, 43vh, 22.5rem);
++  height: clamp(13.2rem, 49vh, 25.9rem);
+   margin-top: 0;
+-  margin-bottom: clamp(0.55rem, 1.2vh, 0.85rem);
++  margin-bottom: clamp(0.2rem, 0.55vh, 0.4rem);
+ }
+ 
+ /*
+@@ -1667,8 +1846,8 @@ html.reduce-motion .pmr-v2-tension-focus { transition-duration: 0ms !important;
+ 
+   .pmr-v2-figure {
+     width: min(63vw, 16.5rem);
+-    height: clamp(10rem, 38vh, 17.5rem);
+-    margin-bottom: 0.3rem;
++    height: clamp(11rem, 42vh, 19.5rem);
++    margin-bottom: 0.15rem;
+   }
+ 
+   .pmr-v2-copy {
+diff --git a/src/lib/interventions.js b/src/lib/interventions.js
+index 9aa58cf..2f8e6a8 100644
+--- a/src/lib/interventions.js
++++ b/src/lib/interventions.js
+@@ -602,7 +602,7 @@ const SOMATIC = [
+       speak: "Back supported, hands resting in your lap.",
+       region: "whole",
+       phase: "intro",
+-      holdSec: 14,
++      holdSec: 7,
+     },
+ 
+     {
