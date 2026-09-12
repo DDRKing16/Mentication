@@ -108,6 +108,7 @@ describe("device-local application data", () => {
     await sessionStore.create({ id: "one", direction: "calm" });
     window.localStorage.setItem("haven.a11y.v2", JSON.stringify({ reducedMotion: true }));
     window.localStorage.setItem("mentation.thought-or-fact.records.v1", JSON.stringify([{ id: "record-1" }]));
+    events.length = 0;
 
     expect(await deleteLocalDataGroup("sessions")).toEqual({ deleted: true, count: 1 });
     expect(await sessionStore.list()).toEqual([]);
