@@ -77,7 +77,7 @@ function sortSessions(sessions, sort = "-created_date") {
 function listOwnedLocalStorage() {
   const local = storage();
   if (!local) return {};
-  const keys = listOwnedLocalStorageKeys(local)
+  const keys = listExportableLocalStorageKeys(local)
     .sort();
   return Object.fromEntries(keys.map((key) => [key, local.getItem(key)]));
 }
@@ -90,6 +90,14 @@ function listOwnedLocalStorageKeys(local = storage()) {
   const known = [...KNOWN_APP_KEYS, ...FLAGSHIP_KEYS].filter((key) => local.getItem?.(key) != null);
   return Array.from(new Set([...enumerated, ...known]))
     .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
+}
+
+function listExportableLocalStorageKeys(local = storage()) {
+  if (!local) return [];
+  const keys = LOCAL_DATA_GROUPS
+    .flatMap((group) => group.keys(local))
+    .filter((key) => key && APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix)));
+  return Array.from(new Set(keys));
 }
 
 const LOCAL_DATA_GROUPS = [
@@ -162,9 +170,10 @@ export const sessionStore = Object.freeze({
   },
 });
 
-export function deleteAllLocalAppData() {
+export async function deleteAllLocalAppData() {
   const local = storage();
   if (!local) return;
+  await sessionStore.deleteMany();
   const keys = listOwnedLocalStorageKeys(local);
   for (const key of keys) {
     if (APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);

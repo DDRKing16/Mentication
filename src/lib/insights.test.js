@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { buildMomentumSummary } from "./insights";
+import { buildMomentumSummary, computeEffectivenessInsights } from "./insights";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -50,6 +50,9 @@ describe("buildMomentumSummary", () => {
     ]);
 
     expect(summary.thisWeek).toBe(1);
+    expect(computeEffectivenessInsights([
+      { created_date: "2026-09-05T00:00:00.000Z", direction: "calm", intensity_start: 5, intensity_end: 3, pathway: ["sigh"] },
+    ]).thisWeek).toBe(1);
 
   });
 

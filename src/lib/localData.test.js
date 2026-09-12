@@ -54,7 +54,7 @@ describe("device-local application data", () => {
     expect(exported.localStorage["mentation.preference"]).toBe("quiet");
     expect(exported.localStorage.haven_onboarded).toBe("1");
 
-    deleteAllLocalAppData();
+    await deleteAllLocalAppData();
 
     expect(await sessionStore.list()).toEqual([]);
     expect(window.localStorage.getItem("mentation.preference")).toBeNull();
