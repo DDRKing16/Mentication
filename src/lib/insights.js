@@ -30,13 +30,17 @@ export function buildMomentumSummary(sessions = []) {
 
   const dayStarts = [...new Set(ordered.map((session) => startOfDay(session.created_date)).filter(Number.isFinite))];
   let streakDays = 0;
-  for (let index = 0; index < dayStarts.length; index += 1) {
-    if (index === 0) {
-      streakDays = 1;
-      continue;
+  const todayStart = startOfDay(Date.now());
+  const mostRecentDay = dayStarts[0];
+  if (mostRecentDay === todayStart || mostRecentDay === todayStart - DAY_MS) {
+    for (let index = 0; index < dayStarts.length; index += 1) {
+      if (index === 0) {
+        streakDays = 1;
+        continue;
+      }
+      if (dayStarts[index - 1] - dayStarts[index] === DAY_MS) streakDays += 1;
+      else break;
     }
-    if (dayStarts[index - 1] - dayStarts[index] === DAY_MS) streakDays += 1;
-    else break;
   }
 
   const directionStats = ordered.reduce((map, session) => {

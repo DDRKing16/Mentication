@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, LifeBuoy, Trash2, ShieldCheck, Download } from "lucide-react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
-import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
-import { deleteLocalDataGroup, downloadLocalAppData, getLocalDataInventory } from "@/lib/localData";
+import {
+  deleteLocalDataGroup,
+  downloadLocalAppData,
+  getLocalDataInventory,
+  LOCAL_DATA_CHANGED_EVENT,
+} from "@/lib/localData";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -39,13 +43,19 @@ export default function Settings() {
 
   const refreshInventory = () => setInventory(getLocalDataInventory());
 
+  useEffect(() => {
+    window.addEventListener(LOCAL_DATA_CHANGED_EVENT, refreshInventory);
+    window.addEventListener("focus", refreshInventory);
+    return () => {
+      window.removeEventListener(LOCAL_DATA_CHANGED_EVENT, refreshInventory);
+      window.removeEventListener("focus", refreshInventory);
+    };
+  }, []);
+
   const deleteGroup = async (group) => {
     if (!window.confirm(`Delete ${group.label.toLowerCase()} from this device?`)) return;
     await deleteLocalDataGroup(group.id);
-    if (group.id === "flagship") {
-      deleteFlagshipMemory("all");
-      setMemoryCleared(true);
-    }
+    if (group.id === "flagship") setMemoryCleared(true);
     setDeletedGroup(group.label);
     refreshInventory();
   };
@@ -166,9 +176,9 @@ export default function Settings() {
           </div>
           <Button
             variant="ghost"
-            onClick={() => {
+            onClick={async () => {
               if (!window.confirm("Delete local intervention memory, saved return points and handoff preferences from this device?")) return;
-              deleteFlagshipMemory("all");
+              await deleteLocalDataGroup("flagship");
               setMemoryCleared(true);
               refreshInventory();
             }}

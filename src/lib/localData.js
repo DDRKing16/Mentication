@@ -178,6 +178,12 @@ export async function deleteLocalDataGroup(groupId) {
     writeSessions([]);
     return { deleted: true, count };
   }
+  if (group.id === "flagship") {
+    const count = group.keys(local).length;
+    deleteFlagshipMemory("all");
+    emitLocalDataChanged();
+    return { deleted: true, count };
+  }
   const keys = group.keys(local);
   keys.forEach((key) => local.removeItem(key));
   emitLocalDataChanged();
@@ -212,3 +218,4 @@ export function downloadLocalAppData(filenamePrefix = "mentation-export") {
 }
 
 export const LOCAL_DATA_CHANGED_EVENT = LOCAL_DATA_EVENT;
+import { deleteFlagshipMemory } from "./flagshipMemory";

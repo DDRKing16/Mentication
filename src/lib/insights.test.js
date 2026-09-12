@@ -50,4 +50,19 @@ describe("buildMomentumSummary", () => {
 
     vi.useRealTimers();
   });
+
+  it("resets the streak when the latest session is older than yesterday", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-12T12:00:00.000Z"));
+
+    const summary = buildMomentumSummary([
+      { created_date: "2026-09-03T12:00:00.000Z", direction: "calm", intensity_start: 6, intensity_end: 3 },
+      { created_date: "2026-09-02T12:00:00.000Z", direction: "calm", intensity_start: 5, intensity_end: 3 },
+      { created_date: "2026-09-01T12:00:00.000Z", direction: "calm", intensity_start: 4, intensity_end: 2 },
+    ]);
+
+    expect(summary.streakDays).toBe(0);
+
+    vi.useRealTimers();
+  });
 });
