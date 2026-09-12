@@ -44,11 +44,10 @@ export default function EffectivenessDashboard() {
             Your Patterns
           </h1>
           <p className="text-sm text-muted-foreground">
-            Based on {insights.totalSessions} sessions • {insights.thisWeek} this week
+            Based on what you chose and rated in {insights.totalSessions} sessions • {insights.thisWeek} this week
           </p>
         </motion.div>
 
-        {/* Top Interventions */}
         {insights.topInterventions.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -58,10 +57,10 @@ export default function EffectivenessDashboard() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Zap className="h-5 w-5 text-amber-500" />
-              <h2 className="font-heading text-lg font-medium text-primary">Most Effective</h2>
+              <h2 className="font-heading text-lg font-medium text-primary">Most often useful</h2>
             </div>
             <div className="space-y-2">
-              {insights.topInterventions.map((iv, idx) => (
+              {insights.topInterventions.map((iv) => (
                 <div
                   key={iv.id}
                   className="flex items-center justify-between rounded-lg border border-border bg-card p-3"
@@ -69,7 +68,7 @@ export default function EffectivenessDashboard() {
                   <div>
                     <p className="font-medium text-foreground">{iv.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {(iv.score * 100).toFixed(0)}% effectiveness
+                      Relative fit {(iv.score * 100).toFixed(0)} — from your ratings, not a clinical score
                     </p>
                   </div>
                   <div className="text-right">
@@ -86,7 +85,6 @@ export default function EffectivenessDashboard() {
           </motion.div>
         )}
 
-        {/* Direction Insights */}
         {insights.directionStats.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -111,12 +109,12 @@ export default function EffectivenessDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-emerald-600">↓ {dir.avgImprovement}</p>
-                      <p className="text-xs text-muted-foreground">avg improvement</p>
+                      <p className="text-xs text-muted-foreground">avg rated shift</p>
                     </div>
                   </div>
                   {dir.bestIntervention && (
                     <p className="text-xs text-muted-foreground">
-                      Works best: <span className="text-foreground font-medium">{dir.bestIntervention.name}</span>
+                      You used most here: <span className="text-foreground font-medium">{dir.bestIntervention.name}</span>
                     </p>
                   )}
                 </div>
@@ -125,7 +123,6 @@ export default function EffectivenessDashboard() {
           </motion.div>
         )}
 
-        {/* Location Insights */}
         {insights.locationStats.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -156,7 +153,6 @@ export default function EffectivenessDashboard() {
           </motion.div>
         )}
 
-        {/* Context Patterns */}
         {insights.contextPatterns.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
