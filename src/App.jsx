@@ -10,7 +10,6 @@ import AppErrorBoundary from '@/components/AppErrorBoundary';
 import { MotionConfig, AnimatePresence, motion } from 'framer-motion';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import { useSystemDarkMode } from '@/hooks/useSystemDarkMode';
-import { AccessibilityProvider } from '@/lib/accessibility';
 import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
 
@@ -91,14 +90,12 @@ function App() {
   return (
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>
-        <AccessibilityProvider>
-          <AppErrorBoundary>
-            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <ScrollToTop />
-              <MenticationRoutes />
-            </Router>
-          </AppErrorBoundary>
-        </AccessibilityProvider>
+        <AppErrorBoundary>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <ScrollToTop />
+            <MenticationRoutes />
+          </Router>
+        </AppErrorBoundary>
         <Toaster />
       </QueryClientProvider>
     </MotionConfig>

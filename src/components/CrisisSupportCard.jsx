@@ -17,9 +17,10 @@ export default function CrisisSupportCard({
   const button = dark
     ? "border-cream/15 bg-transparent text-cream hover:bg-white/10"
     : "border-destructive/30 bg-white/70 text-destructive hover:bg-destructive/10";
+  const padding = compact ? "p-4" : "p-5";
 
   return (
-    <div className={`rounded-2xl border p-${compact ? "4" : "5"} ${shell} ${className}`}>
+    <div className={`rounded-2xl border ${padding} ${shell} ${className}`}>
       <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em]">
         <LifeBuoy className="h-4 w-4" /> {title}
       </p>

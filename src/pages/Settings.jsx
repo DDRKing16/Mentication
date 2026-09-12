@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, LifeBuoy, Trash2, ShieldCheck, Download } from "lucide-react";
-import { useAccessibility } from "@/lib/accessibility";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
@@ -28,8 +27,6 @@ function Toggle({ label, desc, on, onToggle }) {
 
 export default function Settings() {
   const navigate = useNavigate();
-  const a11y = useAccessibility() || {};
-  const { update } = a11y;
   const amb = useAccessibilityPrefs();
   const [memoryCleared, setMemoryCleared] = useState(false);
   const [exported, setExported] = useState(false);
@@ -70,26 +67,26 @@ export default function Settings() {
           <Toggle
             label="Reduce motion"
             desc="Calm animations and transitions"
-            on={!!a11y.reducedMotion}
-            onToggle={() => update({ reducedMotion: !a11y.reducedMotion })}
+            on={!!amb.prefs.reducedMotion}
+            onToggle={() => amb.setPref("reducedMotion", !amb.prefs.reducedMotion)}
           />
           <Toggle
             label="High contrast"
             desc="Stronger text and borders"
-            on={!!a11y.highContrast}
-            onToggle={() => update({ highContrast: !a11y.highContrast })}
+            on={!!amb.prefs.highContrast}
+            onToggle={() => amb.setPref("highContrast", !amb.prefs.highContrast)}
           />
           <Toggle
             label="Captions on by default"
             desc="Show guide text during resets"
-            on={!!a11y.captions}
-            onToggle={() => update({ captions: !a11y.captions })}
+            on={!!amb.prefs.captions}
+            onToggle={() => amb.setPref("captions", !amb.prefs.captions)}
           />
           <Toggle
             label="One-handed reach"
             desc="Narrow layout for thumb use"
-            on={!!a11y.oneHanded}
-            onToggle={() => update({ oneHanded: !a11y.oneHanded })}
+            on={!!amb.prefs.oneHanded}
+            onToggle={() => amb.setPref("oneHanded", !amb.prefs.oneHanded)}
           />
           <Toggle
             label="Ambient soundscape"
@@ -133,10 +130,10 @@ export default function Settings() {
               <button
                 key={o.v}
                 type="button"
-                onClick={() => update({ textScale: o.v })}
+                onClick={() => amb.setPref("textScale", o.v)}
                 className={
                   "no-tap rounded-2xl border py-3 text-sm font-medium transition-all active:scale-95 " +
-                  (a11y.textScale === o.v
+                  (amb.prefs.textScale === o.v
                     ? "border-primary/0 bg-primary text-primary-foreground soft-depth"
                     : "border-border bg-card text-foreground hover:border-primary/30")
                 }
@@ -173,6 +170,7 @@ export default function Settings() {
               if (!window.confirm("Delete local intervention memory, saved return points and handoff preferences from this device?")) return;
               deleteFlagshipMemory("all");
               setMemoryCleared(true);
+              refreshInventory();
             }}
             className="mt-2 rounded-full text-muted-foreground"
           >
