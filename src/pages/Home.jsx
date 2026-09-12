@@ -8,7 +8,7 @@ import { sessionStore } from "@/lib/localData";
 import { pickLastWorked, buildPersonalBest } from "@/lib/interventions";
 import { buildRecommendation } from "@/lib/recommend";
 import { buildMomentumSummary } from "@/lib/insights";
-import { hasCompletedOnboarding } from "@/lib/onboarding";
+import { hasCompletedOnboarding, hasSeenWelcome } from "@/lib/onboarding";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -40,8 +40,8 @@ export default function Home() {
     try {
       setLoadError("");
       const sessions = await sessionStore.list("-created_date", 30);
-      if (!hasCompletedOnboarding() && sessions.length === 0) {
-        navigate("/welcome", { replace: true });
+      if (sessions.length === 0 && !hasCompletedOnboarding()) {
+        navigate(hasSeenWelcome() ? "/onboarding" : "/welcome", { replace: true });
         return;
       }
       setLastWorked(pickLastWorked(sessions));

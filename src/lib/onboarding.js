@@ -6,11 +6,18 @@ let memoryWelcomed = false;
 export function hasCompletedOnboarding() {
   try {
     return localStorage.getItem(KEY) === "1"
-      || localStorage.getItem(WELCOME_KEY) === "1"
-      || memoryCompleted
+      || memoryCompleted;
+  } catch {
+    return memoryCompleted;
+  }
+}
+
+export function hasSeenWelcome() {
+  try {
+    return localStorage.getItem(WELCOME_KEY) === "1"
       || memoryWelcomed;
   } catch {
-    return memoryCompleted || memoryWelcomed;
+    return memoryWelcomed;
   }
 }
 
