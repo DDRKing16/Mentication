@@ -5,6 +5,7 @@ import { Sparkles, HeartHandshake, ShieldCheck, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { BrandLockup } from "@/components/Logo";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
+import PremiumTrustStrip from "@/components/PremiumTrustStrip";
 import { completeWelcome } from "@/lib/onboarding";
 
 const SLIDES = [
@@ -41,6 +42,9 @@ export default function Welcome() {
     <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
       <div className="mx-auto flex min-h-full max-w-md flex-col px-6 pt-14 pb-12">
         <BrandLockup />
+        <div className="mt-6">
+          <PremiumTrustStrip items={["Private on this device", "No account", "Guided in minutes"]} />
+        </div>
 
         <div className="flex flex-1 flex-col justify-center">
           <AnimatePresence mode="wait">

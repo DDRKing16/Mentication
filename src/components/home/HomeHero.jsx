@@ -5,9 +5,9 @@ import { Logo, MENTICATION_SLOGAN } from "@/components/Logo";
 
 function greetingFor() {
   const h = new Date().getHours();
-  if (h < 12) return "GOOD MORNING";
-  if (h < 18) return "GOOD AFTERNOON";
-  return "GOOD EVENING";
+  if (h < 12) return "Good morning";
+  if (h < 18) return "Good afternoon";
+  return "Good evening";
 }
 
 export default function HomeHero({ onProfile, onInsights }) {
@@ -50,10 +50,13 @@ export default function HomeHero({ onProfile, onInsights }) {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="relative mt-5 text-left"
       >
-        <p className="text-[0.82rem] font-medium uppercase tracking-[0.32em] text-[#DDB977]">{greetingFor()}</p>
+        <p className="text-[0.78rem] font-medium tracking-[0.16em] text-[#DDB977]">{greetingFor()}</p>
         <h1 className="mt-3 font-clean text-[1.64rem] font-normal leading-[1.15] tracking-[-0.01em] text-[#FFFFFF]">
           Let’s find your reset for today.
         </h1>
+        <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#FFFFFF]/75">
+          Private, guided support that adapts to the moment without making the app feel busy.
+        </p>
       </motion.div>
     </header>
   );

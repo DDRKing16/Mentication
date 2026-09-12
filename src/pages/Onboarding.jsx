@@ -9,6 +9,7 @@ import { HOME_CARDS } from "@/lib/interventions";
 import SafetyFooter from "@/components/SafetyFooter";
 import CrisisSupportCard from "@/components/CrisisSupportCard";
 import { BrandLockup } from "@/components/Logo";
+import PremiumTrustStrip from "@/components/PremiumTrustStrip";
 import { completeOnboarding } from "@/lib/onboarding";
 
 const ICONS = { CloudRain, Sun, RefreshCw, Anchor, Target, Moon, HelpCircle };
@@ -33,6 +34,9 @@ export default function Onboarding() {
         <header className="flex items-center justify-center">
           <BrandLockup size="md" tagline />
         </header>
+        <div className="mt-6 flex justify-center">
+          <PremiumTrustStrip items={["Private on this device", "No account", "Start in under a minute"]} />
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -52,7 +56,7 @@ export default function Onboarding() {
             Choose what you need,<br />then let’s begin.
           </h1>
           <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-muted-foreground text-balance">
-            Step 2 of 2. Pick the closest fit — you’ll start your first reset right away.
+            Step 2 of 2. Pick the closest fit and start right away — simple, private, and low-pressure.
           </p>
         </motion.div>
 

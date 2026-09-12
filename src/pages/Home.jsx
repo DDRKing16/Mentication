@@ -17,6 +17,7 @@ import LastWorkedCard from "@/components/home/LastWorkedCard";
 import CategoryCard from "@/components/home/CategoryCard";
 import RecommendedCard from "@/components/home/RecommendedCard";
 import FlagshipReturnCard from "@/components/FlagshipReturnCard";
+import PremiumTrustStrip from "@/components/PremiumTrustStrip";
 
 const ICON_BASE = "/media/images/home-icons/";
 const HOME_GRID = [
@@ -118,6 +119,10 @@ export default function Home() {
           <HomeHero onProfile={() => navigate("/profile")} onInsights={() => navigate("/insights")} />
 
           <FlagshipReturnCard />
+
+          <section className="px-[18px] pt-5">
+            <PremiumTrustStrip items={["Private on this device", "No account", "Guided in minutes"]} />
+          </section>
 
           <section className="px-[18px] pt-6">
             <CrisisSupportCard compact />

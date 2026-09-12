@@ -54,6 +54,47 @@ function movementFor(position, capacity) {
   return "Change the rhythm or direction of your existing movement for a few cycles.";
 }
 
+function sighRouteFor(where, style) {
+  const anchor = {
+    chest: "drop the shoulders and let the chest soften on the out-breath",
+    throat: "unclench the jaw, soften the tongue and keep the throat easy",
+    stomach: "let the belly release instead of holding the breath high",
+    whole: "let the whole body get a little heavier on the exhale",
+  }[where] || "let the body soften a few percent on the exhale";
+  const shape = {
+    single: "Take one fuller inhale, then a long easy sigh out.",
+    double: "Take a breath in, sip a little more air, then let a longer sigh leave slowly.",
+    silent: "Take a quieter inhale and send the whole exhale out through relaxed lips.",
+  }[style] || "Take one fuller inhale, then a long easy sigh out.";
+  return `${shape} On each round, ${anchor}.`;
+}
+
+function move90RouteFor(position, style) {
+  const start = {
+    seated: "Stay seated and",
+    standing: "From standing,",
+    lying: "From where you are lying,",
+    already: "Without overthinking it,",
+  }[position] || "From where you are,";
+  const action = {
+    loosen: "roll the shoulders, open the chest and add easy arm movement for ninety seconds.",
+    march: "march in place, shift weight or pace the room with a steady rhythm for ninety seconds.",
+    cross: "use cross-body reaches or taps to wake up both sides of the body for ninety seconds.",
+    shake: "shake out the hands, arms and upper body until the flatness breaks slightly.",
+  }[style] || "add light movement for ninety seconds.";
+  return `${start} ${action}`;
+}
+
+function sensoryWakeRouteFor(input) {
+  return {
+    cold: "Use a bright temperature cue: cool water on hands or face, a cold glass, or a cooler doorway for thirty to sixty seconds.",
+    light: "Move toward brighter light, lift the gaze and let your eyes take in a little more contrast and distance.",
+    sound: "Play one clear, energising sound or song and let the body respond to it for one minute.",
+    scent: "Use the strongest clean scent available and pair it with one deliberate fuller inhale.",
+    texture: "Wake up the hands with a textured object, quick rubbing, or firmer pressure against fabric or a wall.",
+  }[input] || "Use one bright sensory cue that feels safe and noticeably different from the flat state.";
+}
+
 function feelingSupportFor(feeling) {
   return {
     anxious: "We are giving the feeling a name so your system does not have to hold it as unnamed alarm.",
@@ -213,6 +254,28 @@ function screensFor(id, data) {
     away("Carry the movement into real life.", "The app can close. Return when you know whether any more movement became available."),
     returning("Is any more movement available than before?", "We are tracking usable activation, not happiness or performance."),
   ];
+  if (id === "sigh") return [
+    intro("Use the fastest off-ramp.", "This is a brief exhale-lengthening reset. We are not forcing deep breathing - only giving the body a clearer signal that the danger spike can come down."),
+    { prompt: "Where does the tension feel loudest?", options: [choice("chest", "Chest"), choice("throat", "Jaw, throat or face"), choice("stomach", "Stomach or solar plexus"), choice("whole", "All over")] },
+    { prompt: "What kind of sigh fits best here?", options: [choice("single", "Single long sigh"), choice("double", "Physiological sigh"), choice("silent", "Quiet discreet sigh")] },
+    { kind: "action", prompt: "Take three slower off-ramps.", body: "Comfort matters more than size. Stop if breathing work makes you feel worse.", defaultValue: sighRouteFor(data.tensionArea, data.sighStyle) },
+    { kind: "completion", prompt: "The body got a clearer safety cue.", body: "Even a small drop in pressure counts. The win is a little more room, not perfect calm." },
+  ];
+  if (id === "move90") return [
+    intro("Wake the body before the mood.", "Movement can shift chemistry faster than waiting for motivation. Keep it simple and work with the body you have right now."),
+    { prompt: "Where are you starting from?", options: [choice("seated", "Seated"), choice("standing", "Standing"), choice("lying", "Lying down"), choice("already", "Already moving a little")] },
+    { prompt: "What movement style feels most believable?", options: [choice("loosen", "Loosen and open"), choice("march", "March or pace"), choice("cross", "Cross-body rhythm"), choice("shake", "Shake it out")] },
+    { kind: "action", prompt: "Give it ninety seconds.", body: "The goal is a clean state shift, not a workout.", defaultValue: move90RouteFor(data.startPosition, data.moveStyle) },
+    away("Carry the movement through.", "The app can stay behind you. Return after the ninety seconds to decide what the energy can serve."),
+    returning("Did the movement create any more availability?", "More energy, more willingness, or even a little less heaviness all count."),
+  ];
+  if (id === "sensoryWake") return [
+    intro("Brighten the input, not the pressure.", "When you feel foggy or flat, a sharper sensory cue can create enough contrast to wake the system back up."),
+    { prompt: "Which sense feels easiest to wake up safely?", options: [choice("cold", "Temperature"), choice("light", "Light"), choice("sound", "Sound"), choice("scent", "Scent"), choice("texture", "Touch or texture")] },
+    { kind: "action", prompt: "Use one clean sensory jolt.", body: "Keep it brief, safe and noticeable - not overwhelming.", defaultValue: sensoryWakeRouteFor(data.sensoryInput) },
+    { prompt: "What should that extra brightness serve?", options: [choice("move", "Getting moving"), choice("task", "Starting a task"), choice("care", "Basic self-care"), choice("outside", "Changing rooms or going outside")] },
+    { kind: "completion", prompt: "The flatness has been interrupted.", body: "Use the opened window quickly. The next small move matters more than analysing the feeling." },
+  ];
   if (id === "nameFeeling") return [
     intro("Give the feeling edges.", "This is not about analysing yourself perfectly. It is about turning a blur into something your mind and body can work with."),
     { prompt: "Which word is closest right now?", body: "Pick the nearest fit, even if it is only roughly right.", options: [choice("anxious", "Anxious"), choice("sad", "Sad"), choice("angry", "Angry"), choice("hurt", "Hurt"), choice("ashamed", "Ashamed"), choice("tense", "Tense"), choice("flat", "Flat"), choice("numb", "Numb")] },
@@ -284,6 +347,9 @@ function SignatureVisual({ id, step, reducedMotion }) {
   if (id === "countermove") return <div className="signature gravity"><div className="gravity-mass"/><motion.div className="trajectory t1" {...motionProps}/><div className="trajectory t2"/><div className="moving-point"/></div>;
   if (id === "openChannel") return <div className="signature channel"><div className="channel-point left"/><div className="channel-bridge">{[0,1,2,3].map(i=><span key={i}/>)}</div><div className="channel-point right"/></div>;
   if (id === "pulseShift") return <div className="signature pulse">{[0,1,2,3].map(i=><motion.span key={i} style={{animationDelay:`${i*.35}s`}} {...motionProps}/>)}</div>;
+  if (id === "sigh") return <div className="signature pulse">{[0,1,2].map(i=><motion.span key={i} style={{animationDelay:`${i*.45}s`}} {...motionProps}/>)}</div>;
+  if (id === "move90") return <div className="signature gravity"><div className="gravity-mass"/><motion.div className="trajectory t1" {...motionProps}/><div className="trajectory t2"/><div className="moving-point"/></div>;
+  if (id === "sensoryWake") return <div className="signature ignition"><motion.span {...motionProps}/>{[0,1,2,3,4].map(i=><i key={i} style={{transform:`rotate(${i*72}deg) translateY(-54px)`}}/>)}</div>;
   if (id === "thenWhat") return <div className="signature timeline">{[0,1,2,3,4].map((i)=><span key={i} className={i <= Math.min(4, step) ? "active" : ""}/>)}</div>;
   if (id === "testPrediction") return <div className="signature experiment"><div>PREDICTION</div><span/><div>OBSERVATION</div></div>;
   if (id === "factCheck") return <div className="signature sorting"><span>FACT</span><span>MEANING</span><span>NEXT</span></div>;
@@ -362,6 +428,8 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
       factCheck: ["", "thought", "classification", "balanced", "completion"], thenWhat: ["", "eligibility", "frame", "meaning", "coping", "presentAction", "completion"],
       countermove: ["", "pull", "pullCheck", "trajectory", "action", "away", "status"], openChannel: ["", "closure", "barrier", "connectionSafety", "bridge", "message", "away", "status"],
       pulseShift: ["", "state", "position", "capacity", "movement", "destination", "away", "status"], tomorrowParking: ["urgency", "parkingItem", "complete"],
+      sigh: ["", "tensionArea", "sighStyle", "action", "completion"], move90: ["", "startPosition", "moveStyle", "action", "away", "status"],
+      sensoryWake: ["", "sensoryInput", "action", "destination", "completion"],
       nameFeeling: ["", "feeling", "intensityBand", "trigger", "completion"], whatNeed: ["", "need", "action", "away", "status"],
       dontSendIt: ["", "channel", "protection", "away", "status"], checkBasics: ["", "need", "action", "away", "status"],
       orienting: ["", "anchor", "scope", "action", "completion"],
@@ -453,6 +521,9 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
   const accent = {
     tomorrowParking: "#b9c7ff",
     countermove: "#ffcc78",
+    sigh: "#a7d8ff",
+    move90: "#ffd28a",
+    sensoryWake: "#ffe2a8",
     nameFeeling: "#f4b0d8",
     whatNeed: "#c8b8ff",
     dontSendIt: "#ffb38c",
