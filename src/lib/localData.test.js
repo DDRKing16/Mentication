@@ -77,7 +77,8 @@ describe("device-local application data", () => {
 
     await deleteLocalDataGroup("adaptive");
     expect(window.localStorage.getItem("haven.dislikes")).toBeNull();
-    expect(window.localStorage.getItem("haven_onboarded")).toBe("1");
+    expect(hasSeenWelcome()).toBe(true);
+    expect(hasCompletedOnboarding()).toBe(false);
 
     const removed = await deleteLocalDataGroup("flagship");
     expect(removed).toEqual({ deleted: true, count: 2 });
