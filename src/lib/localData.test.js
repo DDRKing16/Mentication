@@ -20,14 +20,17 @@ class MemoryStorage {
 
 describe("device-local application data", () => {
   beforeEach(() => {
+    const localStorage = new MemoryStorage();
     globalThis.window = {
-      localStorage: new MemoryStorage(),
+      localStorage,
       dispatchEvent: () => {},
     };
+    globalThis.localStorage = localStorage;
   });
 
   afterEach(() => {
     delete globalThis.window;
+    delete globalThis.localStorage;
   });
 
   it("creates, orders and limits session records without a remote service", async () => {
