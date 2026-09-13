@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import TabBar from "@/components/TabBar";
 import Home from "@/pages/Home";
@@ -22,39 +22,49 @@ const visible = { display: "block" };
 
 export default function AppShell() {
   const { pathname } = useLocation();
+  const visitedTabs = useRef(new Set(["/"]));
+  visitedTabs.current.add(pathname);
 
   return (
     <div className="relative min-h-full">
       <div style={pathname === "/" ? visible : hidden} className="min-h-full">
         <Home />
       </div>
-      <div style={pathname === "/library" ? visible : hidden} className="min-h-full">
-        <Suspense fallback={<PageSpinner />}>
-          <InterventionLibrary />
-        </Suspense>
-      </div>
-      <>
-          <div style={pathname === "/plan" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <MyPlan />
-            </Suspense>
-          </div>
-          <div style={pathname === "/profile" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <RegulationProfile />
-            </Suspense>
-          </div>
-          <div style={pathname === "/insights" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <EffectivenessDashboard />
-            </Suspense>
-          </div>
-          <div style={pathname === "/settings" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <Settings />
-            </Suspense>
-          </div>
-      </>
+      {visitedTabs.current.has("/library") && (
+        <div style={pathname === "/library" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <InterventionLibrary />
+          </Suspense>
+        </div>
+      )}
+      {visitedTabs.current.has("/plan") && (
+        <div style={pathname === "/plan" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <MyPlan />
+          </Suspense>
+        </div>
+      )}
+      {visitedTabs.current.has("/profile") && (
+        <div style={pathname === "/profile" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <RegulationProfile />
+          </Suspense>
+        </div>
+      )}
+      {visitedTabs.current.has("/insights") && (
+        <div style={pathname === "/insights" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <EffectivenessDashboard />
+          </Suspense>
+        </div>
+      )}
+      {visitedTabs.current.has("/settings") && (
+        <div style={pathname === "/settings" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <Settings />
+          </Suspense>
+        </div>
+      )}
       <TabBar />
     </div>
   );
