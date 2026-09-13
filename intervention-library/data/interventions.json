@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-06-elite-17",
-  "reviewedOn": "2026-09-06",
+  "version": "2026-09-14-elite-18",
+  "reviewedOn": "2026-09-14",
   "interventions": [
     {
       "id": "boxV2",
@@ -99,6 +99,20 @@
       "evidenceGrade": "A for behavioural activation packages; C for the four-pathway branded selector",
       "sources": ["https://pubmed.ncbi.nlm.nih.gov/37068380/", "https://pubmed.ncbi.nlm.nih.gov/37227760/"],
       "limits": "Evidence is mainly from depression treatment protocols delivered over time. One micro-action should not be described as treatment or guaranteed mood improvement."
+    },
+    {
+      "id": "happyBump",
+      "name": "The Happy Bump",
+      "goal": "Lift",
+      "designSystem": "Cumulative Kinetic Sculpture",
+      "purpose": "A completion-led behavioural activation sequence for flatness, low energy or difficulty getting started. It stacks movement, self-selected music, hydration, a safe five-minute walk, social approach, mastery, positive reflection and values-led action.",
+      "psychoeducation": "Behavioural activation can improve low mood by increasing contact with rewarding, meaningful and mastery-building activity before motivation arrives. Movement, social connection, positive reflection and values-led action are offered as accessible supports, not guaranteed mood treatments.",
+      "flow": ["Set an honest starting state", "Stand and move", "Start self-selected music", "Hydrate", "Take a safe five-minute walk", "Connect during the walk or deliberately skip", "Finish one tiny task", "Name pride, gratitude and anticipation", "Choose a wellbeing area and complete one low-effort step", "Plan one productive, enjoyable or relaxing activity", "Set the state again", "Replay and optionally save the combination"],
+      "visualAudio": "One living emerald-and-gold curve gains pulse, travel, a returning signal and a stable resting shape as actions accumulate. Sparse causal tones and optional haptics mark only meaningful transitions; reduced motion preserves every state change without animation.",
+      "upgrade": "The intervention makes a sequence of completed actions feel like one continuous object rather than a checklist. It ends with an evidence-informed life direction and a concrete next activity, records the user's actual before-and-after state without promising improvement, and remembers only broad preferences.",
+      "evidenceGrade": "B+ for behavioural activation; mixed and component-specific evidence for the combined sequence",
+      "sources": ["https://pubmed.ncbi.nlm.nih.gov/37068380/", "https://pubmed.ncbi.nlm.nih.gov/37227760/"],
+      "limits": "The combined branded sequence has not been independently tested. Movement must remain safe and capacity-matched; music, hydration and social contact do not guarantee a mood shift. The six wellbeing areas are evidence-informed domains, not a definitive universal ranking."
     },
     {
       "id": "changeScene",

@@ -6,8 +6,9 @@ import { clearActiveFlagship, getActiveFlagship, getFlagshipPreferences, recordH
 import { recommendHandoff } from "@/lib/flagshipHandoffs";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import InterventionControlShell from "@/components/InterventionControlShell";
+import HappyBumpExperience from "@/components/HappyBumpExperience";
 
-export const NEW_FLAGSHIP_IDS = Object.freeze(["reroute", "signalLock", "nightChannel"]);
+export const NEW_FLAGSHIP_IDS = Object.freeze(["reroute", "signalLock", "nightChannel", "happyBump"]);
 export const isNewFlagship = (id) => NEW_FLAGSHIP_IDS.includes(id);
 
 const optionClass = "min-h-14 rounded-2xl border border-white/15 bg-white/[0.06] p-4 text-left transition hover:border-[var(--nf-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--nf-accent)]";
@@ -120,6 +121,7 @@ export function NightChannelExperience({ intervention, onAttemptEvent, onExit })
 }
 
 export default function NewFlagshipExperience(props) {
+  if(props.intervention.id==="happyBump")return <HappyBumpExperience {...props}/>;
   if(props.intervention.id==="reroute")return <RerouteExperience {...props}/>;
   if(props.intervention.id==="signalLock")return <SignalLockExperience {...props}/>;
   return <NightChannelExperience {...props}/>;

@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { buildUrgeSurfLearningRecord, normaliseChoiceWindow } from "./urgeSurfState.js";
 
 describe("Urge Surfing state", () => {
-  it("limits a Standard choice window to the approved 90 to 180 second values", () => {
-    expect(normaliseChoiceWindow(12)).toBe(90);
-    expect(normaliseChoiceWindow(120)).toBe(120);
-    expect(normaliseChoiceWindow(240)).toBe(180);
+  it("limits a choice window to the exported 30 to 60 second values", () => {
+    expect(normaliseChoiceWindow(12)).toBe(30);
+    expect(normaliseChoiceWindow(47)).toBe(45);
+    expect(normaliseChoiceWindow(240)).toBe(60);
   });
 
   it("keeps raw urge wording, voice material, and body detail out of coarse learning", () => {
@@ -14,14 +14,14 @@ describe("Urge Surfing state", () => {
       urgeText: "Send an angry message to Sam",
       voiceTranscript: "Send it now",
       bodyDetail: "My chest is tight",
-      windowSeconds: 90,
+      windowSeconds: 60,
       intensityBefore: 8,
       intensityNow: 5,
       action: "wait",
       choiceOutcome: "a_little",
     })).toEqual({
       category: "send",
-      windowSeconds: 90,
+      windowSeconds: 60,
       intensityBefore: 8,
       intensityNow: 5,
       action: "wait",

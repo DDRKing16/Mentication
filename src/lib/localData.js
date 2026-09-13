@@ -1,7 +1,9 @@
+// @ts-check
 // Device-local persistence for Mentication.
 //
 // V1 deliberately has no remote account or application backend. Session data
 // stays in this app's local storage and can be erased in-app at any time.
+import { notifyAccessibilityPreferencesChanged } from "./accessibilityEvents";
 
 const SESSION_KEY = "mentation.sessions.v1";
 const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_"];
@@ -71,6 +73,7 @@ export function deleteAllLocalAppData() {
     if (APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
   }
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
+  notifyAccessibilityPreferencesChanged();
 }
 
 export function exportLocalAppData() {

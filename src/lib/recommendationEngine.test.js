@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { buildPathway, buildSegment, computeEffectiveness, buildProfile, immediatePathway, RECOMMENDATION_ENGINE_VERSION, getIntervention, normalizeAttemptResponse, coarseContextKey, buildAttemptRecord, suggestAdaptiveAlternative, INTERVENTIONS, pathwayByIds } from '@/lib/interventions';
 import { CORE_25_CATALOGUE_VERSION, CORE_25_IDS, core25Counts } from '@/lib/final50Catalog';
 import {
@@ -7,19 +7,20 @@ import {
   scoreInterventionV3,
   V3_WEIGHTS,
 } from '@/lib/recommendationV3';
-import { computeEffectivenessInsights } from '@/lib/insights';
+import { computeEffectivenessInsights, computeLocalCalendarStreak } from '@/lib/insights';
 import { FLAGSHIP_IDS, FLAGSHIP_REGISTRY } from '@/lib/flagshipRegistry';
 import { handoffRules, recommendHandoff } from '@/lib/flagshipHandoffs';
+import { recordDislike } from '@/lib/preferences';
 
 describe('recommendation engine v2 basics', () => {
-  it('locks the production catalogue to the curated 25 with 17 flagships', () => {
-    expect(INTERVENTIONS).toHaveLength(25);
-    expect(new Set(INTERVENTIONS.map((iv) => iv.id)).size).toBe(25);
+  it('locks the production catalogue to the curated 26 with 18 flagships', () => {
+    expect(INTERVENTIONS).toHaveLength(26);
+    expect(new Set(INTERVENTIONS.map((iv) => iv.id)).size).toBe(26);
     expect(INTERVENTIONS.map((iv) => iv.id)).toEqual(CORE_25_IDS);
-    expect(CORE_25_CATALOGUE_VERSION).toBe('2026-09-06-v1-core25');
+    expect(CORE_25_CATALOGUE_VERSION).toBe('2026-09-14-v1-core26');
     expect(core25Counts(INTERVENTIONS)).toEqual({
       calm: 7,
-      lift: 7,
+      lift: 8,
       ground: 4,
       focus: 3,
       sleep: 4,
@@ -33,6 +34,45 @@ describe('recommendation engine v2 basics', () => {
       const eligible = INTERVENTIONS.filter((iv) => iv.directions.includes(direction));
       expect(eligible.length, direction).toBeGreaterThanOrEqual(minimumEligible[direction]);
     }
+  });
+
+  it('uses Happy Bump as the Lift opener until feedback shows it is unwanted', () => {
+    const answers = {
+      direction: 'lift', intensity: 3, whereFelt: 'both', timeMin: 6,
+      location: 'home', audio: 'yes', movement: 'yes',
+    };
+    expect(buildPathway(answers, {})[0]?.id).toBe('happyBump');
+
+    const storage = new Map();
+    vi.stubGlobal('localStorage', {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+      removeItem: (key) => storage.delete(key),
+    });
+    try {
+      recordDislike('happyBump', getIntervention('happyBump').mechanism);
+      expect(buildPathway(answers, {})[0]?.id).not.toBe('happyBump');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('honours a strongly effective Lift alternative over the Happy Bump default', () => {
+    const answers = {
+      direction: 'lift', intensity: 3, whereFelt: 'both', timeMin: 6,
+      location: 'home', audio: 'yes', movement: 'yes',
+    };
+    const path = buildPathway(answers, { happyBump: 0.2, activationMenu: 0.9 });
+    expect(path[0]?.id).toBe('activationMenu');
+  });
+
+  it('offers Happy Bump only as a context-aware Calm and Focus secondary option', () => {
+    const calm = { direction: 'calm', intensity: 4, whereFelt: 'both', timeMin: 6, location: 'home', audio: 'yes', movement: 'yes' };
+    const focus = { direction: 'focus', intensity: 3, whereFelt: 'both', timeMin: 6, location: 'home', audio: 'yes', movement: 'yes', avoiding: true };
+    expect(hardEligibleV3(getIntervention('happyBump'), calm)).toBe(true);
+    expect(hardEligibleV3(getIntervention('happyBump'), focus)).toBe(true);
+    expect(hardEligibleV3(getIntervention('happyBump'), { ...calm, intensity: 8 })).toBe(false);
+    expect(hardEligibleV3(getIntervention('happyBump'), { ...focus, avoiding: false })).toBe(false);
   });
 
   it('maps retired hero and duplicate ids to their core-25 successor', () => {
@@ -62,6 +102,7 @@ describe('recommendation engine v2 basics', () => {
       'factCheck',
       'urgeSurf',
       'activationMenu',
+      'happyBump',
       'nextAction',
       'tomorrowParking',
       'thenWhat',
@@ -76,7 +117,7 @@ describe('recommendation engine v2 basics', () => {
     expect(INTERVENTIONS.some((iv) => iv.id === 'changeScene')).toBe(true);
     expect(INTERVENTIONS.some((iv) => iv.id === 'songMove')).toBe(false);
     expect(new Set(INTERVENTIONS.map((iv) => iv.mechanismFamily)).size).toBeGreaterThanOrEqual(15);
-    expect(FLAGSHIP_IDS).toHaveLength(17);
+    expect(FLAGSHIP_IDS).toHaveLength(18);
     expect(FLAGSHIP_IDS.every((id) => INTERVENTIONS.some((iv) => iv.id === id && iv.flagship))).toBe(true);
     expect(FLAGSHIP_REGISTRY.nextAction.displayName).toBe('Next Easiest Step');
     expect(INTERVENTIONS.some((iv) => /Gravity Map|Quiet Return/i.test(iv.name))).toBe(false);
@@ -484,6 +525,7 @@ describe('recommendation engine v2 basics', () => {
     expect(Array.isArray(insights.contextPatterns)).toBe(true);
     expect(typeof insights.totalSessions).toBe('number');
     expect(typeof insights.thisWeek).toBe('number');
+    expect(typeof insights.currentStreak).toBe('number');
 
     // Verify top interventions have required fields
     insights.topInterventions.forEach((iv) => {
@@ -510,6 +552,35 @@ describe('recommendation engine v2 basics', () => {
     expect(insights.totalSessions).toBe(3);
     // All sessions are within the past 7 days
     expect(insights.thisWeek).toBe(3);
+  });
+
+  it('counts streaks by local calendar day across DST changes', () => {
+    const springForward = [
+      { created_date: '2026-03-08T06:30:00.000Z' },
+      { created_date: '2026-03-09T04:30:00.000Z' },
+      { created_date: '2026-03-10T04:30:00.000Z' },
+    ];
+    expect(computeLocalCalendarStreak(springForward, {
+      now: new Date('2026-03-10T16:00:00.000Z'),
+      timeZone: 'America/New_York',
+    })).toBe(3);
+
+    const fallBack = [
+      { created_date: '2026-11-01T05:30:00.000Z' },
+      { created_date: '2026-11-01T06:30:00.000Z' },
+      { created_date: '2026-11-02T05:30:00.000Z' },
+    ];
+    expect(computeLocalCalendarStreak(fallBack, {
+      now: new Date('2026-11-02T17:00:00.000Z'),
+      timeZone: 'America/New_York',
+    })).toBe(2);
+  });
+
+  it('returns zero when the latest local calendar day is stale', () => {
+    expect(computeLocalCalendarStreak(
+      [{ created_date: '2026-03-07T15:00:00.000Z' }],
+      { now: new Date('2026-03-10T15:00:00.000Z'), timeZone: 'America/New_York' },
+    )).toBe(0);
   });
 
   it('uses different intervention families in different situations and avoids context blind repetition', () => {

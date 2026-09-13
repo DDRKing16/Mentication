@@ -3,6 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { INTERVENTIONS } from "../src/lib/interventions.js";
 import { spokenFor } from "../src/lib/spoken.js";
+import { HAPPY_BUMP_NARRATION } from "../src/lib/happyBumpNarration.js";
 
 const ENV_PATH = ".env.local";
 const MANIFEST_PATH = "narration-manifest.json";
@@ -62,6 +63,10 @@ function collectLines() {
       if (!entry.interventionIds.includes(intervention.id)) entry.interventionIds.push(intervention.id);
     }
   }
+  Object.values(HAPPY_BUMP_NARRATION).forEach((text) => {
+    const normalised = normalize(text);
+    if (!byText.has(normalised)) byText.set(normalised, { text, interventionIds: ["happyBump"] });
+  });
   return [...byText.values()];
 }
 

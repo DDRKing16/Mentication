@@ -1,4 +1,4 @@
-export const STANDARD_CHOICE_WINDOWS = Object.freeze([90, 120, 150, 180]);
+export const STANDARD_CHOICE_WINDOWS = Object.freeze([30, 35, 40, 45, 50, 55, 60]);
 
 export const URGE_CATEGORY_KEYS = Object.freeze(["send", "check", "use", "snap", "avoid"]);
 export const URGE_ACTION_KEYS = Object.freeze(["wait", "leave", "support", "substitute", "act"]);

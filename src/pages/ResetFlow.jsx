@@ -1,15 +1,17 @@
+// @ts-check
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Sparkles, Check, ArrowRight, ArrowLeft, RotateCcw, X, Mic, Scale, LockKeyhole } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
-import ChoiceButtons from "@/components/ChoiceButtons";
 import ResetPlayer from "@/components/ResetPlayer";
 import FlagshipExperience, { isInteractiveFlagship } from "@/components/FlagshipExperience";
 import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
 import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
+import ThoughtOrFactEntry from "@/components/thought-or-fact/ThoughtOrFactEntry";
 import UrgeSurfExperience from "@/components/UrgeSurfExperience";
+import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/components/reset-flow/ResetSetupScreens";
 import { warmNarration } from "@/lib/preloadBoxV2";
 import {
   buildPathway,
@@ -20,37 +22,23 @@ import {
   computeEffectiveness,
   buildAttemptRecord,
   coarseContextKey,
-  TIME_OPTIONS,
-  WHERE_OPTIONS,
-  AUDIO_OPTIONS,
-  MOVE_OPTIONS,
-  LOCATION_OPTIONS,
 } from "@/lib/interventions";
-import { AWAKE_REASONS } from "@/lib/sleep";
-import PreferencesRow from "@/components/PreferencesRow";
 import FlowHomeButton from "@/components/FlowHomeButton";
 import { sessionStore } from "@/lib/localData";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
+import {
+  createInitialResetAnswers,
+  INTENSITY_QUESTION,
+  REMAINING_STATE_BY_ID,
+  REMAINING_STATE_OPTIONS,
+  UNSURE_FIRST_STEP,
+  unsureSecondStep,
+} from "@/lib/resetFlowConfig";
 import "@/styles/thought-or-fact.css";
 import "@/styles/urge-surfing.css";
-
-const WHERE_FELT_DEFAULT = { calm: "body", lift: "both", reset: "thoughts", ground: "both", focus: "thoughts", sleep: "body" };
-
-const QUESTIONS = [
-  { key: "intensity", title: "How intense is it right now?", sub: "There’s no wrong number. Just an honest first read.", render: "intensity" },
-];
-
-const REMAIN_CHIPS = [
-  { id: "thoughts", label: "Racing thoughts", direction: "reset", whereFelt: "thoughts" },
-  { id: "body", label: "Tense body", direction: "calm", whereFelt: "body" },
-  { id: "low", label: "Low / flat", direction: "lift", whereFelt: "both" },
-  { id: "focus", label: "Can’t focus", direction: "focus", whereFelt: "thoughts" },
-  { id: "wired", label: "Wired / wakeful", direction: "sleep", whereFelt: "body" },
-  { id: "none", label: "Nothing — I’m good", direction: null, whereFelt: null },
-];
-const REMAIN_MAP = Object.fromEntries(REMAIN_CHIPS.map((c) => [c.id, { direction: c.direction, whereFelt: c.whereFelt }]));
+import "@/styles/happy-bump.css";
 
 export default function ResetFlow() {
   const navigate = useNavigate();
@@ -58,33 +46,18 @@ export default function ResetFlow() {
   const entry = location.state;
   const { allowed, isPremium, loading: quotaLoading } = useFreeQuota();
 
-  const initialPhase = entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions"));
+  const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
+  const startsUrgeSurfing = directEntryPathway.length === 1 && directEntryPathway[0]?.id === "urgeSurf";
+  const startsDirectFlagship = directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
+  const initialPhase = startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
-  const [qIndex, setQIndex] = useState(0);
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
   // swipe-back steps chronologically through the flow instead of exiting.
-  const flowStack = useRef([{ phase: initialPhase, qIndex: 0, unsureStep: 0 }]);
+  const flowStack = useRef([{ phase: initialPhase, unsureStep: 0 }]);
   const buildingTimer = useRef(null);
   const stepParam = useMemo(() => parseInt(new URLSearchParams(location.search).get("step") || "0", 10) || 0, [location.search]);
-  const [answers, setAnswers] = useState({
-    direction: entry?.direction ?? (entry?.immediate ? "calm" : null),
-    directionLabel: entry?.directionLabel ?? (entry?.immediate ? "Calm down" : ""),
-    immediate: !!entry?.immediate,
-    intensity: entry?.intensity ?? (entry?.immediate ? 9 : null),
-    whereFelt: entry?.whereFelt ?? (entry?.direction ? (WHERE_FELT_DEFAULT[entry.direction] || "both") : null),
-    timeMin: entry?.timeMin ?? 5,
-    audio: entry?.audio ?? "yes",
-    movement: entry?.movement ?? "seated",
-    location: entry?.location ?? "home",
-    situation: entry?.situation ?? null,
-    awake_reason: null,
-    discreet: !!entry?.discreet,
-    eyesOpen: false,
-    noBreathing: false,
-    noAudio: false,
-    bedtime: !!entry?.bedtime,
-  });
+  const [answers, setAnswers] = useState(() => createInitialResetAnswers(entry));
 
   const [endIntensity, setEndIntensity] = useState(null);
   const [tofEntryThought, setTofEntryThought] = useState("");
@@ -98,8 +71,8 @@ export default function ResetFlow() {
   const [unsureBranch, setUnsureBranch] = useState(null);
   const [saving, setSaving] = useState(false);
   // coaching loop state
-  const [activePathway, setActivePathway] = useState(null);
-  const [usedIds, setUsedIds] = useState([]);
+  const [activePathway, setActivePathway] = useState(startsDirectFlagship ? directEntryPathway : null);
+  const [usedIds, setUsedIds] = useState(startsDirectFlagship ? directEntryPathway.map((item) => item.id) : []);
   const [planRemaining, setPlanRemaining] = useState(0);
   const [lastValue, setLastValue] = useState(answers.intensity ?? 5);
   const [checkinValue, setCheckinValue] = useState(null);
@@ -140,7 +113,6 @@ export default function ResetFlow() {
       flowStack.current = flowStack.current.slice(0, stepParam + 1);
       if (snap) {
         setPhase(snap.phase);
-        setQIndex(snap.qIndex ?? 0);
         setUnsureStep(snap.unsureStep ?? 0);
         setBuilding(false);
       }
@@ -160,7 +132,6 @@ export default function ResetFlow() {
   const pathway = useMemo(() => {
     return entry?.prebuilt ? pathwayByIds(entry.pathway) : buildPathway(answers, effectiveness);
   }, [entry, answers, effectiveness]);
-  const pathwayPreview = entry?.prebuilt ? pathway : pathway.slice(0, 1);
   const isThoughtOrFactEntry = entry?.prebuilt && pathway.length === 1 && pathway[0]?.id === "factCheck";
 
   const releaseThoughtVoice = () => {
@@ -224,11 +195,9 @@ export default function ResetFlow() {
   const advance = (snap) => {
     flowStack.current.push({
       phase: snap.phase,
-      qIndex: snap.qIndex ?? qIndex,
       unsureStep: snap.unsureStep ?? unsureStep,
     });
     setPhase(snap.phase);
-    if (snap.qIndex != null) setQIndex(snap.qIndex);
     if (snap.unsureStep != null) setUnsureStep(snap.unsureStep);
     navigate(`/reset?step=${flowStack.current.length - 1}`, { state: entry });
   };
@@ -238,21 +207,11 @@ export default function ResetFlow() {
   };
 
   const nextQuestion = () => {
-    if (qIndex < QUESTIONS.length - 1) {
-      advance({ phase: "questions", qIndex: qIndex + 1 });
-    } else {
-      if (!isPremium && !quotaLoading && allowed <= 0) return;
-      setBuilding(true);
-      buildingTimer.current = setTimeout(() => { setBuilding(false); advance({ phase: "pathway" }); }, 650);
-    }
+    if (!isPremium && !quotaLoading && allowed <= 0) return;
+    setBuilding(true);
+    buildingTimer.current = setTimeout(() => { setBuilding(false); advance({ phase: "pathway" }); }, 650);
   };
   const prevQuestion = () => goBack();
-
-  const currentQ = QUESTIONS[qIndex];
-  const canProceed = () => {
-    if (currentQ.key === "intensity") return answers.intensity !== null;
-    return answers[currentQ.key] !== null;
-  };
 
   const currentAttemptContext = (intensity = lastValue) => ({
     ...answers,
@@ -395,7 +354,7 @@ export default function ResetFlow() {
     const nextIntensity = checkinValue ?? lastValue;
     const nextEffectiveness = commitPendingPulse(nextIntensity);
     const remTarget = Math.min(6, Math.max(1, Math.round(planRemaining)));
-    const implied = remaining ? REMAIN_MAP[remaining] : null;
+    const implied = remaining ? REMAINING_STATE_BY_ID[remaining] : null;
     if (implied && implied.direction && implied.direction !== answers.direction) {
       startSegment({ targetMin: Math.min(6, Math.max(2, remTarget)), direction: implied.direction, whereFelt: implied.whereFelt }, nextEffectiveness);
       setPlanRemaining(0);
@@ -408,7 +367,7 @@ export default function ResetFlow() {
   const addMore = (mins, count) => {
     const nextIntensity = checkinValue ?? lastValue;
     const nextEffectiveness = commitPendingPulse(nextIntensity);
-    const implied = remaining ? REMAIN_MAP[remaining] : null;
+    const implied = remaining ? REMAINING_STATE_BY_ID[remaining] : null;
     startSegment({ targetMin: mins, count: 1, whereFelt: implied?.whereFelt }, nextEffectiveness);
   };
 
@@ -474,10 +433,9 @@ export default function ResetFlow() {
   // quietly re-run the just-completed pathway from the overview
   const restartSame = () => {
     if (buildingTimer.current) clearTimeout(buildingTimer.current);
-    flowStack.current = [{ phase: "pathway", qIndex: 0, unsureStep: 0 }];
+    flowStack.current = [{ phase: "pathway", unsureStep: 0 }];
     startTimeRef.current = Date.now();
     setPhase("pathway");
-    setQIndex(0);
     setUnsureStep(0);
     setBuilding(false);
     setActivePathway(null);
@@ -496,155 +454,40 @@ export default function ResetFlow() {
 
   // ---------- BUILDING ----------
   if (building) {
-    return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-6 bg-gradient-to-b from-cream via-background to-background px-6">
-        <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-teal/40 to-indigo/40 breath-glow"
-        >
-          <Sparkles className="h-9 w-9 text-primary" strokeWidth={1.4} />
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="font-heading text-2xl text-primary tracking-tight"
-        >
-          Building your reset…
-        </motion.p>
-        <p className="text-muted-foreground">Tailoring a pathway just for you.</p>
-      </div>
-    );
+    return <BuildingResetScreen />;
   }
 
   // ---------- PATHWAY OVERVIEW ----------
   if (phase === "pathway") {
     if (!pathway.length) {
-      return (
-        <div className="flex min-h-full flex-col items-center justify-center gap-5 px-6 text-center">
-          <FlowHomeButton />
-          <h1 className="font-heading text-3xl font-medium text-primary">No safe match for these settings</h1>
-          <p className="max-w-md text-muted-foreground">Adjust the intensity or session preferences and try again. Mentication will not bypass hard eligibility rules to force a recommendation.</p>
-          <Button onClick={() => advance({ phase: "questions", qIndex: 0 })} className="rounded-full">Adjust settings</Button>
-        </div>
-      );
+      return <NoSafeMatchScreen onAdjust={() => advance({ phase: "questions" })} />;
     }
-    if (isThoughtOrFactEntry && !tofReady) {
-      return <div className="tof-readiness">
-        <header className="tof-entry__header"><button type="button" onClick={() => navigate(-1)} aria-label="Go back" className="tof-entry__icon"><ArrowLeft /></button><p>Thought or Fact?</p><button type="button" onClick={() => navigate("/")} aria-label="Exit Thought or Fact" className="tof-entry__icon"><X /></button></header>
-        <main className="tof-readiness__main">
-          <div><p className="tof-readiness__eyebrow">A quiet examination</p><h1>Hold the thought up to the light.</h1><p>Separate what happened from what your mind added.</p></div>
-          <details><summary>This is for an everyday upsetting thought.</summary><p>If you’re in immediate danger, dealing with abuse or trauma, or need urgent medical or legal help, choose support instead.</p></details>
-          <div className="tof-readiness__actions"><button type="button" onClick={() => setTofReady(true)} className="tof-entry__primary">Begin <ArrowRight /></button><button type="button" className="tof-entry__ground" onClick={() => navigate("/reset", { state: { prebuilt: true, pathway: ["grounding54321V2"], direction: "ground", intensity: answers.intensity ?? 5, timeMin: 5, audio: answers.audio } })}>Ground first</button><button type="button" className="tof-entry__ground" onClick={() => navigate("/reset", { state: { prebuilt: true, pathway: ["nextAction"], direction: "focus", intensity: answers.intensity ?? 5, timeMin: 3, audio: answers.audio } })}>Take a practical step</button></div>
-        </main>
-      </div>;
-    }
-    if (isThoughtOrFactEntry && tofVoiceState !== "idle") {
-      const isListening = tofVoiceState === "listening";
-      const elapsed = String(Math.floor(tofVoiceSeconds / 60)).padStart(2, "0") + ":" + String(tofVoiceSeconds % 60).padStart(2, "0");
-      return (
-        <div className="tof-voice" data-state={tofVoiceState}>
-          <header className="tof-entry__header">
-            <button type="button" onClick={returnToThoughtWriting} aria-label="Return to writing" className="tof-entry__icon"><ArrowLeft /></button>
-            <p>Thought or Fact?</p>
-            <button type="button" onClick={() => navigate("/")} aria-label="Exit Thought or Fact" className="tof-entry__icon"><X /></button>
-          </header>
-          <div className="tof-entry__progress" aria-label="Stage 1 of 8">{Array.from({ length: 8 }, (_, index) => <span key={index} className={index === 0 ? "is-active" : ""} />)}</div>
-          <main className="tof-voice__main">
-            <div className="tof-voice__intro">
-              <p>Voice capture</p>
-              <h1>{isListening ? "I’m listening." : tofVoiceState === "unavailable" ? "Voice capture isn’t available." : "Recording paused."}</h1>
-              <span>{isListening ? "Say the thought exactly as it appears." : tofVoiceState === "unavailable" ? "You can continue by writing it instead." : "Your typed thought is still here."}</span>
-            </div>
-            <section className="tof-voice__panel" aria-live="polite">
-              <div className="tof-voice__pulse"><Mic aria-hidden="true" /></div>
-              <div className="tof-voice__wave" aria-hidden="true">{Array.from({ length: 17 }, (_, index) => <span key={index} style={{ "--wave-delay": index * -0.08 + "s" }} />)}</div>
-              <time dateTime={"PT" + tofVoiceSeconds + "S"}>{elapsed}</time>
-              {isListening ? <button type="button" onClick={stopThoughtVoiceEntry} className="tof-voice__stop"><span aria-hidden="true" />Stop recording</button> : <p className="tof-voice__status">{tofVoiceState === "unavailable" ? "Microphone permission was not granted." : "No recording has been kept."}</p>}
-            </section>
-            <p className="tof-voice__privacy"><LockKeyhole aria-hidden="true" /> Audio is not saved</p>
-            <div className="tof-voice__actions"><button type="button" disabled className="tof-entry__primary">Use recording</button><button type="button" onClick={returnToThoughtWriting} className="tof-entry__ground">Cancel</button></div>
-          </main>
-        </div>
-      );
-    }
-
     if (isThoughtOrFactEntry) {
       return (
-        <div className="tof-entry">
-          <header className="tof-entry__header">
-            <button type="button" onClick={() => navigate(-1)} aria-label="Go back" className="tof-entry__icon"><ArrowLeft /></button>
-            <p>Thought or Fact?</p>
-            <button type="button" onClick={() => navigate("/")} aria-label="Exit Thought or Fact" className="tof-entry__icon"><X /></button>
-          </header>
-          <div className="tof-entry__progress" aria-label="Stage 1 of 8">{Array.from({ length: 8 }, (_, index) => <span key={index} className={index === 0 ? "is-active" : ""} />)}</div>
-          <main className="tof-entry__main">
-            <div className="tof-entry__intro"><h1>What thought are you putting on trial?</h1><p>Write it as it appears in your mind.</p></div>
-            <section className="tof-entry__folder">
-              <div className="tof-entry__tab"><Scale aria-hidden="true" /></div>
-              <label className="tof-entry__field"><textarea value={tofEntryThought} onChange={(event) => setTofEntryThought(event.target.value)} maxLength={360} placeholder="For example: I made a mistake." aria-label="The thought you want to examine" /><button type="button" aria-label="Start voice entry" className="tof-entry__mic" onClick={startThoughtVoiceEntry}><Mic /></button></label>
-              <p><LockKeyhole aria-hidden="true" /> Private on this device</p>
-            </section>
-            <div className="tof-entry__actions"><button type="button" disabled={tofEntryThought.trim().length < 3} onClick={beginGuided} className="tof-entry__primary">Open case</button><button type="button" onClick={() => navigate("/reset", { state: { prebuilt: true, pathway: ["grounding54321V2"], direction: "ground", intensity: answers.intensity ?? 5, timeMin: 5, audio: answers.audio } })} className="tof-entry__ground">Ground first</button></div>
-          </main>
-        </div>
+        <ThoughtOrFactEntry
+          answers={answers}
+          ready={tofReady}
+          thought={tofEntryThought}
+          voiceSeconds={tofVoiceSeconds}
+          voiceState={tofVoiceState}
+          onBegin={beginGuided}
+          onReady={() => setTofReady(true)}
+          onReturnToWriting={returnToThoughtWriting}
+          onStartVoice={startThoughtVoiceEntry}
+          onStopVoice={stopThoughtVoiceEntry}
+          onThoughtChange={setTofEntryThought}
+        />
       );
     }
 
     return (
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
-        <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
-          <div className="flex justify-end">
-            <FlowHomeButton />
-          </div>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">Your reset</p>
-          <h1 className="mt-3 font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
-            Your {answers.timeMin}-minute reset
-          </h1>
-          <p className="mt-3 text-lg text-muted-foreground text-balance">
-            {entry?.prebuilt
-              ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
-              : "Starting with the best-fit practice. The next step will adapt after your check-in."}
-          </p>
-
-          <div className="mt-10 flex flex-col gap-3">
-            {pathwayPreview.map((iv, i) => (
-              <motion.div
-                key={iv.id}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.08, duration: 0.4 }}
-                className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 soft-depth"
-              >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
-                  {i + 1}
-                </span>
-                <div>
-                  <p className="font-heading text-lg font-medium tracking-tight text-foreground">{iv.name}</p>
-                  <p className="text-sm leading-snug text-muted-foreground">{iv.why}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {!entry?.prebuilt && (
-            <PreferencesRow answers={answers} setAnswers={setAnswers} />
-          )}
-
-          <div className="mt-10 flex justify-center">
-            <Button
-              size="lg"
-              onClick={beginGuided}
-              data-sfx="select"
-              className="h-16 w-full max-w-sm rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95"
-            >
-              Begin <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <ResetOverview
+        answers={answers}
+        isPrebuilt={Boolean(entry?.prebuilt)}
+        pathway={pathway}
+        setAnswers={setAnswers}
+        onBegin={beginGuided}
+      />
     );
   }
 
@@ -703,7 +546,7 @@ export default function ResetFlow() {
     const v = checkinValue ?? lastValue ?? 5;
     const delta = v - lastValue;
     const improved = isLift ? delta : -delta;
-    const implied = remaining ? REMAIN_MAP[remaining] : null;
+    const implied = remaining ? REMAINING_STATE_BY_ID[remaining] : null;
     const shiftsDir = implied && implied.direction && implied.direction !== answers.direction;
     const dirLabel = (id) => (DIRECTIONS.find((d) => d.id === id) || {}).label || id;
     const remMin = Math.round(planRemaining);
@@ -739,7 +582,7 @@ export default function ResetFlow() {
           <div className="mt-5 w-full max-w-md">
             <p className="text-sm font-medium text-muted-foreground">What’s still in the way?</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {REMAIN_CHIPS.map((c) => (
+              {REMAINING_STATE_OPTIONS.map((c) => (
                 <button
                   key={c.id}
                   type="button"
@@ -1064,50 +907,21 @@ export default function ResetFlow() {
 
   // ---------- UNSURE (determine direction) ----------
   if (phase === "unsure") {
-    const q1 = {
-      title: "Let’s find your direction",
-      sub: "No idea needed — just pick what’s closest.",
-      options: [
-        { label: "Too high", sub: "Wound up, racing", branch: "high" },
-        { label: "Too low", sub: "Flat, heavy", branch: "low" },
-        { label: "Stuck", sub: "Neither — just stuck", branch: "stuck" },
-      ],
-    };
-    const q2For = (branch) => {
-      if (branch === "high") return {
-        title: "Where is it loudest?",
-        sub: "One more and we’ll begin.",
-        options: [
-          { label: "In my body", sub: "Tense, racing heart", dir: "calm", dirLabel: "Calm down" },
-          { label: "In my thoughts", sub: "Can’t switch off", dir: "reset", dirLabel: "Get unstuck" },
-          { label: "I want to sleep", sub: "Wired at bedtime", dir: "sleep", dirLabel: "Sleep" },
-        ],
-      };
-      if (branch === "low") return {
-        title: "What’s closer?",
-        sub: "One more and we’ll begin.",
-        options: [
-          { label: "Low mood", sub: "Down, flat", dir: "lift", dirLabel: "Feel better" },
-          { label: "Can’t get going", sub: "Stuck on a task", dir: "focus", dirLabel: "Focus" },
-        ],
-      };
-      return {
-        title: "Where’s the stuckness?",
-        sub: "One more and we’ll begin.",
-        options: [
-          { label: "In my head", sub: "Looping thoughts", dir: "reset", dirLabel: "Get unstuck" },
-          { label: "Disconnected", sub: "Spaced out, not here", dir: "ground", dirLabel: "Feel grounded" },
-        ],
-      };
-    };
-    const chooseUnsure = (o) => {
-      if (o.branch) { setUnsureBranch(o.branch); advance({ phase: "unsure", unsureStep: 1 }); }
+    const chooseUnsure = (option) => {
+      if (option.branch) {
+        setUnsureBranch(option.branch);
+        advance({ phase: "unsure", unsureStep: 1 });
+      }
       else {
-        setAnswers((a) => ({ ...a, direction: o.dir, directionLabel: o.dirLabel }));
-        advance({ phase: "questions", qIndex: 0 });
+        setAnswers((current) => ({
+          ...current,
+          direction: option.direction,
+          directionLabel: option.directionLabel,
+        }));
+        advance({ phase: "questions" });
       }
     };
-    const q = unsureStep === 0 ? q1 : q2For(unsureBranch);
+    const question = unsureStep === 0 ? UNSURE_FIRST_STEP : unsureSecondStep(unsureBranch);
     return (
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
@@ -1121,19 +935,19 @@ export default function ResetFlow() {
             <FlowHomeButton />
           </div>
           <h1 className="mt-8 font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
-            {q.title}
+            {question.title}
           </h1>
-          <p className="mt-3 text-lg text-muted-foreground text-balance">{q.sub}</p>
+          <p className="mt-3 text-lg text-muted-foreground text-balance">{question.description}</p>
           <div className="mt-8 flex flex-col gap-3">
-            {q.options.map((o) => (
+            {question.options.map((option) => (
               <button
-                key={o.label}
-                onClick={() => chooseUnsure(o)}
+                key={option.label}
+                onClick={() => chooseUnsure(option)}
                 className="no-tap flex items-center justify-between rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-primary/30 hover:-translate-y-0.5 active:scale-[0.99]"
               >
                 <span>
-                  <span className="block font-heading text-lg font-medium tracking-tight text-foreground">{o.label}</span>
-                  <span className="block text-sm text-muted-foreground">{o.sub}</span>
+                  <span className="block font-heading text-lg font-medium tracking-tight text-foreground">{option.label}</span>
+                  <span className="block text-sm text-muted-foreground">{option.description}</span>
                 </span>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </button>
@@ -1156,24 +970,14 @@ export default function ResetFlow() {
             <ChevronLeft className="h-4 w-4" /> Back
           </button>
           <div className="flex items-center gap-3">
-            <div className="flex gap-1.5">
-              {QUESTIONS.map((_, i) => (
-                <span
-                  key={i}
-                  className={
-                    "h-1.5 w-6 rounded-full transition-colors " +
-                    (i <= qIndex ? "bg-primary" : "bg-secondary")
-                  }
-                />
-              ))}
-            </div>
+            <span className="h-1.5 w-6 rounded-full bg-primary" />
             <FlowHomeButton />
           </div>
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={qIndex}
+            key="intensity"
             initial={{ opacity: 0, x: 18 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -18 }}
@@ -1181,68 +985,24 @@ export default function ResetFlow() {
             className="flex flex-1 flex-col"
           >
             <h1 className="font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
-              {currentQ.key === "intensity" && answers.direction === "lift" ? "How is your mood right now?" : currentQ.title}
+              {answers.direction === "lift" ? "How is your mood right now?" : INTENSITY_QUESTION.title}
             </h1>
             <p className="mt-3 text-lg text-muted-foreground text-balance">
-              {currentQ.key === "intensity" && answers.direction === "lift" ? "Low to high. An honest first read." : currentQ.sub}
+              {answers.direction === "lift" ? "Low to high. An honest first read." : INTENSITY_QUESTION.description}
             </p>
 
             <div className="mt-10 flex flex-1 flex-col items-center">
-              {currentQ.render === "intensity" && (
-                <IntensityDial value={answers.intensity ?? 5} onChange={(v) => setAnswer("intensity", v)} direction={answers.direction} />
-              )}
-              {currentQ.render === "where" && (
-                <div className="w-full">
-                  {answers.direction === "sleep" ? (
-                    <ChoiceButtons
-                      options={AWAKE_REASONS.map((r) => ({ value: r.whereFelt, label: r.label, awake: r.id }))}
-                      value={answers.whereFelt}
-                      onSelect={(v, opt) => { setAnswer("whereFelt", v); setAnswer("awake_reason", opt?.awake); }}
-                    />
-                  ) : (
-                    <ChoiceButtons
-                      options={WHERE_OPTIONS}
-                      value={answers.whereFelt}
-                      onSelect={(v) => setAnswer("whereFelt", v)}
-                    />
-                  )}
-                </div>
-              )}
-              {currentQ.render === "time" && (
-                <div className="w-full">
-                  <ChoiceButtons
-                    options={TIME_OPTIONS.map((t) => ({ value: t.value, label: t.label }))}
-                    value={answers.timeMin}
-                    onSelect={(v) => setAnswer("timeMin", v)}
-                    columns="grid-cols-2 sm:grid-cols-3"
-                  />
-                </div>
-              )}
-              {currentQ.render === "audio" && (
-                <div className="w-full">
-                  <ChoiceButtons options={AUDIO_OPTIONS} value={answers.audio} onSelect={(v) => setAnswer("audio", v)} />
-                </div>
-              )}
-              {currentQ.render === "move" && (
-                <div className="w-full">
-                  <ChoiceButtons options={MOVE_OPTIONS} value={answers.movement} onSelect={(v) => setAnswer("movement", v)} />
-                </div>
-              )}
-              {currentQ.render === "location" && (
-                <div className="w-full">
-                  <ChoiceButtons options={LOCATION_OPTIONS} value={answers.location} onSelect={(v) => setAnswer("location", v)} />
-                </div>
-              )}
+              <IntensityDial value={answers.intensity ?? 5} onChange={(value) => setAnswer("intensity", value)} direction={answers.direction} />
             </div>
 
             <div className="mt-10 flex justify-center">
               <Button
                 size="lg"
-                disabled={!canProceed()}
+                disabled={answers.intensity === null}
                 onClick={nextQuestion}
                 className="h-16 w-full max-w-sm rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95 disabled:opacity-40 disabled:shadow-none"
               >
-                {qIndex < QUESTIONS.length - 1 ? "Continue" : "Build my reset"}
+                Build my reset
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </div>

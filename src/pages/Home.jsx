@@ -1,4 +1,5 @@
-// Home — premium emerald/ivory landing matching the Homepage V3 reference.
+// @ts-check
+// Home — premium mobile landing with a reversible palette experiment.
 // Presentation only; all flows (direction selection, last-worked replay,
 // time-of-day recommendation) route to the existing /reset entry unchanged.
 import React, { useState, useEffect } from "react";
@@ -12,7 +13,7 @@ import HomeHero from "@/components/home/HomeHero";
 import LastWorkedCard from "@/components/home/LastWorkedCard";
 import CategoryCard from "@/components/home/CategoryCard";
 import RecommendedCard from "@/components/home/RecommendedCard";
-import FlagshipReturnCard from "@/components/FlagshipReturnCard";
+import { HOME_THEME } from "@/lib/homeTheme";
 
 const ICON_BASE = "/media/images/home-icons/";
 const HOME_GRID = [
@@ -78,42 +79,40 @@ export default function Home() {
 
   return (
     <PullToRefresh onRefresh={loadSessions}>
-      <div className="min-h-full bg-[var(--mcn-cream)] text-[var(--mcn-emerald)]">
+      <div className={`home-theme home-theme--${HOME_THEME} min-h-full bg-[var(--home-bg)] text-[var(--home-ink)]`}>
         <div className="mx-auto flex min-h-full max-w-[36rem] flex-col">
           <HomeHero onProfile={() => navigate("/profile")} onInsights={() => navigate("/insights")} />
 
-          <FlagshipReturnCard />
-
-          {(lastWorked || personalBest) && (
-            <LastWorkedCard subtitle="Repeat your most effective reset" onClick={doLastWorked} overlap />
-          )}
-
-          <section className="px-[18px] pt-6">
-            <h2 className="text-center font-clean text-[1.65rem] font-medium leading-tight tracking-[-0.01em] text-[var(--mcn-emerald)]">
+          <section className="px-5 pt-9">
+            <h2 className="text-center font-clean text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-[var(--home-ink)]">
               What do you need right now?
             </h2>
-            <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-4">
+            <div className="mt-6 grid grid-cols-2 gap-4">
               {HOME_GRID.map((c, i) => (
                 <CategoryCard key={c.id} card={c} index={i} onClick={() => choose(c)} />
               ))}
             </div>
           </section>
 
-          {recommendation && (
-            <section className="mt-7 px-[18px]">
+          {(lastWorked || personalBest) ? (
+            <section className="mt-10 px-2">
+              <LastWorkedCard subtitle="Repeat your most effective reset" onClick={doLastWorked} overlap={false} />
+            </section>
+          ) : recommendation ? (
+            <section className="mt-10 px-5">
               <RecommendedCard
                 title={recommendation.title}
                 descriptor={`${recommendation.minutes} min · ${recommendation.tag}`}
                 onClick={doRecommend}
               />
             </section>
-          )}
+          ) : null}
 
-          <div className="px-[18px]">
+          <div className="px-5">
             <SafetyFooter dark={false} />
           </div>
 
-          <div className="h-28" />
+          <div className="h-32" />
         </div>
       </div>
     </PullToRefresh>

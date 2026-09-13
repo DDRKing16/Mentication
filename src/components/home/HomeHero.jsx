@@ -1,7 +1,8 @@
+// @ts-check
 import React from "react";
 import { User, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Logo, MENTICATION_SLOGAN } from "@/components/Logo";
+import { MENTICATION_GREEN_PINK_ASSET, MENTICATION_SLOGAN } from "@/components/Logo";
 
 function greetingFor() {
   const h = new Date().getHours();
@@ -12,46 +13,53 @@ function greetingFor() {
 
 export default function HomeHero({ onProfile, onInsights }) {
   return (
-    <header className="relative overflow-hidden rounded-b-[2.5rem] bg-[var(--mcn-emerald)] px-[18px] pt-[max(1.4rem,env(safe-area-inset-top))] pb-10">
-      {/* top row: profile · supplied brand symbol · insights */}
+    <header className="home-hero relative overflow-hidden rounded-b-[2.5rem] px-5 pt-[max(1.4rem,env(safe-area-inset-top))] pb-12">
       <div className="relative flex items-center justify-between">
         <button
           type="button"
           onClick={onProfile}
           aria-label="Profile"
-          className="no-tap flex h-12 w-12 items-center justify-center rounded-full bg-[#ECE2D2] text-[#0E4536] shadow-[0_8px_22px_-10px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
+          className="no-tap flex h-12 w-12 items-center justify-center rounded-full bg-[var(--home-control)] text-[var(--home-control-ink)] shadow-[0_8px_22px_-10px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
         >
           <User className="h-5 w-5" strokeWidth={1.6} />
         </button>
 
-        <Logo
-          className="h-24 w-24 sm:h-28 sm:w-28"
-          label={`Mentication — ${MENTICATION_SLOGAN}`}
-        />
+        <span
+          className="relative h-44 w-[15.5rem] shrink-0"
+          role="img"
+          aria-label={`Mentication — ${MENTICATION_SLOGAN}`}
+        >
+          <img
+            src={MENTICATION_GREEN_PINK_ASSET}
+            className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+          />
+        </span>
 
         <button
           type="button"
           onClick={onInsights}
           aria-label="Insights"
-          className="no-tap flex h-12 w-12 items-center justify-center rounded-full bg-[#ECE2D2] text-[#0E4536] shadow-[0_8px_22px_-10px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
+          className="no-tap flex h-12 w-12 items-center justify-center rounded-full bg-[var(--home-control)] text-[var(--home-control-ink)] shadow-[0_8px_22px_-10px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
         >
           <BarChart3 className="h-5 w-5" strokeWidth={1.6} />
         </button>
       </div>
 
-      <p className="mt-2 text-center text-[0.68rem] font-medium tracking-[0.08em] text-[#FFFFFF]/85">
+      <p className="mt-1 text-center font-[var(--font-editorial)] text-[1.03rem] italic leading-none text-[var(--home-hero-soft)]">
         {MENTICATION_SLOGAN}
       </p>
 
-      {/* left-aligned greeting + statement */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="relative mt-5 text-left"
+        className="relative mt-7 max-w-[19rem] text-left"
       >
-        <p className="text-[0.82rem] font-medium uppercase tracking-[0.32em] text-[#DDB977]">{greetingFor()}</p>
-        <h1 className="mt-3 font-clean text-[1.64rem] font-normal leading-[1.15] tracking-[-0.01em] text-[#FFFFFF]">
+        <p className="text-[0.82rem] font-medium uppercase tracking-[0.32em] text-[var(--home-accent)]">{greetingFor()}</p>
+        <h1 className="mt-3 font-clean text-[2rem] font-medium leading-[1.08] tracking-[-0.025em] text-[var(--home-hero-text)]">
           Let’s find your reset for today.
         </h1>
       </motion.div>

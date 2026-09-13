@@ -29,6 +29,7 @@ export function useGuideVoice() {
   const currentRef = useRef(null);        // { key, audio }
   const leadRef = useRef(null);           // timeout id
   const pendingRef = useRef(null);        // key of the line we're switching to
+  const requestSequenceRef = useRef(0);   // invalidates stale same-text requests
 
   const keyOf = (text, voice) => `${voice}|${text}`;
 
@@ -102,10 +103,10 @@ export function useGuideVoice() {
     else fadeTo(cur.audio, 0, FADE_OUT_MS, () => cur.audio.pause());
   };
 
-  const startLine = (key, audio, rate, leadMs, onEnd) => {
+  const startLine = (key, audio, rate, leadMs, onEnd, requestId) => {
     pendingRef.current = key;
     const begin = () => {
-      if (pendingRef.current !== key) return; // superseded while waiting
+      if (pendingRef.current !== key || requestSequenceRef.current !== requestId) return;
       stopCurrent(false);
       if (audio.currentTime > 0) audio.currentTime = 0;
       audio.playbackRate = rate;
@@ -136,15 +137,17 @@ export function useGuideVoice() {
     const leadMs = opts.leadMs || 0;
     const onEnd = opts.onEnd || null;
     const key = keyOf(text, voice);
+    const requestId = ++requestSequenceRef.current;
     pendingRef.current = key;
 
     ensure(text, voice).then((audio) => {
-      if (!audio || pendingRef.current !== key) return;
-      startLine(key, audio, rate, leadMs, onEnd);
+      if (!audio || pendingRef.current !== key || requestSequenceRef.current !== requestId) return;
+      startLine(key, audio, rate, leadMs, onEnd, requestId);
     });
   }, [ensure]);
 
   const stop = useCallback(() => {
+    requestSequenceRef.current += 1;
     cancelLead();
     pendingRef.current = null;
     stopCurrent(true);
@@ -161,13 +164,17 @@ export function useGuideVoice() {
 
   const resume = useCallback(() => {
     const cur = currentRef.current;
-    if (cur && cur.audio.paused) {
-      cur.audio.volume = 0;
-      const p = cur.audio.play();
-      const up = () => fadeTo(cur.audio, TARGET_VOLUME, FADE_IN_MS);
-      if (p && typeof p.then === "function") p.then(up).catch(() => {});
-      else up();
+    if (!cur) return;
+    cancelFadeOf(cur.audio);
+    if (!cur.audio.paused) {
+      fadeTo(cur.audio, TARGET_VOLUME, FADE_IN_MS);
+      return;
     }
+    cur.audio.volume = 0;
+    const p = cur.audio.play();
+    const up = () => fadeTo(cur.audio, TARGET_VOLUME, FADE_IN_MS);
+    if (p && typeof p.then === "function") p.then(up).catch(() => {});
+    else up();
   }, []);
 
   const preload = useCallback((text, opts = {}) => {
@@ -175,6 +182,7 @@ export function useGuideVoice() {
   }, [ensure]);
 
   useEffect(() => () => {
+    requestSequenceRef.current += 1;
     cancelLead();
     poolRef.current.forEach(({ audio }) => {
       cancelFadeOf(audio);
