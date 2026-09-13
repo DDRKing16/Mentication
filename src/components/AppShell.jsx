@@ -1,10 +1,10 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useLayoutEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import TabBar from "@/components/TabBar";
 import Home from "@/pages/Home";
 
-// Each tab is mounted once and kept alive (hidden via display:none) so state
-// survives tab switches.
+// Each tab loads on first visit, then stays mounted (hidden via display:none)
+// so subsequent switches preserve its state without front-loading every chunk.
 const InterventionLibrary = lazy(() => import("@/pages/InterventionLibrary"));
 const RegulationProfile = lazy(() => import("@/pages/RegulationProfile"));
 const MyPlan = lazy(() => import("@/pages/MyPlan"));
@@ -19,42 +19,57 @@ const PageSpinner = () => (
 
 const hidden = { display: "none" };
 const visible = { display: "block" };
+const TAB_PATHS = ["/library", "/plan", "/profile", "/insights", "/settings"];
 
 export default function AppShell() {
   const { pathname } = useLocation();
+  const [mountedTabs, setMountedTabs] = useState(() => new Set([pathname]));
+
+  useLayoutEffect(() => {
+    if (!TAB_PATHS.includes(pathname) || mountedTabs.has(pathname)) return;
+    setMountedTabs((previous) => new Set(previous).add(pathname));
+  }, [mountedTabs, pathname]);
 
   return (
     <div className="relative min-h-full">
       <div style={pathname === "/" ? visible : hidden} className="min-h-full">
         <Home />
       </div>
-      <div style={pathname === "/library" ? visible : hidden} className="min-h-full">
-        <Suspense fallback={<PageSpinner />}>
-          <InterventionLibrary />
-        </Suspense>
-      </div>
-      <>
-          <div style={pathname === "/plan" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <MyPlan />
-            </Suspense>
-          </div>
-          <div style={pathname === "/profile" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <RegulationProfile />
-            </Suspense>
-          </div>
-          <div style={pathname === "/insights" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <EffectivenessDashboard />
-            </Suspense>
-          </div>
-          <div style={pathname === "/settings" ? visible : hidden} className="min-h-full">
-            <Suspense fallback={<PageSpinner />}>
-              <Settings />
-            </Suspense>
-          </div>
-      </>
+      {mountedTabs.has("/library") && (
+        <div style={pathname === "/library" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <InterventionLibrary />
+          </Suspense>
+        </div>
+      )}
+      {mountedTabs.has("/plan") && (
+        <div style={pathname === "/plan" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <MyPlan />
+          </Suspense>
+        </div>
+      )}
+      {mountedTabs.has("/profile") && (
+        <div style={pathname === "/profile" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <RegulationProfile />
+          </Suspense>
+        </div>
+      )}
+      {mountedTabs.has("/insights") && (
+        <div style={pathname === "/insights" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <EffectivenessDashboard />
+          </Suspense>
+        </div>
+      )}
+      {mountedTabs.has("/settings") && (
+        <div style={pathname === "/settings" ? visible : hidden} className="min-h-full">
+          <Suspense fallback={<PageSpinner />}>
+            <Settings />
+          </Suspense>
+        </div>
+      )}
       <TabBar />
     </div>
   );
