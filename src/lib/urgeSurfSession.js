@@ -1,7 +1,7 @@
 import { STANDARD_CHOICE_WINDOWS } from "./urgeSurfState.js";
 
 export const URGE_SURF_DEFAULTS = Object.freeze({
-  durationSeconds: 90,
+  durationSeconds: 60,
   extensionSeconds: 600,
   durations: STANDARD_CHOICE_WINDOWS,
   bodyRegions: ["head_face", "throat_neck", "shoulders", "chest", "upper_abdomen", "lower_abdomen", "pelvis", "arms_hands", "legs_feet", "whole_body"],
@@ -32,7 +32,7 @@ export function createUrgeSession(nowEpochMs = Date.now()) {
     choiceOutcome: null,
     completionRoute: null,
     savePreference: false,
-    timer: { segmentIndex: 0, segmentDurationMs: URGE_SURF_DEFAULTS.durationSeconds * 1000, segmentStartedAtEpochMs: null, segmentEndsAtEpochMs: null, totalElapsedMs: 0, hapticsEnabled: false, completionReason: null },
+    timer: { segmentIndex: 0, segmentDurationMs: URGE_SURF_DEFAULTS.durationSeconds * 1000, segmentStartedAtEpochMs: null, segmentEndsAtEpochMs: null, pausedRemainingMs: null, totalElapsedMs: 0, hapticsEnabled: false, completionReason: null },
   };
 }
 
@@ -51,14 +51,12 @@ const validDuration = (value) => {
 };
 const canStartTimer = (state) => Boolean(
   validIntensity(state.initialIntensity)
-  && state.categoryKeys.length
   && (state.bodyRegionKey || state.environmentCueKey)
   && state.sensationKeys.length
-  && state.anchorText.trim()
 );
 const canNavigateTo = (state, route) => {
   if (state.currentRoute === "urge.name" && route === "urge.body") {
-    return Boolean(validIntensity(state.initialIntensity) && state.categoryKeys.length);
+    return Boolean(validIntensity(state.initialIntensity));
   }
   if (state.currentRoute === "urge.body" && route === "urge.anchor") {
     return Boolean((state.bodyRegionKey || state.environmentCueKey) && state.sensationKeys.length);
@@ -91,15 +89,28 @@ export function reduceUrgeSession(session, event) {
   if (event.type === "TIMER_STARTED") {
     if (!canStartTimer(state)) return state;
     const duration = state.timer.segmentDurationMs;
-    return next({ status: "timer_active", currentRoute: "urge.timer", timer: { ...state.timer, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, completionReason: null } });
+    return next({ status: "timer_active", currentRoute: "urge.timer", timer: { ...state.timer, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null } });
+  }
+  if (event.type === "TIMER_PAUSED") {
+    if (state.status !== "timer_active") return state;
+    const pausedRemainingMs = Math.max(0, state.timer.segmentEndsAtEpochMs - at);
+    return next({ status: "timer_paused", timer: { ...state.timer, segmentEndsAtEpochMs: null, pausedRemainingMs } });
+  }
+  if (event.type === "TIMER_RESUMED") {
+    if (state.status !== "timer_paused") return state;
+    const remainingMs = Math.max(0, state.timer.pausedRemainingMs ?? 0);
+    return next({ status: "timer_active", timer: { ...state.timer, segmentEndsAtEpochMs: at + remainingMs, pausedRemainingMs: null } });
   }
   if (event.type === "TIMER_ELAPSED") {
     if (state.status !== "timer_active" || remainingSeconds(state, at) > 0) return state;
     return next({ status: "timer_complete", currentRoute: "urge.postRating", timer: { ...state.timer, totalElapsedMs: state.timer.totalElapsedMs + state.timer.segmentDurationMs, completionReason: "elapsed" } });
   }
   if (event.type === "TIMER_STOPPED") {
-    if (state.status !== "timer_active") return state;
-    const elapsed = Math.min(state.timer.segmentDurationMs, Math.max(0, at - state.timer.segmentStartedAtEpochMs));
+    if (state.status !== "timer_active" && state.status !== "timer_paused") return state;
+    const remainingMs = state.status === "timer_paused"
+      ? Math.max(0, state.timer.pausedRemainingMs ?? 0)
+      : Math.max(0, state.timer.segmentEndsAtEpochMs - at);
+    const elapsed = Math.min(state.timer.segmentDurationMs, state.timer.segmentDurationMs - remainingMs);
     return next({ status: "timer_complete", currentRoute: "urge.postRating", timer: { ...state.timer, totalElapsedMs: state.timer.totalElapsedMs + elapsed, completionReason: "stopped" } });
   }
   if (event.type === "POST_INTENSITY_SELECTED") return next({ postIntensity: validIntensity(event.value) });
@@ -109,7 +120,7 @@ export function reduceUrgeSession(session, event) {
   if (event.type === "EXTEND_TIMER") {
     if (state.currentRoute !== "urge.complete" || state.status !== "timer_complete") return state;
     const duration = URGE_SURF_DEFAULTS.extensionSeconds * 1000;
-    return next({ status: "timer_active", currentRoute: "urge.timer", timer: { ...state.timer, segmentIndex: state.timer.segmentIndex + 1, segmentDurationMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, completionReason: null } });
+    return next({ status: "timer_active", currentRoute: "urge.timer", timer: { ...state.timer, segmentIndex: state.timer.segmentIndex + 1, segmentDurationMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null } });
   }
   return state;
 }
