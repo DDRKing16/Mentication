@@ -61,7 +61,7 @@ export default function InterventionControlShell({
         {bottomActionLabel && onBottomAction
           ? <button onClick={onBottomAction} className="min-h-11 rounded-full px-5 text-sm font-medium text-white/68 underline-offset-4 hover:text-white hover:underline">{bottomActionLabel}</button>
           : <button onClick={openAdapt} className="min-h-11 rounded-full px-5 text-sm font-medium text-white/68 underline-offset-4 hover:text-white hover:underline">This is not helping</button>}
-        {active && <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/45 p-1.5 shadow-2xl backdrop-blur-xl">
+        {(active || onAudio) && <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/45 p-1.5 shadow-2xl backdrop-blur-xl">
           {onPause && <button onClick={onPause} aria-label={paused ? "Resume" : "Pause"} className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10">{paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}</button>}
           {onAudio && <button onClick={onAudio} aria-label={audioOn ? "Mute audio" : "Enable audio"} aria-pressed={audioOn} className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10">{audioOn ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}</button>}
           <button onClick={openAdapt} aria-label="Adapt intervention" className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10"><SlidersHorizontal className="h-5 w-5" /></button>
