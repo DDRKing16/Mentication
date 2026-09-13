@@ -4,8 +4,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { sessionStore } from "@/lib/localData";
-import { pickLastWorked, buildPersonalBest } from "@/lib/interventions";
-import { buildRecommendation } from "@/lib/recommend";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
 import HomeHero from "@/components/home/HomeHero";
@@ -31,7 +29,11 @@ export default function Home() {
   const [recommendation, setRecommendation] = useState(null);
 
   const loadSessions = async () => {
-    const sessions = await sessionStore.list("-created_date", 30);
+    const [sessions, { pickLastWorked, buildPersonalBest }, { buildRecommendation }] = await Promise.all([
+      sessionStore.list("-created_date", 30),
+      import("@/lib/interventions"),
+      import("@/lib/recommend"),
+    ]);
     setLastWorked(pickLastWorked(sessions));
     setPersonalBest(buildPersonalBest(sessions));
     setRecommendation(buildRecommendation(sessions));
