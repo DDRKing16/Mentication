@@ -7,3 +7,7 @@ coverage/
 
 .DS_Store
 *.log
+
+# Build output and local scratch captures
+dist/
+tmp/
