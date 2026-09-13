@@ -66,24 +66,23 @@ export default function HappyBumpExperience({ intervention, answers, onComplete,
   const { speak, stop: stopVoice, preload } = useGuideVoice();
   const narrationAvailable = !answers?.noAudio && !answers?.discreet;
   const [narrationOn, setNarrationOn] = useState(() => narrationAvailable && answers?.audio === "yes");
-  const [interactionPaused, setInteractionPaused] = useState(false);
-  const voice = useMemo(() => voiceFor("lift"), []);
+  const voice = useMemo(() => ({ ...voiceFor("lift"), rate: 1, leadMs: 0 }), []);
   const stage = STAGE[s.scene] || 1; const elapsed = s.startedAt && !s.paused ? s.elapsedBeforePause + (now - s.startedAt) / 1000 : s.elapsedBeforePause; const progress = Math.min(1, elapsed / DURATION_SECONDS); const area = AREAS.find((item) => item.id === s.lifeArea);
   useEffect(() => { if (!s.runId && !runStarted.current) { runStarted.current = true; set((value) => ({ ...value, runId: startBumpRun() })); } else if (s.runId) recordBumpScene(s.runId, s.scene); }, [s.runId, s.scene]);
   useEffect(() => { if (!["move", "connection"].includes(s.scene) || s.paused) return undefined; const timer = window.setInterval(() => setNow(Date.now()), 500); return () => window.clearInterval(timer); }, [s.scene, s.paused]);
   useEffect(() => {
-    const nextScene = Object.keys(STAGE).find((scene) => STAGE[scene] === Math.min(12, stage + 1));
-    [HAPPY_BUMP_NARRATION[s.scene], HAPPY_BUMP_NARRATION[nextScene]].forEach((line) => { if (line) preload(line, voice); });
-  }, [preload, s.scene, stage, voice]);
+    if (!narrationOn) return;
+    Object.values(HAPPY_BUMP_NARRATION).forEach((line) => preload(line, voice));
+  }, [narrationOn, preload, voice]);
   useEffect(() => {
-    if (!narrationOn || interactionPaused || s.paused) { stopVoice(); return undefined; }
+    if (!narrationOn || s.paused) { stopVoice(); return undefined; }
     const line = HAPPY_BUMP_NARRATION[s.scene];
     if (line) speak(line, voice);
     return stopVoice;
-  }, [interactionPaused, narrationOn, s.paused, s.scene, speak, stopVoice, voice]);
+  }, [narrationOn, s.paused, s.scene, speak, stopVoice, voice]);
   useEffect(() => () => stopVoice(), [stopVoice]);
-  const go = (scene, values = {}) => { setInteractionPaused(false); set((value) => ({ ...value, ...values, scene })); };
-  const pauseNarrationForInput = () => { stopVoice(); setInteractionPaused(true); };
+  const go = (scene, values = {}) => set((value) => ({ ...value, ...values, scene }));
+  const pauseNarrationForInput = () => stopVoice();
   const pause = () => set((value) => value.paused ? { ...value, paused: false, startedAt: Date.now() } : { ...value, paused: true, elapsedBeforePause: elapsed, startedAt: null });
   const open = (href, connection) => { stopVoice(); set((value) => ({ ...value, connection })); if (typeof window !== "undefined") window.location.assign(href); };
   const messenger = () => { set((value) => ({ ...value, connection: "messenger" })); const app = "fb-messenger://"; if (window.Capacitor?.isNativePlatform?.()) window.open(app, "_system"); else { const fallback = window.setTimeout(() => { if (document.visibilityState === "visible") window.open("https://www.messenger.com/", "_blank", "noopener,noreferrer"); }, 900); window.addEventListener("pagehide", () => window.clearTimeout(fallback), { once: true }); window.location.assign(app); } };
@@ -91,7 +90,7 @@ export default function HappyBumpExperience({ intervention, answers, onComplete,
   const nextPlanReady = s.nextMode === "productive" ? s.nextActivity.trim() && s.pairing.trim() && s.reward.trim() : s.nextActivity.trim() && s.senses.length;
   const toggleSense = (sense) => set((value) => ({ ...value, activeSense: sense, senses: value.senses.includes(sense) ? value.senses.filter((item) => item !== sense) : [...value.senses, sense] }));
   const shift = s.current - s.baseline;
-  return <InterventionControlShell id={ID} goal="Lift" title="The Happy Bump" stage={stage} stages={12} onBack={s.scene === "arrival" ? onExit : () => go(BACK[s.scene] || "arrival")} onExit={() => { stopVoice(); onExit(); }} active={["move", "connection"].includes(s.scene)} paused={s.paused} onPause={pause} audioOn={narrationOn} onAudio={narrationAvailable ? () => { setInteractionPaused(false); setNarrationOn((value) => !value); } : undefined} onDifferent={() => { recordDislike(ID, intervention.mechanism); stopVoice(); onExit(); }} bottomActionLabel={s.scene === "complete" ? undefined : "Skip ahead"} onBottomAction={() => go(SKIP[s.scene] || s.scene)} dark accent="var(--bump-light)" className={`happy-bump happy-bump-stage-${stage}`} field={<><div className="happy-bump-ambient" /><div className="happy-bump-grain" /><Engine level={(stage - 1) / 11} stage={stage} progress={["move", "connection"].includes(s.scene) ? Math.max(.45, progress) : Math.min(1, stage / 12 + .12)} pulse={!prefs.reducedMotion && stage > 1 && stage < 12} /></>}>
+  return <InterventionControlShell id={ID} goal="Lift" title="The Happy Bump" stage={stage} stages={12} onBack={s.scene === "arrival" ? onExit : () => go(BACK[s.scene] || "arrival")} onExit={() => { stopVoice(); onExit(); }} active={["move", "connection"].includes(s.scene)} paused={s.paused} onPause={pause} audioOn={narrationOn} onAudio={narrationAvailable ? () => setNarrationOn((value) => !value) : undefined} onDifferent={() => { recordDislike(ID, intervention.mechanism); stopVoice(); onExit(); }} bottomActionLabel={s.scene === "complete" ? undefined : "Skip ahead"} onBottomAction={() => go(SKIP[s.scene] || s.scene)} dark accent="var(--bump-light)" className={`happy-bump happy-bump-stage-${stage}`} field={<><div className="happy-bump-ambient" /><div className="happy-bump-grain" /><Engine level={(stage - 1) / 11} stage={stage} progress={["move", "connection"].includes(s.scene) ? Math.max(.45, progress) : Math.min(1, stage / 12 + .12)} pulse={!prefs.reducedMotion && stage > 1 && stage < 12} /></>}>
     <div className="happy-bump-content"><AnimatePresence mode="wait">
       {s.scene === "arrival" && <Copy title="Shift your state." body="Twelve short steps, about 10–15 minutes. No motivation required.">{saved && <button className="happy-bump-saved" onClick={() => go("baseline", saved)}>Run my saved bump <Play className="h-4 w-4" /></button>}<Primary onClick={() => go("baseline")}>Start</Primary></Copy>}
       {s.scene === "baseline" && <Copy step={1} title="Where are you at right now?" body="Move the curve until it feels about right."><input aria-label="Starting energy from flat to more alive" className="happy-bump-slider" type="range" min="0" max="10" value={s.baseline} onChange={(event) => set((value) => ({ ...value, baseline: Number(event.target.value) }))} /><div className="happy-bump-scale"><span>Flat</span><span>More alive</span></div><Primary onClick={() => go("stand")}>That's where I am</Primary></Copy>}
