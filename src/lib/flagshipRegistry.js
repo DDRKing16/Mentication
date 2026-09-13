@@ -67,7 +67,7 @@ export const FLAGSHIP_REGISTRY = Object.freeze({
     completionModel: "whether the selected action felt worthwhile",
   }),
   happyBump: meta({
-    id: "happyBump", displayName: "The Happy Bump", primaryGoal: "lift", secondaryGoals: ["focus"],
+    id: "happyBump", displayName: "The Happy Bump", primaryGoal: "lift", secondaryGoals: ["calm", "focus"],
     primaryMechanism: "stacked behavioural activation", targetState: "low energy, low mood or inertia where a gentle sequence can build momentum",
     bestWhen: "A safe, capacity-matched lift through movement, hydration, connection and one small action would be useful", eligibleIntensity: [0, 7],
     preferredIntensity: [1, 5], cognitiveLoad: 1, physicalDemand: 2, arousalDirection: "raise", pathwayRole: ["opener", "core"],

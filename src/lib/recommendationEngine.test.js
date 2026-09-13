@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { buildPathway, buildSegment, computeEffectiveness, buildProfile, immediatePathway, RECOMMENDATION_ENGINE_VERSION, getIntervention, normalizeAttemptResponse, coarseContextKey, buildAttemptRecord, suggestAdaptiveAlternative, INTERVENTIONS, pathwayByIds } from '@/lib/interventions';
 import { CORE_25_CATALOGUE_VERSION, CORE_25_IDS, core25Counts } from '@/lib/final50Catalog';
 import {
@@ -10,6 +10,7 @@ import {
 import { computeEffectivenessInsights, computeLocalCalendarStreak } from '@/lib/insights';
 import { FLAGSHIP_IDS, FLAGSHIP_REGISTRY } from '@/lib/flagshipRegistry';
 import { handoffRules, recommendHandoff } from '@/lib/flagshipHandoffs';
+import { recordDislike } from '@/lib/preferences';
 
 describe('recommendation engine v2 basics', () => {
   it('locks the production catalogue to the curated 26 with 18 flagships', () => {
@@ -33,6 +34,45 @@ describe('recommendation engine v2 basics', () => {
       const eligible = INTERVENTIONS.filter((iv) => iv.directions.includes(direction));
       expect(eligible.length, direction).toBeGreaterThanOrEqual(minimumEligible[direction]);
     }
+  });
+
+  it('uses Happy Bump as the Lift opener until feedback shows it is unwanted', () => {
+    const answers = {
+      direction: 'lift', intensity: 3, whereFelt: 'both', timeMin: 6,
+      location: 'home', audio: 'yes', movement: 'yes',
+    };
+    expect(buildPathway(answers, {})[0]?.id).toBe('happyBump');
+
+    const storage = new Map();
+    vi.stubGlobal('localStorage', {
+      getItem: (key) => storage.get(key) ?? null,
+      setItem: (key, value) => storage.set(key, value),
+      removeItem: (key) => storage.delete(key),
+    });
+    try {
+      recordDislike('happyBump', getIntervention('happyBump').mechanism);
+      expect(buildPathway(answers, {})[0]?.id).not.toBe('happyBump');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('honours a strongly effective Lift alternative over the Happy Bump default', () => {
+    const answers = {
+      direction: 'lift', intensity: 3, whereFelt: 'both', timeMin: 6,
+      location: 'home', audio: 'yes', movement: 'yes',
+    };
+    const path = buildPathway(answers, { happyBump: 0.2, activationMenu: 0.9 });
+    expect(path[0]?.id).toBe('activationMenu');
+  });
+
+  it('offers Happy Bump only as a context-aware Calm and Focus secondary option', () => {
+    const calm = { direction: 'calm', intensity: 4, whereFelt: 'both', timeMin: 6, location: 'home', audio: 'yes', movement: 'yes' };
+    const focus = { direction: 'focus', intensity: 3, whereFelt: 'both', timeMin: 6, location: 'home', audio: 'yes', movement: 'yes', avoiding: true };
+    expect(hardEligibleV3(getIntervention('happyBump'), calm)).toBe(true);
+    expect(hardEligibleV3(getIntervention('happyBump'), focus)).toBe(true);
+    expect(hardEligibleV3(getIntervention('happyBump'), { ...calm, intensity: 8 })).toBe(false);
+    expect(hardEligibleV3(getIntervention('happyBump'), { ...focus, avoiding: false })).toBe(false);
   });
 
   it('maps retired hero and duplicate ids to their core-25 successor', () => {

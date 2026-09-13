@@ -211,6 +211,13 @@ export function hardEligibleV3(iv, answers = {}, profile = inferProfileV3(answer
   if (asArray(iv.unsuitableSubstates).some((tag) => activeSubstates.has(tag))) return false;
 
   if (iv.id === "petConnection" && answers.hasPet !== true) return false;
+  // Happy Bump can support a gentle calm-down only when movement is welcome
+  // and distress is not acute. For focus it is an activation bridge, not a
+  // replacement for a concrete task intervention.
+  if (iv.id === "happyBump" && direction === "calm" && (intensity > 5 || profile.tags.has("acute"))) return false;
+  if (iv.id === "happyBump" && direction === "focus" && !(
+    answers.avoiding || answers.low_energy || answers.low_mood || answers.tired || answers.exhausted
+  )) return false;
   return true;
 }
 
