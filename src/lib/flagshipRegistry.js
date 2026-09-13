@@ -2,7 +2,7 @@
 // deliberately data-only: recommendation, hand-off and presentation layers can
 // consume the same clinical distinctions without duplicating them.
 
-export const FLAGSHIP_CATALOGUE_VERSION = "2026-09-06-v1-core25";
+export const FLAGSHIP_CATALOGUE_VERSION = "2026-09-14-v1-core26";
 
 const meta = (definition) => Object.freeze({
   secondaryGoals: [],
@@ -65,6 +65,14 @@ export const FLAGSHIP_REGISTRY = Object.freeze({
     bestWhen: "The person needs one worthwhile action rather than more pressure", eligibleIntensity: [1, 7], preferredIntensity: [2, 5],
     cognitiveLoad: 2, arousalDirection: "raise", interactionSignature: "personalised field of meaningful activation possibilities",
     completionModel: "whether the selected action felt worthwhile",
+  }),
+  happyBump: meta({
+    id: "happyBump", displayName: "The Happy Bump", primaryGoal: "lift", secondaryGoals: ["focus"],
+    primaryMechanism: "stacked behavioural activation", targetState: "low energy, low mood or inertia where a gentle sequence can build momentum",
+    bestWhen: "A safe, capacity-matched lift through movement, hydration, connection and one small action would be useful", eligibleIntensity: [0, 7],
+    preferredIntensity: [1, 5], cognitiveLoad: 1, physicalDemand: 2, arousalDirection: "raise", pathwayRole: ["opener", "core"],
+    contextRequirements: ["safe movement route"], contraindications: ["acute panic", "dizziness", "significant pain", "physical instability"],
+    interactionSignature: "a cumulative curve that makes each small input visible", completionModel: "before-and-after energy rating with a saved combination",
   }),
   changeScene: meta({
     id: "changeScene", displayName: "Change the Scene", primaryGoal: "lift", secondaryGoals: ["ground"],

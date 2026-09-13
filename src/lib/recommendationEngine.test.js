@@ -12,14 +12,14 @@ import { FLAGSHIP_IDS, FLAGSHIP_REGISTRY } from '@/lib/flagshipRegistry';
 import { handoffRules, recommendHandoff } from '@/lib/flagshipHandoffs';
 
 describe('recommendation engine v2 basics', () => {
-  it('locks the production catalogue to the curated 25 with 17 flagships', () => {
-    expect(INTERVENTIONS).toHaveLength(25);
-    expect(new Set(INTERVENTIONS.map((iv) => iv.id)).size).toBe(25);
+  it('locks the production catalogue to the curated 26 with 18 flagships', () => {
+    expect(INTERVENTIONS).toHaveLength(26);
+    expect(new Set(INTERVENTIONS.map((iv) => iv.id)).size).toBe(26);
     expect(INTERVENTIONS.map((iv) => iv.id)).toEqual(CORE_25_IDS);
-    expect(CORE_25_CATALOGUE_VERSION).toBe('2026-09-06-v1-core25');
+    expect(CORE_25_CATALOGUE_VERSION).toBe('2026-09-14-v1-core26');
     expect(core25Counts(INTERVENTIONS)).toEqual({
       calm: 7,
-      lift: 7,
+      lift: 8,
       ground: 4,
       focus: 3,
       sleep: 4,
@@ -62,6 +62,7 @@ describe('recommendation engine v2 basics', () => {
       'factCheck',
       'urgeSurf',
       'activationMenu',
+      'happyBump',
       'nextAction',
       'tomorrowParking',
       'thenWhat',
@@ -76,7 +77,7 @@ describe('recommendation engine v2 basics', () => {
     expect(INTERVENTIONS.some((iv) => iv.id === 'changeScene')).toBe(true);
     expect(INTERVENTIONS.some((iv) => iv.id === 'songMove')).toBe(false);
     expect(new Set(INTERVENTIONS.map((iv) => iv.mechanismFamily)).size).toBeGreaterThanOrEqual(15);
-    expect(FLAGSHIP_IDS).toHaveLength(17);
+    expect(FLAGSHIP_IDS).toHaveLength(18);
     expect(FLAGSHIP_IDS.every((id) => INTERVENTIONS.some((iv) => iv.id === id && iv.flagship))).toBe(true);
     expect(FLAGSHIP_REGISTRY.nextAction.displayName).toBe('Next Easiest Step');
     expect(INTERVENTIONS.some((iv) => /Gravity Map|Quiet Return/i.test(iv.name))).toBe(false);

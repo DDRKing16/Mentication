@@ -38,6 +38,7 @@ import {
 } from "@/lib/resetFlowConfig";
 import "@/styles/thought-or-fact.css";
 import "@/styles/urge-surfing.css";
+import "@/styles/happy-bump.css";
 
 export default function ResetFlow() {
   const navigate = useNavigate();
@@ -47,7 +48,8 @@ export default function ResetFlow() {
 
   const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
   const startsUrgeSurfing = directEntryPathway.length === 1 && directEntryPathway[0]?.id === "urgeSurf";
-  const initialPhase = startsUrgeSurfing ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
+  const startsDirectFlagship = directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
+  const initialPhase = startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
@@ -69,8 +71,8 @@ export default function ResetFlow() {
   const [unsureBranch, setUnsureBranch] = useState(null);
   const [saving, setSaving] = useState(false);
   // coaching loop state
-  const [activePathway, setActivePathway] = useState(startsUrgeSurfing ? directEntryPathway : null);
-  const [usedIds, setUsedIds] = useState(startsUrgeSurfing ? directEntryPathway.map((item) => item.id) : []);
+  const [activePathway, setActivePathway] = useState(startsDirectFlagship ? directEntryPathway : null);
+  const [usedIds, setUsedIds] = useState(startsDirectFlagship ? directEntryPathway.map((item) => item.id) : []);
   const [planRemaining, setPlanRemaining] = useState(0);
   const [lastValue, setLastValue] = useState(answers.intensity ?? 5);
   const [checkinValue, setCheckinValue] = useState(null);

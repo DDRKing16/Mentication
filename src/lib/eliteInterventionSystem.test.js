@@ -21,11 +21,11 @@ class LocalStorageStub {
 
 beforeEach(() => { global.localStorage = new LocalStorageStub(); });
 
-describe("elite 17 contract", () => {
+describe("elite 18 contract", () => {
   it("includes every flagship exactly once with evidence", () => {
-    expect(FLAGSHIP_IDS).toHaveLength(17);
-    expect(new Set(FLAGSHIP_IDS).size).toBe(17);
-    expect(library.interventions).toHaveLength(17);
+    expect(FLAGSHIP_IDS).toHaveLength(18);
+    expect(new Set(FLAGSHIP_IDS).size).toBe(18);
+    expect(library.interventions).toHaveLength(18);
     expect(new Set(library.interventions.map((item) => item.id))).toEqual(new Set(FLAGSHIP_IDS));
     FLAGSHIP_IDS.forEach((id) => {
       expect(FLAGSHIP_REGISTRY[id].flagship).toBe(true);
@@ -43,7 +43,7 @@ describe("elite 17 contract", () => {
   it("keeps the active catalogue internally consistent and resolves every flagship pathway", () => {
     expect(INTERVENTIONS).toHaveLength(ACTIVE_INTERVENTION_COUNT);
     const resolved = pathwayByIds(FLAGSHIP_IDS);
-    expect(resolved).toHaveLength(17);
+    expect(resolved).toHaveLength(18);
     expect(new Set(resolved.map((item) => item.id))).toEqual(new Set(FLAGSHIP_IDS));
     library.interventions.forEach((item) => {
       expect(item.flow.length).toBeGreaterThanOrEqual(4);
@@ -51,7 +51,7 @@ describe("elite 17 contract", () => {
     });
   });
 
-  it("routes all 17 flagships through an implemented experience system", () => {
+  it("routes all 18 flagships through an implemented experience system", () => {
     const guidedPlayerIds = FLAGSHIP_IDS.filter((id) => !INTERACTIVE_FLAGSHIP_IDS.includes(id));
     expect(new Set([...INTERACTIVE_FLAGSHIP_IDS, ...guidedPlayerIds])).toEqual(new Set(FLAGSHIP_IDS));
     expect(guidedPlayerIds.sort()).toEqual([
