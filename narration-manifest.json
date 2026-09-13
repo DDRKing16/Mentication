@@ -5332,5 +5332,957 @@
         "end": 3.437
       }
     ]
+  },
+  "a61decbcf2c84fe506a4dc83c4e11a529a02a644975648052f7a3b2d3b3eb4df": {
+    "text": "You don't have to fight this feeling. Let's just notice what's here. How strong is the urge right now, from one to ten?",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/a61decbcf2c84fe506a4dc83c4e11a529a02a644975648052f7a3b2d3b3eb4df.mp3",
+    "alignment": [
+      {
+        "word": "You",
+        "start": 0,
+        "end": 0.151
+      },
+      {
+        "word": "don't",
+        "start": 0.209,
+        "end": 0.43
+      },
+      {
+        "word": "have",
+        "start": 0.488,
+        "end": 0.615
+      },
+      {
+        "word": "to",
+        "start": 0.639,
+        "end": 0.685
+      },
+      {
+        "word": "fight",
+        "start": 0.755,
+        "end": 0.987
+      },
+      {
+        "word": "this",
+        "start": 1.022,
+        "end": 1.161
+      },
+      {
+        "word": "feeling.",
+        "start": 1.231,
+        "end": 1.811
+      },
+      {
+        "word": "Let's",
+        "start": 1.95,
+        "end": 2.206
+      },
+      {
+        "word": "just",
+        "start": 2.241,
+        "end": 2.415
+      },
+      {
+        "word": "notice",
+        "start": 2.485,
+        "end": 2.926
+      },
+      {
+        "word": "what's",
+        "start": 2.949,
+        "end": 3.158
+      },
+      {
+        "word": "here.",
+        "start": 3.216,
+        "end": 3.704
+      },
+      {
+        "word": "How",
+        "start": 4.214,
+        "end": 4.4
+      },
+      {
+        "word": "strong",
+        "start": 4.47,
+        "end": 4.841
+      },
+      {
+        "word": "is",
+        "start": 4.899,
+        "end": 4.969
+      },
+      {
+        "word": "the",
+        "start": 5.027,
+        "end": 5.097
+      },
+      {
+        "word": "urge",
+        "start": 5.166,
+        "end": 5.433
+      },
+      {
+        "word": "right",
+        "start": 5.468,
+        "end": 5.654
+      },
+      {
+        "word": "now,",
+        "start": 5.712,
+        "end": 6.002
+      },
+      {
+        "word": "from",
+        "start": 6.06,
+        "end": 6.258
+      },
+      {
+        "word": "one",
+        "start": 6.351,
+        "end": 6.606
+      },
+      {
+        "word": "to",
+        "start": 6.664,
+        "end": 6.757
+      },
+      {
+        "word": "ten?",
+        "start": 6.827,
+        "end": 7.245
+      }
+    ]
+  },
+  "16187813b8255d5755a2380abb9d05577832012a6feeb72e2357adb23e489b9f": {
+    "text": "Now, where do you feel the urge in your body? Choose the place that wants your attention. Then choose the words that best describe how it feels.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/16187813b8255d5755a2380abb9d05577832012a6feeb72e2357adb23e489b9f.mp3",
+    "alignment": [
+      {
+        "word": "Now,",
+        "start": 0,
+        "end": 0.372
+      },
+      {
+        "word": "where",
+        "start": 0.406,
+        "end": 0.673
+      },
+      {
+        "word": "do",
+        "start": 0.708,
+        "end": 0.778
+      },
+      {
+        "word": "you",
+        "start": 0.848,
+        "end": 0.917
+      },
+      {
+        "word": "feel",
+        "start": 0.998,
+        "end": 1.3
+      },
+      {
+        "word": "the",
+        "start": 1.358,
+        "end": 1.44
+      },
+      {
+        "word": "urge",
+        "start": 1.521,
+        "end": 1.927
+      },
+      {
+        "word": "in",
+        "start": 1.962,
+        "end": 2.055
+      },
+      {
+        "word": "your",
+        "start": 2.113,
+        "end": 2.218
+      },
+      {
+        "word": "body?",
+        "start": 2.276,
+        "end": 2.752
+      },
+      {
+        "word": "Choose",
+        "start": 2.821,
+        "end": 3.216
+      },
+      {
+        "word": "the",
+        "start": 3.239,
+        "end": 3.309
+      },
+      {
+        "word": "place",
+        "start": 3.367,
+        "end": 3.773
+      },
+      {
+        "word": "that",
+        "start": 3.808,
+        "end": 3.924
+      },
+      {
+        "word": "wants",
+        "start": 3.994,
+        "end": 4.307
+      },
+      {
+        "word": "your",
+        "start": 4.342,
+        "end": 4.458
+      },
+      {
+        "word": "attention.",
+        "start": 4.493,
+        "end": 5.19
+      },
+      {
+        "word": "Then",
+        "start": 5.294,
+        "end": 5.515
+      },
+      {
+        "word": "choose",
+        "start": 5.584,
+        "end": 5.898
+      },
+      {
+        "word": "the",
+        "start": 5.933,
+        "end": 6.002
+      },
+      {
+        "word": "words",
+        "start": 6.06,
+        "end": 6.455
+      },
+      {
+        "word": "that",
+        "start": 6.525,
+        "end": 6.653
+      },
+      {
+        "word": "best",
+        "start": 6.734,
+        "end": 7.105
+      },
+      {
+        "word": "describe",
+        "start": 7.175,
+        "end": 7.895
+      },
+      {
+        "word": "how",
+        "start": 7.93,
+        "end": 8.104
+      },
+      {
+        "word": "it",
+        "start": 8.173,
+        "end": 8.243
+      },
+      {
+        "word": "feels.",
+        "start": 8.313,
+        "end": 9.149
+      }
+    ]
+  },
+  "cddc50779d17d0e48183384ac6142b3ea52de3afdc7aca7b18be572e0b29b552": {
+    "text": "What are you protecting by waiting? You can choose a thought below, write your own, or simply move on. This part is completely optional.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/cddc50779d17d0e48183384ac6142b3ea52de3afdc7aca7b18be572e0b29b552.mp3",
+    "alignment": [
+      {
+        "word": "What",
+        "start": 0,
+        "end": 0.197
+      },
+      {
+        "word": "are",
+        "start": 0.221,
+        "end": 0.302
+      },
+      {
+        "word": "you",
+        "start": 0.325,
+        "end": 0.395
+      },
+      {
+        "word": "protecting",
+        "start": 0.453,
+        "end": 1.045
+      },
+      {
+        "word": "by",
+        "start": 1.126,
+        "end": 1.254
+      },
+      {
+        "word": "waiting?",
+        "start": 1.324,
+        "end": 2.02
+      },
+      {
+        "word": "You",
+        "start": 2.833,
+        "end": 2.961
+      },
+      {
+        "word": "can",
+        "start": 3.019,
+        "end": 3.123
+      },
+      {
+        "word": "choose",
+        "start": 3.181,
+        "end": 3.495
+      },
+      {
+        "word": "a",
+        "start": 3.518,
+        "end": 3.553
+      },
+      {
+        "word": "thought",
+        "start": 3.611,
+        "end": 3.959
+      },
+      {
+        "word": "below,",
+        "start": 4.04,
+        "end": 4.667
+      },
+      {
+        "word": "write",
+        "start": 4.841,
+        "end": 5.213
+      },
+      {
+        "word": "your",
+        "start": 5.271,
+        "end": 5.41
+      },
+      {
+        "word": "own,",
+        "start": 5.48,
+        "end": 5.875
+      },
+      {
+        "word": "or",
+        "start": 5.944,
+        "end": 6.107
+      },
+      {
+        "word": "simply",
+        "start": 6.177,
+        "end": 6.548
+      },
+      {
+        "word": "move",
+        "start": 6.629,
+        "end": 6.873
+      },
+      {
+        "word": "on.",
+        "start": 6.943,
+        "end": 7.349
+      },
+      {
+        "word": "This",
+        "start": 7.732,
+        "end": 7.953
+      },
+      {
+        "word": "part",
+        "start": 8.034,
+        "end": 8.382
+      },
+      {
+        "word": "is",
+        "start": 8.452,
+        "end": 8.545
+      },
+      {
+        "word": "completely",
+        "start": 8.615,
+        "end": 9.195
+      },
+      {
+        "word": "optional.",
+        "start": 9.265,
+        "end": 10.124
+      }
+    ]
+  },
+  "4452d9700e73f21e712dba81183f87b8984c0f48be5a5cc4930751cf1548520e": {
+    "text": "Here comes the wave. Gently notice the pull.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/4452d9700e73f21e712dba81183f87b8984c0f48be5a5cc4930751cf1548520e.mp3",
+    "alignment": [
+      {
+        "word": "Here",
+        "start": 0,
+        "end": 0.221
+      },
+      {
+        "word": "comes",
+        "start": 0.279,
+        "end": 0.522
+      },
+      {
+        "word": "the",
+        "start": 0.58,
+        "end": 0.65
+      },
+      {
+        "word": "wave.",
+        "start": 0.708,
+        "end": 1.219
+      },
+      {
+        "word": "Gently",
+        "start": 1.393,
+        "end": 1.8
+      },
+      {
+        "word": "notice",
+        "start": 1.892,
+        "end": 2.31
+      },
+      {
+        "word": "the",
+        "start": 2.334,
+        "end": 2.403
+      },
+      {
+        "word": "pull.",
+        "start": 2.438,
+        "end": 3.111
+      }
+    ]
+  },
+  "727331bc2b1837e87abad6ed11188ba7f77bbdcea3ae79a3d054036ddccf4927": {
+    "text": "Make room for it, without pushing it away.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/727331bc2b1837e87abad6ed11188ba7f77bbdcea3ae79a3d054036ddccf4927.mp3",
+    "alignment": [
+      {
+        "word": "Make",
+        "start": 0,
+        "end": 0.302
+      },
+      {
+        "word": "room",
+        "start": 0.36,
+        "end": 0.534
+      },
+      {
+        "word": "for",
+        "start": 0.604,
+        "end": 0.697
+      },
+      {
+        "word": "it,",
+        "start": 0.778,
+        "end": 1.033
+      },
+      {
+        "word": "without",
+        "start": 1.091,
+        "end": 1.451
+      },
+      {
+        "word": "pushing",
+        "start": 1.486,
+        "end": 1.788
+      },
+      {
+        "word": "it",
+        "start": 1.823,
+        "end": 1.869
+      },
+      {
+        "word": "away.",
+        "start": 1.892,
+        "end": 2.554
+      }
+    ]
+  },
+  "dcb92c78b6e26d844a779c2f6b1b492252a64697ed24b52638152835aebf5c73": {
+    "text": "Ride the lift. You can feel this without following it.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/dcb92c78b6e26d844a779c2f6b1b492252a64697ed24b52638152835aebf5c73.mp3",
+    "alignment": [
+      {
+        "word": "Ride",
+        "start": 0,
+        "end": 0.313
+      },
+      {
+        "word": "the",
+        "start": 0.337,
+        "end": 0.406
+      },
+      {
+        "word": "lift.",
+        "start": 0.441,
+        "end": 1.01
+      },
+      {
+        "word": "You",
+        "start": 1.08,
+        "end": 1.207
+      },
+      {
+        "word": "can",
+        "start": 1.242,
+        "end": 1.37
+      },
+      {
+        "word": "feel",
+        "start": 1.44,
+        "end": 1.695
+      },
+      {
+        "word": "this",
+        "start": 1.753,
+        "end": 1.962
+      },
+      {
+        "word": "without",
+        "start": 2.032,
+        "end": 2.345
+      },
+      {
+        "word": "following",
+        "start": 2.403,
+        "end": 2.775
+      },
+      {
+        "word": "it.",
+        "start": 2.844,
+        "end": 3.344
+      }
+    ]
+  },
+  "71eed0c5e41ba5839c0696d00329900d969e9c2e09bca7a7cd10177d3793a9d4": {
+    "text": "Stay at the crest. This peak will pass.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/71eed0c5e41ba5839c0696d00329900d969e9c2e09bca7a7cd10177d3793a9d4.mp3",
+    "alignment": [
+      {
+        "word": "Stay",
+        "start": 0,
+        "end": 0.302
+      },
+      {
+        "word": "at",
+        "start": 0.337,
+        "end": 0.395
+      },
+      {
+        "word": "the",
+        "start": 0.418,
+        "end": 0.488
+      },
+      {
+        "word": "crest.",
+        "start": 0.511,
+        "end": 1.126
+      },
+      {
+        "word": "This",
+        "start": 1.184,
+        "end": 1.44
+      },
+      {
+        "word": "peak",
+        "start": 1.509,
+        "end": 1.823
+      },
+      {
+        "word": "will",
+        "start": 1.904,
+        "end": 2.078
+      },
+      {
+        "word": "pass.",
+        "start": 2.148,
+        "end": 2.926
+      }
+    ]
+  },
+  "08ec829dd1417cdbde6992bb6d7c1086149a40fbcd72e765c4d77ec173fb0b96": {
+    "text": "The wave is softening. Let your body release.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/08ec829dd1417cdbde6992bb6d7c1086149a40fbcd72e765c4d77ec173fb0b96.mp3",
+    "alignment": [
+      {
+        "word": "The",
+        "start": 0,
+        "end": 0.163
+      },
+      {
+        "word": "wave",
+        "start": 0.232,
+        "end": 0.685
+      },
+      {
+        "word": "is",
+        "start": 0.755,
+        "end": 0.871
+      },
+      {
+        "word": "softening.",
+        "start": 0.906,
+        "end": 1.602
+      },
+      {
+        "word": "Let",
+        "start": 1.8,
+        "end": 1.985
+      },
+      {
+        "word": "your",
+        "start": 2.02,
+        "end": 2.136
+      },
+      {
+        "word": "body",
+        "start": 2.171,
+        "end": 2.415
+      },
+      {
+        "word": "release.",
+        "start": 2.485,
+        "end": 3.297
+      }
+    ]
+  },
+  "095dd5360578f26e0c5ff9356778fed33f93445f395a94d1e27b911eade213cb": {
+    "text": "Watch it pass, as it moves beyond you.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/095dd5360578f26e0c5ff9356778fed33f93445f395a94d1e27b911eade213cb.mp3",
+    "alignment": [
+      {
+        "word": "Watch",
+        "start": 0,
+        "end": 0.302
+      },
+      {
+        "word": "it",
+        "start": 0.36,
+        "end": 0.43
+      },
+      {
+        "word": "pass,",
+        "start": 0.488,
+        "end": 0.998
+      },
+      {
+        "word": "as",
+        "start": 1.033,
+        "end": 1.149
+      },
+      {
+        "word": "it",
+        "start": 1.207,
+        "end": 1.277
+      },
+      {
+        "word": "moves",
+        "start": 1.335,
+        "end": 1.625
+      },
+      {
+        "word": "beyond",
+        "start": 1.683,
+        "end": 1.985
+      },
+      {
+        "word": "you.",
+        "start": 2.067,
+        "end": 2.554
+      }
+    ]
+  },
+  "043abf3fef340260c15df927103fb1e7f4a161987c6495e5f00dc63294213a73": {
+    "text": "Take a moment. Where is the wave now? It may feel softer, stronger, or simply different. Every answer is okay. Did the pause give you a little more room to choose?",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/043abf3fef340260c15df927103fb1e7f4a161987c6495e5f00dc63294213a73.mp3",
+    "alignment": [
+      {
+        "word": "Take",
+        "start": 0,
+        "end": 0.29
+      },
+      {
+        "word": "a",
+        "start": 0.313,
+        "end": 0.337
+      },
+      {
+        "word": "moment.",
+        "start": 0.395,
+        "end": 1.103
+      },
+      {
+        "word": "Where",
+        "start": 1.277,
+        "end": 1.556
+      },
+      {
+        "word": "is",
+        "start": 1.591,
+        "end": 1.66
+      },
+      {
+        "word": "the",
+        "start": 1.695,
+        "end": 1.765
+      },
+      {
+        "word": "wave",
+        "start": 1.8,
+        "end": 2.09
+      },
+      {
+        "word": "now?",
+        "start": 2.148,
+        "end": 2.682
+      },
+      {
+        "word": "It",
+        "start": 3.007,
+        "end": 3.158
+      },
+      {
+        "word": "may",
+        "start": 3.228,
+        "end": 3.39
+      },
+      {
+        "word": "feel",
+        "start": 3.46,
+        "end": 3.692
+      },
+      {
+        "word": "softer,",
+        "start": 3.762,
+        "end": 4.377
+      },
+      {
+        "word": "stronger,",
+        "start": 4.516,
+        "end": 5.283
+      },
+      {
+        "word": "or",
+        "start": 5.387,
+        "end": 5.619
+      },
+      {
+        "word": "simply",
+        "start": 5.724,
+        "end": 6.118
+      },
+      {
+        "word": "different.",
+        "start": 6.177,
+        "end": 6.966
+      },
+      {
+        "word": "Every",
+        "start": 7.349,
+        "end": 7.721
+      },
+      {
+        "word": "answer",
+        "start": 7.79,
+        "end": 8.139
+      },
+      {
+        "word": "is",
+        "start": 8.208,
+        "end": 8.278
+      },
+      {
+        "word": "okay.",
+        "start": 8.348,
+        "end": 9.056
+      },
+      {
+        "word": "Did",
+        "start": 9.567,
+        "end": 9.752
+      },
+      {
+        "word": "the",
+        "start": 9.776,
+        "end": 9.845
+      },
+      {
+        "word": "pause",
+        "start": 9.88,
+        "end": 10.275
+      },
+      {
+        "word": "give",
+        "start": 10.31,
+        "end": 10.495
+      },
+      {
+        "word": "you",
+        "start": 10.53,
+        "end": 10.612
+      },
+      {
+        "word": "a",
+        "start": 10.681,
+        "end": 10.716
+      },
+      {
+        "word": "little",
+        "start": 10.751,
+        "end": 11.029
+      },
+      {
+        "word": "more",
+        "start": 11.064,
+        "end": 11.285
+      },
+      {
+        "word": "room",
+        "start": 11.343,
+        "end": 11.622
+      },
+      {
+        "word": "to",
+        "start": 11.703,
+        "end": 11.773
+      },
+      {
+        "word": "choose?",
+        "start": 11.842,
+        "end": 12.678
+      }
+    ]
+  },
+  "4c9071408b9bbc5626e542c2f2829d23716d2098c88e3912a7db041b1572adf5": {
+    "text": "You did it. You made space between the feeling and the action. Whatever the number, you stayed present with yourself.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/4c9071408b9bbc5626e542c2f2829d23716d2098c88e3912a7db041b1572adf5.mp3",
+    "alignment": [
+      {
+        "word": "You",
+        "start": 0,
+        "end": 0.151
+      },
+      {
+        "word": "did",
+        "start": 0.221,
+        "end": 0.383
+      },
+      {
+        "word": "it.",
+        "start": 0.464,
+        "end": 0.789
+      },
+      {
+        "word": "You",
+        "start": 0.987,
+        "end": 1.126
+      },
+      {
+        "word": "made",
+        "start": 1.207,
+        "end": 1.416
+      },
+      {
+        "word": "space",
+        "start": 1.451,
+        "end": 1.904
+      },
+      {
+        "word": "between",
+        "start": 1.939,
+        "end": 2.276
+      },
+      {
+        "word": "the",
+        "start": 2.299,
+        "end": 2.368
+      },
+      {
+        "word": "feeling",
+        "start": 2.426,
+        "end": 2.926
+      },
+      {
+        "word": "and",
+        "start": 3.019,
+        "end": 3.146
+      },
+      {
+        "word": "the",
+        "start": 3.204,
+        "end": 3.274
+      },
+      {
+        "word": "action.",
+        "start": 3.332,
+        "end": 3.924
+      },
+      {
+        "word": "Whatever",
+        "start": 4.005,
+        "end": 4.412
+      },
+      {
+        "word": "the",
+        "start": 4.447,
+        "end": 4.516
+      },
+      {
+        "word": "number,",
+        "start": 4.551,
+        "end": 5.143
+      },
+      {
+        "word": "you",
+        "start": 5.294,
+        "end": 5.387
+      },
+      {
+        "word": "stayed",
+        "start": 5.457,
+        "end": 5.735
+      },
+      {
+        "word": "present",
+        "start": 5.77,
+        "end": 6.177
+      },
+      {
+        "word": "with",
+        "start": 6.211,
+        "end": 6.327
+      },
+      {
+        "word": "yourself.",
+        "start": 6.385,
+        "end": 7.245
+      }
+    ]
   }
 }

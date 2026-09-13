@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { createUrgeSession, reduceUrgeSession, remainingSeconds } from "./urgeSurfSession.js";
+import { createUrgeSession, reduceUrgeSession, remainingSeconds, URGE_SURF_DEFAULTS } from "./urgeSurfSession.js";
 
 function readySession() {
   return [
     { type: "INITIAL_INTENSITY_SET", value: 8 },
-    { type: "CATEGORY_TOGGLED", key: "send" },
     { type: "BODY_REGION_SET", key: "chest" },
     { type: "SENSATION_TOGGLED", key: "tight" },
     { type: "ANCHOR_CHANGED", value: "Tomorrow morning" },
@@ -14,40 +13,72 @@ function readySession() {
 describe("Urge Surfing session", () => {
   it("starts directly at Name the wave without collecting any urge details", () => {
     const session = createUrgeSession(1_000);
-    expect(session).toMatchObject({ schemaVersion: 3, status: "draft", currentRoute: "urge.name", savePreference: false });
+    expect(session).toMatchObject({
+      schemaVersion: 3,
+      status: "draft",
+      currentRoute: "urge.name",
+      savePreference: false,
+      timer: { segmentDurationMs: 60_000 },
+    });
+    expect(URGE_SURF_DEFAULTS.durations).toEqual([30, 35, 40, 45, 50, 55, 60]);
     expect(session).not.toHaveProperty("voiceTranscript");
     expect(session).not.toHaveProperty("audioReference");
   });
 
-  it("does not allow navigation or a timer to bypass required Screen 1 inputs", () => {
+  it("does not allow navigation or a timer to bypass the required intensity", () => {
     const empty = createUrgeSession();
     expect(reduceUrgeSession(empty, { type: "NAVIGATE", route: "urge.body" })).toEqual(empty);
     expect(reduceUrgeSession(empty, { type: "TIMER_STARTED", nowEpochMs: 10 })).toEqual(empty);
   });
 
-  it("allows Continue from Name the wave after required inputs and preserves the selected data", () => {
-    const named = [
-      { type: "INITIAL_INTENSITY_SET", value: 8 },
-      { type: "CATEGORY_TOGGLED", key: "send" },
-    ].reduce((state, event) => reduceUrgeSession(state, event), createUrgeSession());
+  it("allows Continue from Name the wave after setting intensity", () => {
+    const named = reduceUrgeSession(createUrgeSession(), { type: "INITIAL_INTENSITY_SET", value: 8 });
     expect(reduceUrgeSession(named, { type: "NAVIGATE", route: "urge.body" })).toMatchObject({
       currentRoute: "urge.body",
       initialIntensity: 8,
-      categoryKeys: ["send"],
+      categoryKeys: [],
     });
   });
 
   it("uses an end timestamp so a restored timer does not drift", () => {
     const started = reduceUrgeSession(readySession(), { type: "TIMER_STARTED", nowEpochMs: 1_000 });
-    expect(remainingSeconds(started, 31_001)).toBe(60);
-    expect(remainingSeconds(started, 91_001)).toBe(0);
+    expect(remainingSeconds(started, 31_001)).toBe(30);
+    expect(remainingSeconds(started, 61_001)).toBe(0);
   });
 
   it("moves to post-rating once when the timer elapses", () => {
     const active = reduceUrgeSession(readySession(), { type: "TIMER_STARTED", nowEpochMs: 1_000 });
-    const elapsed = reduceUrgeSession(active, { type: "TIMER_ELAPSED", nowEpochMs: 91_000 });
+    const elapsed = reduceUrgeSession(active, { type: "TIMER_ELAPSED", nowEpochMs: 61_000 });
     expect(elapsed.currentRoute).toBe("urge.postRating");
     expect(reduceUrgeSession(elapsed, { type: "TIMER_ELAPSED", nowEpochMs: 100_000 })).toEqual(elapsed);
+  });
+
+  it("preserves the remaining choice window while paused", () => {
+    const started = reduceUrgeSession(readySession(), { type: "TIMER_STARTED", nowEpochMs: 1_000 });
+    const paused = reduceUrgeSession(started, { type: "TIMER_PAUSED", nowEpochMs: 21_000 });
+    expect(paused).toMatchObject({
+      status: "timer_paused",
+      timer: { segmentEndsAtEpochMs: null, pausedRemainingMs: 40_000 },
+    });
+    expect(reduceUrgeSession(paused, { type: "TIMER_ELAPSED", nowEpochMs: 90_000 })).toEqual(paused);
+
+    const resumed = reduceUrgeSession(paused, { type: "TIMER_RESUMED", nowEpochMs: 100_000 });
+    expect(resumed).toMatchObject({
+      status: "timer_active",
+      timer: { segmentEndsAtEpochMs: 140_000, pausedRemainingMs: null },
+    });
+    expect(remainingSeconds(resumed, 100_000)).toBe(40);
+  });
+
+  it("records only active elapsed time when stopped from pause", () => {
+    const started = reduceUrgeSession(readySession(), { type: "TIMER_STARTED", nowEpochMs: 1_000 });
+    const paused = reduceUrgeSession(started, { type: "TIMER_PAUSED", nowEpochMs: 21_000 });
+    const stopped = reduceUrgeSession(paused, { type: "TIMER_STOPPED", nowEpochMs: 90_000 });
+    expect(stopped).toMatchObject({
+      status: "timer_complete",
+      currentRoute: "urge.postRating",
+      timer: { totalElapsedMs: 20_000, completionReason: "stopped" },
+    });
   });
 
   it("can stop an active window without discarding the elapsed time", () => {
@@ -69,11 +100,13 @@ describe("Urge Surfing session", () => {
     expect(skipped).toMatchObject({ currentRoute: "urge.complete", choiceOutcome: null, postIntensity: null });
   });
 
-  it("uses only Standard choice-window bounds", () => {
+  it("uses only the exported 30 to 60 second choice-window options", () => {
     const atMinimum = reduceUrgeSession(readySession(), { type: "DURATION_CHANGED", durationMs: 2_000, nowEpochMs: 10 });
     const atMaximum = reduceUrgeSession(readySession(), { type: "DURATION_CHANGED", durationMs: 999_000, nowEpochMs: 20 });
-    expect(atMinimum.timer.segmentDurationMs).toBe(90_000);
-    expect(atMaximum.timer.segmentDurationMs).toBe(180_000);
+    const middle = reduceUrgeSession(readySession(), { type: "DURATION_CHANGED", durationMs: 47_000, nowEpochMs: 15 });
+    expect(atMinimum.timer.segmentDurationMs).toBe(30_000);
+    expect(middle.timer.segmentDurationMs).toBe(45_000);
+    expect(atMaximum.timer.segmentDurationMs).toBe(60_000);
   });
 
   it("keeps one selected urge category while preserving the stable key", () => {
@@ -97,7 +130,6 @@ describe("Urge Surfing session", () => {
   it("requires a body/environment and sensation before continuing to the anchor", () => {
     const named = [
       { type: "INITIAL_INTENSITY_SET", value: 8 },
-      { type: "CATEGORY_TOGGLED", key: "send" },
       { type: "NAVIGATE", route: "urge.body" },
     ].reduce((state, event) => reduceUrgeSession(state, event), createUrgeSession());
     expect(reduceUrgeSession(named, { type: "NAVIGATE", route: "urge.anchor" })).toEqual(named);
@@ -112,6 +144,16 @@ describe("Urge Surfing session", () => {
     });
   });
 
+  it("allows the choice window to start without an anchor", () => {
+    const withoutAnchor = [
+      { type: "INITIAL_INTENSITY_SET", value: 8 },
+      { type: "BODY_REGION_SET", key: "chest" },
+      { type: "SENSATION_TOGGLED", key: "tight" },
+    ].reduce((state, event) => reduceUrgeSession(state, event), createUrgeSession());
+    const started = reduceUrgeSession(withoutAnchor, { type: "TIMER_STARTED", nowEpochMs: 1_000 });
+    expect(started).toMatchObject({ status: "timer_active", currentRoute: "urge.timer" });
+  });
+
   it("allows one explicit local save preference without saving a draft", () => {
     const saved = reduceUrgeSession(readySession(), { type: "SAVE_PREFERENCE_SET", value: true });
     expect(saved.savePreference).toBe(true);
@@ -119,9 +161,9 @@ describe("Urge Surfing session", () => {
 
   it("creates exactly one ten-minute extension after completion", () => {
     const started = reduceUrgeSession(readySession(), { type: "TIMER_STARTED", nowEpochMs: 1_000 });
-    const rated = reduceUrgeSession(started, { type: "TIMER_ELAPSED", nowEpochMs: 91_000 });
-    const complete = reduceUrgeSession(rated, { type: "POST_INTENSITY_SET", value: 5, nowEpochMs: 91_500 });
-    const extended = reduceUrgeSession(complete, { type: "EXTEND_TIMER", nowEpochMs: 92_000 });
+    const rated = reduceUrgeSession(started, { type: "TIMER_ELAPSED", nowEpochMs: 61_000 });
+    const complete = reduceUrgeSession(rated, { type: "POST_INTENSITY_SET", value: 5, nowEpochMs: 61_500 });
+    const extended = reduceUrgeSession(complete, { type: "EXTEND_TIMER", nowEpochMs: 62_000 });
     expect(extended.timer.segmentDurationMs).toBe(600_000);
     expect(reduceUrgeSession(extended, { type: "EXTEND_TIMER", nowEpochMs: 93_000 })).toEqual(extended);
   });
