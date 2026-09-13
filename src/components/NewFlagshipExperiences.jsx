@@ -83,7 +83,7 @@ export function SignalLockExperience({ intervention, answers, onComplete, onAtte
   const [capture,setCapture] = useState("");
   const a11y = useAccessibilityPrefs();
   const launch = id=>launchIntervention(navigate,"signalLock",id,answers);
-  useEffect(()=>{ if(!s.running||s.paused)return; const t=setInterval(()=>setNow(Date.now()),250); return()=>clearInterval(t); },[s.running,s.paused]);
+  useEffect(()=>{ if(!s.running||s.paused)return; const t=setInterval(()=>setNow(Date.now()),1000); return()=>clearInterval(t); },[s.running,s.paused]);
   const remaining = s.running ? Math.max(0,Math.ceil(((s.endAt||now)-now)/1000)) : s.duration*60;
   const elapsedMinutes = s.startedAt ? Math.max(0, Math.round((Date.now() - s.startedAt) / 6000) / 10) : 0;
   useEffect(()=>{ if(s.running&&!s.paused&&remaining===0)set(v=>({...v,running:false,stage:"expired"})); },[remaining,s.running,s.paused,set]);
