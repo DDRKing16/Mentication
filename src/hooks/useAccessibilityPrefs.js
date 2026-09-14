@@ -1,4 +1,6 @@
+// @ts-check
 import { useState, useEffect, useCallback } from "react";
+import { ACCESSIBILITY_CHANGED_EVENT, notifyAccessibilityPreferencesChanged } from "@/lib/accessibilityEvents";
 
 // Accessibility preferences, persisted locally and applied to <html> as classes.
 const KEY = "haven.a11y.v2";
@@ -38,10 +40,17 @@ export function useAccessibilityPrefs() {
     applyToDocument(prefs);
   }, [prefs]);
 
+  useEffect(() => {
+    const refresh = () => setPrefs(read());
+    window.addEventListener(ACCESSIBILITY_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(ACCESSIBILITY_CHANGED_EVENT, refresh);
+  }, []);
+
   const setPref = useCallback((key, value) => {
     setPrefs((prev) => {
       const next = { ...prev, [key]: value };
       try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* */ }
+      queueMicrotask(notifyAccessibilityPreferencesChanged);
       return next;
     });
   }, []);
@@ -49,6 +58,7 @@ export function useAccessibilityPrefs() {
   const reset = useCallback(() => {
     setPrefs({ ...ACCESSIBILITY_DEFAULTS });
     try { localStorage.setItem(KEY, JSON.stringify(ACCESSIBILITY_DEFAULTS)); } catch { /* */ }
+    notifyAccessibilityPreferencesChanged();
   }, []);
 
   return { prefs, setPref, reset };

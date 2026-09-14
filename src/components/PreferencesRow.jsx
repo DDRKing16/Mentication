@@ -1,3 +1,4 @@
+// @ts-check
 import React from "react";
 import { Eye, EyeOff, Ban, VolumeX } from "lucide-react";
 
@@ -11,11 +12,13 @@ const PREFS = [
 export default function PreferencesRow({ answers, setAnswers }) {
   const toggle = (key) => setAnswers((a) => ({ ...a, [key]: !a[key] }));
   return (
-    <div className="mt-8">
-      <p className="text-sm font-medium text-muted-foreground">
-        Any preferences? <span className="text-muted-foreground/60">Optional — make this reset work for you.</span>
-      </p>
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+    <details className="group mt-5 rounded-2xl border border-border bg-card">
+      <summary className="no-tap flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-medium text-foreground">
+        Optional preferences
+        <span className="text-lg leading-none text-muted-foreground transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+      </summary>
+      <p className="px-4 pb-3 text-xs text-muted-foreground">Adjust how the reset is guided.</p>
+      <div className="grid grid-cols-2 gap-2 border-t border-border p-3 sm:grid-cols-4">
         {PREFS.map((p) => {
           const on = !!answers[p.key];
           const Icon = p.icon;
@@ -38,6 +41,6 @@ export default function PreferencesRow({ answers, setAnswers }) {
           );
         })}
       </div>
-    </div>
+    </details>
   );
 }

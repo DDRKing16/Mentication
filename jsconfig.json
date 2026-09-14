@@ -9,13 +9,35 @@
     "moduleResolution": "bundler",
     "lib": ["esnext", "dom"],
     "target": "esnext",
+    "allowJs": true,
     "checkJs": false,
+    "noEmit": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "types": []
+    "types": ["vite/client"]
   },
-  "include": ["src/components/**/*.js", "src/pages/**/*.jsx", "src/Layout.jsx"],
-  "exclude": ["node_modules", "dist", "src/vite-plugins", "src/components/ui", "src/api", "src/lib"]
-} 
+  "include": [
+    "src/main.jsx",
+    "src/App.jsx",
+    "src/pages/Home.jsx",
+    "src/pages/Welcome.jsx",
+    "src/pages/Onboarding.jsx",
+    "src/pages/ResetFlow.jsx",
+    "src/pages/EffectivenessDashboard.jsx",
+    "src/pages/RegulationProfile.jsx",
+    "src/components/Logo.jsx",
+    "src/components/SafetyFooter.jsx",
+    "src/components/PreferencesRow.jsx",
+    "src/components/home/**/*.jsx",
+    "src/hooks/useAccessibilityPrefs.js",
+    "src/lib/accessibility.jsx",
+    "src/lib/accessibilityEvents.js",
+    "src/lib/homeTheme.js",
+    "src/lib/insights.js",
+    "src/lib/localData.js",
+    "src/lib/onboarding.js"
+  ],
+  "exclude": ["node_modules", "dist", "src/vite-plugins"]
+}

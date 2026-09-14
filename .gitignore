@@ -1,2 +1,13 @@
-.env.local
 node_modules/
+coverage/
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+*.log
+
+# Build output and local scratch captures
+dist/
+tmp/

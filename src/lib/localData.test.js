@@ -13,14 +13,23 @@ class MemoryStorage {
 
 describe("device-local application data", () => {
   beforeEach(() => {
+    const events = [];
     globalThis.window = {
       localStorage: new MemoryStorage(),
-      dispatchEvent: () => {},
+      dispatchEvent: (event) => events.push(event.type),
+      __events: events,
+    };
+    globalThis.CustomEvent = class CustomEvent {
+      constructor(type, init) {
+        this.type = type;
+        this.detail = init?.detail;
+      }
     };
   });
 
   afterEach(() => {
     delete globalThis.window;
+    delete globalThis.CustomEvent;
   });
 
   it("creates, orders and limits session records without a remote service", async () => {
@@ -35,6 +44,8 @@ describe("device-local application data", () => {
   it("exports and erases only application-owned local data", async () => {
     await sessionStore.create({ id: "one", direction: "sleep" });
     window.localStorage.setItem("mentation.preference", "quiet");
+    window.localStorage.setItem("haven_a11y", JSON.stringify({ reducedMotion: true }));
+    window.localStorage.setItem("haven.a11y.v2", JSON.stringify({ largeText: true }));
     window.localStorage.setItem("unrelated.product", "keep");
     expect(exportLocalAppData().sessions).toHaveLength(1);
 
@@ -42,6 +53,9 @@ describe("device-local application data", () => {
 
     expect(await sessionStore.list()).toEqual([]);
     expect(window.localStorage.getItem("mentation.preference")).toBeNull();
+    expect(window.localStorage.getItem("haven_a11y")).toBeNull();
+    expect(window.localStorage.getItem("haven.a11y.v2")).toBeNull();
     expect(window.localStorage.getItem("unrelated.product")).toBe("keep");
+    expect(window.__events).toContain("mentation:accessibility-changed");
   });
 });

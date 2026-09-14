@@ -2,7 +2,7 @@ import React from "react";
 
 // Simple hand-drawn sketch icons in thin dark-teal line-art, matching the
 // uploaded V3 reference. Shared 64×64 viewBox, 1.6px stroke, rounded caps.
-const S = { stroke: "#0e3131", strokeWidth: 2.4, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" };
+const S = { stroke: "currentColor", strokeWidth: 2.4, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" };
 
 const ICONS = {
   // Stacked cairn — three rounded stones, slightly irregular for a hand-drawn feel.
@@ -50,7 +50,7 @@ const ICONS = {
       <path d="M50 42 L50 50 L42 50" />
       <line x1="32" y1="24" x2="32" y2="40" />
       <line x1="24" y1="32" x2="40" y2="32" />
-      <circle cx="32" cy="32" r="1.8" fill="#0e3131" stroke="none" />
+      <circle cx="32" cy="32" r="1.8" fill="currentColor" stroke="none" />
     </svg>
   ),
   // Compass — circle with diamond needle and cardinal tick.
@@ -60,7 +60,7 @@ const ICONS = {
       <path d="M32 16 L36 32 L32 48 L28 32 Z" />
       <line x1="32" y1="12" x2="32" y2="16" />
       <line x1="32" y1="48" x2="32" y2="52" />
-      <circle cx="32" cy="32" r="1.6" fill="#0e3131" stroke="none" />
+      <circle cx="32" cy="32" r="1.6" fill="currentColor" stroke="none" />
     </svg>
   ),
 };

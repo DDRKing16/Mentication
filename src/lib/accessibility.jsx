@@ -1,4 +1,6 @@
+// @ts-check
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { ACCESSIBILITY_CHANGED_EVENT } from "./accessibilityEvents";
 
 // Global accessibility preferences, persisted to localStorage and applied to <html>.
 const KEY = "haven_a11y";
@@ -26,6 +28,15 @@ export function AccessibilityProvider({ children }) {
         setSettings((s) => ({ ...s, reducedMotion: true }));
       }
     } catch { /* */ }
+  }, []);
+
+  useEffect(() => {
+    const refresh = () => {
+      try { setSettings({ ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }); }
+      catch { setSettings(DEFAULTS); }
+    };
+    window.addEventListener(ACCESSIBILITY_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(ACCESSIBILITY_CHANGED_EVENT, refresh);
   }, []);
 
   useEffect(() => {

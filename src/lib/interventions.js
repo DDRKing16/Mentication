@@ -1623,6 +1623,25 @@ function highDistressFamilyPriority(iv) {
   return 4;
 }
 
+function isStrongHappyBumpAlternative(candidates, effectiveness = {}) {
+  const happyBumpFit = Number(effectiveness.happyBump);
+  if (!Number.isFinite(happyBumpFit) || happyBumpFit >= 0.55) return false;
+  return candidates.some((candidate) =>
+    candidate.id !== "happyBump" &&
+    Number.isFinite(Number(effectiveness[candidate.id])) &&
+    Number(effectiveness[candidate.id]) >= 0.7
+  );
+}
+
+function liftOpeningPriority(iv, answers, effectiveness, slot) {
+  if (iv.id !== "happyBump" || answers.direction !== "lift" || slot !== "opener") return 0;
+  // An explicit current rejection is a preference, not an invitation to
+  // overpower the user with a default. A well-supported alternative also wins.
+  if (dislikePenalty(iv.id, iv.mechanism) >= 7) return Number.NEGATIVE_INFINITY;
+  if (isStrongHappyBumpAlternative(INTERVENTIONS, effectiveness)) return 0;
+  return 18;
+}
+
 function chooseRankedV3(candidates, a, effectiveness, {
   slot = "core",
   usedMechanisms = new Set(),
@@ -1632,9 +1651,8 @@ function chooseRankedV3(candidates, a, effectiveness, {
 } = {}) {
   const profile = inferProfileV3(a);
   const scored = candidates
-    .map((iv) => ({
-      iv,
-      result: scoreInterventionV3(iv, a, effectiveness, {
+    .map((iv) => {
+      const result = scoreInterventionV3(iv, a, effectiveness, {
         profile,
         slot,
         usedMechanisms,
@@ -1642,10 +1660,11 @@ function chooseRankedV3(candidates, a, effectiveness, {
         immediate,
         seed,
         dislikePenalty,
-      }),
-    }))
-    .filter((x) => x.result.eligible && Number.isFinite(x.result.score))
-    .sort((x, y) => y.result.score - x.result.score);
+      });
+      return { iv, result, priority: liftOpeningPriority(iv, a, effectiveness, slot) };
+    })
+    .filter((x) => x.result.eligible && Number.isFinite(x.result.score) && Number.isFinite(x.priority))
+    .sort((x, y) => (y.result.score + y.priority) - (x.result.score + x.priority));
 
   if (!scored.length) return null;
 

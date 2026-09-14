@@ -291,6 +291,27 @@ const CONTENT_OVERRIDES = {
       },
     ],
   },
+  happyBump: {
+    name: "The Happy Bump",
+    mechanism: "stacked-behavioural-activation",
+    why: "A short sequence of movement, hydration, connection and one small action can build momentum without waiting for motivation.",
+    directions: ["lift", "calm", "focus"],
+    durationMin: 5,
+    cognitiveLoad: 1,
+    physicalDemand: 2,
+    environment: "any",
+    eyes: "open",
+    audio: "optional",
+    movement: "yes",
+    energy: "energising",
+    arousal: "raise",
+    basePriority: 10,
+    intensityMin: 0,
+    intensityMax: 7,
+    unsuitableSubstates: ["acute", "physical_instability"],
+    contraindicationTags: ["dizziness", "pain", "physical-instability"],
+    steps: [{ title: "Build a small lift", body: "Move safely, add music and water, choose connection, finish one small task, and carry the momentum into a realistic next step.", holdSec: 60 }],
+  },
   nextAction: {
     name: "Next Easiest Step",
     mechanism: "executive-friction-reduction",
@@ -364,6 +385,19 @@ const NEW_INTERVENTIONS = {
       { title: "Continue the film", body: "What happens immediately afterwards? What first response, person or resource becomes available?", holdSec: 45 },
       { title: "Build the coping route", body: "Map the first move, first person, first resource, what remains intact and what happens next.", holdSec: 50 },
       { title: "Return to now", body: "Decide whether anything genuinely needs to be done now.", holdSec: 25 },
+    ],
+  }),
+  happyBump: newIntervention({
+    id: "happyBump", name: "The Happy Bump", category: "activation", mechanism: "stacked-behavioural-activation",
+    why: "A short sequence of movement, hydration, connection and one small action can build momentum without waiting for motivation.",
+    targets: ["body", "thoughts", "behaviour"], states: ["low_energy", "low_mood", "tired"], directions: ["lift", "calm", "focus"], durationMin: 5,
+    cognitiveLoad: 1, physicalDemand: 2, environment: "any", eyes: "open", audio: "optional", movement: "yes",
+    energy: "energising", arousal: "raise", basePriority: 10, intensityMin: 0, intensityMax: 7,
+    unsuitableSubstates: ["acute", "physical_instability"], contraindicationTags: ["dizziness", "pain", "physical-instability"],
+    steps: [
+      { title: "Stand and move", body: "Start with safe, capacity-matched movement.", holdSec: 20 },
+      { title: "Add small supports", body: "Choose music, water, a safe walk and optional connection.", holdSec: 60 },
+      { title: "Carry the lift forward", body: "Complete one small task and plan a realistic next move.", holdSec: 40 },
     ],
   }),
   countermove: newIntervention({
@@ -701,6 +735,7 @@ const CORE_25_SPECS = [
 
   // Lift (7)
   ["activationMenu", "lift"],
+  ["happyBump", "lift"],
   ["countermove", "lift"],
   ["openChannel", "lift"],
   ["pulseShift", "lift"],
@@ -770,6 +805,7 @@ const NAME_OVERRIDES = {
   factCheck: "Thought or Fact?",
   fivePoints: "Five Points of Contact",
   activationMenu: "Ignition Point",
+  happyBump: "The Happy Bump",
   nextAction: "Next Easiest Step",
   pomodoro: "One Focus Block",
   songMove: "Song and Move",
@@ -806,8 +842,8 @@ export function createCore25Catalogue(legacyInterventions = []) {
   });
 
   const ids = new Set(catalogue.map((iv) => iv.id));
-  if (catalogue.length !== 25 || ids.size !== 25) {
-    throw new Error(`[active-catalogue] Expected 25 unique interventions; received ${catalogue.length}/${ids.size}`);
+  if (catalogue.length !== 26 || ids.size !== 26) {
+    throw new Error(`[active-catalogue] Expected 26 unique interventions; received ${catalogue.length}/${ids.size}`);
   }
   return catalogue;
 }

@@ -21,11 +21,11 @@ class LocalStorageStub {
 
 beforeEach(() => { global.localStorage = new LocalStorageStub(); });
 
-describe("elite 17 contract", () => {
+describe("elite 18 contract", () => {
   it("includes every flagship exactly once with evidence", () => {
-    expect(FLAGSHIP_IDS).toHaveLength(17);
-    expect(new Set(FLAGSHIP_IDS).size).toBe(17);
-    expect(library.interventions).toHaveLength(17);
+    expect(FLAGSHIP_IDS).toHaveLength(18);
+    expect(new Set(FLAGSHIP_IDS).size).toBe(18);
+    expect(library.interventions).toHaveLength(18);
     expect(new Set(library.interventions.map((item) => item.id))).toEqual(new Set(FLAGSHIP_IDS));
     FLAGSHIP_IDS.forEach((id) => {
       expect(FLAGSHIP_REGISTRY[id].flagship).toBe(true);
@@ -43,7 +43,7 @@ describe("elite 17 contract", () => {
   it("keeps the active catalogue internally consistent and resolves every flagship pathway", () => {
     expect(INTERVENTIONS).toHaveLength(ACTIVE_INTERVENTION_COUNT);
     const resolved = pathwayByIds(FLAGSHIP_IDS);
-    expect(resolved).toHaveLength(17);
+    expect(resolved).toHaveLength(18);
     expect(new Set(resolved.map((item) => item.id))).toEqual(new Set(FLAGSHIP_IDS));
     library.interventions.forEach((item) => {
       expect(item.flow.length).toBeGreaterThanOrEqual(4);
@@ -51,7 +51,7 @@ describe("elite 17 contract", () => {
     });
   });
 
-  it("routes all 17 flagships through an implemented experience system", () => {
+  it("routes all 18 flagships through an implemented experience system", () => {
     const guidedPlayerIds = FLAGSHIP_IDS.filter((id) => !INTERACTIVE_FLAGSHIP_IDS.includes(id));
     expect(new Set([...INTERACTIVE_FLAGSHIP_IDS, ...guidedPlayerIds])).toEqual(new Set(FLAGSHIP_IDS));
     expect(guidedPlayerIds.sort()).toEqual([
@@ -177,6 +177,7 @@ describe("elite 17 contract", () => {
 
   it("keeps Thought or Fact readiness focused and keeps safety details available on demand", () => {
     const source = fs.readFileSync(new URL("../components/ThoughtOrFactExperience.jsx", import.meta.url), "utf8");
+    const entrySource = fs.readFileSync(new URL("../components/thought-or-fact/ThoughtOrFactEntry.jsx", import.meta.url), "utf8");
     expect(source).toContain("A thought can feel true without being a fact.");
     expect(source).toContain("Is this a good time for this?");
     expect(source).toContain(">Ground first<");
@@ -186,15 +187,16 @@ describe("elite 17 contract", () => {
     expect(source).not.toContain("tof-progress");
     const resetSource = fs.readFileSync(new URL("../pages/ResetFlow.jsx", import.meta.url), "utf8");
     expect(resetSource).toContain("isThoughtOrFactEntry");
-    expect(resetSource).toContain("What thought are you putting on trial?");
-    expect(resetSource).toContain("Write it as it appears in your mind.");
-    expect(resetSource).toContain("Open case");
-    expect(resetSource).toContain("Ground first");
+    expect(resetSource).toContain("<ThoughtOrFactEntry");
     expect(resetSource).toContain("startThoughtVoiceEntry");
     expect(resetSource).toContain("navigator.mediaDevices.getUserMedia");
-    expect(resetSource).toContain("tof-voice");
-    expect(resetSource).toContain("Use recording");
-    expect(resetSource).toContain("Audio is not saved");
+    expect(entrySource).toContain("What thought are you putting on trial?");
+    expect(entrySource).toContain("Write it as it appears in your mind.");
+    expect(entrySource).toContain("Open case");
+    expect(entrySource).toContain("Ground first");
+    expect(entrySource).toContain("tof-voice");
+    expect(entrySource).toContain("Use recording");
+    expect(entrySource).toContain("Audio is not saved");
   });
 
   it("keeps Thought or Fact capture private, plain, and free of a premature certainty prompt", () => {
@@ -300,7 +302,7 @@ describe("elite 17 contract", () => {
   });
 
   it("starts Thought or Fact with a calm suitability checkpoint", () => {
-    const source = fs.readFileSync(new URL("../pages/ResetFlow.jsx", import.meta.url), "utf8");
+    const source = fs.readFileSync(new URL("../components/thought-or-fact/ThoughtOrFactEntry.jsx", import.meta.url), "utf8");
     expect(source).toContain("Hold the thought up to the light.");
     expect(source).toContain("This is for an everyday upsetting thought.");
     expect(source).toContain("Take a practical step");
@@ -525,7 +527,10 @@ describe("elite 17 contract", () => {
 
   it("ships equivalent accessibility modes by default", () => {
     expect(ACCESSIBILITY_DEFAULTS).toMatchObject({ reducedMotion: false, captions: true, highContrast: false, oneHanded: false });
-    const css = fs.readFileSync(new URL("../index.css", import.meta.url), "utf8");
+    const css = [
+      fs.readFileSync(new URL("../index.css", import.meta.url), "utf8"),
+      fs.readFileSync(new URL("../styles/intervention-experiences.css", import.meta.url), "utf8"),
+    ].join("\n");
     expect(css).toContain("html.high-contrast");
     expect(css).toContain("html.large-text");
     expect(css).toContain("html.one-handed");

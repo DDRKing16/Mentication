@@ -1,7 +1,8 @@
+// @ts-check
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import ScrollToTop from './components/ScrollToTop';
@@ -11,6 +12,7 @@ import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import { useSystemDarkMode } from '@/hooks/useSystemDarkMode';
 import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
+import { hasCompletedOnboarding } from '@/lib/onboarding';
 
 // Route page components are loaded on demand to keep the initial bundle small.
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
@@ -18,6 +20,7 @@ import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirect
 const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
 const Crisis = lazy(() => import('@/pages/Crisis'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
+const Welcome = lazy(() => import('@/pages/Welcome'));
 
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
 
@@ -25,6 +28,10 @@ const PageSpinner = () => (
   <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/90 backdrop-blur-sm">
     <div className="h-8 w-8 rounded-full border-4 border-secondary border-t-primary animate-spin" />
   </div>
+);
+
+const OnboardingGate = ({ children }) => (
+  hasCompletedOnboarding() ? children : <Navigate to="/welcome" replace />
 );
 
 // Direction-aware page transitions: forward nav slides the new page in from the
@@ -58,7 +65,7 @@ const MenticationRoutes = () => {
         >
           <Suspense fallback={<PageSpinner />}>
             <Routes location={location}>
-              <Route element={<AppShell />}>
+              <Route element={<OnboardingGate><AppShell /></OnboardingGate>}>
                 <Route path="/" element={<></>} />
                 <Route path="/library" element={<></>} />
                 <Route path="/plan" element={<></>} />
@@ -66,6 +73,7 @@ const MenticationRoutes = () => {
                 <Route path="/insights" element={<></>} />
                 <Route path="/settings" element={<></>} />
               </Route>
+              <Route path="/welcome" element={<Welcome />} />
               <Route path="/reset" element={<ResetFlow />} />
               <Route path="/support" element={<Crisis />} />
               <Route path="/privacy" element={<Privacy />} />
@@ -85,7 +93,7 @@ function App() {
   return (
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Router>
           <ScrollToTop />
           <MenticationRoutes />
         </Router>

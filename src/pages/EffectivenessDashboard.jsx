@@ -1,13 +1,17 @@
+// @ts-check
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, MapPin, Loader } from "lucide-react";
 import { sessionStore } from "@/lib/localData";
 import { computeEffectivenessInsights } from "@/lib/insights";
+import { getBumpFunnel } from "@/lib/happyBumpFunnel";
 import FlowHomeButton from "@/components/FlowHomeButton";
 
 export default function EffectivenessDashboard() {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
+  const bumpRuns = getBumpFunnel().runs || [];
+  const completedBumps = bumpRuns.filter((run) => run.scenes?.includes("complete")).length;
 
   useEffect(() => {
     const loadInsights = async () => {
@@ -45,6 +49,7 @@ export default function EffectivenessDashboard() {
           </h1>
           <p className="text-sm text-muted-foreground">
             Based on {insights.totalSessions} sessions • {insights.thisWeek} this week
+            {insights.currentStreak > 0 && ` • ${insights.currentStreak}-day streak`}
           </p>
         </motion.div>
 
@@ -87,6 +92,20 @@ export default function EffectivenessDashboard() {
         )}
 
         {/* Direction Insights */}
+        {bumpRuns.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-8 rounded-lg border border-border bg-card p-4"
+          >
+            <h2 className="font-heading text-lg font-medium text-primary">The Happy Bump flow</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {completedBumps} completed {completedBumps === 1 ? "run" : "runs"} from {bumpRuns.length} started.
+            </p>
+          </motion.div>
+        )}
+
         {insights.directionStats.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
