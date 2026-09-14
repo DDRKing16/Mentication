@@ -256,10 +256,7 @@ export function useWordReveal({ body, spoken, rate = 0.82, leadMs = 0, narrate, 
   useEffect(() => {
     let raf;
     const loop = () => {
-      if (revealAll || endedRef.current || !aligned) {
-        raf = requestAnimationFrame(loop);
-        return;
-      }
+      if (revealAll || endedRef.current || !aligned) return;
       const audio = audioRef.current;
       if (audio && !audio.paused) {
         const t = audio.currentTime;
@@ -287,8 +284,12 @@ export function useWordReveal({ body, spoken, rate = 0.82, leadMs = 0, narrate, 
       }
       raf = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    if (!revealAll && !endedRef.current && aligned) {
+      raf = requestAnimationFrame(loop);
+    }
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [aligned, revealAlignment, hasTrailingNarrationWords, clipEndAt, revealAll, fireEnd]);
 
   // Hard failure → reveal the full body and signal completion.

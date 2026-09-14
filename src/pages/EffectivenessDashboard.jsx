@@ -48,7 +48,7 @@ export default function EffectivenessDashboard() {
             Your Patterns
           </h1>
           <p className="text-sm text-muted-foreground">
-            Based on {insights.totalSessions} sessions • {insights.thisWeek} this week
+            Based on what you chose and rated in {insights.totalSessions} sessions • {insights.thisWeek} this week
             {insights.currentStreak > 0 && ` • ${insights.currentStreak}-day streak`}
           </p>
         </motion.div>
@@ -63,7 +63,7 @@ export default function EffectivenessDashboard() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Zap className="h-5 w-5 text-amber-500" />
-              <h2 className="font-heading text-lg font-medium text-primary">Most Effective</h2>
+              <h2 className="font-heading text-lg font-medium text-primary">Most often useful</h2>
             </div>
             <div className="space-y-2">
               {insights.topInterventions.map((iv, idx) => (
@@ -74,7 +74,7 @@ export default function EffectivenessDashboard() {
                   <div>
                     <p className="font-medium text-foreground">{iv.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {(iv.score * 100).toFixed(0)}% effectiveness
+                      Rated fit {(iv.score * 100).toFixed(0)}% — based on your check-ins, not a clinical score
                     </p>
                   </div>
                   <div className="text-right">
@@ -130,12 +130,12 @@ export default function EffectivenessDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-emerald-600">↓ {dir.avgImprovement}</p>
-                      <p className="text-xs text-muted-foreground">avg improvement</p>
+                      <p className="text-xs text-muted-foreground">avg rated shift</p>
                     </div>
                   </div>
                   {dir.bestIntervention && (
                     <p className="text-xs text-muted-foreground">
-                      Works best: <span className="text-foreground font-medium">{dir.bestIntervention.name}</span>
+                      You used most here: <span className="text-foreground font-medium">{dir.bestIntervention.name}</span>
                     </p>
                   )}
                 </div>
