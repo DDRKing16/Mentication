@@ -742,7 +742,7 @@ This does not mean the product lacks direction. It means the codebase has evolve
 
 If all of Mentication had to be compressed into a few lines, the most accurate summary would be this:
 
-Mentication is a standalone, local-first, mobile-first mental wellbeing app that guides a user into the most suitable short intervention pathway for their current state. It combines a curated intervention library, a privacy-preserving recommendation engine, adaptive in-session routing, and device-local learning. It is intentionally account-free, analytics-light, and honest about its limits. Its strategic ambition is to become a world-leading, high-trust mental health application and eventually a multi-million-dollar business without compromising its core privacy and product principles.
+Mentication is a standalone, local-first, mobile-first mental wellbeing app that guides a user into the most suitable short intervention pathway for their current state. It combines a curated intervention library, a privacy-preserving recommendation engine, adaptive in-session routing, and device-local learning. It is intentionally account-free, has no analytics in its default runtime model, and is honest about its limits. Its strategic ambition is to become a world-leading, high-trust mental health application and eventually a multi-million-dollar business without compromising its core privacy and product principles.
 
 ## 41. Final framing
 
