@@ -566,7 +566,7 @@ Accessibility is treated as product behavior, not decoration. The app includes s
 - one-handed reach;
 - ambient soundscape preferences.
 
-There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` owns the older `haven_a11y` contract and applies font-size and DOM-class behavior, while `src/hooks/useAccessibilityPrefs.js` owns the newer `haven.a11y.v2` preference set used by the app for document-class and ambient-soundscape-related behavior. Future work should not treat those stores as interchangeable without an explicit migration decision.
+There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` owns the older `haven_a11y` contract and applies font-size and DOM-class behavior, while `src/hooks/useAccessibilityPrefs.js` owns the newer `haven.a11y.v2` preference set used by the app for document-class and ambient-soundscape-related behavior. In the current app shell and motion wiring, `useAccessibilityPrefs` is the active authority for app-level reads and writes, while the older store remains a compatibility path for existing accessibility controls. Future work should not treat those stores as interchangeable without an explicit migration decision.
 
 ## 30. Audio and narration model
 
