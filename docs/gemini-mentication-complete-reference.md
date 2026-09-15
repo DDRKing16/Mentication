@@ -566,7 +566,7 @@ Accessibility is treated as product behavior, not decoration. The app includes s
 - one-handed reach;
 - ambient soundscape preferences.
 
-There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` defines the older `haven_a11y` contract, while `src/hooks/useAccessibilityPrefs.js` defines the newer `haven.a11y.v2` contract used by the current app wiring in `src/App.jsx` and `src/pages/Settings.jsx`. Treat those files as the canonical source for current behavior, and do not assume the two stores are interchangeable without an explicit migration decision.
+There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` defines the older `haven_a11y` contract, which is still read and written at runtime by `src/pages/Settings.jsx` for settings such as reduced motion, high contrast, captions, one-handed reach, and text scale. `src/hooks/useAccessibilityPrefs.js` defines the newer `haven.a11y.v2` contract used by the current app wiring in `src/App.jsx` and `src/pages/Settings.jsx` for motion-related document classes and ambient soundscape preferences. The repository does not present a single unifying migration layer here, so treat those files as the canonical source for current behavior and do not assume the two stores are interchangeable without an explicit migration decision.
 
 ## 30. Audio and narration model
 
