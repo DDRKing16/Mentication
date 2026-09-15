@@ -635,7 +635,7 @@ Future work should avoid:
 - storing intimate user text by default;
 - embedding private API keys in app bundles.
 
-## 38. Important engineering constraints for assistants and contributors
+## 36. Important engineering constraints for assistants and contributors
 
 When proposing or modifying Mentication, assistants and contributors should preserve these rules:
 
@@ -650,7 +650,7 @@ When proposing or modifying Mentication, assistants and contributors should pres
 - preserve account-free usage;
 - preserve honest safety boundaries.
 
-## 39. Known codebase nuances
+## 37. Known codebase nuances
 
 Gemini should also understand that the repository has some transitional naming and architecture traces:
 
@@ -663,13 +663,13 @@ Gemini should also understand that the repository has some transitional naming a
 
 This does not mean the product lacks direction. It means the codebase has evolved through earlier catalogue and architecture phases.
 
-## 40. Short summary for quick orientation
+## 38. Short summary for quick orientation
 
 If all of Mentication had to be compressed into a few lines, the most accurate summary would be this:
 
 Mentication is a standalone, local-first, mobile-first mental wellbeing app that guides a user into the most suitable short intervention pathway for their current state. It combines a curated intervention library, a privacy-preserving recommendation engine, adaptive in-session routing, and device-local learning. It is intentionally account-free, has no analytics in its default runtime model, and is honest about its limits.
 
-## 41. Final framing
+## 39. Final framing
 
 The most important thing for Gemini to understand is that Mentication is not just “an app with breathing exercises.” It is a product system with a worldview:
 
