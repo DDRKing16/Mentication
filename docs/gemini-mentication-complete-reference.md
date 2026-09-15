@@ -73,7 +73,7 @@ The intended long-term value in that vision is not modest. The aspiration is for
 
 ## 5. Current monetisation position
 
-As implemented, V1 is effectively complete and account-free. Premium hooks are present in simple placeholder form, but all core features are included. For exact current monetisation and platform guidance, read `README.md` and `docs/app-store-release.md`; those files are the canonical source.
+At a high level, the current repository presents V1 as account-free with premium behavior deferred; use `README.md` and `docs/app-store-release.md` as the canonical source for the exact current monetisation and platform guidance.
 
 So the correct framing is:
 
@@ -228,7 +228,7 @@ Even though the app is written largely in JavaScript/JSX, it uses type-checking 
 
 Local-first is not marketing decoration in this repository. It is the architecture.
 
-Session history is stored in browser local storage. App-owned keys use namespaced prefixes such as:
+Session history is stored in browser local storage. App-owned keys use namespaced prefixes; examples visible in `src/lib/localData.js` include:
 
 - `mentation.`
 - `haven.`
@@ -512,7 +512,7 @@ It records attempt-level data such as:
 - switch preference;
 - context key.
 
-Learning is confidence-weighted and recency-weighted. The documented model uses an approximate 45-day half-life for reward signals. Dislikes also decay over time so old rejections do not permanently bury interventions.
+Learning is confidence-weighted and recency-weighted. Reward and dislike decay are implemented in code so old outcomes do not permanently dominate the system; use `src/lib/recommendationV3.js`, `src/lib/preferences.js`, and `scripts/verify-v3-algorithm.mjs` for the exact current behavior.
 
 The hierarchy of evidence prioritizes:
 
@@ -526,7 +526,7 @@ This is not a giant machine-learning stack. It is a pragmatic, inspectable, devi
 
 ## 25. Negative-preference memory
 
-The app includes strong dislike memory. If the user indicates that something is not helping, that signal has meaningful weight. However, it decays with a 30-day half-life so one old rejection does not become a permanent veto.
+The app includes strong dislike memory. If the user indicates that something is not helping, that signal has meaningful weight. It also decays over time so one old rejection does not become a permanent veto; the exact decay behavior lives in `src/lib/preferences.js`.
 
 This is a subtle but valuable product choice. It treats user aversion seriously without freezing the system forever.
 
@@ -680,9 +680,9 @@ Possible long-term monetisable assets include:
 
 But the foundational brand equity is trust. If trust is broken, much of the product’s differentiated value erodes.
 
-## 38. Important engineering constraints Gemini should respect
+## 38. Important engineering constraints for assistants and contributors
 
-When proposing or modifying Mentication, an AI assistant should preserve these rules:
+When proposing or modifying Mentication, assistants and contributors should preserve these rules:
 
 - keep it local-first unless there is an explicit product decision otherwise;
 - do not introduce a hosted backend casually;
