@@ -652,7 +652,7 @@ This section is a summary of the contributor-facing boundaries already reflected
 
 ## 37. Known codebase nuances
 
-Gemini should also understand that the repository has some transitional naming and architecture traces:
+The repository also has some transitional naming and architecture traces:
 
 - “final50” naming remains in several files even though the active V1 scope is curated; the practical catalogue entry points are `src/lib/interventions.js` and `src/lib/final50Catalog.js`;
 - legacy intervention aliases and archived interventions still exist for migration compatibility; the resolver logic also lives in `src/lib/final50Catalog.js`;
@@ -665,13 +665,13 @@ This does not mean the product lacks direction. It means the codebase has evolve
 
 ## 38. Short summary for quick orientation
 
-If all of Mentication had to be compressed into a few lines, the most accurate summary would be this:
+If all of Mentication had to be compressed into a few lines, the highest-level summary — with implementation specifics still owned by the canonical files cited above — would be this:
 
 Mentication is a standalone, local-first, mobile-first mental wellbeing app that guides a user into the most suitable short intervention pathway for their current state. It combines a curated intervention library, a privacy-preserving recommendation engine, adaptive in-session routing, and device-local learning. It is intentionally account-free, has no analytics in its default runtime model, and is honest about its limits.
 
 ## 39. Final framing
 
-The most important thing for Gemini to understand is that Mentication is not just “an app with breathing exercises.” It is a product system with a worldview:
+The most important thing to understand is that Mentication is not just “an app with breathing exercises.” It is a product system with a worldview:
 
 - help immediately;
 - reduce friction;
