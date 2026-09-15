@@ -263,7 +263,7 @@ The repository distinguishes between:
 
 It rejects hidden profiling and coercive engagement tricks. It also draws strict boundaries around what should not be inferred, such as diagnosis, risk scores, trauma history, motivation as a trait, sleep quality as a hidden fact, or whether another person responded to a message.
 
-This is a very important part of the product’s identity. Gemini should treat it as a core invariant, not an optional preference.
+This is a very important part of the product’s identity. It should be treated as a core product invariant, not an optional preference.
 
 ## 13. The intervention catalogue
 
@@ -637,7 +637,7 @@ Future work should avoid:
 
 ## 36. Important engineering constraints for assistants and contributors
 
-When proposing or modifying Mentication, assistants and contributors should preserve these rules:
+This section is a summary of the contributor-facing boundaries already reflected in `AGENTS.md`, `README.md`, and the repository docs. When proposing or modifying Mentication, assistants and contributors should preserve these rules:
 
 - keep it local-first unless there is an explicit product decision otherwise;
 - do not introduce a hosted backend casually;
