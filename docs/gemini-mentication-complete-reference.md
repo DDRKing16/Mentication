@@ -59,11 +59,9 @@ That is visible in the welcome flow and reflected throughout the product. The ap
 
 The product is practical rather than abstract. It wants to be used in real-life moments of friction, distress, fatigue, avoidance, rumination, overwhelm, and bedtime wakefulness.
 
-## 4. Non-authoritative future vision requested for this reference
+## 4. Strategic boundary for future work
 
-The current repository implements a local-first V1. Separately, the user requested that this reference preserve an aspirational strategy note. That note is not implementation authority for the current codebase.
-
-In that requested future-facing framing, Mentication aims to become a world-leading, high-trust mental health and wellbeing application focused on immediate regulation, privacy-respecting personalisation, elegant low-friction intervention delivery, and practical usefulness. The requested long-term ambition is a multi-million-dollar business, but any future growth model should remain consistent with the repository’s visible ethics around user dignity, local control, and honest capability boundaries.
+The current repository implements a local-first V1. Future work should deepen, not weaken, the product’s visible through-line: immediate regulation, privacy-respecting personalisation, low-friction intervention delivery, and honest capability boundaries.
 
 ## 5. Current monetisation position
 
@@ -613,21 +611,9 @@ Mentication’s intended value is immediate, practical, repeatable relief and gu
 
 Its value proposition is not only emotional. It is also cognitive and operational: reduce friction, reduce indecision, reduce overload, and give the user a path.
 
-## 35. Intended strategic value
+## 35. Future direction within repository boundaries
 
-If the product becomes excellent, its strategic value could come from a combination of:
-
-- high trust because of local-first privacy;
-- strong retention because it is genuinely useful in moments of need;
-- a defensible intervention-and-recommendation engine;
-- a differentiated brand in the mental wellbeing space;
-- possible expansion into premium pathways, guided programs, or advanced personalisation without betraying the local-first core.
-
-The user’s requested framing is that this can become a multi-million-dollar revenue business. That is a valid ambition, but the repository suggests the most defensible route is not shallow growth hacking. It is product quality, trust, and distinctive intervention intelligence.
-
-## 36. Future direction: what Mentication could become
-
-A coherent future for Mentication would likely deepen rather than replace the current principles. Strong future directions could include:
+A coherent future for Mentication would likely deepen rather than replace the current principles. Repository-consistent future directions could include:
 
 - richer personalisation with explicit user control;
 - more polished flagship experiences;
@@ -639,7 +625,7 @@ A coherent future for Mentication would likely deepen rather than replace the cu
 - better explanation surfaces for “why this was suggested”;
 - carefully bounded AI support for drafting or summarising user-entered content when explicitly enabled.
 
-The wrong future direction would be:
+Future work should avoid:
 
 - aggressive cloud dependence;
 - hidden profiling;
@@ -648,27 +634,6 @@ The wrong future direction would be:
 - engagement manipulation;
 - storing intimate user text by default;
 - embedding private API keys in app bundles.
-
-## 37. Business interpretation
-
-From a business perspective, Mentication should be seen as a premium-trust consumer wellbeing product with platform potential. Its likely strongest business narrative is:
-
-1. immediate utility;
-2. elegant product design;
-3. measurable subjective user-perceived usefulness;
-4. high privacy trust;
-5. expansion potential into deeper premium experiences.
-
-Possible long-term monetisable assets include:
-
-- premium guided experiences;
-- advanced personal plans;
-- more powerful local-first memory and patterning tools;
-- curated content expansions;
-- structured protocol packs;
-- brand trust strong enough to justify subscription or lifetime pricing.
-
-But the foundational brand equity is trust. If trust is broken, much of the product’s differentiated value erodes.
 
 ## 38. Important engineering constraints for assistants and contributors
 
@@ -716,4 +681,10 @@ The most important thing for Gemini to understand is that Mentication is not jus
 - stay honest;
 - keep control on the user’s device whenever possible.
 
-That worldview is the through-line connecting the UX, recommendation engine, privacy model, intervention design, and long-term ambition.
+That worldview is the through-line connecting the UX, recommendation engine, privacy model, and intervention design.
+
+## Appendix A. Non-authoritative strategy note
+
+This appendix is intentionally separate from the repository-reference sections above. It captures a future-facing strategic framing requested for this document and should not be treated as implementation authority.
+
+In that aspirational framing, Mentication aims to become a world-leading, high-trust mental health and wellbeing application focused on immediate regulation, privacy-respecting personalisation, elegant low-friction intervention delivery, and practical usefulness. The long-term ambition is a multi-million-dollar business built on product quality, trust, and distinctive intervention intelligence rather than surveillance, hidden profiling, or shallow growth tactics.
