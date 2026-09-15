@@ -348,7 +348,7 @@ Directions include:
 - Focus: restore attention and action;
 - Sleep: wind down to rest.
 
-The visible primary product surfaces emphasize Calm, Lift, Ground, Focus, Sleep, and “Guide me.” Reset still exists conceptually and in engine logic, especially for cognitive stuckness.
+The currently visible primary entry surfaces emphasize Calm, Lift, Ground, Focus, Sleep, and “Guide me.” Reset is still part of the conceptual and engine vocabulary, especially for cognitive stuckness, but it is not the main user-facing top-level button set described above.
 
 ## 16. Flagship interventions
 
