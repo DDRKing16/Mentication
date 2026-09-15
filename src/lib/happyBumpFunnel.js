@@ -1,5 +1,5 @@
 const FUNNEL_KEY = "mentation.happyBump.funnel.v1";
-const SCENES = new Set(["arrival", "baseline", "stand", "music", "hydrate", "environment", "move", "connection", "win", "mission", "proud", "grateful", "anticipate", "lifeArea", "areaAction", "nextMode", "nextPlan", "rerate", "reveal", "complete"]);
+const SCENES = new Set(["arrival", "baseline", "hydrate", "window", "environment", "move", "connection", "win", "mission", "proud", "grateful", "anticipate", "lifeArea", "areaAction", "nextMode", "nextPlan", "rerate", "reveal", "complete"]);
 
 const read = () => {
   try { return JSON.parse(localStorage.getItem(FUNNEL_KEY) || "") || { version: 1, runs: [] }; } catch { return { version: 1, runs: [] }; }
@@ -27,4 +27,10 @@ export function recordBumpScene(runId, scene) {
 }
 
 export function getBumpFunnel() { return read(); }
+
+export function getBumpsCompletedThisWeek() {
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  return read().runs.filter((run) => run.scenes.includes("complete") && now - new Date(run.updatedAt).getTime() <= weekMs).length;
+}
 export function clearBumpFunnel() { try { localStorage.removeItem(FUNNEL_KEY); } catch { /* private mode */ } }

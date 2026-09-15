@@ -5,7 +5,7 @@ import { getNarration } from "@/lib/narrationService";
 describe("Happy Bump narration", () => {
   it("bundles a concise local narration clip for every meaningful scene", () => {
     const scenes = [
-      "arrival", "baseline", "stand", "music", "hydrate", "environment", "move",
+      "arrival", "baseline", "hydrate", "window", "environment", "move",
       "connection", "win", "mission", "proud", "grateful", "anticipate",
       "lifeArea", "areaAction", "nextMode", "nextPlan", "rerate", "reveal", "complete",
     ];

@@ -1,9 +1,8 @@
 export const HAPPY_BUMP_NARRATION = Object.freeze({
   arrival: "This is a small lift, built one step at a time. There is no need to feel motivated before you begin.",
   baseline: "Take an honest read of your energy. There is no right number.",
-  stand: "Let your body rise in whatever way feels safe and available.",
-  music: "Choose music that makes the next few minutes easier to enter.",
   hydrate: "Have some water if it is available. Small care counts.",
+  window: "Get to a window or outside for thirty seconds.",
   environment: "Choose the safest practical route for a short walk.",
   move: "Take this at your own pace. You can pause, shorten it, or simply keep moving.",
   connection: "One genuine signal is enough. Skipping connection is also a deliberate choice.",
