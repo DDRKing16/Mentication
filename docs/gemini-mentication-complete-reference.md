@@ -59,17 +59,11 @@ That is visible in the welcome flow and reflected throughout the product. The ap
 
 The product is practical rather than abstract. It wants to be used in real-life moments of friction, distress, fatigue, avoidance, rumination, overwhelm, and bedtime wakefulness.
 
-## 4. Strategic ambition
+## 4. Non-authoritative future vision requested for this reference
 
-The current repository implements a local-first V1. The next few paragraphs are a user-requested future-vision framing, not an implementation-level repository fact. In that aspirational framing, Mentication aims to become a world-leading mental health and wellbeing application through a very specific lane:
+The current repository implements a local-first V1. Separately, the user requested that this reference preserve an aspirational strategy note. That note is not implementation authority for the current codebase.
 
-- immediate in-the-moment regulation;
-- privacy-respecting personalisation;
-- elegant and low-friction intervention delivery;
-- practical usefulness over generic inspiration;
-- trustworthy guardrails over exaggerated AI or clinical claims.
-
-The intended long-term value in that vision is not modest. The aspiration is for Mentication to become a multi-million-dollar revenue product and, if executed exceptionally well, a category-leading consumer mental wellbeing platform. That business ambition is future-facing rather than repository-authoritative, and it should not distort the current design ethics. The repository strongly favors user dignity, local control, and honest capability boundaries. Any future growth model should preserve those principles.
+In that requested future-facing framing, Mentication aims to become a world-leading, high-trust mental health and wellbeing application focused on immediate regulation, privacy-respecting personalisation, elegant low-friction intervention delivery, and practical usefulness. The requested long-term ambition is a multi-million-dollar business, but any future growth model should remain consistent with the repository’s visible ethics around user dignity, local control, and honest capability boundaries.
 
 ## 5. Current monetisation position
 
@@ -228,11 +222,7 @@ Even though the app is written largely in JavaScript/JSX, it uses type-checking 
 
 Local-first is not marketing decoration in this repository. It is the architecture.
 
-Session history is stored in browser local storage. App-owned keys use namespaced prefixes; examples visible in `src/lib/localData.js` include:
-
-- `mentation.`
-- `haven.`
-- `haven_`
+Session history is stored in browser local storage. The authoritative app-owned storage namespaces and deletion/export behavior live in `src/lib/localData.js`.
 
 The session store keeps a bounded list of sessions and exposes list/create/delete functionality. The app can also export local app data and delete all app-owned local data from the device. When data is erased, the app dispatches events so the UI updates accordingly.
 
@@ -712,7 +702,7 @@ This does not mean the product lacks direction. It means the codebase has evolve
 
 If all of Mentication had to be compressed into a few lines, the most accurate summary would be this:
 
-Mentication is a standalone, local-first, mobile-first mental wellbeing app that guides a user into the most suitable short intervention pathway for their current state. It combines a curated intervention library, a privacy-preserving recommendation engine, adaptive in-session routing, and device-local learning. It is intentionally account-free, has no analytics in its default runtime model, and is honest about its limits. Its strategic ambition is to become a world-leading, high-trust mental health application and eventually a multi-million-dollar business without compromising its core privacy and product principles.
+Mentication is a standalone, local-first, mobile-first mental wellbeing app that guides a user into the most suitable short intervention pathway for their current state. It combines a curated intervention library, a privacy-preserving recommendation engine, adaptive in-session routing, and device-local learning. It is intentionally account-free, has no analytics in its default runtime model, and is honest about its limits.
 
 ## 41. Final framing
 
