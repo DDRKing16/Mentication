@@ -65,7 +65,7 @@ The current repository implements a local-first V1. Future work should deepen, n
 
 ## 5. Current monetisation position
 
-At a high level, the current repository presents V1 as account-free with premium behavior deferred; use `README.md` and `docs/app-store-release.md` as the canonical source for the exact current monetisation and platform guidance.
+At a high level, the current repository presents V1 as account-free with premium behavior deferred; use `docs/app-store-release.md` as the canonical source for the exact current monetisation and platform guidance.
 
 So the correct framing is:
 
@@ -566,7 +566,7 @@ Accessibility is treated as product behavior, not decoration. The app includes s
 - one-handed reach;
 - ambient soundscape preferences.
 
-There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` owns the older `haven_a11y` contract and applies font-size and DOM-class behavior, while `src/hooks/useAccessibilityPrefs.js` owns the newer `haven.a11y.v2` preference set used by the app for document-class and ambient-soundscape-related behavior. In the current app shell and motion wiring, `useAccessibilityPrefs` is the active authority for app-level reads and writes, while the older store remains a compatibility path for existing accessibility controls. Future work should not treat those stores as interchangeable without an explicit migration decision.
+There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` owns the older `haven_a11y` contract and applies font-size and DOM-class behavior, while `src/hooks/useAccessibilityPrefs.js` owns the newer `haven.a11y.v2` preference set used by the app for document-class and ambient-soundscape-related behavior. In the current app shell and motion wiring, `useAccessibilityPrefs` is the active authority for app-level reads and writes, as seen in `src/App.jsx` and `src/pages/Settings.jsx`, while the older store remains a compatibility path for existing accessibility controls. Future work should not treat those stores as interchangeable without an explicit migration decision.
 
 ## 30. Audio and narration model
 
