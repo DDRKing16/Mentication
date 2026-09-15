@@ -641,7 +641,7 @@ The repository does not position live AI as a requirement for the core product. 
 - optional for core intervention use;
 - separated from long-term storage permission.
 
-That means any future Gemini-assisted or AI-assisted Mentication features should be governed, transparent, and bounded. AI is not the product’s excuse to weaken privacy.
+This document is written for Gemini as a documentation audience, not as evidence of a current in-product Gemini feature. If Mentication ever adds Gemini-assisted or other AI-assisted product behavior, it should be governed, transparent, and bounded. AI is not the product’s excuse to weaken privacy.
 
 ## 34. Intended value to the user
 
@@ -731,10 +731,11 @@ When proposing or modifying Mentication, an AI assistant should preserve these r
 
 Gemini should also understand that the repository has some transitional naming and architecture traces:
 
-- “final50” naming remains in several files even though the active V1 scope is curated;
-- legacy intervention aliases and archived interventions still exist for migration compatibility;
-- some docs and internal naming refer to historical catalogue structures;
-- privacy and accessibility systems include layered or evolving contracts.
+- “final50” naming remains in several files even though the active V1 scope is curated; the practical catalogue entry points are `src/lib/interventions.js` and `src/lib/final50Catalog.js`;
+- legacy intervention aliases and archived interventions still exist for migration compatibility; the resolver logic also lives in `src/lib/final50Catalog.js`;
+- recommendation behavior should be treated as authoritative in `src/lib/recommendationV3.js`, `src/lib/interventions.js`, and `scripts/verify-v3-algorithm.mjs`;
+- local-session and device-data behavior should be treated as authoritative in `src/lib/localData.js` and the privacy-oriented docs under `docs/`;
+- privacy and accessibility systems include layered or evolving contracts, with key behavior split across `src/lib/accessibility.jsx`, `src/hooks/useAccessibilityPrefs.js`, and `docs/personalisation-memory-privacy-contract.md`.
 
 This does not mean the product lacks direction. It means the codebase has evolved through earlier catalogue and architecture phases.
 
