@@ -61,7 +61,7 @@ The product is practical rather than abstract. It wants to be used in real-life 
 
 ## 4. Strategic ambition
 
-The current repository implements a local-first V1. The requested future framing goes beyond that implementation. Strategically, Mentication should be understood as aiming to become a world-leading mental health and wellbeing application, but through a very specific lane:
+The current repository implements a local-first V1. The next few paragraphs are a user-requested future-vision framing, not an implementation-level repository fact. In that aspirational framing, Mentication aims to become a world-leading mental health and wellbeing application through a very specific lane:
 
 - immediate in-the-moment regulation;
 - privacy-respecting personalisation;
@@ -69,11 +69,11 @@ The current repository implements a local-first V1. The requested future framing
 - practical usefulness over generic inspiration;
 - trustworthy guardrails over exaggerated AI or clinical claims.
 
-The intended long-term value is not modest. The aspiration is for Mentication to become a multi-million-dollar revenue product and, if executed exceptionally well, a category-leading consumer mental wellbeing platform. That financial ambition should not distort the current design ethics. The repository strongly favors user dignity, local control, and honest capability boundaries. Any future growth model should preserve those principles.
+The intended long-term value in that vision is not modest. The aspiration is for Mentication to become a multi-million-dollar revenue product and, if executed exceptionally well, a category-leading consumer mental wellbeing platform. That business ambition is future-facing rather than repository-authoritative, and it should not distort the current design ethics. The repository strongly favors user dignity, local control, and honest capability boundaries. Any future growth model should preserve those principles.
 
 ## 5. Current monetisation position
 
-As implemented, V1 is effectively complete and account-free. Premium hooks are present in simple placeholder form, but all core features are included. The authoritative repository guidance for this is in `README.md` and `docs/app-store-release.md`, which state that V1 is a complete free app and that if premium digital features are introduced later in the iOS build, Apple In-App Purchase must be used. The native app should not reintroduce an external web checkout for digital unlocks unless that product and platform guidance is deliberately changed.
+As implemented, V1 is effectively complete and account-free. Premium hooks are present in simple placeholder form, but all core features are included. For exact current monetisation and platform guidance, read `README.md` and `docs/app-store-release.md`; those files are the canonical source.
 
 So the correct framing is:
 
@@ -279,13 +279,7 @@ This is a very important part of the product’s identity. Gemini should treat i
 
 ## 13. The intervention catalogue
 
-Mentication’s active catalogue is arranged by directional purpose, not by raw content type alone. The intended locked V1 composition is 25 interventions:
-
-- Calm: 7
-- Lift: 7
-- Ground: 4
-- Focus: 3
-- Sleep: 4
+Mentication’s active catalogue is arranged by directional purpose, not by raw content type alone. The current product docs describe a locked V1 catalogue snapshot, while the implementation authority lives in `src/lib/final50Catalog.js`, `src/lib/interventions.js`, `FINAL_50_LOCK.md`, and `scripts/verify-v3-algorithm.mjs`.
 
 The repository also retains traces of a larger historical or transitional catalogue architecture. There are archived interventions, legacy ID aliases, and “final50/core25” naming in code and docs. The conceptual truth for product scope is that V1 is a curated active set, not an infinite toolbox.
 
@@ -594,27 +588,15 @@ The app also has logic around discreet and no-audio preferences. Spoken audio sh
 
 ## 31. Native application model
 
-The repository includes a Capacitor iOS app. The current native configuration in `capacitor.config.ts` includes:
-
-- app ID `com.mentation.app`;
-- app name `Mentication`;
-- `dist` as the web build directory;
-- splash-screen and status-bar configuration;
-- mobile content mode.
+The repository includes a Capacitor iOS app. The current native configuration authority is `capacitor.config.ts`, and the release-process authority is `docs/app-store-release.md`. Together they define the active app identity, web build handoff, and native plugin behavior for the current snapshot.
 
 The repository also contains release notes emphasizing privacy declarations, lack of tracking, lack of collected data, and the fact that all features are local and account-free in V1.
 
 ## 32. Validation and engineering discipline
 
-The documented validation commands are:
+Use `README.md` as the canonical source for the current validation commands.
 
-- `npm test -- --run`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run build`
-- `node scripts/verify-v3-algorithm.mjs`
-
-This last script is important because it validates recommendation-engine invariants, intervention-count expectations, scoring behavior, immediate-mode constraints, and dislike-penalty behavior. In other words, the intervention algorithm is treated as a real product subsystem that deserves explicit verification.
+The important extra context here is that `scripts/verify-v3-algorithm.mjs` validates recommendation-engine invariants, intervention-count expectations, scoring behavior, immediate-mode constraints, and dislike-penalty behavior. In other words, the intervention algorithm is treated as a real product subsystem that deserves explicit verification.
 
 ## 33. Product boundaries around AI
 
