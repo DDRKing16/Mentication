@@ -79,7 +79,7 @@ One of Mentication’s distinctive ideas is the reduction of complexity at the m
 
 That pathway works like this:
 
-1. The user indicates what they need or enters through a direct button such as Calm, Lift, Ground, Focus, Sleep, or Guide me.
+1. The user indicates what they need through the visible top-level home entries such as Calm, Lift, Ground, Focus, Sleep, or Guide me; “Reset” remains an internal direction label used by the engine and flow logic.
 2. The app gathers a compact current context: direction, intensity, where the issue is felt, time available, audio preference, movement constraints, location, and related restrictions.
 3. The recommendation engine filters out interventions that are not eligible under those conditions.
 4. It ranks the remaining candidates.
@@ -566,7 +566,7 @@ Accessibility is treated as product behavior, not decoration. The app includes s
 - one-handed reach;
 - ambient soundscape preferences.
 
-There are two accessibility-related storage systems in the repository: one older/global-style local storage contract and a newer preference hook used in the app. This is worth knowing because future work should not assume they are interchangeable.
+There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` owns the older `haven_a11y` contract and applies font-size and DOM-class behavior, while `src/hooks/useAccessibilityPrefs.js` owns the newer `haven.a11y.v2` preference set used by the app for document-class and ambient-soundscape-related behavior. Future work should not treat those stores as interchangeable without an explicit migration decision.
 
 ## 30. Audio and narration model
 
