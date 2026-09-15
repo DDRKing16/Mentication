@@ -73,7 +73,7 @@ The intended long-term value is not modest. The aspiration is for Mentication to
 
 ## 5. Current monetisation position
 
-As implemented, V1 is effectively complete and account-free. Premium hooks are present in simple placeholder form, but all core features are included. The iOS release documentation is explicit that V1 is a complete free app and that if premium digital features are introduced later in the iOS build, Apple In-App Purchase must be used. The app should not reintroduce an external web checkout into the native product for digital unlocks.
+As implemented, V1 is effectively complete and account-free. Premium hooks are present in simple placeholder form, but all core features are included. The authoritative repository guidance for this is in `README.md` and `docs/app-store-release.md`, which state that V1 is a complete free app and that if premium digital features are introduced later in the iOS build, Apple In-App Purchase must be used. The native app should not reintroduce an external web checkout for digital unlocks unless that product and platform guidance is deliberately changed.
 
 So the correct framing is:
 
@@ -209,9 +209,9 @@ Key files:
 
 ## 9. Technology stack
 
-Mentication is built with:
+Mentication is built with technologies defined in `package.json` and related config files, including:
 
-- React 18;
+- React;
 - Vite;
 - Capacitor for native packaging;
 - React Router;
@@ -470,7 +470,7 @@ This is part of Mentication’s trust model. If a user says they need discreet, 
 
 ## 21. Scoring model
 
-The V3 engine uses transparent weighted components. The scoring model includes factors such as:
+The V3 engine uses transparent weighted components. The scoring model in `src/lib/recommendationV3.js` combines factors such as:
 
 - state fit;
 - intensity fit;
@@ -484,21 +484,7 @@ The V3 engine uses transparent weighted components. The scoring model includes f
 - diversity fit;
 - novelty fit.
 
-Representative weights in the current implementation are:
-
-- state: 20
-- intensity: 18
-- personal: 15
-- target: 10
-- direction: 8
-- load/arousal: 8
-- context: 6
-- evidence: 5
-- role: 4
-- diversity: 3
-- novelty: 3
-
-There is also a dislike penalty and a small deterministic jitter term used for stable ranking behavior.
+The exact numeric weights should be treated as code-level implementation details owned by `src/lib/recommendationV3.js` and cross-checked by `scripts/verify-v3-algorithm.mjs`, rather than duplicated as a second source of truth here. In addition to the weighted components, the scorer also applies a dislike penalty and a small deterministic jitter term for stable ranking behavior.
 
 ## 22. Pathway construction
 
