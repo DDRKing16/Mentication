@@ -594,7 +594,7 @@ The app also has logic around discreet and no-audio preferences. Spoken audio sh
 
 ## 31. Native application model
 
-The repository includes a Capacitor iOS app. The current native configuration includes:
+The repository includes a Capacitor iOS app. The current native configuration in `capacitor.config.ts` includes:
 
 - app ID `com.mentation.app`;
 - app name `Mentication`;
@@ -721,7 +721,8 @@ Gemini should also understand that the repository has some transitional naming a
 - legacy intervention aliases and archived interventions still exist for migration compatibility; the resolver logic also lives in `src/lib/final50Catalog.js`;
 - recommendation behavior should be treated as authoritative in `src/lib/recommendationV3.js`, `src/lib/interventions.js`, and `scripts/verify-v3-algorithm.mjs`;
 - local-session and device-data behavior should be treated as authoritative in `src/lib/localData.js` and the privacy-oriented docs under `docs/`;
-- privacy and accessibility systems include layered or evolving contracts, with key behavior split across `src/lib/accessibility.jsx`, `src/hooks/useAccessibilityPrefs.js`, and `docs/personalisation-memory-privacy-contract.md`.
+- accessibility behavior includes layered or evolving contracts, with key behavior split across `src/lib/accessibility.jsx` and `src/hooks/useAccessibilityPrefs.js`;
+- privacy contracts and memory boundaries should be read from `docs/personalisation-memory-privacy-contract.md`, the privacy summary surfaces, and `src/lib/localData.js`.
 
 This does not mean the product lacks direction. It means the codebase has evolved through earlier catalogue and architecture phases.
 
