@@ -566,7 +566,7 @@ Accessibility is treated as product behavior, not decoration. The app includes s
 - one-handed reach;
 - ambient soundscape preferences.
 
-There are two accessibility-related storage systems in the repository. `src/lib/accessibility.jsx` defines the older `haven_a11y` contract, which is still read and written at runtime by `src/pages/Settings.jsx` for settings such as reduced motion, high contrast, captions, one-handed reach, and text scale. `src/hooks/useAccessibilityPrefs.js` defines the newer `haven.a11y.v2` contract used by the current app wiring in `src/App.jsx` and `src/pages/Settings.jsx` for motion-related document classes and ambient soundscape preferences. The repository does not present a single unifying migration layer here, so treat those files as the canonical source for current behavior and do not assume the two stores are interchangeable without an explicit migration decision.
+Accessibility preference storage is split across the older contract in `src/lib/accessibility.jsx` and the newer contract in `src/hooks/useAccessibilityPrefs.js`. Before changing persistence or migration behavior, verify the current usage in those files and in `src/pages/Settings.jsx`, because the repository does not treat the two stores as interchangeable.
 
 ## 30. Audio and narration model
 
@@ -682,9 +682,3 @@ The most important thing for Gemini to understand is that Mentication is not jus
 - keep control on the user’s device whenever possible.
 
 That worldview is the through-line connecting the UX, recommendation engine, privacy model, and intervention design.
-
-## Appendix A. Non-authoritative strategy note
-
-This appendix is intentionally separate from the repository-reference sections above. It captures a future-facing strategic framing requested for this document and should not be treated as implementation authority.
-
-In that aspirational framing, Mentication aims to become a world-leading, high-trust mental health and wellbeing application focused on immediate regulation, privacy-respecting personalisation, elegant low-friction intervention delivery, and practical usefulness. The long-term ambition is a multi-million-dollar business built on product quality, trust, and distinctive intervention intelligence rather than surveillance, hidden profiling, or shallow growth tactics.
