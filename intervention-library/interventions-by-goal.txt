@@ -1,0 +1,58 @@
+Mentication interventions by goal
+Source set: intervention library plus Home Screen routes
+Excluded from this list by request: Signal Lock, Reroute, Pulse Shift, Open Channel, Then What?, Test the Prediction
+
+HOME SCREEN
+- Calm (goal: Calm)
+  Data obtained: top-level direction choice only.
+- Lift (goal: Lift)
+  Data obtained: top-level direction choice only.
+- Ground (goal: Ground)
+  Data obtained: top-level direction choice only.
+- Sleep (goal: Sleep)
+  Data obtained: top-level direction choice only.
+- Focus (goal: Focus)
+  Data obtained: top-level direction choice only.
+- Guide me (goal: mixed / unsure)
+  Data obtained: an "unsure" route choice instead of a fixed goal.
+- Worked for you last time (dynamic Home card)
+  Data obtained: no new input on the card itself; it reuses prior session data to replay a past pathway.
+- Recommended for you (dynamic Home card)
+  Data obtained: no new input on the card itself; it uses prior session history to launch a recommended pathway.
+
+CALM
+- Box Breathing
+  Data obtained: breathing comfort check, route choice (standard or no-hold), and guidance/hold adjustments during the exercise.
+- Progressive Muscle Relaxation
+  Data obtained: pain/injury/movement comfort check, mode choice, selected body region(s), and tension/release observations.
+- Thought or Fact
+  Data obtained: the user's thought text, optional refined claim, fragment classifications (fact / interpretation / prediction / catastrophe / feeling / open), evidence for, evidence against, alternatives, uncertainty points, optional feeling intensity, certainty before and after, balanced thought text, and an optional return phrase.
+  Learning record retained from the flow is intentionally coarse: classification, certainty shift, repeat mode, and whether saved copy was used.
+- Urge Surfing
+  Data obtained: coarse urge category, choice-window length, urge intensity before and after, action taken after the pause, and choice outcome.
+  Raw urge detail/body detail is intentionally not stored in the learning record.
+
+GROUND
+- 5-4-3-2-1 Grounding
+  Data obtained: sensory observations across sight, touch, sound, smell, and taste (or a neutral alternative), plus a final reconnection/orientation check.
+
+LIFT
+- Ignition Point
+  Data obtained: whether rest/safety is the real need, chosen pathway (Pleasure / Mastery / Connection / Dream), selected reachable option, how it was scaled to current capacity, first move, and whether it felt worthwhile.
+- The Happy Bump
+  Data obtained: baseline and current energy ratings, whether hydration and fresh-air/window steps were done, chosen walk environment, connection choice or skip, chosen tiny task, proud/grateful/looking-forward reflections, selected life area, selected area action, next-mode choice, and next-step planning details.
+  Productive next-step planning can capture activity, pairing, and reward. Comfort-focused planning can capture chosen senses, a comfort idea, and an optional custom soothing idea. The app can also save a broad combination such as environment, connection, life area, and next mode, and separately remembers last focus area/action.
+- Change the Scene
+  Data obtained: safety/movement fit, chosen scene shift (turn / doorway / room / outside), smallest transition preview, one noticed difference in the new setting, and what behaviour feels available next.
+- Countermove
+  Data obtained: the user's pull or avoidance pattern, whether that pull is protective/restorative/avoidant, chosen trajectory size (5 / 20 / 45 degree shift), selected countermove, and whether the situation felt more open afterward.
+
+FOCUS
+- Next Easiest Step
+  Data obtained: the main barrier to starting, the compressed next physical step, and whether the user can now begin that step.
+
+SLEEP
+- Tomorrow Parking Lot
+  Data obtained: one unfinished thought, responsibility, or task captured in a short line and parked for tomorrow.
+- Night Channel
+  Data obtained: chosen audio channel type (for example familiar voice, continuing story, interesting facts, gentle conversation, fictional world, or replay), familiarity/engagement tuning, and optional fade duration.
