@@ -437,16 +437,16 @@ const NEW_INTERVENTIONS = {
       { title: "Direct", body: "Choose what this movement could carry you into next.", holdSec: 30 },
     ],
   }),
-  reroute: newIntervention({
-    id: "reroute", name: "Reroute", category: "grounding", mechanism: "preferred-attention-redirection",
-    why: "A brief physical foothold can restore enough choice to redirect attention into a familiar, absorbing activity.",
-    targets: ["body", "thoughts"], states: ["overwhelmed", "anxious", "distressed"], directions: ["ground", "lift"],
-    durationMin: 3, cognitiveLoad: 1, eyes: "open", energy: "steady", intensityMin: 3, intensityMax: 8,
-    unsuitableSubstates: ["immediate-danger"], requiredResources: ["safe preferred activity"],
+  vectorShift: newIntervention({
+    id: "vectorShift", name: "Vector Shift", category: "grounding", mechanism: "precision-grounding",
+    why: "A sequence of visual tracking, navigation, code-building and scanning can redirect attention into a structured present-moment task.",
+    targets: ["body", "thoughts"], states: ["overwhelmed", "anxious", "distressed"], directions: ["ground", "calm"],
+    durationMin: 5, cognitiveLoad: 2, eyes: "open", energy: "steady", intensityMin: 3, intensityMax: 8,
+    unsuitableSubstates: ["immediate-danger"], requiredResources: ["screen interaction"],
     steps: [
-      { title: "Create a foothold", body: "Use one stable physical point for about ten seconds. No controlled breathing or prolonged scan.", holdSec: 10 },
-      { title: "Choose the destination", body: "Select a familiar, absorbing, comforting, active, social, funny or creative activity.", holdSec: 25 },
-      { title: "Open the route", body: "Remove the first piece of friction and leave Mentication for the real activity.", holdSec: 15 },
+      { title: "Align", body: "Track the moving target and establish a stable visual lock.", holdSec: 60 },
+      { title: "Navigate", body: "Guide the vector through a contained field of stabilising signals.", holdSec: 60 },
+      { title: "Build and scan", body: "Complete the grounding code and identify celestial anomalies before selecting a stabilisation signal.", holdSec: 150 },
     ],
   }),
   signalLock: newIntervention({
@@ -745,7 +745,7 @@ const CORE_25_SPECS = [
 
   // Ground (4)
   ["grounding54321V2", "ground"],
-  ["reroute", "ground"],
+  ["vectorShift", "ground"],
   ["orienting", "ground"],
   ["nameFeeling", "ground"],
 
@@ -775,7 +775,7 @@ const DIRECTION_OVERRIDES = {
   compassionBreak: ["lift", "calm"],
   valuesStep: ["lift", "focus"],
   grounding54321V2: ["ground", "calm"],
-  reroute: ["ground", "lift"],
+  vectorShift: ["ground", "calm"],
   orienting: ["ground", "calm"],
   fivePoints: ["ground", "calm"],
   objectFocus: ["ground", "calm"],

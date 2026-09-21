@@ -116,15 +116,15 @@ export const FLAGSHIP_REGISTRY = Object.freeze({
     primaryMechanism: "multisensory present-moment orientation", targetState: "overwhelm, disconnection or sensory narrowing",
     bestWhen: "Eyes-open contact with the immediate environment is useful", eligibleIntensity: [4, 10], preferredIntensity: [7, 10],
     cognitiveLoad: 1, arousalDirection: "lower", pathwayRole: ["rescue", "opener"], contextRequirements: ["eyes-open environment"],
-    interactionSignature: "sensory world progressively rebuilding", completionModel: "degree of reconnection with the immediate environment", eligibleHandoffs: ["reroute"],
+    interactionSignature: "sensory world progressively rebuilding", completionModel: "degree of reconnection with the immediate environment", eligibleHandoffs: ["vectorShift"],
   }),
-  reroute: meta({
-    id: "reroute", displayName: "Reroute", primaryGoal: "ground", secondaryGoals: ["lift"],
-    primaryMechanism: "brief physical orientation followed by preferred attentional redirection", targetState: "genuine distress where a long grounding sequence is unlikely to be usable",
-    bestWhen: "Immediate danger is absent and a familiar absorbing activity can restore choice", eligibleIntensity: [3, 8], preferredIntensity: [5, 8],
-    cognitiveLoad: 1, arousalDirection: "steady", pathwayRole: ["rescue", "opener"], contextRequirements: ["safe attentional redirection"],
-    contraindications: ["immediate danger", "urgent practical action", "unable to choose safely"], interactionSignature: "a stable point opening a route through visual interference",
-    completionModel: "whether attention gained a usable destination", eligibleHandoffs: ["nextAction", "openChannel"],
+  vectorShift: meta({
+    id: "vectorShift", displayName: "Vector Shift", primaryGoal: "ground", secondaryGoals: ["calm"],
+    primaryMechanism: "precision-grounding through attention, visual tracking and reassuring reframing", targetState: "feeling detached, unsettled or overloaded when active external focus is usable",
+    bestWhen: "Immediate danger is absent and a structured, game-like grounding protocol would help restore presence", eligibleIntensity: [3, 8], preferredIntensity: [5, 8],
+    cognitiveLoad: 2, arousalDirection: "steady", pathwayRole: ["rescue", "opener"], contextRequirements: ["screen interaction"],
+    contraindications: ["immediate danger", "urgent practical action", "unable to use a screen safely"], interactionSignature: "four precision challenges resolving into a stabilisation readout",
+    completionModel: "completion of the grounding protocol and selected stability signal", eligibleHandoffs: [],
   }),
   nextAction: meta({
     id: "nextAction", displayName: "Next Easiest Step", primaryGoal: "focus", secondaryGoals: ["lift"],
