@@ -11,6 +11,10 @@ account or application backend.
   `src/lib/localData.js`.
 - Narration resolves only from the checked-in manifest and bundled audio.
 - Fonts, visuals and intervention media are bundled into the application.
+- Signal Lock is available from the Intervention Library and runs from its
+  supplied offline build at `/signal-lock`; its static HTML and scene assets
+  are bundled in `public/signal-lock/` so its focus flow has no network or
+  third-party runtime dependency.
 - `ios/` is the native Xcode project used for App Store builds.
 - No hosted application platform, remote database, analytics SDK or external
   checkout is required at runtime.

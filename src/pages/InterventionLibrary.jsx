@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Search, X, ArrowRight } from "lucide-react";
+import { ChevronLeft, Search, X, ArrowRight, LockKeyhole } from "lucide-react";
 import { INTERVENTIONS } from "@/lib/interventions";
 
 const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "sleep"];
@@ -172,6 +172,30 @@ export default function InterventionLibrary() {
         </div>
 
         <div className="mt-8 flex flex-col gap-10">
+          <section aria-labelledby="signal-lock-heading">
+            <h2 id="signal-lock-heading" className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Focus session
+            </h2>
+            <button
+              type="button"
+              onClick={() => navigate("/signal-lock")}
+              className="no-tap group mt-3 flex w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary/30 hover:shadow-[0_12px_36px_-20px_hsl(179_69%_17%/0.22)] active:scale-[0.99]"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                <LockKeyhole className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-2">
+                  <span className="font-heading text-base font-medium tracking-tight text-foreground">Signal Lock</span>
+                  <span className="text-xs text-muted-foreground">· Focus</span>
+                </span>
+                <span className="mt-1 block text-sm leading-snug text-muted-foreground">
+                  A visual focus session with a task plan, timer, and reward.
+                </span>
+              </span>
+              <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </section>
           {grouped.map((g) => (
             <section key={g.category}>
               <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
