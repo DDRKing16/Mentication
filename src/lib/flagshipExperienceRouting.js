@@ -3,7 +3,7 @@
 export const INTERACTIVE_FLAGSHIP_IDS = Object.freeze([
   "factCheck", "urgeSurf", "activationMenu", "changeScene", "testPrediction", "thenWhat",
   "countermove", "openChannel", "pulseShift", "nextAction", "tomorrowParking",
-  "reroute", "signalLock", "nightChannel", "happyBump",
+  "vectorShift", "signalLock", "nightChannel", "happyBump",
 ]);
 
 export const isInteractiveFlagship = (id) => INTERACTIVE_FLAGSHIP_IDS.includes(id);

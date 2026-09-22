@@ -2,13 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Check, ChevronRight, ExternalLink, Focus, Headphones, Pause, Play, Plus, Radio } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FLAGSHIP_REGISTRY } from "@/lib/flagshipRegistry";
-import { clearActiveFlagship, getActiveFlagship, getFlagshipPreferences, recordHandoffDecision, rememberFlagshipEvent, saveActiveFlagship, saveNightChannelFeedbackPrompt } from "@/lib/flagshipMemory";
+import { clearActiveFlagship, getActiveFlagship, recordHandoffDecision, rememberFlagshipEvent, saveActiveFlagship, saveNightChannelFeedbackPrompt } from "@/lib/flagshipMemory";
 import { recommendHandoff } from "@/lib/flagshipHandoffs";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import InterventionControlShell from "@/components/InterventionControlShell";
 import HappyBumpExperience from "@/components/HappyBumpExperience";
 
-export const NEW_FLAGSHIP_IDS = Object.freeze(["reroute", "signalLock", "nightChannel", "happyBump"]);
+export const NEW_FLAGSHIP_IDS = Object.freeze(["vectorShift", "signalLock", "nightChannel", "happyBump"]);
 export const isNewFlagship = (id) => NEW_FLAGSHIP_IDS.includes(id);
 
 const optionClass = "min-h-14 rounded-2xl border border-white/15 bg-white/[0.06] p-4 text-left transition hover:border-[var(--nf-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--nf-accent)]";
@@ -34,7 +34,7 @@ function usePersistedExperience(id, initial) {
 
 function Shell({ id, stage, children, onBack, onExit, dark = false, active = false, paused = false, onPause, onSimplify }) {
   const meta = FLAGSHIP_REGISTRY[id];
-  const accent = id === "reroute" ? "#9ef0d0" : id === "signalLock" ? "#ffd36b" : "#9eb6ff";
+  const accent = id === "vectorShift" ? "#00ff88" : id === "signalLock" ? "#ffd36b" : "#9eb6ff";
   return <InterventionControlShell id={id} goal={meta.primaryGoal} title={meta.displayName} stage={stage} onBack={onBack} onExit={onExit} active={active} paused={paused} onPause={onPause} onSimplify={onSimplify || onBack} simplifyLabel={id === "signalLock" ? "Reduce the target" : "Make this route simpler"} onDifferent={onExit} dark={dark} accent={accent} className={`new-flagship nf-${id} ${dark ? "nf-dark" : ""}`} field={<div className="nf-field" aria-hidden="true"/>}>
     <div className="mx-auto flex min-h-[calc(100dvh-170px)] w-full max-w-3xl flex-col justify-center px-5 py-6">{children}</div>
   </InterventionControlShell>;
@@ -57,22 +57,37 @@ function launchIntervention(navigate, from, id, answers) {
   navigate("/reset", { replace: true, state: { prebuilt: true, pathway: [id], direction: meta.primaryGoal, directionLabel: meta.displayName, intensity: answers?.intensity || 5, whereFelt: "both", timeMin: 8, audio: answers?.audio || "yes" } });
 }
 
-export function RerouteExperience({ intervention, answers, onComplete, onAttemptEvent, onExit }) {
-  const navigate = useNavigate();
-  const [s, set] = usePersistedExperience("reroute", { stage: "safety", qualities: [] });
-  const saved = getFlagshipPreferences().events?.filter(e=>e.interventionId==="reroute" && e.options?.activity).slice(-1)[0]?.options?.activity;
-  const suggestions = saved ? [saved, "Continue a familiar episode or game", "Use a five-minute tactile or creative activity"] : ["Continue something familiar already in progress", "Use one saved piece of music or audio", "Choose a five-minute tactile or creative activity"];
-  const launch = (id) => launchIntervention(navigate, "reroute", id, answers);
-  const back = () => set(v=>({...v,stage:{foothold:"safety",qualities:"foothold",activity:"qualities",friction:"activity",away:"friction",return:"away",later:"return"}[v.stage]||"safety"}));
-  const finish = () => { rememberFlagshipEvent({interventionId:"reroute", completed:true, options:{activity:s.custom?"custom-activity":s.activity||"private-choice",qualities:s.qualities}}); clearActiveFlagship("reroute"); onAttemptEvent?.({interventionId:"reroute",mechanism:intervention.mechanism,action:"completed",completedPercentage:s.outcome==="couldnt"?.35:1,timestamp:Date.now()}); onComplete?.({interventionId:"reroute",data:s}); };
-  if (s.stage === "safety") return <Shell id="reroute" stage={1} onBack={onExit} onExit={onExit}><Panel eyebrow="Safety first" title="You don’t have to process everything right now." body="Reroute is short-term regulation. It does not make the underlying problem disappear."><div className="mt-6 grid gap-2">{[["safe","Redirection is safe right now"],["urgent","Urgent practical action is needed"],["danger","I may be in immediate danger"],["support","I need professional or crisis support"]].map(([v,l])=><button key={v} className={optionClass} onClick={()=>v==="safe"?set({...s,stage:"foothold"}):navigate("/support")}>{l}</button>)}</div></Panel></Shell>;
-  if (s.stage === "foothold") return <Shell id="reroute" stage={1} onBack={back} onExit={onExit}><Panel eyebrow="10-second foothold" title="Stabilise one point." body="Choose one physical fact. No timer, controlled breathing or full grounding sequence."><div className="mt-6 grid gap-2 sm:grid-cols-2">{["Press both feet into the floor","Feel the surface supporting you","Hold one solid object","Look at one stable feature","Press one hand into a safe surface"].map(x=><button key={x} className={optionClass} onClick={()=>set({...s,foothold:x,stage:"qualities"})}>{x}</button>)}</div></Panel></Shell>;
-  if (s.stage === "qualities") return <Shell id="reroute" stage={2} onBack={back} onExit={onExit}><Panel eyebrow="Choose the destination" title="Where should attention go instead?" body="Select every quality that would help right now."><div className="mt-6 flex flex-wrap gap-2">{["Familiar","Absorbing","Comforting","Active","Social","Funny","Creative"].map(q=><button aria-pressed={s.qualities.includes(q.toLowerCase())} key={q} onClick={()=>set({...s,qualities:s.qualities.includes(q.toLowerCase())?s.qualities.filter(x=>x!==q.toLowerCase()):[...s.qualities,q.toLowerCase()]})} className={`min-h-11 rounded-full border px-4 ${s.qualities.includes(q.toLowerCase())?"border-[var(--nf-accent)] bg-[var(--nf-accent)] text-slate-950":"border-white/15"}`}>{q}</button>)}</div><button disabled={!s.qualities.length} onClick={()=>set({...s,stage:"activity"})} className={`${primaryClass} mt-6`}>Show three routes</button></Panel></Shell>;
-  if (s.stage === "activity") return <Shell id="reroute" stage={2} onBack={back} onExit={onExit}><Panel eyebrow="Preferred routes" title="Choose a real destination." body="Mentication cannot open external services here, so it will only prepare the first action."><div className="mt-6 grid gap-2">{suggestions.map(x=><button key={x} className={optionClass} onClick={()=>set({...s,activity:x,destination:s.qualities.includes("social")?"social":"activity",stage:"friction"})}>{x}</button>)}</div><label className="mt-5 block text-sm text-white/60">Or name a deliberately chosen activity<input aria-label="Preferred activity" className="mt-2 min-h-12 w-full rounded-2xl border border-white/15 bg-black/20 px-4 text-white" value={s.custom||""} onChange={e=>set({...s,custom:e.target.value})}/></label><button disabled={!s.custom?.trim()} onClick={()=>set({...s,activity:s.custom.trim(),stage:"friction"})} className={`${primaryClass} mt-3`}>Use this activity</button></Panel></Shell>;
-  if (s.stage === "friction") return <Shell id="reroute" stage={3} onBack={back} onExit={onExit}><Panel eyebrow="Open the route" title={s.activity} body="Remove only the first piece of friction."><div className="mt-6 grid gap-2 sm:grid-cols-2">{["Put the needed item within reach","Open to the exact starting place","Make the first action take under 30 seconds","Prepare one editable message","Choose another route"].map(x=><button key={x} className={optionClass} onClick={()=>x==="Choose another route"?set({...s,stage:"activity"}):set({...s,friction:x,stage:"away",away:true})}>{x}</button>)}</div></Panel></Shell>;
-  if (s.stage === "away") return <Shell id="reroute" stage={3} onBack={back} onExit={onExit}><Panel eyebrow="Route open" title="Leave Mentication for the activity." body="There is no timer and no required return. Your place is saved if you come back."><button onClick={()=>set({...s,stage:"return",away:false})} className={`${primaryClass} mt-6`}>I came back</button><button onClick={onExit} className="mt-3 min-h-11 w-full text-sm text-white/55">Leave the app now</button></Panel></Shell>;
-  if (s.stage === "return") return <Shell id="reroute" stage={3} onBack={back} onExit={onExit}><Panel eyebrow="Optional return" title="What happened?" body="We are checking whether attention gained a usable destination—not whether distress disappeared."><div className="mt-6 grid gap-2">{[["settled","Attention settled elsewhere"],["weak","The activity was not absorbing enough"],["couldnt","Could not begin"],["support","Distress still needs support"]].map(([v,l])=><button key={v} className={optionClass} onClick={()=>v==="support"?navigate("/support"):v==="weak"?set({...s,qualities:[],stage:"qualities"}):set({...s,outcome:v,stage:"later"})}>{l}</button>)}</div></Panel></Shell>;
-  return <Shell id="reroute" stage={3} onBack={back} onExit={onExit}><Panel eyebrow="Choice restored" title="Does this still need attention later?" body="Only decide this now if the immediate state is manageable."><div className="mt-6 grid gap-2 sm:grid-cols-2">{["No","Return to it later","Take one practical action","Seek support"].map(x=><button key={x} className={optionClass} onClick={()=>set({...s,later:x})}>{x}</button>)}</div>{s.later&&<><Handoff from="reroute" context={{couldNotBegin:s.outcome==="couldnt",firstActionUnclear:s.outcome==="couldnt",destination:s.destination,safeContact:s.destination==="social"}} launch={launch}/><button onClick={finish} className={`${primaryClass} mt-5`}>Finish <Check className="ml-2 inline h-4 w-4"/></button></>}</Panel></Shell>;
+const VECTOR_WORDS = ["BREATHE", "PRESENT", "BALANCE", "ANCHORS", "RECOVER", "HOLDING", "RETURNS", "GROUNDS", "CALMING", "STABLES", "UNWINDS", "RELAXED"];
+const SCAN_TARGETS = [
+  ["LUNA", 64, 41], ["SATURN RINGS", 70, 58], ["MARS ICE CAP", 54, 62], ["COMET", 18, 20], ["GREAT RED SPOT", 48, 72],
+  ["PLEIADES", 84, 18], ["VENUS", 42, 36], ["ASTEROID BELT", 50, 55], ["SOLAR FLARE", 55, 48], ["TRITON", 88, 71],
+];
+
+export function VectorShiftExperience({ intervention, onComplete, onAttemptEvent, onExit }) {
+  const [s, set] = usePersistedExperience("vectorShift", { stage: "terminal", word: VECTOR_WORDS[0], letters: [], scan: [] });
+  const [pointer, setPointer] = useState({ x: 50, y: 50 });
+  const back = () => set((v) => ({ ...v, stage: ({ align: "terminal", serpent: "align", code: "serpent", scan: "code", reframe: "scan", complete: "reframe" })[v.stage] || "terminal" }));
+  const finish = () => {
+    rememberFlagshipEvent({ interventionId: "vectorShift", completed: true, options: { stages: 4, word: "captured", scanCount: s.scan.length } });
+    clearActiveFlagship("vectorShift");
+    onAttemptEvent?.({ interventionId: "vectorShift", mechanism: intervention.mechanism, action: "completed", completedPercentage: 1, timestamp: Date.now() });
+    onComplete?.({ interventionId: "vectorShift", data: s });
+  };
+  const chooseLetter = (letter) => {
+    if (s.letters.includes(letter)) return;
+    const letters = [...s.letters, letter];
+    set({ ...s, letters, stage: s.word.split("").every((item) => letters.includes(item)) ? "scan" : "code" });
+  };
+  const findTarget = (index) => set((v) => ({ ...v, scan: v.scan.includes(index) ? v.scan : [...v.scan, index], stage: v.scan.length + 1 === SCAN_TARGETS.length ? "reframe" : "scan" }));
+  const panel = (eyebrow, title, body, children) => <Shell id="vectorShift" stage={Math.min(3, Math.max(1, ["terminal", "align", "serpent", "code", "scan", "reframe", "complete"].indexOf(s.stage) - 1))} onBack={s.stage === "terminal" ? onExit : back} onExit={onExit} dark><Panel eyebrow={eyebrow} title={title} body={body}>{children}</Panel></Shell>;
+
+  if (s.stage === "terminal") return panel("Terminal // nominal", <>VECTOR<br />SHIFT</>, "Precision grounding protocol · 4.5 min", <div className="vs-terminal"><div className="vs-orbit" aria-hidden="true" /><button onClick={() => set({ ...s, stage: "align" })} className="vs-launch">▶<span>GROUND</span></button><p>Tap here to begin</p><small>VECTOR · 4 STEP · FELT SAFE</small></div>);
+  if (s.stage === "align") return panel("Perfect lock • bullseye", "Keep star in ring", "Drag or tap the field until the star meets the moving ring.", <div className="vs-align" onPointerMove={(event) => { const box = event.currentTarget.getBoundingClientRect(); setPointer({ x: ((event.clientX - box.left) / box.width) * 100, y: ((event.clientY - box.top) / box.height) * 100 }); }}><i className="vs-ring" style={{ left: "62%", top: "38%" }} /><button aria-label="Lock onto the target" className="vs-star" style={{ left: `${pointer.x}%`, top: `${pointer.y}%` }} onClick={() => set({ ...s, stage: "serpent" })}>✦</button><button onClick={() => set({ ...s, stage: "serpent" })} className={`${primaryClass} absolute bottom-4 left-4 right-4 w-auto`}>LOCK VECTOR</button></div>);
+  if (s.stage === "serpent") return panel("Vector serpent // nourished", "Navigate the field", "Use the directional controls to feed the serpent through 15 stabilising signals.", <div className="vs-serpent"><div className="vs-grid">{Array.from({ length: 144 }, (_, index) => <i key={index} className={index % 19 === 0 ? "is-serpent" : index === 89 ? "is-signal" : ""} />)}</div><div className="mt-4 grid grid-cols-3 gap-2"><span /><button className={optionClass} onClick={() => set({ ...s, stage: "code" })}>↑</button><span /><button className={optionClass} onClick={() => set({ ...s, stage: "code" })}>←</button><button className={optionClass} onClick={() => set({ ...s, stage: "code" })}>↓</button><button className={optionClass} onClick={() => set({ ...s, stage: "code" })}>→</button></div></div>);
+  if (s.stage === "code") return panel("Vector word // 7 letters", "Build the code", "Reveal every letter in the grounding word. Each choice keeps the vector moving.", <><div className="vs-word">{s.word.split("").map((letter, index) => <span key={`${letter}-${index}`}>{s.letters.includes(letter) ? letter : ""}</span>)}</div><div className="mt-6 grid grid-cols-7 gap-2">{Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map((letter) => <button key={letter} onClick={() => chooseLetter(letter)} disabled={s.letters.includes(letter)} className="vs-key">{letter}</button>)}</div></>);
+  if (s.stage === "scan") return panel(`Differences left: ${SCAN_TARGETS.length - s.scan.length}`, "Solar system scan", "Tap each real celestial anomaly to complete the vector.", <div className="vs-scan">{SCAN_TARGETS.map(([label, left, top], index) => <button key={label} aria-label={`Find ${label}`} className={`vs-target ${s.scan.includes(index) ? "is-found" : ""}`} style={{ left: `${left}%`, top: `${top}%` }} onClick={() => findTarget(index)}>{s.scan.includes(index) ? "✓" : "•"}</button>)}</div>);
+  if (s.stage === "reframe") return panel("Reframe", "What is 1% more stable now than at launch?", "No score is required. Choose the signal that feels closest.", <div className="mt-6 grid gap-2"><button className={optionClass} onClick={() => set({ ...s, stage: "complete", reframe: "My hands / breath / focus" })}>My hands, breath, or focus</button><button className={optionClass} onClick={() => set({ ...s, stage: "complete", reframe: "The screen feels calmer" })}>The screen feels calmer</button></div>);
+  return panel("Vector stabilizing", "You steered the vector", <><span className="vs-status" />State is stabilizing. You’re returning.</>, <><p className="mt-6 text-sm italic text-white/70">No scores. Just noticing you’re more here than when you launched. That’s the work.</p><button onClick={finish} className={`${primaryClass} mt-6`}>DONE <Check className="ml-2 inline h-4 w-4" /></button></>);
 }
 
 const vagueTarget = (value="") => /^(study|do admin|work on (the )?project|clean the house|work)$/i.test(value.trim()) || value.trim().split(/\s+/).length < 3;
@@ -122,7 +137,7 @@ export function NightChannelExperience({ intervention, onAttemptEvent, onExit })
 
 export default function NewFlagshipExperience(props) {
   if(props.intervention.id==="happyBump")return <HappyBumpExperience {...props}/>;
-  if(props.intervention.id==="reroute")return <RerouteExperience {...props}/>;
+  if(props.intervention.id==="vectorShift")return <VectorShiftExperience {...props}/>;
   if(props.intervention.id==="signalLock")return <SignalLockExperience {...props}/>;
   return <NightChannelExperience {...props}/>;
 }

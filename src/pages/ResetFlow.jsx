@@ -603,9 +603,9 @@ export default function ResetFlow() {
           {usedIds.includes("grounding54321V2") && improved > 0 && v >= 4 && (
             <div className="mt-5 w-full max-w-md rounded-3xl border border-border bg-card p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Optional next route</p>
-              <h2 className="mt-2 font-heading text-xl text-primary">Reroute</h2>
-              <p className="mt-2 text-sm text-muted-foreground">You appear more oriented, but attention may still need somewhere safe and absorbing to go.</p>
-              <button onClick={()=>{recordHandoffDecision("grounding54321V2","reroute","accepted");navigate("/reset",{replace:true,state:{prebuilt:true,pathway:["reroute"],direction:"ground",directionLabel:"Reroute",intensity:v,whereFelt:"both",timeMin:3,audio:answers.audio||"yes"}})}} className="mt-4 min-h-11 w-full rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground">Begin Reroute with my consent</button>
+              <h2 className="mt-2 font-heading text-xl text-primary">Vector Shift</h2>
+              <p className="mt-2 text-sm text-muted-foreground">You appear more oriented; a short precision-grounding protocol can help consolidate that return.</p>
+              <button onClick={()=>{recordHandoffDecision("grounding54321V2","vectorShift","accepted");navigate("/reset",{replace:true,state:{prebuilt:true,pathway:["vectorShift"],direction:"ground",directionLabel:"Vector Shift",intensity:v,whereFelt:"both",timeMin:5,audio:answers.audio||"yes"}})}} className="mt-4 min-h-11 w-full rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground">Begin Vector Shift with my consent</button>
             </div>
           )}
 

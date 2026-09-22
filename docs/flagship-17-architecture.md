@@ -6,7 +6,7 @@ The active intervention catalogue contains 25 unique interventions. Seventeen ar
 
 ## New flagships
 
-- `reroute` — Ground/Lift. Brief safety check, one physical foothold, multi-select activity qualities, preference-aware activity selection, friction reduction, persistent external-action state and optional return.
+- `vectorShift` — Ground/Calm. A four-stage precision-grounding protocol: visual alignment, serpent navigation, a grounding code and solar scan, followed by a no-score stabilisation signal.
 - `signalLock` — Focus/Lift. Observable-target validation, editable scaffolding, 3/8/15/custom sprint selection, selective perimeter clearing, background-safe timestamp countdown, pause/resume, private distraction count and outcome calibration.
 - `nightChannel` — Sleep/Calm. Channel and engagement selection, honest source availability, flexible visual fade preference, near-black playback hand-off and optional delayed daytime feedback.
 
@@ -18,4 +18,4 @@ Sensitive task, activity and audio-title text is held only in local active-state
 
 ## Handoffs
 
-The handoff registry adds Grounding → Reroute, Reroute → Next Easiest Step/Open Channel, Countermove → Reroute, Next Easiest Step → Signal Lock, Signal Lock → Next Easiest Step and Tomorrow Parking Lot → Night Channel. Existing dismissal memory, consent and circular-routing protections apply.
+The handoff registry adds Grounding → Vector Shift, Countermove → Vector Shift, Next Easiest Step → Signal Lock, Signal Lock → Next Easiest Step and Tomorrow Parking Lot → Night Channel. Existing dismissal memory, consent and circular-routing protections apply.

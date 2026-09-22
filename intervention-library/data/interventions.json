@@ -37,7 +37,7 @@
       "designSystem": "Sequential Discovery",
       "purpose": "An eyes-open sensory orientation experience for overwhelm, disconnection or narrowed attention. It rebuilds contact with the immediate environment one sense at a time without asking the user to analyse why they feel this way.",
       "psychoeducation": "Grounding uses present sensory information to redirect attention toward the here and now. The exact 5-4-3-2-1 sequence is widely used, but direct efficacy research on that specific sequence remains limited.",
-      "flow": ["Check immediate safety and orient eyes open", "See five", "Feel four", "Hear three", "Smell two", "Taste one or use a neutral alternative", "Notice reconnection", "Finish or reroute attention"],
+      "flow": ["Check immediate safety and orient eyes open", "See five", "Feel four", "Hear three", "Smell two", "Taste one or use a neutral alternative", "Notice reconnection", "Finish or continue with Vector Shift"],
       "visualAudio": "A quiet world progressively rebuilds through light, ripple, wave, wisp and droplet layers. Each sense has one tactile sound identity; narration is optional and every gesture has a large tap target.",
       "upgrade": "Discovery replaces a checklist: the environment visibly returns as senses are named. Counts can be shortened, inaccessible senses skipped, and success is orientation rather than symptom disappearance.",
       "evidenceGrade": "C: mechanism-informed; exact sequence under-studied",
@@ -185,18 +185,18 @@
       "limits": "The meta-analysis found substantial heterogeneity and typically studied exercise bouts, not tiny movements. This is not medical or exercise advice."
     },
     {
-      "id": "reroute",
-      "name": "Reroute",
+      "id": "vectorShift",
+      "name": "Vector Shift",
       "goal": "Ground",
-      "designSystem": "Spatial Attention Mapping",
-      "purpose": "A brief orientation and attentional-redirection experience for genuine distress when a longer grounding exercise is unlikely to be usable. It gives attention one safe, absorbing destination while preserving the option to return to the problem later.",
-      "psychoeducation": "Distraction can reduce emotional impact in some contexts, but its usefulness depends on the emotion, timing and purpose. Reroute is a deliberate short-term shift of attention, not suppression or a claim that the problem no longer matters.",
-      "flow": ["Check immediate danger and urgent practical action", "Orient to one stable point", "Choose Social, Sensory, Familiar, Active or Absorbing destination", "Select a reachable route", "Take the first action", "Leave the app", "Notice whether attention entered", "Return, repeat once or choose another mechanism"],
-      "visualAudio": "Visual interference clears around one stable point, then a single route opens through the field. Directional sound follows the route; reduced-motion mode swaps travelling lines for progressive contrast.",
-      "upgrade": "The tool distinguishes deliberate redirection from avoidance, asks whether attention actually entered, and hands to Next Easiest Step when the destination fits but the first action is unclear.",
-      "evidenceGrade": "C: mechanism-informed attentional deployment",
+      "designSystem": "Precision Grounding Protocol",
+      "purpose": "A four-stage visual grounding experience for feeling detached, unsettled or overloaded. It directs attention through alignment, navigation, code-building and anomaly scanning before a no-score stabilisation check.",
+      "psychoeducation": "Structured external attention tasks can offer a short-term present-moment anchor. Vector Shift does not claim to resolve the underlying problem or replace urgent practical action.",
+      "flow": ["Launch the grounding terminal", "Lock the moving star in the alignment ring", "Navigate the vector serpent", "Build the seven-letter grounding code", "Find ten celestial anomalies", "Select a 1% stabilisation signal", "Finish or leave the app"],
+      "visualAudio": "A deep green terminal field, neon vector indicators, grid navigation and a celestial scan progressively resolve into a quiet stabilisation state. Reduced-motion mode preserves all challenge controls without continuous animation.",
+      "upgrade": "The protocol supplies four concrete, screen-contained attention tasks and an optional reframe rather than asking the person to create an external destination.",
+      "evidenceGrade": "C: mechanism-informed attentional grounding",
       "sources": ["https://pubmed.ncbi.nlm.nih.gov/22582737/"],
-      "limits": "The meta-analysis found strategy and context differences; attentional deployment was not uniformly effective. Do not use when urgent safety or practical action is required."
+      "limits": "This is not crisis support and should not be used when urgent safety or practical action is required. It requires a usable screen and may not suit sensory-sensitive users."
     },
     {
       "id": "nextAction",

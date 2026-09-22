@@ -109,7 +109,7 @@ describe('recommendation engine v2 basics', () => {
       'countermove',
       'openChannel',
       'pulseShift',
-      'reroute',
+      'vectorShift',
       'signalLock',
       'nightChannel',
     ];
@@ -134,10 +134,10 @@ describe('recommendation engine v2 basics', () => {
     expect(handoffRules().length).toBeGreaterThanOrEqual(14);
     expect(recommendHandoff('factCheck', { classification: 'prediction', safelyTestable: true })?.to).toBe('testPrediction');
     expect(recommendHandoff('thenWhat', { presentAction: 'yes' })?.to).toBe('nextAction');
-    expect(recommendHandoff('reroute', { couldNotBegin: true })?.to).toBe('nextAction');
+    expect(recommendHandoff('grounding54321V2', { orientationImproved: true, needsDestination: true })?.to).toBe('vectorShift');
     expect(recommendHandoff('signalLock', { targetUnstartable: true })?.to).toBe('nextAction');
     expect(recommendHandoff('tomorrowParking', { parkedNow: true, audioAllowed: true })?.to).toBe('nightChannel');
-    expect(recommendHandoff('countermove', { pull: 'isolate', relational: true, directActionTooDemanding: true })?.to).toBe('reroute');
+    expect(recommendHandoff('countermove', { pull: 'isolate', relational: true, directActionTooDemanding: true })?.to).toBe('vectorShift');
     expect(handoffRules().every((rule) => FLAGSHIP_REGISTRY[rule.from] && FLAGSHIP_REGISTRY[rule.to])).toBe(true);
     expect(handoffRules().every((rule) => rule.from !== rule.to)).toBe(true);
   });

@@ -46,7 +46,6 @@ HEROES = {
     "openChannel": ASSET_DIR / "open-channel-hero.png",
     "countermove": ROOT / "intervention-library/source-assets/Countermove/01-opening-pull.png",
     "pulseShift": ASSET_DIR / "pulse-shift-hero.png",
-    "reroute": ASSET_DIR / "reroute-hero.png",
     "nextAction": ROOT / "intervention-library/source-assets/Next_Easiest_Step/01_Focus_Target_and_Barrier.png",
     "signalLock": ASSET_DIR / "signal-lock-hero.png",
     "tomorrowParking": ROOT / "intervention-library/source-assets/Tomorrow_Parking_Lot/03_Parked_and_Darkness.png",
