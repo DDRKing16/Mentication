@@ -11,5 +11,11 @@ export default defineConfig({
   },
   plugins: [
     react(),
-  ]
+  ],
+  test: {
+    // The .claude/worktrees folder holds separate, isolated agent
+    // checkouts of this same repo. Their test files must never be picked
+    // up when running tests from the main checkout.
+    exclude: ['**/node_modules/**', '**/dist/**', '.claude/**'],
+  },
 });

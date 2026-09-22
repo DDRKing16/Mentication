@@ -9,6 +9,7 @@ export default [
     ignores: [
       "**/node_modules/**",
       "**/dist/**",
+      ".claude/**",
       "**/generate-pmr-narration-direct*.mjs",
       "**/generate-pmr-narration-direct*.js",
       "src/lib/**/*",

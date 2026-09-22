@@ -13,17 +13,10 @@ import {
   ArrowLeft, 
   ArrowRight,
   Sparkles,
-  Volume2,
   Trash2,
   Info,
   Mic,
-  MicOff,
-  User,
-  Activity,
-  Heart,
   Calendar,
-  Send,
-  Sliders,
   Sparkle
 } from "lucide-react";
 

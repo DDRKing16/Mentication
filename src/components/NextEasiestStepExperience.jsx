@@ -3,7 +3,6 @@ import {
   ChevronLeft, 
   Pause, 
   Play,
-  Smile,
   Sparkles,
   Briefcase,
   BookOpen,
@@ -12,14 +11,10 @@ import {
   Utensils,
   Activity,
   Package,
-  Volume2,
-  Heart,
-  RefreshCw,
   Clock,
   X,
   Home
 } from "lucide-react";
-import { Logo } from "./Logo";
 import { consumeNextStepHandoff } from "@/lib/tomorrowParking/storage";
 
 // Category to Lucide icon mapping for Image 1 premium grid
