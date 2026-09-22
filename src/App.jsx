@@ -18,9 +18,14 @@ import { hasCompletedOnboarding } from '@/lib/onboarding';
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
 // inside AppShell so they can be kept mounted across tab switches.
 const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
+const NextEasiestStepExperience = lazy(() => import('@/components/NextEasiestStepExperience'));
 const Crisis = lazy(() => import('@/pages/Crisis'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Welcome = lazy(() => import('@/pages/Welcome'));
+const Journal = lazy(() => import('@/pages/Journal'));
+const Dear2100 = lazy(() => import('@/pages/Dear2100'));
+const NightChannel = lazy(() => import('@/pages/NightChannel'));
+const ParkingLot = lazy(() => import('@/pages/ParkingLot'));
 const SignalLock = lazy(() => import('@/pages/SignalLock'));
 
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
@@ -76,6 +81,12 @@ const MenticationRoutes = () => {
               </Route>
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/reset" element={<ResetFlow />} />
+              <Route path="/next-easiest-step" element={<NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} />} />
+              <Route path="/next-easiest-step-v2" element={<NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} />} />
+              <Route path="/journal" element={<Journal />} />
+              <Route path="/dear-2100" element={<Dear2100 />} />
+              <Route path="/night-channel" element={<NightChannel />} />
+              <Route path="/parking-lot" element={<ParkingLot />} />
               <Route path="/support" element={<Crisis />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />

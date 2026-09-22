@@ -13022,5 +13022,1089 @@
         "end": 4.69
       }
     ]
+  },
+  "49c69ca6a7d78969b01ae2840fe4d51de89ded2d6995370ad2d3283e485237e1": {
+    "text": "Change the scene. Shift the moment, one small move at a time.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/49c69ca6a7d78969b01ae2840fe4d51de89ded2d6995370ad2d3283e485237e1.mp3",
+    "alignment": [
+      {
+        "word": "Change",
+        "start": 0,
+        "end": 0.43
+      },
+      {
+        "word": "the",
+        "start": 0.476,
+        "end": 0.546
+      },
+      {
+        "word": "scene.",
+        "start": 0.592,
+        "end": 1.126
+      },
+      {
+        "word": "Shift",
+        "start": 1.428,
+        "end": 1.753
+      },
+      {
+        "word": "the",
+        "start": 1.8,
+        "end": 1.869
+      },
+      {
+        "word": "moment,",
+        "start": 1.927,
+        "end": 2.647
+      },
+      {
+        "word": "one",
+        "start": 2.786,
+        "end": 3.111
+      },
+      {
+        "word": "small",
+        "start": 3.17,
+        "end": 3.495
+      },
+      {
+        "word": "move",
+        "start": 3.576,
+        "end": 3.889
+      },
+      {
+        "word": "at",
+        "start": 3.936,
+        "end": 4.029
+      },
+      {
+        "word": "a",
+        "start": 4.087,
+        "end": 4.11
+      },
+      {
+        "word": "time.",
+        "start": 4.18,
+        "end": 4.923
+      }
+    ]
+  },
+  "d7b6e45fe14970a2b2c812c740791c32e96cb0539bc333bffb249db90d44080f": {
+    "text": "Move, just a little. Move to a different spot in the room. Even a few steps counts.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/d7b6e45fe14970a2b2c812c740791c32e96cb0539bc333bffb249db90d44080f.mp3",
+    "alignment": [
+      {
+        "word": "Move,",
+        "start": 0,
+        "end": 0.569
+      },
+      {
+        "word": "just",
+        "start": 0.627,
+        "end": 0.859
+      },
+      {
+        "word": "a",
+        "start": 0.906,
+        "end": 0.952
+      },
+      {
+        "word": "little.",
+        "start": 0.998,
+        "end": 1.474
+      },
+      {
+        "word": "Move",
+        "start": 1.683,
+        "end": 2.043
+      },
+      {
+        "word": "to",
+        "start": 2.09,
+        "end": 2.159
+      },
+      {
+        "word": "a",
+        "start": 2.241,
+        "end": 2.264
+      },
+      {
+        "word": "different",
+        "start": 2.322,
+        "end": 2.67
+      },
+      {
+        "word": "spot",
+        "start": 2.717,
+        "end": 2.972
+      },
+      {
+        "word": "in",
+        "start": 3.03,
+        "end": 3.077
+      },
+      {
+        "word": "the",
+        "start": 3.123,
+        "end": 3.193
+      },
+      {
+        "word": "room.",
+        "start": 3.251,
+        "end": 3.68
+      },
+      {
+        "word": "Even",
+        "start": 3.82,
+        "end": 4.133
+      },
+      {
+        "word": "a",
+        "start": 4.18,
+        "end": 4.203
+      },
+      {
+        "word": "few",
+        "start": 4.272,
+        "end": 4.505
+      },
+      {
+        "word": "steps",
+        "start": 4.563,
+        "end": 4.923
+      },
+      {
+        "word": "counts.",
+        "start": 4.992,
+        "end": 5.851
+      }
+    ]
+  },
+  "042a39362fa7fde9f5b2335be48c5ef33844c06748dbc9b05e3b83330450231f": {
+    "text": "Get some water. Grab a glass of water, and take a few slow sips.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/042a39362fa7fde9f5b2335be48c5ef33844c06748dbc9b05e3b83330450231f.mp3",
+    "alignment": [
+      {
+        "word": "Get",
+        "start": 0,
+        "end": 0.244
+      },
+      {
+        "word": "some",
+        "start": 0.302,
+        "end": 0.464
+      },
+      {
+        "word": "water.",
+        "start": 0.488,
+        "end": 1.045
+      },
+      {
+        "word": "Grab",
+        "start": 1.115,
+        "end": 1.358
+      },
+      {
+        "word": "a",
+        "start": 1.405,
+        "end": 1.428
+      },
+      {
+        "word": "glass",
+        "start": 1.451,
+        "end": 1.718
+      },
+      {
+        "word": "of",
+        "start": 1.765,
+        "end": 1.811
+      },
+      {
+        "word": "water,",
+        "start": 1.881,
+        "end": 2.426
+      },
+      {
+        "word": "and",
+        "start": 2.45,
+        "end": 2.612
+      },
+      {
+        "word": "take",
+        "start": 2.67,
+        "end": 2.914
+      },
+      {
+        "word": "a",
+        "start": 2.961,
+        "end": 2.984
+      },
+      {
+        "word": "few",
+        "start": 3.053,
+        "end": 3.297
+      },
+      {
+        "word": "slow",
+        "start": 3.367,
+        "end": 3.634
+      },
+      {
+        "word": "sips.",
+        "start": 3.715,
+        "end": 4.551
+      }
+    ]
+  },
+  "0f433b7ee66a46964686cab50d5e05b5339dd32ee5c468c97a3048fffe45d5a2": {
+    "text": "Step outside. Take thirty seconds outside. Bring your phone, and feel the air change.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/0f433b7ee66a46964686cab50d5e05b5339dd32ee5c468c97a3048fffe45d5a2.mp3",
+    "alignment": [
+      {
+        "word": "Step",
+        "start": 0,
+        "end": 0.325
+      },
+      {
+        "word": "outside.",
+        "start": 0.395,
+        "end": 1.161
+      },
+      {
+        "word": "Take",
+        "start": 1.231,
+        "end": 1.567
+      },
+      {
+        "word": "thirty",
+        "start": 1.614,
+        "end": 1.985
+      },
+      {
+        "word": "seconds",
+        "start": 2.043,
+        "end": 2.496
+      },
+      {
+        "word": "outside.",
+        "start": 2.554,
+        "end": 3.262
+      },
+      {
+        "word": "Bring",
+        "start": 3.332,
+        "end": 3.564
+      },
+      {
+        "word": "your",
+        "start": 3.634,
+        "end": 3.773
+      },
+      {
+        "word": "phone,",
+        "start": 3.82,
+        "end": 4.238
+      },
+      {
+        "word": "and",
+        "start": 4.284,
+        "end": 4.435
+      },
+      {
+        "word": "feel",
+        "start": 4.516,
+        "end": 4.76
+      },
+      {
+        "word": "the",
+        "start": 4.818,
+        "end": 4.888
+      },
+      {
+        "word": "air",
+        "start": 4.969,
+        "end": 5.132
+      },
+      {
+        "word": "change.",
+        "start": 5.19,
+        "end": 6.037
+      }
+    ]
+  },
+  "486bd6b4a84c7045f5517cf091213bd90480d779f75af1b20a0609883320946f": {
+    "text": "Send one text. Send something small. Connection counts.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/486bd6b4a84c7045f5517cf091213bd90480d779f75af1b20a0609883320946f.mp3",
+    "alignment": [
+      {
+        "word": "Send",
+        "start": 0,
+        "end": 0.302
+      },
+      {
+        "word": "one",
+        "start": 0.383,
+        "end": 0.569
+      },
+      {
+        "word": "text.",
+        "start": 0.615,
+        "end": 1.184
+      },
+      {
+        "word": "Send",
+        "start": 1.231,
+        "end": 1.474
+      },
+      {
+        "word": "something",
+        "start": 1.521,
+        "end": 1.846
+      },
+      {
+        "word": "small.",
+        "start": 1.916,
+        "end": 2.403
+      },
+      {
+        "word": "Connection",
+        "start": 2.45,
+        "end": 3.007
+      },
+      {
+        "word": "counts.",
+        "start": 3.077,
+        "end": 3.855
+      }
+    ]
+  },
+  "317822515eb491df647b8287aef4583e95ee38e6a99ab8d2e7f5f8c96d284228": {
+    "text": "Find a quiet corner. Choose somewhere different. Get comfortable, and let your body soften.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/317822515eb491df647b8287aef4583e95ee38e6a99ab8d2e7f5f8c96d284228.mp3",
+    "alignment": [
+      {
+        "word": "Find",
+        "start": 0,
+        "end": 0.348
+      },
+      {
+        "word": "a",
+        "start": 0.406,
+        "end": 0.43
+      },
+      {
+        "word": "quiet",
+        "start": 0.488,
+        "end": 0.859
+      },
+      {
+        "word": "corner.",
+        "start": 0.929,
+        "end": 1.463
+      },
+      {
+        "word": "Choose",
+        "start": 1.544,
+        "end": 1.916
+      },
+      {
+        "word": "somewhere",
+        "start": 1.939,
+        "end": 2.276
+      },
+      {
+        "word": "different.",
+        "start": 2.322,
+        "end": 2.995
+      },
+      {
+        "word": "Get",
+        "start": 3.1,
+        "end": 3.309
+      },
+      {
+        "word": "comfortable,",
+        "start": 3.379,
+        "end": 4.098
+      },
+      {
+        "word": "and",
+        "start": 4.168,
+        "end": 4.342
+      },
+      {
+        "word": "let",
+        "start": 4.4,
+        "end": 4.54
+      },
+      {
+        "word": "your",
+        "start": 4.586,
+        "end": 4.702
+      },
+      {
+        "word": "body",
+        "start": 4.76,
+        "end": 5.027
+      },
+      {
+        "word": "soften.",
+        "start": 5.097,
+        "end": 5.898
+      }
+    ]
+  },
+  "6bbbbb91de3e12094dd694a6eecac97a2ee9d877c7957568f410ffccddeee130": {
+    "text": "Plan one thing. Put one real thing on the horizon. A dinner, a class, a lesson, or an activity.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/6bbbbb91de3e12094dd694a6eecac97a2ee9d877c7957568f410ffccddeee130.mp3",
+    "alignment": [
+      {
+        "word": "Plan",
+        "start": 0,
+        "end": 0.337
+      },
+      {
+        "word": "one",
+        "start": 0.441,
+        "end": 0.639
+      },
+      {
+        "word": "thing.",
+        "start": 0.685,
+        "end": 1.219
+      },
+      {
+        "word": "Put",
+        "start": 1.428,
+        "end": 1.672
+      },
+      {
+        "word": "one",
+        "start": 1.753,
+        "end": 2.032
+      },
+      {
+        "word": "real",
+        "start": 2.113,
+        "end": 2.438
+      },
+      {
+        "word": "thing",
+        "start": 2.519,
+        "end": 2.821
+      },
+      {
+        "word": "on",
+        "start": 2.937,
+        "end": 3.065
+      },
+      {
+        "word": "the",
+        "start": 3.123,
+        "end": 3.193
+      },
+      {
+        "word": "horizon.",
+        "start": 3.251,
+        "end": 4.029
+      },
+      {
+        "word": "A",
+        "start": 4.11,
+        "end": 4.191
+      },
+      {
+        "word": "dinner,",
+        "start": 4.272,
+        "end": 4.725
+      },
+      {
+        "word": "a",
+        "start": 4.795,
+        "end": 4.876
+      },
+      {
+        "word": "class,",
+        "start": 4.946,
+        "end": 5.538
+      },
+      {
+        "word": "a",
+        "start": 5.584,
+        "end": 5.654
+      },
+      {
+        "word": "lesson,",
+        "start": 5.759,
+        "end": 6.281
+      },
+      {
+        "word": "or",
+        "start": 6.351,
+        "end": 6.502
+      },
+      {
+        "word": "an",
+        "start": 6.56,
+        "end": 6.606
+      },
+      {
+        "word": "activity.",
+        "start": 6.653,
+        "end": 7.709
+      }
+    ]
+  },
+  "f6918ba48894534b90d38dc63b1062d46b2be91c436640afc471c4eafce185b2": {
+    "text": "Scene changed. Notice what shifted, even slightly. Carry that change into your day.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/f6918ba48894534b90d38dc63b1062d46b2be91c436640afc471c4eafce185b2.mp3",
+    "alignment": [
+      {
+        "word": "Scene",
+        "start": 0,
+        "end": 0.372
+      },
+      {
+        "word": "changed.",
+        "start": 0.43,
+        "end": 1.184
+      },
+      {
+        "word": "Notice",
+        "start": 1.324,
+        "end": 1.823
+      },
+      {
+        "word": "what",
+        "start": 1.846,
+        "end": 2.02
+      },
+      {
+        "word": "shifted,",
+        "start": 2.078,
+        "end": 2.659
+      },
+      {
+        "word": "even",
+        "start": 2.74,
+        "end": 3.053
+      },
+      {
+        "word": "slightly.",
+        "start": 3.1,
+        "end": 3.75
+      },
+      {
+        "word": "Carry",
+        "start": 3.831,
+        "end": 4.156
+      },
+      {
+        "word": "that",
+        "start": 4.214,
+        "end": 4.354
+      },
+      {
+        "word": "change",
+        "start": 4.423,
+        "end": 4.83
+      },
+      {
+        "word": "into",
+        "start": 4.888,
+        "end": 5.097
+      },
+      {
+        "word": "your",
+        "start": 5.155,
+        "end": 5.294
+      },
+      {
+        "word": "day.",
+        "start": 5.341,
+        "end": 5.851
+      }
+    ]
+  },
+  "fa7bead2265de81d42d21e9fbbb211003101908e5eb2d4b8255c051f5a8ab8aa": {
+    "text": "Click the play button below to shift the moment with a small step.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/fa7bead2265de81d42d21e9fbbb211003101908e5eb2d4b8255c051f5a8ab8aa.mp3",
+    "alignment": [
+      {
+        "word": "Click",
+        "start": 0,
+        "end": 0.36
+      },
+      {
+        "word": "the",
+        "start": 0.418,
+        "end": 0.488
+      },
+      {
+        "word": "play",
+        "start": 0.511,
+        "end": 0.755
+      },
+      {
+        "word": "button",
+        "start": 0.824,
+        "end": 1.173
+      },
+      {
+        "word": "below",
+        "start": 1.231,
+        "end": 1.66
+      },
+      {
+        "word": "to",
+        "start": 1.8,
+        "end": 1.927
+      },
+      {
+        "word": "shift",
+        "start": 2.009,
+        "end": 2.345
+      },
+      {
+        "word": "the",
+        "start": 2.403,
+        "end": 2.473
+      },
+      {
+        "word": "moment",
+        "start": 2.543,
+        "end": 3.007
+      },
+      {
+        "word": "with",
+        "start": 3.065,
+        "end": 3.204
+      },
+      {
+        "word": "a",
+        "start": 3.251,
+        "end": 3.274
+      },
+      {
+        "word": "small",
+        "start": 3.332,
+        "end": 3.669
+      },
+      {
+        "word": "step.",
+        "start": 3.738,
+        "end": 4.505
+      }
+    ]
+  },
+  "463579ef1def8644f057c34f954e8ceb057b6d5a53d68b04c125adfeb290f4f5": {
+    "text": "Move to a different spot in the room.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/463579ef1def8644f057c34f954e8ceb057b6d5a53d68b04c125adfeb290f4f5.mp3",
+    "alignment": [
+      {
+        "word": "Move",
+        "start": 0,
+        "end": 0.348
+      },
+      {
+        "word": "to",
+        "start": 0.372,
+        "end": 0.441
+      },
+      {
+        "word": "a",
+        "start": 0.511,
+        "end": 0.534
+      },
+      {
+        "word": "different",
+        "start": 0.58,
+        "end": 0.998
+      },
+      {
+        "word": "spot",
+        "start": 1.045,
+        "end": 1.312
+      },
+      {
+        "word": "in",
+        "start": 1.37,
+        "end": 1.44
+      },
+      {
+        "word": "the",
+        "start": 1.486,
+        "end": 1.556
+      },
+      {
+        "word": "room.",
+        "start": 1.602,
+        "end": 2.229
+      }
+    ]
+  },
+  "034f0cd1a21a5403dc62931e2f0492599fb37fabc0931a58787ef747415abc6d": {
+    "text": "Grab a glass of water. Take a few slow sips.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/034f0cd1a21a5403dc62931e2f0492599fb37fabc0931a58787ef747415abc6d.mp3",
+    "alignment": [
+      {
+        "word": "Grab",
+        "start": 0,
+        "end": 0.279
+      },
+      {
+        "word": "a",
+        "start": 0.337,
+        "end": 0.36
+      },
+      {
+        "word": "glass",
+        "start": 0.383,
+        "end": 0.685
+      },
+      {
+        "word": "of",
+        "start": 0.731,
+        "end": 0.801
+      },
+      {
+        "word": "water.",
+        "start": 0.871,
+        "end": 1.405
+      },
+      {
+        "word": "Take",
+        "start": 1.451,
+        "end": 1.776
+      },
+      {
+        "word": "a",
+        "start": 1.823,
+        "end": 1.846
+      },
+      {
+        "word": "few",
+        "start": 1.916,
+        "end": 2.159
+      },
+      {
+        "word": "slow",
+        "start": 2.229,
+        "end": 2.531
+      },
+      {
+        "word": "sips.",
+        "start": 2.601,
+        "end": 3.39
+      }
+    ]
+  },
+  "b25ba127b4181370458f0e3faf7024273f8a622ba4e8192123fc2f0199ef4cf7": {
+    "text": "Take thirty seconds outside. Bring your phone.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/b25ba127b4181370458f0e3faf7024273f8a622ba4e8192123fc2f0199ef4cf7.mp3",
+    "alignment": [
+      {
+        "word": "Take",
+        "start": 0,
+        "end": 0.325
+      },
+      {
+        "word": "thirty",
+        "start": 0.372,
+        "end": 0.708
+      },
+      {
+        "word": "seconds",
+        "start": 0.778,
+        "end": 1.173
+      },
+      {
+        "word": "outside.",
+        "start": 1.231,
+        "end": 1.95
+      },
+      {
+        "word": "Bring",
+        "start": 2.032,
+        "end": 2.276
+      },
+      {
+        "word": "your",
+        "start": 2.334,
+        "end": 2.473
+      },
+      {
+        "word": "phone.",
+        "start": 2.519,
+        "end": 3.204
+      }
+    ]
+  },
+  "e55a586b9c1ce0b8a856ebbf79452b56b4afbf80970d1a5003c624c59ed91d96": {
+    "text": "Send a small text.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/e55a586b9c1ce0b8a856ebbf79452b56b4afbf80970d1a5003c624c59ed91d96.mp3",
+    "alignment": [
+      {
+        "word": "Send",
+        "start": 0,
+        "end": 0.337
+      },
+      {
+        "word": "a",
+        "start": 0.395,
+        "end": 0.418
+      },
+      {
+        "word": "small",
+        "start": 0.464,
+        "end": 0.731
+      },
+      {
+        "word": "text.",
+        "start": 0.778,
+        "end": 1.579
+      }
+    ]
+  },
+  "41226e5ddd3801e7b2fdee796db946775a65e7f9d8d5cc4150498fde88030ad5": {
+    "text": "Choose somewhere different. Get comfortable and let your body soften.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/41226e5ddd3801e7b2fdee796db946775a65e7f9d8d5cc4150498fde88030ad5.mp3",
+    "alignment": [
+      {
+        "word": "Choose",
+        "start": 0,
+        "end": 0.441
+      },
+      {
+        "word": "somewhere",
+        "start": 0.488,
+        "end": 0.964
+      },
+      {
+        "word": "different.",
+        "start": 1.01,
+        "end": 1.776
+      },
+      {
+        "word": "Get",
+        "start": 2.032,
+        "end": 2.31
+      },
+      {
+        "word": "comfortable",
+        "start": 2.38,
+        "end": 3.123
+      },
+      {
+        "word": "and",
+        "start": 3.17,
+        "end": 3.355
+      },
+      {
+        "word": "let",
+        "start": 3.413,
+        "end": 3.564
+      },
+      {
+        "word": "your",
+        "start": 3.611,
+        "end": 3.75
+      },
+      {
+        "word": "body",
+        "start": 3.796,
+        "end": 4.075
+      },
+      {
+        "word": "soften.",
+        "start": 4.145,
+        "end": 4.969
+      }
+    ]
+  },
+  "b1f39bb3c95e6a32b456d22326de244c348fd21c42e7d715961860df22efbeb9": {
+    "text": "Plan one thing, anything you'd like to do.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/b1f39bb3c95e6a32b456d22326de244c348fd21c42e7d715961860df22efbeb9.mp3",
+    "alignment": [
+      {
+        "word": "Plan",
+        "start": 0,
+        "end": 0.337
+      },
+      {
+        "word": "one",
+        "start": 0.453,
+        "end": 0.662
+      },
+      {
+        "word": "thing,",
+        "start": 0.72,
+        "end": 1.161
+      },
+      {
+        "word": "anything",
+        "start": 1.3,
+        "end": 1.73
+      },
+      {
+        "word": "you'd",
+        "start": 1.776,
+        "end": 1.939
+      },
+      {
+        "word": "like",
+        "start": 1.985,
+        "end": 2.194
+      },
+      {
+        "word": "to",
+        "start": 2.218,
+        "end": 2.264
+      },
+      {
+        "word": "do.",
+        "start": 2.334,
+        "end": 2.926
+      }
+    ]
+  },
+  "57886207b5ea8562641ed3e85bc98e0a8d221fd6b92a1a9d23419bf7cb2ad569": {
+    "text": "Notice any difference in how you feel. Feel free to rest, or keep moving if you want a greater shift.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/57886207b5ea8562641ed3e85bc98e0a8d221fd6b92a1a9d23419bf7cb2ad569.mp3",
+    "alignment": [
+      {
+        "word": "Notice",
+        "start": 0,
+        "end": 0.534
+      },
+      {
+        "word": "any",
+        "start": 0.592,
+        "end": 0.813
+      },
+      {
+        "word": "difference",
+        "start": 0.871,
+        "end": 1.44
+      },
+      {
+        "word": "in",
+        "start": 1.486,
+        "end": 1.579
+      },
+      {
+        "word": "how",
+        "start": 1.649,
+        "end": 1.788
+      },
+      {
+        "word": "you",
+        "start": 1.858,
+        "end": 1.95
+      },
+      {
+        "word": "feel.",
+        "start": 2.032,
+        "end": 2.531
+      },
+      {
+        "word": "Feel",
+        "start": 2.717,
+        "end": 3.007
+      },
+      {
+        "word": "free",
+        "start": 3.077,
+        "end": 3.332
+      },
+      {
+        "word": "to",
+        "start": 3.379,
+        "end": 3.471
+      },
+      {
+        "word": "rest,",
+        "start": 3.576,
+        "end": 4.052
+      },
+      {
+        "word": "or",
+        "start": 4.133,
+        "end": 4.284
+      },
+      {
+        "word": "keep",
+        "start": 4.365,
+        "end": 4.586
+      },
+      {
+        "word": "moving",
+        "start": 4.656,
+        "end": 5.143
+      },
+      {
+        "word": "if",
+        "start": 5.283,
+        "end": 5.433
+      },
+      {
+        "word": "you",
+        "start": 5.48,
+        "end": 5.55
+      },
+      {
+        "word": "want",
+        "start": 5.608,
+        "end": 5.817
+      },
+      {
+        "word": "a",
+        "start": 5.863,
+        "end": 5.886
+      },
+      {
+        "word": "greater",
+        "start": 5.944,
+        "end": 6.316
+      },
+      {
+        "word": "shift.",
+        "start": 6.362,
+        "end": 7.152
+      }
+    ]
+  },
+  "eb14105f1eadc971b44ea04323b2b3c174719b7f9a9cb08ca752b8fcff3f5d41": {
+    "text": "Shift now.",
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "audio": "/audio/narration/eb14105f1eadc971b44ea04323b2b3c174719b7f9a9cb08ca752b8fcff3f5d41.mp3",
+    "alignment": [
+      {
+        "word": "Shift",
+        "start": 0,
+        "end": 0.488
+      },
+      {
+        "word": "now.",
+        "start": 0.592,
+        "end": 1.254
+      }
+    ]
   }
 }

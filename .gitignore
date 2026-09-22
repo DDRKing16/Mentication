@@ -11,3 +11,4 @@ coverage/
 # Build output and local scratch captures
 dist/
 tmp/
+.claude/

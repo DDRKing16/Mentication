@@ -1198,7 +1198,7 @@ const FOCUS = [
     { title: "Name the action", body: "Exactly what you’ll do then.", holdSec: 25 },
     { title: "Say it", body: "‘When ___, I will ___.’", holdSec: 15 },
   ] }),
-  make({ id: "nextAction", name: "The Next Physical Step", category: "focus", mechanism: "task-initiation", why: "Naming the literal next physical move ends paralysis by abstraction.", targets: ["thoughts", "body"], states: ["any"], directions: ["focus"], durationMin: 1, energy: "grounding", arousal: "steady", basePriority: 8, steps: [
+  make({ id: "nextAction", name: "Next Easiest Step V2 MentiCation_Copilot_Package_V2_Locked", category: "focus", mechanism: "task-initiation", why: "Naming the literal next physical move ends paralysis by abstraction.", targets: ["thoughts", "body"], states: ["any"], directions: ["focus"], durationMin: 1, energy: "grounding", arousal: "steady", basePriority: 8, steps: [
     { title: "Shrink the task", body: "Not the outcome — the next physical action.", holdSec: 15 },
     { title: "Name it", body: "‘Open the doc.’ ‘Pick up the brush.’ One move.", holdSec: 20 },
     { title: "Do it", body: "That one move, now.", holdSec: 15 },
@@ -1291,6 +1291,10 @@ const SLEEP = [
     { title: "Can wait", body: "Anything else. It can wait. It's parked now.", holdSec: 40 },
     { title: "It's parked", body: "None of this needs solving tonight. It's noted, and it can stay here.", holdSec: 40 },
     { title: "Let the night begin", body: "Tomorrow has its own time. Tonight is for rest.", holdSec: 35 },
+  ] }),
+  make({ id: "nightChannel", name: "Night Channel", category: "cognitive", mechanism: "listening", why: "A low-effort audio destination for bedtime rumination when you want something sufficiently interesting to drift into.", targets: ["thoughts", "both"], states: ["worried", "overthinking", "cant_switch_off", "cant_sleep"], directions: ["sleep", "calm"], durationMin: 20, cognitiveLoad: 1, physicalDemand: 1, environment: "private", eyes: "closed", audio: "required", movement: "none", discreet: false, bedtime: true, closing: true, gentle: true, basePriority: 5, steps: [
+    { title: "Tune the channel", body: "Pick a broadcast or simulated playlist.", holdSec: 60 },
+    { title: "Let it play", body: "Fades automatically.", holdSec: 120 },
   ] }),
 ];
 

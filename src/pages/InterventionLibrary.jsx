@@ -28,6 +28,20 @@ const FILTERS = [
   { key: "noBreathing", label: "No breathing", test: (iv) => iv.category !== "breathing" },
 ];
 
+const DEAR_2100_INTERVENTION = {
+  id: "dear2100",
+  name: "Dear 2100",
+  primaryDirection: "lift",
+  directions: ["lift"],
+  durationMin: 15,
+  why: "A premium 15-minute reflective journey that guides you from avoidance to a real, committed smallest action.",
+  discreet: true,
+  eyes: "open",
+  bedtime: false,
+  category: "reflective",
+  isKing: true,
+};
+
 function Badges({ iv }) {
   const tags = [];
   if (iv.discreet) tags.push("Discreet");
@@ -56,7 +70,8 @@ export default function InterventionLibrary() {
   const grouped = useMemo(() => {
     const term = q.trim().toLowerCase();
     const activeFilters = FILTERS.filter((f) => filters[f.key]);
-    let list = INTERVENTIONS.filter((iv) => {
+    const allItems = [...INTERVENTIONS, DEAR_2100_INTERVENTION];
+    let list = allItems.filter((iv) => {
       if (cat && iv.primaryDirection !== cat) return false;
       if (activeFilters.length && !activeFilters.every((f) => f.test(iv))) return false;
       if (!term) return true;
@@ -68,6 +83,14 @@ export default function InterventionLibrary() {
   }, [q, cat, filters]);
 
   const launch = (iv) => {
+    if (iv.id === "dear2100") {
+      navigate("/dear-2100");
+      return;
+    }
+    if (iv.id === "nightChannel") {
+      navigate("/night-channel");
+      return;
+    }
     navigate("/reset", {
       state: {
         prebuilt: true,
@@ -95,7 +118,7 @@ export default function InterventionLibrary() {
           </button>
           <div>
             <h1 className="font-heading text-2xl font-medium tracking-tight">Intervention Library</h1>
-            <p className="text-sm text-muted-foreground">Pick any practice. {INTERVENTIONS.length} in total.</p>
+            <p className="text-sm text-muted-foreground">Pick any practice. {INTERVENTIONS.length + 1} in total.</p>
           </div>
         </header>
 
@@ -202,23 +225,53 @@ export default function InterventionLibrary() {
                 {CATEGORY_LABELS[g.category] || g.category} · {g.items.length}
               </h2>
               <div className="mt-3 flex flex-col gap-2">
-                {g.items.map((iv) => (
-                  <button
-                    key={iv.id}
-                    onClick={() => launch(iv)}
-                    className="no-tap group flex items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary/30 hover:shadow-[0_12px_36px_-20px_hsl(179_69%_17%/0.22)] active:scale-[0.99]"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-heading text-base font-medium tracking-tight text-foreground">{iv.name}</span>
-                        <span className="text-xs text-muted-foreground">· {iv.durationMin} min</span>
+                {g.items.map((iv) => {
+                  const isKing = iv.isKing;
+                  return (
+                    <button
+                      key={iv.id}
+                      onClick={() => launch(iv)}
+                      className={
+                        "no-tap group flex items-start gap-4 rounded-3xl p-5 text-left transition-all active:scale-[0.99] w-full " +
+                        (isKing
+                          ? "border-2 border-[#CE9131]/60 bg-gradient-to-br from-[#FAF7F0] via-[#FAF6EE] to-[#ECE2D2] dark:from-[#122A23] dark:via-[#0F2D25] dark:to-[#0E4536]/20 dark:border-[#C99646]/50 shadow-[0_10px_30px_-12px_rgba(206,145,49,0.25)] hover:border-[#CE9131] dark:hover:border-[#C99646] hover:shadow-[0_12px_40px_-10px_rgba(206,145,49,0.35)]"
+                          : "border border-border bg-card hover:border-primary/30 hover:shadow-[0_12px_36px_-20px_hsl(179_69%_17%/0.22)]")
+                      }
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={
+                            "font-heading text-base font-semibold tracking-tight " +
+                            (isKing ? "text-[#0E4536] dark:text-[#ECE2D2]" : "text-foreground")
+                          }>
+                            {iv.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">· {iv.durationMin} min</span>
+                        </div>
+                        <p className={
+                          "mt-1 text-sm leading-snug line-clamp-2 " +
+                          (isKing ? "text-[#315E51] dark:text-[#A1BBA2]" : "text-muted-foreground")
+                        }>
+                          {iv.why}
+                        </p>
+                        <Badges iv={iv} />
+                        
+                        {isKing && (
+                          <div className="mt-3.5 border-t border-[#CE9131]/20 dark:border-[#C99646]/20 pt-2.5">
+                            <p className="text-xs italic text-[#7A572E] dark:text-[#C99646] font-medium leading-relaxed flex items-center gap-1.5">
+                              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CE9131] dark:bg-[#C99646] shrink-0" />
+                              Intended for longer durations (15+ minutes) and repeated use.
+                            </p>
+                          </div>
+                        )}
                       </div>
-                      <p className="mt-1 text-sm leading-snug text-muted-foreground line-clamp-2">{iv.why}</p>
-                      <Badges iv={iv} />
-                    </div>
-                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                ))}
+                      <ArrowRight className={
+                        "mt-1 h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5 " +
+                        (isKing ? "text-[#CE9131] dark:text-[#C99646]" : "text-muted-foreground")
+                      } />
+                    </button>
+                  );
+                })}
               </div>
             </section>
           ))}

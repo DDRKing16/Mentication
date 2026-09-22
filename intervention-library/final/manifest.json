@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "interventionCount": 17,
-  "boardCount": 17,
+  "interventionCount": 18,
+  "boardCount": 18,
   "assetCount": 17,
   "pdf": "output/pdf/mentation-elite-intervention-library.pdf",
   "files": [
@@ -71,67 +71,75 @@
     },
     {
       "path": "intervention-library/final/boards/5-4-3-2-1-grounding-elite-board.png",
-      "sha256": "cb79cbf84c7eef347c1e12bb5e61932e1f07ceefff8647d99368d92f58845bc9"
+      "sha256": "0b67a008b41ffa7ca934504e4bda5b0f66b8182e84c8f8aa57b7a99a53cb5a7b"
     },
     {
       "path": "intervention-library/final/boards/box-breathing-elite-board.png",
-      "sha256": "56af4c2eb03ed4e7405cdb5d13aba5bf27f6d1666ab075c8681ed392480c02ee"
+      "sha256": "961a23a3938e241c3c03dc05a5774808ab07ae1095d8d3a1ffd7af479b89e219"
     },
     {
       "path": "intervention-library/final/boards/change-the-scene-elite-board.png",
-      "sha256": "a9bc13b9900e08485ecc3076d1e57ac3b718348a0cbcca271c9fe6f55e492ea2"
+      "sha256": "1f77c1364d897f5e5c397194cd1c78dc18a50ed8335ea3fdafa476e067c8e0e6"
     },
     {
       "path": "intervention-library/final/boards/countermove-elite-board.png",
-      "sha256": "1478b6cd79813486b02d1b13f0204ef02f45ddc835ba8a5f867c59ce4c80ad7c"
+      "sha256": "bde4f965a4da91dbfc7f3b4e5b6adffd021c1ec0d5622ac1434b986a2f656cdd"
     },
     {
       "path": "intervention-library/final/boards/ignition-point-elite-board.png",
-      "sha256": "bc6d08d41270d4ab43000d7d6979613d3b34a19c7affe0d8cf078b5185514e97"
+      "sha256": "45d0b7ca95d1c00d4f0122297bbc4b59b05fa2e9155af988053af04821ea8c5a"
     },
     {
       "path": "intervention-library/final/boards/next-easiest-step-elite-board.png",
-      "sha256": "82b69be08fad1ae4c451b89a4e52e9add6b3c4ce7cb1baf255ee9640976642dc"
+      "sha256": "f7a1e7da68099644cc0e04385663fec697674dbf82600b5774515b372ad45007"
     },
     {
       "path": "intervention-library/final/boards/night-channel-elite-board.png",
-      "sha256": "dba5f046d3d2520575fc08b250c5ea99418bbcad6f08836115e4d44c3151640b"
+      "sha256": "1fcf46313c3adde1d7e148a0c82d21e50463f73cf1f880fbef3c39d482b96200"
     },
     {
       "path": "intervention-library/final/boards/open-channel-elite-board.png",
-      "sha256": "fd69434ceec1d53e8c380559e5d208b8ce0756b8c54fb85ca57643df3d21a8c5"
+      "sha256": "daa56d08f675cbcad74a1151bd95e95d55f0182c538dca6bea3db0f4f7835306"
     },
     {
       "path": "intervention-library/final/boards/progressive-muscle-relaxation-elite-board.png",
-      "sha256": "ea90279458a4a8c0c08bbeffe4a0df37488009412e8b878c5ce682fdc607fbc3"
+      "sha256": "1c8d8afeac249d788aa23fa379d4a5cdb685f674550d802dbdffb665e8dc2fdc"
     },
     {
       "path": "intervention-library/final/boards/pulse-shift-elite-board.png",
-      "sha256": "8dfebc28cb6bcd1e1a30597b88eb0d5cc32833b0ac4eeaa7f4b6a434b8261219"
+      "sha256": "b223e6adf976050b28db40bf8f0471136f45a6bf4c1d2f2ba288d31afc12e0f9"
+    },
+    {
+      "path": "intervention-library/final/boards/reroute-elite-board.png",
+      "sha256": "b9fea9519f58e6943a3161104cb4127da9753425442ed9b73beba91057fff7cf"
     },
     {
       "path": "intervention-library/final/boards/signal-lock-elite-board.png",
-      "sha256": "303af747e4208385637fae7560ef60956628cb94ad3f0850f03d699ca7dda72e"
+      "sha256": "4383d8d9e5a637a788b218865e9b5984333e03d499ed1701cc7c67246886439f"
     },
     {
       "path": "intervention-library/final/boards/test-the-prediction-elite-board.png",
-      "sha256": "60a3f104406eda0b0f26959fe1db9a2f5050d9f117b3617bc73c2efd2ce9de64"
+      "sha256": "8f2e03f4ceab3c17d82db5e8dc5889249aabbd6325c68c24e45a1891bd3fabc9"
+    },
+    {
+      "path": "intervention-library/final/boards/the-happy-bump-elite-board.png",
+      "sha256": "c959538d475d854ae9bc452e90ba8f152acb53875876e9e8322330f0c9f89f80"
     },
     {
       "path": "intervention-library/final/boards/then-what-elite-board.png",
-      "sha256": "ab64547f27581bbecf3a5a3be1da92157b4bd57bc00a9eaa4f05e05d1f634a01"
+      "sha256": "3776180bf248c5b2a3ea2167574488a077bb6572c5a92670ad3921f10d3983e7"
     },
     {
       "path": "intervention-library/final/boards/thought-or-fact-elite-board.png",
-      "sha256": "4a878cfc5f13c9a92055893a0eab8920b8886c5931fb579e382fe0df3d50b24e"
+      "sha256": "6d98ab760b87372a0e5bbc035d8387fbc7c5d813e02c3d601e05361ce3238937"
     },
     {
       "path": "intervention-library/final/boards/tomorrow-parking-lot-elite-board.png",
-      "sha256": "c0961c5460cd6e6e0fae831f8060c6798cd1430a89c77bf15308515bc0edd833"
+      "sha256": "b1a3d04f20899be871cda97225a30dce15d69a47a05ab21d457ff45249391268"
     },
     {
       "path": "intervention-library/final/boards/urge-surfing-elite-board.png",
-      "sha256": "e1d756503c40055209efc1abe3d24146c877f32e21e06b8db901e87f9fa80d23"
+      "sha256": "8d13cc429b9dca2a7c4ed63018b708c7ca557a6966754a15e0e6c2aff6f078d4"
     }
   ]
 }

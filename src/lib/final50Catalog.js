@@ -313,7 +313,7 @@ const CONTENT_OVERRIDES = {
     steps: [{ title: "Build a small lift", body: "Move safely, add music and water, choose connection, finish one small task, and carry the momentum into a realistic next step.", holdSec: 60 }],
   },
   nextAction: {
-    name: "Next Easiest Step",
+    name: "Next Easiest Step V2 MentiCation_Copilot_Package_V2_Locked",
     mechanism: "executive-friction-reduction",
     why: "Identifying the exact barrier and compressing the task into one observable action makes starting more executable.",
     directions: ["focus", "lift"],
@@ -724,41 +724,27 @@ const NEW_INTERVENTIONS = {
 // Order is product order. It is also the source of truth for the catalogue
 // count and for the within-direction order in the Intervention Library.
 const CORE_25_SPECS = [
-  // Calm (7)
-  ["sigh", "calm"],
+  // Calm (4)
   ["boxV2", "calm"],
   ["progressive-muscle-relaxation-v2", "calm"],
   ["factCheck", "calm"],
-  ["solvableWorry", "calm"],
   ["urgeSurf", "calm"],
-  ["thenWhat", "calm"],
 
-  // Lift (7)
-  ["activationMenu", "lift"],
+  // Lift (2)
   ["happyBump", "lift"],
-  ["countermove", "lift"],
-  ["openChannel", "lift"],
-  ["pulseShift", "lift"],
-  ["testPrediction", "lift"],
   ["changeScene", "lift"],
-  ["compassionBreak", "lift"],
 
-  // Ground (4)
+  // Ground (2)
   ["grounding54321V2", "ground"],
   ["vectorShift", "ground"],
-  ["orienting", "ground"],
-  ["nameFeeling", "ground"],
 
-  // Focus (3)
+  // Focus (2)
   ["nextAction", "focus"],
   ["signalLock", "focus"],
-  ["frictionSweep", "focus"],
 
-  // Sleep (4)
+  // Sleep (2)
   ["tomorrowParking", "sleep"],
   ["nightChannel", "sleep"],
-  ["awakeInBedReset", "sleep"],
-  ["dropSleepStruggle", "sleep"],
 ];
 
 export const CORE_25_IDS = Object.freeze(CORE_25_SPECS.map(([id]) => id));
@@ -842,8 +828,9 @@ export function createCore25Catalogue(legacyInterventions = []) {
   });
 
   const ids = new Set(catalogue.map((iv) => iv.id));
-  if (catalogue.length !== 26 || ids.size !== 26) {
-    throw new Error(`[active-catalogue] Expected 26 unique interventions; received ${catalogue.length}/${ids.size}`);
+  const expected = CORE_25_SPECS.length;
+  if (catalogue.length !== expected || ids.size !== expected) {
+    throw new Error(`[active-catalogue] Expected ${expected} unique interventions; received ${catalogue.length}/${ids.size}`);
   }
   return catalogue;
 }

@@ -88,7 +88,19 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 8. Change the Scene
+## 8. The Happy Bump
+
+**User-facing psychoeducation:** Behavioural activation can improve low mood by increasing contact with rewarding, meaningful and mastery-building activity before motivation arrives. Movement, social connection, positive reflection and values-led action are offered as accessible supports, not guaranteed mood treatments.
+
+**Evidence fit:** B+ for behavioural activation; mixed and component-specific evidence for the combined sequence
+
+**Limits and safety:** The combined branded sequence has not been independently tested. Movement must remain safe and capacity-matched; music, hydration and social contact do not guarantee a mood shift. The six wellbeing areas are evidence-informed domains, not a definitive universal ranking.
+
+**Sources:** [https://pubmed.ncbi.nlm.nih.gov/37068380/](https://pubmed.ncbi.nlm.nih.gov/37068380/), [https://pubmed.ncbi.nlm.nih.gov/37227760/](https://pubmed.ncbi.nlm.nih.gov/37227760/)
+
+**Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
+
+## 9. Change the Scene
 
 **User-facing psychoeducation:** Stable contexts can cue automatic behaviour, while a context change can interrupt those cues and create a window for a different choice. Evidence supports the broader context-discontinuity principle, not this exact short intervention.
 
@@ -100,7 +112,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 9. Test the Prediction
+## 10. Test the Prediction
 
 **User-facing psychoeducation:** Behavioural experiments can help people compare a prediction with observable experience. Evidence suggests benefit within anxiety treatment, but results must be read fairly and should never be designed to prove the user wrong.
 
@@ -112,7 +124,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 10. Open Channel
+## 11. Open Channel
 
 **User-facing psychoeducation:** Interventions that increase access to people or address barriers to connection can improve social contact and perceived connection. One message is only a bridge, not a guaranteed repair or cure for loneliness.
 
@@ -124,7 +136,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 11. Countermove
+## 12. Countermove
 
 **User-facing psychoeducation:** Behavioural activation increases meaningful interaction with the environment, and specific action plans can help close the gap between intention and behaviour. A small directional move can count before mood changes.
 
@@ -136,7 +148,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 12. Pulse Shift
+## 13. Pulse Shift
 
 **User-facing psychoeducation:** A single bout of exercise is associated on average with modest improvements in mood and anxiety, but responses vary widely. Here the aim is simply to make a little more movement available, not to prescribe intensity or promise a mood lift.
 
@@ -148,7 +160,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 13. Reroute
+## 14. Reroute
 
 **User-facing psychoeducation:** Distraction can reduce emotional impact in some contexts, but its usefulness depends on the emotion, timing and purpose. Reroute is a deliberate short-term shift of attention, not suppression or a claim that the problem no longer matters.
 
@@ -160,7 +172,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 14. Next Easiest Step
+## 15. Next Easiest Step
 
 **User-facing psychoeducation:** Specific action plans can improve goal attainment by linking intention to a concrete response. The useful target is a visible next behaviour, not a perfect plan or a judgment about motivation.
 
@@ -172,7 +184,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 15. Signal Lock
+## 16. Signal Lock
 
 **User-facing psychoeducation:** Reducing interruption costs and using deliberate time-management strategies can support task accuracy, resumption and wellbeing. Evidence does not show that one branded timer length is universally best.
 
@@ -184,7 +196,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 16. Tomorrow Parking Lot
+## 17. Tomorrow Parking Lot
 
 **User-facing psychoeducation:** In one small sleep-laboratory study, writing a specific bedtime to-do list was associated with faster sleep onset than writing about completed activities. This supports offloading as a useful option, not a guarantee of sleep.
 
@@ -196,7 +208,7 @@ Grades describe the fit between the claim and the cited evidence, not product ef
 
 **Review status:** Approved for provisional product use with the stated limitations. Reviewed 2026-09-06; next review due 2027-09-06 or sooner if the mechanism or copy changes.
 
-## 17. Night Channel
+## 18. Night Channel
 
 **User-facing psychoeducation:** Music may improve subjective sleep quality for some adults, while effects on objective sleep and other audio formats are less certain. Choose content that feels settling; Night Channel does not guarantee sleep.
 

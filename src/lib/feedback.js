@@ -56,6 +56,158 @@ export function playComplete() {
   tone({ freq: 130.81, type: "sine", gain: 0.04, attack: 0.04, decay: 1.5, when: 0.09, lp: 700 });
 }
 
+// Crisp mechanical click sound
+export function playCrispClick() {
+  tone({ freq: 880, type: "sine", gain: 0.08, attack: 0.002, decay: 0.03, lp: 2500 });
+  tone({ freq: 1760, type: "sine", gain: 0.04, attack: 0.001, decay: 0.015, lp: 4000 });
+}
+
+// Dopamine feedback clicking sound: crisp click followed by rapid rising warm sparkles
+export function playDopamineClick() {
+  playCrispClick();
+  const sparkles = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+  sparkles.forEach((freq, idx) => {
+    tone({
+      freq,
+      type: "sine",
+      gain: 0.025,
+      attack: 0.008,
+      decay: 0.15,
+      when: 0.05 + idx * 0.04,
+      lp: 2000
+    });
+  });
+}
+
+// A short run of the same warm "shift" chime used by the opening control.
+// It marks the start of a selected micro-action without speaking a countdown.
+export function playShiftCountdown() {
+  playDopamineClick();
+  [0.65, 1.3, 1.95, 2.6].forEach((when, index) => {
+    tone({
+      freq: index % 2 === 0 ? 523.25 : 659.25,
+      type: "sine",
+      gain: 0.022,
+      attack: 0.008,
+      decay: 0.14,
+      when,
+      lp: 2000
+    });
+  });
+}
+
+// Ultra-premium reward chime for complete satisfaction upon finishing
+export function playSuperRewardChime() {
+  playComplete();
+  const notes = [311.13, 392.00, 466.16, 622.25, 783.99, 932.33, 1244.50]; // Eb4, G4, Bb4, Eb5, G5, Bb5, Eb6
+  notes.forEach((freq, idx) => {
+    tone({
+      freq,
+      type: "sine",
+      gain: 0.03,
+      attack: 0.015,
+      decay: 0.8 - idx * 0.08,
+      when: idx * 0.08,
+      lp: 1800
+    });
+  });
+}
+
+// 2-second uplifting conquest major-chord brassy sweep
+export function playConquestInstrumental() {
+  playCrispClick();
+  const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50]; // C4, E4, G4, C5, E5, G5, C6
+  notes.forEach((freq, idx) => {
+    tone({
+      freq,
+      type: "sine",
+      gain: 0.03,
+      attack: 0.05,
+      decay: 1.8 - idx * 0.1,
+      when: 0.02 + idx * 0.07,
+      lp: 1600
+    });
+    tone({
+      freq: freq * 1.005,
+      type: "triangle",
+      gain: 0.012,
+      attack: 0.08,
+      decay: 1.5 - idx * 0.1,
+      when: 0.02 + idx * 0.07,
+      lp: 1200
+    });
+  });
+}
+
+// 1.2-second realistic double-chirp of a bird synthesized via Web Audio
+export function playBirdChirp() {
+  const c = ac();
+  if (!c || suspended) return;
+  const t = c.currentTime;
+  for (let i = 0; i < 2; i++) {
+    const t0 = t + i * 0.22;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1400, t0);
+    osc.frequency.exponentialRampToValueAtTime(3600, t0 + 0.09);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(0.012, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.09);
+    osc.connect(g);
+    g.connect(c.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.12);
+  }
+}
+
+// A lower, more spacious call used as the second opening-scene nature cue.
+export function playDawnBirdCall() {
+  const c = ac();
+  if (!c || suspended) return;
+  const t = c.currentTime;
+  [0, 0.34].forEach((offset, index) => {
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    const t0 = t + offset;
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(index === 0 ? 820 : 980, t0);
+    osc.frequency.exponentialRampToValueAtTime(index === 0 ? 1420 : 1240, t0 + 0.16);
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(0.018, t0 + 0.024);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.2);
+    osc.connect(g);
+    g.connect(c.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.22);
+  });
+}
+
+// A brief, soft filtered swell suggesting wind through leaves.
+export function playTreeWind() {
+  const c = ac();
+  if (!c || suspended) return;
+  const buffer = c.createBuffer(1, c.sampleRate * 1.6, c.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let index = 0; index < data.length; index += 1) data[index] = Math.random() * 2 - 1;
+  const source = c.createBufferSource();
+  const filter = c.createBiquadFilter();
+  const g = c.createGain();
+  filter.type = "lowpass";
+  filter.frequency.value = 820;
+  filter.Q.value = 0.7;
+  const t = c.currentTime;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(0.025, t + 0.35);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 1.55);
+  source.buffer = buffer;
+  source.connect(filter);
+  filter.connect(g);
+  g.connect(c.destination);
+  source.start(t);
+  source.stop(t + 1.6);
+}
+
 // Temporarily mute UI feedback (e.g. during a discreet / no-audio session).
 export function suspendFeedback() { suspended = true; }
 export function resumeFeedback() { suspended = false; }

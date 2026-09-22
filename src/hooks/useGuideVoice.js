@@ -99,11 +99,13 @@ export function useGuideVoice() {
     cancelLead();
     const cur = currentRef.current;
     if (!cur) return;
+    cur.audio.ontimeupdate = null;
+    cur.audio.onended = null;
     if (immediate) { cancelFadeOf(cur.audio); cur.audio.pause(); cur.audio.volume = 0; }
     else fadeTo(cur.audio, 0, FADE_OUT_MS, () => cur.audio.pause());
   };
 
-  const startLine = (key, audio, rate, leadMs, onEnd, requestId) => {
+  const startLine = (key, audio, rate, leadMs, onEnd, onTimeUpdate, requestId) => {
     pendingRef.current = key;
     const begin = () => {
       if (pendingRef.current !== key || requestSequenceRef.current !== requestId) return;
@@ -115,6 +117,9 @@ export function useGuideVoice() {
       // the narrator before advancing — only fires for the active line.
       audio.onended = onEnd
         ? () => { if (currentRef.current && currentRef.current.key === key) onEnd(); }
+        : null;
+      audio.ontimeupdate = onTimeUpdate
+        ? () => { if (currentRef.current && currentRef.current.key === key) onTimeUpdate(audio.currentTime); }
         : null;
       const p = audio.play();
       const launch = () => fadeTo(audio, TARGET_VOLUME, FADE_IN_MS);
@@ -136,13 +141,15 @@ export function useGuideVoice() {
     const rate = opts.rate ?? DEFAULT_RATE;
     const leadMs = opts.leadMs || 0;
     const onEnd = opts.onEnd || null;
+    const onTimeUpdate = opts.onTimeUpdate || null;
     const key = keyOf(text, voice);
     const requestId = ++requestSequenceRef.current;
     pendingRef.current = key;
 
     ensure(text, voice).then((audio) => {
-      if (!audio || pendingRef.current !== key || requestSequenceRef.current !== requestId) return;
-      startLine(key, audio, rate, leadMs, onEnd, requestId);
+      if (pendingRef.current !== key || requestSequenceRef.current !== requestId) return;
+      if (!audio) return;
+      startLine(key, audio, rate, leadMs, onEnd, onTimeUpdate, requestId);
     });
   }, [ensure]);
 
@@ -186,6 +193,8 @@ export function useGuideVoice() {
     cancelLead();
     poolRef.current.forEach(({ audio }) => {
       cancelFadeOf(audio);
+      audio.ontimeupdate = null;
+      audio.onended = null;
       audio.pause();
       audio.src = "";
     });

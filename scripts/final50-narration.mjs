@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import { INTERVENTIONS } from "../src/lib/interventions.js";
 import { spokenFor } from "../src/lib/spoken.js";
 import { HAPPY_BUMP_NARRATION } from "../src/lib/happyBumpNarration.js";
+import { CHANGE_SCENE_NARRATION } from "../src/lib/changeSceneNarration.js";
 
 const ENV_PATH = ".env.local";
 const MANIFEST_PATH = "narration-manifest.json";
@@ -66,6 +67,10 @@ function collectLines() {
   Object.values(HAPPY_BUMP_NARRATION).forEach((text) => {
     const normalised = normalize(text);
     if (!byText.has(normalised)) byText.set(normalised, { text, interventionIds: ["happyBump"] });
+  });
+  Object.values(CHANGE_SCENE_NARRATION).forEach((text) => {
+    const normalised = normalize(text);
+    if (!byText.has(normalised)) byText.set(normalised, { text, interventionIds: ["changeScene"] });
   });
   return [...byText.values()];
 }

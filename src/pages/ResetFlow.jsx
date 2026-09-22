@@ -11,6 +11,9 @@ import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipEx
 import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
 import ThoughtOrFactEntry from "@/components/thought-or-fact/ThoughtOrFactEntry";
 import UrgeSurfExperience from "@/components/UrgeSurfExperience";
+import NextEasiestStepExperience from "@/components/NextEasiestStepExperience";
+import ChangeSceneExperience from "@/components/ChangeSceneExperience";
+import TomorrowParkingExperience from "@/components/TomorrowParkingExperience";
 import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/components/reset-flow/ResetSetupScreens";
 import { warmNarration } from "@/lib/preloadBoxV2";
 import {
@@ -423,7 +426,7 @@ export default function ResetFlow() {
     };
     // Dedicated premium experiences may own their complete state and return
     // directly home; legacy pathways retain the shared completion screen.
-    if (options.direct) navigate("/", { replace: true });
+    if (options.direct) navigate(options.navigateTo || "/", { replace: true });
     else advance({ phase: "done" });
     sessionStore.create(payload).catch(() => {
       // non-blocking — the experience continues regardless
@@ -500,6 +503,12 @@ export default function ResetFlow() {
         ? ThoughtOrFactExperience
         : interventionId === "urgeSurf"
           ? UrgeSurfExperience
+        : interventionId === "nextAction"
+          ? NextEasiestStepExperience
+        : interventionId === "changeScene"
+          ? ChangeSceneExperience
+        : interventionId === "tomorrowParking"
+          ? TomorrowParkingExperience
         : isNewFlagship(interventionId)
           ? NewFlagshipExperience
           : FlagshipExperience;
@@ -519,6 +528,7 @@ export default function ResetFlow() {
                 silent: true,
                 endIntensityOverride: lastValue,
                 interventionOutcome: result.outcome,
+                navigateTo: result.navigateTo,
               });
               return;
             }

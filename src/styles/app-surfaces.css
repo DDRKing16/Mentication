@@ -34,6 +34,27 @@
   --home-shadow: rgba(4, 26, 56, 0.32);
 }
 
+/* 2026-09-16: palette-recolour mockup — navy ink + warm coral-red accent on a
+   cream body, replacing the emerald/gold pairing. Purely additive; flip
+   HOME_THEME back to "emerald" in homeTheme.js to revert instantly. */
+.home-theme--navy {
+  --home-bg: #ECE2D2;
+  --home-hero: #0E2A52;
+  --home-hero-text: #F8F3EA;
+  --home-hero-soft: #DCE4F1;
+  --home-ink: #0E2A52;
+  --home-muted: #5A6A82;
+  --home-icon: #123262;
+  --home-accent: #D6553F;
+  --home-card: #FFFFFF;
+  --home-card-alt: #F7F0E5;
+  --home-control: #ECE2D2;
+  --home-control-ink: #0E2A52;
+  --home-tabbar: #ECE2D2;
+  --home-border: #D9D0C7;
+  --home-shadow: rgba(14, 42, 82, 0.34);
+}
+
 .home-category-card {
   border: 1px solid var(--home-border);
   box-shadow:
@@ -49,6 +70,37 @@
     url("/media/textures/felt-grain.svg");
   background-blend-mode: soft-light, multiply, soft-light;
   background-size: 100% 100%, 100% 100%, 180px 180px;
+}
+
+/* The felt-grain texture was tuned for the deep-green hero; the same noise
+   read as harsh speckling on the more saturated navy. Use a smooth gradient
+   instead of the grain layer for this theme. */
+.home-theme--navy .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.07), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.18), transparent 60%),
+    linear-gradient(165deg, #14356A 0%, #0E2A52 55%, #0A2140 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+}
+
+.home-hero-glow {
+  position: absolute;
+  z-index: 0;
+  top: -20%;
+  right: -10%;
+  width: min(26rem, 120vw);
+  height: min(26rem, 120vw);
+  pointer-events: none;
+  background: radial-gradient(circle, var(--home-accent) 0%, transparent 62%);
+  opacity: 0.1;
+  filter: blur(10px);
+  animation: home-hero-breathe 14s ease-in-out infinite;
+}
+
+@keyframes home-hero-breathe {
+  0%, 100% { opacity: 0.08; transform: scale(0.98); }
+  50% { opacity: 0.13; transform: scale(1.02); }
 }
 
 .welcome-theme--cream {
@@ -69,4 +121,89 @@
   --welcome-divider: rgba(207, 226, 242, 0.2);
   --welcome-button: #E4F0F8;
   --welcome-button-ink: #082A4C;
+}
+
+/* 2026-09-16: palette-recolour mockup — matches .home-theme--navy. Purely
+   additive; flip WELCOME_THEME back to "midnight" in homeTheme.js to revert. */
+.welcome-theme--navy {
+  --welcome-bg: #0E2A52;
+  --welcome-ink: #F8F3EA;
+  --welcome-soft: #C9D6E8;
+  --welcome-accent: #E8735F;
+  --welcome-divider: rgba(248, 243, 234, 0.2);
+  --welcome-button: #F8F3EA;
+  --welcome-button-ink: #0E2A52;
+}
+
+.welcome-theme {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--welcome-bg);
+  background-image:
+    radial-gradient(circle at 22% 8%, rgba(255, 255, 255, 0.05), transparent 42%),
+    radial-gradient(circle at 82% 78%, rgba(0, 0, 0, 0.05), transparent 48%),
+    url("/media/textures/felt-grain.svg");
+  background-blend-mode: soft-light, multiply, soft-light;
+  background-size: 100% 100%, 100% 100%, 180px 180px;
+}
+
+/* Same fix as .home-theme--navy .home-hero: swap the grain layer for a
+   smooth gradient — it read as harsh speckling on this saturated navy. */
+.welcome-theme.welcome-theme--navy {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.07), transparent 55%),
+    radial-gradient(circle at 85% 95%, rgba(0, 0, 0, 0.18), transparent 60%),
+    linear-gradient(165deg, #14356A 0%, #0E2A52 55%, #0A2140 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+}
+
+.welcome-glow {
+  position: absolute;
+  z-index: 0;
+  top: -18%;
+  left: 50%;
+  width: min(42rem, 160vw);
+  height: min(42rem, 160vw);
+  pointer-events: none;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--welcome-accent) 0%, transparent 60%);
+  opacity: 0.16;
+  filter: blur(10px);
+  animation: welcome-breathe 16s ease-in-out infinite;
+}
+
+.welcome-glow--secondary {
+  position: absolute;
+  z-index: 0;
+  top: 8%;
+  right: -18%;
+  width: min(30rem, 120vw);
+  height: min(30rem, 120vw);
+  pointer-events: none;
+  background: radial-gradient(circle, var(--welcome-soft) 0%, transparent 65%);
+  opacity: 0.1;
+  filter: blur(12px);
+  animation: welcome-breathe-secondary 19s ease-in-out infinite;
+}
+
+@keyframes welcome-breathe {
+  0%, 100% { opacity: 0.12; transform: translateX(-50%) scale(0.98); }
+  50% { opacity: 0.18; transform: translateX(-50%) scale(1.02); }
+}
+
+@keyframes welcome-breathe-secondary {
+  0%, 100% { opacity: 0.07; transform: scale(0.98); }
+  50% { opacity: 0.12; transform: scale(1.02); }
+}
+
+html.reduce-motion .welcome-glow,
+html.reduce-motion .welcome-glow--secondary {
+  animation: none;
+  opacity: 0.14;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-glow, .welcome-glow--secondary { animation: none; opacity: 0.14; }
 }

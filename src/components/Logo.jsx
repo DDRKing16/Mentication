@@ -3,6 +3,8 @@ import React from "react";
 
 export const MENTICATION_PRIMARY_ASSET = "/media/brand/mentation-primary.png";
 export const MENTICATION_MIDNIGHT_COPPER_ASSET = "/media/brand/mentation-midnight-copper.png";
+export const MENTICATION_NAVY_CORAL_ASSET = "/media/brand/mentation-navy-coral.png";
+export const MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET = "/media/brand/mentation-navy-coral-transparent.png";
 export const MENTICATION_GREEN_PINK_ASSET = "/media/brand/mentation-green-pink-transparent.png";
 export const MENTICATION_SLOGAN = "Take your mind somewhere better.";
 

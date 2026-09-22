@@ -50,6 +50,7 @@ HEROES = {
     "signalLock": ASSET_DIR / "signal-lock-hero.png",
     "tomorrowParking": ROOT / "intervention-library/source-assets/Tomorrow_Parking_Lot/03_Parked_and_Darkness.png",
     "nightChannel": ASSET_DIR / "night-channel-hero.png",
+    "happyBump": ASSET_DIR / "happy-bump-hero.png",
 }
 
 
@@ -359,8 +360,8 @@ def main():
     args = parser.parse_args()
     payload = json.loads(DATA.read_text(encoding="utf-8"))
     items = payload["interventions"]
-    assert len(items) == 17, f"Expected 17 interventions, found {len(items)}"
-    assert len({item['id'] for item in items}) == 17, "Duplicate intervention id"
+    assert len(items) == 18, f"Expected 18 interventions, found {len(items)}"
+    assert len({item['id'] for item in items}) == 18, "Duplicate intervention id"
     write_register(items)
     write_sequence_register(items)
     if args.all:
