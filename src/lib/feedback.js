@@ -2,8 +2,32 @@
 // All tones are low-pass shaped, low in pitch, and quiet — designed to feel
 // tactile and reassuring rather than bright, sharp, or celebratory.
 
+import { Capacitor } from "@capacitor/core";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
+
 let ctx = null;
 let suspended = false;
+const isNative = () => {
+  try {
+    return Capacitor.isNativePlatform();
+  } catch {
+    return false;
+  }
+};
+
+// Maps a "duration"-shaped haptic request (the vibrate-style API the rest of
+// this file already calls with) onto the discrete impact strengths iOS/
+// Android actually expose. Kept intentionally light-touch, matching the
+// "always understated" rule below.
+function impactStyleFor(ms) {
+  if (ms <= 10) return ImpactStyle.Light;
+  if (ms <= 20) return ImpactStyle.Medium;
+  return ImpactStyle.Heavy;
+}
+
+function nativeImpact(ms) {
+  Haptics.impact({ style: impactStyleFor(ms) }).catch(() => {});
+}
 
 function ac() {
   if (typeof window === "undefined") return null;
@@ -219,13 +243,31 @@ let hapticsEnabled = true;
 export function setHapticsEnabled(v) { hapticsEnabled = !!v; }
 export function haptic(ms = 12) {
   if (!hapticsEnabled) return;
+  if (isNative()) {
+    nativeImpact(ms);
+    return;
+  }
   if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return;
   try { navigator.vibrate(ms); } catch { /* */ }
 }
 
-// Tiny multi-pulse haptic motifs for premium stage choreography.
+// Tiny multi-pulse haptic motifs for premium stage choreography. `pattern` is
+// a vibrate-style [onMs, offMs, onMs, ...] sequence; on native we replay it as
+// timed discrete impacts instead, since iOS/Android have no raw duration API.
 export function hapticPattern(pattern = [8]) {
   if (!hapticsEnabled) return;
+  if (isNative()) {
+    let t = 0;
+    pattern.forEach((ms, i) => {
+      const isOnPulse = i % 2 === 0;
+      if (isOnPulse && ms > 0) {
+        const fireAt = t;
+        setTimeout(() => nativeImpact(ms), fireAt);
+      }
+      t += ms;
+    });
+    return;
+  }
   if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") return;
   try { navigator.vibrate(pattern); } catch { /* */ }
 }
