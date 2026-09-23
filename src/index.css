@@ -114,6 +114,15 @@
 }
 
 @layer utilities {
+  /* Swipeable rows (e.g. library filter chips): keep scrolling, hide the bar. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   input[type="range"].reset-slider {
     -webkit-appearance: none;
     appearance: none;

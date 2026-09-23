@@ -143,7 +143,7 @@ export default function InterventionLibrary() {
         </div>
 
         {/* category navigation */}
-        <div className="mt-4 -mx-5 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="Practice categories">
+        <div className="mt-4 -mx-5 overflow-x-auto scrollbar-none px-5 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="Practice categories">
           <div className="flex gap-2">
             <button
               onClick={() => setCat(null)}
@@ -174,7 +174,7 @@ export default function InterventionLibrary() {
         </div>
 
         {/* filters */}
-        <div className="mt-2.5 -mx-5 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="Practice filters">
+        <div className="mt-2.5 -mx-5 overflow-x-auto scrollbar-none px-5 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="Practice filters">
           <div className="flex gap-2">
             {FILTERS.map((f) => (
               <button
