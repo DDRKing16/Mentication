@@ -73,6 +73,24 @@ personality. No build labels, version numbers or dev text may ever show to a use
 Done so far: Library cards carry a chip in each intervention's own colours;
 Next Easiest Step's "V2" and package label were replaced by a "Mentication · Focus" line.
 
+**The Mentication Standard (phase 3 target).** Box Breathing and Happy Bump already feel
+like Mentication; Change the Scene, Next Easiest Step, Tomorrow Parking Lot, Urge Surfing
+and the three standalone builds feel like other apps. What the good ones do:
+1. A full-bleed world of their own colours (dark, calm), never a pale dashboard.
+2. ONE focal thing per screen. No cards inside cards, badges, ladders, dense lists, tiles.
+3. The opening screen is: one soft Garamond headline (a promise), one short Hanken line,
+   one large soft-gradient pill button, nothing else.
+4. The shared header (Back, MENTICATION · GOAL, Home/Exit), thread progress and glass dock.
+5. Guidance written as calm guidance, not web-app instructions ("Click the play button…").
+   Wording changes go to SUGGESTIONS.md, never edited in place.
+6. No build labels, version numbers or dev text. Ever.
+Order of work, one intervention per block, keeping every step and its meaning: 1 Change the
+Scene, 2 Next Easiest Step, 3 Tomorrow Parking Lot, 4 Urge Surfing. The three standalone
+builds (Signal Lock, Vector Shift, Night Channel) are the owner's finished designs: tie them
+in from outside only (entry, Threshold, top bar, closing) and ask before recolouring inside.
+Done: Library options are now world cards (each intervention's own background, glow and
+real logo in its colourway).
+
 **Next phases (in order):**
 
 3. **Chrome unification.** The bespoke chromes (Box/PMR/Grounding player, Urge

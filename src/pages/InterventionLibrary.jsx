@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Search, X, ArrowRight, LockKeyhole } from "lucide-react";
+import { ChevronLeft, Search, X, ArrowRight } from "lucide-react";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
-import { getBrandAtmosphere, getBrandColourway } from "@/lib/interventionBrand";
+import { getBrandAtmosphere, getBrandInk, getBrandLogoParts } from "@/lib/interventionBrand";
 import { INTERVENTIONS } from "@/lib/interventions";
 
 const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "sleep"];
@@ -62,20 +62,74 @@ function Badges({ iv }) {
 }
 
 
-// A small chip in the intervention's own colours (its world + its logo colourway),
-// so the colours you tap in the Library are the colours you arrive in.
-function WorldChip({ id }) {
-  const world = getBrandAtmosphere(id);
-  const ink = getBrandColourway(id);
+function badgeTags(iv) {
+  const tags = [];
+  if (iv.discreet) tags.push("Discreet");
+  if (iv.eyes === "open") tags.push("Eyes open");
+  if (iv.bedtime) tags.push("Sleep");
+  return tags;
+}
+
+// The real logo, in the intervention's own colourway, put back together at small size.
+function MiniLockup({ parts }) {
   return (
-    <span
-      aria-hidden="true"
-      className="mt-0.5 flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-1 rounded-2xl"
-      style={{ background: world.background, boxShadow: `inset 0 0 0 1px ${ink.swash}44` }}
-    >
-      <span style={{ width: 11, height: 13, border: `2px solid ${ink.arch}`, borderBottom: 0, borderRadius: "6px 6px 0 0" }} />
-      <span style={{ width: 24, height: 3, borderRadius: 2, background: ink.swash }} />
+    <span aria-hidden="true" className="relative block w-[4.75rem]" style={{ aspectRatio: String(parts.aspect) }}>
+      {["doorway", "wordmark", "swash"].map((name) => (
+        <img
+          key={name}
+          src={parts[name].src}
+          alt=""
+          draggable={false}
+          className="absolute"
+          style={{ left: `${parts[name].left}%`, top: `${parts[name].top}%`, width: `${parts[name].width}%`, height: `${parts[name].height}%` }}
+        />
+      ))}
     </span>
+  );
+}
+
+// Each option looks like the world it opens into: that intervention's own
+// background and glow, the real logo in its own colourway, and its promise.
+// The colours you tap are the colours you arrive in.
+function WorldCard({ id, name, meta, why, iv, onClick, className = "" }) {
+  const world = getBrandAtmosphere(id);
+  const ink = getBrandInk(id);
+  const light = world.tone === "light";
+  const tags = iv ? badgeTags(iv) : [];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`no-tap group relative w-full overflow-hidden rounded-3xl border p-5 text-left transition-all active:scale-[0.99] ${className}`}
+      style={{
+        background: `radial-gradient(120% 100% at 100% 0%, ${world.glow}, transparent 62%), ${world.background}`,
+        borderColor: light ? "rgba(14,42,82,0.14)" : "rgba(255,255,255,0.10)",
+        color: ink,
+      }}
+    >
+      <span className="flex items-start gap-4">
+        <span className="min-w-0 flex-1">
+          <span className="flex flex-wrap items-baseline gap-x-2">
+            <span className="font-heading text-[1.05rem] font-semibold tracking-tight">{name}</span>
+            <span className="text-xs opacity-60">· {meta}</span>
+          </span>
+          <span className="mt-1.5 line-clamp-2 block text-sm leading-snug opacity-75">{why}</span>
+          {tags.length ? (
+            <span className="mt-2.5 flex flex-wrap gap-1">
+              {tags.map((t) => (
+                <span key={t} className="rounded-full px-2 py-0.5 text-[0.68rem] font-medium" style={{ background: light ? "rgba(14,42,82,0.08)" : "rgba(255,255,255,0.10)" }}>
+                  {t}
+                </span>
+              ))}
+            </span>
+          ) : null}
+        </span>
+        <span className="flex shrink-0 flex-col items-end gap-3">
+          <MiniLockup parts={getBrandLogoParts(id)} />
+          <ArrowRight className="h-4 w-4 opacity-70 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+        </span>
+      </span>
+    </button>
   );
 }
 
@@ -220,25 +274,14 @@ export default function InterventionLibrary() {
             <h2 id="signal-lock-heading" className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
               Focus session
             </h2>
-            <button
-              type="button"
+            <WorldCard
+              id="signalLock"
+              name="Signal Lock"
+              meta="Focus"
+              why="A visual focus session with a task plan, timer, and reward."
               onClick={() => navigate("/signal-lock")}
-              className="no-tap group mt-3 flex w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary/30 hover:shadow-[0_12px_36px_-20px_hsl(179_69%_17%/0.22)] active:scale-[0.99]"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <LockKeyhole className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-2">
-                  <span className="font-heading text-base font-medium tracking-tight text-foreground">Signal Lock</span>
-                  <span className="text-xs text-muted-foreground">· Focus</span>
-                </span>
-                <span className="mt-1 block text-sm leading-snug text-muted-foreground">
-                  A visual focus session with a task plan, timer, and reward.
-                </span>
-              </span>
-              <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-            </button>
+              className="mt-3"
+            />
           </section>
           {grouped.map((g) => (
             <section key={g.category}>
@@ -248,6 +291,9 @@ export default function InterventionLibrary() {
               <div className="mt-3 flex flex-col gap-2">
                 {g.items.map((iv) => {
                   const isKing = iv.isKing;
+                  if (!isKing) {
+                    return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={`${iv.durationMin} min`} why={iv.why} iv={iv} onClick={() => launch(iv)} />;
+                  }
                   return (
                     <button
                       key={iv.id}
@@ -259,8 +305,7 @@ export default function InterventionLibrary() {
                           : "border border-border bg-card hover:border-primary/30 hover:shadow-[0_12px_36px_-20px_hsl(179_69%_17%/0.22)]")
                       }
                     >
-                      {!isKing && <WorldChip id={iv.id} />}
-                      <div className="flex-1 min-w-0">
+                                            <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={
                             "font-heading text-base font-semibold tracking-tight " +

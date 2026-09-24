@@ -439,7 +439,7 @@ const NEW_INTERVENTIONS = {
   }),
   vectorShift: newIntervention({
     id: "vectorShift", name: "Vector Shift", category: "grounding", mechanism: "precision-grounding",
-    why: "A sequence of visual tracking, navigation, code-building and scanning can redirect attention into a structured present-moment task.",
+    why: "A sequence of visual tracking, navigation and code-building can redirect attention into a structured present-moment task.",
     targets: ["body", "thoughts"], states: ["overwhelmed", "anxious", "distressed"], directions: ["ground", "calm"],
     durationMin: 5, cognitiveLoad: 2, eyes: "open", energy: "steady", intensityMin: 3, intensityMax: 8,
     unsuitableSubstates: ["immediate-danger"], requiredResources: ["screen interaction"],
