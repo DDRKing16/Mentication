@@ -1,3 +1,6 @@
+import colourwayData from "@/lib/brandColourways.json";
+import logoLayout from "@/lib/brandLogoLayout.json";
+
 // The Mentication brand thread.
 //
 // Every intervention keeps its own colour world (its "atmosphere"), but all of
@@ -51,19 +54,63 @@ export function getBrandAtmosphere(id) {
   return INTERVENTION_ATMOSPHERE[id] || DEFAULT_ATMOSPHERE;
 }
 
-/** Brand coral appropriate for the atmosphere's tone. */
+/** The line colour for an intervention: its logo's swash colour. */
 export function getBrandCoral(id) {
-  return getBrandAtmosphere(id).tone === "light" ? BRAND_CORAL.onLight : BRAND_CORAL.onDark;
+  return getBrandColourway(id).swash;
 }
 
-// The real logo artwork. Cream-ink version for dark worlds, navy-ink version
-// (same artwork, recoloured) for the one light world. Never redraw the logo.
-export const BRAND_LOGO_ON_DARK = "/media/brand/mentation-navy-coral-transparent.png";
-export const BRAND_LOGO_ON_LIGHT = "/media/brand/mentation-navy-ink-transparent.png";
+// Each intervention gets its own colourway of the REAL logo, taken from the
+// MCN V1 Branding Kit (see src/lib/brandColourways.json). The shapes are never
+// redrawn; scripts/build_brand_logos.py recolours the supplied artwork.
+export const BRAND_COLOURWAYS = colourwayData.colourways;
 
-/** The logo artwork that reads on this intervention's atmosphere. */
-export function getBrandLogo(id) {
-  return getBrandAtmosphere(id).tone === "light" ? BRAND_LOGO_ON_LIGHT : BRAND_LOGO_ON_DARK;
+export const INTERVENTION_COLOURWAY = Object.freeze({
+  boxV2: "sky-peach",
+  "progressive-muscle-relaxation-v2": "blush-mustard",
+  factCheck: "cream-rose-sage",
+  urgeSurf: "emerald-cream",
+  happyBump: "sun-violet",
+  changeScene: "garnet-meadow",
+  grounding54321V2: "sage-rose",
+  vectorShift: "lilac-lime",
+  nextAction: "peach-teal",
+  signalLock: "cobalt-coral",
+  tomorrowParking: "cream-red",
+  nightChannel: "sky-lilac",
+});
+
+const DEFAULT_COLOURWAY = "cream-rose-sage";
+
+/** The colourway id for an intervention (falls back to a neutral brand one). */
+export function getBrandColourwayId(id) {
+  return INTERVENTION_COLOURWAY[id] || DEFAULT_COLOURWAY;
+}
+
+/** The four ink colours (wordmark, figure, swash, arch) for an intervention. */
+export function getBrandColourway(id) {
+  return BRAND_COLOURWAYS[getBrandColourwayId(id)];
+}
+
+/**
+ * The three real logo parts, coloured for this intervention, with where each
+ * sits on the original artwork (as percentages of the artwork's size).
+ */
+export function getBrandLogoParts(id) {
+  const folder = `/media/brand/logo/${getBrandColourwayId(id)}`;
+  const { width, height, layers } = logoLayout;
+  const part = (name) => ({
+    src: `${folder}/${name}.png`,
+    left: (layers[name].x / width) * 100,
+    top: (layers[name].y / height) * 100,
+    width: (layers[name].w / width) * 100,
+    height: (layers[name].h / height) * 100,
+  });
+  return {
+    aspect: width / height,
+    doorway: part("doorway"),
+    wordmark: part("wordmark"),
+    swash: part("swash"),
+  };
 }
 
 /** Ink (text) colour appropriate for the atmosphere's tone. */

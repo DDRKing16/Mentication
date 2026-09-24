@@ -3,55 +3,72 @@ import { motion } from "framer-motion";
 import { BRAND_EASE } from "@/lib/interventionBrand";
 
 /**
- * The real Mentication logo and wordmark, revealed in two strokes:
- * first the doorway (arch and flowing figure), then the hand-lettered
- * wordmark and its coral swash sweep in from the left.
+ * The real Mentication logo and wordmark, put back together from its three real
+ * parts (doorway, hand-lettered wordmark, coral swash) and revealed in order:
+ * the doorway settles in, the wordmark writes on from the left, then the swash
+ * sweeps out beneath it.
  *
- * This always uses the supplied artwork (public/media/brand). Never redraw or
- * approximate the logo or wordmark.
+ * Reliability rule: only opacity and transform are animated (never clip-path,
+ * masks or SVG geometry), because those work in every browser and web view.
+ * If an animation ever fails to run, the parts must still end up visible, so
+ * each part's `animate` target is its natural, fully visible state.
  *
- * Artwork layout (1041 x 784): the doorway sits in the top-right block
- * (x > 62%, y < 56%); the wordmark and swash fill the lower part.
+ * The artwork is never redrawn (see docs/BRAND_THREAD.md). `parts` comes from
+ * getBrandLogoParts(id) in src/lib/interventionBrand.js.
  *
  * Decorative: the parent names the moment for screen readers.
  */
-const DOORWAY_HIDDEN = "inset(0% 0% 100% 62%)";
-const DOORWAY_SHOWN = "inset(0% 0% 56% 62%)";
-// Everything except the doorway block, so the two layers never double-draw it.
-const WITHOUT_DOORWAY = "polygon(0% 0%, 62% 0%, 62% 56%, 100% 56%, 100% 100%, 0% 100%)";
-
-export function BrandLockup({ src, delay = 0, className = "w-72" }) {
-  const imgProps = {
-    src,
-    alt: "",
-    draggable: false,
-    "aria-hidden": true,
-    className: "pointer-events-none block h-auto w-full select-none",
-  };
-
+function Part({ part, initial, animate, transition, origin }) {
   return (
-    <div className={`relative ${className}`} aria-hidden="true">
-      {/* 1. The doorway draws downward. */}
-      <motion.img
-        {...imgProps}
-        className="pointer-events-none absolute inset-0 block h-full w-full select-none"
-        initial={{ clipPath: DOORWAY_HIDDEN }}
-        animate={{ clipPath: DOORWAY_SHOWN }}
+    <motion.img
+      src={part.src}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      className="pointer-events-none absolute select-none"
+      style={{
+        left: `${part.left}%`,
+        top: `${part.top}%`,
+        width: `${part.width}%`,
+        height: `${part.height}%`,
+        transformOrigin: origin,
+      }}
+      initial={initial}
+      animate={animate}
+      transition={transition}
+    />
+  );
+}
+
+export function BrandLockup({ parts, delay = 0, className = "w-72" }) {
+  return (
+    <div className={`relative ${className}`} style={{ aspectRatio: String(parts.aspect) }} aria-hidden="true">
+      <Part
+        part={parts.doorway}
+        initial={{ opacity: 0, y: -14 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.85, delay, ease: BRAND_EASE }}
+        origin="50% 0%"
       />
-      {/* 2. The wordmark and swash sweep in from the left. */}
-      <motion.div
-        initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
-        animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-        transition={{ duration: 1, delay: delay + 0.55, ease: BRAND_EASE }}
-      >
-        <img {...imgProps} style={{ clipPath: WITHOUT_DOORWAY }} />
-      </motion.div>
+      <Part
+        part={parts.wordmark}
+        initial={{ opacity: 0, x: -22 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.9, delay: delay + 0.5, ease: BRAND_EASE }}
+        origin="0% 50%"
+      />
+      <Part
+        part={parts.swash}
+        initial={{ opacity: 0, scaleX: 0.5 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 0.9, delay: delay + 0.95, ease: BRAND_EASE }}
+        origin="0% 50%"
+      />
     </div>
   );
 }
 
-/** A fine coral line that draws itself under the intervention name. */
+/** A fine line that draws itself under the intervention name. */
 export function BrandHairline({ coral = "#E0715C", delay = 0, className = "w-40" }) {
   return (
     <motion.span

@@ -1,14 +1,14 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
-  BRAND_CORAL,
+  BRAND_COLOURWAYS,
   INTERVENTION_ATMOSPHERE,
+  INTERVENTION_COLOURWAY,
   getBrandAtmosphere,
-  BRAND_LOGO_ON_DARK,
-  BRAND_LOGO_ON_LIGHT,
+  getBrandColourway,
   getBrandCoral,
   getBrandInk,
-  getBrandLogo,
+  getBrandLogoParts,
 } from "./interventionBrand";
 
 const ACTIVE_IDS = [
@@ -41,25 +41,55 @@ describe("intervention brand thread", () => {
     expect(new Set(backgrounds).size).toBe(backgrounds.length);
   });
 
-  it("uses the deeper coral only on the light atmosphere", () => {
-    expect(getBrandCoral("grounding54321V2")).toBe(BRAND_CORAL.onLight);
-    ACTIVE_IDS.filter((id) => id !== "grounding54321V2").forEach((id) => {
-      expect(getBrandCoral(id), id).toBe(BRAND_CORAL.onDark);
-    });
-  });
-
   it("uses dark ink on the light atmosphere and cream ink on dark ones", () => {
     expect(getBrandInk("grounding54321V2")).not.toBe(getBrandInk("boxV2"));
   });
 
-  it("always uses the real logo artwork, in the version that reads on each world", () => {
-    expect(getBrandLogo("grounding54321V2")).toBe(BRAND_LOGO_ON_LIGHT);
-    ACTIVE_IDS.filter((id) => id !== "grounding54321V2").forEach((id) => {
-      expect(getBrandLogo(id), id).toBe(BRAND_LOGO_ON_DARK);
+  it("gives every intervention its own colourway of the real logo", () => {
+    const ids = ACTIVE_IDS.map((id) => INTERVENTION_COLOURWAY[id]);
+    ids.forEach((cid, i) => expect(BRAND_COLOURWAYS[cid], ACTIVE_IDS[i]).toBeTruthy());
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("defines all four inks of every colourway as real hex colours", () => {
+    Object.entries(BRAND_COLOURWAYS).forEach(([cid, colours]) => {
+      ["wordmark", "figure", "swash", "arch"].forEach((role) => {
+        expect(colours[role], `${cid}.${role}`).toMatch(/^#[0-9A-Fa-f]{6}$/);
+      });
     });
-    [BRAND_LOGO_ON_DARK, BRAND_LOGO_ON_LIGHT].forEach((path) => {
-      expect(existsSync(`public${path}`), path).toBe(true);
+  });
+
+  it("uses each intervention's swash colour for its line colour", () => {
+    ACTIVE_IDS.forEach((id) => expect(getBrandCoral(id), id).toBe(getBrandColourway(id).swash));
+  });
+
+  it("has the real, recoloured artwork on disk for every colourway", () => {
+    Object.keys(BRAND_COLOURWAYS).forEach((cid) => {
+      ["doorway", "wordmark", "swash"].forEach((part) => {
+        expect(existsSync(`public/media/brand/logo/${cid}/${part}.png`), `${cid}/${part}`).toBe(true);
+      });
     });
+  });
+
+  it("puts the three logo parts back where they sit on the original artwork", () => {
+    const parts = getBrandLogoParts("boxV2");
+    expect(parts.aspect).toBeGreaterThan(1);
+    ["doorway", "wordmark", "swash"].forEach((name) => {
+      const p = parts[name];
+      expect(p.src).toContain("/media/brand/logo/sky-peach/");
+      expect(p.left + p.width).toBeLessThanOrEqual(100.5);
+      expect(p.top + p.height).toBeLessThanOrEqual(100.5);
+    });
+    // the doorway sits above and to the right of the wordmark
+    expect(parts.doorway.top).toBeLessThan(parts.wordmark.top);
+    expect(parts.doorway.left).toBeGreaterThan(parts.wordmark.left);
+  });
+
+  it("reveals the logo with opacity/transform only, never clip-path (some web views drop it)", () => {
+    const src = readFileSync("src/components/brand/BrandLockup.jsx", "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "") // ignore comments; only the code matters
+      .replace(/\/\/.*$/gm, "");
+    expect(src).not.toMatch(/clipPath|clip-path|maskImage|mask-image/);
   });
 
   it("falls back to Mentication navy for unknown ids", () => {

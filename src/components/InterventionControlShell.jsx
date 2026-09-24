@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, CircleStop, MoreHorizontal, Pause, Play, SlidersHorizontal, Volume2, VolumeX, X } from "lucide-react";
 import AccessibilityPanel from "@/components/AccessibilityPanel";
-import { BRAND_CORAL, BRAND_EASE } from "@/lib/interventionBrand";
+import { BRAND_EASE, getBrandCoral } from "@/lib/interventionBrand";
 
 export default function InterventionControlShell({
   id,
@@ -43,7 +43,7 @@ export default function InterventionControlShell({
       <header className="relative z-20 flex items-center justify-between gap-3 p-4 sm:p-6">
         <button onClick={onBack} aria-label="Go back" className="grid min-h-11 min-w-11 place-items-center rounded-full border border-white/15 bg-black/20"><ArrowLeft className="h-5 w-5" /></button>
         <div className="min-w-0 text-center">
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white/50">Mentication <span aria-hidden="true" style={{ color: BRAND_CORAL.onDark }}>·</span> {String(goal || "").toLowerCase()}</p>
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white/50">Mentication <span aria-hidden="true" style={{ color: getBrandCoral(id) }}>·</span> {String(goal || "").toLowerCase()}</p>
           <p className="truncate font-heading text-lg">{title}</p>
         </div>
         <div className="flex gap-2">
@@ -57,7 +57,7 @@ export default function InterventionControlShell({
         <div className="relative h-[3px] w-full max-w-[15rem] rounded-full bg-white/15">
           <motion.span
             className="absolute inset-y-0 left-0 rounded-full"
-            style={{ background: `linear-gradient(90deg, ${BRAND_CORAL.onDark}66, ${BRAND_CORAL.onDark})`, boxShadow: `0 0 10px ${BRAND_CORAL.onDark}88` }}
+            style={{ background: `linear-gradient(90deg, ${getBrandCoral(id)}66, ${getBrandCoral(id)})`, boxShadow: `0 0 10px ${getBrandCoral(id)}88` }}
             initial={false}
             animate={{ width: `${Math.min(100, Math.max(0, (stage / Math.max(1, stages)) * 100))}%` }}
             transition={{ duration: 0.7, ease: BRAND_EASE }}

@@ -1,0 +1,17 @@
+{
+  "_note": "Colourways for the real Mentication logo, taken from the MCN V1 Branding Kit colour package. Each colourway sets the ink of the four parts of the logo. Regenerate the artwork with scripts/build_brand_logos.py after editing.",
+  "colourways": {
+    "sky-peach":       { "label": "Sky & Peach",        "wordmark": "#F5B08E", "figure": "#8FB9E8", "swash": "#FFF3B0", "arch": "#FFF3B0" },
+    "blush-mustard":   { "label": "Blush & Mustard",    "wordmark": "#F5C4C4", "figure": "#F5C4C4", "swash": "#D9A02C", "arch": "#D9A02C" },
+    "cream-rose-sage": { "label": "Cream, Rose & Sage", "wordmark": "#FBF3DC", "figure": "#8FB39A", "swash": "#E0607A", "arch": "#E8574F" },
+    "emerald-cream":   { "label": "Emerald & Cream",    "wordmark": "#FBF3DC", "figure": "#FBF3DC", "swash": "#33C892", "arch": "#33C892" },
+    "sun-violet":      { "label": "Sun & Violet",       "wordmark": "#FBF3DC", "figure": "#FFFFFF", "swash": "#F5DA2E", "arch": "#F5DA2E" },
+    "garnet-meadow":   { "label": "Garnet & Meadow",    "wordmark": "#8FD27A", "figure": "#FBF3DC", "swash": "#FBF3DC", "arch": "#8FD27A" },
+    "sage-rose":       { "label": "Sage & Rose",        "wordmark": "#C43E5B", "figure": "#8FB39A", "swash": "#8FB39A", "arch": "#E0454B" },
+    "lilac-lime":      { "label": "Lilac & Lime",       "wordmark": "#B79CF0", "figure": "#B79CF0", "swash": "#D4F53A", "arch": "#D4F53A" },
+    "peach-teal":      { "label": "Peach & Teal",       "wordmark": "#F2B584", "figure": "#F2B584", "swash": "#1FB8A3", "arch": "#1FB8A3" },
+    "cobalt-coral":    { "label": "Cobalt & Coral",     "wordmark": "#FBF3DC", "figure": "#FFFFFF", "swash": "#E8433A", "arch": "#E8433A" },
+    "cream-red":       { "label": "Cream & Red",        "wordmark": "#FBF3DC", "figure": "#F5C4C4", "swash": "#E0454B", "arch": "#E0454B" },
+    "sky-lilac":       { "label": "Sky & Lilac",        "wordmark": "#8FB9E8", "figure": "#8FB9E8", "swash": "#A78ADB", "arch": "#A78ADB" }
+  }
+}

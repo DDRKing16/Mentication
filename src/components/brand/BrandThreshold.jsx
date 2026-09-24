@@ -9,16 +9,17 @@ import {
   getBrandAtmosphere,
   getBrandCoral,
   getBrandInk,
-  getBrandLogo,
+  getBrandLogoParts,
 } from "@/lib/interventionBrand";
 import { BrandHairline, BrandLockup } from "@/components/brand/BrandLockup";
 
 /**
  * The Threshold: a short (under 2s) brand moment shown before an intervention
  * begins. It is dressed in that intervention's own colour world, but the mark
- * on top is always the real Mentication logo and wordmark: the doorway draws
- * itself, the wordmark and its coral swash sweep in, the intervention's name
- * appears, then the door opens onto the intervention.
+ * on top is always the real Mentication logo and wordmark, in that
+ * intervention's own colourway from the brand kit: the doorway settles in, the
+ * wordmark writes on, the swash sweeps out, the intervention's name appears,
+ * then the door opens onto the intervention.
  *
  * - Tap anywhere to skip.
  * - Skipped entirely when Reduce motion is on.
@@ -83,7 +84,7 @@ export default function BrandThreshold({ id, name, onReady, onDone }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.55, ease: BRAND_EASE } }}
         >
-          <BrandLockup src={getBrandLogo(id)} className="w-[19rem] max-w-[80vw]" />
+          <BrandLockup parts={getBrandLogoParts(id)} className="w-[19rem] max-w-[80vw]" />
 
           <motion.h1
             className="mt-6 text-[2rem] italic leading-tight"
