@@ -728,6 +728,8 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       field={
         <style dangerouslySetInnerHTML={{
           __html: `
+            ${step === 0 ? "" : `.change-scene-v2-container > header, .change-scene-v2-container > header p { color: #1c3a30 !important; }
+            .change-scene-v2-container > header button { color: #1c3a30; border-color: rgba(28,58,48,0.25); background: rgba(255,255,255,0.45); }`}
             .change-scene-v2-container {
               background: ${step === 0
                 ? step0BgColor
@@ -749,7 +751,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               --button-bg: ${theme.buttonBg};
               --button-text: ${theme.buttonText};
               width: 100%;
-              height: calc(100dvh - 168px);
+              height: calc(100dvh - 126px);
               min-height: 0;
               display: flex;
               align-items: center;
@@ -760,6 +762,10 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               overflow: hidden;
             }
 
+            @media (max-height: 740px) {
+              .change-scene-v2 { height: calc(100dvh - 168px); }
+            }
+
             .change-scene-v2 .shell {
               width: 100%;
               max-width: 520px;
@@ -767,7 +773,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               height: 100%;
               max-height: 780px;
               min-height: 0;
-              padding: 18px 20px 12px;
+              padding: 18px 20px 40px;
               box-sizing: border-box;
               display: flex;
               flex-direction: column;
