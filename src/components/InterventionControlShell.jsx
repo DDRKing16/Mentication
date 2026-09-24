@@ -42,14 +42,14 @@ export default function InterventionControlShell({
     <div className={`${className} intervention-control-shell min-h-dvh text-white ${active ? "pb-32" : "pb-16"}`} style={{ "--intervention-accent": accent, "--nf-accent": accent, "--flag-accent": accent }} data-intervention={id} data-quiet={quiet || undefined}>
       {field}
       <header className="relative z-20 flex items-center justify-between gap-3 p-4 sm:p-6">
-        <button onClick={onBack} aria-label="Go back" className="grid min-h-11 min-w-11 place-items-center rounded-full border border-white/15 bg-black/20"><ArrowLeft className="h-5 w-5" /></button>
+        <button onClick={onBack} aria-label="Go back" className="brand-chrome-btn grid min-h-11 min-w-11 place-items-center rounded-full"><ArrowLeft className="h-5 w-5" /></button>
         <div className="min-w-0 text-center">
           <p className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white/50">Mentication <span aria-hidden="true" style={{ color: getBrandCoral(id) }}>·</span> {String(goal || "").toLowerCase()}</p>
           <p className="truncate font-heading text-lg">{title}</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setShowA11y(true)} aria-label="Accessibility options" className="grid min-h-11 min-w-11 place-items-center rounded-full border border-white/15 bg-black/20"><MoreHorizontal className="h-5 w-5" /></button>
-          <button onClick={onExit} aria-label="Exit intervention" className="grid min-h-11 min-w-11 place-items-center rounded-full border border-white/15 bg-black/20"><X className="h-5 w-5" /></button>
+          <button onClick={() => setShowA11y(true)} aria-label="Accessibility options" className="brand-chrome-btn grid min-h-11 min-w-11 place-items-center rounded-full"><MoreHorizontal className="h-5 w-5" /></button>
+          <button onClick={onExit} aria-label="Exit intervention" className="brand-chrome-btn grid min-h-11 min-w-11 place-items-center rounded-full"><X className="h-5 w-5" /></button>
         </div>
       </header>
 
@@ -62,7 +62,7 @@ export default function InterventionControlShell({
         {bottomActionLabel && onBottomAction
           ? <button onClick={onBottomAction} className="min-h-11 rounded-full px-5 text-sm font-medium text-white/68 underline-offset-4 hover:text-white hover:underline">{bottomActionLabel}</button>
           : <button onClick={openAdapt} className="min-h-11 rounded-full px-5 text-sm font-medium text-white/68 underline-offset-4 hover:text-white hover:underline">This is not helping</button>}
-        {(active || onAudio) && <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/45 p-1.5 shadow-2xl backdrop-blur-xl">
+        {(active || onAudio) && <div className="brand-chrome-dock flex items-center gap-1 rounded-full p-1.5">
           {onPause && <button onClick={onPause} aria-label={paused ? "Resume" : "Pause"} className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10">{paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}</button>}
           {onAudio && <button onClick={onAudio} aria-label={audioOn ? "Mute audio" : "Enable audio"} aria-pressed={audioOn} className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10">{audioOn ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}</button>}
           <button onClick={openAdapt} aria-label="Adapt intervention" className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10"><SlidersHorizontal className="h-5 w-5" /></button>
