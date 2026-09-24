@@ -1,16 +1,7 @@
-import { useNavigate } from "react-router-dom";
-import { NightChannelExperience } from "@/components/NewFlagshipExperiences";
-import { INTERVENTIONS } from "@/lib/interventions";
+import React from "react";
+import StandaloneFrame from "@/components/brand/StandaloneFrame";
 
-const intervention = INTERVENTIONS.find(({ id }) => id === "nightChannel");
-
+// Night Channel is a finished, self-contained build (public/night-channel).
 export default function NightChannel() {
-  const navigate = useNavigate();
-
-  return (
-    <NightChannelExperience
-      intervention={intervention}
-      onExit={() => navigate("/library")}
-    />
-  );
+  return <StandaloneFrame id="nightChannel" name="Night Channel" src="/night-channel/index.html" background="#02050B" />;
 }

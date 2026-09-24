@@ -1,12 +1,13 @@
 // @ts-check
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
 import ResetPlayer from "@/components/ResetPlayer";
 import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
+import { standaloneRouteFor } from "@/lib/standaloneInterventions";
 import BrandClosing from "@/components/brand/BrandClosing";
 import FlagshipExperience, { isInteractiveFlagship } from "@/components/FlagshipExperience";
 import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
@@ -521,6 +522,10 @@ export default function ResetFlow() {
 
   // ---------- GUIDING ----------
   if (phase === "guiding" && activePathway) {
+    // Signal Lock, Vector Shift and Night Channel are finished standalone builds;
+    // never show the simplified in-code stand-ins.
+    const standaloneRoute = activePathway.length === 1 ? standaloneRouteFor(activePathway[0]?.id) : null;
+    if (standaloneRoute) return <Navigate to={standaloneRoute} replace />;
     const interactive = activePathway.length === 1 && isInteractiveFlagship(activePathway[0]?.id);
     if (interactive) {
       const interventionId = activePathway[0]?.id;

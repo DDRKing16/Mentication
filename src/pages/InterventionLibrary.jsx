@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, Search, X, ArrowRight, LockKeyhole } from "lucide-react";
+import { standaloneRouteFor } from "@/lib/standaloneInterventions";
 import { INTERVENTIONS } from "@/lib/interventions";
 
 const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "sleep"];
@@ -87,8 +88,9 @@ export default function InterventionLibrary() {
       navigate("/dear-2100");
       return;
     }
-    if (iv.id === "nightChannel") {
-      navigate("/night-channel");
+    const standalone = standaloneRouteFor(iv.id);
+    if (standalone) {
+      navigate(standalone);
       return;
     }
     navigate("/reset", {
