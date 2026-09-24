@@ -749,7 +749,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               --button-bg: ${theme.buttonBg};
               --button-text: ${theme.buttonText};
               width: 100%;
-              height: calc(100dvh - 126px);
+              height: calc(100dvh - 168px);
               min-height: 0;
               display: flex;
               align-items: center;
@@ -762,10 +762,10 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
 
             .change-scene-v2 .shell {
               width: 100%;
-              max-width: 440px;
+              max-width: 520px;
               margin: 0 auto;
               height: 100%;
-              max-height: 680px;
+              max-height: 780px;
               min-height: 0;
               padding: 18px 20px 12px;
               box-sizing: border-box;
