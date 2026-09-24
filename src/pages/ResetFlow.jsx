@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
 import ResetPlayer from "@/components/ResetPlayer";
+import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import FlagshipExperience, { isInteractiveFlagship } from "@/components/FlagshipExperience";
 import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
 import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
@@ -513,6 +514,7 @@ export default function ResetFlow() {
           ? NewFlagshipExperience
           : FlagshipExperience;
       return (
+        <WithBrandThreshold key={interventionId} id={interventionId} name={activePathway[0]?.name}>
         <Experience
           intervention={activePathway[0]}
           initialThought={interventionId === "factCheck" ? tofEntryThought : undefined}
@@ -536,17 +538,21 @@ export default function ResetFlow() {
           }}
           onExit={() => navigate("/")}
         />
+        </WithBrandThreshold>
       );
     }
+    const single = activePathway.length === 1 ? activePathway[0] : null;
     return (
-      <ResetPlayer
-        pathway={activePathway}
-        answers={{ ...answers, intensity: lastValue }}
-        effectiveness={effectiveness}
-        onAttemptEvent={handleAttemptEvent}
-        onComplete={onSegmentComplete}
-        onExit={() => navigate("/")}
-      />
+      <WithBrandThreshold key={single?.id || "pathway"} id={single?.id} name={single?.name}>
+        <ResetPlayer
+          pathway={activePathway}
+          answers={{ ...answers, intensity: lastValue }}
+          effectiveness={effectiveness}
+          onAttemptEvent={handleAttemptEvent}
+          onComplete={onSegmentComplete}
+          onExit={() => navigate("/")}
+        />
+      </WithBrandThreshold>
     );
   }
 
