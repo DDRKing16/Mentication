@@ -26,3 +26,11 @@ Start with `README.md` for setup, validation and iOS workflow.
 - Never place speech, payment or other private API keys in frontend or native
   application bundles.
 - Run the package validation commands before finishing code changes.
+
+## Rules for every AI agent (Copilot, Codex, Claude, others)
+
+See `.github/copilot-instructions.md`. In short: never change `main` directly (work on
+a branch and let the owner merge); never run `git pull`, `rebase`, `reset`, `stash` or
+switch branches inside the owner's working folder; never replace the finished
+Signal Lock, Vector Shift and Night Channel builds with simplified versions; and never
+claim anything is live or in `main` unless it has been merged.
