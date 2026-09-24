@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-
 import IntensityDial from "@/components/IntensityDial";
 import ResetPlayer from "@/components/ResetPlayer";
 import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
+import BrandClosing from "@/components/brand/BrandClosing";
 import FlagshipExperience, { isInteractiveFlagship } from "@/components/FlagshipExperience";
 import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
 import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
@@ -74,6 +75,10 @@ export default function ResetFlow() {
   const [unsureStep, setUnsureStep] = useState(0);
   const [unsureBranch, setUnsureBranch] = useState(null);
   const [saving, setSaving] = useState(false);
+  // The Closing brand moment plays once between a session ending and the
+  // screen that follows (the shared "done" screen, or navigating away).
+  // { id, onDone } while it plays; null the rest of the time.
+  const [closing, setClosing] = useState(null);
   // coaching loop state
   const [activePathway, setActivePathway] = useState(startsDirectFlagship ? directEntryPathway : null);
   const [usedIds, setUsedIds] = useState(startsDirectFlagship ? directEntryPathway.map((item) => item.id) : []);
@@ -425,13 +430,24 @@ export default function ResetFlow() {
       bedtime: !!answers.bedtime,
       intervention_outcome: options.interventionOutcome || undefined,
     };
-    // Dedicated premium experiences may own their complete state and return
-    // directly home; legacy pathways retain the shared completion screen.
-    if (options.direct) navigate(options.navigateTo || "/", { replace: true });
-    else advance({ phase: "done" });
     sessionStore.create(payload).catch(() => {
       // non-blocking — the experience continues regardless
     });
+    // Dedicated premium experiences may own their complete state and return
+    // directly home; legacy pathways retain the shared completion screen.
+    // Either way, the Closing brand moment plays first so every session
+    // resolves into the logo and swash the same way before it hands off.
+    const finish = () => {
+      if (options.direct) navigate(options.navigateTo || "/", { replace: true });
+      else advance({ phase: "done" });
+    };
+    setClosing({ id: usedIds[usedIds.length - 1] || pathway[0]?.id, onDone: finish });
+  };
+
+  const finishClosing = () => {
+    const finish = closing?.onDone;
+    setClosing(null);
+    finish?.();
   };
 
   // quietly re-run the just-completed pathway from the overview
@@ -514,6 +530,7 @@ export default function ResetFlow() {
           ? NewFlagshipExperience
           : FlagshipExperience;
       return (
+        <>
         <WithBrandThreshold key={interventionId} id={interventionId} name={activePathway[0]?.name}>
         <Experience
           intervention={activePathway[0]}
@@ -539,6 +556,8 @@ export default function ResetFlow() {
           onExit={() => navigate("/")}
         />
         </WithBrandThreshold>
+        {closing && <BrandClosing id={closing.id} onDone={finishClosing} />}
+        </>
       );
     }
     const single = activePathway.length === 1 ? activePathway[0] : null;
@@ -723,6 +742,7 @@ export default function ResetFlow() {
       : null;
     const helpedOptions = pathwayByIds(usedIds.length ? usedIds : pathway.map((p) => p.id));
     return (
+      <>
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto flex min-h-full max-w-xl flex-col items-center px-5 pt-10 pb-28 sm:px-8">
           <div className="flex w-full justify-start">
@@ -840,6 +860,8 @@ export default function ResetFlow() {
           </div>
         </div>
       </div>
+      {closing && <BrandClosing id={closing.id} onDone={finishClosing} />}
+      </>
     );
   }
 
