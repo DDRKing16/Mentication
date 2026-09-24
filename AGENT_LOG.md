@@ -16,3 +16,6 @@ One line per work block: date, what changed, commit.
 
 ## 24 Sep — Screen-fit pass
 Checked every intervention at 375x667, 390x844 and 1440x900 for content running off-screen. Fixed Thought or Fact and Change the Scene (too tall on small phones) and The Happy Bump (its glowing line made the page wider than a 390 phone). Standalone builds scroll a little inside their frame; left as is.
+
+## 24 Sep — Brand thread phase 3, continued: the progress thread
+Pulled the shared shell's coral progress bar into one reusable piece (`BrandThreadProgress`) and gave it to the two places that were still drawing their own: the Box Breathing / PMR / 5-4-3-2-1 Grounding player (was a plain intervention-colour hairline) and Tomorrow Parking Lot's capture/seal/parked steps (had no progress line at all) (2236529). Watched all four in a real headless-browser run at 375x812 — each shows its own colourway ink, nothing recoloured to match another. Updated the brand doc's status and started SUGGESTIONS.md, flagging that Next Easiest Step's post-ladder "Momentum Dashboard" screen breaks from the rest of its own burgundy/gold palette into cyan-on-navy, and that its colours are marked "locked" in the file, so left for the owner rather than guessed at (dd8aeaa). Did not touch Next Easiest Step's buttons — its primary buttons already use the shared pill shape.
