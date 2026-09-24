@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, CalendarPlus, ListTree, Pencil, SunMedium, Trash2 } from "lucide-react";
 import ParkedObject from "@/components/tomorrow-parking/ParkedObject";
+import InterventionNav from "@/components/brand/InterventionNav";
+import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { daysRemaining, formatDate, savedWhenLabel, timeZoneLabel } from "@/lib/tomorrowParking/dates";
 import { GENERIC_EVENT_TITLE, buildIcs, downloadIcs } from "@/lib/tomorrowParking/ics";
 import {
@@ -17,6 +19,11 @@ const NIGHT_ENTRY_STATE = { prebuilt: true, pathway: ["tomorrowParking"], direct
 // behalf.
 export default function ParkingLot() {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Opening this straight from Home's quick action is a fresh entry into
+  // Mentication and gets the Threshold; arriving here from "Review in
+  // daylight" already just played the Closing moment, so it goes straight in.
+  const freshEntry = location.state?.fromHome === true;
   const [ready, setReady] = useState(false);
   const [view, setView] = useState("arrival");
   const [records, setRecords] = useState([]);
@@ -35,7 +42,9 @@ export default function ParkingLot() {
   const goNight = () => navigate("/reset", { state: NIGHT_ENTRY_STATE });
 
   return (
+    <WithBrandThreshold id={freshEntry ? "tomorrowParking" : undefined} name={freshEntry ? "Tomorrow Parking Lot" : undefined}>
     <main className="tpl tpl--daylight">
+      <InterventionNav tone="light" />
       <div className="tpl-frame" style={{ paddingTop: "2rem" }}>
         <p className="tpl-eyebrow tpl-center">Tomorrow Parking Lot</p>
 
@@ -149,6 +158,7 @@ export default function ParkingLot() {
         </div>
       </div>
     </main>
+    </WithBrandThreshold>
   );
 }
 

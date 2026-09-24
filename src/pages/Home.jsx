@@ -155,7 +155,7 @@ export default function Home() {
             <section className="px-5 pt-4">
               <button
                 type="button"
-                onClick={() => navigate("/parking-lot")}
+                onClick={() => navigate("/parking-lot", { state: { fromHome: true } })}
                 aria-label="Open your parking lot to review what you parked last night"
                 className="w-full text-left bg-[#5B5A8C] text-[#F5F1FA] rounded-[28px] p-6 shadow-[0_12px_32px_rgba(91,90,140,0.22)] border border-white/10 transition-all hover:scale-[1.01] active:scale-[0.99] flex justify-between items-center relative overflow-hidden group"
               >
