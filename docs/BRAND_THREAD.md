@@ -93,37 +93,64 @@ real logo in its colourway).
 
 **Next phases (in order):**
 
-3. **Chrome unification (in progress).** The bespoke chromes (Box/PMR/Grounding
+3. **Chrome unification — done.** The bespoke chromes (Box/PMR/Grounding
    player, Urge Surfing bar, Next Easiest Step buttons, Tomorrow Parking Lot
-   buttons) adopt the shared header label, thread progress and button style.
-   Done: Urge Surfing's header now reads `MENTICATION · CALM` with a coral
-   thread in place of its old pink logo image and dot progress, and its main
-   button is the same soft pill shape as everywhere else. Box Breathing and
-   5-4-3-2-1 Grounding's shared player header now reads `MENTICATION · GOAL`
-   too, in place of the technique's own name (Grounding had no header label
-   at all before); PMR is unchanged since it already has its own heading and
-   would duplicate. Tomorrow Parking Lot's night capture flow now reads
-   `MENTICATION · SLEEP` instead of a plain "Tomorrow Parking Lot" line; its
-   buttons were already the shared pill shape. The Box/PMR/Grounding player's
-   progress hairline and Tomorrow Parking Lot's capture/seal/parked steps now
-   draw the coral thread (each in its own colourway ink) via a shared
-   `BrandThreadProgress` component (`src/components/brand/BrandThreadProgress.jsx`),
-   in place of the player's old plain-accent hairline and Tomorrow Parking
-   Lot's missing progress indicator; `InterventionControlShell` now uses the
-   same component instead of its own inline copy. Not done yet: Next Easiest
-   Step's buttons. Its primary actions (the segmented path-length control, the
-   main CTA, Pause/Done, the ladder's active-step card) already use the same
-   soft-pill shape used elsewhere, so nothing changed there this round; its
-   colours are marked "Official locked color theme tokens" in the file, so
-   recolouring it — including its post-ladder "Momentum Dashboard" screen,
-   which currently switches to a cyan-on-navy palette unlike the rest of the
-   intervention's burgundy/gold/cream world — needs the owner's say-so, not a
-   chrome-only pass. Flagged in SUGGESTIONS.md.
-4. **Type harmonisation.** Moment headlines in EB Garamond italic everywhere;
-   retire stray families (Fraunces, Lora, Nunito Sans, Inter, Space Grotesk,
-   Georgia) where it can be done without changing the look people love.
-5. **Direct routes.** `/next-easiest-step`, `/night-channel`, `/parking-lot`
-   and `/signal-lock` get the Threshold too. Signal Lock exists as two builds
-   (native dark navy and an iframe in cream/lime) and should become one look.
+   buttons) adopted the shared header label, thread progress and button style.
+   Urge Surfing's header reads `MENTICATION · CALM` with a coral thread in
+   place of its old pink logo image and dot progress, and its main button is
+   the same soft pill shape as everywhere else. Box Breathing and 5-4-3-2-1
+   Grounding's shared player header reads `MENTICATION · GOAL` too, in place
+   of the technique's own name (Grounding had no header label at all before);
+   PMR is unchanged since it already has its own heading and would
+   duplicate. Tomorrow Parking Lot's night capture flow reads
+   `MENTICATION · SLEEP` instead of a plain "Tomorrow Parking Lot" line. The
+   Box/PMR/Grounding player's progress hairline and Tomorrow Parking Lot's
+   capture/seal/parked steps draw the coral thread (each in its own
+   colourway ink) via a shared `BrandThreadProgress` component
+   (`src/components/brand/BrandThreadProgress.jsx`); `InterventionControlShell`
+   uses the same component instead of its own inline copy. Left as is: Next
+   Easiest Step's buttons already use the same soft-pill shape used
+   elsewhere, and its colours are marked "Official locked color theme
+   tokens" in the file, so recolouring it — including its post-ladder
+   "Momentum Dashboard" screen, which currently switches to a cyan-on-navy
+   palette unlike the rest of the intervention's burgundy/gold/cream world —
+   needs the owner's say-so, not a chrome-only pass. Flagged in
+   SUGGESTIONS.md.
+4. **Type harmonisation — done, nothing further to change.** Audited every
+   `font-family`/`fontFamily` in the codebase. The shared shell, brand
+   moments (Threshold, Closing) and every screen outside the twelve
+   interventions' own experience components already use the shared tokens
+   (`--font-heading`/`--font-body`/`--font-clean`/`--font-display` = Hanken
+   Grotesk, `--font-editorial` = EB Garamond italic) — including Urge
+   Surfing, which an earlier pass had already moved off raw font names onto
+   these same tokens. The remaining raw `Fraunces`/`Lora`/`Nunito Sans`/
+   `Inter`/Iowan Old Style/Georgia references left in the codebase all live
+   inside one intervention's own experience file or its own scoped
+   stylesheet (Thought or Fact's courtroom serif, Change the Scene's
+   postcard serif, Tomorrow Parking Lot's own embedded Lora/Nunito Sans
+   webfonts, Next Easiest Step's own locked token block) — each one is that
+   intervention's own deliberately chosen typography, which "What stays
+   unique" above protects. Retiring them would restyle a world to match
+   another, which rule 1 forbids.
+5. **Direct routes (in progress).** `/signal-lock`, `/vector-shift` and
+   `/night-channel` already open through the Threshold and carry the shared
+   Back/Home bar — `StandaloneFrame` (`src/components/brand/StandaloneFrame.jsx`)
+   wraps all three, regardless of how someone reaches them. This round added
+   the two direct entries that had no doorway at all: `/next-easiest-step`
+   and `/next-easiest-step-v2` (reachable from Next Easiest Step's own
+   deep link and from Tomorrow Parking Lot's "act on this now" handoff) now
+   open through the Threshold like every other way into the app; and the
+   Tomorrow Parking Lot daytime review, opened from Home's "Tomorrow Parking
+   Lot" card, now opens through the Threshold too and carries the shared
+   Back/Home buttons on every one of its screens (it had none before, so
+   there was no way out of the very first screen except the phone's own
+   back gesture). Re-opening the review right after parking something at
+   night — which already just played its own Closing moment seconds
+   earlier — still goes in directly, so nobody sees two brand moments back
+   to back. Still open: Signal Lock exists as two different-looking builds
+   (the finished iframe build in cream/lime, and a separate native dark-navy
+   implementation used when Signal Lock is one step inside a longer plan) —
+   flagged in SUGGESTIONS.md rather than guessed at, since recolouring the
+   finished build needs the owner's say-so.
 6. **Shared surface recipe.** One set of tokens for glass surfaces (border,
    blur, radius) and grain so cards and docks match across worlds.
