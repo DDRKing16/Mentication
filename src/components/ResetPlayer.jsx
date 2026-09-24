@@ -5,6 +5,7 @@ import {
   X, Play, Pause, Volume2, VolumeX, Type, Clock, EyeOff, Waves, Moon, Layers,
   Activity, Brain, Feather, Zap, Shuffle, ChevronRight, ArrowLeft } from "lucide-react";
 import StageVisual, { stageModeFor } from "@/components/StageVisual";
+import BrandThreadProgress from "@/components/brand/BrandThreadProgress";
 import BoxBreathingV2Stage from "@/components/BoxBreathingV2Stage";
 import GroundingV2Stage from "@/components/grounding54321/GroundingV2Stage";
 import PMRV2Stage from "@/components/PMRV2Stage";
@@ -563,14 +564,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       {/* Box Breathing V2: true-black canvas so the crystal disappears into it */}
       {isBoxV2 && <div className="pointer-events-none absolute inset-0 bg-[var(--intervention-bg)]" />}
 
-      {/* subtle, non-pressuring progress hairline */}
-      <div className="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-white/[0.06]">
-        <motion.div
-          className="h-full bg-gradient-to-r from-transparent via-[var(--intervention-accent)] to-transparent"
-          animate={{ width: `${Math.min(progress * 100, 100)}%` }}
-          transition={{ ease: "easeInOut", duration: 1.2 }}
-        />
-      </div>
+      {/* The Mentication Thread: progress as a coral line, in this intervention's own colourway. */}
+      <BrandThreadProgress id={iv?.id} progress={progress} variant="hairline" />
 
       {/* top bar */}
       <div className="relative flex items-center justify-between px-6 safe-top-lg">

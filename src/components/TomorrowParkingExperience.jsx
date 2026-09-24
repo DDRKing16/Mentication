@@ -7,6 +7,7 @@ import Shutter from "@/components/tomorrow-parking/Shutter";
 import ParkedObject from "@/components/tomorrow-parking/ParkedObject";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { hapticPattern } from "@/lib/feedback";
+import BrandThreadProgress from "@/components/brand/BrandThreadProgress";
 import { clearActiveFlagship, recordHandoffDecision, rememberFlagshipEvent } from "@/lib/flagshipMemory";
 import { getBrandCoral } from "@/lib/interventionBrand";
 import { SUGGESTION_GROUPS } from "@/lib/tomorrowParking/suggestions";
@@ -18,6 +19,8 @@ import "@/styles/tomorrow-parking.css";
 
 const ID = "tomorrowParking";
 const DARKNESS_DELAY_MS = 9000;
+// Darkness is a passive, wound-down screen with no chrome at all, so it has no stage.
+const STAGE_FOR_STEP = { capture: 1, seal: 2, parked: 3 };
 
 // Night flow: capture → seal → parked (passive) → darkness (passive).
 // State stays tied to confirmed persistence: "parked" is only reached after a
@@ -137,9 +140,12 @@ export default function TomorrowParkingExperience({ intervention, onAttemptEvent
 
       <div className="tpl-frame">
         {step !== "darkness" && (
-          <p className="tpl-eyebrow">
-            Mentication <span aria-hidden="true" style={{ color: getBrandCoral(ID) }}>·</span> sleep
-          </p>
+          <>
+            <p className="tpl-eyebrow">
+              Mentication <span aria-hidden="true" style={{ color: getBrandCoral(ID) }}>·</span> sleep
+            </p>
+            <BrandThreadProgress id={ID} stage={STAGE_FOR_STEP[step] || 1} stages={3} className="mt-3" />
+          </>
         )}
 
         {step === "capture" && (

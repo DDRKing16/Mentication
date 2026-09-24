@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, CircleStop, MoreHorizontal, Pause, Play, SlidersHorizontal, Volume2, VolumeX, X } from "lucide-react";
 import AccessibilityPanel from "@/components/AccessibilityPanel";
-import { BRAND_EASE, getBrandCoral } from "@/lib/interventionBrand";
+import BrandThreadProgress from "@/components/brand/BrandThreadProgress";
+import { getBrandCoral } from "@/lib/interventionBrand";
 
 export default function InterventionControlShell({
   id,
@@ -53,17 +54,7 @@ export default function InterventionControlShell({
       </header>
 
       {/* The Mentication Thread: progress is a coral thread being drawn. */}
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-center px-5" role="progressbar" aria-label={`Stage ${stage} of ${stages}`} aria-valuemin={1} aria-valuemax={stages} aria-valuenow={stage}>
-        <div className="relative h-[3px] w-full max-w-[15rem] rounded-full bg-white/15">
-          <motion.span
-            className="absolute inset-y-0 left-0 rounded-full"
-            style={{ background: `linear-gradient(90deg, ${getBrandCoral(id)}66, ${getBrandCoral(id)})`, boxShadow: `0 0 10px ${getBrandCoral(id)}88` }}
-            initial={false}
-            animate={{ width: `${Math.min(100, Math.max(0, (stage / Math.max(1, stages)) * 100))}%` }}
-            transition={{ duration: 0.7, ease: BRAND_EASE }}
-          />
-        </div>
-      </div>
+      <BrandThreadProgress id={id} stage={stage} stages={stages} />
 
       <main className="relative z-10">{children}</main>
 
