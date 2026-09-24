@@ -41,7 +41,7 @@ function Shell({ id, stage, children, onBack, onExit, dark = false, active = fal
 }
 
 function Panel({ eyebrow, title, body, children }) {
-  return <section aria-live="polite" className="rounded-[2rem] border border-white/15 bg-[rgba(5,15,29,.76)] p-6 shadow-2xl backdrop-blur-xl sm:p-8"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nf-accent)]">{eyebrow}</p><h1 className="mt-3 font-heading text-3xl leading-tight sm:text-4xl">{title}</h1>{body&&<p className="mt-4 leading-relaxed text-white/68">{body}</p>}{children}</section>;
+  return <section aria-live="polite" className="brand-chrome-card rounded-[2rem] p-6 sm:p-8"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nf-accent)]">{eyebrow}</p><h1 className="mt-3 font-heading text-3xl leading-tight sm:text-4xl">{title}</h1>{body&&<p className="mt-4 leading-relaxed text-white/68">{body}</p>}{children}</section>;
 }
 
 function Handoff({ from, context, launch }) {

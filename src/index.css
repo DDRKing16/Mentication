@@ -263,6 +263,16 @@
 .brand-chrome-dock[data-tone="light"] { box-shadow: 0 18px 44px -22px rgba(14, 42, 82, 0.3); }
 .brand-chrome-btn[data-tone="light"]:hover { background: rgba(255, 255, 255, 0.84); }
 
+/* Same family, sized for a content card (the Vector Shift / Signal Lock /
+   Night Channel step panel) rather than a button or dock. */
+.brand-chrome-card {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(5, 15, 29, 0.76);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow: 0 20px 60px -24px rgba(0, 0, 0, 0.7);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

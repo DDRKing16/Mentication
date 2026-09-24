@@ -14,6 +14,13 @@ describe("brand chrome (shared glass recipe)", () => {
     expect(css).toMatch(/\.brand-chrome-dock\[data-tone="light"\]/);
   });
 
+  it("defines the same family of recipe for a content card (Vector Shift / Signal Lock / Night Channel step panel)", () => {
+    expect(css).toMatch(/\.brand-chrome-card\s*\{/);
+    const flagship = readFileSync("src/components/NewFlagshipExperiences.jsx", "utf8");
+    expect(flagship).toMatch(/brand-chrome-card/);
+    expect(flagship).not.toMatch(/bg-\[rgba\(5,15,29,\.76\)\]/);
+  });
+
   it("the shared shell and the Back/Home nav both use the shared glass classes instead of their own one-off values", () => {
     const shell = readFileSync("src/components/InterventionControlShell.jsx", "utf8");
     const nav = readFileSync("src/components/brand/InterventionNav.jsx", "utf8");
