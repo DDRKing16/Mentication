@@ -8,6 +8,7 @@ import ParkedObject from "@/components/tomorrow-parking/ParkedObject";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { hapticPattern } from "@/lib/feedback";
 import { clearActiveFlagship, recordHandoffDecision, rememberFlagshipEvent } from "@/lib/flagshipMemory";
+import { getBrandCoral } from "@/lib/interventionBrand";
 import { SUGGESTION_GROUPS } from "@/lib/tomorrowParking/suggestions";
 import { formatDate, timeZoneLabel } from "@/lib/tomorrowParking/dates";
 import {
@@ -135,7 +136,11 @@ export default function TomorrowParkingExperience({ intervention, onAttemptEvent
       {step !== "darkness" && <ThoughtLines still={backgrounded} intensity={0.5} style={{ opacity: 0.7 }} />}
 
       <div className="tpl-frame">
-        {step !== "darkness" && <p className="tpl-eyebrow">Tomorrow Parking Lot</p>}
+        {step !== "darkness" && (
+          <p className="tpl-eyebrow">
+            Mentication <span aria-hidden="true" style={{ color: getBrandCoral(ID) }}>·</span> sleep
+          </p>
+        )}
 
         {step === "capture" && (
           <CaptureScreen
