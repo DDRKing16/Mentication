@@ -586,8 +586,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
           {!lightChrome ? (
             <div className="intervention-copy-muted flex items-center gap-2.5 text-[0.7rem] font-medium uppercase tracking-[0.22em]">
               <span className="intervention-accent-bg h-1.5 w-1.5 rounded-full animate-soft-pulse" />
-              {/* PMR V2 owns a single restrained heading rendered in its own stage, so the generic name label is skipped here to avoid a duplicate. */}
-              {isPMRV2 ? null : iv?.name ? <span>{iv.name}</span> : "Reset in progress"}
+              {/* PMR V2 owns a single restrained heading rendered in its own stage, so the generic label is skipped here to avoid a duplicate. */}
+              {isPMRV2 ? null : <span>Mentication · {String(answers?.direction || "").toLowerCase() || "reset"}</span>}
             </div>
           ) : null}
         </div>
