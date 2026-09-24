@@ -93,9 +93,21 @@ real logo in its colourway).
 
 **Next phases (in order):**
 
-3. **Chrome unification.** The bespoke chromes (Box/PMR/Grounding player, Urge
-   Surfing bar, Next Easiest Step buttons, Tomorrow Parking Lot buttons) adopt
-   the shared header label, thread progress and button style.
+3. **Chrome unification (in progress).** The bespoke chromes (Box/PMR/Grounding
+   player, Urge Surfing bar, Next Easiest Step buttons, Tomorrow Parking Lot
+   buttons) adopt the shared header label, thread progress and button style.
+   Done: Urge Surfing's header now reads `MENTICATION · CALM` with a coral
+   thread in place of its old pink logo image and dot progress, and its main
+   button is the same soft pill shape as everywhere else. Box Breathing and
+   5-4-3-2-1 Grounding's shared player header now reads `MENTICATION · GOAL`
+   too, in place of the technique's own name (Grounding had no header label
+   at all before); PMR is unchanged since it already has its own heading and
+   would duplicate. Tomorrow Parking Lot's night capture flow now reads
+   `MENTICATION · SLEEP` instead of a plain "Tomorrow Parking Lot" line; its
+   buttons were already the shared pill shape. Not done yet: Next Easiest
+   Step's buttons, and the shared thread progress bar for the Box/PMR/
+   Grounding player and for Tomorrow Parking Lot (both currently use their
+   own progress hairline/dots, not the coral thread).
 4. **Type harmonisation.** Moment headlines in EB Garamond italic everywhere;
    retire stray families (Fraunces, Lora, Nunito Sans, Inter, Space Grotesk,
    Georgia) where it can be done without changing the look people love.
