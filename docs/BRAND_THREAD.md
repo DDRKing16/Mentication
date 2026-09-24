@@ -14,8 +14,8 @@ own look.
 
 | Element | What it is | Where it comes from |
 |---|---|---|
-| **The Doorway** | The coral arch (with the soft flowing figure beneath it) from the logo, drawn as stroke art so it can animate | `src/components/brand/BrandDoorway.jsx` |
-| **The Thread** | The coral brush swash from under the wordmark. Used as a title underline, a progress line, and a divider | `BrandSwash`, and the progress line in `InterventionControlShell` |
+| **The Logo and Wordmark** | The real supplied artwork: the brushed coral doorway with its flowing figure, the hand-lettered wordmark and its coral swash. Revealed in two strokes (doorway, then wordmark and swash). Never redrawn | `src/components/brand/BrandLockup.jsx`, artwork in `public/media/brand/` |
+| **The Thread** | The coral line that runs through every intervention: the swash under the wordmark, a hairline under each name, and the progress line in the shared shell | `BrandHairline`, `InterventionControlShell` |
 | **Moment type** | EB Garamond *italic* for the headline of a "moment" (opening, closing). Hanken Grotesk for all interface text | `var(--font-editorial)` and `var(--font-heading)` |
 | **One easing** | Every brand moment uses the same easing curve so they feel like one hand | `BRAND_EASE` |
 | **Coral** | `#E0715C` on dark worlds, deeper `#D6553F` on the one light world (5-4-3-2-1 Grounding) | `getBrandCoral(id)` |
@@ -31,6 +31,7 @@ and interaction.
 
 ## Rules
 
+0. **Never redraw, approximate or restyle the logo or wordmark.** Always use the supplied artwork in `public/media/brand/`. Dark worlds use `mentation-navy-coral-transparent.png`; the light world uses `mentation-navy-ink-transparent.png` (the same artwork recoloured navy). A test checks both files exist.
 1. Never restyle an intervention's colour world to "match" another. Distinct is the point.
 2. Brand elements go on top of a world, never replace it.
 3. Every brand moment is short (under 2s), skippable with a tap, and skipped
@@ -41,15 +42,15 @@ and interaction.
 ## Status
 
 **Phase 1 — done:** The Threshold. Every intervention started from the Library
-now opens with the Doorway drawing itself in that intervention's own colour
-world, then its name in Garamond italic with the coral Thread under it, then the
-door lifts (`WithBrandThreshold` in `ResetFlow.jsx`). The shared shell shows
+now opens with the real logo and wordmark revealing themselves in that
+intervention's own colour world, then its name in Garamond italic with a coral
+hairline under it, then the door lifts (`WithBrandThreshold` in `ResetFlow.jsx`). The shared shell shows
 progress as a coral thread and the label as `MENTICATION · <GOAL>`.
 
 **Next phases (in order):**
 
 2. **The closing moment.** The Thread completes: the shared completion/reflect
-   screens and each intervention's own ending resolve into the Doorway and
+   screens and each intervention's own ending resolve into the logo and
    swash, so every session closes the same way.
 3. **Chrome unification.** The bespoke chromes (Box/PMR/Grounding player, Urge
    Surfing bar, Next Easiest Step buttons, Tomorrow Parking Lot buttons) adopt

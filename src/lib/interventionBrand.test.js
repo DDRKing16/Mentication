@@ -1,10 +1,14 @@
+import { existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   BRAND_CORAL,
   INTERVENTION_ATMOSPHERE,
   getBrandAtmosphere,
+  BRAND_LOGO_ON_DARK,
+  BRAND_LOGO_ON_LIGHT,
   getBrandCoral,
   getBrandInk,
+  getBrandLogo,
 } from "./interventionBrand";
 
 const ACTIVE_IDS = [
@@ -46,6 +50,16 @@ describe("intervention brand thread", () => {
 
   it("uses dark ink on the light atmosphere and cream ink on dark ones", () => {
     expect(getBrandInk("grounding54321V2")).not.toBe(getBrandInk("boxV2"));
+  });
+
+  it("always uses the real logo artwork, in the version that reads on each world", () => {
+    expect(getBrandLogo("grounding54321V2")).toBe(BRAND_LOGO_ON_LIGHT);
+    ACTIVE_IDS.filter((id) => id !== "grounding54321V2").forEach((id) => {
+      expect(getBrandLogo(id), id).toBe(BRAND_LOGO_ON_DARK);
+    });
+    [BRAND_LOGO_ON_DARK, BRAND_LOGO_ON_LIGHT].forEach((path) => {
+      expect(existsSync(`public${path}`), path).toBe(true);
+    });
   });
 
   it("falls back to Mentication navy for unknown ids", () => {

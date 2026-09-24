@@ -56,6 +56,16 @@ export function getBrandCoral(id) {
   return getBrandAtmosphere(id).tone === "light" ? BRAND_CORAL.onLight : BRAND_CORAL.onDark;
 }
 
+// The real logo artwork. Cream-ink version for dark worlds, navy-ink version
+// (same artwork, recoloured) for the one light world. Never redraw the logo.
+export const BRAND_LOGO_ON_DARK = "/media/brand/mentation-navy-coral-transparent.png";
+export const BRAND_LOGO_ON_LIGHT = "/media/brand/mentation-navy-ink-transparent.png";
+
+/** The logo artwork that reads on this intervention's atmosphere. */
+export function getBrandLogo(id) {
+  return getBrandAtmosphere(id).tone === "light" ? BRAND_LOGO_ON_LIGHT : BRAND_LOGO_ON_DARK;
+}
+
 /** Ink (text) colour appropriate for the atmosphere's tone. */
 export function getBrandInk(id) {
   return getBrandAtmosphere(id).tone === "light" ? BRAND_NAVY : BRAND_CREAM;
