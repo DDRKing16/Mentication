@@ -450,6 +450,14 @@ export default function ResetFlow() {
     finish?.();
   };
 
+  // A session that just ended shows only the Closing brand moment -- never
+  // stacked on top of whatever screen was showing -- so nothing of the old
+  // screen can show through as it fades. Once it finishes, `finishClosing`
+  // hands off to the shared "done" screen or navigates away.
+  if (closing) {
+    return <BrandClosing id={closing.id} onDone={finishClosing} />;
+  }
+
   // quietly re-run the just-completed pathway from the overview
   const restartSame = () => {
     if (buildingTimer.current) clearTimeout(buildingTimer.current);
@@ -530,7 +538,6 @@ export default function ResetFlow() {
           ? NewFlagshipExperience
           : FlagshipExperience;
       return (
-        <>
         <WithBrandThreshold key={interventionId} id={interventionId} name={activePathway[0]?.name}>
         <Experience
           intervention={activePathway[0]}
@@ -556,8 +563,6 @@ export default function ResetFlow() {
           onExit={() => navigate("/")}
         />
         </WithBrandThreshold>
-        {closing && <BrandClosing id={closing.id} onDone={finishClosing} />}
-        </>
       );
     }
     const single = activePathway.length === 1 ? activePathway[0] : null;
@@ -742,7 +747,6 @@ export default function ResetFlow() {
       : null;
     const helpedOptions = pathwayByIds(usedIds.length ? usedIds : pathway.map((p) => p.id));
     return (
-      <>
       <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
         <div className="mx-auto flex min-h-full max-w-xl flex-col items-center px-5 pt-10 pb-28 sm:px-8">
           <div className="flex w-full justify-start">
@@ -860,8 +864,6 @@ export default function ResetFlow() {
           </div>
         </div>
       </div>
-      {closing && <BrandClosing id={closing.id} onDone={finishClosing} />}
-      </>
     );
   }
 
