@@ -12,3 +12,6 @@ One line per work block: date, what changed, commit.
 - 2026-09-24 — Removed the spot-the-difference Scan game from Vector Shift (Code now leads straight to Reframe; step list renumbered).
 - 2026-09-24 — Tie-in pass: Library cards now carry a chip in each intervention's own colours; removed build labels from Next Easiest Step; documented owner feedback that interventions must feel like one app (drives brand phase 3).
 - 2026-09-24 — Library options redesigned as world cards (own background, glow, real logo in own colourway); Vector Shift card text no longer mentions the removed scan game; recorded the Mentication Standard and work order in the brand doc.
+
+## 24 Sep — Screen-fit pass
+Checked every intervention at 375x667, 390x844 and 1440x900 for content running off-screen. Fixed Thought or Fact and Change the Scene (too tall on small phones) and The Happy Bump (its glowing line made the page wider than a 390 phone). Standalone builds scroll a little inside their frame; left as is.
