@@ -63,6 +63,16 @@ was showing), and only advances once it finishes. Not covered yet: Night
 Channel, which exits through its own "Leave Night Channel" control rather
 than the shared completion path -- that belongs with phase 5's direct routes.
 
+**Owner feedback, 24 Sep (drives phase 3 below):** some interventions feel clunky and
+"like a different app", not tied into Mentication. Next Easiest Step and Change the
+Scene were named first; Tomorrow Parking Lot and Urge Surfing are close behind. The
+test for "tied in": someone moving from Home or the Library into any intervention should
+never feel they left Mentication. That means the same chrome, type, surfaces and
+transitions everywhere, with each intervention keeping only its own colour world and
+personality. No build labels, version numbers or dev text may ever show to a user.
+Done so far: Library cards carry a chip in each intervention's own colours;
+Next Easiest Step's "V2" and package label were replaced by a "Mentication · Focus" line.
+
 **Next phases (in order):**
 
 3. **Chrome unification.** The bespoke chromes (Box/PMR/Grounding player, Urge

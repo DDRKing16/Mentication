@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, Search, X, ArrowRight, LockKeyhole } from "lucide-react";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
+import { getBrandAtmosphere, getBrandColourway } from "@/lib/interventionBrand";
 import { INTERVENTIONS } from "@/lib/interventions";
 
 const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "sleep"];
@@ -57,6 +58,24 @@ function Badges({ iv }) {
         </span>
       ))}
     </div>
+  );
+}
+
+
+// A small chip in the intervention's own colours (its world + its logo colourway),
+// so the colours you tap in the Library are the colours you arrive in.
+function WorldChip({ id }) {
+  const world = getBrandAtmosphere(id);
+  const ink = getBrandColourway(id);
+  return (
+    <span
+      aria-hidden="true"
+      className="mt-0.5 flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-1 rounded-2xl"
+      style={{ background: world.background, boxShadow: `inset 0 0 0 1px ${ink.swash}44` }}
+    >
+      <span style={{ width: 11, height: 13, border: `2px solid ${ink.arch}`, borderBottom: 0, borderRadius: "6px 6px 0 0" }} />
+      <span style={{ width: 24, height: 3, borderRadius: 2, background: ink.swash }} />
+    </span>
   );
 }
 
@@ -240,6 +259,7 @@ export default function InterventionLibrary() {
                           : "border border-border bg-card hover:border-primary/30 hover:shadow-[0_12px_36px_-20px_hsl(179_69%_17%/0.22)]")
                       }
                     >
+                      {!isKing && <WorldChip id={iv.id} />}
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={

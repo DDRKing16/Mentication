@@ -2572,10 +2572,10 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
             {/* Hero Title Section */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginTop: "16px", marginBottom: "16px" }}>
               <h1 className="h1" style={{ fontSize: "40px", margin: "0", lineHeight: "1.08", letterSpacing: "-0.03em", fontWeight: "800", fontFamily: "var(--font-headline)", color: "var(--text-burgundy)", textShadow: "0 1px 0px rgba(255, 255, 255, 0.45), 0 2px 10px rgba(90, 36, 48, 0.08)" }}>
-                Next Easiest Step V2
+                Next Easiest Step
               </h1>
               <span style={{ fontSize: "10.5px", fontWeight: "800", color: "#1C5E52", letterSpacing: "0.05em", textTransform: "uppercase", marginTop: "8px", fontFamily: "var(--font-body)" }}>
-                MentiCation_Copilot_Package_V2_Locked
+                Mentication · Focus
               </span>
               
               {/* Elegant centered short Coral line bar */}
