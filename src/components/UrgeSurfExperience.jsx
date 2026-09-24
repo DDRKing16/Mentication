@@ -10,8 +10,10 @@ import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { URGE_SURF_NARRATION } from "@/lib/urgeSurfNarration";
 import { createUrgeSession, reduceUrgeSession, URGE_SURF_DEFAULTS } from "@/lib/urgeSurfSession";
 import { buildUrgeSurfLearningRecord } from "@/lib/urgeSurfState";
+import { getBrandCoral } from "@/lib/interventionBrand";
 
-const URGE_WORDMARK = "/media/brand/mentation-urge-wordmark-pink.png";
+const BRAND_ID = "urgeSurf";
+const BRAND_GOAL = "calm";
 
 const BODY_AREAS = [
   ["head_face", "Head"],
@@ -49,14 +51,6 @@ const PRACTICE_STAGES = [
 
 const STAGE_SHARES = [0.12, 0.14, 0.22, 0.18, 0.21, 0.13];
 
-function BrandMark({ compact = false }) {
-  return (
-    <span className={`urge-lovable__brand ${compact ? "is-compact" : ""}`} role="img" aria-label="Mentication">
-      <img src={URGE_WORDMARK} alt="" aria-hidden="true" draggable={false} />
-    </span>
-  );
-}
-
 function BackgroundWaves() {
   return (
     <div className="urge-lovable__background" aria-hidden="true">
@@ -76,21 +70,23 @@ function Shell({ children, step, onBack, backLabel = "Go back", trailing }) {
       <section className="urge-lovable__shell">
         <BackgroundWaves />
         <header className="urge-lovable__header">
-          <div>
-            {onBack ? (
+          <div className="urge-lovable__header-side urge-lovable__header-side--start">
+            {onBack && (
               <button type="button" onClick={onBack} aria-label={backLabel} className="urge-lovable__icon-button">
                 <ChevronLeft aria-hidden="true" />
               </button>
-            ) : <BrandMark compact />}
+            )}
           </div>
-          {step ? (
-            <div className="urge-lovable__progress" aria-label={`Step ${step} of 5`}>
-              {Array.from({ length: 5 }, (_, index) => (
-                <span className={index < step ? "is-complete" : ""} key={index} />
-              ))}
-            </div>
-          ) : trailing}
+          <p className="urge-lovable__header-label">
+            Mentication <span aria-hidden="true" style={{ color: getBrandCoral(BRAND_ID) }}>·</span> {BRAND_GOAL}
+          </p>
+          <div className="urge-lovable__header-side urge-lovable__header-side--end">{trailing}</div>
         </header>
+        {step ? (
+          <div className="urge-lovable__thread" role="progressbar" aria-label={`Step ${step} of 5`} aria-valuemin={1} aria-valuemax={5} aria-valuenow={step}>
+            <span className="urge-lovable__thread-fill" style={{ width: `${(step / 5) * 100}%`, background: `linear-gradient(90deg, ${getBrandCoral(BRAND_ID)}66, ${getBrandCoral(BRAND_ID)})`, boxShadow: `0 0 10px ${getBrandCoral(BRAND_ID)}88` }} />
+          </div>
+        ) : null}
         <div className="urge-lovable__content">{children}</div>
       </section>
     </main>
