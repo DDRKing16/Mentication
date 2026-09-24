@@ -1,3 +1,4 @@
+import { useFlowNav } from "@/components/brand/InterventionNav";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
@@ -187,6 +188,7 @@ export default function TomorrowParkingExperience({ intervention, onAttemptEvent
 /* ------------------------------ screen one -------------------------------- */
 
 function CaptureScreen({ text, setText, onContinue, onLeave, onSupport, hasSavedRecord }) {
+  const { goBack } = useFlowNav();
   const [suitability, setSuitability] = useState(text.trim() ? "wait" : null);
   const [group, setGroup] = useState(null);
   const canContinue = text.trim().length > 0;
@@ -197,7 +199,10 @@ function CaptureScreen({ text, setText, onContinue, onLeave, onSupport, hasSaved
   return (
     <div className="tpl-rise" style={{ paddingTop: "1.25rem" }}>
       <div className="tpl-topbar" style={{ alignItems: "flex-start" }}>
-        <div>
+        <button type="button" className="tpl-icon-btn" aria-label="Back" onClick={goBack} style={{ marginTop: 4, marginRight: 8 }}>
+          <ArrowLeft aria-hidden="true" size={20} />
+        </button>
+        <div style={{ flex: 1 }}>
           <h1 className="tpl-display tpl-h1">What are you holding onto?</h1>
           <p className="tpl-lede">One short note is enough. No need to organise it.</p>
         </div>

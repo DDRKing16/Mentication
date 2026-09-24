@@ -1,9 +1,9 @@
+import { useFlowNav } from "@/components/brand/InterventionNav";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Play, Pause, Volume2, VolumeX, Type, Clock, EyeOff, Waves, Moon, Layers,
-  Activity, Brain, Feather, Zap, Shuffle, ChevronRight,
-} from "lucide-react";
+  Activity, Brain, Feather, Zap, Shuffle, ChevronRight, ArrowLeft } from "lucide-react";
 import StageVisual, { stageModeFor } from "@/components/StageVisual";
 import BoxBreathingV2Stage from "@/components/BoxBreathingV2Stage";
 import GroundingV2Stage from "@/components/grounding54321/GroundingV2Stage";
@@ -319,11 +319,19 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     }, 19000);
   }, [mixer, stopVoice, onComplete]);
 
+  const { goBack } = useFlowNav();
   const handleExit = () => {
     stopVoice();
     sleepTimer.cancel();
     mixer.stopAll();
     onExit();
+  };
+  // Back returns to the previous screen (the Library), stopping audio first.
+  const handleBack = () => {
+    stopVoice();
+    sleepTimer.cancel();
+    mixer.stopAll();
+    goBack();
   };
 
   // ---- PMR V2: move directly to the next muscle group ----
@@ -566,15 +574,23 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
       {/* top bar */}
       <div className="relative flex items-center justify-between px-6 safe-top-lg">
-        {!lightChrome ? (
-          <div className="intervention-copy-muted flex items-center gap-2.5 text-[0.7rem] font-medium uppercase tracking-[0.22em]">
-            <span className="intervention-accent-bg h-1.5 w-1.5 rounded-full animate-soft-pulse" />
-            {/* PMR V2 owns a single restrained heading rendered in its own stage, so the generic name label is skipped here to avoid a duplicate. */}
-            {isPMRV2 ? null : iv?.name ? <span>{iv.name}</span> : "Reset in progress"}
-          </div>
-        ) : (
-          <span />
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleBack}
+            aria-label="Back"
+            data-sfx="none"
+            className={"no-tap -ml-3 flex h-11 w-11 items-center justify-center rounded-full transition-all " + (lightChrome ? "text-[#1A2E26]/55 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/55 hover:bg-white/10 hover:text-cream")}
+          >
+            <ArrowLeft className="h-5 w-5" strokeWidth={1.6} />
+          </button>
+          {!lightChrome ? (
+            <div className="intervention-copy-muted flex items-center gap-2.5 text-[0.7rem] font-medium uppercase tracking-[0.22em]">
+              <span className="intervention-accent-bg h-1.5 w-1.5 rounded-full animate-soft-pulse" />
+              {/* PMR V2 owns a single restrained heading rendered in its own stage, so the generic name label is skipped here to avoid a duplicate. */}
+              {isPMRV2 ? null : iv?.name ? <span>{iv.name}</span> : "Reset in progress"}
+            </div>
+          ) : null}
+        </div>
         <button
           onClick={handleExit}
           aria-label="Exit"

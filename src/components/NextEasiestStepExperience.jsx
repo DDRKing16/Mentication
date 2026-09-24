@@ -1,3 +1,4 @@
+import InterventionNav from "@/components/brand/InterventionNav";
 import React, { useState, useRef, useEffect } from "react";
 import { 
   ChevronLeft, 
@@ -1997,6 +1998,8 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
         transition: "background 300ms cubic-bezier(0.4, 0, 0.2, 1)"
       }}
     >
+      {/* Shared Home button on every screen, and Back on the opening screen (inner screens keep their own step-back arrows). */}
+      <InterventionNav back={gameState.screen === "landing"} home tone="dark" />
       {/* Scope-contained inject tokens and components styling for precision rendering */}
       <style dangerouslySetInnerHTML={{ __html: `
         .nes-v2-wrap {

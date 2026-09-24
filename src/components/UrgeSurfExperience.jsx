@@ -1,3 +1,4 @@
+import { useFlowNav } from "@/components/brand/InterventionNav";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import { Check, ChevronLeft, ExternalLink, Pause, Play, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -138,11 +139,12 @@ function useUrgeNarration(text, enabled) {
 }
 
 function NameStage({ session, dispatch, onExit, audioEnabled }) {
+  const { goBack } = useFlowNav();
   const intensity = session.initialIntensity ?? 7;
   const ready = Number.isInteger(session.initialIntensity);
   useUrgeNarration(URGE_SURF_NARRATION.name, audioEnabled);
   return (
-    <Shell trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
+    <Shell onBack={goBack} backLabel="Back" trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
       <div className="urge-lovable__screen">
         <div className="urge-lovable__intro">
           <p className="urge-lovable__eyebrow">Urge surfing</p>
@@ -399,11 +401,12 @@ function PostRatingStage({ session, dispatch, audioEnabled }) {
 }
 
 function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
+  const { goBack } = useFlowNav();
   const navigate = useNavigate();
   const totalSeconds = Math.round((session.timer.totalElapsedMs || session.timer.segmentDurationMs) / 1000);
   useUrgeNarration(URGE_SURF_NARRATION.complete, audioEnabled);
   return (
-    <Shell trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
+    <Shell onBack={goBack} backLabel="Back" trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
       <div className="urge-lovable__screen urge-lovable__complete">
         <div className="urge-lovable__complete-mark"><Check aria-hidden="true" /></div>
         <p className="urge-lovable__eyebrow">Wave passed</p>
