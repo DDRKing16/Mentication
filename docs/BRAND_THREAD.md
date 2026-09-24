@@ -48,11 +48,23 @@ colourway from the brand kit, revealing themselves over that intervention's own
 colour world, then its name in Garamond italic with a hairline under it, then the door lifts (`WithBrandThreshold` in `ResetFlow.jsx`). The shared shell shows
 progress as a thread in the intervention's colour and the label as `MENTICATION · <GOAL>`.
 
+**Phase 2 — done:** The Closing. `BrandClosing` (`src/components/brand/BrandClosing.jsx`)
+is the mirror of the Threshold: the coral thread draws in, then the logo and
+wordmark resolve out of it, in the colour world of whichever intervention the
+session just finished with. It plays once from `ResetFlow.jsx`'s single
+`completeSession` function, so it covers every pathway that flow drives to an
+end -- the shared reflect screen (Box Breathing, PMR, Grounding, Vector Shift,
+Signal Lock) and the direct-exit experiences (Thought or Fact, Urge Surfing,
+Change the Scene, Tomorrow Parking Lot, The Happy Bump) alike -- before handing
+off to the shared "done" screen or navigating home. To make sure nothing of
+the old screen could show through as the moment fades, `ResetFlow` renders
+*only* the Closing while it plays (never stacked on top of the screen that
+was showing), and only advances once it finishes. Not covered yet: Night
+Channel, which exits through its own "Leave Night Channel" control rather
+than the shared completion path -- that belongs with phase 5's direct routes.
+
 **Next phases (in order):**
 
-2. **The closing moment.** The Thread completes: the shared completion/reflect
-   screens and each intervention's own ending resolve into the logo and
-   swash, so every session closes the same way.
 3. **Chrome unification.** The bespoke chromes (Box/PMR/Grounding player, Urge
    Surfing bar, Next Easiest Step buttons, Tomorrow Parking Lot buttons) adopt
    the shared header label, thread progress and button style.
