@@ -104,10 +104,21 @@ real logo in its colourway).
    at all before); PMR is unchanged since it already has its own heading and
    would duplicate. Tomorrow Parking Lot's night capture flow now reads
    `MENTICATION · SLEEP` instead of a plain "Tomorrow Parking Lot" line; its
-   buttons were already the shared pill shape. Not done yet: Next Easiest
-   Step's buttons, and the shared thread progress bar for the Box/PMR/
-   Grounding player and for Tomorrow Parking Lot (both currently use their
-   own progress hairline/dots, not the coral thread).
+   buttons were already the shared pill shape. The Box/PMR/Grounding player's
+   progress hairline and Tomorrow Parking Lot's capture/seal/parked steps now
+   draw the coral thread (each in its own colourway ink) via a shared
+   `BrandThreadProgress` component (`src/components/brand/BrandThreadProgress.jsx`),
+   in place of the player's old plain-accent hairline and Tomorrow Parking
+   Lot's missing progress indicator; `InterventionControlShell` now uses the
+   same component instead of its own inline copy. Not done yet: Next Easiest
+   Step's buttons. Its primary actions (the segmented path-length control, the
+   main CTA, Pause/Done, the ladder's active-step card) already use the same
+   soft-pill shape used elsewhere, so nothing changed there this round; its
+   colours are marked "Official locked color theme tokens" in the file, so
+   recolouring it — including its post-ladder "Momentum Dashboard" screen,
+   which currently switches to a cyan-on-navy palette unlike the rest of the
+   intervention's burgundy/gold/cream world — needs the owner's say-so, not a
+   chrome-only pass. Flagged in SUGGESTIONS.md.
 4. **Type harmonisation.** Moment headlines in EB Garamond italic everywhere;
    retire stray families (Fraunces, Lora, Nunito Sans, Inter, Space Grotesk,
    Georgia) where it can be done without changing the look people love.
