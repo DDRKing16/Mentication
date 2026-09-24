@@ -152,5 +152,28 @@ real logo in its colourway).
    implementation used when Signal Lock is one step inside a longer plan) —
    flagged in SUGGESTIONS.md rather than guessed at, since recolouring the
    finished build needs the owner's say-so.
-6. **Shared surface recipe.** One set of tokens for glass surfaces (border,
-   blur, radius) and grain so cards and docks match across worlds.
+6. **Shared surface recipe (in progress).** One set of tokens for glass
+   surfaces (border, blur, radius) and grain so cards and docks match
+   across worlds. First slice done: `InterventionControlShell`'s header
+   buttons and bottom control dock (used directly by Change the Scene,
+   Thought or Fact and The Happy Bump, and indirectly by Vector Shift,
+   Signal Lock and Night Channel when reached as one step in a longer plan)
+   and `InterventionNav`'s floating Back/Home buttons (used by every
+   standalone build and by Next Easiest Step and Tomorrow Parking Lot) each
+   had their own one-off border/background/blur numbers, so the same kind
+   of floating button looked a little different depending on which
+   intervention it was on. Both now come from one shared recipe
+   (`.brand-chrome-btn` / `.brand-chrome-dock` in `src/index.css`, with a
+   light-tone variant for cream worlds like the finished Signal Lock
+   build). The Vector Shift/Signal Lock/Night Channel step panel's card now
+   shares the same family (`.brand-chrome-card`), with its existing colours
+   kept exactly so nothing about its look changed. Checked in a real
+   headless-browser run at 375x812 across Change the Scene, Thought or
+   Fact, The Happy Bump, Vector Shift, Signal Lock (light tone) and Next
+   Easiest Step. Not yet touched, left for a future pass: the Box/PMR/
+   Grounding player's own bottom dock (already carefully tuned and
+   consistent with itself, so lower priority) and the smaller popups
+   (ambient sound mixer, sleep timer). Grain (a subtle texture layer) is
+   not part of this slice -- today it only appears on a few individual
+   screens as part of their own look, and adding it everywhere is a bigger
+   visual call than a chrome-only consolidation.
