@@ -227,6 +227,7 @@
 .intervention-themed-surface {
   border-color: color-mix(in srgb, var(--intervention-fg) 14%, transparent);
   background: color-mix(in srgb, var(--intervention-surface) 62%, transparent);
+  box-shadow: 0 20px 60px -24px rgba(0, 0, 0, 0.6);
 }
 .intervention-theme[data-theme-mode="light"] .intervention-themed-surface {
   box-shadow: 0 10px 30px -18px rgb(14 69 54 / 0.28);
@@ -234,6 +235,32 @@
 .intervention-theme[data-theme-mode="light"] [class*="text-cream"] {
   color: var(--intervention-fg) !important;
 }
+
+/* A row or chip that sits on a themed surface (a popup's option list, a
+   preset button): background and hover both mix from the intervention's own
+   foreground colour, so they read correctly on every world -- dark or
+   light -- without a separate light-tone variant. */
+.intervention-row-hover:hover {
+  background: color-mix(in srgb, var(--intervention-fg) 8%, transparent);
+}
+.intervention-row-active {
+  background: color-mix(in srgb, var(--intervention-fg) 12%, transparent);
+}
+.intervention-chip {
+  border-color: color-mix(in srgb, var(--intervention-fg) 14%, transparent);
+  background: color-mix(in srgb, var(--intervention-fg) 6%, transparent);
+  color: var(--intervention-fg);
+}
+.intervention-chip:hover {
+  background: color-mix(in srgb, var(--intervention-fg) 12%, transparent);
+}
+.intervention-dot-on { background-color: var(--intervention-accent); }
+.intervention-dot-off { background: color-mix(in srgb, var(--intervention-fg) 30%, transparent); }
+.intervention-icon-well {
+  background: color-mix(in srgb, var(--intervention-accent) 18%, transparent);
+  color: var(--intervention-accent);
+}
+.intervention-chip:hover { border-color: color-mix(in srgb, var(--intervention-accent) 45%, transparent); }
 
 /* Brand chrome: the one glass recipe (border, background, blur, shadow) for
    every intervention's Back/Home button, header icon buttons and bottom

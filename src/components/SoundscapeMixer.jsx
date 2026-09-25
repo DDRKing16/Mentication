@@ -10,11 +10,11 @@ export default function SoundscapeMixer({ mixer, onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-      className="absolute bottom-28 left-1/2 z-50 w-[min(92vw,26rem)] -translate-x-1/2 rounded-2xl border border-cream/10 bg-[hsl(178_36%_13%)]/95 p-4 backdrop-blur-md"
+      className="intervention-themed-surface absolute bottom-28 left-1/2 z-50 w-[min(92vw,26rem)] -translate-x-1/2 rounded-2xl border p-4 backdrop-blur-md"
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-[0.18em] text-cream/55">Soundscapes</span>
-        <button onClick={onClose} className="no-tap text-cream/50 transition-colors hover:text-cream text-xs">Done</button>
+        <span className="intervention-copy-muted text-xs font-medium uppercase tracking-[0.18em]">Soundscapes</span>
+        <button onClick={onClose} className="no-tap intervention-copy-muted text-xs transition-opacity hover:opacity-70">Done</button>
       </div>
 
       <div className="mb-3 flex flex-wrap gap-1.5">
@@ -22,7 +22,7 @@ export default function SoundscapeMixer({ mixer, onClose }) {
           <button
             key={p.id}
             onClick={() => applyPreset(p)}
-            className="no-tap rounded-full border border-cream/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-cream/80 transition-colors hover:bg-white/10"
+            className="intervention-chip no-tap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
           >
             {p.label}
           </button>
@@ -34,13 +34,13 @@ export default function SoundscapeMixer({ mixer, onClose }) {
           const v = volumes[l.id] || 0;
           const on = v > 0;
           return (
-            <div key={l.id} className="flex items-center gap-3 rounded-xl px-2 py-1.5">
+            <div key={l.id} className="intervention-row-hover flex items-center gap-3 rounded-xl px-2 py-1.5">
               <button
                 onClick={() => setLayer(l.id, on ? 0 : 0.5)}
                 aria-label={on ? "Mute layer" : "Enable layer"}
-                className={"h-2.5 w-2.5 shrink-0 rounded-full transition-colors " + (on ? "bg-teal" : "bg-cream/25")}
+                className={"h-2.5 w-2.5 shrink-0 rounded-full transition-colors " + (on ? "intervention-dot-on" : "intervention-dot-off")}
               />
-              <span className={"w-28 shrink-0 text-sm " + (on ? "text-cream" : "text-cream/50")}>{l.label}</span>
+              <span className={"w-28 shrink-0 text-sm " + (on ? "intervention-copy-primary" : "intervention-copy-muted")}>{l.label}</span>
               <input
                 type="range"
                 min={0}

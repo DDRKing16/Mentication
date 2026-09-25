@@ -800,7 +800,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute bottom-32 left-1/2 z-50 -translate-x-1/2 rounded-3xl border border-white/10 bg-[hsl(178_36%_13%)]/95 p-2 shadow-[0_20px_60px_-20px_hsl(178_60%_4%/0.8)] backdrop-blur-xl"
+            className="intervention-themed-surface absolute bottom-32 left-1/2 z-50 -translate-x-1/2 rounded-3xl border p-2 backdrop-blur-xl"
           >
             <div className="flex flex-col gap-1">
               {AMBIENT_OPTIONS.map((o) => (
@@ -808,11 +808,11 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   key={o.id}
                   onClick={() => { setAmbient(o.id); if (o.id !== "off") setShowAmbient(false); }}
                   className={
-                    "no-tap flex items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm transition-colors " +
-                    (ambient === o.id ? "bg-white/15 text-cream" : "text-cream/70 hover:bg-white/10")
+                    "no-tap intervention-row-hover flex items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm transition-colors " +
+                    (ambient === o.id ? "intervention-row-active intervention-copy-primary" : "intervention-copy-muted")
                   }
                 >
-                  <span className={"h-2 w-2 rounded-full " + (ambient === o.id ? "bg-teal" : "bg-cream/30")} />
+                  <span className={"h-2 w-2 rounded-full " + (ambient === o.id ? "intervention-dot-on" : "intervention-dot-off")} />
                   {o.label}
                 </button>
               ))}
@@ -855,11 +855,11 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               exit={{ y: 40, opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md rounded-t-3xl bg-gradient-to-b from-[hsl(178_34%_16%)] to-[hsl(178_40%_9%)] p-6 pb-10 sm:rounded-3xl"
+              className="intervention-themed-surface w-full max-w-md rounded-t-3xl border p-6 pb-10 sm:rounded-3xl"
             >
-              <div className="mx-auto mb-5 h-1.5 w-10 rounded-full bg-cream/20 sm:hidden" />
-              <h3 className="font-heading text-2xl font-medium tracking-tight text-cream">Let’s try something else</h3>
-              <p className="mt-1 text-cream/55">Pick a direction — we’ll switch right away.</p>
+              <div className="intervention-dot-off mx-auto mb-5 h-1.5 w-10 rounded-full sm:hidden" />
+              <h3 className="intervention-copy-primary font-heading text-2xl font-medium tracking-tight">Let’s try something else</h3>
+              <p className="intervention-copy-muted mt-1">Pick a direction — we’ll switch right away.</p>
               <div className="mt-5 flex flex-col gap-2.5">
                 {SWITCH_MODES.map((m) => {
                   const Icon = { Activity, Brain, Feather, Zap, Shuffle }[m.icon];
@@ -867,23 +867,23 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                     <button
                       key={m.value}
                       onClick={() => doSwitch(m.value)}
-                      className="no-tap flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 text-left transition-all duration-300 hover:border-teal/40 hover:bg-white/[0.08] active:scale-[0.98]"
+                      className="intervention-chip no-tap flex items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300 active:scale-[0.98]"
                     >
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-teal">
+                      <span className="intervention-icon-well flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
                         <Icon className="h-5 w-5" strokeWidth={1.7} />
                       </span>
                       <span className="flex-1">
-                        <span className="block font-heading text-lg font-medium text-cream">{m.label}</span>
-                        <span className="block text-sm text-cream/50">{m.hint}</span>
+                        <span className="intervention-copy-primary block font-heading text-lg font-medium">{m.label}</span>
+                        <span className="intervention-copy-muted block text-sm">{m.hint}</span>
                       </span>
-                      <ChevronRight className="h-5 w-5 text-cream/40" />
+                      <ChevronRight className="intervention-copy-muted h-5 w-5" />
                     </button>
                   );
                 })}
               </div>
               <button
                 onClick={() => setShowSwitch(false)}
-                className="no-tap mt-5 w-full rounded-full py-3 text-sm font-medium text-cream/55 transition-colors hover:text-cream"
+                className="no-tap intervention-copy-muted mt-5 w-full rounded-full py-3 text-sm font-medium transition-opacity hover:opacity-70"
               >
                 Stay with this one
               </button>
