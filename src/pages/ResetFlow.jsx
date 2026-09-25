@@ -1,23 +1,30 @@
 // @ts-check
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
-import ResetPlayer from "@/components/ResetPlayer";
 import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
 import BrandClosing from "@/components/brand/BrandClosing";
-import FlagshipExperience, { isInteractiveFlagship } from "@/components/FlagshipExperience";
-import NewFlagshipExperience, { isNewFlagship } from "@/components/NewFlagshipExperiences";
-import ThoughtOrFactExperience from "@/components/ThoughtOrFactExperience";
+import { isInteractiveFlagship, isNewFlagship } from "@/lib/flagshipExperienceRouting";
 import ThoughtOrFactEntry from "@/components/thought-or-fact/ThoughtOrFactEntry";
-import UrgeSurfExperience from "@/components/UrgeSurfExperience";
-import NextEasiestStepExperience from "@/components/NextEasiestStepExperience";
-import ChangeSceneExperience from "@/components/ChangeSceneExperience";
-import TomorrowParkingExperience from "@/components/TomorrowParkingExperience";
 import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/components/reset-flow/ResetSetupScreens";
+
+// Each intervention's own guided experience is a large, self-contained
+// world (its own screens, motion and — for a couple of them — thousands of
+// lines of markup). Only one ever runs per session, so they load on demand
+// once the pathway is known, instead of every one of them riding along in
+// this shared flow's bundle for every reset.
+const ResetPlayer = lazy(() => import("@/components/ResetPlayer"));
+const FlagshipExperience = lazy(() => import("@/components/FlagshipExperience"));
+const NewFlagshipExperience = lazy(() => import("@/components/NewFlagshipExperiences"));
+const ThoughtOrFactExperience = lazy(() => import("@/components/ThoughtOrFactExperience"));
+const UrgeSurfExperience = lazy(() => import("@/components/UrgeSurfExperience"));
+const NextEasiestStepExperience = lazy(() => import("@/components/NextEasiestStepExperience"));
+const ChangeSceneExperience = lazy(() => import("@/components/ChangeSceneExperience"));
+const TomorrowParkingExperience = lazy(() => import("@/components/TomorrowParkingExperience"));
 import { warmNarration, warmBoxV2Images } from "@/lib/preloadBoxV2";
 import {
   buildPathway,
@@ -531,7 +538,10 @@ export default function ResetFlow() {
     const interactive = activePathway.length === 1 && isInteractiveFlagship(activePathway[0]?.id);
     if (interactive) {
       const interventionId = activePathway[0]?.id;
-      const Experience = interventionId === "factCheck"
+      // Each branch is a separately lazy-loaded component with its own props
+      // shape; the union those component types produce is narrower than any
+      // one of them, so the props passed below are typed loosely here.
+      const Experience = /** @type {any} */ (interventionId === "factCheck"
         ? ThoughtOrFactExperience
         : interventionId === "urgeSurf"
           ? UrgeSurfExperience
@@ -543,9 +553,10 @@ export default function ResetFlow() {
           ? TomorrowParkingExperience
         : isNewFlagship(interventionId)
           ? NewFlagshipExperience
-          : FlagshipExperience;
+          : FlagshipExperience);
       return (
         <WithBrandThreshold key={interventionId} id={interventionId} name={activePathway[0]?.name}>
+        <Suspense fallback={<BuildingResetScreen />}>
         <Experience
           intervention={activePathway[0]}
           initialThought={interventionId === "factCheck" ? tofEntryThought : undefined}
@@ -569,12 +580,14 @@ export default function ResetFlow() {
           }}
           onExit={() => navigate("/")}
         />
+        </Suspense>
         </WithBrandThreshold>
       );
     }
     const single = activePathway.length === 1 ? activePathway[0] : null;
     return (
       <WithBrandThreshold key={single?.id || "pathway"} id={single?.id} name={single?.name}>
+        <Suspense fallback={<BuildingResetScreen />}>
         <ResetPlayer
           pathway={activePathway}
           answers={{ ...answers, intensity: lastValue }}
@@ -583,6 +596,7 @@ export default function ResetFlow() {
           onComplete={onSegmentComplete}
           onExit={() => navigate("/")}
         />
+        </Suspense>
       </WithBrandThreshold>
     );
   }
