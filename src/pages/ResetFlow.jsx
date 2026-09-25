@@ -18,7 +18,7 @@ import NextEasiestStepExperience from "@/components/NextEasiestStepExperience";
 import ChangeSceneExperience from "@/components/ChangeSceneExperience";
 import TomorrowParkingExperience from "@/components/TomorrowParkingExperience";
 import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/components/reset-flow/ResetSetupScreens";
-import { warmNarration } from "@/lib/preloadBoxV2";
+import { warmNarration, warmBoxV2Images } from "@/lib/preloadBoxV2";
 import {
   buildPathway,
   buildSegment,
@@ -182,12 +182,14 @@ export default function ResetFlow() {
     setTofVoiceState("idle");
   };
 
-  // Preload the first Box Breathing V2 narration as soon as the intervention
-  // is selected. The native SVG Breath Loom has no media-loading gate.
+  // Preload the first Box Breathing V2 narration and its two background
+  // images as soon as the intervention is selected, rather than at every app
+  // launch, so it still starts instantly without paying that cost up front.
   useEffect(() => {
     const first = pathway[0];
     if (first?.id === "boxV2") {
       warmNarration(first, answers.direction);
+      warmBoxV2Images();
     }
   }, [pathway, answers.direction]);
 

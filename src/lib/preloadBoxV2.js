@@ -14,16 +14,16 @@ import { getNarration } from "@/lib/narrationService";
 
 // The persistent backdrop artwork.
 export const BOX_V2_BACKGROUND_URL = "/media/box-breathing-bg-v2.png";
+// The glass centrepiece's reference photo (the img inside .box-v2-glass-square).
+export const BOX_V2_GLASS_URL = "/media/images/box-v2-glass-square-reference.png";
 
-// Fetch AND decode the backdrop while the previous screen is still visible, so
-// the first painted frame of the exercise already contains the artwork.
-let backgroundReady = null;
-export function warmBackground() {
-  if (backgroundReady) return backgroundReady;
+// Fetch AND decode an image while the previous screen is still visible, so the
+// first painted frame of the exercise already contains it.
+function warmImage(url) {
   const img = new Image();
   img.fetchPriority = "high";
-  img.src = BOX_V2_BACKGROUND_URL;
-  backgroundReady = img.decode
+  img.src = url;
+  return img.decode
     ? img.decode().catch(() => {})
     : img.complete
       ? Promise.resolve()
@@ -31,7 +31,28 @@ export function warmBackground() {
           img.onload = resolve;
           img.onerror = resolve;
         });
+}
+
+let backgroundReady = null;
+export function warmBackground() {
+  if (!backgroundReady) backgroundReady = warmImage(BOX_V2_BACKGROUND_URL);
   return backgroundReady;
+}
+
+let glassReady = null;
+export function warmGlassReference() {
+  if (!glassReady) glassReady = warmImage(BOX_V2_GLASS_URL);
+  return glassReady;
+}
+
+// Both images used to be blanket-preloaded at every app launch via <link
+// rel="preload"> in index.html, whether or not Box Breathing was ever opened.
+// Now they're warmed here instead, the moment Box Breathing is selected — see
+// the call in ResetFlow.jsx — so the exercise still starts instantly without
+// paying that cost on every launch.
+export function warmBoxV2Images() {
+  warmBackground();
+  warmGlassReference();
 }
 
 // Warm the browser's audio cache for the first instruction lines' local
