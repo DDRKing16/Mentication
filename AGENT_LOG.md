@@ -33,3 +33,6 @@ Each sense step now casts its own soft coloured glow behind the figure (gold for
 
 ## 25 Sep — Warmer narrator
 All 754 narration clips re-made in the Jessica voice (warmer, slightly slower, more expressive; chosen by the owner from samples). Same words, same file names, timing data refreshed. Old voice is in git history if it needs to come back.
+
+## 25 Sep — Narrator, final voice
+All 754 narration clips re-made with the ORIGINAL narrator voice on the eleven_v3 engine, prefixed with the delivery cue "[warmly, smiling, gently]" (stability 0.35, style 0.7, no speaker boost). Chosen by the owner from samples ("friendly and expressive"). Word timing refreshed. The voice is slower than before: 8 steps now run 1-4 s over their hold time (the player waits for the voice, so nothing is cut off). The earlier Jessica-voice commit is in history.

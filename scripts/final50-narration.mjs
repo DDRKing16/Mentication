@@ -12,7 +12,7 @@ const AUDIO_DIR = "public/audio/narration";
 
 // Locked Mentication narration preset. Keep this aligned with
 // docs/mentation-narration-preset.md and the approved backend snapshot.
-const VOICE_ID = "cgSgspJ2msm6clMCkdW9"; // Jessica: warmer voice chosen by the owner, 25 Sep
+const VOICE_ID = "qKsErzZyZLoLSAUfEopJ"; // original narrator, re-tuned 25 Sep with the v3 engine: warm, friendly, expressive
 const MODEL_ID = "eleven_multilingual_v2";
 const OUTPUT_FORMAT = "mp3_44100_128";
 const SPEED = 0.88;
