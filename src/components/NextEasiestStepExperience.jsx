@@ -31,12 +31,8 @@ const CATEGORY_ICONS = {
 };
 
 // Official locked color theme tokens for inline styles
-const PRIMARY_BASE = "#E1E8C1"; // Sunlit Yellow-Green bg (Slightly faded for premium look)
 const PRIMARY_LIGHT = "#E1E8C1"; // Sunlit Yellow-Green Success fill / text on burgundy
-const ALTERNATE_BASE = "#5A2430"; // Burgundy Focus Mode bg
-const ALTERNATE_SURFACE = "#3D1E28"; // Dopamine track bg
 const ACCENT_CORAL = "#E75A6D"; // Underlines, sparkles, vertical fill base
-const ACCENT_TEAL = "#1C5E52"; // Checkmarks, positive focus icons
 
 
 const CATEGORY_THEMES = {
@@ -1112,13 +1108,6 @@ const CATEGORY_STYLES = {
   errands: { border: "#C7D2FE", bg: "#EEF2FF", text: "#3730A3", iconBg: "rgba(199, 210, 254, 0.2)" }
 };
 
-// Helper for dopamine level dynamic styling/tooltips
-const getDopamineColor = (level) => {
-  if (level <= 30) return "#E75A6D"; // Coral
-  if (level <= 70) return "#FCD34D"; // Warm yellow-gold
-  return "#D6DFAB"; // Sage green success
-};
-
 const generateLadder = (category, taskKey, brainState, pathLength = "regular") => {
   let baseSteps = [];
   const capitalizedTaskName = taskKey.replace(/-/g, " ").replace(/\\b\\w/g, c => c.toUpperCase());
@@ -1211,77 +1200,6 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular") =
     ...step,
     id: String(idx + 1).padStart(3, "0")
   }));
-};
-
-// Helper to render high-fidelity teal SVG category icons (24px size)
-const getCategoryIcon = (catKey) => {
-  switch (catKey) {
-    case "cleaning":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <path d="m2 22 5-5M19.5 4.5a3.5 3.5 0 1 1-5 5L10 14" />
-          <path d="M12 2v1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M20 12h1M4 12H3" />
-        </svg>
-      );
-    case "work":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-        </svg>
-      );
-    case "study":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-          <path d="M6 6h10M6 10h10" />
-        </svg>
-      );
-    case "email":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <rect width="20" height="16" x="2" y="4" rx="2" />
-          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-        </svg>
-      );
-    case "creative":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
-          <path d="M12 6A1.5 1.5 0 1 1 12 9A1.5 1.5 0 1 1 12 6Z" />
-          <path d="M7 11A1.5 1.5 0 1 1 7 14A1.5 1.5 0 1 1 7 11Z" />
-          <path d="M17 11A1.5 1.5 0 1 1 17 14A1.5 1.5 0 1 1 17 11Z" />
-          <path d="M12 15A1.5 1.5 0 1 1 12 18A1.5 1.5 0 1 1 12 15Z" />
-        </svg>
-      );
-    case "cooking":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <path d="M6 18H18V10C18 7.79086 16.2091 6 14 6H10C7.79086 6 6 7.79086 6 10V18Z" />
-          <path d="M6 14H18M12 2V6M9 3V6M15 2V6" />
-        </svg>
-      );
-    case "exercise":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <path d="M18 8h4M6 8H2M6.5 12h11M12 4v16" />
-          <circle cx="12" cy="4" r="2" />
-        </svg>
-      );
-    case "errands":
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-          <circle cx="12" cy="10" r="3" />
-        </svg>
-      );
-    default:
-      return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <circle cx="12" cy="12" r="10" />
-        </svg>
-      );
-  }
 };
 
 export default function NextEasiestStepExperience({ onComplete, onExit }) {
@@ -1416,7 +1334,7 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.06);
-    } catch (e) {}
+    } catch { /* audio unsupported */ }
   };
 
   // Haptic Vibration helper
@@ -1460,7 +1378,6 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
       });
     }
 
-    let animFrame;
     const render = () => {
       ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
       let active = false;
@@ -1495,7 +1412,7 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
       });
 
       if (active) {
-        animFrame = requestAnimationFrame(render);
+        requestAnimationFrame(render);
       } else {
         ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
       }
@@ -1508,15 +1425,6 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
   const navigateTo = (screenName) => {
     playClick();
     setGameState(prev => ({ ...prev, screen: screenName }));
-  };
-
-  const handleSelectBrainState = (state) => {
-    playClick();
-    setGameState(prev => ({ ...prev, brainState: state }));
-    // Tactile delay before entering the Intent Screen
-    setTimeout(() => {
-      setGameState(prev => ({ ...prev, screen: "intent" }));
-    }, 250);
   };
 
   const handleSelectCategoryTask = (catKey, taskObj) => {
@@ -1628,354 +1536,6 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
     setCustomTaskInput("");
     setEasierOptionsVisible(false);
     setShowPause(false);
-  };
-
-  // Renders exactly 3 steps in the stack layout (Upgraded to match Image 3 exactly)
-  const renderLadderList = () => {
-    const { ladder, currentStepIndex } = gameState;
-    if (!ladder || ladder.length === 0) return null;
-
-    let displayIndices = [];
-    if (currentStepIndex === 0) {
-      displayIndices = [0, 1, 2];
-    } else {
-      displayIndices = [currentStepIndex - 1, currentStepIndex, currentStepIndex + 1];
-    }
-
-    return displayIndices.map((idx, listPosition) => {
-      if (idx < 0 || idx >= ladder.length) return null;
-      const step = ladder[idx];
-      
-      const isDone = idx < currentStepIndex;
-      const isActive = idx === currentStepIndex;
-      const isSubsequent = idx > currentStepIndex;
-
-      // Completed card in deep teal with gold outline checkmark matching Image 3 exactly
-      if (isDone) {
-        return (
-          <div
-            key={step.id}
-            className="card"
-            style={{
-              background: "#1C5E52", // Deep Teal matching Image 3 Completed card
-              borderRadius: "24px",
-              padding: "20px 24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              border: "none",
-              boxShadow: "0 8px 24px rgba(28, 94, 82, 0.12)",
-              transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              <div style={{
-                width: "36px",
-                height: "36px",
-                border: "2.5px solid #D6DFAB", // Glowing gold/sage ring
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#D6DFAB",
-                backgroundColor: "rgba(214, 223, 171, 0.15)",
-                flexShrink: 0
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                <span style={{ color: "#FFFFFF", fontSize: "16px", fontWeight: "700", fontFamily: "var(--font-body)", letterSpacing: "-0.01em" }}>
-                  {step.title}
-                </span>
-                <span style={{ color: "#D6DFAB", fontSize: "12px", fontWeight: "700", letterSpacing: "0.02em" }}>
-                  Foundation Completed
-                </span>
-              </div>
-            </div>
-            <span style={{ color: "#D6DFAB", fontSize: "13px", fontWeight: "700" }}>
-              {step.time}
-            </span>
-          </div>
-        );
-      }
-
-      // Active card in premium Burgundy with glowing Coral highlight
-      if (isActive) {
-        return (
-          <div
-            key={step.id}
-            onClick={() => navigateTo("focus")}
-            className="card active-ladder-card"
-            style={{
-              background: "var(--alternate-base)", // Deep Burgundy
-              borderRadius: "24px",
-              padding: "24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-              cursor: "pointer",
-              border: `2.5px solid var(--accent-coral)`,
-              boxShadow: "0 16px 36px rgba(90, 36, 48, 0.22), 0 0 0 1px rgba(231, 90, 109, 0.25)",
-              transform: "scale(1.02)",
-              transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "16px", width: "100%" }}>
-              <div className="active-ring-pulse" style={{
-                width: "36px",
-                height: "36px",
-                border: "2px solid var(--accent-coral)",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--accent-coral)",
-                flexShrink: 0
-              }}>
-                <div style={{ width: "16px", height: "16px", borderRadius: "50%", backgroundColor: "var(--accent-coral)" }} />
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "2px", flex: 1 }}>
-                <span style={{ color: "#FFFFFF", fontSize: "17px", fontWeight: "800", letterSpacing: "-0.01em" }}>
-                  {step.title}
-                </span>
-                <span style={{ color: "var(--accent-coral-light)", fontSize: "12px", fontWeight: "800", letterSpacing: "0.03em" }}>
-                  ACTIVE STEP • TAP TO FOCUS
-                </span>
-              </div>
-              <span style={{ color: "#D6DFAB", fontSize: "13px", fontWeight: "700" }}>
-                {step.time}
-              </span>
-            </div>
-            <p style={{ fontSize: "13.5px", color: "rgba(255, 255, 255, 0.8)", margin: "4px 0 0 52px", lineHeight: "1.45" }}>
-              {step.micro}
-            </p>
-          </div>
-        );
-      }
-
-      // Pending card in dark Burgundy with white/cream outline circle matching Image 3 exactly
-      return (
-        <div
-          key={step.id}
-          className="card"
-          style={{
-            background: "var(--alternate-base)", // Deep Burgundy
-            borderRadius: "24px",
-            padding: "20px 24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            opacity: 0.85, // Perfectly solid Burgundy
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            boxShadow: "0 8px 24px rgba(90, 36, 48, 0.15)",
-            transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div style={{
-              width: "36px",
-              height: "36px",
-              border: "2px solid rgba(214, 223, 171, 0.4)", // White/cream outline circle
-              borderRadius: "50%",
-              flexShrink: 0
-            }} />
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ color: "#FFFFFF", fontSize: "16px", fontWeight: "700", letterSpacing: "-0.01em" }}>
-                {step.title}
-              </span>
-              <span style={{ color: "rgba(214, 223, 171, 0.5)", fontSize: "12px", fontWeight: "700" }}>
-                Step Pending
-              </span>
-            </div>
-          </div>
-          <span style={{ color: "rgba(214, 223, 171, 0.6)", fontSize: "13px", fontWeight: "700" }}>
-            {step.time}
-          </span>
-        </div>
-      );
-    });
-  };
-
-  // Renders a highly-optimized, compact ladder stack designed exclusively for the Homescreen view
-  const renderHomescreenLadder = () => {
-    const list = gameState.ladder && gameState.ladder.length > 0 
-      ? gameState.ladder 
-      : [
-          { id: "step-1", title: "Take a centering breath", micro: "Inhale deeply and stretch. You are ready.", time: "<10 sec" },
-          { id: "step-2", title: "Tidy your workspace", micro: "Gently arrange items on your desk for a fresh start.", time: "2 min" },
-          { id: "step-3", title: "Open the first task file", micro: "Locate the file and click open to begin.", time: "1 min" }
-        ];
-
-    const activeIdx = gameState.ladder && gameState.ladder.length > 0
-      ? gameState.currentStepIndex
-      : 1;
-
-    let displayIndices = [];
-    if (activeIdx === 0) {
-      displayIndices = [0, 1, 2];
-    } else {
-      displayIndices = [activeIdx - 1, activeIdx, activeIdx + 1];
-    }
-
-    return (
-      <div className="list-stack ladder-container" style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px", width: "100%", zIndex: 5 }}>
-        {displayIndices.map((idx) => {
-          if (idx < 0 || idx >= list.length) return null;
-          const step = list[idx];
-          
-          const isDone = idx < activeIdx;
-          const isActive = idx === activeIdx;
-          const isSubsequent = idx > activeIdx;
-
-          // Completed card in deep teal with gold outline checkmark (Compact)
-          if (isDone) {
-            return (
-              <div
-                key={step.id}
-                className="card"
-                style={{
-                  background: "#1C5E52", 
-                  borderRadius: "16px",
-                  padding: "12px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  border: "none",
-                  boxShadow: "0 4px 12px rgba(28, 94, 82, 0.08)",
-                  transition: "all 0.3s ease"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{
-                    width: "28px",
-                    height: "28px",
-                    border: "2px solid #D6DFAB", 
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#D6DFAB",
-                    backgroundColor: "rgba(214, 223, 171, 0.15)",
-                    flexShrink: 0
-                  }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-                    <span style={{ color: "#FFFFFF", fontSize: "14.5px", fontWeight: "700", fontFamily: "var(--font-body)", letterSpacing: "-0.01em" }}>
-                      {step.title}
-                    </span>
-                    <span style={{ color: "#D6DFAB", fontSize: "11px", fontWeight: "700", letterSpacing: "0.02em" }}>
-                      Foundation Completed
-                    </span>
-                  </div>
-                </div>
-                <span style={{ color: "#D6DFAB", fontSize: "12px", fontWeight: "700" }}>
-                  {step.time}
-                </span>
-              </div>
-            );
-          }
-
-          // Active card in premium Burgundy with glowing Coral highlight (Compact)
-          if (isActive) {
-            return (
-              <div
-                key={step.id}
-                onClick={() => navigateTo(gameState.ladder && gameState.ladder.length > 0 ? "focus" : "brain-check")}
-                className="card active-ladder-card"
-                style={{
-                  background: "var(--alternate-base)", 
-                  borderRadius: "16px",
-                  padding: "14px 16px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "6px",
-                  cursor: "pointer",
-                  border: `2px solid var(--accent-coral)`,
-                  boxShadow: "0 10px 24px rgba(90, 36, 48, 0.16)",
-                  transition: "all 0.3s ease"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%" }}>
-                  <div style={{
-                    width: "28px",
-                    height: "28px",
-                    border: "2px solid var(--accent-coral)",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "var(--accent-coral)",
-                    flexShrink: 0
-                  }}>
-                    <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: "var(--accent-coral)" }} />
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1px", flex: 1 }}>
-                    <span style={{ color: "#FFFFFF", fontSize: "15px", fontWeight: "800", letterSpacing: "-0.01em" }}>
-                      {step.title}
-                    </span>
-                    <span style={{ color: "var(--accent-coral-light)", fontSize: "11px", fontWeight: "800", letterSpacing: "0.03em" }}>
-                      ACTIVE STEP • TAP TO FOCUS
-                    </span>
-                  </div>
-                  <span style={{ color: "#D6DFAB", fontSize: "12px", fontWeight: "700" }}>
-                    {step.time}
-                  </span>
-                </div>
-                <p style={{ fontSize: "12.5px", color: "rgba(255, 255, 255, 0.8)", margin: "2px 0 0 40px", lineHeight: "1.4" }}>
-                  {step.micro}
-                </p>
-              </div>
-            );
-          }
-
-          // Pending card in dark Burgundy with white/cream outline circle (Compact)
-          return (
-            <div
-              key={step.id}
-              className="card"
-              style={{
-                background: "var(--alternate-base)", 
-                borderRadius: "16px",
-                padding: "12px 16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                opacity: 0.85, 
-                border: "1px solid rgba(255, 255, 255, 0.08)",
-                boxShadow: "0 4px 12px rgba(90, 36, 48, 0.08)",
-                transition: "all 0.3s ease"
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{
-                  width: "28px",
-                  height: "28px",
-                  border: "2px solid rgba(214, 223, 171, 0.4)", 
-                  borderRadius: "50%",
-                  flexShrink: 0
-                }} />
-                <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-                  <span style={{ color: "#FFFFFF", fontSize: "14.5px", fontWeight: "700", letterSpacing: "-0.01em" }}>
-                    {step.title}
-                  </span>
-                  <span style={{ color: "rgba(214, 223, 171, 0.5)", fontSize: "11px", fontWeight: "700" }}>
-                    Step Pending
-                  </span>
-                </div>
-              </div>
-              <span style={{ color: "rgba(214, 223, 171, 0.6)", fontSize: "12px", fontWeight: "700" }}>
-                {step.time}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    );
   };
 
   const currentStep = gameState.ladder[gameState.currentStepIndex];

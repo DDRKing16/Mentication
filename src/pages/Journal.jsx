@@ -20,18 +20,6 @@ import {
   Sparkle
 } from "lucide-react";
 
-// --- PREMIUM BRAND COLORS (BROWN, CREAM & LIGHT BLUE PRESET) ---
-const COLOR_BG = "#F7F2E8";       // Warm Premium Cream Background
-const COLOR_TEXT = "#38221E";     // Deep Espresso/Chocolate Brown Text
-const COLOR_CARD = "#FFFFFF";     // Crisp Editorial White
-const COLOR_BORDER = "#E5DCD0";   // Warm Linen Tan Border
-const COLOR_GREEN = "#4A7685";    // Serene Slate/Light Blue Accent (replaces Soft Sage)
-const COLOR_PINK_MUTED = "#FBF0EB"; // Soft Rose Clay Tint (for Anxious Quadrant)
-const COLOR_YELLOW_MUTED = "#FAF3DB"; // Soft Sun Gold Tint (for Energized Quadrant)
-const COLOR_BLUE_MUTED = "#EAF1F4"; // Soft Misty Blue Tint (for Drained Quadrant)
-const COLOR_GREEN_MUTED = "#E9F2F0"; // Soft Serene Slate Tint (for Calm Quadrant)
-const COLOR_GOLD = "#C29B68";     // Muted Antique Gold
-
 // --- UPGRADED EMOTIONS MAP (Matches the exact 16 words from the Mood Meter image) ---
 const EMOTIONS = [
   // TL - ANXIOUS (x: 0..0.5, y: 0..0.5)
@@ -270,7 +258,7 @@ export default function Journal() {
             gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
             osc2.start(ctx.currentTime);
             osc2.stop(ctx.currentTime + 0.5);
-          } catch (e) {}
+          } catch { /* audio unsupported */ }
         }, 80);
       } else if (type === 'delete') {
         const osc = ctx.createOscillator();
@@ -336,7 +324,7 @@ export default function Journal() {
     if (stored) {
       try {
         setDaybook(JSON.parse(stored));
-      } catch (e) {
+      } catch {
         console.error("Failed to parse daybook from storage");
       }
     }
