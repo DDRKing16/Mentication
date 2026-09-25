@@ -1,16 +1,32 @@
 // @ts-check
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Sparkles, TrendingDown, Repeat, Layers } from "lucide-react";
+import { ChevronLeft, Sparkles, TrendingDown, Repeat, Layers, History } from "lucide-react";
 import { deleteAllLocalAppData, sessionStore } from "@/lib/localData";
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
 import { usePremium } from "@/hooks/usePremium";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
-import ResetHistory from "@/components/history/ResetHistory";
+
+// The reset history chart pulls in a full charting library (and its own
+// sizeable dependencies) that nothing else in the app needs, so it loads
+// on demand rather than riding along with the rest of this page.
+const ResetHistory = lazy(() => import("@/components/history/ResetHistory"));
+
+function ResetHistoryFallback() {
+  return (
+    <div className="mt-8">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <History className="h-4 w-4" />
+        <span className="text-sm font-medium uppercase tracking-[0.15em]">Reset history</span>
+      </div>
+      <div className="mt-3 h-24 w-full animate-pulse rounded-2xl border border-border bg-card" />
+    </div>
+  );
+}
 
 export default function RegulationProfile() {
   const navigate = useNavigate();
@@ -144,7 +160,9 @@ export default function RegulationProfile() {
           </button>
         )}
 
-        <ResetHistory sessions={sessions} />
+        <Suspense fallback={<ResetHistoryFallback />}>
+          <ResetHistory sessions={sessions} />
+        </Suspense>
 
         {isPremium && profile.topTools.length > 0 && (
           <Section title="What tends to help you most" icon={<Sparkles className="h-4 w-4" />}>
