@@ -504,6 +504,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     switch (groundingSense) {
       case "sight":
         return {
+          "--grounding-v2-bloom": "rgba(242, 201, 76, 0.34)",
           "--grounding-v2-wash-opacity": 0.68,
           "--grounding-v2-veil-opacity": 0.24,
           "--grounding-v2-diffuse": "13px",
@@ -512,6 +513,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         };
       case "touch":
         return {
+          "--grounding-v2-bloom": "rgba(90, 190, 235, 0.30)",
           "--grounding-v2-wash-opacity": 0.76,
           "--grounding-v2-veil-opacity": 0.18,
           "--grounding-v2-diffuse": "10px",
@@ -520,6 +522,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         };
       case "hearing":
         return {
+          "--grounding-v2-bloom": "rgba(160, 120, 220, 0.26)",
           "--grounding-v2-wash-opacity": 0.84,
           "--grounding-v2-veil-opacity": 0.12,
           "--grounding-v2-diffuse": "7px",
@@ -528,6 +531,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         };
       case "smell":
         return {
+          "--grounding-v2-bloom": "rgba(240, 150, 110, 0.28)",
           "--grounding-v2-wash-opacity": 0.92,
           "--grounding-v2-veil-opacity": 0.06,
           "--grounding-v2-diffuse": "4px",
@@ -535,6 +539,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
           "--grounding-v2-bright": 0.998,
         };
       case "taste":
+        return { ...intro, "--grounding-v2-bloom": "rgba(120, 190, 140, 0.30)" };
       default:
         return intro;
     }

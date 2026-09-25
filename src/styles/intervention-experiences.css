@@ -222,6 +222,7 @@ html.reduce-motion .grounding-v2-scene-base {
   --grounding-v2-diffuse: 0px;
   --grounding-v2-color: 1;
   --grounding-v2-bright: 1;
+  --grounding-v2-bloom: transparent;
   pointer-events: none;
   isolation: isolate;
 }
@@ -236,6 +237,8 @@ html.reduce-motion .grounding-v2-scene-base {
 }
 .grounding-v2-ambient::before {
   background:
+    radial-gradient(58% 44% at 50% 46%, var(--grounding-v2-bloom, transparent), transparent 72%),
+    radial-gradient(120% 90% at 50% 108%, rgba(214, 170, 130, 0.30), transparent 60%),
     radial-gradient(70% 60% at 16% 22%, rgba(224, 235, 230, 0.75), transparent 62%),
     radial-gradient(66% 56% at 88% 82%, rgba(245, 240, 233, 0.8), transparent 62%);
   opacity: var(--grounding-v2-wash-opacity);
