@@ -152,7 +152,7 @@ real logo in its colourway).
    implementation used when Signal Lock is one step inside a longer plan) —
    flagged in SUGGESTIONS.md rather than guessed at, since recolouring the
    finished build needs the owner's say-so.
-6. **Shared surface recipe (in progress).** One set of tokens for glass
+6. **Shared surface recipe -- done.** One set of tokens for glass
    surfaces (border, blur, radius) and grain so cards and docks match
    across worlds. First slice done: `InterventionControlShell`'s header
    buttons and bottom control dock (used directly by Change the Scene,
@@ -189,10 +189,18 @@ real logo in its colourway).
    from a plain non-animated wrapper instead. Checked in a real
    headless-browser run at 375x812 across the Sleep, Ground and Calm
    directions (dark and light worlds both). A regression test
-   (`src/components/brand/popupSurfaces.test.js`) guards both fixes. Not
-   yet touched, left for a future pass since it's lower priority (already
-   carefully tuned and consistent with itself): the Box/PMR/Grounding
-   player's own header and bottom control dock. Grain (a subtle texture
-   layer) is not part of this slice -- today it only appears on a few
-   individual screens as part of their own look, and adding it everywhere
-   is a bigger visual call than a chrome-only consolidation.
+   (`src/components/brand/popupSurfaces.test.js`) guards both fixes.
+   Third slice done: the Box/PMR/Grounding player's own header (the
+   Back and Exit buttons) and bottom control dock were the last place
+   still carrying their own one-off border/background/blur numbers
+   instead of the shared recipe. Both now use `.brand-chrome-btn` /
+   `.brand-chrome-dock`, with the light-tone variant kept for the
+   5-4-3-2-1 Grounding world -- nothing about the icons, layout,
+   colours or behaviour of the player changed, only the glass they sit
+   in. `src/components/brand/brandChrome.test.js` now also guards this
+   file. Checked in a real headless-browser run at 375x812 across Box
+   Breathing (dark), 5-4-3-2-1 Grounding (light) and Progressive
+   Muscle Relaxation (dark). Grain (a subtle texture layer) is still
+   not part of this slice -- today it only appears on a few individual
+   screens as part of their own look, and adding it everywhere is a
+   bigger visual call than a chrome-only consolidation.
