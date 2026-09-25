@@ -795,29 +795,31 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
       <AnimatePresence>
         {showAmbient && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="intervention-themed-surface absolute bottom-32 left-1/2 z-50 -translate-x-1/2 rounded-3xl border p-2 backdrop-blur-xl"
-          >
-            <div className="flex flex-col gap-1">
-              {AMBIENT_OPTIONS.map((o) => (
-                <button
-                  key={o.id}
-                  onClick={() => { setAmbient(o.id); if (o.id !== "off") setShowAmbient(false); }}
-                  className={
-                    "no-tap intervention-row-hover flex items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm transition-colors " +
-                    (ambient === o.id ? "intervention-row-active intervention-copy-primary" : "intervention-copy-muted")
-                  }
-                >
-                  <span className={"h-2 w-2 rounded-full " + (ambient === o.id ? "intervention-dot-on" : "intervention-dot-off")} />
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          </motion.div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-32 z-50 flex justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="intervention-themed-surface pointer-events-auto rounded-3xl border p-2 backdrop-blur-xl"
+            >
+              <div className="flex flex-col gap-1">
+                {AMBIENT_OPTIONS.map((o) => (
+                  <button
+                    key={o.id}
+                    onClick={() => { setAmbient(o.id); if (o.id !== "off") setShowAmbient(false); }}
+                    className={
+                      "no-tap intervention-row-hover flex items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm transition-colors " +
+                      (ambient === o.id ? "intervention-row-active intervention-copy-primary" : "intervention-copy-muted")
+                    }
+                  >
+                    <span className={"h-2 w-2 rounded-full " + (ambient === o.id ? "intervention-dot-on" : "intervention-dot-off")} />
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
