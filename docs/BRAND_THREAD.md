@@ -170,10 +170,29 @@ real logo in its colourway).
    kept exactly so nothing about its look changed. Checked in a real
    headless-browser run at 375x812 across Change the Scene, Thought or
    Fact, The Happy Bump, Vector Shift, Signal Lock (light tone) and Next
-   Easiest Step. Not yet touched, left for a future pass: the Box/PMR/
-   Grounding player's own bottom dock (already carefully tuned and
-   consistent with itself, so lower priority) and the smaller popups
-   (ambient sound mixer, sleep timer). Grain (a subtle texture layer) is
-   not part of this slice -- today it only appears on a few individual
-   screens as part of their own look, and adding it everywhere is a bigger
-   visual call than a chrome-only consolidation.
+   Easiest Step.
+   Second slice done: the Box/PMR/Grounding player's smaller popups --
+   ambient sound, the sleep soundscape mixer, the sleep timer, and the
+   "this isn't helping" switch sheet -- were the one place still hardcoded
+   to a single fixed dark teal colour no matter which of the six direction
+   worlds (or the light 5-4-3-2-1 Grounding world) they floated over. They
+   now pull border, background, text and accent colour from the same
+   per-intervention theme tokens (`--intervention-fg`, `--intervention-
+   accent`, etc.) the rest of the player already used, via a small new set
+   of helper classes (`.intervention-themed-surface`, `-row-hover`,
+   `-chip`, `-dot-on/off`, `-icon-well` in `src/index.css`). Along the way,
+   found and fixed a real bug in all three popups: their centring
+   (`left-1/2` + a CSS transform) was silently overwritten by
+   framer-motion's own transform for the open/close animation, so every
+   one of them rendered with its left edge at screen centre -- roughly
+   half of it cut off past the right edge of the phone. Centring now comes
+   from a plain non-animated wrapper instead. Checked in a real
+   headless-browser run at 375x812 across the Sleep, Ground and Calm
+   directions (dark and light worlds both). A regression test
+   (`src/components/brand/popupSurfaces.test.js`) guards both fixes. Not
+   yet touched, left for a future pass since it's lower priority (already
+   carefully tuned and consistent with itself): the Box/PMR/Grounding
+   player's own header and bottom control dock. Grain (a subtle texture
+   layer) is not part of this slice -- today it only appears on a few
+   individual screens as part of their own look, and adding it everywhere
+   is a bigger visual call than a chrome-only consolidation.
