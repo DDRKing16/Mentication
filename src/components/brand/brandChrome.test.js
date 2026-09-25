@@ -40,4 +40,15 @@ describe("brand chrome (shared glass recipe)", () => {
     const nav = readFileSync("src/components/brand/InterventionNav.jsx", "utf8");
     expect(nav).toMatch(/data-tone=\{chromeTone\}/);
   });
+
+  it("the Box/PMR/Grounding player's header buttons and control dock use the shared glass classes too", () => {
+    const player = readFileSync("src/components/ResetPlayer.jsx", "utf8");
+
+    expect(player).toMatch(/brand-chrome-btn/);
+    expect(player).toMatch(/brand-chrome-dock/);
+
+    // No leftover one-off glass values for the buttons/dock this test covers.
+    expect(player).not.toMatch(/border border-white\/\[0\.08\] bg-white\/\[0\.04\]/);
+    expect(player).not.toMatch(/border border-\[#1A2E26\]\/10 bg-white\/40 shadow-\[0_8px_30px_-12px_rgba\(26,46,38,0\.18\)\]/);
+  });
 });
