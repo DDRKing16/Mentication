@@ -579,7 +579,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
             onClick={handleBack}
             aria-label="Back"
             data-sfx="none"
-            className={"no-tap -ml-3 flex h-11 w-11 items-center justify-center rounded-full transition-all " + (lightChrome ? "text-[#1A2E26]/55 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/55 hover:bg-white/10 hover:text-cream")}
+            data-tone={lightChrome ? "light" : "dark"}
+            className="no-tap brand-chrome-btn flex h-11 w-11 items-center justify-center rounded-full transition-all"
           >
             <ArrowLeft className="h-5 w-5" strokeWidth={1.6} />
           </button>
@@ -594,7 +595,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         <button
           onClick={handleExit}
           aria-label="Exit"
-          className={"no-tap flex h-11 w-11 items-center justify-center rounded-full transition-all " + (lightChrome ? "text-[#1A2E26]/55 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/55 hover:bg-white/10 hover:text-cream")}
+          data-tone={lightChrome ? "light" : "dark"}
+          className="no-tap brand-chrome-btn flex h-11 w-11 items-center justify-center rounded-full transition-all"
         >
           <X className="h-5 w-5" strokeWidth={1.6} />
         </button>
@@ -759,7 +761,10 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
       {/* control dock */}
       <div className={`safe-bottom relative flex items-center justify-center gap-2 px-6 pb-10 pt-3 ${isPMRV2 ? "pmr-v2-control-wrap" : ""}`}>
-        <div className={"flex items-center gap-0.5 rounded-full p-1.5 backdrop-blur-xl " + (isPMRV2 ? "pmr-v2-control-dock " : "") + (lightChrome ? "border border-[#1A2E26]/10 bg-white/40 shadow-[0_8px_30px_-12px_rgba(26,46,38,0.18)]" : "border border-white/[0.08] bg-white/[0.04] shadow-[0_8px_30px_-12px_hsl(178_60%_4%/0.7)]")}>
+        <div
+          data-tone={lightChrome ? "light" : "dark"}
+          className={"brand-chrome-dock flex items-center gap-0.5 rounded-full p-1.5 " + (isPMRV2 ? "pmr-v2-control-dock" : "")}
+        >
           <CtrlButton light={lightChrome} active={running} onClick={togglePause} label={running ? "Pause" : "Play"}>
             {running ? <Pause className="h-5 w-5" strokeWidth={1.7} /> : <Play className="h-5 w-5" strokeWidth={1.7} />}
           </CtrlButton>
