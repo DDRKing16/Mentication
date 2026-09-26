@@ -1785,4 +1785,30 @@ JS.clinician=()=>{jMode(true);jStage(5,1);const d=jFocus(),v=jSat(d.k),b0=JST.ba
 jSwapCheck();jRestore();
 
 </script>
-<script>document.addEventListener("DOMContentLoaded",function(){var m=document.querySelector('[data-g="x"]');if(m)m.click();});</script></body></html>
+<script>document.addEventListener("DOMContentLoaded",function(){var m=document.querySelector('[data-g="x"]');if(m)m.click();});</script><style id="mentication-narration">
+#gmSound{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:12px;z-index:50;width:36px;height:36px;border-radius:50%;border:1px solid rgba(244,241,234,.25);background:rgba(18,3,10,.55);color:#F4F1EA;font-size:15px;line-height:1;cursor:pointer}
+</style>
+<script id="mentication-narration-js">
+/* Mentication: a brief spoken line for each screen. Silent on the support and psychologist screens on purpose. */
+(function(){
+  var NO_LINE={care:1,clinician:1},cur=null,last=null,on=true,btn;
+  try{on=localStorage.getItem("gm_narr")!=="off"}catch(e){}
+  function stop(){if(cur){try{cur.pause()}catch(e){}cur=null}}
+  function say(id){
+    if(id===last)return;last=id;stop();
+    if(!on||NO_LINE[id])return;
+    var a=new Audio("audio/"+id+".mp3");cur=a;
+    a.play().catch(function(){/* the phone may block sound until the first tap; the next screen will play */});
+  }
+  var orig=window.jNavMark;
+  window.jNavMark=function(id){try{orig(id)}catch(e){}say(id)};
+  function label(){btn.textContent=on?"\uD83D\uDD0A":"\uD83D\uDD07";btn.setAttribute("aria-label",on?"Turn narration off":"Turn narration on")}
+  document.addEventListener("DOMContentLoaded",function(){
+    btn=document.createElement("button");btn.id="gmSound";btn.type="button";label();
+    btn.onclick=function(){on=!on;try{localStorage.setItem("gm_narr",on?"on":"off")}catch(e){}if(!on)stop();label()};
+    document.body.appendChild(btn);
+    setTimeout(function(){say("sort")},700);
+  });
+})();
+</script>
+</body></html>
