@@ -6,6 +6,7 @@ export const STANDALONE_ROUTES = Object.freeze({
   signalLock: "/signal-lock",
   vectorShift: "/vector-shift",
   nightChannel: "/night-channel",
+  goodMap: "/good-map",
 });
 
 /** The route of an intervention's finished build, or null if it has none. */

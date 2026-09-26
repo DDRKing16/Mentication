@@ -126,6 +126,32 @@ export default function Home() {
             </div>
           </section>
 
+          {/* The Good Map — sort what matters, see it on a map, close the biggest gap */}
+          <section className="px-5 pt-4">
+            <button
+              type="button"
+              onClick={() => navigate("/good-map")}
+              aria-label="Open The Good Map"
+              className="w-full text-left bg-[#2A040B] text-[#F4F1EA] rounded-[28px] p-6 shadow-[0_12px_32px_rgba(42,4,11,0.28)] border border-[#3EE8AA]/20 transition-all hover:scale-[1.01] active:scale-[0.99] flex justify-between items-center relative overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[#3EE8AA]/10 to-transparent pointer-events-none" />
+              <div className="flex-1 min-w-0 pr-4 z-10">
+                <span className="text-[9px] font-bold tracking-[0.25em] text-[#3EE8AA] uppercase block mb-1">
+                  THE GOOD MAP · 10 MINUTES
+                </span>
+                <h3 className="font-serif text-[23px] font-bold leading-none tracking-wide text-white mb-2">
+                  See what makes life feel good
+                </h3>
+                <p className="text-[12px] opacity-80 leading-relaxed max-w-[240px]">
+                  Sort sixteen everyday moments, see your map, then choose one small step.
+                </p>
+              </div>
+              <div className="shrink-0 w-12 h-12 rounded-[18px] bg-white/10 flex items-center justify-center border border-white/20 z-10 transition-transform group-hover:scale-105">
+                <span className="text-[20px] leading-none">→</span>
+              </div>
+            </button>
+          </section>
+
           {/* Dear 2100 — the longer reflective flow for a goal you've been avoiding */}
           <section className="px-5 pt-4">
             <div

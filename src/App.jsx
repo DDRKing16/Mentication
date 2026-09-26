@@ -29,6 +29,7 @@ const NightChannel = lazy(() => import('@/pages/NightChannel'));
 const ParkingLot = lazy(() => import('@/pages/ParkingLot'));
 const SignalLock = lazy(() => import('@/pages/SignalLock'));
 const VectorShift = lazy(() => import('@/pages/VectorShift'));
+const GoodMap = lazy(() => import('@/pages/GoodMap'));
 
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
 
@@ -93,6 +94,7 @@ const MenticationRoutes = () => {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
               <Route path="/vector-shift" element={<OnboardingGate><VectorShift /></OnboardingGate>} />
+              <Route path="/good-map" element={<OnboardingGate><GoodMap /></OnboardingGate>} />
               <Route path="*" element={<PageNotFound />} />
             </Routes>
           </Suspense>

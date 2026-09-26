@@ -460,6 +460,19 @@ const NEW_INTERVENTIONS = {
       { title: "Sprint", body: "Start the visible countdown; distractions can be captured without leaving the target.", holdSec: 180 },
     ],
   }),
+  goodMap: newIntervention({
+    id: "goodMap", name: "The Good Map", category: "lift", mechanism: "values-based-activation-mapping",
+    why: "Sorting what makes life feel good shows where a small step will help most, then turns that gap into one doable thing to try.",
+    targets: ["thoughts", "behaviour"], states: ["low_mood", "flat", "unmotivated"], directions: ["lift"], durationMin: 10,
+    cognitiveLoad: 2, environment: "any", eyes: "open", audio: "optional",
+    energy: "energising", arousal: "raise", basePriority: 4, intensityMin: 0, intensityMax: 5,
+    unsuitableSubstates: ["acute"], contraindicationTags: ["acute-distress"],
+    steps: [
+      { title: "Sort the cards", body: "Sort sixteen everyday moments by how much each one matters to you.", holdSec: 120 },
+      { title: "See your map", body: "See where life already feels good and where a small step would help most.", holdSec: 60 },
+      { title: "Choose one step", body: "Pick one small, doable step to close the biggest gap.", holdSec: 60 },
+    ],
+  }),
   nightChannel: newIntervention({
     id: "nightChannel", name: "Night Channel", category: "sleep", mechanism: "narrative-attentional-capture",
     why: "Interesting, low-pressure narrative audio gives bedtime attention somewhere appealing to settle without requiring an exercise.",
@@ -733,6 +746,7 @@ const CORE_25_SPECS = [
   // Lift (2)
   ["happyBump", "lift"],
   ["changeScene", "lift"],
+  ["goodMap", "lift"],
 
   // Ground (2)
   ["grounding54321V2", "ground"],
@@ -778,6 +792,7 @@ const DIRECTION_OVERRIDES = {
   mobiliseFocus: ["focus", "lift"],
   tomorrowParking: ["sleep", "calm"],
   nightChannel: ["sleep", "calm"],
+  goodMap: ["lift"],
   windDownBody: ["sleep", "calm"],
   warmHeavy: ["sleep", "calm"],
   sleepDrift: ["sleep", "calm"],

@@ -12,6 +12,7 @@
     "peach-teal":      { "label": "Peach & Teal",       "wordmark": "#F2B584", "figure": "#F2B584", "swash": "#1FB8A3", "arch": "#1FB8A3" },
     "cobalt-coral":    { "label": "Cobalt & Coral",     "wordmark": "#FBF3DC", "figure": "#FFFFFF", "swash": "#E8433A", "arch": "#E8433A" },
     "cream-red":       { "label": "Cream & Red",        "wordmark": "#FBF3DC", "figure": "#F5C4C4", "swash": "#E0454B", "arch": "#E0454B" },
-    "sky-lilac":       { "label": "Sky & Lilac",        "wordmark": "#8FB9E8", "figure": "#8FB9E8", "swash": "#A78ADB", "arch": "#A78ADB" }
+    "sky-lilac":       { "label": "Sky & Lilac",        "wordmark": "#8FB9E8", "figure": "#8FB9E8", "swash": "#A78ADB", "arch": "#A78ADB" },
+    "jade-champagne":  { "label": "Jade & Champagne",   "wordmark": "#EAD8B8", "figure": "#EAD8B8", "swash": "#3EE8AA", "arch": "#3EE8AA" }
   }
 }

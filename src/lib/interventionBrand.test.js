@@ -24,6 +24,7 @@ const ACTIVE_IDS = [
   "signalLock",
   "tomorrowParking",
   "nightChannel",
+  "goodMap",
 ];
 
 describe("intervention brand thread", () => {
