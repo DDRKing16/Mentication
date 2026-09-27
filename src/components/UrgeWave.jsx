@@ -66,6 +66,12 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
     // burst) so nothing "pops" — a flat, calm illustration, not a physics
     // sim.
     let tips = [];
+    // Tracks the tightest the curl has gotten, and where its tip was, so
+    // that when it lets go we can throw an actual splash from that exact
+    // spot — the "crash" — instead of the barrel just quietly deflating.
+    let peakBarrel = 0;
+    let peakTipX = 0;
+    let peakTipY = 0;
 
     const resize = () => {
       const bounds = wrap.getBoundingClientRect();
@@ -106,8 +112,17 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       };
 
       const crestY = surfaceY(center);
-      // How far into a barrel the wave is, 0 (flat) to 1 (fully wound).
-      const barrelT = clamp(wave.curl / 0.8);
+      // How far into a barrel the wave is, 0 (a plain wave, no curl at all)
+      // to 1 (fully wound). This is deliberately tied to the overall phase,
+      // not to wave.curl: it stays at exactly zero through Notice, Allow,
+      // Rise and most of Crest — a plain rising wall of water, nothing
+      // hooking over — and only starts folding over itself late in Crest,
+      // finishing (and then crashing) right around Soften. The formation
+      // itself takes real time, so it reads as the crest toppling forward
+      // under its own weight, not a decoration that was already there.
+      const barrelRise = ease(clamp((phase - 3.55) / 0.55));
+      const barrelFall = ease(clamp((phase - 4.35) / 0.55));
+      const barrelT = clamp(barrelRise - barrelFall);
 
       context.clearRect(0, 0, width, height);
 
@@ -126,42 +141,32 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       }
       context.globalAlpha = 1;
 
-      // The wave's plain body: one simple, closed silhouette, always the
-      // same shape of curve regardless of curl, so it can never glitch.
-      context.beginPath();
-      context.moveTo(-4, height + 4);
-      for (let x = -4; x <= width + 4; x += 4) context.lineTo(x, surfaceY(x));
-      context.lineTo(width + 4, height + 4);
-      context.closePath();
-      const bodyGrad = context.createLinearGradient(0, crestY, 0, waterline + 20);
-      bodyGrad.addColorStop(0, palette.glass);
-      bodyGrad.addColorStop(0.55, palette.mid);
-      bodyGrad.addColorStop(1, palette.deep);
-      context.fillStyle = bodyGrad;
-      context.fill();
-      context.lineWidth = 2;
-      context.strokeStyle = palette.deep;
-      context.globalAlpha = 0.3;
-      context.stroke();
-      context.globalAlpha = 1;
-
-      // The barrel: the crest rolls over into a tight scroll, exactly like
-      // a rolled sheet of paper — an outer curve and an inner curve that
-      // both wind around the same centre with a steadily SHRINKING radius.
-      // Because the radius only ever shrinks as the curve is drawn, the two
-      // edges of the band can never cross themselves or each other, so the
-      // shape can't self-intersect or glitch, however tightly it's wound.
+      // The whole wave — body AND, once it curls, the scroll — is ONE path
+      // filled with ONE gradient in ONE call. That's the fix for the curl
+      // looking like a different, bolted-on piece of water: it IS the same
+      // shape and the same fill as the rest of the wave, just folded over.
       let tipX = center;
       let tipY = crestY;
+      let spiralX = center;
+      let spiralY = crestY;
+      let spiralHoleR = 0;
+      context.beginPath();
+      context.moveTo(-4, height + 4);
+      for (let x = -4; x <= center; x += 4) context.lineTo(x, surfaceY(x));
+
+      let resumeX = center;
       if (barrelT > 0.01 && amplitude > 10) {
-        // Both start at zero, so the scroll grows from nothing — a thin
-        // hook first, winding tighter every frame — instead of popping in
-        // at some minimum size the moment curl appears.
+        // The crest rolls over into a tight scroll — an outer curve and an
+        // inner curve winding around the same centre with a steadily
+        // SHRINKING radius, like a rolled sheet of paper. Because the
+        // radius only ever shrinks, the two edges can never cross
+        // themselves or each other, however tightly it winds.
         const span = mix(0, 2.6, ease(barrelT)) * Math.PI; // up to ~1.3 turns
         const outerR = amplitude * mix(0, 0.5, ease(barrelT));
         const shrinkTo = mix(0.55, 0.14, barrelT);
-        const spiralX = center;
-        const spiralY = crestY + outerR;
+        spiralX = center;
+        spiralY = crestY + outerR;
+        spiralHoleR = outerR * shrinkTo;
         const samples = 26;
         const outerPts = [];
         const innerPts = [];
@@ -178,38 +183,58 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
         }
         tipX = outerPts[outerPts.length - 1].x;
         tipY = outerPts[outerPts.length - 1].y;
-
-        // A hint of shadow at the heart of the scroll — where the tightly
-        // wound tip leaves a gap between the coils, exactly as it should.
-        context.save();
-        const holeR = outerR * shrinkTo * 1.3;
-        const holeGrad = context.createRadialGradient(spiralX, spiralY - outerR * shrinkTo * 0.5, 0, spiralX, spiralY - outerR * shrinkTo * 0.5, holeR);
-        holeGrad.addColorStop(0, "rgba(2,10,11,0.85)");
-        holeGrad.addColorStop(1, "rgba(2,10,11,0)");
-        context.fillStyle = holeGrad;
-        context.beginPath();
-        context.arc(spiralX, spiralY - outerR * shrinkTo * 0.5, holeR, 0, Math.PI * 2);
-        context.fill();
-        context.restore();
-
-        context.beginPath();
-        context.moveTo(outerPts[0].x, outerPts[0].y);
         for (let i = 1; i < outerPts.length; i += 1) context.lineTo(outerPts[i].x, outerPts[i].y);
         for (let i = innerPts.length - 1; i >= 0; i -= 1) context.lineTo(innerPts[i].x, innerPts[i].y);
-        context.closePath();
-        const bandGrad = context.createRadialGradient(spiralX, spiralY, outerR * shrinkTo * 0.3, spiralX, spiralY, outerR);
-        bandGrad.addColorStop(0, palette.mid);
-        bandGrad.addColorStop(0.55, palette.glass);
-        bandGrad.addColorStop(0.82, palette.foam);
-        bandGrad.addColorStop(1, palette.foam);
-        context.fillStyle = bandGrad;
-        context.fill();
-        context.lineWidth = 1.5;
-        context.strokeStyle = palette.deep;
-        context.globalAlpha = 0.28;
-        context.stroke();
-        context.globalAlpha = 1;
+        // Rejoin the front face smoothly, a short step past the crest.
+        resumeX = center + outerR * 0.22;
+        context.quadraticCurveTo(innerPts[0].x, innerPts[0].y + amplitude * 0.06, resumeX, surfaceY(resumeX));
       }
+      for (let x = resumeX; x <= width + 4; x += 4) context.lineTo(x, surfaceY(x));
+      context.lineTo(width + 4, height + 4);
+      context.closePath();
+
+      const bodyGrad = context.createLinearGradient(0, crestY, 0, waterline + 20);
+      bodyGrad.addColorStop(0, palette.glass);
+      bodyGrad.addColorStop(0.55, palette.mid);
+      bodyGrad.addColorStop(1, palette.deep);
+      context.fillStyle = bodyGrad;
+      context.fill();
+      context.lineWidth = 2;
+      context.strokeStyle = palette.deep;
+      context.globalAlpha = 0.3;
+      context.stroke();
+      context.globalAlpha = 1;
+
+      // A hint of shadow deep in the scroll's centre — the same water,
+      // just in its own shade, not a separate colour — plus a bright
+      // foam-lit edge along the curling lip, both clipped to the exact
+      // shape just filled so neither can spill outside it.
+      if (barrelT > 0.03 && spiralHoleR > 2) {
+        context.save();
+        context.clip();
+        const holeGrad = context.createRadialGradient(spiralX, spiralY - spiralHoleR * 0.5, 0, spiralX, spiralY - spiralHoleR * 0.5, spiralHoleR * 1.5);
+        holeGrad.addColorStop(0, palette.deep);
+        holeGrad.addColorStop(1, "rgba(0,0,0,0)");
+        context.fillStyle = holeGrad;
+        context.globalAlpha = 0.6;
+        context.beginPath();
+        context.arc(spiralX, spiralY - spiralHoleR * 0.5, spiralHoleR * 1.5, 0, Math.PI * 2);
+        context.fill();
+        context.globalAlpha = 1;
+        context.restore();
+      }
+
+      // Track the tightest the curl gets and where its tip sits, so the
+      // moment it lets go, the crash can throw a splash from that exact
+      // point instead of just deflating quietly.
+      if (barrelT >= peakBarrel) {
+        peakBarrel = barrelT;
+        peakTipX = tipX;
+        peakTipY = tipY;
+      } else if (barrelT < 0.02) {
+        peakBarrel = 0;
+      }
+      const collapse = peakBarrel > 0.25 ? clamp(peakBarrel - barrelT) : 0;
 
       // A few foam bits at the curling tip — a fixed small cap, smoothly
       // fading in and out with the curl, never a sudden scatter.
@@ -227,6 +252,25 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
         context.fill();
       });
       context.globalAlpha = 1;
+
+      // The crash: the instant the barrel starts letting go, a burst of
+      // whitewater throws out from exactly where its tip was, then quickly
+      // spreads and fades — the actual "it barrels over and breaks" moment,
+      // not just the scroll quietly shrinking back to nothing.
+      if (collapse > 0.01) {
+        const burst = ease(clamp(collapse / Math.max(peakBarrel, 0.01)));
+        const burstR = mix(4, amplitude * 0.9, burst);
+        context.fillStyle = palette.foam;
+        context.globalAlpha = (1 - burst) * 0.55;
+        for (let i = 0; i < 6; i += 1) {
+          const a = (i / 6) * Math.PI * 2 + i;
+          const d = burstR * mix(0.3, 1, (i % 3) / 2);
+          context.beginPath();
+          context.arc(peakTipX + Math.cos(a) * d, peakTipY + Math.sin(a) * d * 0.6 + burst * amplitude * 0.15, mix(2, 6, burst), 0, Math.PI * 2);
+          context.fill();
+        }
+        context.globalAlpha = 1;
+      }
 
       // A calm foam wash at the base once the wave has passed — two or
       // three flat, softly-edged blobs that fade with wave.wash, not a
