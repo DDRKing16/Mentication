@@ -44,39 +44,41 @@ export function NoSafeMatchScreen({ onAdjust }) {
 
 export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegin }) {
   return (
-    <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+    <div className="calmbg min-h-full">
       <div className="mx-auto flex min-h-[100dvh] max-w-xl flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8">
         <div className="flex justify-end">
           <FlowHomeButton />
         </div>
-        <h1 className="mt-3 font-heading text-[1.8rem] font-semibold leading-tight tracking-[-0.025em] text-primary text-balance sm:text-4xl">
-          Your {answers.timeMin}-minute reset
-        </h1>
-        <p className="mt-2 max-w-lg text-[0.98rem] leading-relaxed text-muted-foreground text-balance">
-          {isPrebuilt
-            ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
-            : "Starting with the best-fit practice. The next step will adapt after your check-in."}
-        </p>
+        <div className="flex flex-1 flex-col justify-center">
+          <h1 className="font-heading text-[1.8rem] font-semibold leading-tight tracking-[-0.025em] text-primary text-balance sm:text-4xl">
+            Your {answers.timeMin}-minute reset
+          </h1>
+          <p className="mt-2 max-w-lg text-[0.98rem] leading-relaxed text-muted-foreground text-balance">
+            {isPrebuilt
+              ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
+              : "Starting with the best-fit practice. The next step will adapt after your check-in."}
+          </p>
 
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mt-6 rounded-[1.5rem] border border-border bg-card p-5 soft-depth"
-        >
-          <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            <span>First activity</span>
-            <span>{answers.timeMin} min</span>
-          </div>
-          <h2 className="mt-3 font-heading text-[1.35rem] font-semibold tracking-[-0.02em] text-foreground">
-            {pathway[0]?.name}
-          </h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{pathway[0]?.why}</p>
-        </motion.section>
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mt-6 rounded-[1.5rem] border border-border bg-card p-5 soft-depth"
+          >
+            <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <span>First activity</span>
+              <span>{answers.timeMin} min</span>
+            </div>
+            <h2 className="mt-3 font-heading text-[1.35rem] font-semibold tracking-[-0.02em] text-foreground">
+              {pathway[0]?.name}
+            </h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{pathway[0]?.why}</p>
+          </motion.section>
 
-        {!isPrebuilt && <PreferencesRow answers={answers} setAnswers={setAnswers} />}
+          {!isPrebuilt && <PreferencesRow answers={answers} setAnswers={setAnswers} />}
+        </div>
 
-        <div className="mt-auto flex justify-center pt-6">
+        <div className="flex justify-center pt-6">
           <Button
             size="lg"
             onClick={onBegin}
