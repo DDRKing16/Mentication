@@ -82,3 +82,6 @@ Reworked the curl into an actual hollow tube instead of a folding lip: a dark ca
 
 ## 28 Sep — Urge Surfing wave, fixed the barrel
 The previous attempt at a hollow barrel (a second overlapping tongue/cave shape) self-intersected and threw stray lines on screen — reverted that. The barrel is back to one continuous, self-consistent curve like the earlier working version, just with a much bigger overshoot at full curl, plus a single plain radial shadow (clipped to the wave, so it can never paint outside it) to sell the hollow. Checked clean through a full Notice-to-Pass cycle with no stray shapes.
+
+## 28 Sep — Urge Surfing wave, rebuilt to match a reference
+Started over after the owner shared a flat-illustration wave reference: rewrote the whole animation as a calm, flat shape instead of a noisy/photoreal one. The curl is now a proper rolled scroll — an outer and inner curve winding around one point with a steadily SHRINKING radius, so it can never cross itself or glitch, however tightly wound. A small dark hollow shows through near the tightly-wound tip, matching the reference. Removed all the noise-texture, caustics and random particle bursts from the last two passes; foam is now a small, fixed, smoothly fading cap. Checked clean through a full cycle.

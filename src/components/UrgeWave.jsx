@@ -7,24 +7,6 @@ const ease = (value) => {
   return point * point * (3 - 2 * point);
 };
 
-// A tiny deterministic value-noise generator (no library): smooth, seeded and
-// cheap enough to sample every frame for a natural, never-repeating swell.
-function makeNoise1D(seed = 7) {
-  let state = seed >>> 0;
-  const rand = () => {
-    state = (state * 1664525 + 1013904223) >>> 0;
-    return state / 4294967296;
-  };
-  const table = Array.from({ length: 256 }, rand);
-  return (x) => {
-    const i = Math.floor(x);
-    const f = ease(x - i);
-    const a = table[((i % 256) + 256) % 256];
-    const b = table[((i + 1) % 256 + 256) % 256];
-    return mix(a, b, f) * 2 - 1;
-  };
-}
-
 const WAVE_STATES = [
   { height: 0.08, steep: 0.02, curl: 0, wash: 0, center: 0.08 },
   { height: 0.15, steep: 0.08, curl: 0, wash: 0, center: 0.18 },
@@ -79,13 +61,11 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       foam: colors.getPropertyValue("--urge-wave-foam").trim() || "#f1eee5",
     };
 
-    // Two independent noise fields: a slow one for the swell's own texture,
-    // a faster one for chop and spray, so the surface never looks tiled.
-    const swellNoise = makeNoise1D(11);
-    const chopNoise = makeNoise1D(53);
-    let spray = [];
-    let foamTrail = []; // whitewater that lingers and drifts after the break
-    let mist = []; // fine airborne haze near a tall crest, present even without a barrel
+    // A small, capped set of foam bits flung from the curling tip. Kept
+    // deliberately few and smooth (spawn/fade every frame, never a sudden
+    // burst) so nothing "pops" — a flat, calm illustration, not a physics
+    // sim.
+    let tips = [];
 
     const resize = () => {
       const bounds = wrap.getBoundingClientRect();
@@ -114,230 +94,153 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       const amplitude = Math.min(height * 0.62, width * 0.42) * wave.height;
       const center = width * wave.center;
       const spread = width * mix(0.235, 0.115, wave.steep);
+      // One gentle, smooth breathing motion — no per-pixel noise — so the
+      // surface reads as calm and flat, not textured or jittery.
+      const bob = Math.sin(time * 0.55) * amplitude * 0.012;
 
       const surfaceY = (x) => {
         const normal = (x - center) / spread;
         const skew = normal < 0 ? normal * 0.58 : normal * (2.15 + wave.steep);
         const peak = Math.exp(-Math.pow(Math.abs(skew), 2.42) * 1.12);
-        // Layered noise instead of pure sines: a slow swell texture plus a
-        // faster chop, both fading out where the wave is flat (calm water
-        // stays glassy; the swell and the barrel get the texture).
-        const swellTex = swellNoise(x * 0.006 + time * 0.35) * 3.2 * (0.35 + wave.height);
-        const chop = chopNoise(x * 0.05 + time * 1.6) * 1.6 * (0.3 + wave.steep);
-        return waterline - amplitude * peak + swellTex + chop;
+        return waterline - amplitude * peak + bob;
       };
 
       const crestY = surfaceY(center);
-      // A real barrel: normalised so the wave's peak curl (~0.78) reads as
-      // a fully hollow tube. The face overshoots past vertical and hooks
-      // back on itself in one continuous, self-consistent curve (never two
-      // overlapping paths, which is what made the shape glitch and
-      // self-intersect); a plain radial shadow underneath then sells the
-      // hollow without adding more curve geometry.
+      // How far into a barrel the wave is, 0 (flat) to 1 (fully wound).
       const barrelT = clamp(wave.curl / 0.8);
-      const reach = amplitude * mix(0.14, 0.92, barrelT);
-      const throatX = center + reach * 0.62;
-      const throatY = crestY - amplitude * mix(0.1, 0.3, barrelT);
-      const lipX = center + reach;
-      const lipY = crestY + amplitude * mix(0.02, 1.05, Math.pow(barrelT, 1.4));
-      const hookX = lipX - reach * mix(0.22, 0.42, barrelT);
-      const hookY = lipY - amplitude * mix(0.05, 0.28, barrelT);
-      // Roughly the middle of the hollow, for the shadow and the foam.
-      const holeX = (throatX + hookX) / 2 + amplitude * 0.06;
-      const holeY = (throatY + lipY) / 2 + amplitude * 0.12;
-      const holeR = Math.max(amplitude * mix(0.05, 0.62, barrelT), 1);
-
-      const traceWave = () => {
-        context.beginPath();
-        context.moveTo(-4, height + 4);
-        for (let x = -4; x <= center; x += 2) context.lineTo(x, surfaceY(x));
-        if (barrelT > 0.03 && amplitude > 12) {
-          context.bezierCurveTo(center + reach * 0.25, crestY - amplitude * 0.05, throatX, throatY, hookX, hookY);
-          context.quadraticCurveTo(lipX, lipY - amplitude * 0.02, lipX, lipY);
-          context.bezierCurveTo(lipX + 4, lipY + amplitude * 0.12, center + amplitude * 0.58, waterline - amplitude * 0.1, center + amplitude * 0.7, waterline);
-        }
-        for (let x = center + amplitude * 0.7; x <= width + 4; x += 2) context.lineTo(x, surfaceY(x));
-        context.lineTo(width + 4, height + 4);
-        context.closePath();
-      };
 
       context.clearRect(0, 0, width, height);
 
-      // Distant swell lines behind the main wave, for depth.
+      // Distant swell lines behind the main wave, for a sense of depth —
+      // one smooth sine each, never noise, so they stay calm.
       for (let layer = 2; layer >= 0; layer -= 1) {
         const line = waterline + 7 + layer * 10;
-        context.globalAlpha = 0.1 + layer * 0.06;
+        context.globalAlpha = 0.08 + layer * 0.05;
         context.fillStyle = layer ? palette.deep : palette.glass;
         context.beginPath();
         context.moveTo(0, line);
-        for (let x = 0; x <= width; x += 5) {
-          const n = swellNoise(x * 0.012 - time * (0.3 + layer * 0.1) + layer * 40) * (3 + layer * 1.5);
-          context.lineTo(x, line + n);
-        }
+        for (let x = 0; x <= width; x += 8) context.lineTo(x, line + Math.sin(x * 0.02 - time * (0.3 + layer * 0.15) + layer * 2) * (2 + layer));
         context.lineTo(width, height);
         context.lineTo(0, height);
         context.fill();
       }
-
       context.globalAlpha = 1;
-      traceWave();
-      // Sunlit-water gradient: a bright rim at the crest, a jade mid-tone
-      // where light passes through the face, deepening to near-black below.
-      const gradient = context.createLinearGradient(center - amplitude * 0.3, crestY - amplitude * 0.1, center + amplitude * 0.5, waterline + 40);
-      gradient.addColorStop(0, palette.light);
-      gradient.addColorStop(0.16, palette.glass);
-      gradient.addColorStop(0.5, palette.mid);
-      gradient.addColorStop(1, palette.deep);
-      context.fillStyle = gradient;
+
+      // The wave's plain body: one simple, closed silhouette, always the
+      // same shape of curve regardless of curl, so it can never glitch.
+      context.beginPath();
+      context.moveTo(-4, height + 4);
+      for (let x = -4; x <= width + 4; x += 4) context.lineTo(x, surfaceY(x));
+      context.lineTo(width + 4, height + 4);
+      context.closePath();
+      const bodyGrad = context.createLinearGradient(0, crestY, 0, waterline + 20);
+      bodyGrad.addColorStop(0, palette.glass);
+      bodyGrad.addColorStop(0.55, palette.mid);
+      bodyGrad.addColorStop(1, palette.deep);
+      context.fillStyle = bodyGrad;
       context.fill();
+      context.lineWidth = 2;
+      context.strokeStyle = palette.deep;
+      context.globalAlpha = 0.3;
+      context.stroke();
+      context.globalAlpha = 1;
 
-      // Everything below is clipped to the wave's own silhouette, so light
-      // and texture only ever sit inside the water, never bleed past it.
-      context.save();
-      context.clip();
+      // The barrel: the crest rolls over into a tight scroll, exactly like
+      // a rolled sheet of paper — an outer curve and an inner curve that
+      // both wind around the same centre with a steadily SHRINKING radius.
+      // Because the radius only ever shrinks as the curve is drawn, the two
+      // edges of the band can never cross themselves or each other, so the
+      // shape can't self-intersect or glitch, however tightly it's wound.
+      let tipX = center;
+      let tipY = crestY;
+      if (barrelT > 0.04 && amplitude > 10) {
+        const span = mix(0.55, 2.6, barrelT) * Math.PI; // up to ~1.3 turns
+        const outerR = amplitude * mix(0.22, 0.5, barrelT);
+        const shrinkTo = mix(0.55, 0.14, barrelT);
+        const spiralX = center;
+        const spiralY = crestY + outerR;
+        const samples = 26;
+        const outerPts = [];
+        const innerPts = [];
+        for (let i = 0; i <= samples; i += 1) {
+          const t = i / samples;
+          const theta = t * span;
+          const r = outerR * mix(1, shrinkTo, t);
+          const thickness = outerR * mix(0.36, 0.015, t);
+          const dx = Math.sin(theta);
+          const dy = -Math.cos(theta);
+          outerPts.push({ x: spiralX + r * dx, y: spiralY + r * dy });
+          const ri = Math.max(r - thickness, 1);
+          innerPts.push({ x: spiralX + ri * dx, y: spiralY + ri * dy });
+        }
+        tipX = outerPts[outerPts.length - 1].x;
+        tipY = outerPts[outerPts.length - 1].y;
 
-      // Caustic light shafts: soft, slowly drifting bands of brighter water,
-      // as if sunlight were passing through the swell from above.
-      context.globalCompositeOperation = "screen";
-      for (let ray = 0; ray < 3; ray += 1) {
-        const rx = center - amplitude * 0.6 + ray * amplitude * 0.55 + Math.sin(time * 0.18 + ray * 2.1) * amplitude * 0.25;
-        const rayGrad = context.createLinearGradient(rx, crestY - amplitude * 0.2, rx + amplitude * 0.5, waterline + 60);
-        rayGrad.addColorStop(0, "rgba(255,255,255,0)");
-        rayGrad.addColorStop(0.5, `rgba(255,255,255,${0.05 + 0.02 * ray})`);
-        rayGrad.addColorStop(1, "rgba(255,255,255,0)");
-        context.fillStyle = rayGrad;
-        context.fillRect(rx - amplitude * 0.16, 0, amplitude * 0.32, height);
-      }
-      context.globalCompositeOperation = "source-over";
-
-      // A soft specular highlight along the face, brightest just under the
-      // crest, so the water reads as translucent rather than a flat fill.
-      const shine = context.createRadialGradient(center - amplitude * 0.1, crestY + amplitude * 0.18, 0, center - amplitude * 0.1, crestY + amplitude * 0.18, amplitude * 1.1);
-      shine.addColorStop(0, "rgba(255,255,255,0.32)");
-      shine.addColorStop(0.4, "rgba(255,255,255,0.08)");
-      shine.addColorStop(1, "rgba(255,255,255,0)");
-      context.fillStyle = shine;
-      context.fillRect(0, 0, width, height);
-      context.restore();
-
-      // The barrel's hollow: one plain radial shadow, clipped to the wave's
-      // own silhouette (so it can never paint outside the water), instead
-      // of a second overlapping curve — a robust shape that cannot
-      // self-intersect or glitch, however far the barrel opens up.
-      if (barrelT > 0.05 && amplitude > 14) {
+        // A hint of shadow at the heart of the scroll — where the tightly
+        // wound tip leaves a gap between the coils, exactly as it should.
         context.save();
-        traceWave();
-        context.clip();
-        const hollow = context.createRadialGradient(holeX, holeY, 0, holeX, holeY, holeR * 1.6);
-        hollow.addColorStop(0, "rgba(2,10,11,0.92)");
-        hollow.addColorStop(0.6, "rgba(3,20,22,0.55)");
-        hollow.addColorStop(1, "rgba(3,20,22,0)");
-        context.fillStyle = hollow;
+        const holeR = outerR * shrinkTo * 1.3;
+        const holeGrad = context.createRadialGradient(spiralX, spiralY - outerR * shrinkTo * 0.5, 0, spiralX, spiralY - outerR * shrinkTo * 0.5, holeR);
+        holeGrad.addColorStop(0, "rgba(2,10,11,0.85)");
+        holeGrad.addColorStop(1, "rgba(2,10,11,0)");
+        context.fillStyle = holeGrad;
         context.beginPath();
-        context.arc(holeX, holeY, holeR * 1.6, 0, Math.PI * 2);
+        context.arc(spiralX, spiralY - outerR * shrinkTo * 0.5, holeR, 0, Math.PI * 2);
         context.fill();
         context.restore();
+
+        context.beginPath();
+        context.moveTo(outerPts[0].x, outerPts[0].y);
+        for (let i = 1; i < outerPts.length; i += 1) context.lineTo(outerPts[i].x, outerPts[i].y);
+        for (let i = innerPts.length - 1; i >= 0; i -= 1) context.lineTo(innerPts[i].x, innerPts[i].y);
+        context.closePath();
+        const bandGrad = context.createRadialGradient(spiralX, spiralY, outerR * shrinkTo * 0.3, spiralX, spiralY, outerR);
+        bandGrad.addColorStop(0, palette.mid);
+        bandGrad.addColorStop(0.55, palette.glass);
+        bandGrad.addColorStop(0.82, palette.foam);
+        bandGrad.addColorStop(1, palette.foam);
+        context.fillStyle = bandGrad;
+        context.fill();
+        context.lineWidth = 1.5;
+        context.strokeStyle = palette.deep;
+        context.globalAlpha = 0.28;
+        context.stroke();
+        context.globalAlpha = 1;
       }
 
-      // A crisp lit rim along the crest and the barrel's own edge.
-      context.save();
-      context.globalCompositeOperation = "screen";
-      context.strokeStyle = palette.light;
-      context.globalAlpha = 0.55;
-      context.lineWidth = 1.4;
-      context.beginPath();
-      for (let x = 0; x <= center; x += 3) {
-        if (x === 0) context.moveTo(x, surfaceY(x));
-        else context.lineTo(x, surfaceY(x));
-      }
-      if (barrelT > 0.03) {
-        context.bezierCurveTo(center + reach * 0.25, crestY - amplitude * 0.05, throatX, throatY, hookX, hookY);
-        context.quadraticCurveTo(lipX, lipY - amplitude * 0.02, lipX, lipY);
-      }
-      context.stroke();
-      context.restore();
-
-      // Spray droplets flung off the lip while the barrel is pitching.
-      if (wave.curl > 0.25 && amplitude > 20) {
-        const want = Math.round(mix(0, 22, ease((wave.curl - 0.25) / 0.6)));
-        while (spray.length < want) {
-          spray.push({
-            x: lipX + (Math.random() - 0.4) * amplitude * 0.2,
-            y: lipY - Math.random() * amplitude * 0.15,
-            vx: mix(0.4, 1.6, Math.random()) * (width / 400),
-            vy: -mix(0.6, 2.2, Math.random()) * (width / 400),
-            r: mix(0.6, 1.8, Math.random()),
-            life: 1,
-          });
-        }
-        if (spray.length > want) spray.length = want;
-      } else if (spray.length) {
-        spray.length = Math.max(0, spray.length - 1);
-      }
-      const gravity = 5.2 * (width / 400) * delta;
+      // A few foam bits at the curling tip — a fixed small cap, smoothly
+      // fading in and out with the curl, never a sudden scatter.
+      const wantTips = barrelT > 0.35 ? Math.round(mix(0, 7, ease((barrelT - 0.35) / 0.5))) : 0;
+      while (tips.length < wantTips) tips.push({ a: Math.random() * Math.PI * 2, d: mix(4, 14, Math.random()), r: mix(1, 2.2, Math.random()), life: 0 });
+      if (tips.length > wantTips) tips.length = wantTips;
       context.fillStyle = palette.foam;
-      spray = spray.filter((p) => p.life > 0.02);
-      spray.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += gravity;
-        p.life -= delta * 0.55;
-        context.globalAlpha = clamp(p.life) * 0.85;
+      tips.forEach((p) => {
+        p.life = clamp(p.life + delta * 1.6);
+        const x = tipX + Math.cos(p.a) * p.d * p.life;
+        const y = tipY + Math.sin(p.a) * p.d * p.life * 0.6 + p.life * 3;
+        context.globalAlpha = p.life * (1 - p.life * 0.3) * 0.8;
         context.beginPath();
-        context.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        context.fill();
-        if (p.y > waterline + 4) p.life = 0;
-      });
-
-      // Fine haze near a tall crest, even without a full barrel: a
-      // constant, gentle sense of spray in the air, not just at the break.
-      if (amplitude > height * 0.28) {
-        const wantMist = Math.round(mix(0, 10, ease((amplitude / height - 0.28) / 0.3)));
-        while (mist.length < wantMist) {
-          mist.push({ x: center + (Math.random() - 0.5) * amplitude * 0.7, y: crestY - Math.random() * amplitude * 0.1, vy: -mix(0.15, 0.4, Math.random()) * (width / 400), r: mix(0.5, 1.2, Math.random()), life: mix(0.6, 1, Math.random()) });
-        }
-        if (mist.length > wantMist) mist.length = wantMist;
-      } else if (mist.length) mist.length = Math.max(0, mist.length - 1);
-      context.fillStyle = palette.light;
-      mist = mist.filter((p) => p.life > 0.02);
-      mist.forEach((p) => {
-        p.y += p.vy;
-        p.life -= delta * 0.3;
-        context.globalAlpha = clamp(p.life) * 0.28;
-        context.beginPath();
-        context.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        context.arc(x, y, p.r, 0, Math.PI * 2);
         context.fill();
       });
-
-      // Whitewater from the break: particles that ride the surface, drift
-      // outward and slowly dissolve, instead of a fixed band redrawn each
-      // frame, so the foam actually spreads and thins the way real foam does.
-      if (wave.wash > 0.03 && foamTrail.length < 90) {
-        const spawn = Math.round(wave.wash * 6);
-        for (let n = 0; n < spawn; n += 1) {
-          foamTrail.push({
-            x: hookX - amplitude * 0.1 + (Math.random() - 0.3) * amplitude * 0.3,
-            bob: Math.random() * Math.PI * 2,
-            drift: mix(0.3, 1.1, Math.random()) * (width / 400),
-            r: mix(1, 2.6, Math.random()),
-            life: 1,
-          });
-        }
-      }
-      context.fillStyle = palette.foam;
-      foamTrail = foamTrail.filter((p) => p.life > 0.02);
-      foamTrail.forEach((p) => {
-        p.x += p.drift;
-        p.bob += delta * 3;
-        p.life -= delta * 0.22;
-        const y = surfaceY(p.x) - Math.abs(Math.sin(p.bob)) * 2;
-        context.globalAlpha = clamp(p.life) * 0.5;
-        context.beginPath();
-        context.arc(p.x, y, p.r * clamp(p.life, 0.4, 1), 0, Math.PI * 2);
-        context.fill();
-      });
-
       context.globalAlpha = 1;
+
+      // A calm foam wash at the base once the wave has passed — two or
+      // three flat, softly-edged blobs that fade with wave.wash, not a
+      // busy redrawn band.
+      if (wave.wash > 0.03) {
+        context.fillStyle = palette.foam;
+        for (let i = 0; i < 3; i += 1) {
+          const wx = tipX - amplitude * 0.1 + i * width * 0.11 + Math.sin(time * 0.4 + i) * 4;
+          const wy = waterline - 2 + Math.sin(time * 0.5 + i * 2) * 2;
+          context.globalAlpha = wave.wash * 0.3;
+          context.beginPath();
+          context.ellipse(wx, wy, 16 + i * 4, 4, 0, 0, Math.PI * 2);
+          context.fill();
+        }
+        context.globalAlpha = 1;
+      }
+
       frame = window.requestAnimationFrame(draw);
     };
 
