@@ -153,9 +153,12 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       // shape can't self-intersect or glitch, however tightly it's wound.
       let tipX = center;
       let tipY = crestY;
-      if (barrelT > 0.04 && amplitude > 10) {
-        const span = mix(0.55, 2.6, barrelT) * Math.PI; // up to ~1.3 turns
-        const outerR = amplitude * mix(0.22, 0.5, barrelT);
+      if (barrelT > 0.01 && amplitude > 10) {
+        // Both start at zero, so the scroll grows from nothing — a thin
+        // hook first, winding tighter every frame — instead of popping in
+        // at some minimum size the moment curl appears.
+        const span = mix(0, 2.6, ease(barrelT)) * Math.PI; // up to ~1.3 turns
+        const outerR = amplitude * mix(0, 0.5, ease(barrelT));
         const shrinkTo = mix(0.55, 0.14, barrelT);
         const spiralX = center;
         const spiralY = crestY + outerR;
@@ -210,7 +213,7 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
 
       // A few foam bits at the curling tip — a fixed small cap, smoothly
       // fading in and out with the curl, never a sudden scatter.
-      const wantTips = barrelT > 0.35 ? Math.round(mix(0, 7, ease((barrelT - 0.35) / 0.5))) : 0;
+      const wantTips = Math.round(mix(0, 7, ease(barrelT)));
       while (tips.length < wantTips) tips.push({ a: Math.random() * Math.PI * 2, d: mix(4, 14, Math.random()), r: mix(1, 2.2, Math.random()), life: 0 });
       if (tips.length > wantTips) tips.length = wantTips;
       context.fillStyle = palette.foam;

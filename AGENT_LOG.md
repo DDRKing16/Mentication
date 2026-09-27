@@ -85,3 +85,6 @@ The previous attempt at a hollow barrel (a second overlapping tongue/cave shape)
 
 ## 28 Sep — Urge Surfing wave, rebuilt to match a reference
 Started over after the owner shared a flat-illustration wave reference: rewrote the whole animation as a calm, flat shape instead of a noisy/photoreal one. The curl is now a proper rolled scroll — an outer and inner curve winding around one point with a steadily SHRINKING radius, so it can never cross itself or glitch, however tightly wound. A small dark hollow shows through near the tightly-wound tip, matching the reference. Removed all the noise-texture, caustics and random particle bursts from the last two passes; foam is now a small, fixed, smoothly fading cap. Checked clean through a full cycle.
+
+## 28 Sep — Urge Surfing wave, fixed the pop-in
+Found why the curl looked like it "formed all at once": the spiral's size and wind amount had a built-in minimum, so the instant any curl appeared it jumped straight to a half-wound shape instead of starting from nothing. Both now start at zero and grow with an eased curve, so on screen it visibly begins as a small hook and winds tighter frame by frame into the full scroll, then unwinds the same way as the wave passes. Watched Rise through Crest closely to confirm.
