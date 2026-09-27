@@ -24,3 +24,13 @@ changing them. Nothing here has been applied.
   asking you which one should be the "real" Signal Lock everyone sees, or
   recolouring the iframe build, which is outside what an agent should decide
   alone.
+
+- **Change the Scene's opening line reads like web-app instructions, not
+  calm guidance.** It says "Click the play button below to shift the moment
+  with a small step." (`src/lib/changeSceneNarration.js` and
+  `src/components/ChangeSceneExperience.jsx`) — the exact pattern the brand
+  doc's Mentication Standard asks every intervention to move away from
+  ("Click the play button…"). It's the only line left in the app that still
+  does this. Wording is yours to change, not an agent's, so flagging it
+  rather than editing it — something like "A small step, whenever you're
+  ready." would keep the meaning and drop the instruction-manual tone.
