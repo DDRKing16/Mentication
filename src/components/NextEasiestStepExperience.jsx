@@ -3605,85 +3605,48 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
 
           {/* Action buttons with neon play pulse & glowing card-button (20% reduced size, pushed up) */}
           <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "10px", zIndex: 5 }}>
-            {gameState.ladder && gameState.ladder.length > 0 ? (
-              <div
-                className="card play-pulse-glow"
-                role="button"
-                tabIndex={0}
-                onClick={() => navigateTo("focus")}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("focus"); } }}
-                style={{
-                  borderRadius: "18px",
-                  background: "linear-gradient(135deg, rgba(128, 12, 20, 0.95) 0%, rgba(95, 8, 14, 0.85) 100%)",
-                  border: "2px solid rgba(165, 243, 252, 0.4)",
-                  cursor: "pointer",
-                  padding: "10px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <div>
-                  <div style={{ color: "#a5f3fc", fontWeight: "900", fontSize: "13px", letterSpacing: "0.06em" }}>CONTINUE LADDER</div>
-                  <div style={{ color: "#a5f3fc", opacity: 0.8, fontSize: "11px", marginTop: "1px" }}>Resume your task momentum</div>
-                </div>
-                <div style={{
-                  width: "38px",
-                  height: "38px",
-                  borderRadius: "50%",
-                  background: "rgba(165, 243, 252, 0.15)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "1.5px solid #a5f3fc",
-                  boxShadow: "0 0 10px rgba(165, 243, 252, 0.5)"
-                }}>
-                  <Play size={18} fill="#a5f3fc" color="#a5f3fc" style={{ marginLeft: "2px" }} />
-                </div>
+            {/* The dashboard is only ever reached once the current ladder is
+                fully done (see handleCompleteStep), so the next action here
+                is always to start a fresh task, never to "continue" the one
+                that just finished. */}
+            <div
+              className="card play-pulse-glow"
+              role="button"
+              tabIndex={0}
+              onClick={() => navigateTo("intent")}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("intent"); } }}
+              style={{
+                borderRadius: "18px",
+                background: "linear-gradient(135deg, rgba(128, 12, 20, 0.95) 0%, rgba(95, 8, 14, 0.85) 100%)",
+                border: "2px solid rgba(165, 243, 252, 0.4)",
+                cursor: "pointer",
+                padding: "10px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                transition: "all 0.3s ease"
+              }}
+            >
+              <div>
+                <div style={{ color: "#a5f3fc", fontWeight: "900", fontSize: "13px", letterSpacing: "0.06em" }}>START NEW TASK</div>
+                <div style={{ color: "#a5f3fc", opacity: 0.8, fontSize: "11px", marginTop: "1px" }}>Begin your next easy win</div>
               </div>
-            ) : (
-              <div
-                className="card play-pulse-glow"
-                role="button"
-                tabIndex={0}
-                onClick={() => navigateTo("brain-check")}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("brain-check"); } }}
-                style={{
-                  borderRadius: "18px",
-                  background: "linear-gradient(135deg, rgba(128, 12, 20, 0.95) 0%, rgba(95, 8, 14, 0.85) 100%)",
-                  border: "2px solid rgba(165, 243, 252, 0.4)",
-                  cursor: "pointer",
-                  padding: "10px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
-                  transition: "all 0.3s ease"
-                }}
-              >
-                <div>
-                  <div style={{ color: "#a5f3fc", fontWeight: "900", fontSize: "13px", letterSpacing: "0.06em" }}>START NEW TASK</div>
-                  <div style={{ color: "#a5f3fc", opacity: 0.8, fontSize: "11px", marginTop: "1px" }}>Begin your next easy win</div>
-                </div>
-                <div style={{
-                  width: "38px",
-                  height: "38px",
-                  borderRadius: "50%",
-                  background: "rgba(165, 243, 252, 0.15)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "1.5px solid #a5f3fc",
-                  boxShadow: "0 0 10px rgba(165, 243, 252, 0.5)"
-                }}>
-                  <Play size={18} fill="#a5f3fc" color="#a5f3fc" style={{ marginLeft: "2px" }} />
-                </div>
+              <div style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "50%",
+                background: "rgba(165, 243, 252, 0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1.5px solid #a5f3fc",
+                boxShadow: "0 0 10px rgba(165, 243, 252, 0.5)"
+              }}>
+                <Play size={18} fill="#a5f3fc" color="#a5f3fc" style={{ marginLeft: "2px" }} />
               </div>
-            )}
+            </div>
             
             {/* Split Option: Reset Day on left (40% width) and Return Home on right (60% width) with light blue fill, dark blue text */}
             <div style={{ display: "flex", gap: "10px", width: "100%" }}>
