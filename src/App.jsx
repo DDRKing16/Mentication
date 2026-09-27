@@ -7,6 +7,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import ScrollToTop from './components/ScrollToTop';
 import AppShell from '@/components/AppShell';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { MotionConfig, AnimatePresence, motion } from 'framer-motion';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import { useSystemDarkMode } from '@/hooks/useSystemDarkMode';
@@ -72,32 +73,34 @@ const MenticationRoutes = () => {
           transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="min-h-full"
         >
-          <Suspense fallback={<PageSpinner />}>
-            <Routes location={location}>
-              <Route element={<OnboardingGate><AppShell /></OnboardingGate>}>
-                <Route path="/" element={<></>} />
-                <Route path="/library" element={<></>} />
-                <Route path="/plan" element={<></>} />
-                <Route path="/profile" element={<></>} />
-                <Route path="/insights" element={<></>} />
-                <Route path="/settings" element={<></>} />
-              </Route>
-              <Route path="/welcome" element={<Welcome />} />
-              <Route path="/reset" element={<ResetFlow />} />
-              <Route path="/next-easiest-step" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} /></WithBrandThreshold>} />
-              <Route path="/next-easiest-step-v2" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} /></WithBrandThreshold>} />
-              <Route path="/journal" element={<Journal />} />
-              <Route path="/dear-2100" element={<Dear2100 />} />
-              <Route path="/night-channel" element={<NightChannel />} />
-              <Route path="/parking-lot" element={<ParkingLot />} />
-              <Route path="/support" element={<Crisis />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
-              <Route path="/vector-shift" element={<OnboardingGate><VectorShift /></OnboardingGate>} />
-              <Route path="/good-map" element={<OnboardingGate><GoodMap /></OnboardingGate>} />
-              <Route path="*" element={<PageNotFound />} />
-            </Routes>
-          </Suspense>
+          <ErrorBoundary key={groupKey}>
+            <Suspense fallback={<PageSpinner />}>
+              <Routes location={location}>
+                <Route element={<OnboardingGate><AppShell /></OnboardingGate>}>
+                  <Route path="/" element={<></>} />
+                  <Route path="/library" element={<></>} />
+                  <Route path="/plan" element={<></>} />
+                  <Route path="/profile" element={<></>} />
+                  <Route path="/insights" element={<></>} />
+                  <Route path="/settings" element={<></>} />
+                </Route>
+                <Route path="/welcome" element={<Welcome />} />
+                <Route path="/reset" element={<ResetFlow />} />
+                <Route path="/next-easiest-step" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} /></WithBrandThreshold>} />
+                <Route path="/next-easiest-step-v2" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} /></WithBrandThreshold>} />
+                <Route path="/journal" element={<Journal />} />
+                <Route path="/dear-2100" element={<Dear2100 />} />
+                <Route path="/night-channel" element={<NightChannel />} />
+                <Route path="/parking-lot" element={<ParkingLot />} />
+                <Route path="/support" element={<Crisis />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
+                <Route path="/vector-shift" element={<OnboardingGate><VectorShift /></OnboardingGate>} />
+                <Route path="/good-map" element={<OnboardingGate><GoodMap /></OnboardingGate>} />
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </motion.div>
       </AnimatePresence>
     </DirectionContext.Provider>
