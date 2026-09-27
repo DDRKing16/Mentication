@@ -2974,22 +2974,26 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
               <span style={{ fontFamily: "var(--font-headline)", fontSize: "18px", fontWeight: "700", color: "#D6DFAB", letterSpacing: "-0.01em" }}>Mentication</span>
             </div>
             
-            {/* Right Pause Button */}
-            <button 
+            {/* Right Pause Button. Shifted left of centre with marginRight so it
+                doesn't sit under the shared floating Home button, which is
+                fixed to the same top-right corner on every screen. */}
+            <button
               onClick={() => setShowPause(true)}
-              style={{ 
-                background: "rgba(214,223,171,0.2)", 
-                border: "none", 
-                width: "36px", 
-                height: "36px", 
-                borderRadius: "50%", 
-                color: "#D6DFAB", 
-                cursor: "pointer", 
-                display: "flex", 
-                alignItems: "center", 
+              aria-label="Pause"
+              style={{
+                background: "rgba(214,223,171,0.2)",
+                border: "none",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                color: "#D6DFAB",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
                 justifyContent: "center",
                 transition: "background 0.2s",
-                minHeight: "36px"
+                minHeight: "36px",
+                marginRight: "48px"
               }}
             >
               <Pause size={16} fill="#D6DFAB" stroke="#D6DFAB" />
