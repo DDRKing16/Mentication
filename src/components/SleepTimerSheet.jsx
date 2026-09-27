@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Moon } from "lucide-react";
+import { useEscapeToClose } from "@/hooks/useEscapeToClose";
 
 const PRESETS = [
   { min: 5, label: "5 min" },
@@ -12,6 +13,7 @@ const PRESETS = [
 ];
 
 export default function SleepTimerSheet({ active, secondsLeft, onPick, onCancel, onClose }) {
+  useEscapeToClose(true, onClose);
   const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-28 z-50 flex justify-center px-4">
@@ -20,6 +22,9 @@ export default function SleepTimerSheet({ active, secondsLeft, onPick, onCancel,
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sleep timer"
         className="intervention-themed-surface pointer-events-auto w-[min(92vw,24rem)] rounded-2xl border p-5 backdrop-blur-md"
       >
         <div className="mb-4 flex items-center justify-between">

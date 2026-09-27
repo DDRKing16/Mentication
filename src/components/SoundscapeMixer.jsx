@@ -1,9 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { SOUNDSCAPE_LAYERS, MIX_PRESETS } from "@/lib/sleep";
+import { useEscapeToClose } from "@/hooks/useEscapeToClose";
 
 export default function SoundscapeMixer({ mixer, onClose }) {
   const { volumes, setLayer, applyPreset } = mixer;
+  useEscapeToClose(true, onClose);
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-28 z-50 flex justify-center px-4">
       <motion.div
@@ -11,6 +13,9 @@ export default function SoundscapeMixer({ mixer, onClose }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Soundscapes"
         className="intervention-themed-surface pointer-events-auto w-[min(92vw,26rem)] rounded-2xl border p-4 backdrop-blur-md"
       >
         <div className="mb-3 flex items-center justify-between">
@@ -38,7 +43,7 @@ export default function SoundscapeMixer({ mixer, onClose }) {
               <div key={l.id} className="intervention-row-hover flex items-center gap-3 rounded-xl px-2 py-1.5">
                 <button
                   onClick={() => setLayer(l.id, on ? 0 : 0.5)}
-                  aria-label={on ? "Mute layer" : "Enable layer"}
+                  aria-label={on ? `Mute ${l.label}` : `Enable ${l.label}`}
                   className={"h-2.5 w-2.5 shrink-0 rounded-full transition-colors " + (on ? "intervention-dot-on" : "intervention-dot-off")}
                 />
                 <span className={"w-28 shrink-0 text-sm " + (on ? "intervention-copy-primary" : "intervention-copy-muted")}>{l.label}</span>
@@ -49,6 +54,7 @@ export default function SoundscapeMixer({ mixer, onClose }) {
                   step={0.05}
                   value={v}
                   onChange={(e) => setLayer(l.id, Number(e.target.value))}
+                  aria-label={`${l.label} volume`}
                   className="reset-slider h-2 w-full cursor-pointer rounded-full bg-cream/15 outline-none"
                 />
               </div>

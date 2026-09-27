@@ -26,7 +26,7 @@ describe("the player's popups use the per-intervention theme, not a fixed colour
   });
 
   it("the ambient sound popup in the shared player pulls from the intervention theme", () => {
-    expect(files.resetPlayer).toMatch(/showAmbient[\s\S]{0,400}intervention-themed-surface/);
+    expect(files.resetPlayer).toMatch(/showAmbient[\s\S]{0,500}intervention-themed-surface/);
   });
 
   // A popup animated with framer-motion cannot also rely on a CSS transform

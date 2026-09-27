@@ -17,6 +17,7 @@ import { useAmbientSound, AMBIENT_OPTIONS } from "@/hooks/useAmbientSound";
 import { useGuideVoice } from "@/hooks/useGuideVoice";
 import { useSoundscapeMixer } from "@/hooks/useSoundscapeMixer";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
+import { useEscapeToClose } from "@/hooks/useEscapeToClose";
 import { useBoxBreathingSoundscape } from "@/hooks/useBoxBreathingSoundscape";
 import { useGroundingSoundscape } from "@/hooks/useGroundingSoundscape";
 import { usePMRSoundscape } from "@/hooks/usePMRSoundscape";
@@ -55,6 +56,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   const sleepTimer = useSleepTimer();
   const [showSounds, setShowSounds] = useState(false);
   const [showSleepTimer, setShowSleepTimer] = useState(false);
+  useEscapeToClose(showSwitch, () => setShowSwitch(false));
+  useEscapeToClose(showAmbient, () => setShowAmbient(false));
   const [stepsDone, setStepsDone] = useState(0);
   const transitionTimer = useRef(null);
 
@@ -811,12 +814,16 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              role="menu"
+              aria-label="Ambient sound"
               className="intervention-themed-surface pointer-events-auto rounded-3xl border p-2 backdrop-blur-xl"
             >
               <div className="flex flex-col gap-1">
                 {AMBIENT_OPTIONS.map((o) => (
                   <button
                     key={o.id}
+                    role="menuitemradio"
+                    aria-checked={ambient === o.id}
                     onClick={() => { setAmbient(o.id); if (o.id !== "off") setShowAmbient(false); }}
                     className={
                       "no-tap intervention-row-hover flex items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm transition-colors " +
@@ -867,10 +874,13 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               exit={{ y: 40, opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="reset-switch-sheet-title"
               className="intervention-themed-surface w-full max-w-md rounded-t-3xl border p-6 pb-10 sm:rounded-3xl"
             >
               <div className="intervention-dot-off mx-auto mb-5 h-1.5 w-10 rounded-full sm:hidden" />
-              <h3 className="intervention-copy-primary font-heading text-2xl font-medium tracking-tight">Let’s try something else</h3>
+              <h3 id="reset-switch-sheet-title" className="intervention-copy-primary font-heading text-2xl font-medium tracking-tight">Let’s try something else</h3>
               <p className="intervention-copy-muted mt-1">Pick a direction — we’ll switch right away.</p>
               <div className="mt-5 flex flex-col gap-2.5">
                 {SWITCH_MODES.map((m) => {
