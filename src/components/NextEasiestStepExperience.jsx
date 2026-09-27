@@ -3763,7 +3763,7 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
               onClick={() => {
                 playClick();
                 setShowPause(false);
-                navigateTo("ladder");
+                navigateTo("landing");
               }}
             >
               Back to Ladder
