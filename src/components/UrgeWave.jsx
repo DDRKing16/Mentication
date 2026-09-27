@@ -84,6 +84,8 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
     const swellNoise = makeNoise1D(11);
     const chopNoise = makeNoise1D(53);
     let spray = [];
+    let foamTrail = []; // whitewater that lingers and drifts after the break
+    let mist = []; // fine airborne haze near a tall crest, present even without a barrel
 
     const resize = () => {
       const bounds = wrap.getBoundingClientRect();
@@ -180,10 +182,27 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       context.fillStyle = gradient;
       context.fill();
 
-      // A soft specular highlight along the face, brightest just under the
-      // crest, so the water reads as translucent rather than a flat fill.
+      // Everything below is clipped to the wave's own silhouette, so light
+      // and texture only ever sit inside the water, never bleed past it.
       context.save();
       context.clip();
+
+      // Caustic light shafts: soft, slowly drifting bands of brighter water,
+      // as if sunlight were passing through the swell from above.
+      context.globalCompositeOperation = "screen";
+      for (let ray = 0; ray < 3; ray += 1) {
+        const rx = center - amplitude * 0.6 + ray * amplitude * 0.55 + Math.sin(time * 0.18 + ray * 2.1) * amplitude * 0.25;
+        const rayGrad = context.createLinearGradient(rx, crestY - amplitude * 0.2, rx + amplitude * 0.5, waterline + 60);
+        rayGrad.addColorStop(0, "rgba(255,255,255,0)");
+        rayGrad.addColorStop(0.5, `rgba(255,255,255,${0.05 + 0.02 * ray})`);
+        rayGrad.addColorStop(1, "rgba(255,255,255,0)");
+        context.fillStyle = rayGrad;
+        context.fillRect(rx - amplitude * 0.16, 0, amplitude * 0.32, height);
+      }
+      context.globalCompositeOperation = "source-over";
+
+      // A soft specular highlight along the face, brightest just under the
+      // crest, so the water reads as translucent rather than a flat fill.
       const shine = context.createRadialGradient(center - amplitude * 0.1, crestY + amplitude * 0.18, 0, center - amplitude * 0.1, crestY + amplitude * 0.18, amplitude * 1.1);
       shine.addColorStop(0, "rgba(255,255,255,0.32)");
       shine.addColorStop(0.4, "rgba(255,255,255,0.08)");
@@ -242,22 +261,53 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
         if (p.y > waterline + 4) p.life = 0;
       });
 
-      // Foam wash spreading from the impact zone, fading as it thins out.
-      if (wave.wash > 0.02) {
-        context.lineCap = "round";
-        for (let index = 0; index < 34; index += 1) {
-          const ratio = index / 34;
-          const jitter = chopNoise(index * 3.1 + time * 2) * 4;
-          const bandY = waterline - Math.sin(ratio * Math.PI) * amplitude * 0.16 + jitter;
-          context.strokeStyle = palette.foam;
-          context.globalAlpha = wave.wash * (0.18 + (index % 5) * 0.045) * (0.6 + 0.4 * Math.sin(ratio * Math.PI));
-          context.lineWidth = 0.7 + (index % 3) * 0.5;
-          context.beginPath();
-          context.moveTo(lipX - amplitude * 0.18 + ratio * width * 0.3, bandY);
-          context.lineTo(lipX - amplitude * 0.13 + ratio * width * 0.3, bandY + 2.4);
-          context.stroke();
+      // Fine haze near a tall crest, even without a full barrel: a
+      // constant, gentle sense of spray in the air, not just at the break.
+      if (amplitude > height * 0.28) {
+        const wantMist = Math.round(mix(0, 10, ease((amplitude / height - 0.28) / 0.3)));
+        while (mist.length < wantMist) {
+          mist.push({ x: center + (Math.random() - 0.5) * amplitude * 0.7, y: crestY - Math.random() * amplitude * 0.1, vy: -mix(0.15, 0.4, Math.random()) * (width / 400), r: mix(0.5, 1.2, Math.random()), life: mix(0.6, 1, Math.random()) });
+        }
+        if (mist.length > wantMist) mist.length = wantMist;
+      } else if (mist.length) mist.length = Math.max(0, mist.length - 1);
+      context.fillStyle = palette.light;
+      mist = mist.filter((p) => p.life > 0.02);
+      mist.forEach((p) => {
+        p.y += p.vy;
+        p.life -= delta * 0.3;
+        context.globalAlpha = clamp(p.life) * 0.28;
+        context.beginPath();
+        context.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        context.fill();
+      });
+
+      // Whitewater from the break: particles that ride the surface, drift
+      // outward and slowly dissolve, instead of a fixed band redrawn each
+      // frame, so the foam actually spreads and thins the way real foam does.
+      if (wave.wash > 0.03 && foamTrail.length < 90) {
+        const spawn = Math.round(wave.wash * 6);
+        for (let n = 0; n < spawn; n += 1) {
+          foamTrail.push({
+            x: lipX - amplitude * 0.1 + (Math.random() - 0.3) * amplitude * 0.3,
+            bob: Math.random() * Math.PI * 2,
+            drift: mix(0.3, 1.1, Math.random()) * (width / 400),
+            r: mix(1, 2.6, Math.random()),
+            life: 1,
+          });
         }
       }
+      context.fillStyle = palette.foam;
+      foamTrail = foamTrail.filter((p) => p.life > 0.02);
+      foamTrail.forEach((p) => {
+        p.x += p.drift;
+        p.bob += delta * 3;
+        p.life -= delta * 0.22;
+        const y = surfaceY(p.x) - Math.abs(Math.sin(p.bob)) * 2;
+        context.globalAlpha = clamp(p.life) * 0.5;
+        context.beginPath();
+        context.arc(p.x, y, p.r * clamp(p.life, 0.4, 1), 0, Math.PI * 2);
+        context.fill();
+      });
 
       context.globalAlpha = 1;
       frame = window.requestAnimationFrame(draw);
