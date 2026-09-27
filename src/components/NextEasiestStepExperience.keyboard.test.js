@@ -9,7 +9,7 @@ describe("Next Easiest Step's primary controls are keyboard-reachable", () => {
   const src = readFileSync("src/components/NextEasiestStepExperience.jsx", "utf8");
 
   it("the active step card is a keyboard-operable button", () => {
-    expect(src).toMatch(/role="button"[\s\S]{0,40}tabIndex=\{0\}[\s\S]{0,60}onClick=\{\(\) => navigateTo\("brain-check"\)\}[\s\S]{0,200}onKeyDown=/);
+    expect(src).toMatch(/role="button"[\s\S]{0,40}tabIndex=\{0\}[\s\S]{0,60}onClick=\{\(\) => navigateTo\("intent"\)\}[\s\S]{0,200}onKeyDown=/);
   });
 
   it('both ladder "continue" cards respond to Enter and Space, not only a click', () => {

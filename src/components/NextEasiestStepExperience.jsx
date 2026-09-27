@@ -2345,8 +2345,8 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => navigateTo("brain-check")}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("brain-check"); } }}
+                onClick={() => navigateTo("intent")}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("intent"); } }}
                 style={{
                   display: "flex",
                   alignItems: "center",
