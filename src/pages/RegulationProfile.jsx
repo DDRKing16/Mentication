@@ -89,7 +89,7 @@ export default function RegulationProfile() {
 
   if (!profile || profile.count === 0) {
     return (
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+      <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
           <button onClick={() => navigate("/")} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
             <ChevronLeft className="h-4 w-4" /> Back
@@ -108,7 +108,7 @@ export default function RegulationProfile() {
 
   return (
     <PullToRefresh onRefresh={loadSessions}>
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+      <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
           <button onClick={() => navigate("/")} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
             <ChevronLeft className="h-4 w-4" /> Back

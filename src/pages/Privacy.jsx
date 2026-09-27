@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function Privacy() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+    <div className="calmbg min-h-full">
       <main className="mx-auto max-w-xl px-5 pb-20 pt-[max(2.5rem,env(safe-area-inset-top))]">
         <button onClick={() => navigate(-1)} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back

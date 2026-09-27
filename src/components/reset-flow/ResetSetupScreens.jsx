@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export function BuildingResetScreen() {
   return (
-    <div className="flex min-h-full flex-col items-center justify-center gap-6 bg-gradient-to-b from-cream via-background to-background px-6">
+    <div className="calmbg flex min-h-full flex-col items-center justify-center gap-6 px-6">
       <motion.div
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

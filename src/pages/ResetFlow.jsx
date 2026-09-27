@@ -613,7 +613,7 @@ export default function ResetFlow() {
     const remMin = Math.round(planRemaining);
 
     return (
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+      <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col items-center px-5 pt-6 pb-10 sm:px-8">
           <div className="flex w-full justify-start">
             <FlowHomeButton />
@@ -768,7 +768,7 @@ export default function ResetFlow() {
       : null;
     const helpedOptions = pathwayByIds(usedIds.length ? usedIds : pathway.map((p) => p.id));
     return (
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+      <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col items-center px-5 pt-10 pb-28 sm:px-8">
           <div className="flex w-full justify-start">
             <FlowHomeButton />
@@ -911,7 +911,7 @@ export default function ResetFlow() {
       ? "Different things work at different times. Be gentle with yourself."
       : "Holding steady. You showed up, and that matters.";
     return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-6 bg-gradient-to-b from-cream via-background to-background px-6 text-center">
+      <div className="calmbg flex min-h-full flex-col items-center justify-center gap-6 px-6 text-center">
         <div className="relative flex h-24 w-24 items-center justify-center">
           <motion.span
             initial={{ scale: 0.7, opacity: 0.5 }}
@@ -984,7 +984,7 @@ export default function ResetFlow() {
     };
     const question = unsureStep === 0 ? UNSURE_FIRST_STEP : unsureSecondStep(unsureBranch);
     return (
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+      <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
           <div className="flex items-center justify-between">
             <button
@@ -1021,7 +1021,7 @@ export default function ResetFlow() {
 
   // ---------- QUESTIONS ----------
   return (
-    <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+    <div className="calmbg min-h-full">
       <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
         <div className="mb-8 flex items-center justify-between">
           <button

@@ -30,14 +30,14 @@ export default function EffectivenessDashboard() {
 
   if (loading || !insights) {
     return (
-      <div className="min-h-full bg-gradient-to-b from-cream via-background to-background flex items-center justify-center">
+      <div className="calmbg flex min-h-full items-center justify-center">
         <Loader className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+    <div className="calmbg min-h-full">
       <div className="mx-auto max-w-xl px-5 pt-6 pb-28">
         <div className="flex justify-start mb-6">
           <FlowHomeButton />

@@ -32,7 +32,7 @@ export default function Settings() {
   const [memoryCleared, setMemoryCleared] = useState(false);
 
   return (
-    <div className="min-h-full bg-gradient-to-b from-cream via-background to-background">
+    <div className="calmbg min-h-full">
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-28">
         <button
           onClick={() => navigate(-1)}
