@@ -116,7 +116,6 @@
 .tpl input,
 .tpl textarea {
   font: inherit;
-  color: inherit;
 }
 
 .tpl button {
