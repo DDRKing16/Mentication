@@ -91,3 +91,6 @@ Found why the curl looked like it "formed all at once": the spiral's size and wi
 
 ## 28 Sep — Urge Surfing wave, delayed the hook to just before crashing
 After feedback that the hook appeared too early and looked like a separate loop scaling up: the curl amount is no longer tied to the exercise's curl keyframe (which started ramping right at the start of the Crest hold, far too early). It's now tied to overall time directly and stays at exactly zero through Notice, Allow, Rise and roughly the first 60% of the Crest hold - a plain wave, no lean at all - only starting to fold over itself in the last stretch before the crash, finishing and crashing right around Soften. Verified by sampling the canvas's own pixels through a full session: zero change for the first ~58% of the session, then the fold and crash, then settling foam. Body and curl remain one shape/one gradient (from the previous fix).
+
+## 28 Sep — Urge Surfing: a repeat button
+Added "Ride it again" to the finished screen, next to the existing options. It restarts the same wave (same length as the one just done) from the very beginning, ready to rate again at the end. Verified it actually resets the wave animation to its first stage rather than just navigating home.

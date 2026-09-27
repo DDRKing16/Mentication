@@ -122,5 +122,18 @@ export function reduceUrgeSession(session, event) {
     const duration = URGE_SURF_DEFAULTS.extensionSeconds * 1000;
     return next({ status: "timer_active", currentRoute: "urge.timer", timer: { ...state.timer, segmentIndex: state.timer.segmentIndex + 1, segmentDurationMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null } });
   }
+  if (event.type === "REPEAT_WAVE") {
+    // Rides the same wave again: same length as the one just finished,
+    // fresh timer, back to the start of the animation, ready to rate again.
+    if (state.currentRoute !== "urge.complete" || state.status !== "timer_complete") return state;
+    const duration = state.timer.segmentDurationMs;
+    return next({
+      status: "timer_active",
+      currentRoute: "urge.timer",
+      postIntensity: null,
+      choiceOutcome: null,
+      timer: { ...state.timer, segmentIndex: state.timer.segmentIndex + 1, segmentDurationMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null },
+    });
+  }
   return state;
 }

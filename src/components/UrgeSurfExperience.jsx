@@ -415,6 +415,7 @@ function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
         </label>
         <div className="urge-lovable__finish-actions">
           <PrimaryButton onClick={() => onFinish("wait")}>Return home</PrimaryButton>
+          <button type="button" onClick={() => dispatch({ type: "REPEAT_WAVE" })}>Ride it again</button>
           <button type="button" onClick={() => dispatch({ type: "EXTEND_TIMER" })}>Wait 10 more minutes</button>
           <button type="button" onClick={() => onFinish("leave")}>Leave the trigger</button>
           <button type="button" onClick={() => onFinish("substitute")}>Choose a substitute</button>
