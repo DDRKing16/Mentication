@@ -2971,7 +2971,7 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
                   style={{ width: "100%", height: "100%", objectFit: "contain" }} 
                 />
               </div>
-              <span style={{ fontFamily: "var(--font-headline)", fontSize: "18px", fontWeight: "700", color: "#D6DFAB", letterSpacing: "-0.01em" }}>MentiCation</span>
+              <span style={{ fontFamily: "var(--font-headline)", fontSize: "18px", fontWeight: "700", color: "#D6DFAB", letterSpacing: "-0.01em" }}>Mentication</span>
             </div>
             
             {/* Right Pause Button */}
