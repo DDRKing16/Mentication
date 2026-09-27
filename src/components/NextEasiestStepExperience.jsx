@@ -2342,12 +2342,15 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
               </div>
 
               {/* STEP 2: Active Step */}
-              <div 
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => navigateTo("brain-check")}
-                style={{ 
-                  display: "flex", 
-                  alignItems: "center", 
-                  gap: "14px", 
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("brain-check"); } }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
                   width: "100%",
                   cursor: "pointer"
                 }}
@@ -3603,10 +3606,13 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
           {/* Action buttons with neon play pulse & glowing card-button (20% reduced size, pushed up) */}
           <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "10px", zIndex: 5 }}>
             {gameState.ladder && gameState.ladder.length > 0 ? (
-              <div 
-                className="card play-pulse-glow" 
-                onClick={() => navigateTo("focus")} 
-                style={{ 
+              <div
+                className="card play-pulse-glow"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigateTo("focus")}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("focus"); } }}
+                style={{
                   borderRadius: "18px",
                   background: "linear-gradient(135deg, rgba(128, 12, 20, 0.95) 0%, rgba(95, 8, 14, 0.85) 100%)",
                   border: "2px solid rgba(165, 243, 252, 0.4)",
@@ -3639,10 +3645,13 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
                 </div>
               </div>
             ) : (
-              <div 
-                className="card play-pulse-glow" 
-                onClick={() => navigateTo("brain-check")} 
-                style={{ 
+              <div
+                className="card play-pulse-glow"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigateTo("brain-check")}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigateTo("brain-check"); } }}
+                style={{
                   borderRadius: "18px",
                   background: "linear-gradient(135deg, rgba(128, 12, 20, 0.95) 0%, rgba(95, 8, 14, 0.85) 100%)",
                   border: "2px solid rgba(165, 243, 252, 0.4)",

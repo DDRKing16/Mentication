@@ -104,9 +104,11 @@ export default function Home() {
 
           {/* New Premium ENTRY Daily Journal Card */}
           <section className="px-5 pt-8">
-            <div 
+            <button
+              type="button"
               onClick={() => navigate("/journal")}
-              className="bg-[#38221E] text-[#F7F2E8] rounded-[28px] p-6 shadow-[0_12px_32px_rgba(56,34,30,0.18)] border border-[#38221E]/10 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] flex justify-between items-center relative overflow-hidden group"
+              aria-label="Open your Journal"
+              className="w-full text-left bg-[#38221E] text-[#F7F2E8] rounded-[28px] p-6 shadow-[0_12px_32px_rgba(56,34,30,0.18)] border border-[#38221E]/10 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] flex justify-between items-center relative overflow-hidden group"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent pointer-events-none" />
               <div className="flex-1 min-w-0 pr-4 z-10">
@@ -123,7 +125,7 @@ export default function Home() {
               <div className="shrink-0 w-12 h-12 rounded-[18px] bg-white/10 flex items-center justify-center border border-white/20 z-10 transition-transform group-hover:scale-105">
                 <Sparkles className="w-6 h-6 text-[#C29B68]" />
               </div>
-            </div>
+            </button>
           </section>
 
           {/* The Good Map — sort what matters, see it on a map, close the biggest gap */}
