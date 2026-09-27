@@ -222,6 +222,10 @@ function CaptureScreen({ text, setText, onContinue, onLeave, onSupport, hasSaved
         </button>
       </div>
 
+      {/* This group centres in the space below the header so an unanswered
+          or short-answer state doesn't leave a dead gap; once the "wait"
+          writing area fills the space, centring has no visible effect. */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", minHeight: 0 }}>
       {/* Suitability check lives on the same screen; nothing is diagnosed from the text. */}
       <fieldset style={{ border: 0, padding: 0, margin: "1.25rem 0 0" }}>
         <legend className="tpl-small tpl-muted" style={{ marginBottom: "0.5rem" }}>Does this need action tonight?</legend>
@@ -316,6 +320,7 @@ function CaptureScreen({ text, setText, onContinue, onLeave, onSupport, hasSaved
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }
@@ -400,7 +405,7 @@ function ParkedScreen({ onReopen, onQuiet, onInteract, onNightChannel, consents,
   const [showNightChannel, setShowNightChannel] = useState(false);
 
   return (
-    <div className="tpl-rise" onPointerDown={onInteract} onFocus={onInteract}>
+    <div className="tpl-rise" style={{ justifyContent: "center" }} onPointerDown={onInteract} onFocus={onInteract}>
       <h1 className="tpl-display tpl-h1 tpl-h1--center" style={{ marginTop: "1.75rem" }}>It’s parked.</h1>
       <p className="tpl-lede tpl-lede--center" style={{ marginTop: "0.75rem" }} role="status">Saved here for when you’re ready.</p>
 
