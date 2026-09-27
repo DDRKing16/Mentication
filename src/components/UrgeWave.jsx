@@ -128,28 +128,44 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       };
 
       const crestY = surfaceY(center);
-      const reach = amplitude * (0.14 + wave.curl * 0.72);
-      const lipX = center + reach;
-      const lipY = crestY + amplitude * (0.02 + Math.pow(wave.curl, 1.5) * 0.95);
-      // A real barrel: the face overshoots past vertical and hooks back
-      // in on itself, instead of a single smooth bezier to the lip.
-      const throatX = center + reach * 0.62;
-      const throatY = crestY - amplitude * (0.1 + wave.curl * 0.22);
-      const hookX = lipX - reach * 0.22;
-      const hookY = lipY - amplitude * 0.05;
+      // A real barrel: normalised so the wave's peak curl (~0.78) reads as
+      // a fully hollow tube, not just a folded lip. The tongue of water
+      // pitches out and drops well past the crest before curling back to
+      // "kiss" the face, leaving a hollow big enough to read as a real tube.
+      const barrelT = clamp(wave.curl / 0.8);
+      const reach = amplitude * mix(0.16, 1.05, barrelT);
+      const overhang = amplitude * mix(0.05, 1.15, barrelT);
+      const throatX = center + reach * 0.24;
+      const throatY = crestY - amplitude * mix(0.02, 0.18, barrelT);
+      const tipX = center + reach;
+      const tipY = crestY + overhang;
+      const kissX = center + reach * mix(0.32, 0.6, barrelT);
+      const kissY = tipY + amplitude * mix(0.06, 0.3, barrelT);
+      // A little thickness so the tongue reads as a sheet of water, not a
+      // wire: the "outer" (top, lit) curve and the "inner" (underside)
+      // curve share the same tip/kiss anchors but bow apart in the middle.
+      const tongue = amplitude * mix(0.08, 0.2, barrelT);
 
       const traceWave = () => {
+        // The wave's plain body: unaffected by the curl, so the cave and
+        // the overhanging tongue can be layered on top of a solid mass.
         context.beginPath();
         context.moveTo(-4, height + 4);
         for (let x = -4; x <= center; x += 2) context.lineTo(x, surfaceY(x));
-        if (wave.curl > 0.03 && amplitude > 12) {
-          context.bezierCurveTo(center + reach * 0.25, crestY - amplitude * 0.05, throatX, throatY, hookX, hookY);
-          context.quadraticCurveTo(lipX, lipY - amplitude * 0.02, lipX, lipY);
-          context.bezierCurveTo(lipX + 4, lipY + amplitude * 0.12, center + amplitude * 0.58, waterline - amplitude * 0.1, center + amplitude * 0.7, waterline);
-        }
-        for (let x = center + amplitude * 0.7; x <= width + 4; x += 2) context.lineTo(x, surfaceY(x));
+        for (let x = center; x <= width + 4; x += 2) context.lineTo(x, surfaceY(x));
         context.lineTo(width + 4, height + 4);
         context.closePath();
+      };
+
+      // The upper (outer, lit) curve of the tongue: crest -> throat -> tip.
+      const traceTongueTop = () => {
+        context.moveTo(center, crestY);
+        context.bezierCurveTo(center + reach * 0.2, crestY - amplitude * 0.06, throatX, throatY, center + reach * 0.66, crestY + overhang * 0.32);
+        context.bezierCurveTo(center + reach * 0.88, crestY + overhang * 0.62, tipX - reach * 0.06, tipY - overhang * 0.1, tipX, tipY);
+      };
+      // The underside (inner, shadowed) curve: tip curling back to the kiss.
+      const traceTongueUnder = () => {
+        context.bezierCurveTo(tipX + amplitude * 0.06, tipY + amplitude * 0.22, kissX + amplitude * 0.18, kissY - amplitude * 0.16, kissX, kissY);
       };
 
       context.clearRect(0, 0, width, height);
@@ -211,7 +227,69 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
       context.fillRect(0, 0, width, height);
       context.restore();
 
-      // A crisp lit rim along the crest and the barrel's edge.
+      // The barrel: a dark hollow cave overlaid on the face, roofed by a
+      // bright overhanging tongue of water — the classic hollow-tube look,
+      // sized so the opening is a real fraction of the wave's own height.
+      if (barrelT > 0.03 && amplitude > 14) {
+        // The cave: the tongue's own outline (top curve out to the tip,
+        // under-curve back to the kiss point), then a soft curve back to
+        // the face beneath it, closing a large dark hollow.
+        context.beginPath();
+        traceTongueTop();
+        traceTongueUnder();
+        context.quadraticCurveTo(center + reach * 0.34, waterline - amplitude * 0.22, throatX, throatY);
+        context.closePath();
+        context.save();
+        context.clip();
+        const cave = context.createRadialGradient(kissX, kissY - amplitude * 0.25, 0, tipX - reach * 0.2, crestY + overhang * 0.55, amplitude * 1.2);
+        cave.addColorStop(0, "#020a0b");
+        cave.addColorStop(0.55, palette.deep);
+        cave.addColorStop(1, palette.mid);
+        context.fillStyle = cave;
+        context.fillRect(0, 0, width, height);
+        // A cool rim of reflected light along the top of the cave, as if
+        // daylight were glancing off the underside of the tongue above it.
+        context.globalCompositeOperation = "screen";
+        context.strokeStyle = palette.light;
+        context.globalAlpha = 0.22;
+        context.lineWidth = amplitude * 0.05;
+        context.beginPath();
+        context.moveTo(center, crestY);
+        traceTongueTop();
+        context.stroke();
+        context.restore();
+
+        // The tongue itself: a lit sheet of water curling over the cave,
+        // with its own gradient (bright rim, glassy underside) so it reads
+        // as a thin roof rather than a flat shape.
+        context.beginPath();
+        context.moveTo(center, crestY);
+        traceTongueTop();
+        traceTongueUnder();
+        // trace back along an inset parallel curve to give the sheet a
+        // visible thickness, instead of collapsing to a wire.
+        context.bezierCurveTo(kissX - tongue * 0.5, kissY - amplitude * 0.28, tipX - tongue, tipY - amplitude * 0.18, tipX - tongue * 1.1, tipY - overhang * 0.18);
+        context.bezierCurveTo(center + reach * 0.7, crestY + overhang * 0.18, center + reach * 0.16, crestY - amplitude * 0.02, center, crestY);
+        context.closePath();
+        const tongueGrad = context.createLinearGradient(center, crestY, tipX, tipY);
+        tongueGrad.addColorStop(0, palette.light);
+        tongueGrad.addColorStop(0.45, palette.glass);
+        tongueGrad.addColorStop(1, palette.mid);
+        context.fillStyle = tongueGrad;
+        context.fill();
+        context.save();
+        context.clip();
+        const tongueShine = context.createLinearGradient(center, crestY - amplitude * 0.05, tipX, tipY);
+        tongueShine.addColorStop(0, "rgba(255,255,255,0.5)");
+        tongueShine.addColorStop(0.3, "rgba(255,255,255,0.12)");
+        tongueShine.addColorStop(1, "rgba(255,255,255,0)");
+        context.fillStyle = tongueShine;
+        context.fillRect(0, 0, width, height);
+        context.restore();
+      }
+
+      // A crisp lit rim along the crest and, once it's barrelling, the
+      // outer edge of the tongue.
       context.save();
       context.globalCompositeOperation = "screen";
       context.strokeStyle = palette.light;
@@ -222,9 +300,9 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
         if (x === 0) context.moveTo(x, surfaceY(x));
         else context.lineTo(x, surfaceY(x));
       }
-      if (wave.curl > 0.03) {
-        context.bezierCurveTo(center + reach * 0.25, crestY - amplitude * 0.05, throatX, throatY, hookX, hookY);
-        context.quadraticCurveTo(lipX, lipY - amplitude * 0.02, lipX, lipY);
+      if (barrelT > 0.03) {
+        context.moveTo(center, crestY);
+        traceTongueTop();
       }
       context.stroke();
       context.restore();
@@ -234,8 +312,8 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
         const want = Math.round(mix(0, 22, ease((wave.curl - 0.25) / 0.6)));
         while (spray.length < want) {
           spray.push({
-            x: hookX + (Math.random() - 0.4) * amplitude * 0.2,
-            y: hookY - Math.random() * amplitude * 0.15,
+            x: tipX + (Math.random() - 0.4) * amplitude * 0.2,
+            y: tipY - Math.random() * amplitude * 0.15,
             vx: mix(0.4, 1.6, Math.random()) * (width / 400),
             vy: -mix(0.6, 2.2, Math.random()) * (width / 400),
             r: mix(0.6, 1.8, Math.random()),
@@ -288,7 +366,7 @@ export default function UrgeWave({ stage = 3, progress = 0, paused = false, redu
         const spawn = Math.round(wave.wash * 6);
         for (let n = 0; n < spawn; n += 1) {
           foamTrail.push({
-            x: lipX - amplitude * 0.1 + (Math.random() - 0.3) * amplitude * 0.3,
+            x: kissX - amplitude * 0.1 + (Math.random() - 0.3) * amplitude * 0.3,
             bob: Math.random() * Math.PI * 2,
             drift: mix(0.3, 1.1, Math.random()) * (width / 400),
             r: mix(1, 2.6, Math.random()),

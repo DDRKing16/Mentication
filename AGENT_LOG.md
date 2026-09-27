@@ -76,3 +76,6 @@ Rewrote the wave animation (UrgeWave.jsx): the surface now uses layered noise in
 
 ## 28 Sep — Urge Surfing wave, second pass
 Pushed the wave further after feedback: caustic light shafts drifting under the surface, ambient airborne mist near a tall crest even without a full break, and a persistent whitewater trail that rides the surface and slowly dissolves instead of a static foam band redrawn each frame. Same steps and wording.
+
+## 28 Sep — Urge Surfing wave, real hollow barrel
+Reworked the curl into an actual hollow tube instead of a folding lip: a dark cave (radial-gradient shadow, with a cool reflected-light rim) sits under a separate bright, curling tongue of water that pitches out and drops back onto the face. Sized so the hollow reads as large — big enough for a rider — at the wave's peak curl. Spray and foam anchors updated to the new geometry. Sound was left off; the wave was checked with the preview server muted.
