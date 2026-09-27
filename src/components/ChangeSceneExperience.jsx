@@ -728,7 +728,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       field={
         <style dangerouslySetInnerHTML={{
           __html: `
-            ${step === 0 ? "" : `.change-scene-v2-container > header, .change-scene-v2-container > header p { color: #1c3a30 !important; }
+            ${(step === 0 || step === 5 || step === 6 || step === 8) ? "" : `.change-scene-v2-container > header, .change-scene-v2-container > header p { color: #1c3a30 !important; }
             .change-scene-v2-container > header button { color: #1c3a30; border-color: rgba(28,58,48,0.25); background: rgba(255,255,255,0.45); }`}
             .change-scene-v2-container {
               background: ${step === 0
@@ -943,6 +943,8 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               justify-content: center;
               padding: 18px 8px;
               border-radius: 22px;
+              overflow-y: auto;
+              -webkit-overflow-scrolling: touch;
               background:
                 radial-gradient(circle at 10% 16%, rgba(163, 249, 184, 0.86) 0 2px, transparent 3px),
                 radial-gradient(circle at 18% 68%, rgba(248, 214, 106, 0.86) 0 3px, transparent 4px),
@@ -2060,6 +2062,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               text-align: center;
               color: var(--ink);
               opacity: 0.55;
+              margin-top: 12px;
             }
 
             .change-scene-v2-container .different-btn {
