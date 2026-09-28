@@ -14,6 +14,7 @@ import RecommendedCard from "@/components/home/RecommendedCard";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { Sparkles } from "lucide-react";
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
+import { usePlus } from "@/lib/subscription";
 
 const ICON_BASE = "/media/images/home-icons/";
 const HOME_GRID = [
@@ -27,6 +28,7 @@ const HOME_GRID = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const plus = usePlus();
   const [lastWorked, setLastWorked] = useState(null);
   const [personalBest, setPersonalBest] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
@@ -139,7 +141,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-[#3EE8AA]/10 to-transparent pointer-events-none" />
               <div className="flex-1 min-w-0 pr-4 z-10">
                 <span className="text-[9px] font-bold tracking-[0.25em] text-[#3EE8AA] uppercase block mb-1">
-                  THE GOOD MAP · 10 MINUTES
+                  THE GOOD MAP · 10 MINUTES {!plus.active && <span className="ml-1 rounded-full bg-white/15 px-2 py-0.5 tracking-[0.18em] text-white">PLUS</span>}
                 </span>
                 <h3 className="font-serif text-[23px] font-bold leading-none tracking-wide text-white mb-2">
                   See what makes life feel good
@@ -163,7 +165,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent pointer-events-none" />
               <div className="flex-1 min-w-0 pr-4 z-10">
                 <span className="text-[9px] font-bold tracking-[0.25em] text-[#F3B65B] uppercase block mb-1">
-                  DEAR 2100 · 15 MINUTES
+                  DEAR 2100 · 15 MINUTES {!plus.active && <span className="ml-1 rounded-full bg-white/15 px-2 py-0.5 tracking-[0.18em] text-white">PLUS</span>}
                 </span>
                 <h3 className="font-serif text-[23px] font-bold leading-none tracking-wide text-white mb-2">
                   Go after the thing you've avoided

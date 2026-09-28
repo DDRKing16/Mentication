@@ -5,6 +5,7 @@ import { useAccessibility } from "@/lib/accessibility";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
+import { usePlus } from "@/lib/subscription";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -26,6 +27,7 @@ function Toggle({ label, desc, on, onToggle }) {
 
 export default function Settings() {
   const navigate = useNavigate();
+  const plus = usePlus();
   const a11y = useAccessibility() || {};
   const { update } = a11y;
   const amb = useAccessibilityPrefs();
@@ -158,6 +160,14 @@ export default function Settings() {
             Delete local intervention memory
           </Button>
           {memoryCleared && <p role="status" className="mt-2 text-sm text-muted-foreground">Local intervention memory deleted.</p>}
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-border bg-card p-5">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Mentication Plus</p>
+          <p className="mt-2 text-sm text-muted-foreground">{plus.active ? "Plus is active on this Apple ID." : "Dear 2100, The Good Map and new journeys. The everyday tools stay free."}</p>
+          <Button variant="outline" onClick={() => navigate("/plus")} className="mt-4 rounded-full">
+            {plus.active ? "Manage Plus" : "See Plus"}
+          </Button>
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">

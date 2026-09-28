@@ -12,10 +12,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
+import PlusGate from "@/components/plus/PlusGate";
 
 export default function Dear2100() {
   const navigate = useNavigate();
   return (
+    <PlusGate route="dear-2100" name="Dear 2100" background="#112b50"
+      promise="Understand the pattern behind what you keep postponing."
+      detail="Then choose your next small step, and keep it in your own book.">
     <div className="fixed inset-0" aria-label="Dear 2100">
       <iframe title="Dear 2100" src="/dear2100-updated/index.html" className="h-full w-full border-0" allow="autoplay" />
       {/* The build's own header is busy edge-to-edge on every screen, so the
@@ -31,5 +35,6 @@ export default function Dear2100() {
         <Home className="h-5 w-5" strokeWidth={1.8} />
       </button>
     </div>
+    </PlusGate>
   );
 }

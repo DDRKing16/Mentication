@@ -23,7 +23,7 @@ export default function Privacy() {
           </section>
           <section>
             <h2 className="font-heading text-xl font-medium text-primary">What leaves the device</h2>
-            <p className="mt-2 text-muted-foreground">Mentication has no analytics, advertising, account server or runtime narration service. All app fonts, visuals and available narration are bundled with the app.</p>
+            <p className="mt-2 text-muted-foreground">Mentication has no analytics, advertising, account server or runtime narration service. All app fonts, visuals and available narration are bundled with the app. If you subscribe to Mentication Plus, the purchase is handled entirely by Apple; Mentication only asks Apple whether a subscription is active.</p>
           </section>
           <section>
             <h2 className="font-heading text-xl font-medium text-primary">External choices</h2>

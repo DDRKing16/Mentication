@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
+import { refreshPlus } from '@/lib/subscription';
 import PageNotFound from './lib/PageNotFound';
 import ScrollToTop from './components/ScrollToTop';
 import AppShell from '@/components/AppShell';
@@ -31,6 +32,7 @@ const ParkingLot = lazy(() => import('@/pages/ParkingLot'));
 const SignalLock = lazy(() => import('@/pages/SignalLock'));
 const VectorShift = lazy(() => import('@/pages/VectorShift'));
 const GoodMap = lazy(() => import('@/pages/GoodMap'));
+const Plus = lazy(() => import('@/pages/Plus'));
 
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
 
@@ -94,6 +96,7 @@ const MenticationRoutes = () => {
                 <Route path="/parking-lot" element={<ParkingLot />} />
                 <Route path="/support" element={<Crisis />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/plus" element={<Plus />} />
                 <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
                 <Route path="/vector-shift" element={<OnboardingGate><VectorShift /></OnboardingGate>} />
                 <Route path="/good-map" element={<OnboardingGate><GoodMap /></OnboardingGate>} />
@@ -111,6 +114,8 @@ function App() {
   const { prefs } = useAccessibilityPrefs();
   useSystemDarkMode();
   useEffect(() => installFeedback(), []);
+  // Ask Apple once per launch whether Plus is active (kept on the device for offline use).
+  useEffect(() => { void refreshPlus(); }, []);
   return (
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>
