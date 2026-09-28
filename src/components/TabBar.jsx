@@ -3,14 +3,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Home as HomeIcon, BookOpen, ClipboardList, BarChart3, Sparkles, Settings as SettingsIcon } from "lucide-react";
 import { HOME_THEME } from "@/lib/homeTheme";
 
-// Six-item bottom navigation: Home, Library, My Plan, Progress, Insights and
+// Six-item bottom navigation: Home, Library, My Plan, Profile, Insights and
 // Settings. Warm frosted-ivory bar, icon-over-label, gold dot under
 // the active item. Fixed to the viewport and respects safe areas.
+// "Profile" (not "Progress") because /insights already opens with its own
+// "Your progress" heading — two tabs both called Progress was confusing.
 const TABS = [
   { to: "/", label: "Home", icon: HomeIcon },
   { to: "/library", label: "Library", icon: BookOpen },
   { to: "/plan", label: "My Plan", icon: ClipboardList },
-  { to: "/profile", label: "Progress", icon: BarChart3 },
+  { to: "/profile", label: "Profile", icon: BarChart3 },
   { to: "/insights", label: "Insights", icon: Sparkles },
   { to: "/settings", label: "Settings", icon: SettingsIcon },
 ];
