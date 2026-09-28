@@ -47,6 +47,23 @@ changing them. Nothing here has been applied.
   deciding where they should actually take someone (and whether that's
   wanted at all on this screen), which felt like your call.
 
+- **Two different "make text bigger" controls that don't agree with each
+  other.** Settings has a three-step "Text size" (Default / Large / Extra
+  large) that scales the whole app's base font size — this one already works
+  everywhere. The accessibility panel you can open during a session (the "T"
+  button) has its own separate "Larger text" on/off switch, which turns on a
+  handful of extra layout tweaks in a few screens (bigger grids in The Happy
+  Bump, roomier spacing in Thought or Fact and the player chrome) that the
+  Settings control doesn't reach. The two don't show or affect each other —
+  picking "Large" in Settings won't flip the in-session switch on, and vice
+  versa. Found this while fixing the Reduce motion / High contrast / Captions
+  toggles in this same block (2026-09-28), which had the same kind of split
+  but were a mechanical fix (all three now read the one store everything else
+  already used). This one needs your call on shape first — should the
+  in-session switch become a three-step picker to match Settings, should
+  Settings drop to a simple on/off, or should both stay but at least agree
+  with each other — before it's safe for an agent to touch.
+
 ## Programmes wording (added 28 Sep) — please review
 New multi-day programmes use existing exercises unchanged; only this framing
 copy is new. Edit freely in `src/lib/programmes.js`.

@@ -148,3 +148,30 @@ Three multi-day programmes made only of existing exercises (unchanged): Seven ca
   (it only counts rated sessions). Small fix to do next if the owner agrees.
 - Still to do, needs Xcode: the same pass on a real iPhone/simulator, plus checking the share sheet
   (backup), notifications (reminders) and Apple's purchase sheet (Plus).
+
+## 2026-09-28 — Reduce motion / High contrast / Captions toggles fixed
+The brand thread's next phases in docs/BRAND_THREAD.md (2 through 6) were already all done, and the
+earlier fallback items (preload, load speed, dead code, the error boundary) were already done too, so
+this block surveyed the app in a real headless-browser run at 375x812, checking specifically for
+whether "skipped entirely when Reduce motion is on" (a brand doc rule) actually held up. It didn't:
+with the phone's own Reduce Motion setting simulated, the brand Threshold still played in full every
+time. Traced it to two separate, disconnected places the app remembers accessibility choices: Settings'
+Reduce motion / High contrast / Captions on by default toggles wrote to one of them, but the brand
+Threshold and Closing, and every one of the 12 interventions' own players, only ever read the other one.
+Flipping those three switches in Settings visibly moved, but changed nothing anywhere else in the app —
+High contrast in particular had no matching styling at all under its old name, so it could never have
+done anything even before that. Settings now writes to the same store everything else already reads
+(ddef3ab). Also added something the real store was missing entirely: on a first run with no saved
+Mentication preference, Reduce motion now starts from the phone's own setting, which is what the brand
+doc promises and what nothing previously delivered. Verified with a real headless-browser run: simulating
+the phone's Reduce Motion setting now correctly skips the Threshold before even opening the app, and
+tapping Reduce motion / High contrast in Settings now visibly does what it says (checked Box Breathing's
+threshold-skip and the resulting `high-contrast` class landing on the page). 6 new tests guard the
+first-run default and that an explicit save always wins over it. Also looked closely at Box Breathing,
+Progressive Muscle Relaxation, Thought or Fact, The Happy Bump, Vector Shift and Night Channel's own
+screens for further visual problems; found none worth changing — Box Breathing's long quiet opening
+turned out to be the narration simply taking longer than its nominal timing, not a stuck screen, and
+resolves into its full breathing-square visual as expected. Found a smaller, related split (Settings'
+three-step Text size and the in-session panel's separate Larger-text switch don't agree with each other)
+and logged it in SUGGESTIONS.md rather than reshaping either control myself. Full test/typecheck/lint/build
+suite passes with the same baseline dear2100 failures as every prior run.
