@@ -216,11 +216,6 @@ export default function EffectivenessDashboard() {
           </motion.div>
         )}
 
-        {insights.totalSessions === 0 && (
-          <p className="text-center text-sm text-muted-foreground">
-            Complete a few sessions to see your personal patterns emerge.
-          </p>
-        )}
       </div>
     </div>
   );
