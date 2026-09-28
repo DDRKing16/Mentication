@@ -16,13 +16,19 @@ function markSeen() {
   try { localStorage.setItem(SEEN_KEY, "1"); } catch { /* storage unavailable */ }
 }
 
-/** Only for people who are new: one to three finished sessions, card not yet dismissed. */
-export const shouldShowFirstWin = (sessionCount, seen) => !seen && sessionCount >= 1 && sessionCount <= 3;
+/**
+ * Only for people who are genuinely new: one to three finished sessions, card
+ * not yet dismissed, and no sign they already have rhythm going (an active
+ * programme, or a two-day streak) — otherwise "your first reset" reads as
+ * confused rather than encouraging.
+ */
+export const shouldShowFirstWin = (sessionCount, seen, { hasActiveProgramme = false, streak = 0 } = {}) =>
+  !seen && sessionCount >= 1 && sessionCount <= 3 && !hasActiveProgramme && streak < 2;
 
-export default function FirstWinCard({ sessionCount, plusActive, onProgramme, onPlus }) {
+export default function FirstWinCard({ sessionCount, plusActive, hasActiveProgramme, streak, onProgramme, onPlus }) {
   const [hidden, setHidden] = useState(() => firstWinSeen());
   const [reminderNote, setReminderNote] = useState("");
-  if (hidden || !shouldShowFirstWin(sessionCount, false)) return null;
+  if (hidden || !shouldShowFirstWin(sessionCount, false, { hasActiveProgramme, streak })) return null;
 
   const close = () => { markSeen(); setHidden(true); };
   const remind = async () => {

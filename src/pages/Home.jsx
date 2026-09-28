@@ -15,6 +15,7 @@ import YourWeek from "@/components/home/YourWeek";
 import ProgrammeCard from "@/components/home/ProgrammeCard";
 import FirstWinCard from "@/components/home/FirstWinCard";
 import { activeProgrammeId, getProgramme, launchStateFor } from "@/lib/programmes";
+import { computeLocalCalendarStreak } from "@/lib/insights";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { Sparkles } from "lucide-react";
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
@@ -103,6 +104,8 @@ export default function Home() {
           <FirstWinCard
             sessionCount={sessions.length}
             plusActive={plus.active}
+            hasActiveProgramme={!!activeProgrammeId()}
+            streak={computeLocalCalendarStreak(sessions)}
             onProgramme={() => navigate("/programmes/calmer-seven")}
             onPlus={() => navigate("/plus")}
           />
