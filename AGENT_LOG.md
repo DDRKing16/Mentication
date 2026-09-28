@@ -230,3 +230,25 @@ but its own opening screen says "about 10–15 minutes," and the full walkthroug
 five-minute walk timer) really does take closer to that. Logged for the owner rather than changed, since
 this is a timing question (90072ce). Full test/typecheck/lint/build suite passes with the same baseline
 dear2100 failures as every prior run.
+
+## 28 Sep — A misleading button found in a full walkthrough of 5-4-3-2-1 Grounding
+With the brand thread phases and every earlier fallback item already done, gave 5-4-3-2-1 Grounding its
+own dedicated real headless-browser walkthrough at 375x812 (it had only had a partial pass before — a
+glow effect added a few runs back, but never a full walk of every sense stage). The practice itself looks
+and plays beautifully end to end (all five senses plus the closing recenter stage, each with its own soft
+glow, narration and progress dot) — no visual problems found there. But testing the "Next" chip next to
+"This isn't helping" turned up a real, verified problem: tapping it while on the very first sense
+("Five things you can see") didn't move to the next sense as the word "Next" and the six-dot progress row
+right above it both suggest — it immediately ended the whole five-minute practice and dropped straight
+into the "How are you now?" check-in, skipping the other four senses entirely. Reading the code confirmed
+why: that button has always meant "end this technique now," not "next stage" — Progressive Muscle
+Relaxation's own player already knew this and labelled it "Next intervention" for exactly that reason, but
+every other multi-stage practice (Grounding, Box Breathing and any other technique that shares this same
+player) still showed the plain, misleading "Next". Gave all of them the same honest label PMR already had,
+plus a new "Finish here" for when there's nothing left afterwards (6bce1b6). Nothing about what the button
+does, or any technique's steps, order or timing, changed — checked the corrected label in both a
+single-practice session (Grounding) and reasoned through the multi-practice case from the same code path
+PMR already used successfully. Also swept My Plan, Progress, Insights, Settings (scrolled to the bottom),
+Plus and Programmes in the browser and watched Box Breathing's own player, including its ambient-sound
+popup; found nothing else broken. Full test/typecheck/lint/build suite passes with the same baseline
+dear2100 failures as every prior run.
