@@ -26,6 +26,10 @@ Start with `README.md` for setup, validation and iOS workflow.
 - Never place speech, payment or other private API keys in frontend or native
   application bundles.
 - Run the package validation commands before finishing code changes.
+- Native plugins approved by the owner: `@capacitor/haptics`,
+  `@capacitor/local-notifications` (on-device reminders) and
+  `@capgo/native-purchases` (subscriptions; talks only to Apple's StoreKit, no
+  third-party server). Ask before adding anything else.
 
 ## Rules for every AI agent (Copilot, Codex, Claude, others)
 
