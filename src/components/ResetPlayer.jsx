@@ -757,7 +757,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
             onClick={skipToNext}
             className={"no-tap flex h-12 items-center rounded-full px-5 text-sm font-medium transition-all " + (lightChrome ? "text-[#1A2E26]/65 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/65 hover:bg-white/10 hover:text-cream")}
           >
-            {isPMRV2 ? "Next intervention" : "Next"}
+            {isLastIv ? "Finish here" : "Next intervention"}
           </button>
         </div>
       </div>
