@@ -1,8 +1,8 @@
 // @ts-check
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Screen, Btn, Headline, Sub, Glyph, PathwayMap, RED, NAVY, GOLD } from './shared';
-import { TOOLKIT_STEPS, PATHWAY_NODES, DISTORTIONS, PATHWAY_STEPS } from '@/lib/dear2100Content';
+import { Screen, Btn, Headline, Sub, Glyph, RED, NAVY, GOLD } from './shared';
+import { TOOLKIT_STEPS, DISTORTIONS, PATHWAY_STEPS } from '@/lib/dear2100Content';
 
 export const S23_Toolkit = ({ answers, update, onNext, onBack }) => {
   const tab = answers.toolkitTab;

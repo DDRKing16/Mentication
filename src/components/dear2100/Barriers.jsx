@@ -1,6 +1,6 @@
 // @ts-check
 import React from 'react';
-import { Screen, Btn, Headline, Sub, Counter, Grid, Pill, SuggestionField, DownArrow, RED, NAVY } from './shared';
+import { Screen, Btn, Headline, Sub, Counter, Grid, Pill, SuggestionField, RED, NAVY } from './shared';
 import { BANK_BARRIER_EXTRA, BANK_TRIED_BEFORE, BANK_SELFTALK, VERDICT_TABS, BANK_FEELING, FEAR_CHAIN_STEPS, BANK_VOICE } from '@/lib/dear2100Content';
 
 export const S03_BarriersIntro = ({ onNext, onBack }) => (

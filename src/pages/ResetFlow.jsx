@@ -60,7 +60,6 @@ export default function ResetFlow() {
   const { allowed, isPremium, loading: quotaLoading } = useFreeQuota();
 
   const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
-  const startsUrgeSurfing = directEntryPathway.length === 1 && directEntryPathway[0]?.id === "urgeSurf";
   const startsDirectFlagship = directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
   const initialPhase = startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
@@ -383,7 +382,7 @@ export default function ResetFlow() {
     setPlanRemaining((prev) => Math.max(0, prev - remTarget));
   };
 
-  const addMore = (mins, count) => {
+  const addMore = (mins) => {
     const nextIntensity = checkinValue ?? lastValue;
     const nextEffectiveness = commitPendingPulse(nextIntensity);
     const implied = remaining ? REMAINING_STATE_BY_ID[remaining] : null;
@@ -703,7 +702,7 @@ export default function ResetFlow() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => addMore(8, 3)}
+                  onClick={() => addMore(8)}
                   className="no-tap rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:text-foreground active:scale-95"
                 >
                   A lot more

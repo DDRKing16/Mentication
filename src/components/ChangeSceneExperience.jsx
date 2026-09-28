@@ -269,14 +269,6 @@ const ALTERNATIVE_TASKS = {
   7: "Choose one gentle thing to do next."
 };
 
-const CHIPS = [
-  "Reach out", "Reply to someone", "Organise something", "Appreciate someone",
-  "Just check in", "Say thank you", "Share something funny", "Invite to catch up",
-  "Send encouragement", "Ask how they are"
-];
-
-const QUICK_PLANS = ["Dinner", "Class", "Climb", "Lesson"];
-
 export default function ChangeSceneExperience({ intervention, answers, onComplete, onAttemptEvent, onExit }) {
   const { prefs } = useAccessibilityPrefs();
   const { speak, stop: stopVoice, preload } = useGuideVoice();
@@ -303,7 +295,6 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   // Premium alignment & sticky note tracking
   const [currentAudioTime, setCurrentAudioTime] = useState(0);
   const [audioIsPlaying, setAudioIsPlaying] = useState(false);
-  const [showSticky, setShowSticky] = useState(false);
 
   // New suggestions & pathway states
   const [selectedSuggestions, setSelectedSuggestions] = useState({});
@@ -314,7 +305,6 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const [selectedPath, setSelectedPath] = useState(null); // "relax" or "active"
   const [selectedPathActivity, setSelectedPathActivity] = useState(null);
   const [pathwayCustomText, setPathwayCustomText] = useState("");
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Save state on change
   useEffect(() => {
@@ -332,15 +322,6 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
     if (!narrationOn) return;
     Object.values(CHANGE_SCENE_NARRATION).forEach((line) => preload(line, voice));
   }, [narrationOn, preload, voice]);
-
-  // Urgency glow effect timer
-  useEffect(() => {
-    setElapsedSeconds(0);
-    const interval = setInterval(() => {
-      setElapsedSeconds(prev => prev + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [step]);
 
   // Toast automatic clear effect
   useEffect(() => {
@@ -366,7 +347,6 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   // Trigger audio narration per step
   useEffect(() => {
     stopVoice();
-    setShowSticky(false);
 
     if (narrationOn) {
       const speechText = CHANGE_SCENE_NARRATION[`s${step}`];
@@ -379,12 +359,9 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
           },
           onEnd: () => {
             setAudioIsPlaying(false);
-            setShowSticky(true);
           }
         });
       }
-    } else {
-      setShowSticky(true);
     }
 
     return () => {
