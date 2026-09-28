@@ -39,6 +39,16 @@ function savePrefs(prefs) {
   try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* storage unavailable */ }
 }
 
+/**
+ * Change the saved reminder time without touching whether reminders are on.
+ * Used while reminders are off, so picking a time to have ready doesn't turn
+ * notifications on by itself. If reminders are already on, call
+ * enableDailyReminder(hour, minute) instead, which also reschedules them.
+ */
+export function setReminderTime(hour, minute) {
+  savePrefs({ ...getReminderPrefs(), hour, minute });
+}
+
 /** Reminders only fire in the iPhone app, not a browser preview. */
 export const remindersSupported = () => Capacitor.isNativePlatform();
 

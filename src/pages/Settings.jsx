@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import { usePlus } from "@/lib/subscription";
 import { backupSessionCount, parseBackup, restoreBackup, saveBackup } from "@/lib/backup";
-import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, remindersSupported } from "@/lib/reminders";
+import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, remindersSupported, setReminderTime } from "@/lib/reminders";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -219,7 +219,12 @@ export default function Settings() {
                 value={`${String(reminder.hour).padStart(2, "0")}:${String(reminder.minute).padStart(2, "0")}`}
                 onChange={(event) => {
                   const [h, m] = event.target.value.split(":").map(Number);
-                  if (Number.isInteger(h) && Number.isInteger(m)) void setReminderOn(true, h, m);
+                  if (!Number.isInteger(h) || !Number.isInteger(m)) return;
+                  // Only reschedule if reminders are already on. If they're
+                  // off, just remember the time for when they're turned on -
+                  // touching the picker shouldn't silently enable notifications.
+                  if (reminder.enabled) void setReminderOn(true, h, m);
+                  else { setReminderTime(h, m); setReminder(getReminderPrefs()); }
                 }}
                 className="min-h-11 rounded-full border border-border bg-background px-3 text-foreground"
                 aria-label="Reminder time"
