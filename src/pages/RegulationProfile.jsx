@@ -95,9 +95,13 @@ export default function RegulationProfile() {
             <ChevronLeft className="h-4 w-4" /> Back
           </button>
           <div className="mt-20 text-center">
-            <h1 className="font-heading text-3xl font-medium tracking-tight text-primary text-balance">No resets yet</h1>
+            <h1 className="font-heading text-3xl font-medium tracking-tight text-primary text-balance">
+              {sessions.length > 0 ? `${sessions.length} reset${sessions.length === 1 ? "" : "s"} so far` : "No resets yet"}
+            </h1>
             <p className="mx-auto mt-3 max-w-sm text-lg text-muted-foreground text-balance">
-              Complete a reset or two and your regulation profile will appear here.
+              {sessions.length > 0
+                ? "Next time, rate how you feel before and after. That's what shows what helps you, and your profile will appear here."
+                : "Complete a reset or two and your regulation profile will appear here."}
             </p>
             <Button onClick={() => navigate("/")} className="mt-8 rounded-full">Back to start</Button>
           </div>

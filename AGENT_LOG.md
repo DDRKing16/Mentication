@@ -144,8 +144,7 @@ Three multi-day programmes made only of existing exercises (unchanged): Seven ca
 ## 2026-09-28 — Tier 2, item 7: reliability pass (browser part)
 - Opened all 23 screens at iPhone size (390×844): every one loads, no errors, nothing wider than the phone.
   Night Channel, Signal Lock and Vector Shift load their inner pages correctly.
-- Found: Profile says "No resets yet" when someone has practised but skipped the before/after ratings
-  (it only counts rated sessions). Small fix to do next if the owner agrees.
+- Fixed: Profile now counts practices even when ratings were skipped, and invites a rating next time.
 - Still to do, needs Xcode: the same pass on a real iPhone/simulator, plus checking the share sheet
   (backup), notifications (reminders) and Apple's purchase sheet (Plus).
 
