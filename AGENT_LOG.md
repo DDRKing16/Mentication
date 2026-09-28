@@ -208,3 +208,25 @@ earlier accessibility pass was thorough. Also walked the entirety of Thought or 
 thought, sort it, charge it against thinking patterns, weigh evidence for and against, reach a balanced
 reframe, choose how to close) looking for genuine visual bugs; found none, so left it unchanged. Full
 test/typecheck/lint/build suite passes with the same baseline dear2100 failures as every prior run.
+
+## 28 Sep — Library no longer shows Signal Lock twice, plus a full walkthrough of two more interventions
+With the brand thread phases and every earlier fallback item already done, this block started with a
+close look at the Intervention Library's own search and filters (a real headless-browser run at 375x812)
+and found a genuine bug: Signal Lock had a second, hardcoded "Focus session" card pinned above the search
+results, always visible no matter what someone searched for or which category/filter was picked —
+searching "Progressive Muscle" still showed Signal Lock at the top, and it showed up a second time,
+correctly filtered, in its normal place in the Focus category. Removed the leftover pinned card; Signal
+Lock now appears once, in its normal place, and disappears and reappears with search and filters like
+every other practice (88d6fa4). Checked search terms, each category tab, each filter chip, and the
+"No practices match" empty state before and after.
+Then walked two more interventions end to end in the browser that hadn't had their own dedicated pass yet
+— Progressive Muscle Relaxation (the full ~4-minute guided session, all four body sections, watching the
+word-by-word narration captions and body-glow tracking match each step) and The Happy Bump (its full
+11-step interactive flow: energy check-in, hydrate, step outside, the walk screen, reaching out, one small
+task, three reflection prompts, a wellbeing area and step, planning what's next, re-rating, and the closing
+"bump" screen). Both held up well — no layout, overlap or accessibility problems, and no console errors
+across either full session. One real inconsistency found in Happy Bump: the Library lists it as "5 min",
+but its own opening screen says "about 10–15 minutes," and the full walkthrough (including its own
+five-minute walk timer) really does take closer to that. Logged for the owner rather than changed, since
+this is a timing question (90072ce). Full test/typecheck/lint/build suite passes with the same baseline
+dear2100 failures as every prior run.
