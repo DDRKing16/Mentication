@@ -2,7 +2,7 @@
 // trial, restore, and the links Apple requires on a subscription screen.
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen, Check, Map, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpen, CalendarDays, Check, Map, Sparkles } from "lucide-react";
 import {
   FALLBACK_PRICES,
   PLUS_TRIAL_DAYS,
@@ -19,6 +19,7 @@ const APPLE_EULA = "https://www.apple.com/legal/internet-services/itunes/dev/std
 const INCLUDED = [
   { icon: BookOpen, title: "Dear 2100", text: "The full journey from what you keep putting off to one real first step, saved as your own book." },
   { icon: Map, title: "The Good Map", text: "Sort what makes life feel good, see your map, and close the biggest gap one small step at a time." },
+  { icon: CalendarDays, title: "Programmes", text: "Five days of small lifts, and Five better nights: one short practice a day." },
   { icon: Sparkles, title: "Everything new", text: "New journeys and programmes as they're added." },
 ];
 
