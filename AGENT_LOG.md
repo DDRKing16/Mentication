@@ -186,3 +186,25 @@ suite passes with the same baseline dear2100 failures as every prior run.
   animated words from them. Looks identical on screen (same layout, checked).
 - Also checked the "three broken buttons" note in SUGGESTIONS.md: that row is hidden by styling, so no one
   can reach it. Updated the note; nothing changed in the app.
+
+## 2026-09-28 — Next Easiest Step: a leftover header, and missing screen-reader labels
+With the brand thread phases and every earlier fallback item already done, checked in a real
+headless-browser run at 375x812 whether the brand chrome sweep had actually reached every screen of
+every one of the 12 interventions, not just the ones already named in past runs. It hadn't: the screen
+you land on once you actually start a task in Next Easiest Step (reached a few taps in, past the opener
+and the category picker, so easy to miss at a glance) still carried its old, pre-brand-thread header — a
+small raw logo image in an off-brand green, next to plain "Mentication" text, instead of the "Mentication
+· Focus" label already used on this same intervention's own opener screen. Replaced it with that same
+label (dae9e97). Nothing about the ladder, its steps, timing or colours changed — checked a full walkthrough
+(pick a task category, sub-category and task, work the ladder, pause and resume) with the same burgundy/
+gold/cream world exactly as before, just the header text.
+While in that file, found and fixed three icon-only buttons with no screen-reader label: the back arrows
+on the "What are you trying to do?" and post-start focus screens, and the close button on the "Choose your
+tiny start" popup (dae9e97).
+Then ran a systematic accessibility scan (every button on every top-level screen, plus a full walkthrough
+into each of the 12 interventions' own opening and player screens, plus the Box/PMR/Grounding player's
+ambient-sound popup) checking for any button with no accessible name. Found none anywhere else — the
+earlier accessibility pass was thorough. Also walked the entirety of Thought or Fact end to end (write a
+thought, sort it, charge it against thinking patterns, weigh evidence for and against, reach a balanced
+reframe, choose how to close) looking for genuine visual bugs; found none, so left it unchanged. Full
+test/typecheck/lint/build suite passes with the same baseline dear2100 failures as every prior run.
