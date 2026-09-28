@@ -2460,8 +2460,9 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
 
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", width: "100%", zIndex: 5 }}>
-            <button 
-              onClick={() => navigateTo("landing")} 
+            <button
+              onClick={() => navigateTo("landing")}
+              aria-label="Go back"
               style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-burgundy)", display: "flex", alignItems: "center", gap: "4px", padding: 0 }}
             >
               <ChevronLeft size={24} />
@@ -2708,8 +2709,9 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
                   </div>
                   
                   {/* Close 'X' Button */}
-                  <button 
+                  <button
                     onClick={() => { setExpandedCategory(null); setSelectedSubcategory(null); }}
+                    aria-label="Close"
                     style={{
                       background: "rgba(255, 255, 255, 0.08)",
                       border: "1px solid rgba(247, 242, 216, 0.15)",
@@ -2944,35 +2946,20 @@ export default function NextEasiestStepExperience({ onComplete, onExit }) {
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", position: "relative", zIndex: 5 }}>
             {/* Left Back Arrow - Goes back to Intent */}
-            <button 
-              onClick={() => navigateTo("intent")} 
+            <button
+              onClick={() => navigateTo("intent")}
+              aria-label="Go back"
               style={{ background: "none", border: "none", color: "#D6DFAB", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", minHeight: "48px" }}
             >
               <ChevronLeft size={24} />
             </button>
-            
-            {/* Center Alternate Logo (Authentic Green Coaster Logo) */}
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <div style={{
-                width: "28px",
-                height: "28px",
-                backgroundColor: "#D5E0A3",
-                borderRadius: "7px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden",
-                padding: "3px",
-                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)"
-              }}>
-                <img 
-                  src="/media/brand/mentation-green-pink-transparent.png" 
-                  alt="Mentication Logo" 
-                  style={{ width: "100%", height: "100%", objectFit: "contain" }} 
-                />
-              </div>
-              <span style={{ fontFamily: "var(--font-headline)", fontSize: "18px", fontWeight: "700", color: "#D6DFAB", letterSpacing: "-0.01em" }}>Mentication</span>
-            </div>
+
+            {/* Centre label: same "Mentication · Focus" wording used on this
+                intervention's own opener screen, instead of a logo lockup
+                that didn't match this intervention's brand colourway. */}
+            <span style={{ fontSize: "10.5px", fontWeight: "800", color: "#D6DFAB", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "var(--font-body)" }}>
+              Mentication · Focus
+            </span>
             
             {/* Right Pause Button. Shifted left of centre with marginRight so it
                 doesn't sit under the shared floating Home button, which is
