@@ -11,6 +11,7 @@ import HomeHero from "@/components/home/HomeHero";
 import LastWorkedCard from "@/components/home/LastWorkedCard";
 import CategoryCard from "@/components/home/CategoryCard";
 import RecommendedCard from "@/components/home/RecommendedCard";
+import YourWeek from "@/components/home/YourWeek";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { Sparkles } from "lucide-react";
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
@@ -33,6 +34,7 @@ export default function Home() {
   const [personalBest, setPersonalBest] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [parkedNotes, setParkedNotes] = useState(false);
+  const [sessions, setSessions] = useState([]);
 
   const loadSessions = async () => {
     const [sessions, interventions, recommendations] = await Promise.all([
@@ -45,6 +47,8 @@ export default function Home() {
     setLastWorked(pickLastWorked(sessions));
     setPersonalBest(buildPersonalBest(sessions));
     setRecommendation(buildRecommendation(sessions));
+    // A longer window just for "Your week" and its streak; the engine above keeps its own 30.
+    setSessions(await sessionStore.list("-created_date", 120));
   };
   useEffect(() => { loadSessions().catch(() => {}); }, []);
   useEffect(() => { setParkedNotes(hasParkedNotes()); }, []);
@@ -92,6 +96,8 @@ export default function Home() {
       <div className={`home-theme home-theme--${HOME_THEME} min-h-full bg-[var(--home-bg)] text-[var(--home-ink)]`}>
         <div className="mx-auto flex min-h-full max-w-[36rem] flex-col">
           <HomeHero onProfile={() => navigate("/profile")} onInsights={() => navigate("/insights")} />
+
+          <YourWeek sessions={sessions} onOpen={() => navigate("/insights")} />
 
           <section className="px-5 pt-9">
             <h2 className="text-center font-clean text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-[var(--home-ink)]">

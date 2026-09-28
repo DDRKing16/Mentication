@@ -6,6 +6,7 @@ import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import { usePlus } from "@/lib/subscription";
+import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, remindersSupported } from "@/lib/reminders";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -28,6 +29,19 @@ function Toggle({ label, desc, on, onToggle }) {
 export default function Settings() {
   const navigate = useNavigate();
   const plus = usePlus();
+  const [reminder, setReminder] = useState(getReminderPrefs);
+  const [reminderNote, setReminderNote] = useState("");
+  const setReminderOn = async (on, hour = reminder.hour, minute = reminder.minute) => {
+    setReminderNote("");
+    if (on) {
+      const result = await enableDailyReminder(hour, minute);
+      if (!result.ok) setReminderNote("Notifications are turned off for Mentication. You can allow them in your iPhone's Settings → Notifications.");
+      else if (result.reason === "preview") setReminderNote("Saved. Reminders appear in the iPhone app.");
+    } else {
+      await disableDailyReminder();
+    }
+    setReminder(getReminderPrefs());
+  };
   const a11y = useAccessibility() || {};
   const { update } = a11y;
   const amb = useAccessibilityPrefs();
@@ -160,6 +174,32 @@ export default function Settings() {
             Delete local intervention memory
           </Button>
           {memoryCleared && <p role="status" className="mt-2 text-sm text-muted-foreground">Local intervention memory deleted.</p>}
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-border bg-card p-5">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Daily reminder</p>
+          <p className="mt-2 text-sm text-muted-foreground">A gentle nudge once a day. It's scheduled on this phone, never sent from anywhere.</p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Button variant={reminder.enabled ? "default" : "outline"} onClick={() => void setReminderOn(!reminder.enabled)} className="rounded-full" aria-pressed={reminder.enabled}>
+              {reminder.enabled ? "On" : "Off"}
+            </Button>
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>at</span>
+              <input
+                type="time"
+                value={`${String(reminder.hour).padStart(2, "0")}:${String(reminder.minute).padStart(2, "0")}`}
+                onChange={(event) => {
+                  const [h, m] = event.target.value.split(":").map(Number);
+                  if (Number.isInteger(h) && Number.isInteger(m)) void setReminderOn(true, h, m);
+                }}
+                className="min-h-11 rounded-full border border-border bg-background px-3 text-foreground"
+                aria-label="Reminder time"
+              />
+            </label>
+          </div>
+          {reminder.enabled && <p className="mt-2 text-sm text-muted-foreground">Every day at {formatReminderTime(reminder.hour, reminder.minute)}.</p>}
+          {reminderNote && <p role="status" className="mt-2 text-sm text-muted-foreground">{reminderNote}</p>}
+          {!remindersSupported() && !reminderNote && <p className="mt-2 text-xs text-muted-foreground">Reminders appear in the iPhone app, not this preview.</p>}
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">
