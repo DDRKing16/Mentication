@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { X, Type, Move, Captions, Contrast, Hand, RotateCcw } from "lucide-react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
+import { useAccessibility } from "@/lib/accessibility";
 
 const TOGGLES = [
   { key: "largeText", label: "Larger text", icon: Type, hint: "Scale up text app-wide" },
@@ -13,6 +14,13 @@ const TOGGLES = [
 
 export default function AccessibilityPanel({ onClose, dark = false }) {
   const { prefs, setPref, reset } = useAccessibilityPrefs();
+  // "Larger text" here and Settings' Text size are the same setting: keep both in step.
+  const textSize = useAccessibility();
+  const isOn = (key) => (key === "largeText" ? !!prefs.largeText || (textSize?.textScale || 1) > 1 : !!prefs[key]);
+  const toggle = (key, on) => {
+    setPref(key, !on);
+    if (key === "largeText") textSize?.update({ textScale: on ? 1 : 1.15 });
+  };
   const card = dark ? "bg-[hsl(178_36%_13%)] text-cream border-cream/15" : "bg-card text-foreground border-border";
   const row = dark ? "border-cream/10 bg-white/5" : "border-border bg-background/60";
   const sub = dark ? "text-cream/60" : "text-muted-foreground";
@@ -38,12 +46,12 @@ export default function AccessibilityPanel({ onClose, dark = false }) {
 
         <div className="mt-5 flex flex-col gap-2.5">
           {TOGGLES.map((t) => {
-            const on = !!prefs[t.key];
+            const on = isOn(t.key);
             const Icon = t.icon;
             return (
               <button
                 key={t.key}
-                onClick={() => setPref(t.key, !on)}
+                onClick={() => toggle(t.key, on)}
                 className={"no-tap flex items-center gap-3 rounded-2xl border p-4 text-left transition-all active:scale-[0.98] " + row}
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -61,7 +69,7 @@ export default function AccessibilityPanel({ onClose, dark = false }) {
           })}
         </div>
 
-        <button onClick={() => reset()} className={"no-tap mt-4 flex w-full items-center justify-center gap-1.5 text-sm " + sub + " hover:opacity-100"}>
+        <button onClick={() => { reset(); textSize?.update({ textScale: 1 }); }} className={"no-tap mt-4 flex w-full items-center justify-center gap-1.5 text-sm " + sub + " hover:opacity-100"}>
           <RotateCcw className="h-3.5 w-3.5" /> Reset to defaults
         </button>
         <button onClick={onClose} className="no-tap mt-3 w-full rounded-full bg-primary py-3 text-sm font-medium text-primary-foreground active:scale-95">

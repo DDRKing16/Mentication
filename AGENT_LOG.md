@@ -174,3 +174,8 @@ resolves into its full breathing-square visual as expected. Found a smaller, rel
 three-step Text size and the in-session panel's separate Larger-text switch don't agree with each other)
 and logged it in SUGGESTIONS.md rather than reshaping either control myself. Full test/typecheck/lint/build
 suite passes with the same baseline dear2100 failures as every prior run.
+
+## 2026-09-28 — Text size controls now agree
+- Settings' Text size and the in-session "Larger text" switch are now one setting: changing either
+  updates the other, and Reset clears both. Also fixed a timing clash that stopped the in-session
+  switch from actually enlarging text. Checked both directions in the browser (16px → 18px → 21px → 16px).

@@ -33,7 +33,13 @@ export function AccessibilityProvider({ children }) {
     document.documentElement.style.fontSize = `${Math.round(16 * (settings.textScale || 1))}px`;
   }, [settings]);
 
-  const update = useCallback((patch) => setSettings((s) => ({ ...s, ...patch })), []);
+  // Saved straight away (not after render), so a refresh triggered by the
+  // other accessibility store in the same tap can't read back the old size.
+  const update = useCallback((patch) => setSettings((s) => {
+    const next = { ...s, ...patch };
+    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* */ }
+    return next;
+  }), []);
   const reset = useCallback(() => setSettings(DEFAULTS), []);
 
   return (
