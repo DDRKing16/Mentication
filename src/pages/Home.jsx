@@ -143,7 +143,7 @@ export default function Home() {
                   Check in with yourself
                 </h3>
                 <p className="text-[12px] opacity-75 leading-relaxed max-w-[240px]">
-                  Take 2 minutes to record your vector, capture voice thoughts, and compile daily blueprints.
+                  Take 2 minutes to note how you're feeling — type it, or just say it out loud.
                 </p>
               </div>
               <div className="shrink-0 w-12 h-12 rounded-[18px] bg-white/10 flex items-center justify-center border border-white/20 z-10 transition-transform group-hover:scale-105">
