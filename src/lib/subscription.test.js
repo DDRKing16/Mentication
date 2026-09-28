@@ -61,4 +61,22 @@ describe("Mentication Plus", () => {
     plus.clearTestPlus();
     expect(plus.isPlusActive()).toBe(false);
   });
+
+  it("in the browser, shows the placeholder prices (there is no App Store here)", async () => {
+    const plus = await freshModule();
+    expect(await plus.loadPlusPrices()).toEqual(plus.FALLBACK_PRICES);
+  });
+
+  it("on the phone, never claims a specific price it couldn't confirm from Apple", async () => {
+    vi.doMock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: () => true } }));
+    vi.doMock("@capgo/native-purchases", () => ({
+      NativePurchases: { getProducts: () => { throw new Error("offline"); } },
+      PURCHASE_TYPE: { SUBS: "subs" },
+    }));
+    const plus = await freshModule();
+    // A wrong-currency guess (the fallback text is Australian dollars) would
+    // mislead anyone not on the Australian store, so a failed fetch must come
+    // back as null, never as FALLBACK_PRICES.
+    expect(await plus.loadPlusPrices()).toEqual({ annual: null, monthly: null });
+  });
 });

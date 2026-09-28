@@ -15,6 +15,9 @@ import {
 } from "@/lib/subscription";
 
 const APPLE_EULA = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+// Shown only if the real price genuinely couldn't be confirmed from the App
+// Store (never a specific number, which could be the wrong currency).
+const PRICE_UNKNOWN = "Price shown at checkout";
 
 const INCLUDED = [
   { icon: BookOpen, title: "Dear 2100", text: "The full journey from what you keep putting off to one real first step, saved as your own book." },
@@ -112,8 +115,8 @@ export default function Plus() {
           <>
             <div className="mt-8 grid gap-3" role="radiogroup" aria-label="Choose a plan">
               {[
-                { key: "annual", label: "Yearly", price: prices.annual, note: "Best value" },
-                { key: "monthly", label: "Monthly", price: prices.monthly, note: "" },
+                { key: "annual", label: "Yearly", price: prices.annual ?? PRICE_UNKNOWN, note: "Best value" },
+                { key: "monthly", label: "Monthly", price: prices.monthly ?? PRICE_UNKNOWN, note: "" },
               ].map((option) => (
                 <button
                   key={option.key}
@@ -141,7 +144,7 @@ export default function Plus() {
               {busy === "buy" ? "Opening the App Store…" : `Start ${PLUS_TRIAL_DAYS}-day free trial`}
             </button>
             <p className="mt-3 text-center text-xs leading-relaxed text-[#F6EFE2]/60">
-              {PLUS_TRIAL_DAYS} days free, then {plan === "annual" ? prices.annual : prices.monthly}. Renews automatically until cancelled. Cancel anytime in your iPhone's Settings, at least 24 hours before the trial ends, and you won't be charged.
+              {PLUS_TRIAL_DAYS} days free, then {(plan === "annual" ? prices.annual : prices.monthly) ?? "your local price (shown at checkout)"}. Renews automatically until cancelled. Cancel anytime in your iPhone's Settings, at least 24 hours before the trial ends, and you won't be charged.
             </p>
           </>
         )}

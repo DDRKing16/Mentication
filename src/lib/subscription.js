@@ -100,22 +100,28 @@ export async function refreshPlus() {
   return snapshot;
 }
 
-/** Real, local prices from the App Store: { annual, monthly } price strings. */
+/**
+ * Real, local prices from the App Store: { annual, monthly } price strings.
+ * On the phone, a price that couldn't be confirmed comes back as `null`
+ * rather than the placeholder text below — showing e.g. "A$59.99" as if
+ * final would be the wrong currency for anyone not on the Australian store.
+ * The caller decides what to say instead (see Plus.jsx).
+ */
 export async function loadPlusPrices() {
   if (!isNative()) return { ...FALLBACK_PRICES };
   try {
     const { NativePurchases, SUBS } = await plugin();
     const { products } = await NativePurchases.getProducts({ productIdentifiers: PRODUCT_IDS, productType: SUBS });
-    const price = (id, suffix, fallback) => {
+    const price = (id, suffix) => {
       const product = (products || []).find((p) => p.identifier === id);
-      return product ? `${product.priceString}${suffix}` : fallback;
+      return product ? `${product.priceString}${suffix}` : null;
     };
     return {
-      annual: price(PLUS_PRODUCTS.annual, "/year", FALLBACK_PRICES.annual),
-      monthly: price(PLUS_PRODUCTS.monthly, "/month", FALLBACK_PRICES.monthly),
+      annual: price(PLUS_PRODUCTS.annual, "/year"),
+      monthly: price(PLUS_PRODUCTS.monthly, "/month"),
     };
   } catch {
-    return { ...FALLBACK_PRICES };
+    return { annual: null, monthly: null };
   }
 }
 
