@@ -1,3 +1,5 @@
+import { clearDraft, clearNextStepHandoff } from "@/lib/tomorrowParking/storage";
+
 const PREF_KEY = "mentation.flagship.preferences.v1";
 const ACTIVE_KEY = "mentation.flagship.active.v1";
 const HANDOFF_KEY = "mentation.flagship.handoffs.v1";
@@ -126,4 +128,9 @@ export function deleteFlagshipMemory(scope = "all") {
       : scope === "saved" ? [PARKING_KEY, PARKING_RECORDS_KEY, NIGHT_FEEDBACK_KEY]
         : [PREF_KEY, ACTIVE_KEY, HANDOFF_KEY, PARKING_KEY, PARKING_RECORDS_KEY, PARKING_CONSENTS_KEY, NIGHT_FEEDBACK_KEY];
   keys.forEach((key) => { try { localStorage.removeItem(key); } catch { /* private mode */ } });
+  // A Tomorrow Parking Lot draft (unsaved note text) and a staged Next Easiest
+  // Step handoff excerpt live in sessionStorage, not the keys above - but this
+  // button promises to clear "saved return points and handoff preferences",
+  // so they need clearing here too, for "saved" and "all".
+  if (scope === "saved" || scope === "all") { clearDraft(); clearNextStepHandoff(); }
 }

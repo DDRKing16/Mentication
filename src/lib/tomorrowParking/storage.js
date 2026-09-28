@@ -321,6 +321,11 @@ export function stageNextStepHandoff(excerpt) {
   }
 }
 
+/** Clears a staged handoff excerpt without reading or returning it. */
+export function clearNextStepHandoff() {
+  try { sessionStore()?.removeItem(NEXT_STEP_HANDOFF_KEY); } catch { /* best-effort */ }
+}
+
 export function consumeNextStepHandoff() {
   const s = sessionStore();
   if (!s) return null;
