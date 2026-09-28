@@ -270,19 +270,6 @@ export default function InterventionLibrary() {
         </div>
 
         <div className="mt-8 flex flex-col gap-10">
-          <section aria-labelledby="signal-lock-heading">
-            <h2 id="signal-lock-heading" className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Focus session
-            </h2>
-            <WorldCard
-              id="signalLock"
-              name="Signal Lock"
-              meta="Focus"
-              why="A visual focus session with a task plan, timer, and reward."
-              onClick={() => navigate("/signal-lock")}
-              className="mt-3"
-            />
-          </section>
           {grouped.map((g) => (
             <section key={g.category}>
               <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
