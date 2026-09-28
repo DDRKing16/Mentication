@@ -46,3 +46,18 @@ changing them. Nothing here has been applied.
   don't work. Left alone rather than guessed at, since wiring them up means
   deciding where they should actually take someone (and whether that's
   wanted at all on this screen), which felt like your call.
+
+## Programmes wording (added 28 Sep) — please review
+New multi-day programmes use existing exercises unchanged; only this framing
+copy is new. Edit freely in `src/lib/programmes.js`.
+- **Seven calmer days** (free): "A week of short practices that settle your
+  system, one a day." Days: Find a steady breath · Come back to the room · Let
+  the body let go · Loosen a sticky thought · Return to your breath · Ride out
+  a strong feeling · Close the week softly.
+- **Five days of small lifts** (Plus): "When things feel flat: five small,
+  doable lifts, one a day." Days: Build a little momentum · Shift the scene ·
+  Notice what's around you · Stack another small win · Take the lift with you.
+- **Five better nights** (Plus): "An evening practice each night to help your
+  mind wind down." Days: Park tomorrow's thoughts · Release the day from your
+  body · Set down what's left · Slow the breath before bed · End the week rested.
+- Daily reminder messages (one per weekday) are in `src/lib/reminders.js`.

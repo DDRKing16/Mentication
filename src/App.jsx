@@ -33,6 +33,8 @@ const SignalLock = lazy(() => import('@/pages/SignalLock'));
 const VectorShift = lazy(() => import('@/pages/VectorShift'));
 const GoodMap = lazy(() => import('@/pages/GoodMap'));
 const Plus = lazy(() => import('@/pages/Plus'));
+const ProgrammeList = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeList })));
+const ProgrammeDetail = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeDetail })));
 
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
 
@@ -97,6 +99,8 @@ const MenticationRoutes = () => {
                 <Route path="/support" element={<Crisis />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/plus" element={<Plus />} />
+                <Route path="/programmes" element={<ProgrammeList />} />
+                <Route path="/programmes/:id" element={<ProgrammeDetail />} />
                 <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
                 <Route path="/vector-shift" element={<OnboardingGate><VectorShift /></OnboardingGate>} />
                 <Route path="/good-map" element={<OnboardingGate><GoodMap /></OnboardingGate>} />

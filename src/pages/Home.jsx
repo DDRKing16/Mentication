@@ -12,6 +12,8 @@ import LastWorkedCard from "@/components/home/LastWorkedCard";
 import CategoryCard from "@/components/home/CategoryCard";
 import RecommendedCard from "@/components/home/RecommendedCard";
 import YourWeek from "@/components/home/YourWeek";
+import ProgrammeCard from "@/components/home/ProgrammeCard";
+import { activeProgrammeId, getProgramme, launchStateFor } from "@/lib/programmes";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { Sparkles } from "lucide-react";
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
@@ -98,6 +100,12 @@ export default function Home() {
           <HomeHero onProfile={() => navigate("/profile")} onInsights={() => navigate("/insights")} />
 
           <YourWeek sessions={sessions} onOpen={() => navigate("/insights")} />
+
+          <ProgrammeCard
+            sessions={sessions}
+            onOpen={() => { const id = activeProgrammeId(); navigate(id ? `/programmes/${id}` : "/programmes/calmer-seven"); }}
+            onStartDay={(day) => { const state = launchStateFor(day.id, getProgramme(activeProgrammeId())); if (state) navigate("/reset", { state }); }}
+          />
 
           <section className="px-5 pt-9">
             <h2 className="text-center font-clean text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-[var(--home-ink)]">
