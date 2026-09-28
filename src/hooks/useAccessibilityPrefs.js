@@ -14,10 +14,21 @@ export const ACCESSIBILITY_DEFAULTS = Object.freeze({
   ambientType: "wind",
 });
 
-function read() {
+// Whether the OS itself asks for reduced motion (checked only before this
+// device has its own saved Mentication preference, same as a first install).
+export function prefersReducedMotionByDefault() {
+  try {
+    return typeof window !== "undefined" && !!window.matchMedia
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
+}
+
+export function read() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) return { ...ACCESSIBILITY_DEFAULTS };
+    if (!raw) return { ...ACCESSIBILITY_DEFAULTS, reducedMotion: prefersReducedMotionByDefault() };
     return { ...ACCESSIBILITY_DEFAULTS, ...JSON.parse(raw) };
   } catch {
     return { ...ACCESSIBILITY_DEFAULTS };

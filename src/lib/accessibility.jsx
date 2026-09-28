@@ -2,14 +2,13 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { ACCESSIBILITY_CHANGED_EVENT } from "./accessibilityEvents";
 
-// Global accessibility preferences, persisted to localStorage and applied to <html>.
+// The one remaining setting this file owns: the three-step text size scale.
+// Reduce motion, high contrast, captions and one-handed reach all live in
+// `src/hooks/useAccessibilityPrefs.js` now (the store every intervention and
+// the brand Threshold/Closing actually read) -- see AGENT_LOG.md, 28 Sep.
 const KEY = "haven_a11y";
 const DEFAULTS = {
-  reducedMotion: false,
   textScale: 1, // 1 | 1.15 | 1.3
-  captions: true,
-  highContrast: false,
-  oneHanded: false,
 };
 
 const AccessibilityContext = createContext(null);
@@ -19,16 +18,6 @@ export function AccessibilityProvider({ children }) {
     try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; }
     catch { return DEFAULTS; }
   });
-
-  // respect the OS preference on first run
-  useEffect(() => {
-    if (localStorage.getItem(KEY)) return;
-    try {
-      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        setSettings((s) => ({ ...s, reducedMotion: true }));
-      }
-    } catch { /* */ }
-  }, []);
 
   useEffect(() => {
     const refresh = () => {
@@ -41,11 +30,7 @@ export function AccessibilityProvider({ children }) {
 
   useEffect(() => {
     try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch { /* */ }
-    const html = document.documentElement;
-    html.style.fontSize = `${Math.round(16 * (settings.textScale || 1))}px`;
-    html.classList.toggle("reduce-motion", !!settings.reducedMotion);
-    html.classList.toggle("hc", !!settings.highContrast);
-    html.classList.toggle("one-handed", !!settings.oneHanded);
+    document.documentElement.style.fontSize = `${Math.round(16 * (settings.textScale || 1))}px`;
   }, [settings]);
 
   const update = useCallback((patch) => setSettings((s) => ({ ...s, ...patch })), []);

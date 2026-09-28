@@ -93,26 +93,26 @@ export default function Settings() {
           <Toggle
             label="Reduce motion"
             desc="Calm animations and transitions"
-            on={!!a11y.reducedMotion}
-            onToggle={() => update({ reducedMotion: !a11y.reducedMotion })}
+            on={!!amb.prefs.reducedMotion}
+            onToggle={() => amb.setPref("reducedMotion", !amb.prefs.reducedMotion)}
           />
           <Toggle
             label="High contrast"
             desc="Stronger text and borders"
-            on={!!a11y.highContrast}
-            onToggle={() => update({ highContrast: !a11y.highContrast })}
+            on={!!amb.prefs.highContrast}
+            onToggle={() => amb.setPref("highContrast", !amb.prefs.highContrast)}
           />
           <Toggle
             label="Captions on by default"
             desc="Show guide text during resets"
-            on={!!a11y.captions}
-            onToggle={() => update({ captions: !a11y.captions })}
+            on={!!amb.prefs.captions}
+            onToggle={() => amb.setPref("captions", !amb.prefs.captions)}
           />
           <Toggle
             label="One-handed reach"
             desc="Narrow layout for thumb use"
-            on={!!a11y.oneHanded}
-            onToggle={() => update({ oneHanded: !a11y.oneHanded })}
+            on={!!amb.prefs.oneHanded}
+            onToggle={() => amb.setPref("oneHanded", !amb.prefs.oneHanded)}
           />
           <Toggle
             label="Ambient soundscape"
