@@ -124,3 +124,11 @@ Three multi-day programmes made only of existing exercises (unchanged): Seven ca
 - Uses only data already on the phone. Recommendation engine untouched.
 - Note: 3 pre-existing lint errors (unused imports) in src/components/dear2100/Barriers.jsx
   and Coping.jsx, from the earlier rescue commit. Not changed here.
+
+## 2026-09-28 — Tier 2, item 5: first-minute onboarding
+- Welcome already sends a new person straight into a calm reset (the first-minute result). Kept as is,
+  including the safety footer.
+- New: after their first finished reset, Home shows a one-time card: "You did it", with an evening
+  reminder, the free seven-day programme, and a gentle Plus free-trial link. Close with the X; it never
+  returns. Only people with 1–3 sessions see it, so existing users won't.
+- Wording listed in SUGGESTIONS.md.

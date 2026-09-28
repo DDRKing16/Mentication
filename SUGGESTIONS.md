@@ -61,3 +61,9 @@ copy is new. Edit freely in `src/lib/programmes.js`.
   mind wind down." Days: Park tomorrow's thoughts · Release the day from your
   body · Set down what's left · Slow the breath before bed · End the week rested.
 - Daily reminder messages (one per weekday) are in `src/lib/reminders.js`.
+
+## New wording for review: "first reset" card on Home (2026-09-28)
+Shown once, after someone's first finished reset:
+- "Your first reset" / "You did it."
+- "That's how Mentication works: a few minutes, whenever you need it. A little each day is what makes it stick."
+- Buttons: "Remind me each evening", "Try seven calmer days (Free)", "Want to go deeper? Try Plus free for 7 days."

@@ -13,6 +13,7 @@ import CategoryCard from "@/components/home/CategoryCard";
 import RecommendedCard from "@/components/home/RecommendedCard";
 import YourWeek from "@/components/home/YourWeek";
 import ProgrammeCard from "@/components/home/ProgrammeCard";
+import FirstWinCard from "@/components/home/FirstWinCard";
 import { activeProgrammeId, getProgramme, launchStateFor } from "@/lib/programmes";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { Sparkles } from "lucide-react";
@@ -98,6 +99,13 @@ export default function Home() {
       <div className={`home-theme home-theme--${HOME_THEME} min-h-full bg-[var(--home-bg)] text-[var(--home-ink)]`}>
         <div className="mx-auto flex min-h-full max-w-[36rem] flex-col">
           <HomeHero onProfile={() => navigate("/profile")} onInsights={() => navigate("/insights")} />
+
+          <FirstWinCard
+            sessionCount={sessions.length}
+            plusActive={plus.active}
+            onProgramme={() => navigate("/programmes/calmer-seven")}
+            onPlus={() => navigate("/plus")}
+          />
 
           <YourWeek sessions={sessions} onOpen={() => navigate("/insights")} />
 
