@@ -18,6 +18,7 @@ export default function Dear2100() {
   const navigate = useNavigate();
   return (
     <PlusGate route="dear-2100" name="Dear 2100" background="#112b50"
+      previewImage="/media/plus-preview/dear2100.jpg"
       promise="Understand the pattern behind what you keep postponing."
       detail="Then choose your next small step, and keep it in your own book.">
     <div className="fixed inset-0" aria-label="Dear 2100">

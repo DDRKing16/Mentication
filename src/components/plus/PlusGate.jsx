@@ -5,17 +5,26 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Home, Lock } from "lucide-react";
 import { usePlus } from "@/lib/subscription";
 
-export default function PlusGate({ route, name, promise, detail, background = "#0A1F3D", children }) {
+export default function PlusGate({ route, name, promise, detail, background = "#0A1F3D", previewImage, children }) {
   const plus = usePlus();
   const navigate = useNavigate();
   if (plus.active) return children;
   return (
-    <div className="fixed inset-0 overflow-y-auto text-[#F6EFE2]" style={{ background: `radial-gradient(70% 50% at 50% 30%, rgba(224,113,92,0.18), transparent 70%), ${background}` }}>
-      <div className="flex items-center justify-between px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <button onClick={() => navigate(-1)} aria-label="Back" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/20"><ArrowLeft className="h-5 w-5" /></button>
-        <button onClick={() => navigate("/")} aria-label="Home" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/20"><Home className="h-5 w-5" /></button>
+    <div className="fixed inset-0 overflow-y-auto text-[#F6EFE2]" style={{ background }}>
+      {previewImage && (
+        // A real screenshot of this journey, not a mockup - a genuine
+        // glimpse of what "Try it free" actually leads to, fading into the
+        // lock screen rather than a flat locked door with nothing behind it.
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[46vh] overflow-hidden">
+          <img src={previewImage} alt="" className="h-full w-full scale-105 object-cover object-top blur-[1.5px] opacity-70" />
+          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 35%, ${background} 96%)` }} />
+        </div>
+      )}
+      <div className="relative flex items-center justify-between px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <button onClick={() => navigate(-1)} aria-label="Back" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/30 backdrop-blur-sm"><ArrowLeft className="h-5 w-5" /></button>
+        <button onClick={() => navigate("/")} aria-label="Home" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/30 backdrop-blur-sm"><Home className="h-5 w-5" /></button>
       </div>
-      <main className="mx-auto flex min-h-[80%] max-w-md flex-col justify-center px-6 pb-16 text-center">
+      <main className="relative mx-auto flex min-h-[80%] max-w-md flex-col justify-end px-6 pb-16 pt-[40vh] text-center">
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#E0715C]/15 text-[#E0715C]"><Lock className="h-6 w-6" /></span>
         <p className="mt-5 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-[#E0715C]">Mentication Plus</p>
         <h1 className="mt-2 text-[2.1rem] italic leading-tight" style={{ fontFamily: "var(--font-editorial)" }}>{name}</h1>

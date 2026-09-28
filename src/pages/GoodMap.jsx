@@ -6,6 +6,7 @@ import PlusGate from "@/components/plus/PlusGate";
 export default function GoodMap() {
   return (
     <PlusGate route="good-map" name="The Good Map" background="#12030A"
+      previewImage="/media/plus-preview/good-map.jpg"
       promise="See what actually makes life feel good."
       detail="Sort what matters, see it on your map, then close the biggest gap one small step at a time.">
       <StandaloneFrame id="goodMap" name="The Good Map" src="/good-map/index.html" background="#12030A" />
