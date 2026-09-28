@@ -132,3 +132,11 @@ Three multi-day programmes made only of existing exercises (unchanged): Seven ca
   reminder, the free seven-day programme, and a gentle Plus free-trial link. Close with the X; it never
   returns. Only people with 1–3 sessions see it, so existing users won't.
 - Wording listed in SUGGESTIONS.md.
+
+## 2026-09-28 — Tier 2, item 6: backup (step 1 of 2)
+- Settings → Backup: "Save a backup" hands one file to the iPhone share sheet (choose Save to Files →
+  iCloud Drive). "Restore from a backup" reads it back, asks first, keeps practices already on the phone.
+- No new libraries. Plus status and reminder settings are never in a backup (Plus always comes from Apple).
+- Privacy page: one sentence added saying backups are files you save yourself.
+- NOT YET TESTED ON A REAL IPHONE: whether the share sheet offers the file needs checking once Xcode is installed.
+- Step 2 (later, needs Xcode + Apple settings): automatic iCloud backup.

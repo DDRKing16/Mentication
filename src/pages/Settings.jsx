@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, LifeBuoy, Trash2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CloudUpload, LifeBuoy, Trash2, ShieldCheck } from "lucide-react";
 import { useAccessibility } from "@/lib/accessibility";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import { usePlus } from "@/lib/subscription";
+import { backupSessionCount, parseBackup, restoreBackup, saveBackup } from "@/lib/backup";
 import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, remindersSupported } from "@/lib/reminders";
 
 function Toggle({ label, desc, on, onToggle }) {
@@ -31,6 +32,34 @@ export default function Settings() {
   const plus = usePlus();
   const [reminder, setReminder] = useState(getReminderPrefs);
   const [reminderNote, setReminderNote] = useState("");
+  const [backupNote, setBackupNote] = useState("");
+  const [pendingRestore, setPendingRestore] = useState(null);
+  const restoreInput = useRef(null);
+
+  const onSaveBackup = async () => {
+    setBackupNote("");
+    const result = await saveBackup().catch(() => "failed");
+    if (result === "shared") setBackupNote("Backup saved.");
+    else if (result === "downloaded") setBackupNote("Backup saved to your downloads.");
+    else if (result === "failed") setBackupNote("That didn't work. Please try again.");
+  };
+  const onPickBackup = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    try {
+      setPendingRestore(parseBackup(await file.text()));
+      setBackupNote("");
+    } catch (error) {
+      setPendingRestore(null);
+      setBackupNote(error.message);
+    }
+  };
+  const confirmRestore = () => {
+    restoreBackup(pendingRestore);
+    setPendingRestore(null);
+    window.location.assign("/");
+  };
   const setReminderOn = async (on, hour = reminder.hour, minute = reminder.minute) => {
     setReminderNote("");
     if (on) {
@@ -208,6 +237,34 @@ export default function Settings() {
           <Button variant="outline" onClick={() => navigate("/plus")} className="mt-4 rounded-full">
             {plus.active ? "Manage Plus" : "See Plus"}
           </Button>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-border bg-card p-5">
+          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            <CloudUpload className="h-4 w-4" /> Backup
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">Everything lives only on this phone. Save a backup to iCloud Drive or Files, so you can bring it back on a new phone.</p>
+          {pendingRestore ? (
+            <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
+              <p className="text-sm font-medium text-foreground">
+                Restore the backup from {new Date(pendingRestore.createdAt).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}?
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                It holds {backupSessionCount(pendingRestore)} {backupSessionCount(pendingRestore) === 1 ? "practice" : "practices"}. Practices already on this phone are kept; your journeys and settings take the backup's version.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Button onClick={confirmRestore} className="rounded-full">Restore</Button>
+                <Button variant="outline" onClick={() => setPendingRestore(null)} className="rounded-full">Cancel</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Button variant="outline" onClick={onSaveBackup} className="rounded-full">Save a backup</Button>
+              <Button variant="outline" onClick={() => restoreInput.current?.click()} className="rounded-full">Restore from a backup</Button>
+            </div>
+          )}
+          <input ref={restoreInput} type="file" accept="application/json,.json" onChange={onPickBackup} className="hidden" aria-hidden="true" tabIndex={-1} />
+          {backupNote && <p role="status" className="mt-3 text-sm text-muted-foreground">{backupNote}</p>}
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">
