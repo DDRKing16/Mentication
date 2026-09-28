@@ -65,3 +65,21 @@ Shown once, after someone's first finished reset:
 - "Your first reset" / "You did it."
 - "That's how Mentication works: a few minutes, whenever you need it. A little each day is what makes it stick."
 - Buttons: "Remind me each evening", "Try seven calmer days (Free)", "Want to go deeper? Try Plus free for 7 days."
+
+- **The Happy Bump's own time estimate doesn't match what the Library
+  promises.** Picking it from the Library (search, or the Lift category)
+  shows "5 min" -- that's `durationMin: 5` in
+  `src/lib/final50Catalog.js`. But the very first screen of the practice
+  itself says "Eleven short steps, about 10–15 minutes." (the opening line
+  in `src/components/HappyBumpExperience.jsx`), and walking the whole thing
+  end to end (a full walkthrough was done this run: baseline check-in,
+  hydrate, step outside, a five-minute walk timer, reaching out to someone,
+  one small task, three reflection prompts, picking a wellbeing area and a
+  step, planning what's next, then a re-rate and reveal) really does take
+  closer to 10-15 minutes than 5, especially with the walk. Someone picking
+  it because the Library said "5 min" may feel misled once they're a couple
+  of steps in. This is a timing question, so it's for you to decide rather
+  than an agent changing either number: either the Library's "5 min" should
+  read closer to what the practice actually takes, or the opening line
+  should describe the quick path (skip the walk, skip reaching out) if
+  that's the more typical 5-minute experience.
