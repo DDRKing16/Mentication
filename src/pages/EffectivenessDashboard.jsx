@@ -6,9 +6,12 @@ import { sessionStore } from "@/lib/localData";
 import { computeEffectivenessInsights } from "@/lib/insights";
 import { getBumpFunnel } from "@/lib/happyBumpFunnel";
 import FlowHomeButton from "@/components/FlowHomeButton";
+import ProgressStory from "@/components/insights/ProgressStory";
+import { summariseProgress } from "@/lib/progressStory";
 
 export default function EffectivenessDashboard() {
   const [insights, setInsights] = useState(null);
+  const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const bumpRuns = getBumpFunnel().runs || [];
   const completedBumps = bumpRuns.filter((run) => run.scenes?.includes("complete")).length;
@@ -19,6 +22,7 @@ export default function EffectivenessDashboard() {
         const sessions = await sessionStore.list("-created_date", 100);
         const computed = computeEffectivenessInsights(sessions);
         setInsights(computed);
+        setStory(summariseProgress(sessions));
       } catch (e) {
         console.error("Failed to load insights:", e);
       } finally {
@@ -43,15 +47,22 @@ export default function EffectivenessDashboard() {
           <FlowHomeButton />
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="font-heading text-3xl font-medium text-primary mb-2">
-            Your Patterns
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Based on what you chose and rated in {insights.totalSessions} sessions • {insights.thisWeek} this week
-            {insights.currentStreak > 0 && ` • ${insights.currentStreak}-day streak`}
-          </p>
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Your progress</p>
+          <h1 className="mt-2 font-heading text-3xl font-medium text-primary">What's helping you</h1>
         </motion.div>
+
+        {story && <div className="mb-10"><ProgressStory story={story} /></div>}
+
+        {insights.totalSessions > 0 && (
+          <div className="mb-6 border-t border-border pt-6">
+            <h2 className="font-heading text-xl font-medium text-primary">The detail</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Based on what you chose and rated in {insights.totalSessions} sessions
+              {insights.currentStreak > 0 && ` • ${insights.currentStreak}-day streak`}
+            </p>
+          </div>
+        )}
 
         {/* Top Interventions */}
         {insights.topInterventions.length > 0 && (
@@ -206,15 +217,9 @@ export default function EffectivenessDashboard() {
         )}
 
         {insights.totalSessions === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <p className="text-muted-foreground">
-              Complete a few sessions to see your personal patterns emerge.
-            </p>
-          </motion.div>
+          <p className="text-center text-sm text-muted-foreground">
+            Complete a few sessions to see your personal patterns emerge.
+          </p>
         )}
       </div>
     </div>

@@ -115,3 +115,12 @@ Daily reminder: Settings has an On/Off and a time (default 7:30pm). It is schedu
 
 ## 28 Sep — Tier 2, item 3: programmes
 Three multi-day programmes made only of existing exercises (unchanged): Seven calmer days (free), Five days of small lifts (Plus), Five better nights (Plus). One day opens at a time; the next opens the following calendar day, a gentle reason to return. Progress is worked out from the sessions the app already saves, so ResetFlow and the recommendation engine are untouched and there is no second tracker to drift. Home shows today's day (or an invitation to start the free one); /programmes lists them; each has a day-by-day page with today's day glowing. Plus programmes send non-members to the Plus screen and back. 9 new tests. New framing copy listed in SUGGESTIONS.md for the owner.
+
+## 2026-09-28 — Tier 2, item 4: "What's helping you"
+- The Insights tab now opens with a plain-English story from the person's own check-ins:
+  how much better they usually feel after a practice this month, their top three helpers,
+  a six-week rhythm chart, and (once there's enough data) the time of day that helps most.
+- The older detail (rated fit, by direction, by location) stays below under "The detail".
+- Uses only data already on the phone. Recommendation engine untouched.
+- Note: 3 pre-existing lint errors (unused imports) in src/components/dear2100/Barriers.jsx
+  and Coping.jsx, from the earlier rescue commit. Not changed here.
