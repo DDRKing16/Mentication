@@ -16,7 +16,7 @@ export default function ProgrammeCard({ sessions, onOpen, onStartDay }) {
   if (!state || state.progress.finished) {
     return (
       <section className="px-5 pt-4">
-        <button type="button" onClick={onOpen} className="flex w-full items-center justify-between gap-4 rounded-[28px] border border-[var(--home-ink)]/10 bg-white/70 p-6 text-left shadow-[0_12px_32px_-22px_rgba(17,43,80,0.45)]">
+        <button type="button" onClick={onOpen} className="flex w-full items-center justify-between gap-4 rounded-[24px] border border-[var(--home-ink)]/10 bg-white/70 p-6 text-left shadow-[0_12px_32px_-22px_rgba(17,43,80,0.45)]">
           <span>
             <span className="block text-[9px] font-bold uppercase tracking-[0.25em] text-[#B94E3B]">Programmes · a little each day</span>
             <span className="mt-1 block font-serif text-[22px] font-bold leading-tight text-[var(--home-ink)]">Try seven calmer days</span>
@@ -34,7 +34,7 @@ export default function ProgrammeCard({ sessions, onOpen, onStartDay }) {
   const waiting = today.status === "tomorrow";
   return (
     <section className="px-5 pt-4">
-      <div className="rounded-[28px] border border-[#E0715C]/35 bg-white/80 p-6 shadow-[0_0_0_4px_rgba(224,113,92,0.08),0_14px_34px_-22px_rgba(224,113,92,0.55)]">
+      <div className="rounded-[24px] border border-[#E0715C]/35 bg-white/80 p-6 shadow-[0_0_0_4px_rgba(224,113,92,0.08),0_14px_34px_-22px_rgba(224,113,92,0.55)]">
         <button type="button" onClick={onOpen} className="block w-full text-left">
           <span className="block text-[9px] font-bold uppercase tracking-[0.25em] text-[#B94E3B]">{programme.title} · day {dayNumber} of {programme.days.length}</span>
           <span className="mt-1 block font-serif text-[22px] font-bold leading-tight text-[var(--home-ink)]">{today.intention}</span>

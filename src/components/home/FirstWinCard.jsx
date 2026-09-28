@@ -43,7 +43,7 @@ export default function FirstWinCard({ sessionCount, plusActive, hasActiveProgra
 
   return (
     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="px-5 pt-6">
-      <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#112b50] via-[#2a3f6e] to-[#E0715C] p-6 text-white shadow-[0_24px_50px_-28px_rgba(17,43,80,0.9)]">
+      <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-[#112b50] via-[#2a3f6e] to-[#E0715C] p-6 text-white shadow-[0_24px_50px_-28px_rgba(17,43,80,0.9)]">
         <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
         <button type="button" onClick={close} aria-label="Not now" className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full text-white/70 hover:text-white">
           <X className="h-5 w-5" />

@@ -26,7 +26,7 @@ export default function CategoryCard({ card, index = 0, onClick }) {
       data-sfx="select"
       style={/** @type {any} */ ({ "--card-accent": accent })}
       className={
-        "relative no-tap flex min-h-[11.25rem] flex-col items-center justify-center gap-2.5 overflow-hidden rounded-[1.6rem] px-4 py-5 text-center " +
+        "relative no-tap flex min-h-[11.25rem] flex-col items-center justify-center gap-2.5 overflow-hidden rounded-[24px] px-4 py-5 text-center " +
         "home-category-card bg-[var(--home-card)] " +
         "transition-all duration-500 hover:-translate-y-0.5 active:scale-[0.98]"
       }
