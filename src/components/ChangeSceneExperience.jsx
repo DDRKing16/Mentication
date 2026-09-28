@@ -414,6 +414,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const current = STEPS[step];
 
   // Calculate high-fidelity alignment timing per word and preserve newlines
+  const spokenPrompt = (current.prompt || "").replace(/\s+/g, " ").trim();
   const mappedLines = useMemo(() => {
     const promptText = current.prompt || "";
     const lines = promptText.split("\n");
@@ -2187,8 +2188,10 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
                         <div className={step === 0 ? "opening-instruction" : "prompt"}>
                         {step === 0 ? (
                           <div className="prompt-text">
+                            {/* The words below are spaced visually, not with real spaces, so screen readers get this properly spaced copy instead. */}
+                            <span className="sr-only">{spokenPrompt}</span>
                             {mappedLines.map((lineWords, lineIdx) => (
-                              <div key={lineIdx} className={lineIdx > 0 ? "mt-1" : ""}>
+                              <div key={lineIdx} aria-hidden="true" className={lineIdx > 0 ? "mt-1" : ""}>
                                   {lineWords.map((item, idx) => {
                                     const isActive = audioIsPlaying && item.end > item.start && currentAudioTime >= item.start && currentAudioTime <= item.end;
                                     return (
@@ -2222,8 +2225,9 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
                                 )}
                                 <span className="task-choice-label">Try this</span>
                                 <span className="prompt-text">
+                                  <span className="sr-only">{spokenPrompt}</span>
                                   {mappedLines.map((lineWords, lineIdx) => (
-                                    <span key={lineIdx} className={lineIdx > 0 ? "block mt-1" : "block"}>
+                                    <span key={lineIdx} aria-hidden="true" className={lineIdx > 0 ? "block mt-1" : "block"}>
                                       {lineWords.map((item, idx) => {
                                         const isActive = audioIsPlaying && item.end > item.start && currentAudioTime >= item.start && currentAudioTime <= item.end;
                                         return (

@@ -179,3 +179,10 @@ suite passes with the same baseline dear2100 failures as every prior run.
 - Settings' Text size and the in-session "Larger text" switch are now one setting: changing either
   updates the other, and Reset clears both. Also fixed a timing clash that stopped the in-session
   switch from actually enlarging text. Checked both directions in the browser (16px → 18px → 21px → 16px).
+
+## 2026-09-28 — Change the Scene: readable by VoiceOver
+- Its word-by-word animated text had no real spaces (spacing was visual only), so VoiceOver would read
+  "Noticeanydifferenceinhowyoufeel". Added a hidden, properly spaced copy for screen readers and hid the
+  animated words from them. Looks identical on screen (same layout, checked).
+- Also checked the "three broken buttons" note in SUGGESTIONS.md: that row is hidden by styling, so no one
+  can reach it. Updated the note; nothing changed in the app.

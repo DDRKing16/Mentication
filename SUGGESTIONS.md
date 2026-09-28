@@ -35,17 +35,10 @@ changing them. Nothing here has been applied.
   rather than editing it — something like "A small step, whenever you're
   ready." would keep the meaning and drop the instruction-manual tone.
 
-- **Change the Scene's closing screen has three buttons that promise to open
-  something else but don't.** On the very last screen ("You changed the
-  scene"), three small buttons read "✦ Happy Bump", "✦ What If I Could" and
-  "✦ Dear 2100" (`src/components/ChangeSceneExperience.jsx`, around line
-  2492). Tapping "Happy Bump" or "Dear 2100" only shows a toast that says
-  "Launching..." and then does nothing else — it doesn't actually open either
-  one. "What If I Could" is already marked "(Coming Soon!)", so that one may
-  be deliberately a placeholder, but the other two look finished and just
-  don't work. Left alone rather than guessed at, since wiring them up means
-  deciding where they should actually take someone (and whether that's
-  wanted at all on this screen), which felt like your call.
+- ~~Change the Scene's closing screen has three buttons that don't work~~
+  **Checked 28 Sep: not visible to anyone.** The screen's own styling hides
+  that whole button row (`.pathway-actions { display: none }`), so nobody can
+  see or tap them. Nothing to fix unless you want the row back.
 
 - ~~Two different "make text bigger" controls that don't agree~~ **Done
   (28 Sep):** kept both, now linked. Settings "Large"/"Extra large" also turns
