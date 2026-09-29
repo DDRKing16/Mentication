@@ -128,9 +128,9 @@ export default function Home() {
             onStartDay={(day) => { const state = launchStateFor(day.id, getProgramme(activeProgrammeId())); if (state) navigate("/reset", { state }); }}
             quick={
               (lastWorked || personalBest)
-                ? { eyebrow: "Worked for you last time", title: "Repeat your most effective reset", onClick: doLastWorked }
+                ? { eyebrow: "Worked last time", title: "Repeat your most effective reset", onClick: doLastWorked }
                 : recommendation
-                  ? { eyebrow: "Recommended for you", title: recommendation.title, onClick: doRecommend }
+                  ? { eyebrow: "For you", title: recommendation.title, onClick: doRecommend }
                   : null
             }
           />
