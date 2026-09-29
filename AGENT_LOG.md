@@ -277,3 +277,21 @@ real names; only the "not yet joined" view was missing that lookup. Gave it the 
 all three programmes, both before and after joining, in the browser -- real names everywhere now, and the
 "in progress" view is unchanged. Full test/typecheck/lint/build suite passes clean with no failures at all
 (nothing baseline-excused this run).
+
+## 29 Sep — Home was quietly downloading the whole recommendation engine on every single launch
+Checked docs/BRAND_THREAD.md again first: all six phases are still done, so this block moved to the
+load-speed work. A real production build showed the app's very first download -- the JavaScript every
+phone has to fetch and run before Home can even appear -- was 726KB, and Vite's own build output pointed
+at why: Home already goes out of its way to fetch the intervention data only when it's actually needed
+(it does this the same way already for a couple of other things), but two other things Home always
+loads -- the "days in a row" streak and the "is a programme active" check -- were pulling in that entire
+dataset anyway, unconditionally, defeating the whole point. Split the streak calculation and the
+programme bookkeeping into their own small files that don't need the intervention data, and moved the
+two spots that do need it (working out which day of a programme is open, and starting a programme's
+exercise) to fetch it only at the moment they're actually used -- the exact same pattern already used
+elsewhere in this file (9f4d736). Nothing about what Home shows or does changed. Checked in the browser:
+a brand-new Home, and a Home with an active programme showing "Ready for day 1?" and a working "Day 1"
+button that correctly opens Box Breathing -- both identical to before. A real production build confirms
+the fix: the first download shrank from 726KB to 504KB (from 220KB to 163KB compressed), and the
+recommendation engine now shows up as its own separate piece that only loads when it's actually needed,
+with no more of Vite's own build warnings about it. Full test/typecheck/lint/build suite passes clean.
