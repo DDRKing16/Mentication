@@ -2,6 +2,7 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryIcon from "@/components/home/CategoryIcons";
+import { hapticPattern } from "@/lib/feedback";
 
 // Each mood direction gets its own identity colour so the six options read as
 // distinct choices at a glance, not six copies of the same neutral tile.
@@ -37,6 +38,7 @@ export default function CategoryCard({ card, index = 0, onClick, recent }) {
   const resetTilt = () => setTilt({ x: 0, y: 0 });
 
   const handleClick = () => {
+    hapticPattern([6]);
     setFlash(true);
     window.setTimeout(() => setFlash(false), 320);
     onClick();

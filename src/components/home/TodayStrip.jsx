@@ -4,15 +4,41 @@
 // means the two rows never compete for the same visual language; they're
 // clearly two different kinds of thing.
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { CalendarDays, Compass, Wind, Waves, Moon, RefreshCw, Zap, Play } from "lucide-react";
-import { summariseWeek } from "@/components/home/YourWeek";
+import { motion, AnimatePresence } from "framer-motion";
+import { CalendarDays, Compass, Wind, Waves, Moon, RefreshCw, Zap, Play, Flame } from "lucide-react";
+import { summariseWeek, weekDays } from "@/components/home/YourWeek";
 import { activeProgrammeId, getProgramme, programmeProgress, programmeStartedAt } from "@/lib/programmes";
 import { hapticPattern } from "@/lib/feedback";
 
 const LAST_STREAK_KEY = "mentication.lastStreak.v1";
 const BEST_STREAK_KEY = "mentication.bestStreak.v1";
 const START_GLOW_KEY = "mentication.startGlowSeen.v1";
+const FULL_WEEK_KEY = "mentication.fullWeekCelebrated.v1";
+
+// A small shape-based celebration instead of a stock confetti graphic or a
+// commissioned illustration neither of which exist for this app: a handful
+// of dots bursting outward from the week card, once, the moment all seven
+// days are done.
+function Burst() {
+  const dots = Array.from({ length: 10 });
+  return (
+    <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 overflow-visible">
+      {dots.map((_, i) => {
+        const angle = (i / dots.length) * Math.PI * 2;
+        return (
+          <motion.span
+            key={i}
+            className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
+            style={{ background: i % 2 ? "#E0715C" : "#E0B25A" }}
+            initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+            animate={{ x: Math.cos(angle) * 70, y: Math.sin(angle) * 70, opacity: 0, scale: 0.4 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          />
+        );
+      })}
+    </span>
+  );
+}
 
 // Which small icon best matches a programme day's practice, so the button
 // isn't always the same generic calendar glyph.
@@ -130,7 +156,11 @@ function PowerButton({ index = 0, onClick, icon: Icon, gradient, glow, ring, ari
         <span className="absolute inset-0 rounded-full" style={{ background: gradient }} />
         <span aria-hidden="true" className="absolute inset-0 rounded-full opacity-90" style={{ background: "radial-gradient(circle at 32% 26%, rgba(255,255,255,0.55), transparent 55%)" }} />
         <span aria-hidden="true" className={`absolute inset-0 rounded-full transition-opacity duration-150 ${pressed ? "opacity-100" : "opacity-0"}`} style={{ background: "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.35), transparent 70%)" }} />
-        {urgent && <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full bg-white text-center text-[0.5rem] leading-[0.9rem]">🔥</span>}
+        {urgent && (
+          <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-white">
+            <Flame className="h-2 w-2 text-[#E0715C]" strokeWidth={2.5} fill="currentColor" />
+          </span>
+        )}
         <motion.span animate={pressed ? { rotate: -8 } : { rotate: 0 }} transition={{ duration: 0.15 }}>
           <Icon className="relative h-7 w-7 text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.25)]" strokeWidth={1.8} fill={Icon === Play ? "#FFFFFF" : "none"} />
         </motion.span>
@@ -148,11 +178,26 @@ function PowerButton({ index = 0, onClick, icon: Icon, gradient, glow, ring, ari
   );
 }
 
-export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onStartDay, quick }) {
+export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onStartDay, quick, loading = false }) {
   const week = useMemo(() => summariseWeek(sessions), [sessions]);
   const line = useMemo(() => weekLine(week), [week]);
   const isBest = useMemo(() => isPersonalBestStreak(week.streak), [week.streak]);
   const [weekRipple, fireWeekRipple] = useRipple("rgba(224,113,92,0.28)");
+
+  // A one-time celebration the moment a full seven-day week is reached,
+  // never repeated for the same week even across reloads.
+  const [celebrate, setCelebrate] = useState(false);
+  useEffect(() => {
+    if (week.count < 7) return;
+    const weekKey = weekDays()[0]?.toISOString().slice(0, 10);
+    try {
+      if (localStorage.getItem(FULL_WEEK_KEY) === weekKey) return;
+      localStorage.setItem(FULL_WEEK_KEY, weekKey);
+    } catch { /* unavailable */ }
+    setCelebrate(true);
+    const t = window.setTimeout(() => setCelebrate(false), 950);
+    return () => window.clearTimeout(t);
+  }, [week.count]);
 
   const programmeState = useMemo(() => {
     const id = activeProgrammeId();
@@ -176,6 +221,21 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
   const PROGRAMME_GRADIENT = "radial-gradient(circle at 35% 30%, #F09477, #C1462F 78%)";
   const QUICK_GRADIENT = "radial-gradient(circle at 35% 30%, #3E5F97, #0E2A52 78%)";
 
+  // Real sessions haven't loaded yet — a brief skeleton instead of a flash
+  // of an empty "your week starts whenever you do" state that would then
+  // immediately be replaced by the real data a moment later.
+  if (loading) {
+    return (
+      <section className="px-5 pt-6" aria-hidden="true">
+        <div className="h-[4.25rem] animate-pulse rounded-[20px] bg-[var(--home-ink)]/8" />
+        <div className="mt-4 flex justify-center gap-6">
+          <div className="h-20 w-20 animate-pulse rounded-full bg-[var(--home-ink)]/10" />
+          <div className="h-20 w-20 animate-pulse rounded-full bg-[var(--home-ink)]/10" />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="px-5 pt-6">
       {/* Your Week: a slim, brushed-silver strip — a soft, continuously
@@ -184,6 +244,7 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
       <button
         type="button"
         onClick={() => { fireWeekRipple(); onOpenWeek(); }}
+        onPointerDown={() => hapticPattern([6])}
         aria-label={`Your week: ${line} Open your progress.`}
         className="no-tap relative block w-full overflow-hidden rounded-[20px] px-4 py-2.5 text-left shadow-[0_8px_20px_-14px_rgba(17,43,80,0.45)] transition-[border-color] duration-500"
         style={{
@@ -193,6 +254,7 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
         }}
       >
         {weekRipple}
+        <AnimatePresence>{celebrate && <Burst />}</AnimatePresence>
         <motion.span
           aria-hidden="true"
           className="pointer-events-none absolute -top-10 h-16 w-24 rotate-[-7deg]"
@@ -206,7 +268,10 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
           </span>
           {week.streak >= 2 ? (
             <span className="flex items-center gap-1 rounded-full bg-[#E0715C]/12 px-2 py-0.5 text-[0.68rem] font-bold text-[#B94E3B]">
-              <motion.span animate={{ scale: [1, 1.18, 1] }} transition={{ duration: 1.4, repeat: Infinity }}>🔥</motion.span> {week.streak}-day streak
+              <motion.span animate={{ scale: [1, 1.18, 1] }} transition={{ duration: 1.4, repeat: Infinity }}>
+                <Flame className="h-3 w-3" strokeWidth={2.5} fill="currentColor" />
+              </motion.span>
+              {week.streak}-day streak
             </span>
           ) : (
             <span className="text-[0.72rem] font-medium text-[var(--home-ink)]/70">{line}</span>
@@ -247,8 +312,11 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
       </button>
 
       {/* Two circular power buttons, centred, clearly their own kind of
-          control — not competing with the square grid cards right below. */}
-      <div className="mt-4 flex items-start justify-center gap-6">
+          control — not competing with the square grid cards right below.
+          A soft blurred glow sits behind them, like a shallow depth of
+          field, so they read as floating slightly above the page. */}
+      <div className="relative mt-4 flex items-start justify-center gap-6">
+        <span aria-hidden="true" className="pointer-events-none absolute left-1/2 top-6 h-20 w-[85%] -translate-x-1/2 rounded-full opacity-25 blur-2xl" style={{ background: "linear-gradient(90deg, #C1462F, #0E2A52)" }} />
         {programmeState ? (
           <PowerButton
             index={0}

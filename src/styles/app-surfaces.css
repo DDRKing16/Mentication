@@ -40,7 +40,10 @@
    cream body, replacing the emerald/gold pairing. Purely additive; flip
    HOME_THEME back to "emerald" in homeTheme.js to revert instantly. */
 .home-theme--navy {
-  --home-bg: #ECE2D2;
+  --home-bg: #EFE6D6;
+  --home-shadow-sm: 0 8px 20px -14px rgba(17, 43, 80, 0.42);
+  --home-shadow-md: 0 14px 32px -18px rgba(17, 43, 80, 0.48);
+  --home-shadow-lg: 0 22px 48px -20px rgba(17, 43, 80, 0.55);
   --home-hero: #0E2A52;
   --home-hero-text: #F8F3EA;
   --home-hero-soft: #DCE4F1;
@@ -56,6 +59,26 @@
   --home-tabbar: #ECE2D2;
   --home-border: #D9D0C7;
   --home-shadow: rgba(14, 42, 82, 0.34);
+}
+
+/* A faint paper grain and a very slow ambient drift across the whole Home
+   background, instead of a flat, static cream fill. */
+.home-theme {
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(224, 113, 92, 0.05), transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(14, 42, 82, 0.04), transparent 45%),
+    url("/media/textures/felt-grain.svg");
+  background-blend-mode: normal, normal, soft-light;
+  background-size: 160% 160%, 160% 160%, 200px 200px;
+  background-position: 0% 0%, 100% 100%, 0 0;
+  animation: home-bg-drift 50s ease-in-out infinite;
+}
+@keyframes home-bg-drift {
+  0%, 100% { background-position: 0% 0%, 100% 100%, 0 0; }
+  50% { background-position: 8% 6%, 92% 94%, 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-theme { animation: none; }
 }
 
 .home-category-card {

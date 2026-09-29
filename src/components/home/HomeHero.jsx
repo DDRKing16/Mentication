@@ -4,6 +4,7 @@ import { User, BarChart3, Sunrise, Sun, Sunset, Moon } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { MENTICATION_GREEN_PINK_ASSET, MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET, MENTICATION_SLOGAN } from "@/components/Logo";
 import { HOME_THEME } from "@/lib/homeTheme";
+import { hapticPattern } from "@/lib/feedback";
 
 const HERO_SEEN_KEY = "mentication.heroWordmarkSeen.v1";
 const todayKey = () => new Date().toISOString().slice(0, 10);
@@ -28,6 +29,7 @@ function IconButton({ onClick, ariaLabel, children, badge = false }) {
     const id = ++rippleId.current;
     setRipples((r) => [...r, id]);
     window.setTimeout(() => setRipples((r) => r.filter((x) => x !== id)), 500);
+    hapticPattern([6]);
   };
   return (
     <button
@@ -53,7 +55,7 @@ function IconButton({ onClick, ariaLabel, children, badge = false }) {
   );
 }
 
-export default function HomeHero({ onProfile, onInsights, hasNewInsight = false }) {
+export default function HomeHero({ onProfile, onInsights, hasNewInsight = false, headline = "Let’s find your reset for today." }) {
   const time = timeOfDay();
   const TimeIcon = TIME_ICONS[time];
   const dateLabel = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
@@ -67,16 +69,22 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false 
     try { localStorage.setItem(HERO_SEEN_KEY, todayKey()); } catch { /* storage unavailable */ }
   }, []);
 
-  // A gentle parallax: the wordmark fades and drifts up slightly as Home is
-  // scrolled, rather than just disappearing under the fold unchanged.
+  // A gentle parallax: the wordmark (closest to the eye) fades and drifts up
+  // faster than the greeting text beneath it (a step further back), so the
+  // header reads as having depth rather than scrolling as one flat sheet.
   const { scrollY } = useScroll();
   const logoOpacity = useTransform(scrollY, [0, 160], [1, 0.35]);
   const logoY = useTransform(scrollY, [0, 160], [0, -14]);
+  const textY = useTransform(scrollY, [0, 220], [0, -6]);
 
   return (
     <div className="relative">
       <header data-time={time} className="home-hero relative overflow-hidden rounded-b-[2.5rem] px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
         <div aria-hidden="true" className="home-hero-glow" />
+        {/* A faint watermark of the flourish mark and a soft vignette at the
+            corners, for a touch more depth than a flat gradient fill. */}
+        <img aria-hidden="true" alt="" draggable={false} src={HOME_THEME === "navy" ? MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET : MENTICATION_GREEN_PINK_ASSET} className="pointer-events-none absolute -right-10 -top-6 h-40 w-40 select-none object-contain opacity-[0.05]" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ boxShadow: "inset 0 0 70px 10px rgba(0,0,0,0.18)" }} />
 
         <div className="relative z-[1] flex items-center justify-between gap-2">
         <IconButton onClick={onProfile} ariaLabel="Profile">
@@ -117,6 +125,7 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{ y: textY }}
         className="relative z-[1] mt-2.5 max-w-[19rem] text-left"
       >
         {/* A pale, clearly-legible eyebrow instead of the coral accent, which
@@ -128,7 +137,7 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false 
           {GREETINGS[time]}
         </p>
         <h1 className="mt-1 font-clean text-[1.28rem] font-medium leading-[1.18] tracking-[-0.015em] text-[var(--home-hero-text)]">
-          Let’s find your reset for today.
+          {headline}
         </h1>
         <p className="mt-1 text-[0.72rem] font-medium text-[var(--home-hero-soft)]">{dateLabel}</p>
         </motion.div>

@@ -13,8 +13,9 @@ import CategoryCard from "@/components/home/CategoryCard";
 import TodayStrip from "@/components/home/TodayStrip";
 import FirstWinCard from "@/components/home/FirstWinCard";
 import MoreWaysIn from "@/components/home/MoreWaysIn";
+import WhatsNewRibbon from "@/components/home/WhatsNewRibbon";
 import ParkedNudge from "@/components/home/ParkedNudge";
-import { activeProgrammeId, getProgramme, launchStateFor } from "@/lib/programmes";
+import { activeProgrammeId, getProgramme, launchStateFor, programmeProgress, programmeStartedAt } from "@/lib/programmes";
 import { computeLocalCalendarStreak } from "@/lib/insights";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
@@ -41,7 +42,7 @@ const hasUnseenInsight = (sessions) => {
 const reveal = (index) => ({
   initial: { opacity: 0, y: 14 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.45, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] },
+  transition: { type: "spring", stiffness: 260, damping: 20, delay: index * 0.06 },
 });
 
 const ICON_BASE = "/media/images/home-icons/";
@@ -78,9 +79,27 @@ export default function Home() {
   const [parkedNotes, setParkedNotes] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [hasNewInsight, setHasNewInsight] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   // Which mood was reached for last time, so the grid can mark it with a
   // small dot — a quiet way back to what was just used, not a suggestion.
   const recentTint = sessions[0]?.direction || null;
+
+  // The greeting sometimes names the actual thing worth doing today, instead
+  // of the same generic line every single time — but only when there's a
+  // real, specific reason to (an open programme day, or a real streak), so
+  // it stays honest rather than performing enthusiasm.
+  const heroHeadline = (() => {
+    const id = activeProgrammeId();
+    const programme = id ? getProgramme(id) : null;
+    if (programme) {
+      const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
+      const today = progress.days[progress.todayIndex];
+      if (!progress.finished && today?.status !== "tomorrow") return `Ready for day ${progress.todayIndex + 1}?`;
+    }
+    const streak = computeLocalCalendarStreak(sessions);
+    if (streak >= 3) return `${streak} days in a row — keep it going.`;
+    return undefined;
+  })();
 
   const loadSessions = async () => {
     const [sessions, interventions, recommendations] = await Promise.all([
@@ -97,6 +116,7 @@ export default function Home() {
     const weekSessions = await sessionStore.list("-created_date", 120);
     setSessions(weekSessions);
     setHasNewInsight(hasUnseenInsight(weekSessions));
+    setLoaded(true);
   };
   useEffect(() => { loadSessions().catch(() => {}); }, []);
   useEffect(() => { setParkedNotes(hasParkedNotes()); }, []);
@@ -147,7 +167,12 @@ export default function Home() {
             onProfile={() => navigate("/profile")}
             onInsights={() => { markInsightsSeen(); setHasNewInsight(false); navigate("/insights"); }}
             hasNewInsight={hasNewInsight}
+            headline={heroHeadline}
           />
+
+          {/* Only for people who've been here before - a brand-new person
+              has nothing to compare this to, so the note would be noise. */}
+          {loaded && sessions.length > 0 && <WhatsNewRibbon />}
 
           <FirstWinCard
             sessionCount={sessions.length}
@@ -164,6 +189,7 @@ export default function Home() {
               of Home and shouldn't need much scrolling to reach. */}
           <TodayStrip
             sessions={sessions}
+            loading={!loaded}
             onOpenWeek={() => navigate("/insights")}
             onOpenProgramme={() => { const id = activeProgrammeId(); navigate(id ? `/programmes/${id}` : "/programmes/calmer-seven"); }}
             onStartDay={(day) => { const state = launchStateFor(day.id, getProgramme(activeProgrammeId())); if (state) navigate("/reset", { state }); }}
@@ -191,7 +217,12 @@ export default function Home() {
               optional journeys below, instead of running straight into them. */}
           <div className="mx-5 mt-9 h-px bg-[var(--home-ink)]/10" />
 
-          <motion.div {...reveal(3)}>
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ type: "spring", stiffness: 220, damping: 22 }}
+          >
             <MoreWaysIn plusActive={plus.active} onOpen={(route) => navigate(route)} />
           </motion.div>
 

@@ -27,7 +27,11 @@ export default function TabBar() {
   return (
     <nav aria-label="Primary navigation" className="pointer-events-none fixed inset-x-0 bottom-0 z-40">
       <div className="safe-x">
-        <div className={`${onHome ? `home-theme home-theme--${HOME_THEME} border-[var(--home-accent)]/25 bg-[var(--home-tabbar)]/95 shadow-[0_-14px_40px_-22px_var(--home-shadow)]` : "border-[#C99646]/25 bg-[#ECE2D2]/95 shadow-[0_-14px_40px_-22px_rgba(30,60,66,0.24)]"} pointer-events-auto mx-auto max-w-[36rem] rounded-t-[1.5rem] border-t px-1.5 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-xl`}>
+        <div className={`${onHome ? `home-theme home-theme--${HOME_THEME} border-[var(--home-accent)]/25 bg-[var(--home-tabbar)]/95 shadow-[0_-14px_40px_-22px_var(--home-shadow)]` : "border-[#C99646]/25 bg-[#ECE2D2]/95 shadow-[0_-14px_40px_-22px_rgba(30,60,66,0.24)]"} pointer-events-auto relative mx-auto max-w-[36rem] overflow-hidden rounded-t-[1.5rem] border-t px-1.5 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-xl`}>
+          {/* A thin light-catching line along the top edge, echoing the
+              silver-sheen treatment used elsewhere on Home, so the tab bar
+              doesn't feel like a flat, unrelated strip. */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" />
           <div className="grid grid-cols-6 items-stretch">
             {TABS.map((t) => {
               const active = pathname === t.to;

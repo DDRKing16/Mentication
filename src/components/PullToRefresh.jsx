@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { RefreshCw } from "lucide-react";
 
 const THRESHOLD = 70;
 
@@ -49,16 +48,31 @@ export default function PullToRefresh({ onRefresh, children }) {
       onTouchEnd={handleEnd}
       className="relative min-h-full"
     >
+      {/* A soft breathing dot with a build-up ring, matching the app's own
+          quiet loading language elsewhere, instead of a generic spinner
+          icon borrowed wholesale from an icon library. */}
       {(pull > 2 || refreshing) && (
         <div
           aria-hidden="true"
           className="pointer-events-none absolute left-1/2 top-2 z-50 flex -translate-x-1/2 items-start justify-center"
           style={{ height: Math.max(pull, refreshing ? THRESHOLD : 0) }}
         >
-          <RefreshCw
-            className={"h-5 w-5 " + (refreshing ? "animate-spin text-primary" : "text-muted-foreground")}
-            style={{ transform: `rotate(${pull * 3}deg)` }}
-          />
+          <div className="relative grid h-6 w-6 place-items-center">
+            <svg viewBox="0 0 24 24" className="absolute inset-0 h-6 w-6 -rotate-90">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground/25" />
+              <circle
+                cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                className={refreshing ? "text-primary" : "text-primary/70"}
+                strokeDasharray={62.8}
+                strokeDashoffset={refreshing ? 0 : 62.8 * (1 - Math.min(pull / THRESHOLD, 1))}
+              />
+            </svg>
+            <motion.span
+              className="h-2.5 w-2.5 rounded-full bg-primary"
+              animate={refreshing ? { scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] } : { scale: 1, opacity: 0.9 }}
+              transition={{ duration: 1.1, repeat: refreshing ? Infinity : 0, ease: "easeInOut" }}
+            />
+          </div>
         </div>
       )}
       <motion.div

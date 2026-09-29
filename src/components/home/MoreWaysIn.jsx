@@ -7,6 +7,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Mic } from "lucide-react";
+import { hapticPattern } from "@/lib/feedback";
 
 const ITEMS = [
   {
@@ -98,7 +99,7 @@ export default function MoreWaysIn({ plusActive, onOpen }) {
                 type="button"
                 role="listitem"
                 onClick={() => onOpen(item.route)}
-                onPointerDown={() => setPressed(item.id)}
+                onPointerDown={() => { setPressed(item.id); hapticPattern([6]); }}
                 onPointerUp={() => setPressed(null)}
                 onPointerLeave={() => setPressed(null)}
                 aria-label={item.title}
@@ -133,7 +134,7 @@ export default function MoreWaysIn({ plusActive, onOpen }) {
                 <div className="relative z-10 p-3.5">
                   <p className="text-[0.6rem] font-semibold uppercase tracking-[0.16em]" style={{ color: item.accent }}>{item.eyebrow}</p>
                   <p className="mt-1 text-[0.92rem] font-semibold leading-snug text-white">{item.title}</p>
-                  {item.id === "journal" && caption && <p className="mt-1 text-[0.68rem] text-white/60">{caption}</p>}
+                  {item.id === "journal" && caption && <p className="mt-1 text-[0.68rem] text-white/75">{caption}</p>}
                 </div>
               </button>
             );
