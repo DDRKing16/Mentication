@@ -32,6 +32,7 @@ export default function GroundingV2Stage({
   spoken = "",
   onNarrationEnd,
   showBody = true,
+  reducedMotion = false,
 }) {
   const [narrationDone, setNarrationDone] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -112,7 +113,7 @@ export default function GroundingV2Stage({
 
   return (
     <div className="flex w-full flex-col items-center gap-5">
-      <StageMarkers activeSense={sense} />
+      <StageMarkers activeSense={sense} reducedMotion={reducedMotion} />
 
       <p
         className="text-[0.65rem] font-medium uppercase tracking-[0.28em]"

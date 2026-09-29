@@ -75,15 +75,15 @@ function Ring({ pct }) {
   );
 }
 
-function CountdownRing({ step, stepRemaining, discreet, showTimer }) {
+function CountdownRing({ step, stepRemaining, discreet, showTimer, reducedMotion }) {
   const pct = step.holdSec ? Math.min(1, Math.max(0, 1 - stepRemaining / step.holdSec)) : 0;
   return (
     <div className="relative flex h-48 w-48 items-center justify-center">
       {!discreet && (
         <motion.div
           className="absolute h-48 w-48 rounded-full border border-teal/10"
-          animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.1, 0.4] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          animate={reducedMotion ? { scale: 1, opacity: 0.25 } : { scale: [1, 1.08, 1], opacity: [0.4, 0.1, 0.4] }}
+          transition={reducedMotion ? { duration: 0 } : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
       {!discreet && <div className="absolute h-52 w-52 rounded-full bg-[radial-gradient(circle,hsl(178_55%_45%/0.12),transparent_70%)]" />}
@@ -99,66 +99,76 @@ function CountdownRing({ step, stepRemaining, discreet, showTimer }) {
   );
 }
 
-function GentleBreath({ running, discreet }) {
+function GentleBreath({ running, discreet, reducedMotion }) {
   return (
     <div className="relative flex h-44 w-44 items-center justify-center">
       <motion.div
         className="absolute h-44 w-44 rounded-full border border-teal/15"
-        animate={{ scale: running ? [1, 1.2, 1] : 1, opacity: [0.4, 0.1, 0.4] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        animate={reducedMotion ? { scale: 1, opacity: 0.25 } : { scale: running ? [1, 1.2, 1] : 1, opacity: [0.4, 0.1, 0.4] }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute h-40 w-40 rounded-full bg-gradient-to-br from-teal/25 to-indigo/25"
-        animate={{ scale: running ? [1, 1.12, 1] : 1, opacity: discreet ? 0.4 : running ? [0.6, 1, 0.6] : 0.6 }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        animate={
+          reducedMotion
+            ? { scale: 1, opacity: discreet ? 0.4 : 0.8 }
+            : { scale: running ? [1, 1.12, 1] : 1, opacity: discreet ? 0.4 : running ? [0.6, 1, 0.6] : 0.6 }
+        }
+        transition={reducedMotion ? { duration: 0 } : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <span className="relative h-2.5 w-2.5 rounded-full bg-cream/80 shadow" />
     </div>
   );
 }
 
-function SenseRings({ running, discreet }) {
+function SenseRings({ running, discreet, reducedMotion }) {
   return (
     <div className="relative flex h-64 w-64 items-center justify-center">
       <motion.span
         className="absolute h-56 w-56 rounded-full border border-dashed border-teal/15"
-        animate={{ rotate: running ? 360 : 0 }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        animate={{ rotate: reducedMotion ? 0 : running ? 360 : 0 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 40, repeat: Infinity, ease: "linear" }}
       />
       {[0, 1, 2, 3, 4].map((i) => (
         <motion.span
           key={i}
           className="absolute rounded-full border border-teal/30"
           style={{ height: 56, width: 56 }}
-          animate={running ? { scale: [1, 4], opacity: [0.55, 0] } : { scale: 1, opacity: discreet ? 0.3 : 0.5 }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: "easeOut", delay: i * 0.9 }}
+          animate={
+            reducedMotion
+              ? { scale: 1, opacity: discreet ? 0.2 : 0.35 }
+              : running
+                ? { scale: [1, 4], opacity: [0.55, 0] }
+                : { scale: 1, opacity: discreet ? 0.3 : 0.5 }
+          }
+          transition={reducedMotion ? { duration: 0 } : { duration: 4.5, repeat: Infinity, ease: "easeOut", delay: i * 0.9 }}
         />
       ))}
       <motion.span
         className="relative h-4 w-4 rounded-full bg-teal shadow-[0_0_22px_hsl(178_55%_45%/0.7)]"
-        animate={{ scale: running ? [1, 1.3, 1] : 1 }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ scale: reducedMotion ? 1 : running ? [1, 1.3, 1] : 1 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
   );
 }
 
-function BodyScan({ running, discreet }) {
+function BodyScan({ running, discreet, reducedMotion }) {
   return (
     <div className="relative flex h-64 w-40 items-center justify-center">
       <div className="absolute h-56 w-24 rounded-[6rem] border border-indigo/15 bg-[radial-gradient(circle,hsl(36_50%_50%/0.06),transparent_70%)]" />
       <div className="absolute left-1/2 top-4 h-[calc(100%-2rem)] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-indigo/40 to-transparent" />
       <motion.div
         className="absolute left-1/2 h-14 w-14 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,hsl(36_55%_65%/0.6),transparent_70%)]"
-        animate={running ? { top: ["10%", "74%", "10%"] } : { top: "42%" }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        animate={reducedMotion || !running ? { top: "42%" } : { top: ["10%", "74%", "10%"] }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 11, repeat: Infinity, ease: "easeInOut" }}
       />
       <span className="relative h-2 w-2 rounded-full bg-cream/70" />
     </div>
   );
 }
 
-function MindCard() {
+function MindCard({ reducedMotion }) {
   return (
     <div
       className="relative w-80 max-w-full rounded-2xl border border-cream/10 bg-cream/[0.04] px-6 py-5 backdrop-blur-md"
@@ -171,14 +181,14 @@ function MindCard() {
       </div>
       <motion.span
         className="absolute right-5 top-5 h-2 w-2 rounded-full bg-[hsl(40_60%_65%)]"
-        animate={{ opacity: [0.3, 1, 0.3] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ opacity: reducedMotion ? 0.65 : [0.3, 1, 0.3] }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
   );
 }
 
-function LiftParticles({ running }) {
+function LiftParticles({ running, reducedMotion }) {
   return (
     <div className="relative h-64 w-64 overflow-hidden">
       <div className="absolute bottom-0 left-1/2 h-24 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,hsl(40_60%_55%/0.22),transparent_70%)]" />
@@ -187,8 +197,8 @@ function LiftParticles({ running }) {
           key={i}
           className="absolute bottom-6 rounded-full bg-[hsl(40_65%_65%)]"
           style={{ height: 4 + (i % 3) * 3, width: 4 + (i % 3) * 3, left: `${8 + i * 11}%` }}
-          animate={running ? { y: [0, -230], opacity: [0, 0.95, 0] } : { y: 0, opacity: 0.4 }}
-          transition={{ duration: 4 + (i % 4), repeat: Infinity, ease: "easeOut", delay: i * 0.5 }}
+          animate={reducedMotion || !running ? { y: 0, opacity: 0.4 } : { y: [0, -230], opacity: [0, 0.95, 0] }}
+          transition={reducedMotion ? { duration: 0 } : { duration: 4 + (i % 4), repeat: Infinity, ease: "easeOut", delay: i * 0.5 }}
         />
       ))}
     </div>
@@ -215,25 +225,25 @@ function FocusStep({ n, total, step, stepRemaining }) {
   );
 }
 
-function ConnectVenn({ running }) {
+function ConnectVenn({ running, reducedMotion }) {
   return (
     <div className="relative flex h-48 items-center justify-center">
       <div className="absolute h-10 w-10 rounded-full bg-[radial-gradient(circle,hsl(40_70%_70%/0.5),transparent_70%)]" />
       <motion.span
         className="relative h-32 w-32 rounded-full border border-[hsl(40_60%_65%/0.4)] bg-[hsl(40_60%_60%/0.08)]"
-        animate={running ? { x: [10, 0, 10] } : { x: 7 }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        animate={reducedMotion || !running ? { x: 7 } : { x: [10, 0, 10] }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.span
         className="relative h-32 w-32 -ml-9 rounded-full border border-[hsl(350_60%_65%/0.4)] bg-[hsl(350_60%_60%/0.08)]"
-        animate={running ? { x: [-10, 0, -10] } : { x: -7 }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        animate={reducedMotion || !running ? { x: -7 } : { x: [-10, 0, -10] }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
   );
 }
 
-export default function StageVisual({ mode, iv, step, stepIndex, running, showTimer, stepRemaining, discreet, noBreathing }) {
+export default function StageVisual({ mode, iv, step, stepIndex, running, showTimer, stepRemaining, discreet, noBreathing, reducedMotion }) {
   const label = MODE_LABEL[mode] || "Hold";
   const accentKey = ACCENT_FOR[mode] || "teal";
   const halo = HALO[accentKey];
@@ -256,27 +266,27 @@ export default function StageVisual({ mode, iv, step, stepIndex, running, showTi
           (isPace ? (
             <BreathingPacer phases={step.pace} shape={breathShape(iv)} discreet={discreet} tone="cream" />
           ) : (
-            <GentleBreath running={running} discreet={discreet} />
+            <GentleBreath running={running} discreet={discreet} reducedMotion={reducedMotion} />
           ))}
 
         {mode === "sense" && (
-          <GroundingStage step={step} stepRemaining={stepRemaining} running={running} discreet={discreet} />
+          <GroundingStage step={step} stepRemaining={stepRemaining} running={running} discreet={discreet} reducedMotion={reducedMotion} />
         )}
 
-        {mode === "body" && <BodyScan running={running} discreet={discreet} />}
+        {mode === "body" && <BodyScan running={running} discreet={discreet} reducedMotion={reducedMotion} />}
 
-        {mode === "mind" && <MindCard />}
+        {mode === "mind" && <MindCard reducedMotion={reducedMotion} />}
 
-        {mode === "lift" && <LiftParticles running={running} />}
+        {mode === "lift" && <LiftParticles running={running} reducedMotion={reducedMotion} />}
 
         {mode === "focus" && (
           <FocusStep n={(stepIndex ?? 0) + 1} total={iv?.steps?.length || 1} step={step} stepRemaining={stepRemaining} />
         )}
 
-        {mode === "connect" && <ConnectVenn running={running} />}
+        {mode === "connect" && <ConnectVenn running={running} reducedMotion={reducedMotion} />}
 
         {mode === "ring" && (
-          <CountdownRing step={step} stepRemaining={stepRemaining} discreet={discreet} showTimer={showTimer} />
+          <CountdownRing step={step} stepRemaining={stepRemaining} discreet={discreet} showTimer={showTimer} reducedMotion={reducedMotion} />
         )}
       </div>
 

@@ -677,6 +677,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   leadMs={ivIndex === 0 && stepIndex === 0 ? vf.leadMs : 250}
                   spoken={spokenFor(step, iv, answers?.direction)}
                   onNarrationEnd={() => { setElapsed(0); setNarrationEnded(true); }}
+                  reducedMotion={a11y.prefs.reducedMotion}
                 />
               ) : isPMRV2 ? (
                 <PMRV2Stage
@@ -711,6 +712,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   stepRemaining={stepRemaining}
                   discreet={discreet}
                   noBreathing={noBreathing}
+                  reducedMotion={a11y.prefs.reducedMotion}
                 />
               )}
 
