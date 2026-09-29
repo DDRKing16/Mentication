@@ -85,6 +85,29 @@
     linear-gradient(165deg, #14356A 0%, #0E2A52 55%, #0A2140 100%);
   background-blend-mode: soft-light, soft-light, normal;
   background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+
+/* A quiet, discrete shift in the hero's gradient by time of day — a touch
+   of warmth at sunrise and dusk, deeper and cooler late at night — rather
+   than the same fixed navy at 7am and 11pm. */
+.home-theme--navy .home-hero[data-time="morning"] {
+  background-image:
+    radial-gradient(circle at 18% 0%, rgba(255, 214, 170, 0.14), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.16), transparent 60%),
+    linear-gradient(165deg, #1C4278 0%, #10305E 55%, #0A2140 100%);
+}
+.home-theme--navy .home-hero[data-time="evening"] {
+  background-image:
+    radial-gradient(circle at 22% 4%, rgba(224, 113, 92, 0.16), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.2), transparent 60%),
+    linear-gradient(165deg, #1B3560 0%, #0E2A52 55%, #08192F 100%);
+}
+.home-theme--navy .home-hero[data-time="night"] {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.28), transparent 60%),
+    linear-gradient(165deg, #0D2247 0%, #081A34 55%, #050F20 100%);
 }
 
 .home-hero-glow {

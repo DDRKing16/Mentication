@@ -20,6 +20,22 @@ import { HOME_THEME } from "@/lib/homeTheme";
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
 import { usePlus } from "@/lib/subscription";
 
+// Tracks the last time Insights was opened, purely on-device, so the small
+// dot on its icon can mean "there's a session since you last looked" rather
+// than always being on or always being off.
+const INSIGHTS_SEEN_KEY = "mentication.insightsSeen.v1";
+const markInsightsSeen = () => { try { localStorage.setItem(INSIGHTS_SEEN_KEY, new Date().toISOString()); } catch { /* storage unavailable */ } };
+const hasUnseenInsight = (sessions) => {
+  const newest = sessions[0]?.created_date;
+  if (!newest) return false;
+  try {
+    const seen = localStorage.getItem(INSIGHTS_SEEN_KEY);
+    return !seen || new Date(newest) > new Date(seen);
+  } catch {
+    return false;
+  }
+};
+
 // A soft staggered rise for each top-level section as Home first loads,
 // instead of everything just appearing at once.
 const reveal = (index) => ({
@@ -46,6 +62,7 @@ export default function Home() {
   const [recommendation, setRecommendation] = useState(null);
   const [parkedNotes, setParkedNotes] = useState(false);
   const [sessions, setSessions] = useState([]);
+  const [hasNewInsight, setHasNewInsight] = useState(false);
 
   const loadSessions = async () => {
     const [sessions, interventions, recommendations] = await Promise.all([
@@ -59,7 +76,9 @@ export default function Home() {
     setPersonalBest(buildPersonalBest(sessions));
     setRecommendation(buildRecommendation(sessions));
     // A longer window just for "Your week" and its streak; the engine above keeps its own 30.
-    setSessions(await sessionStore.list("-created_date", 120));
+    const weekSessions = await sessionStore.list("-created_date", 120);
+    setSessions(weekSessions);
+    setHasNewInsight(hasUnseenInsight(weekSessions));
   };
   useEffect(() => { loadSessions().catch(() => {}); }, []);
   useEffect(() => { setParkedNotes(hasParkedNotes()); }, []);
@@ -106,7 +125,11 @@ export default function Home() {
     <PullToRefresh onRefresh={loadSessions}>
       <div className={`home-theme home-theme--${HOME_THEME} min-h-full bg-[var(--home-bg)] text-[var(--home-ink)]`}>
         <div className="mx-auto flex min-h-full max-w-[36rem] flex-col">
-          <HomeHero onProfile={() => navigate("/profile")} onInsights={() => navigate("/insights")} />
+          <HomeHero
+            onProfile={() => navigate("/profile")}
+            onInsights={() => { markInsightsSeen(); setHasNewInsight(false); navigate("/insights"); }}
+            hasNewInsight={hasNewInsight}
+          />
 
           <FirstWinCard
             sessionCount={sessions.length}
