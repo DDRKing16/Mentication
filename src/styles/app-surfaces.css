@@ -7,6 +7,7 @@
   --home-muted: #496C61;
   --home-icon: #0E3131;
   --home-accent: #C99646;
+  --home-accent-soft: rgba(201, 150, 70, 0.15);
   --home-card: #FFFFFF;
   --home-card-alt: #F7F0E5;
   --home-control: #ECE2D2;
@@ -25,6 +26,7 @@
   --home-muted: #4C6B83;
   --home-icon: #123B5D;
   --home-accent: #B97855;
+  --home-accent-soft: rgba(185, 120, 85, 0.15);
   --home-card: #F9FCFE;
   --home-card-alt: #E4EEF6;
   --home-control: #E4F0F8;
@@ -46,6 +48,7 @@
   --home-muted: #5A6A82;
   --home-icon: #123262;
   --home-accent: #D6553F;
+  --home-accent-soft: rgba(214, 85, 63, 0.15);
   --home-card: #FFFFFF;
   --home-card-alt: #F7F0E5;
   --home-control: #ECE2D2;
