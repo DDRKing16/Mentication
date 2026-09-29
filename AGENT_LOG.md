@@ -323,3 +323,31 @@ pass) a full run through all 16 sort cards and into the rating screen that follo
 counted correctly, moved smoothly between cards, no console errors, the rating screen's slider and chips
 all worked as expected. Found nothing wrong to fix.
 Full test/typecheck/lint/build suite passes clean.
+
+## 29 Sep — Three accessibility fixes for anyone using a screen reader or Reduce motion
+Brand thread still fully done and load-speed items already covered, so ran a dedicated accessibility
+audit (icon-only buttons, images, custom clickable elements, motion, form labels) across the shared
+player and the interventions' own screens. Confirmed most of the app was already in good shape (every
+icon-only button already has a label, no missing image alt text, no unlabelled custom clickable divs)
+and found three real, narrow gaps.
+First: the app's "Reduce motion" setting only ever switched off CSS animations -- it never reached the
+spinning rings, pulsing dots and rising particles inside the Box/PMR/Grounding player's own visuals, or
+5-4-3-2-1 Grounding's active stage marker, because those are driven by a different animation system
+(framer-motion) that setting never touched. Someone who turned Reduce motion on because motion bothers
+them was still seeing it, continuously, throughout every one of those three practices. Threaded the
+setting all the way down so every one of those animations now holds still instead (e2acff6).
+Second: the on/off switches in Settings, the in-session Accessibility panel, and the reset flow's
+"Optional preferences" row only ever announced their label to a screen reader, never whether the
+setting was on or off -- like being told a light switch's name but not whether the light is on
+(a3f7ae2).
+Third: six text fields (Thought or Fact's evidence entry, Next Easiest Step's custom task box, Change
+the Scene's two custom-activity boxes, and two of Journal's custom-note boxes) only had placeholder
+text as their name, which disappears the moment someone starts typing and isn't reliably read by
+screen readers at all; four more fields in Journal had a real, visible label sitting right next to
+them that was never actually wired up to the field, so a screen reader user focusing the box heard
+nothing. Gave all ten a real, connected name (735b2e0).
+None of the three changed how anything looks, reads, or behaves for someone not using these settings
+-- checked in a real headless-browser run (5-4-3-2-1 Grounding with Reduce motion on and off side by
+side, Settings' full toggle list, and the Journal mood-entry screen) and every screen came back
+pixel-identical. Full test/typecheck/lint/build suite passes clean, plus three new regression tests
+covering each fix.
