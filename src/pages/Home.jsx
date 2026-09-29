@@ -9,11 +9,8 @@ import { sessionStore } from "@/lib/localData";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
 import HomeHero from "@/components/home/HomeHero";
-import LastWorkedCard from "@/components/home/LastWorkedCard";
 import CategoryCard from "@/components/home/CategoryCard";
-import RecommendedCard from "@/components/home/RecommendedCard";
-import YourWeek from "@/components/home/YourWeek";
-import ProgrammeCard from "@/components/home/ProgrammeCard";
+import TodayStrip from "@/components/home/TodayStrip";
 import FirstWinCard from "@/components/home/FirstWinCard";
 import MoreWaysIn from "@/components/home/MoreWaysIn";
 import ParkedNudge from "@/components/home/ParkedNudge";
@@ -120,29 +117,22 @@ export default function Home() {
             onPlus={() => navigate("/plus")}
           />
 
-          <YourWeek sessions={sessions} onOpen={() => navigate("/insights")} />
-
-          {/* The single most personal card on this page — what actually
-              worked for this person — used to sit last, after five other
-              blocks. It's here, right after Your Week, where it'll be seen. */}
-          {(lastWorked || personalBest) ? (
-            <motion.section {...reveal(1)} className="px-5 pt-4">
-              <LastWorkedCard subtitle="Repeat your most effective reset" onClick={doLastWorked} overlap={false} />
-            </motion.section>
-          ) : recommendation ? (
-            <motion.section {...reveal(1)} className="px-5 pt-4">
-              <RecommendedCard
-                title={recommendation.title}
-                descriptor={`${recommendation.minutes} min · ${recommendation.tag}`}
-                onClick={doRecommend}
-              />
-            </motion.section>
-          ) : null}
-
-          <ProgrammeCard
+          {/* Your Week, the active programme and one personalised suggestion,
+              bundled into a single compact strip instead of three separate
+              full-size cards — the six buttons below are the main feature
+              of Home and shouldn't need much scrolling to reach. */}
+          <TodayStrip
             sessions={sessions}
-            onOpen={() => { const id = activeProgrammeId(); navigate(id ? `/programmes/${id}` : "/programmes/calmer-seven"); }}
+            onOpenWeek={() => navigate("/insights")}
+            onOpenProgramme={() => { const id = activeProgrammeId(); navigate(id ? `/programmes/${id}` : "/programmes/calmer-seven"); }}
             onStartDay={(day) => { const state = launchStateFor(day.id, getProgramme(activeProgrammeId())); if (state) navigate("/reset", { state }); }}
+            quick={
+              (lastWorked || personalBest)
+                ? { eyebrow: "Worked for you last time", title: "Repeat your most effective reset", onClick: doLastWorked }
+                : recommendation
+                  ? { eyebrow: "Recommended for you", title: recommendation.title, onClick: doRecommend }
+                  : null
+            }
           />
 
           <motion.section {...reveal(2)} className="px-5 pt-9">
