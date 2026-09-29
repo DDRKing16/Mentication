@@ -54,6 +54,21 @@ const HOME_GRID = [
   { id: "guide", label: "Guide me", sub: "Choose what fits", unsure: true, icon: ICON_BASE + "guide.png", tint: "guide" },
 ];
 
+// A gentle reorder by time of day — Sleep surfaces earlier in the evening,
+// Lift and Focus earlier in the morning — instead of one fixed order all
+// day. "Guide me" always stays last: it's a helper, not a mood choice.
+function orderedGrid(now = new Date()) {
+  const hour = now.getHours();
+  const priority = hour >= 20 || hour < 5
+    ? ["sleep", "calm", "ground", "lift", "focus"]
+    : hour < 11
+      ? ["lift", "focus", "calm", "ground", "sleep"]
+      : ["calm", "focus", "lift", "ground", "sleep"];
+  const guide = HOME_GRID.find((c) => c.unsure);
+  const rest = HOME_GRID.filter((c) => !c.unsure).slice().sort((a, b) => priority.indexOf(a.id) - priority.indexOf(b.id));
+  return guide ? [...rest, guide] : rest;
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const plus = usePlus();
@@ -63,6 +78,9 @@ export default function Home() {
   const [parkedNotes, setParkedNotes] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [hasNewInsight, setHasNewInsight] = useState(false);
+  // Which mood was reached for last time, so the grid can mark it with a
+  // small dot — a quiet way back to what was just used, not a suggestion.
+  const recentTint = sessions[0]?.direction || null;
 
   const loadSessions = async () => {
     const [sessions, interventions, recommendations] = await Promise.all([
@@ -162,9 +180,9 @@ export default function Home() {
             <h2 className="text-center font-clean text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-[var(--home-ink)]">
               What do you need right now?
             </h2>
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              {HOME_GRID.map((c, i) => (
-                <CategoryCard key={c.id} card={c} index={i} onClick={() => choose(c)} />
+            <div className="mt-6 grid grid-cols-2 gap-4 min-[430px]:grid-cols-3">
+              {orderedGrid().map((c, i) => (
+                <CategoryCard key={c.id} card={c} index={i} recent={!!recentTint && c.tint === recentTint} onClick={() => choose(c)} />
               ))}
             </div>
           </motion.section>
