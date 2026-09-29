@@ -1202,7 +1202,7 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular") =
   }));
 };
 
-export default function NextEasiestStepExperience({ onComplete, onExit }) {
+export default function NextEasiestStepExperience() {
   // 3. Persistent state initialization from localStorage using 'mentication_nes_v2_app_state'
   const [gameState, setGameState] = useState(() => {
     const saved = localStorage.getItem("mentication_nes_v2_app_state");

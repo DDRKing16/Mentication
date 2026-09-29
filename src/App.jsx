@@ -90,8 +90,8 @@ const MenticationRoutes = () => {
                 </Route>
                 <Route path="/welcome" element={<Welcome />} />
                 <Route path="/reset" element={<ResetFlow />} />
-                <Route path="/next-easiest-step" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} /></WithBrandThreshold>} />
-                <Route path="/next-easiest-step-v2" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience onComplete={() => window.location.href = '/'} onExit={() => window.location.href = '/'} /></WithBrandThreshold>} />
+                <Route path="/next-easiest-step" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience /></WithBrandThreshold>} />
+                <Route path="/next-easiest-step-v2" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience /></WithBrandThreshold>} />
                 <Route path="/journal" element={<Journal />} />
                 <Route path="/dear-2100" element={<Dear2100 />} />
                 <Route path="/night-channel" element={<NightChannel />} />
