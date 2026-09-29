@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Lock, Moon, Sun, Wind } from "lucide-react";
 import { sessionStore } from "@/lib/localData";
+import { getIntervention } from "@/lib/interventions";
 import { usePlus } from "@/lib/subscription";
 import {
   PROGRAMMES,
@@ -126,7 +127,7 @@ export function ProgrammeDetail() {
       )}
 
       <ol className="mt-7 space-y-3">
-        {(progress?.days || programme.days.map((d) => ({ ...d, status: "later" }))).map((day, index) => {
+        {(progress?.days || programme.days.map((d) => ({ ...d, name: getIntervention(d.id)?.name || d.id, status: "later" }))).map((day, index) => {
           const isToday = day.status === "today";
           return (
             <li
