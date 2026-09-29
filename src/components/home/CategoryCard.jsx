@@ -36,8 +36,12 @@ export default function CategoryCard({ card, index = 0, onClick }) {
         className="pointer-events-none absolute -right-6 -top-8 h-28 w-28 rounded-full opacity-[0.16] blur-xl"
         style={{ background: "var(--card-accent)" }}
       />
-      <span className="relative flex h-[76px] w-[76px] items-center justify-center rounded-full text-[var(--card-accent)] ring-[1.5px] ring-[var(--card-accent)]">
-        <CategoryIcon id={card.tint} className="h-11 w-11" />
+      <span
+        className="relative flex h-[76px] w-[76px] items-center justify-center rounded-full text-[var(--card-accent)] ring-[1.5px] ring-[var(--card-accent)]"
+        style={{ background: "radial-gradient(circle at 34% 28%, color-mix(in srgb, var(--card-accent) 16%, white), color-mix(in srgb, var(--card-accent) 5%, white) 70%)" }}
+      >
+        <span aria-hidden="true" className="absolute inset-0 rounded-full opacity-70" style={{ background: "radial-gradient(circle at 30% 24%, rgba(255,255,255,0.85), transparent 50%)" }} />
+        <CategoryIcon id={card.tint} className="relative h-11 w-11" />
       </span>
       <span className="relative mt-1 font-heading text-[1.2rem] font-semibold leading-tight text-[var(--home-ink)]">{card.label}</span>
       <span className="relative text-[0.9rem] leading-snug text-[var(--home-muted)]">{card.sub}</span>

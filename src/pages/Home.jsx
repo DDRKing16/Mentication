@@ -135,7 +135,7 @@ export default function Home() {
             }
           />
 
-          <motion.section {...reveal(2)} className="px-5 pt-9">
+          <motion.section {...reveal(2)} className="px-5 pt-5">
             <h2 className="text-center font-clean text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-[var(--home-ink)]">
               What do you need right now?
             </h2>

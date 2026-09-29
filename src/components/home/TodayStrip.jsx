@@ -60,38 +60,47 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
 
   return (
     <section className="px-5 pt-6">
-      {/* Your Week: same warm-white card, but with softer, glowing "done"
-          dots, a streak badge and more breathing room, instead of thin
-          plain-outline circles. */}
+      {/* Your Week: a slim, brushed-silver strip — a soft diagonal sheen and
+          a bright highlight edge, instead of a flat white card — with a
+          little more shine on each day dot than a plain outline circle. */}
       <button
         type="button"
         onClick={onOpenWeek}
         aria-label={`Your week: ${week.line} Open your progress.`}
-        className="no-tap block w-full rounded-[24px] bg-[var(--home-card)] px-5 py-4 text-left shadow-[0_10px_26px_-18px_rgba(17,43,80,0.4)]"
+        className="no-tap relative block w-full overflow-hidden rounded-[20px] px-4 py-2.5 text-left shadow-[0_8px_20px_-14px_rgba(17,43,80,0.45)]"
+        style={{ background: "linear-gradient(128deg, #FFFFFF 0%, #F7F4EE 38%, #FFFFFF 58%, #EFEAE0 100%)", border: "1px solid rgba(255,255,255,0.9)" }}
       >
-        <span className="flex items-center justify-between gap-3">
-          <span className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[var(--home-ink)]/50">Your week</span>
+        <span aria-hidden="true" className="pointer-events-none absolute -inset-x-6 -top-10 h-16 rotate-[-7deg]" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.85), transparent)" }} />
+        <span className="relative flex items-center justify-between gap-3">
+          <span className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[var(--home-ink)]/50">Your week</span>
           {week.streak >= 2 ? (
-            <span className="flex items-center gap-1 rounded-full bg-[#E0715C]/12 px-2.5 py-1 text-[0.7rem] font-bold text-[#B94E3B]">🔥 {week.streak}-day streak</span>
+            <span className="flex items-center gap-1 rounded-full bg-[#E0715C]/12 px-2 py-0.5 text-[0.68rem] font-bold text-[#B94E3B]">🔥 {week.streak}-day streak</span>
           ) : (
-            <span className="text-[0.76rem] font-medium text-[var(--home-ink)]/70">{week.line}</span>
+            <span className="text-[0.72rem] font-medium text-[var(--home-ink)]/70">{week.line}</span>
           )}
         </span>
-        <span className="mt-3 flex justify-between" aria-hidden="true">
+        <span className="relative mt-2 flex justify-between" aria-hidden="true">
           {week.days.map((day, index) => (
-            <span key={index} className="flex flex-col items-center gap-1.5">
+            <span key={index} className="flex flex-col items-center gap-1">
               <span
-                className={`grid h-7 w-7 place-items-center rounded-full text-[0.62rem] font-bold transition ${
+                className={`relative grid h-6 w-6 place-items-center overflow-hidden rounded-full text-[0.58rem] font-bold transition ${
                   day.done
-                    ? "bg-[#E0715C] text-white shadow-[0_4px_12px_-3px_rgba(224,113,92,0.75)]"
+                    ? "bg-[#E0715C] text-white shadow-[0_4px_10px_-3px_rgba(224,113,92,0.8)]"
                     : day.today
                       ? "border-2 border-[#E0715C]/55 text-[var(--home-ink)]/70"
                       : "border border-[var(--home-ink)]/12 text-[var(--home-ink)]/30"
                 }`}
               >
-                {day.done ? "✓" : ""}
+                {day.done && <span aria-hidden="true" className="absolute inset-0" style={{ background: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.6), transparent 55%)" }} />}
+                <span className="relative">{day.done ? "✓" : ""}</span>
               </span>
-              <span className={`text-[0.58rem] ${day.today ? "font-bold text-[var(--home-ink)]" : "text-[var(--home-ink)]/40"}`}>{day.label}</span>
+              <span
+                className={`grid h-4 w-4 place-items-center rounded-full text-[0.56rem] font-bold ${
+                  day.today ? "bg-[var(--home-ink)] text-white" : "text-[var(--home-ink)]/45"
+                }`}
+              >
+                {day.label}
+              </span>
             </span>
           ))}
         </span>
@@ -99,7 +108,7 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
 
       {/* Two circular power buttons, centred, clearly their own kind of
           control — not competing with the square grid cards right below. */}
-      <div className="mt-5 flex items-start justify-center gap-6">
+      <div className="mt-4 flex items-start justify-center gap-6">
         {programmeState ? (
           <PowerButton
             onClick={canStartToday ? () => onStartDay(today) : onOpenProgramme}
