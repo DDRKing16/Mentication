@@ -4,20 +4,23 @@ import { motion } from "framer-motion";
 import CategoryIcon from "@/components/home/CategoryIcons";
 import { hapticPattern } from "@/lib/feedback";
 
-// Each mood keeps its own identity colour, but pulled from one coherent
-// system tied to the app's own navy-and-coral brand pair, instead of six
-// unrelated hues. Calm, Ground and Sleep are the cool half (closer to the
-// hero's navy); Lift and Focus are the warm half (closer to --home-accent's
-// coral); Guide sits as a quiet, neutral bridge between the two. All six
-// share roughly the same lightness and weight, so together they read as one
-// family with six flavours, not six random picks.
+// A real, designed colour family rather than six independently invented
+// hues: the "Primary" colour from the same numbered slot (item 1) across
+// each mood in the Striking Intervention Palettes set — Sunlit Bloom
+// (Lift), Sea Glass Sanctuary (Calm), Twilight Pearl (Sleep), Arctic Signal
+// (Focus) and Terracotta Moss (Ground) — which were built together as one
+// cohesive set (each pairs a pale, warm-neutral background with a deep
+// jewel-tone primary), so picking the same slot from every mood keeps that
+// cohesion instead of mixing items from different families. Guide me isn't
+// a mood in the set, so it borrows Quiet Mauve's primary as a neutral
+// bridge between them.
 const ACCENTS = {
-  calm: "#3D7A78",
-  ground: "#4C7A52",
-  sleep: "#3C4A7A",
-  lift: "#D97B4A",
-  focus: "#C1573E",
-  guide: "#8A6B7A",
+  lift: "#156A63",
+  calm: "#285D66",
+  sleep: "#483C69",
+  focus: "#0D4E70",
+  ground: "#566046",
+  guide: "#60546E",
 };
 
 // A faint, tint-coloured dot grid per card, distinct enough to tell the six

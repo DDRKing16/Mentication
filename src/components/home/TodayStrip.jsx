@@ -113,10 +113,10 @@ function useRipple(color) {
   return [node, fire];
 }
 
-function PowerButton({ index = 0, onClick, icon: Icon, gradient, rim, glow, ring, ariaLabel, eyebrow, title, urgent, dim, firstEver }) {
+function PowerButton({ index = 0, onClick, icon: Icon, gradient, rim, glow, ring, ariaLabel, title, urgent, dim, firstEver }) {
   const [pressed, setPressed] = useState(false);
   return (
-    <div className="flex w-[6.75rem] flex-col items-center gap-1.5 text-center">
+    <div className="flex w-[3.6rem] shrink-0 flex-col items-center gap-0.5 text-center">
       <motion.button
         type="button"
         onClick={onClick}
@@ -127,7 +127,7 @@ function PowerButton({ index = 0, onClick, icon: Icon, gradient, rim, glow, ring
         animate={firstEver ? { scale: [1, 1.045, 1] } : { scale: [1, 1.018, 1] }}
         transition={{ duration: firstEver ? 1.6 : 3.4, repeat: Infinity, ease: "easeInOut" }}
         whileTap={{ scale: 0.86, scaleY: 0.82 }}
-        className="no-tap group relative grid h-16 w-16 shrink-0 place-items-center rounded-full"
+        className="no-tap group relative grid h-12 w-12 shrink-0 place-items-center rounded-full"
         style={{
           boxShadow: pressed
             ? `0 3px 8px -4px ${glow}, inset 0 3px 6px rgba(0,0,0,0.35), inset 0 -1px 1px rgba(255,255,255,0.25)`
@@ -166,17 +166,16 @@ function PowerButton({ index = 0, onClick, icon: Icon, gradient, rim, glow, ring
           </span>
         )}
         <motion.span animate={pressed ? { rotate: -8 } : { rotate: 0 }} transition={{ duration: 0.15 }}>
-          <Icon className="relative h-6 w-6 text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.25)]" strokeWidth={1.8} fill={Icon === Play ? "#FFFFFF" : "none"} />
+          <Icon className="relative h-4 w-4 text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.25)]" strokeWidth={1.8} fill={Icon === Play ? "#FFFFFF" : "none"} />
         </motion.span>
       </motion.button>
       <motion.span
-        className="min-w-0"
+        className="w-full min-w-0"
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: 0.15 + index * 0.08 }}
       >
-        <span className="block truncate text-[0.56rem] font-bold uppercase tracking-[0.1em] text-[var(--home-ink)]/50">{eyebrow}</span>
-        <span className="mt-0.5 block text-[0.72rem] font-semibold leading-tight text-[var(--home-ink)] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">{title}</span>
+        <span className="block truncate text-[0.52rem] font-semibold leading-tight text-[var(--home-ink)]/75">{title}</span>
       </motion.span>
     </div>
   );
@@ -259,41 +258,40 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
           transition={{ duration: 5, repeat: Infinity, repeatDelay: 2.5, ease: "easeInOut" }}
         />
 
-        <button
-          type="button"
-          onClick={() => { fireWeekRipple(); onOpenWeek(); }}
-          onPointerDown={() => hapticPattern([6])}
-          aria-label={`Your week: ${line} Open your progress.`}
-          className="no-tap relative block w-full px-4 pt-2.5 pb-2 text-left"
-        >
-          {weekRipple}
+        <div className="relative px-4 pt-2.5 pb-2.5">
           <AnimatePresence>{celebrate && <Burst />}</AnimatePresence>
-          <span className="relative flex items-center justify-between gap-3">
-            <span className="flex items-center gap-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[var(--home-ink)]/50">
-              <CalendarDays className="h-3 w-3" strokeWidth={2} aria-hidden="true" /> Your week
-            </span>
-            {week.streak >= 2 ? (
-              <span className="flex items-center gap-1 rounded-full bg-[#E0715C]/12 px-2 py-0.5 text-[0.68rem] font-bold text-[#B94E3B]">
-                <motion.span animate={{ scale: [1, 1.18, 1] }} transition={{ duration: 1.4, repeat: Infinity }}>
-                  <Flame className="h-3 w-3" strokeWidth={2.5} fill="currentColor" />
-                </motion.span>
-                {week.streak}-day streak
+
+          {/* Your Week (left half, two rows of days) and the two power
+              buttons (right half) now share one vertical band instead of
+              stacking — the whole card is roughly half the height it was. */}
+          <div className="relative flex items-center gap-3">
+            <span aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 h-16 w-[55%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.12] blur-2xl" style={{ background: "linear-gradient(90deg, #0E2A52, #C1462F)" }} />
+
+            <button
+              type="button"
+              onClick={() => { fireWeekRipple(); onOpenWeek(); }}
+              onPointerDown={() => hapticPattern([6])}
+              aria-label={`Your week: ${line} Open your progress.`}
+              className="no-tap relative min-w-0 flex-1 text-left"
+            >
+              {weekRipple}
+              <span className="flex items-center gap-1 text-[0.58rem] font-bold uppercase tracking-[0.14em] text-[var(--home-ink)]/50">
+                <CalendarDays className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" /> Your week
+                {week.streak >= 2 ? (
+                  <span className="ml-auto flex items-center gap-0.5 rounded-full bg-[#E0715C]/12 px-1.5 py-0.5 text-[0.62rem] font-bold text-[#B94E3B]">
+                    <Flame className="h-2.5 w-2.5" strokeWidth={2.5} fill="currentColor" />
+                    {week.streak}
+                  </span>
+                ) : null}
               </span>
-            ) : (
-              <span className="text-[0.72rem] font-medium text-[var(--home-ink)]/70">{line}</span>
-            )}
-          </span>
-          <span className="relative mt-2 flex justify-between" aria-hidden="true">
-            {week.days.map((day, index) => {
-              const prevDone = index > 0 && week.days[index - 1].done;
-              return (
-                <span key={index} className="relative flex flex-col items-center gap-1">
-                  {prevDone && day.done && <span className="absolute right-full top-3 h-0.5 w-[calc(100%-1.5rem)] -translate-y-1/2 bg-[#E0715C]/35" />}
+              <span className="mt-1 grid grid-cols-4 gap-x-1.5 gap-y-1.5" aria-hidden="true">
+                {week.days.map((day, index) => (
                   <motion.span
+                    key={index}
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.35, delay: index * 0.04, type: "spring", stiffness: 300, damping: 16 }}
-                    className={`relative grid h-6 w-6 place-items-center overflow-hidden rounded-full text-[0.58rem] font-bold ${
+                    className={`relative grid h-6 w-6 place-items-center overflow-hidden rounded-full text-[0.56rem] font-bold ${
                       day.done
                         ? "bg-[#E0715C] text-white shadow-[0_4px_10px_-3px_rgba(224,113,92,0.8)]"
                         : day.today
@@ -302,72 +300,59 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
                     }`}
                   >
                     {day.done && <span aria-hidden="true" className="absolute inset-0" style={{ background: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.6), transparent 55%)" }} />}
-                    <span className="relative">{day.done ? "✓" : ""}</span>
+                    <span className="relative">{day.done ? "✓" : day.label}</span>
                   </motion.span>
-                  <span
-                    className={`grid h-4 w-4 place-items-center rounded-full text-[0.56rem] font-bold ${
-                      day.today ? "bg-[var(--home-ink)] text-white" : "text-[var(--home-ink)]/45"
-                    }`}
-                  >
-                    {day.label}
-                  </span>
-                </span>
-              );
-            })}
-          </span>
-        </button>
+                ))}
+              </span>
+              {week.streak < 2 && <span className="mt-1 block truncate text-[0.62rem] font-medium text-[var(--home-ink)]/60">{line}</span>}
+            </button>
 
-        <div className="mx-4 h-px bg-[var(--home-ink)]/8" />
+            <span aria-hidden="true" className="h-14 w-px shrink-0 bg-[var(--home-ink)]/10" />
 
-        {/* The two power buttons, now inside the same card, smaller and
-            tighter so this whole block reads as one compact piece instead
-            of a card followed by an empty stretch with floating circles. */}
-        <div className="relative flex items-start justify-center gap-8 px-4 pb-3 pt-2.5">
-          <span aria-hidden="true" className="pointer-events-none absolute left-1/2 top-4 h-16 w-[80%] -translate-x-1/2 rounded-full opacity-[0.14] blur-2xl" style={{ background: "linear-gradient(90deg, #C1462F, #0E2A52)" }} />
-          {programmeState ? (
-            <PowerButton
-              index={0}
-              onClick={canStartToday ? () => onStartDay(today) : onOpenProgramme}
-              ariaLabel={`${programmeState.programme.title}, day ${programmeState.progress.todayIndex + 1}: ${today.intention}${canStartToday ? " — start" : " — opens tomorrow"}`}
-              icon={iconForDay(today.id)}
-              gradient={PROGRAMME_GRADIENT}
-              rim={PROGRAMME_RIM}
-              glow="rgba(193,70,47,0.45)"
-              ring={(programmeState.progress.todayIndex + 1) / programmeState.programme.days.length}
-              eyebrow={canStartToday ? `Day ${programmeState.progress.todayIndex + 1} · Start` : `Day ${programmeState.progress.todayIndex + 1} of ${programmeState.programme.days.length}`}
-              title={today.intention}
-              urgent={canStartToday}
-              dim={!canStartToday}
-              firstEver={firstEverStart}
-            />
-          ) : (
-            <PowerButton
-              index={0}
-              onClick={onOpenProgramme}
-              ariaLabel="Try seven calmer days, a free programme"
-              icon={CalendarDays}
-              gradient={PROGRAMME_GRADIENT}
-              rim={PROGRAMME_RIM}
-              glow="rgba(193,70,47,0.45)"
-              eyebrow="Free · Start"
-              title="Seven calmer days"
-              firstEver={firstEverStart}
-            />
-          )}
+            <div className="relative flex shrink-0 items-center gap-2.5">
+              {programmeState ? (
+                <PowerButton
+                  index={0}
+                  onClick={canStartToday ? () => onStartDay(today) : onOpenProgramme}
+                  ariaLabel={`${programmeState.programme.title}, day ${programmeState.progress.todayIndex + 1}: ${today.intention}${canStartToday ? " — start" : " — opens tomorrow"}`}
+                  icon={iconForDay(today.id)}
+                  gradient={PROGRAMME_GRADIENT}
+                  rim={PROGRAMME_RIM}
+                  glow="rgba(193,70,47,0.45)"
+                  ring={(programmeState.progress.todayIndex + 1) / programmeState.programme.days.length}
+                  title={canStartToday ? `Day ${programmeState.progress.todayIndex + 1}` : `Day ${programmeState.progress.todayIndex + 1}`}
+                  urgent={canStartToday}
+                  dim={!canStartToday}
+                  firstEver={firstEverStart}
+                />
+              ) : (
+                <PowerButton
+                  index={0}
+                  onClick={onOpenProgramme}
+                  ariaLabel="Try seven calmer days, a free programme"
+                  icon={CalendarDays}
+                  gradient={PROGRAMME_GRADIENT}
+                  rim={PROGRAMME_RIM}
+                  glow="rgba(193,70,47,0.45)"
+                  title="7 days"
+                  firstEver={firstEverStart}
+                />
+              )}
 
-          {quick && (
-            <PowerButton
-              index={1}
-              onClick={quick.onClick}
-              ariaLabel={`${quick.title} — ${quick.eyebrow}`}
-              icon={Play}
-              gradient={QUICK_GRADIENT}
-              rim={QUICK_RIM}
-              glow="rgba(14,42,82,0.5)"
-              eyebrow={`${quick.eyebrow} · Begin`}
-              title={quick.title}
-            />
-          )}
+              {quick && (
+                <PowerButton
+                  index={1}
+                  onClick={quick.onClick}
+                  ariaLabel={`${quick.title} — ${quick.eyebrow}`}
+                  icon={Play}
+                  gradient={QUICK_GRADIENT}
+                  rim={QUICK_RIM}
+                  glow="rgba(14,42,82,0.5)"
+                  title="Begin"
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>

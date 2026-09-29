@@ -79,24 +79,40 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
 
   return (
     <div className="relative">
-      <header data-time={time} className="home-hero relative overflow-hidden rounded-b-[2.5rem] px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-5">
+      <header data-time={time} className="home-hero relative overflow-hidden rounded-b-[2.5rem] px-5 pt-[max(0.6rem,env(safe-area-inset-top))] pb-4">
         <div aria-hidden="true" className="home-hero-glow" />
-        {/* A marbled surface instead of a flat gradient fill: a few soft,
-            diagonal veins in lighter navy and a whisper of coral, blended
-            in — the "blue bit" now looks like a real polished material. */}
+        {/* A genuinely marbled surface instead of a flat gradient fill: broad
+            light and dark blotches for depth, underneath finer, more
+            numerous veins in white and coral at varied angles and
+            thicknesses — the "blue bit" now reads as a real polished stone,
+            not a gradient with a couple of faint streaks. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-[0.55] mix-blend-soft-light"
+          className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage: [
-              "radial-gradient(ellipse 140% 10% at 20% 15%, rgba(255,255,255,0.9), transparent 60%)",
-              "radial-gradient(ellipse 120% 8% at 75% 38%, rgba(255,255,255,0.7), transparent 65%)",
-              "radial-gradient(ellipse 160% 9% at 40% 62%, rgba(224,113,92,0.55), transparent 60%)",
-              "radial-gradient(ellipse 130% 7% at 85% 85%, rgba(255,255,255,0.5), transparent 60%)",
-              "radial-gradient(ellipse 110% 6% at 10% 90%, rgba(255,255,255,0.4), transparent 65%)",
+              "radial-gradient(ellipse 55% 40% at 15% 20%, rgba(255,255,255,0.16), transparent 65%)",
+              "radial-gradient(ellipse 60% 45% at 88% 75%, rgba(0,0,0,0.16), transparent 65%)",
+              "radial-gradient(ellipse 45% 35% at 70% 10%, rgba(255,255,255,0.1), transparent 60%)",
             ].join(", "),
-            transform: "rotate(-11deg) scale(1.3)",
-            filter: "blur(2px)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-80 mix-blend-soft-light"
+          style={{
+            backgroundImage: [
+              "radial-gradient(ellipse 150% 4% at 8% 10%, rgba(255,255,255,0.95), transparent 60%)",
+              "radial-gradient(ellipse 130% 3% at 55% 22%, rgba(255,255,255,0.55), transparent 65%)",
+              "radial-gradient(ellipse 140% 5% at 30% 34%, rgba(224,113,92,0.7), transparent 55%)",
+              "radial-gradient(ellipse 120% 3% at 80% 46%, rgba(255,255,255,0.7), transparent 60%)",
+              "radial-gradient(ellipse 160% 4% at 15% 58%, rgba(255,255,255,0.4), transparent 65%)",
+              "radial-gradient(ellipse 130% 3% at 65% 68%, rgba(224,113,92,0.5), transparent 60%)",
+              "radial-gradient(ellipse 150% 5% at 40% 80%, rgba(255,255,255,0.65), transparent 55%)",
+              "radial-gradient(ellipse 120% 3% at 90% 92%, rgba(255,255,255,0.45), transparent 60%)",
+            ].join(", "),
+            transform: "rotate(-13deg) scale(1.4)",
+            filter: "blur(1px)",
           }}
         />
         {/* A faint watermark of the flourish mark and a soft vignette at the
@@ -110,16 +126,17 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
         </IconButton>
 
         {/* The wordmark is the header's main event, not a small logo above
-            other content — it fills most of the header's height, with
-            everything else built tightly around it. */}
+            other content — sized to the image's own aspect ratio so it
+            fills essentially all the width between the two icon buttons,
+            with everything else built tightly around it. */}
         <motion.span
-          className="relative h-[9rem] w-[14.75rem] shrink-0"
+          className="relative h-[181px] w-[240px] shrink-0"
           role="img"
           aria-label={`Mentication — ${MENTICATION_SLOGAN}`}
           style={{ opacity: logoOpacity, y: logoY }}
-          initial={wipeIn ? { clipPath: "inset(0 100% 0 0)" } : false}
-          animate={wipeIn ? { clipPath: "inset(0 0% 0 0)" } : false}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+          initial={wipeIn ? { scale: 0.82 } : false}
+          animate={wipeIn ? { scale: 1 } : false}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
         >
           <img
             src={HOME_THEME === "navy" ? MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET : MENTICATION_GREEN_PINK_ASSET}
