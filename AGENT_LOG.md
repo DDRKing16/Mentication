@@ -252,3 +252,28 @@ PMR already used successfully. Also swept My Plan, Progress, Insights, Settings 
 Plus and Programmes in the browser and watched Box Breathing's own player, including its ambient-sound
 popup; found nothing else broken. Full test/typecheck/lint/build suite passes with the same baseline
 dear2100 failures as every prior run.
+
+## 29 Sep — Three small, verified fixes after confirming the brand thread and every fallback item are done
+Got a real headless browser working again (a fresh checkout each run needs its own Chromium) and checked
+docs/BRAND_THREAD.md first: phases 1–6 are all marked done, and the one open item (Signal Lock's two
+different-looking builds) is already flagged in SUGGESTIONS.md as needing the owner's decision, not an
+agent's. A dedicated search confirmed no intervention can be reached without going through the shared
+Threshold or one of the standalone builds' own frame. So this block moved to genuine bugs found by walking
+real screens end to end at 375x812.
+First: Signal Lock was the only one of the twelve interventions that reached out to the internet on every
+single open, fetching a Google-hosted font live. Everything else in the app works offline; this was quietly
+depending on a network connection for its very first paint. Removed the one line that fetched it; the text
+already falls back to the system font the instant that fetch is slow or missing, so nothing about how it
+looks changes, it just no longer waits on or depends on a server outside the phone (3c79ec3). Checked
+before and after in the browser -- identical.
+Second, in Next Easiest Step: two callback props the screen accepted were never actually used anywhere in
+the file -- the screen already manages its own way out. Removed them and the two call sites that pointlessly
+passed them in (e48bfb0). Checked the intervention still opens and plays exactly the same.
+Third, and the more real one: opening any of the three Programmes (Seven calmer days, Five days of small
+lifts, Five better nights) from the list, before tapping "Start this programme", showed every day's practice
+by its internal code name instead of its real one -- "Day 4 . factCheck" and "Day 6 . urgeSurf" instead of
+"Thought or Fact?" and "Urge Surfing". The moment you joined, the exact same rows correctly switched to the
+real names; only the "not yet joined" view was missing that lookup. Gave it the same one (bd8ca01). Checked
+all three programmes, both before and after joining, in the browser -- real names everywhere now, and the
+"in progress" view is unchanged. Full test/typecheck/lint/build suite passes clean with no failures at all
+(nothing baseline-excused this run).
