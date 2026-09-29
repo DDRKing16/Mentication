@@ -2288,6 +2288,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
                                   border: "2px solid var(--accent)",
                                   boxShadow: "0 0 12px rgba(var(--accent-rgb), 0.4)"
                                 }}
+                                aria-label="Custom shift activity"
                                 placeholder="Type custom shift activity..."
                                 value={customText}
                                 onChange={(e) => setCustomText(e.target.value)}
@@ -2462,6 +2463,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
                           width: "82%",
                           transition: "all 0.3s ease"
                         }}
+                        aria-label="Custom shift activity"
                         placeholder="Or type custom shift activity..."
                         value={pathwayCustomText}
                         onChange={(e) => {

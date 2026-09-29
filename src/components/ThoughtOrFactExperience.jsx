@@ -280,7 +280,7 @@ function EvidenceColumn({ type, title, subtitle, entries, draft, onDraft, onAdd,
         </AnimatePresence>
       </div>
       <div className="tof-evidence-entry">
-        <input value={draft} onChange={(event) => onDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); onAdd(); } }} placeholder={type === "support" ? "One observable detail…" : "One exception or unknown…"} />
+        <input aria-label={title} value={draft} onChange={(event) => onDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); onAdd(); } }} placeholder={type === "support" ? "One observable detail…" : "One exception or unknown…"} />
         <button onClick={onAdd} disabled={!draft.trim()} aria-label={`Add ${title.toLowerCase()}`}><Plus /></button>
       </div>
     </section>
