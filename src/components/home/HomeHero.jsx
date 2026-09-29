@@ -79,8 +79,26 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
 
   return (
     <div className="relative">
-      <header data-time={time} className="home-hero relative overflow-hidden rounded-b-[2.5rem] px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-6">
+      <header data-time={time} className="home-hero relative overflow-hidden rounded-b-[2.5rem] px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-5">
         <div aria-hidden="true" className="home-hero-glow" />
+        {/* A marbled surface instead of a flat gradient fill: a few soft,
+            diagonal veins in lighter navy and a whisper of coral, blended
+            in — the "blue bit" now looks like a real polished material. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.55] mix-blend-soft-light"
+          style={{
+            backgroundImage: [
+              "radial-gradient(ellipse 140% 10% at 20% 15%, rgba(255,255,255,0.9), transparent 60%)",
+              "radial-gradient(ellipse 120% 8% at 75% 38%, rgba(255,255,255,0.7), transparent 65%)",
+              "radial-gradient(ellipse 160% 9% at 40% 62%, rgba(224,113,92,0.55), transparent 60%)",
+              "radial-gradient(ellipse 130% 7% at 85% 85%, rgba(255,255,255,0.5), transparent 60%)",
+              "radial-gradient(ellipse 110% 6% at 10% 90%, rgba(255,255,255,0.4), transparent 65%)",
+            ].join(", "),
+            transform: "rotate(-11deg) scale(1.3)",
+            filter: "blur(2px)",
+          }}
+        />
         {/* A faint watermark of the flourish mark and a soft vignette at the
             corners, for a touch more depth than a flat gradient fill. */}
         <img aria-hidden="true" alt="" draggable={false} src={HOME_THEME === "navy" ? MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET : MENTICATION_GREEN_PINK_ASSET} className="pointer-events-none absolute -right-10 -top-6 h-40 w-40 select-none object-contain opacity-[0.05]" />
@@ -95,7 +113,7 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
             other content — it fills most of the header's height, with
             everything else built tightly around it. */}
         <motion.span
-          className="relative h-[6.75rem] w-[11rem] shrink-0"
+          className="relative h-[9rem] w-[14.75rem] shrink-0"
           role="img"
           aria-label={`Mentication — ${MENTICATION_SLOGAN}`}
           style={{ opacity: logoOpacity, y: logoY }}
@@ -117,7 +135,7 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
         </IconButton>
       </div>
 
-      <p className="relative z-[1] -mt-1 text-center font-[var(--font-editorial)] text-[0.78rem] italic leading-none text-[var(--home-hero-soft)]">
+      <p className="relative z-[1] -mt-3 text-center font-[var(--font-editorial)] text-[0.76rem] italic leading-none text-[var(--home-hero-soft)]">
         {MENTICATION_SLOGAN}
       </p>
 
@@ -126,7 +144,7 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         style={{ y: textY }}
-        className="relative z-[1] mt-2.5 max-w-[19rem] text-left"
+        className="relative z-[1] mt-1.5 max-w-[19rem] text-left"
       >
         {/* A pale, clearly-legible eyebrow instead of the coral accent, which
             clashed against navy and read muddy rather than clear. */}
@@ -136,10 +154,10 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
           </motion.span>
           {GREETINGS[time]}
         </p>
-        <h1 className="mt-1 font-clean text-[1.28rem] font-medium leading-[1.18] tracking-[-0.015em] text-[var(--home-hero-text)]">
+        <h1 className="mt-0.5 font-clean text-[1.24rem] font-medium leading-[1.16] tracking-[-0.015em] text-[var(--home-hero-text)]">
           {headline}
         </h1>
-        <p className="mt-1 text-[0.72rem] font-medium text-[var(--home-hero-soft)]">{dateLabel}</p>
+        <p className="mt-0.5 text-[0.7rem] font-medium text-[var(--home-hero-soft)]">{dateLabel}</p>
         </motion.div>
       </header>
 

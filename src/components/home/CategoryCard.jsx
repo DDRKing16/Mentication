@@ -4,15 +4,20 @@ import { motion } from "framer-motion";
 import CategoryIcon from "@/components/home/CategoryIcons";
 import { hapticPattern } from "@/lib/feedback";
 
-// Each mood direction gets its own identity colour so the six options read as
-// distinct choices at a glance, not six copies of the same neutral tile.
+// Each mood keeps its own identity colour, but pulled from one coherent
+// system tied to the app's own navy-and-coral brand pair, instead of six
+// unrelated hues. Calm, Ground and Sleep are the cool half (closer to the
+// hero's navy); Lift and Focus are the warm half (closer to --home-accent's
+// coral); Guide sits as a quiet, neutral bridge between the two. All six
+// share roughly the same lightness and weight, so together they read as one
+// family with six flavours, not six random picks.
 const ACCENTS = {
-  calm: "#3E8B85",
-  lift: "#D9832E",
-  ground: "#5C8A3A",
-  sleep: "#514F8C",
-  focus: "#B24F2C",
-  guide: "#8F6789",
+  calm: "#3D7A78",
+  ground: "#4C7A52",
+  sleep: "#3C4A7A",
+  lift: "#D97B4A",
+  focus: "#C1573E",
+  guide: "#8A6B7A",
 };
 
 // A faint, tint-coloured dot grid per card, distinct enough to tell the six
