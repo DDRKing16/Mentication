@@ -7,7 +7,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CalendarDays, Compass, Wind, Waves, Moon, RefreshCw, Zap, Play, Flame } from "lucide-react";
 import { summariseWeek, weekDays } from "@/components/home/YourWeek";
-import { activeProgrammeId, getProgramme, programmeProgress, programmeStartedAt } from "@/lib/programmes";
+// Only the on-device bookkeeping is needed synchronously here;
+// `programmeProgress` needs the full intervention data, so it's loaded on
+// demand below instead of up front.
+import { activeProgrammeId, getProgramme, programmeStartedAt } from "@/lib/programmeStore";
 import { hapticPattern } from "@/lib/feedback";
 
 const LAST_STREAK_KEY = "mentication.lastStreak.v1";
@@ -202,13 +205,18 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
     return () => window.clearTimeout(t);
   }, [week.count]);
 
-  const programmeState = useMemo(() => {
+  const [programmeState, setProgrammeState] = useState(null);
+  useEffect(() => {
     const id = activeProgrammeId();
     const programme = id ? getProgramme(id) : null;
-    if (!programme) return null;
-    const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
-    if (progress.finished) return null;
-    return { programme, progress };
+    if (!programme) { setProgrammeState(null); return undefined; }
+    let cancelled = false;
+    import("@/lib/programmes").then(({ programmeProgress }) => {
+      if (cancelled) return;
+      const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
+      setProgrammeState(progress.finished ? null : { programme, progress });
+    });
+    return () => { cancelled = true; };
   }, [sessions]);
 
   const today = programmeState?.progress.days[programmeState.progress.todayIndex];
