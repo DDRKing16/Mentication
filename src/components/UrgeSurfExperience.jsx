@@ -11,6 +11,7 @@ import { URGE_SURF_NARRATION } from "@/lib/urgeSurfNarration";
 import { createUrgeSession, reduceUrgeSession, URGE_SURF_DEFAULTS } from "@/lib/urgeSurfSession";
 import { buildUrgeSurfLearningRecord } from "@/lib/urgeSurfState";
 import { getBrandCoral } from "@/lib/interventionBrand";
+import "@/styles/urge-surfing.css";
 
 const BRAND_ID = "urgeSurf";
 const BRAND_GOAL = "calm";
