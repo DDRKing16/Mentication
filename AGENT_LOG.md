@@ -295,3 +295,31 @@ button that correctly opens Box Breathing -- both identical to before. A real pr
 the fix: the first download shrank from 726KB to 504KB (from 220KB to 163KB compressed), and the
 recommendation engine now shows up as its own separate piece that only loads when it's actually needed,
 with no more of Vite's own build warnings about it. Full test/typecheck/lint/build suite passes clean.
+
+## 29 Sep — Two more things loading for everyone that only two practices ever use
+Checked docs/BRAND_THREAD.md again: all six phases are still done, with the one open item (Signal Lock's
+two different-looking builds) already flagged in SUGGESTIONS.md for the owner. Continued the load-speed
+work from the same block. Found two more cases of the same shape of bug as the Box Breathing image
+preload and the Home streak/programme fix from earlier runs -- something used by only one or two
+practices, loaded for everyone regardless.
+First: opening ANY reset at all -- Box Breathing, Progressive Muscle Relaxation, 5-4-3-2-1 Grounding,
+Vector Shift, Signal Lock, Change the Scene, Next Easiest Step, Tomorrow Parking Lot, The Happy Bump --
+downloaded a 123KB stylesheet meant only for Thought or Fact and Urge Surfing, because the shared reset
+screen (`ResetFlow.jsx`) imported both interventions' styling at the top of the file, and loaded Thought
+or Fact's own entry screen eagerly instead of on demand like every other intervention's experience
+already does. Moved each stylesheet into the component that actually needs it, and made that entry
+screen load on demand too (5bbf2d2). The shared reset screen's own stylesheet is now gone entirely --
+folded into the two interventions' own on-demand styling instead.
+Second: the app's very first download, on every single launch, included a 16KB stylesheet that's only
+ever used by The Happy Bump -- the exact same mistake the Box Breathing images made before that was
+already fixed. Moved it into the one component that uses it, so it only loads when someone actually opens
+The Happy Bump, Vector Shift or Signal Lock's own build (2729419). The app's first download is 16KB
+smaller as a result.
+Checked both in a real headless-browser run: Thought or Fact, Urge Surfing, Change the Scene (an
+unrelated intervention sharing the same shared file) and The Happy Bump all still open fully styled with
+no console errors, nothing about how any of them look or play changed.
+Also gave The Good Map (added a couple of runs back, never walked end to end since its own narration
+pass) a full run through all 16 sort cards and into the rating screen that follows -- sorted correctly,
+counted correctly, moved smoothly between cards, no console errors, the rating screen's slider and chips
+all worked as expected. Found nothing wrong to fix.
+Full test/typecheck/lint/build suite passes clean.
