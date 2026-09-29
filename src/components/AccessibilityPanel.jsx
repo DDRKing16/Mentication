@@ -51,6 +51,8 @@ export default function AccessibilityPanel({ onClose, dark = false }) {
             return (
               <button
                 key={t.key}
+                role="switch"
+                aria-checked={on}
                 onClick={() => toggle(t.key, on)}
                 className={"no-tap flex items-center gap-3 rounded-2xl border p-4 text-left transition-all active:scale-[0.98] " + row}
               >
@@ -61,7 +63,7 @@ export default function AccessibilityPanel({ onClose, dark = false }) {
                   <span className="block text-sm font-medium leading-tight">{t.label}</span>
                   <span className={"block text-xs " + sub}>{t.hint}</span>
                 </span>
-                <span className={"relative h-6 w-11 shrink-0 rounded-full transition-colors " + (on ? "bg-primary" : trackOff)}>
+                <span aria-hidden="true" className={"relative h-6 w-11 shrink-0 rounded-full transition-colors " + (on ? "bg-primary" : trackOff)}>
                   <span className={"absolute top-0.5 h-5 w-5 rounded-full bg-card shadow transition-all " + (on ? "left-[1.4rem]" : "left-0.5")} />
                 </span>
               </button>
