@@ -299,7 +299,7 @@ describe("elite 18 contract", () => {
   it("uses one calm certainty control and does not turn evidence into a numbered progress task", () => {
     const source = fs.readFileSync(new URL("../components/ThoughtOrFactExperience.jsx", import.meta.url), "utf8");
     expect(source).toContain('type="range"');
-    expect(source).toContain('aria-valuetext={`${value} out of 10 now`}');
+    expect(source).toContain('aria-valuetext={`${rating} out of 10 now`}');
     expect(source).not.toContain("tof-evidence-step");
     expect(source).not.toContain("of ${lanes.length}");
   });
@@ -381,6 +381,22 @@ describe("elite 18 contract", () => {
     expect(source).toContain("How true does the original thought feel now?");
     expect(source).toContain('onContinue={() => go("direction")}');
     expect(source).not.toContain('{stage === "rerate"');
+  });
+
+  it("never sends the Back button to a stage with no matching screen", () => {
+    // A stage the Back button can land on but that has no `{stage === "x" && ...}`
+    // render branch is a blank page for anyone who taps Back. This walks every
+    // value the Back button's stage map can produce and every value it can start
+    // from, and checks each one against the stages the file actually renders.
+    const source = fs.readFileSync(new URL("../components/ThoughtOrFactExperience.jsx", import.meta.url), "utf8");
+    const backMapSource = source.match(/const previous = (\{[^}]+\})\[stage\];/)?.[1];
+    expect(backMapSource).toBeTruthy();
+    const backMap = Function(`"use strict"; return (${backMapSource});`)();
+    const renderedStages = new Set([...source.matchAll(/\{stage === "([\w-]+)"/g)].map((m) => m[1]));
+    for (const [from, to] of Object.entries(backMap)) {
+      expect(renderedStages.has(from), `stage "${from}" (a Back source) has no render branch`).toBe(true);
+      expect(renderedStages.has(to), `Back from "${from}" goes to "${to}", which has no render branch`).toBe(true);
+    }
   });
 
   it("keeps direction focused with one relevant primary choice", () => {

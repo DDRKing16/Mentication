@@ -83,3 +83,11 @@ Shown once, after someone's first finished reset:
   read closer to what the practice actually takes, or the opening line
   should describe the quick path (skip the walk, skip reaching out) if
   that's the more typical 5-minute experience.
+
+- **Vector Shift's opening screen says "4 STEP" but the practice actually has
+  six.** The intro card (`public/vector-shift/index.html`, the finished build)
+  reads "VECTOR • 4 STEP • FELT SAFE", but the step tabs shown once it starts
+  are Terminal, Align, Serpent, Code, Reframe, Lock — six, not four. It's a
+  hardcoded label inside a minified, single-file build the brand doc marks as
+  your finished design (not to be hand-edited without asking), so flagging
+  the mismatch rather than guessing at fixing text inside that file myself.
