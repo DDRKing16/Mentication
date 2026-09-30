@@ -1211,7 +1211,13 @@ export default function NextEasiestStepExperience() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed) return { pathLength: "regular", ...parsed };
+        if (parsed) {
+          return {
+            pathLength: "regular",
+            ...parsed,
+            ladder: Array.isArray(parsed.ladder) ? parsed.ladder : [],
+          };
+        }
       } catch (e) {
         console.error("Failed to parse saved state", e);
       }
@@ -1242,7 +1248,11 @@ export default function NextEasiestStepExperience() {
 
   // Synchronize state with localStorage
   useEffect(() => {
-    localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(gameState));
+    try {
+      localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(gameState));
+    } catch {
+      /* storage unavailable (private mode / quota) */
+    }
   }, [gameState]);
 
   // Auto-unlock audio context on first click/touchstart to guarantee sound is ready

@@ -388,7 +388,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   // Clean up voice on unmount
   useEffect(() => () => stopVoice(), [stopVoice]);
 
-  const current = STEPS[step];
+  const current = STEPS[Math.min(step, Math.max(0, STEPS.length - 1))];
 
   // Calculate high-fidelity alignment timing per word and preserve newlines
   const spokenPrompt = (current.prompt || "").replace(/\s+/g, " ").trim();
