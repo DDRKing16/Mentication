@@ -879,7 +879,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               role="dialog"
               aria-modal="true"
               aria-labelledby="reset-switch-sheet-title"
-              className="intervention-themed-surface w-full max-w-md rounded-t-3xl border p-6 pb-10 sm:rounded-3xl"
+              className="intervention-themed-surface w-full max-w-md rounded-t-3xl border p-6 pb-10 backdrop-blur-md sm:rounded-3xl"
             >
               <div className="intervention-dot-off mx-auto mb-5 h-1.5 w-10 rounded-full sm:hidden" />
               <h3 id="reset-switch-sheet-title" className="intervention-copy-primary font-heading text-2xl font-medium tracking-tight">Let’s try something else</h3>

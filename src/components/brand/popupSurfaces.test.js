@@ -29,6 +29,17 @@ describe("the player's popups use the per-intervention theme, not a fixed colour
     expect(files.resetPlayer).toMatch(/showAmbient[\s\S]{0,500}intervention-themed-surface/);
   });
 
+  // The "Let's try something else" switch sheet is translucent
+  // (intervention-themed-surface is ~62% opacity) with no blur of its own,
+  // which let the screen behind it show through, faint but readable, in the
+  // gaps between its option rows. Every other popup built on the same
+  // surface class (the ambient menu above, SoundscapeMixer, SleepTimerSheet)
+  // pairs it with a backdrop-blur so the content behind reads as soft glass,
+  // not a ghost. The switch sheet was the one place missing it.
+  it("the switch sheet blurs what's behind it, like every other themed popup", () => {
+    expect(files.resetPlayer).toMatch(/reset-switch-sheet-title[\s\S]{0,300}intervention-themed-surface[^"]*backdrop-blur/);
+  });
+
   // A popup animated with framer-motion cannot also rely on a CSS transform
   // class (e.g. -translate-x-1/2) for centring: framer-motion writes its own
   // `transform` inline style for the open/close motion, which silently wins
