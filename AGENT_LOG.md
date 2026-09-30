@@ -351,3 +351,37 @@ None of the three changed how anything looks, reads, or behaves for someone not 
 side, Settings' full toggle list, and the Journal mood-entry screen) and every screen came back
 pixel-identical. Full test/typecheck/lint/build suite passes clean, plus three new regression tests
 covering each fix.
+(Note: the prior run's session also fixed a Thought or Fact Back-button bug, "Fix Thought or Fact:
+Back button led to a blank screen" (c6216c6), which reached the branch without a matching log line --
+recorded here for the record.)
+
+## 30 Sep -- The single biggest download of any reset, and one more silent Reduce motion gap
+Checked docs/BRAND_THREAD.md again: still all six phases done, with the same items already flagged in
+SUGGESTIONS.md for the owner (Signal Lock's two builds, Next Easiest Step's Momentum Dashboard colours,
+Change the Scene's "Click the play button" line, Vector Shift's "4 STEP" label). Nothing new and safe to
+do there this round, so continued the load-speed thread with a fresh look at what each of the biggest
+chunks in a real production build actually contains.
+First and by far the biggest: the shared reset screen's own bundle was 481KB -- almost as big as the
+app's entire first download -- because of one thing inside it: the complete local narration manifest
+(every spoken line for every practice that has a voice, with its audio file and word-timing data). It
+was only there because the shared reset screen imports Box Breathing's own image/narration warm-up
+helper at the top of the file, and that helper needs the manifest. The warm-up itself was already
+correctly limited to only run when Box Breathing is the practice someone picked -- but the *import* was
+not, so opening Thought or Fact, Next Easiest Step, Tomorrow Parking Lot or any other practice with no
+spoken narration at all still downloaded the entire manifest before the screen could even show. Made
+that one import happen on demand, inside the same check that already gates the warm-up call (90bb349).
+The shared reset screen's own chunk dropped from 481KB to 43KB; the manifest is now its own separate
+piece, fetched only the first time a practice that actually speaks (Box Breathing, Progressive Muscle
+Relaxation, 5-4-3-2-1 Grounding, Change the Scene, Urge Surfing, The Happy Bump, or the Vector
+Shift/Signal Lock/Night Channel step panel) is opened.
+Second: while auditing every place in the app with its own continuously-animating visual (the same kind
+of check that found the Box/PMR/Grounding player's un-gated animations a couple of runs back), found one
+more -- Next Easiest Step's confetti burst when you complete a ladder step draws itself frame by frame
+on a canvas from JavaScript, which is the one kind of motion neither the app-wide CSS rule nor the
+global framer-motion setting can reach, so it kept playing no matter what Reduce motion was set to.
+Gave it the same "do nothing if Reduce motion is on" guard the rest of the app already uses (ad8c121).
+Verified both in a real headless-browser run: opening Thought or Fact now loads only the small reset
+screen bundle and never the narration manifest; Box Breathing still loads it immediately and starts
+exactly as before; Next Easiest Step opens and completes a step cleanly with no console errors with
+Reduce motion on or off. Full test/typecheck/lint/build suite passes clean, plus a new regression test
+for the confetti fix.
