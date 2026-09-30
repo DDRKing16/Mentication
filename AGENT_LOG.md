@@ -435,3 +435,22 @@ app-wide CSS rule. Walked Thought or Fact end to end (writing a thought through 
 claim) and opened 5-4-3-2-1 Grounding, Vector Shift, Night Channel and Signal Lock in a real headless
 browser -- all read as intended, nothing broken or out of place.
 Full test/typecheck/lint/build suite passes clean.
+
+## 30 Sep -- A visual walkthrough of Box Breathing found one real glass bug
+Checked docs/BRAND_THREAD.md: all six phases still done, same owner-decision items in SUGGESTIONS.md,
+nothing new and safe to change there. Got a headless browser working (dev server + the pre-installed
+Chromium, kept entirely outside the repo) and walked the whole Box Breathing practice end to end --
+Library card, the Threshold opening, the breathing player and every one of its dock popups, the
+mid-practice check-in, and the closing moment through to "Done" -- screenshotting each step at 375x812
+and looking closely at anything that seemed off.
+Found one real bug: the "Let's try something else" sheet (opened from "This isn't helping" during Box
+Breathing, PMR, Grounding and Vector Shift/Signal Lock/Night Channel) was the one popup built on the
+shared glass-surface recipe that never got a blur of its own -- the ambient sound menu, the soundscape
+mixer and the sleep timer all pair that translucent background with a backdrop blur so the screen behind
+reads as soft glass; this sheet didn't, so the screen's own heading showed through faintly, sharp-edged,
+in the gaps between its option rows. Gave it the same blur the other three already use (1f32473).
+Verified before and after in the headless browser, in both a dark world (Box Breathing) and the light
+5-4-3-2-1 Grounding world -- confirmed the ghosting is gone and nothing else about the sheet's look or
+behaviour changed. Added a regression test alongside the existing popup-surface checks, and logged it in
+docs/BRAND_THREAD.md as a fourth slice of that same shared-recipe work (bb23620).
+Full test/typecheck/lint/build suite passes clean.
