@@ -385,3 +385,29 @@ screen bundle and never the narration manifest; Box Breathing still loads it imm
 exactly as before; Next Easiest Step opens and completes a step cleanly with no console errors with
 Reduce motion on or off. Full test/typecheck/lint/build suite passes clean, plus a new regression test
 for the confetti fix.
+
+## 30 Sep -- Two crash risks in Next Easiest Step and Change the Scene, plus a visual check
+Checked docs/BRAND_THREAD.md again: still all six phases done, same items already flagged in
+SUGGESTIONS.md for the owner, nothing new and safe to do there. The launch-time image preload item
+and the dead-code items from earlier runs are also both already done, so ran a focused audit of the
+12 interventions' own code for real crash risks (corrupted or stale saved state, unguarded storage
+writes) rather than style nits, then verified the two real findings in a headless browser before and
+after the fix.
+First: Next Easiest Step wrote its saved ladder progress to localStorage on every change with no
+try/catch -- every other localStorage write in the app already guards against private browsing or a
+full storage quota throwing, this was the one unguarded write left, and it would have crashed the whole
+practice mid-session for anyone it happened to. It also restored a saved "ladder" straight into state
+without checking it was actually a list, so a stale value left over from an older version of the app
+could crash the screen the moment it opened. Both now fail safely: the write is wrapped, and a
+missing/malformed ladder falls back to empty (d4f16d3).
+Second: Change the Scene read its restored step number straight into an array lookup with no bounds
+check, so a leftover step number from a previous build could crash the practice on open -- its sibling
+component (the shared flagship player) already guards against exactly this with a clamp, Change the
+Scene just didn't have it. Added the same clamp (d4f16d3). Added a regression test file for each fix so
+neither can silently regress (584dd86).
+Also spent time with the headless browser walking Urge Surfing (intensity picker through to the wave
+timer screen) and Tomorrow Parking Lot's capture screen (through to typing a note and the suggestion
+chips) end to end, looking for anything that looked broken. Found nothing to fix -- both already match
+the "one focal thing, full-bleed world" standard the brand doc set, and the different thread colours
+(each intervention's own colourway ink, not a mistake) are working as designed.
+Full test/typecheck/lint/build suite passes clean.
