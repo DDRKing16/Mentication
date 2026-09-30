@@ -320,13 +320,14 @@ export default function Journal() {
 
   // Load daybook from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("daybook");
-    if (stored) {
-      try {
-        setDaybook(JSON.parse(stored));
-      } catch {
-        console.error("Failed to parse daybook from storage");
+    try {
+      const stored = localStorage.getItem("daybook");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) setDaybook(parsed);
       }
+    } catch {
+      console.error("Failed to parse daybook from storage");
     }
   }, []);
 
@@ -408,7 +409,7 @@ export default function Journal() {
 
     const updatedDaybook = [newEntry, ...daybook];
     setDaybook(updatedDaybook);
-    localStorage.setItem("daybook", JSON.stringify(updatedDaybook));
+    try { localStorage.setItem("daybook", JSON.stringify(updatedDaybook)); } catch { /* storage unavailable */ }
     triggerToast("Entry saved to Mentication Archive");
     setStep(0); // return to dashboard
   };
@@ -419,7 +420,7 @@ export default function Journal() {
     playSound('delete');
     const updated = daybook.filter(item => item.id !== id);
     setDaybook(updated);
-    localStorage.setItem("daybook", JSON.stringify(updated));
+    try { localStorage.setItem("daybook", JSON.stringify(updated)); } catch { /* storage unavailable */ }
     triggerToast("Entry deleted");
     if (selectedPastEntry?.id === id) {
       setSelectedPastEntry(null);
