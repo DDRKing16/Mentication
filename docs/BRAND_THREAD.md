@@ -204,3 +204,13 @@ real logo in its colourway).
    not part of this slice -- today it only appears on a few individual
    screens as part of their own look, and adding it everywhere is a
    bigger visual call than a chrome-only consolidation.
+   Fourth slice done: the "Let's try something else" switch sheet
+   (opened from "This isn't helping" during Box Breathing, PMR,
+   Grounding and Vector Shift/Signal Lock/Night Channel) was the one
+   `.intervention-themed-surface` popup missing a backdrop-blur of its
+   own -- the ambient sound menu, SoundscapeMixer and SleepTimerSheet
+   all pair that translucent surface with one, this sheet didn't, so
+   the screen's own heading showed through faintly in the gaps between
+   its option rows. Now matches the other three. Checked in a real
+   headless-browser run at 375x812 in both a dark world (Box Breathing)
+   and the light 5-4-3-2-1 Grounding world.
