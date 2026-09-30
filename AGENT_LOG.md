@@ -411,3 +411,27 @@ chips) end to end, looking for anything that looked broken. Found nothing to fix
 the "one focal thing, full-bleed world" standard the brand doc set, and the different thread colours
 (each intervention's own colourway ink, not a mistake) are working as designed.
 Full test/typecheck/lint/build suite passes clean.
+
+## 30 Sep -- The Journal's save and delete could crash, plus a wide check that found nothing else
+Checked docs/BRAND_THREAD.md again: still all six phases done, same items already flagged in
+SUGGESTIONS.md, nothing new and safe to do there. Went looking for the same kind of crash risk the last
+two runs found (an unguarded localStorage write, or a restored value trusted without checking) across
+every remaining place the app reads or writes on-device storage -- not just the 12 interventions this
+time, but Home, Settings, the backup/restore feature, programmes, reminders, and Plus -- plus the
+navigator APIs (share, vibrate, microphone) and the speech/narration engine's own error handling.
+Found one real gap: the Journal saved and deleted entries by writing the whole diary straight to
+localStorage with no try/catch, the one write left in the app without that guard -- private browsing or
+a full storage quota would have thrown and broken saving or deleting an entry mid-action. It also
+trusted a restored diary to already be a list without checking, so a corrupted or hand-edited entry could
+have crashed the Journal the moment it opened. Both now fail safely, with a regression test guarding it
+(21376bb).
+Everywhere else checked out clean: every other storage write and restore in the app was already wrapped
+and validated; the shared session-recording write every reset goes through has no guard of its own but
+both places that call it already catch a failure so nothing crashes; every free-text field checked across
+Urge Surfing, Tomorrow Parking Lot, The Happy Bump, Settings and the standalone builds already has a real
+accessible name; every place with its own continuously-animating visual already stops under Reduce
+motion, including one (5-4-3-2-1 Grounding's pearl orb) that turned out to already be covered by the
+app-wide CSS rule. Walked Thought or Fact end to end (writing a thought through to editing the exact
+claim) and opened 5-4-3-2-1 Grounding, Vector Shift, Night Channel and Signal Lock in a real headless
+browser -- all read as intended, nothing broken or out of place.
+Full test/typecheck/lint/build suite passes clean.
