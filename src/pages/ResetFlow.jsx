@@ -194,10 +194,16 @@ export default function ResetFlow() {
   useEffect(() => {
     const first = pathway[0];
     if (first?.id === "boxV2") {
-      import("@/lib/preloadBoxV2").then(({ warmNarration, warmBoxV2Images }) => {
-        warmNarration(first, answers.direction);
-        warmBoxV2Images();
-      });
+      import("@/lib/preloadBoxV2")
+        .then(({ warmNarration, warmBoxV2Images }) => {
+          warmNarration(first, answers.direction);
+          warmBoxV2Images();
+        })
+        .catch(() => {
+          // Warming is a head start, not a requirement -- Box Breathing's
+          // own screen still loads and plays narration itself if this
+          // fetch fails (e.g. offline).
+        });
     }
   }, [pathway, answers.direction]);
 

@@ -1,5 +1,6 @@
 import InterventionNav from "@/components/brand/InterventionNav";
 import React, { useState, useRef, useEffect } from "react";
+import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { 
   ChevronLeft, 
   Pause, 
@@ -1203,6 +1204,7 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular") =
 };
 
 export default function NextEasiestStepExperience() {
+  const { prefs } = useAccessibilityPrefs();
   // 3. Persistent state initialization from localStorage using 'mentication_nes_v2_app_state'
   const [gameState, setGameState] = useState(() => {
     const saved = localStorage.getItem("mentication_nes_v2_app_state");
@@ -1350,6 +1352,7 @@ export default function NextEasiestStepExperience() {
 
   // Canvas confetti particle burst logic
   const triggerConfetti = () => {
+    if (prefs.reducedMotion) return;
     const canvasEl = canvasRef.current;
     if (!canvasEl) return;
     const ctx = canvasEl.getContext("2d");
