@@ -26,7 +26,6 @@ const UrgeSurfExperience = lazy(() => import("@/components/UrgeSurfExperience"))
 const NextEasiestStepExperience = lazy(() => import("@/components/NextEasiestStepExperience"));
 const ChangeSceneExperience = lazy(() => import("@/components/ChangeSceneExperience"));
 const TomorrowParkingExperience = lazy(() => import("@/components/TomorrowParkingExperience"));
-import { warmNarration, warmBoxV2Images } from "@/lib/preloadBoxV2";
 import {
   buildPathway,
   buildSegment,
@@ -189,11 +188,16 @@ export default function ResetFlow() {
   // Preload the first Box Breathing V2 narration and its two background
   // images as soon as the intervention is selected, rather than at every app
   // launch, so it still starts instantly without paying that cost up front.
+  // The local narration manifest this pulls in is sizeable, so it's fetched
+  // on demand here too -- only a reset that actually opens with Box
+  // Breathing pays for it, not every reset.
   useEffect(() => {
     const first = pathway[0];
     if (first?.id === "boxV2") {
-      warmNarration(first, answers.direction);
-      warmBoxV2Images();
+      import("@/lib/preloadBoxV2").then(({ warmNarration, warmBoxV2Images }) => {
+        warmNarration(first, answers.direction);
+        warmBoxV2Images();
+      });
     }
   }, [pathway, answers.direction]);
 
