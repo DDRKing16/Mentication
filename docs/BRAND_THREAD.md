@@ -47,6 +47,15 @@ now opens with the real logo and wordmark, in that intervention's own
 colourway from the brand kit, revealing themselves over that intervention's own
 colour world, then its name in Garamond italic with a hairline under it, then the door lifts (`WithBrandThreshold` in `ResetFlow.jsx`). The shared shell shows
 progress as a thread in the intervention's colour and the label as `MENTICATION · <GOAL>`.
+Bug fixed since: the door's own fade-out (550ms) was slower than the
+intervention underneath taking over, so for part of that fade the
+translucent logo and name sat on top of the intervention's own opening
+buttons -- most visible on Thought or Fact, where the mark crossed right
+over "Look at a thought". The mark now fades out in 250ms, well before
+the door is translucent enough to show what's behind it. Checked across
+Thought or Fact, 5-4-3-2-1 Grounding, Box Breathing, The Happy Bump,
+Change the Scene, Urge Surfing and Vector Shift in a real headless-browser
+run at 375x812.
 
 **Phase 2 — done:** The Closing. `BrandClosing` (`src/components/brand/BrandClosing.jsx`)
 is the mirror of the Threshold: the coral thread draws in, then the logo and
