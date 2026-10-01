@@ -84,19 +84,28 @@ export default function BrandThreshold({ id, name, onReady, onDone }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.55, ease: BRAND_EASE } }}
         >
-          <BrandLockup parts={getBrandLogoParts(id)} className="w-[19rem] max-w-[80vw]" />
-
-          <motion.h1
-            className="mt-6 text-[2rem] italic leading-tight"
-            style={{ fontFamily: "var(--font-editorial)", color: ink }}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.7, ease: BRAND_EASE }}
+          {/* The mark fades out well before the backdrop does, so the door
+              never leaves ghosted logo text hanging over the intervention's
+              own buttons while the panel itself is still dissolving away. */}
+          <motion.div
+            initial={false}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.25, ease: BRAND_EASE } }}
           >
-            {name}
-          </motion.h1>
+            <BrandLockup parts={getBrandLogoParts(id)} className="w-[19rem] max-w-[80vw]" />
 
-          <BrandHairline coral={coral} delay={1.35} className="mt-3 w-44" />
+            <motion.h1
+              className="mt-6 text-[2rem] italic leading-tight"
+              style={{ fontFamily: "var(--font-editorial)", color: ink }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1, duration: 0.7, ease: BRAND_EASE }}
+            >
+              {name}
+            </motion.h1>
+
+            <BrandHairline coral={coral} delay={1.35} className="mt-3 w-44" />
+          </motion.div>
         </motion.button>
       )}
     </AnimatePresence>
