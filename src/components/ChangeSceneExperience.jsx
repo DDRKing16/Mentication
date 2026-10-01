@@ -2076,6 +2076,44 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
                           radial-gradient(50% 42% at 88% 18%, rgba(230, 163, 206, .24), transparent 72%),
                           linear-gradient(145deg, #ffdad4, #f7e8ed 40%, #e1eaf8 72%, #daf1eb) !important;
             }
+
+            /*
+              The card is a fixed-height, clipped "stage" sized to the
+              viewport, with the opening screen's play button positioned by
+              normal flow underneath the heading and the "about 4 minutes"
+              line. Every other piece of text on this screen already has an
+              explicit size that ignores the root text-size setting (the
+              heading is set in px, the prompt card's own text is 19px), but
+              this line was left to inherit the scaled default -- at the
+              largest text size it grows enough, and wraps to enough extra
+              lines, to push the play button down into the same screen
+              space as the shared "This is not helping" dock, which floats
+              fixed over everything. Giving it the same fixed, explicit
+              size keeps this screen's layout the same height at every text
+              size, so the button and the dock never draw on top of each
+              other; the page can also scroll if a future change needs it.
+            */
+            html.large-text .change-scene-v2 {
+              height: auto;
+              min-height: calc(100dvh - 126px);
+              overflow: visible;
+            }
+            html.large-text .change-scene-v2 .shell {
+              height: auto;
+              min-height: 100%;
+              overflow: visible;
+              padding-bottom: 104px;
+            }
+            html.large-text .change-scene-v2 .opening-meta {
+              font-size: 14px;
+              line-height: 1.35;
+            }
+            html.large-text .change-scene-v2 .start-screen-content {
+              gap: 6px;
+            }
+            html.large-text .change-scene-v2 .start-tap-progress {
+              margin-bottom: 4px;
+            }
           `
         }} />
       }
