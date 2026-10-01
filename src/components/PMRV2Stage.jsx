@@ -643,6 +643,19 @@ export default function PMRV2Stage({
 
       <div key={`pmr-copy-${stepIndex}`} className="pmr-v2-copy">
         <div className="pmr-v2-phase-row">
+          {/* An invisible mirror of the button below, same size, so the grid's
+              two outer columns stay equal and the chip keeps a true centre --
+              without it the chip would centre over the full row then get
+              covered by the real button at larger text sizes. */}
+          {onNextBodyPart && (
+            <span className="pmr-v2-next-body pmr-v2-next-body--mirror" aria-hidden="true">
+              <span>{nextBodyPartLabel}</span>
+              <span className="pmr-v2-next-body-arrow" aria-hidden="true">
+                →
+              </span>
+            </span>
+          )}
+
           <div className={`pmr-v2-phase-chip is-${phase}`}>
             {PHASE_COPY[phase] || "REST"}
           </div>

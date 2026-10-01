@@ -1750,18 +1750,35 @@ html.reduce-motion .pmr-v2-tension-focus { transition-duration: 0ms !important; 
 
 /* ---------- Phase chip + PMR-only navigation ---------- */
 
+/*
+  A 3-column grid (not flex + absolute positioning) so the chip and the
+  "next body part" button each get their own reserved space -- at larger
+  text sizes "SETTLE IN" and "Start with hands" are both long enough to
+  run into each other if the button just floats on top of a centred chip.
+  The outer columns size to their own content (the button on the right,
+  its invisible mirror on the left), so they always stay equal width --
+  the chip keeps a true centre and the button can no longer overlap it.
+*/
 .pmr-v2-phase-row {
-  position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: center;
+  column-gap: 0.4rem;
   width: 100%;
   min-height: 1.75rem;
   align-items: center;
-  justify-content: center;
   margin-bottom: 0.92rem;
 }
 
 .pmr-v2-phase-row .pmr-v2-phase-chip {
+  grid-column: 2;
   margin-bottom: 0;
+}
+
+.pmr-v2-next-body--mirror {
+  grid-column: 1;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 
@@ -1771,8 +1788,7 @@ html.reduce-motion .pmr-v2-tension-focus { transition-duration: 0ms !important; 
   Next button below the intervention.
 */
 .pmr-v2-next-body {
-  position: absolute;
-  right: 0;
+  grid-column: 3;
 
   display: inline-flex;
   align-items: center;
@@ -1913,7 +1929,6 @@ html.reduce-motion .pmr-v2-tension-focus { transition-duration: 0ms !important; 
   }
 
   .pmr-v2-next-body {
-    right: 0.1rem;
     min-height: 1.5rem;
     padding: 0.18rem 0.4rem;
     font-size: 0.51rem;
@@ -2303,7 +2318,6 @@ html.reduce-motion .pmr-v2-tension-focus { transition-duration: 0ms !important; 
 
   .pmr-v2-copy { width: calc(100vw - 2rem); }
   .pmr-v2-next-body {
-    right: 0.35rem;
     max-width: 7.1rem;
     white-space: nowrap;
   }
