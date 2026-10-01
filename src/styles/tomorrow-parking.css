@@ -161,6 +161,16 @@
   text-align: center;
 }
 
+/* The Back/Home buttons float over this screen (InterventionNav), outside
+   this file's own layout, so the page title label needs its own clearance
+   to stay out from under them at larger text sizes instead of running
+   behind the Home button. Scoped to the top-level title only -- the
+   "Your grouping" eyebrow inside each parked note's card sits well clear
+   of the buttons already and doesn't need it. */
+.tpl-frame > .tpl-eyebrow {
+  padding-inline: 3rem;
+}
+
 .tpl-display {
   font-family: var(--tpl-font-display);
   font-weight: 400;
