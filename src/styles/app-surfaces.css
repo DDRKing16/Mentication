@@ -1,3 +1,35 @@
+:root {
+  /* Fallback brand colours (the navy/coral set) so every Home theme,
+     including ones that don't define their own, has them. */
+  --brand-warm: #E0715C;
+  --brand-warm-rgb: 224 113 92;
+  --brand-warm-light: #F09477;
+  --brand-warm-deep: #C1462F;
+  --brand-warm-deep-rgb: 193 70 47;
+  --brand-warm-ink: #B94E3B;
+  --brand-cool: #0E2A52;
+  --brand-cool-rgb: 14 42 82;
+  --brand-cool-light: #3E5F97;
+  --brand-cool-deep: #112B50;
+  --brand-cool-mid: #2A3F6E;
+  --brand-gold: #E0B25A;
+  --brand-gold-rgb: 224 178 90;
+  --brand-done: #E0715C;
+  --brand-done-rgb: 224 113 92;
+  --brand-shadow-rgb: 17 43 80;
+  /* Category identity colours for the Calm / Lift / Ground / Sleep / Focus /
+     Guide me cards (the original set from main). */
+  --cat-calm: #4A8B86;
+  --cat-lift: #D98F4E;
+  --cat-ground: #6B8E4E;
+  --cat-sleep: #5B5A8C;
+  --cat-focus: #B5623D;
+  --cat-guide: #9B7A94;
+  /* The Your Week card surface. */
+  --home-week-bg: linear-gradient(128deg, #FFFFFF 0%, #F7F4EE 38%, #FFFFFF 58%, #EFEAE0 100%);
+  --home-week-border: rgba(255, 255, 255, 0.9);
+}
+
 .home-theme--emerald {
   --home-bg: #ECE2D2;
   --home-hero: #03452C;
@@ -59,14 +91,845 @@
   --home-tabbar: #ECE2D2;
   --home-border: #D9D0C7;
   --home-shadow: rgba(14, 42, 82, 0.34);
+  /* Brand colours used directly by Home components (buttons, week days,
+     badges). Each has an "-rgb" triplet for use with an alpha, e.g.
+     rgb(var(--brand-warm-rgb) / 0.2). */
+  --brand-warm: #E0715C;
+  --brand-warm-rgb: 224 113 92;
+  --brand-warm-light: #F09477;
+  --brand-warm-deep: #C1462F;
+  --brand-warm-deep-rgb: 193 70 47;
+  --brand-warm-ink: #B94E3B;
+  --brand-cool: #0E2A52;
+  --brand-cool-rgb: 14 42 82;
+  --brand-cool-light: #3E5F97;
+  --brand-cool-deep: #112B50;
+  --brand-cool-mid: #2A3F6E;
+  --brand-gold: #E0B25A;
+  --brand-gold-rgb: 224 178 90;
+  --brand-done: #E0715C;
+  --brand-done-rgb: 224 113 92;
+  --brand-shadow-rgb: 17 43 80;
 }
+
+/* Mid-Century Modern (palette M038): slate, burnt sienna and sage on a warm
+   cream, with a soft sand gold. Sage gets its own job — completed days in
+   Your Week — so it reads as "done, settled" rather than decoration. */
+.home-theme--midcentury {
+  --home-bg: #EFE8D4;
+  --home-shadow-sm: 0 8px 20px -14px rgba(46, 48, 72, 0.4);
+  --home-shadow-md: 0 14px 32px -18px rgba(46, 48, 72, 0.46);
+  --home-shadow-lg: 0 22px 48px -20px rgba(46, 48, 72, 0.52);
+  --home-hero: #3D405B;
+  --home-hero-text: #F7F3E8;
+  --home-hero-soft: #E3E3EC;
+  --home-ink: #3D405B;
+  --home-muted: #6B6D83;
+  --home-icon: #3D405B;
+  --home-accent: #E07A5F;
+  --home-accent-soft: rgba(224, 122, 95, 0.15);
+  --home-card: #FFFFFF;
+  --home-card-alt: #F7F2E6;
+  --home-control: #F2CC8F;
+  --home-control-ink: #3D405B;
+  --home-tabbar: #E8DEC5;
+  --home-border: #E2D3B2;
+  --home-shadow: rgba(46, 48, 72, 0.32);
+  --brand-warm: #E07A5F;
+  --brand-warm-rgb: 224 122 95;
+  --brand-warm-light: #EFA088;
+  --brand-warm-deep: #C45E43;
+  --brand-warm-deep-rgb: 196 94 67;
+  --brand-warm-ink: #B0533A;
+  --brand-cool: #3D405B;
+  --brand-cool-rgb: 61 64 91;
+  --brand-cool-light: #666A8C;
+  --brand-cool-deep: #2E3048;
+  --brand-cool-mid: #4A4E6E;
+  --brand-gold: #F2CC8F;
+  --brand-gold-rgb: 242 204 143;
+  --brand-done: #81B29A;
+  --brand-done-rgb: 129 178 154;
+  --brand-shadow-rgb: 46 48 72;
+  /* No white surfaces in this theme: cards are warm sand, Your Week is a
+     sage wash, and the six categories each take a colour from the same
+     slate / sienna / sage / sand family. */
+  --home-card: #F8EBCF;
+  --home-card-alt: #F3E2C0;
+  --home-week-bg: linear-gradient(128deg, #E4EFE7 0%, #D5E6DB 42%, #E2EEE5 60%, #CADDD0 100%);
+  --home-week-border: rgba(129, 178, 154, 0.5);
+  --cat-calm: #5E9479;
+  --cat-lift: #E07A5F;
+  --cat-ground: #B8894A;
+  --cat-sleep: #666A8E;
+  --cat-focus: #3D405B;
+  --cat-guide: #A0685A;
+}
+
+/* Midnight Forest / Molten Sunset (palettes E005 + C001): deep forest green,
+   burnt orange and gold on warm parchment. Forest frames the screen top and
+   bottom (hero + tab bar); Your Week sits on a gold wash, the category cards
+   on a pale forest-mint, so no surface is plain white. */
+.home-theme--forest {
+  --home-bg: #F7EFD9;
+  --home-shadow-sm: 0 8px 20px -14px rgba(7, 42, 32, 0.4);
+  --home-shadow-md: 0 14px 32px -18px rgba(7, 42, 32, 0.46);
+  --home-shadow-lg: 0 22px 48px -20px rgba(7, 42, 32, 0.52);
+  --home-hero: #0B3D2E;
+  --home-hero-text: #FFF8E3;
+  --home-hero-soft: #D6E6DC;
+  --home-ink: #0B3D2E;
+  --home-muted: #4F6B60;
+  --home-icon: #0B3D2E;
+  --home-accent: #FF6B35;
+  --home-accent-soft: rgba(255, 107, 53, 0.15);
+  --home-card: #E6EFE6;
+  --home-card-alt: #DCE8DE;
+  --home-control: #F2C14E;
+  --home-control-ink: #0B3D2E;
+  --home-tabbar: #0B3D2E;
+  --home-border: #CFE0D3;
+  --home-shadow: rgba(7, 42, 32, 0.3);
+  --brand-warm: #FF6B35;
+  --brand-warm-rgb: 255 107 53;
+  --brand-warm-light: #FF8F63;
+  --brand-warm-deep: #D9531E;
+  --brand-warm-deep-rgb: 217 83 30;
+  --brand-warm-ink: #C2471A;
+  --brand-cool: #0B4F4A;
+  --brand-cool-rgb: 11 79 74;
+  --brand-cool-light: #2A7A70;
+  --brand-cool-deep: #0B3D2E;
+  --brand-cool-mid: #0F5A4A;
+  --brand-gold: #F2C14E;
+  --brand-gold-rgb: 242 193 78;
+  --brand-done: #2E9E8A;
+  --brand-done-rgb: 46 158 138;
+  --brand-shadow-rgb: 7 42 32;
+  --home-week-bg: linear-gradient(128deg, #FCEFC6 0%, #F8E3A8 45%, #FBECBF 60%, #F4D98E 100%);
+  --home-week-border: rgba(242, 193, 78, 0.65);
+  --cat-calm: #127A6D;
+  --cat-lift: #E8612C;
+  --cat-ground: #6E7F2E;
+  --cat-sleep: #274C5E;
+  --cat-focus: #0B3D2E;
+  --cat-guide: #B08A1E;
+}
+/* The tab bar is deep forest in this theme, so its icons and labels flip to
+   parchment. */
+.home-theme--forest.home-tabbar {
+  --home-ink: #FFF8E3;
+  --home-muted: rgba(255, 248, 227, 0.62);
+}
+
+/* Ink & Peach & Sage (palette E027): deep ink, soft peach and sage on a
+   peach-tinted cream. Ink frames the screen (hero + tab bar), Your Week sits
+   on a peach wash, and the category cards keep a pale green tile — sage in
+   this palette. */
+.home-theme--inkpeach {
+  --home-bg: #F7EEE5;
+  --home-shadow-sm: 0 8px 20px -14px rgba(27, 27, 58, 0.4);
+  --home-shadow-md: 0 14px 32px -18px rgba(27, 27, 58, 0.46);
+  --home-shadow-lg: 0 22px 48px -20px rgba(27, 27, 58, 0.52);
+  --home-hero: #1B1B3A;
+  --home-hero-text: #FFF4EA;
+  --home-hero-soft: #E4E2F0;
+  --home-ink: #1B1B3A;
+  --home-muted: #5D6070;
+  --home-icon: #1B1B3A;
+  --home-accent: #F29A6B;
+  --home-accent-soft: rgba(242, 154, 107, 0.16);
+  --home-card: #E4ECE2;
+  --home-card-alt: #DAE4D8;
+  --home-control: #FFCBA4;
+  --home-control-ink: #1B1B3A;
+  --home-tabbar: #1B1B3A;
+  --home-border: #CCD8CB;
+  --home-shadow: rgba(27, 27, 58, 0.28);
+  --brand-warm: #F0956A;
+  --brand-warm-rgb: 240 149 106;
+  --brand-warm-light: #FFCBA4;
+  --brand-warm-deep: #D9774E;
+  --brand-warm-deep-rgb: 217 119 78;
+  --brand-warm-ink: #B85A32;
+  --brand-cool: #1B1B3A;
+  --brand-cool-rgb: 27 27 58;
+  --brand-cool-light: #3A3A6A;
+  --brand-cool-deep: #141430;
+  --brand-cool-mid: #2A2A55;
+  --brand-gold: #FFCBA4;
+  --brand-gold-rgb: 255 203 164;
+  --brand-done: #6F8A74;
+  --brand-done-rgb: 111 138 116;
+  --brand-shadow-rgb: 27 27 58;
+  --home-week-bg: linear-gradient(128deg, #FFEADA 0%, #FFDCC2 45%, #FFE6D3 60%, #FFD2B0 100%);
+  --home-week-border: rgba(255, 203, 164, 0.9);
+  --cat-calm: #5E7A66;
+  --cat-lift: #E0845A;
+  --cat-ground: #7A8A5A;
+  --cat-sleep: #4A4A7A;
+  --cat-focus: #1B1B3A;
+  --cat-guide: #C07A6A;
+}
+.home-theme--inkpeach.home-tabbar {
+  --home-ink: #FFF4EA;
+  --home-muted: rgba(255, 244, 234, 0.6);
+}
+
+/* Twilight Lagoon (palette M049), strictly: #264653 slate-teal, #2A9D8F
+   jade, #E9C46A sand — every colour below is one of those three or a
+   lighter/darker mix of one of them. Nothing borrowed from other palettes. */
+.home-theme--lagoon {
+  --home-bg: #FBF4E1;             /* sand, light */
+  --home-shadow-sm: 0 8px 20px -14px rgba(38, 70, 83, 0.4);
+  --home-shadow-md: 0 14px 32px -18px rgba(38, 70, 83, 0.46);
+  --home-shadow-lg: 0 22px 48px -20px rgba(38, 70, 83, 0.52);
+  --home-hero: #264653;
+  --home-hero-text: #FBF4E1;
+  --home-hero-soft: #D4DADD;
+  --home-ink: #264653;
+  --home-muted: #5C7680;          /* slate-teal, lighter */
+  --home-icon: #264653;
+  --home-accent: #E9C46A;
+  --home-accent-soft: rgba(233, 196, 106, 0.18);
+  --home-card: #E4EBEE;           /* slate-teal, very light */
+  --home-card-alt: #D9E2E6;
+  --home-control: #E9C46A;
+  --home-control-ink: #264653;
+  --home-tabbar: #264653;
+  --home-border: #CBD7DC;
+  --home-shadow: rgba(38, 70, 83, 0.28);
+  --brand-warm: #2A9D8F;
+  --brand-warm-rgb: 42 157 143;
+  --brand-warm-light: #55B1A5;
+  --brand-warm-deep: #22867A;
+  --brand-warm-deep-rgb: 34 134 122;
+  --brand-warm-ink: #1F7A6F;
+  --brand-cool: #264653;
+  --brand-cool-rgb: 38 70 83;
+  --brand-cool-light: #4F6B76;
+  --brand-cool-deep: #1C353F;
+  --brand-cool-mid: #2F5563;
+  --brand-gold: #E9C46A;
+  --brand-gold-rgb: 233 196 106;
+  --brand-done: #2A9D8F;
+  --brand-done-rgb: 42 157 143;
+  --brand-shadow-rgb: 38 70 83;
+  --home-week-bg: linear-gradient(128deg, #F8EBC8 0%, #F3DFA6 45%, #F6E7BE 60%, #F0D895 100%);
+  --home-week-border: rgba(233, 196, 106, 0.8);
+  /* Three palette colours, alternating across the six cards. */
+  --cat-calm: #2A9D8F;
+  --cat-focus: #264653;
+  --cat-lift: #B8932F;            /* sand, darker (so it reads on a light tile) */
+  --cat-ground: #2A9D8F;
+  --cat-sleep: #264653;
+  --cat-guide: #B8932F;
+}
+.home-theme--lagoon.home-tabbar {
+  --home-ink: #FBF4E1;
+  --home-muted: rgba(251, 244, 225, 0.62);
+}
+
+/* Cobalt / Red / Cream — page 3 of the Final Colour Package (Primary tile:
+   cream with cobalt + red; Alternate tile: cobalt with white + red). Colours
+   sampled from that page; everything below is one of those three or a
+   lighter/darker mix of one of them. */
+.home-theme--cobalt {
+  --home-bg: #FCF6EA;             /* the palette cream, exactly */
+  --home-shadow-sm: 0 8px 20px -14px rgba(14, 63, 126, 0.4);
+  --home-shadow-md: 0 14px 32px -18px rgba(14, 63, 126, 0.46);
+  --home-shadow-lg: 0 22px 48px -20px rgba(14, 63, 126, 0.52);
+  --home-hero: #1553A0;           /* cobalt (Alternate tile) */
+  --home-hero-text: #FFFFFF;
+  --home-hero-soft: #DCE6F4;
+  --home-ink: #0E3F86;            /* cobalt, deeper for text */
+  --home-muted: #4F6C98;
+  --home-icon: #0E3F86;
+  --home-accent: #E23A3A;         /* red */
+  --home-accent-soft: rgba(226, 58, 58, 0.14);
+  --home-card: #D3E3F8;           /* light blue */
+  --home-card-alt: #C4D9F5;
+  --home-control: #F9F2E6;
+  --home-control-ink: #1553A0;
+  --home-tabbar: #1553A0;
+  --home-border: #BCD2F0;
+  --home-shadow: rgba(14, 63, 126, 0.28);
+  --brand-warm: #E23A3A;
+  --brand-warm-rgb: 226 58 58;
+  --brand-warm-light: #EC6464;
+  --brand-warm-deep: #C92B2B;
+  --brand-warm-deep-rgb: 201 43 43;
+  --brand-warm-ink: #B82828;
+  --brand-cool: #1553A0;
+  --brand-cool-rgb: 21 83 160;
+  --brand-cool-light: #3D72B8;
+  --brand-cool-deep: #0E3F7E;
+  --brand-cool-mid: #1A5CAE;
+  --brand-gold: #F2B0AA;          /* red, light */
+  --brand-gold-rgb: 242 176 170;
+  --brand-done: #1553A0;
+  --brand-done-rgb: 21 83 160;
+  --brand-shadow-rgb: 14 63 126;
+  --home-week-bg: linear-gradient(128deg, #FBF5EB 0%, #F4E9D6 45%, #F9F1E4 60%, #F0E2CB 100%);
+  --home-week-border: rgba(226, 58, 58, 0.25);
+  --cat-calm: #1553A0;
+  --cat-focus: #0E3F7E;
+  --cat-lift: #E23A3A;
+  --cat-ground: #1553A0;
+  --cat-sleep: #0E3F7E;
+  --cat-guide: #E23A3A;
+  /* Every tile gets the same red glow and a red symbol; the solid key edge
+     under each tile is a deeper light blue. */
+  --cat-glow: #E23A3A;
+  --cat-symbol: #E23A3A;
+  --cat-edge: #A8C3E8;
+}
+/* The background is the palette cream, flat — no tint, haze or grain. */
+.home-theme.home-theme--cobalt,
+.home-theme.home-theme--cherry,
+.home-theme.home-theme--ochre,
+.home-theme.home-theme--luxe,
+.home-theme.home-theme--deco,
+.home-theme.home-theme--sunset {
+  background-image: none;
+  animation: none;
+}
+/* Your Week uses Oxblood & Ice Blue (palette E003: #4A0D12, #A7E8F0): an
+   ice-blue card, oxblood text and days, an oxblood "7 days" button and a
+   deeper ice-blue "Begin". Scoped to the card, so nothing else changes. */
+.home-theme--cobalt .home-week,
+.home-theme--cherry .home-week {
+  --home-week-bg: linear-gradient(128deg, #E6F9FC 0%, #C9F1F7 45%, #DDF6FA 60%, #A7E8F0 100%);
+  --home-week-border: rgba(74, 13, 18, 0.2);
+  --home-ink: #4A0D12;
+  --home-muted: #7A3A3F;
+  color: #4A0D12;
+  --brand-warm: #4A0D12;
+  --brand-warm-rgb: 74 13 18;
+  --brand-warm-light: #8A2A33;
+  --brand-warm-deep: #4A0D12;
+  --brand-warm-deep-rgb: 74 13 18;
+  --brand-warm-ink: #4A0D12;
+  --brand-cool: #3F9DAE;
+  --brand-cool-rgb: 63 157 174;
+  --brand-cool-light: #A7E8F0;
+  --brand-gold: #A7E8F0;
+  --brand-gold-rgb: 167 232 240;
+  --brand-done: #4A0D12;
+  --brand-done-rgb: 74 13 18;
+  --brand-shadow-rgb: 74 13 18;
+}
+
+/* Tiles alternate: blue (Calm, Lift, Sleep) and reversed red (Focus,
+   Ground, Guide me). Each deepens towards the bottom so the white subtitle
+   has something to sit on. */
+.home-theme--cobalt .home-category-card {
+  --cat-bg: linear-gradient(180deg, #F0F5FD 0%, #CADDF6 48%, #86AEE3 100%);
+  --cat-title: #0E3F86;
+  --cat-sub: #FFFFFF;
+  --cat-edge: #5A8BCD;
+}
+.home-theme--cobalt .home-category-card[data-variant="alt"] {
+  --cat-bg: linear-gradient(180deg, #FEF2F1 0%, #F8CECB 48%, #E8837E 100%);
+  --cat-title: #9E1F1F;
+  --cat-glow: #1553A0;
+  --cat-symbol: #1553A0;
+  --cat-edge: #C9544F;
+}
+.home-theme--cobalt.home-tabbar {
+  --home-ink: #FFFFFF;
+  --home-muted: rgba(255, 255, 255, 0.66);
+}
+
+/* Baby Blue & Cherry & Cream (palette E035: #89CFF0, #DE3163, #FFFDD0).
+   Cherry carries the hero and tab bar (white text doesn't read on baby
+   blue); baby blue and cherry alternate across the tiles; the page is the
+   palette cream. Your Week keeps its Oxblood & Ice Blue treatment. */
+.home-theme--cherry {
+  --home-bg: #FFFDD0;
+  --home-shadow-sm: 0 8px 20px -14px rgba(122, 20, 52, 0.36);
+  --home-shadow-md: 0 14px 32px -18px rgba(122, 20, 52, 0.42);
+  --home-shadow-lg: 0 22px 48px -20px rgba(122, 20, 52, 0.48);
+  --home-hero: #DE3163;
+  --home-hero-text: #FFFFFF;
+  --home-hero-soft: #FFE3EA;
+  --home-ink: #1D5E85;            /* baby blue, deep */
+  --home-muted: #4F87A8;
+  --home-icon: #1D5E85;
+  --home-accent: #89CFF0;
+  --home-accent-soft: rgba(137, 207, 240, 0.2);
+  --home-card: #DDF0FB;
+  --home-card-alt: #CBE8F8;
+  --home-control: #FFFDD0;
+  --home-control-ink: #DE3163;
+  --home-tabbar: #DE3163;
+  --home-border: #BFE2F5;
+  --home-shadow: rgba(122, 20, 52, 0.24);
+  --brand-warm: #DE3163;
+  --brand-warm-rgb: 222 49 99;
+  --brand-warm-light: #E85C84;
+  --brand-warm-deep: #B8244F;
+  --brand-warm-deep-rgb: 184 36 79;
+  --brand-warm-ink: #A31D46;
+  --brand-cool: #3E9CCB;
+  --brand-cool-rgb: 62 156 203;
+  --brand-cool-light: #89CFF0;
+  --brand-cool-deep: #1D5E85;
+  --brand-cool-mid: #3E9CCB;
+  --brand-gold: #89CFF0;
+  --brand-gold-rgb: 137 207 240;
+  --brand-done: #DE3163;
+  --brand-done-rgb: 222 49 99;
+  --brand-shadow-rgb: 122 20 52;
+  --cat-calm: #DE3163;
+  --cat-focus: #1D5E85;
+  --cat-lift: #DE3163;
+  --cat-ground: #1D5E85;
+  --cat-sleep: #DE3163;
+  --cat-guide: #1D5E85;
+  --cat-glow: #DE3163;
+  --cat-symbol: #DE3163;
+}
+.home-theme--cherry.home-tabbar {
+  --home-ink: #FFFFFF;
+  --home-muted: rgba(255, 255, 255, 0.72);
+}
+/* Tiles alternate: baby blue with cherry symbols (Calm, Lift, Sleep) and
+   cherry-pink with deep baby-blue symbols (Focus, Ground, Guide me). */
+.home-theme--cherry .home-category-card {
+  --cat-bg: linear-gradient(180deg, #F2FAFE 0%, #C4E7F8 48%, #6FBDE6 100%);
+  --cat-title: #1D5E85;
+  --cat-sub: #FFFFFF;
+  --cat-edge: #4FA6D6;
+}
+.home-theme--cherry .home-category-card[data-variant="alt"] {
+  --cat-bg: linear-gradient(180deg, #FEF0F4 0%, #F7C3D2 48%, #E4587F 100%);
+  --cat-title: #A31D46;
+  --cat-glow: #89CFF0;
+  --cat-symbol: #1D5E85;
+  --cat-edge: #C23A62;
+}
+
+/* Ochre Indigo Blush (Claude's trios #23: #22223B, #CB8E16, #F2C6C2), used
+   strictly — every colour is one of the three or a lighter/darker mix of
+   one. Quiet and editorial: ink frames the screen, ochre is the one warm
+   action colour, blush is the soft surface. Gloss is dialled down. */
+.home-theme--ochre {
+  --home-bg: #FCF5F3;             /* blush, very light */
+  --home-shadow-sm: 0 8px 20px -14px rgba(34, 34, 59, 0.34);
+  --home-shadow-md: 0 14px 32px -18px rgba(34, 34, 59, 0.4);
+  --home-shadow-lg: 0 22px 48px -20px rgba(34, 34, 59, 0.46);
+  --home-hero: #22223B;
+  --home-hero-text: #FCF5F3;
+  --home-hero-soft: #F2C6C2;
+  --home-ink: #22223B;
+  --home-muted: #5E5E78;
+  --home-icon: #22223B;
+  --home-accent: #CB8E16;
+  --home-accent-soft: rgba(203, 142, 22, 0.14);
+  --home-card: #F7DCD9;
+  --home-card-alt: #F2C6C2;
+  --home-control: #F2C6C2;
+  --home-control-ink: #22223B;
+  --home-tabbar: #22223B;
+  --home-border: #EDD3D0;
+  --home-shadow: rgba(34, 34, 59, 0.22);
+  --brand-warm: #CB8E16;
+  --brand-warm-rgb: 203 142 22;
+  --brand-warm-light: #DDAE52;
+  --brand-warm-deep: #A87210;
+  --brand-warm-deep-rgb: 168 114 16;
+  --brand-warm-ink: #8C5E0C;
+  --brand-cool: #22223B;
+  --brand-cool-rgb: 34 34 59;
+  --brand-cool-light: #4A4A6E;
+  --brand-cool-deep: #17172A;
+  --brand-cool-mid: #2E2E4E;
+  --brand-gold: #F2C6C2;
+  --brand-gold-rgb: 242 198 194;
+  --brand-done: #CB8E16;
+  --brand-done-rgb: 203 142 22;
+  --brand-shadow-rgb: 34 34 59;
+  --home-week-bg: linear-gradient(128deg, #FDF3F2 0%, #F8DEDB 45%, #FBEBE9 60%, #F2C6C2 100%);
+  --home-week-border: rgba(34, 34, 59, 0.12);
+  --cat-calm: #22223B;
+  --cat-focus: #22223B;
+  --cat-lift: #22223B;
+  --cat-ground: #22223B;
+  --cat-sleep: #22223B;
+  --cat-guide: #22223B;
+  --cat-glow: #CB8E16;
+  --cat-symbol: #22223B;
+  --cat-gloss: 0.55;
+}
+.home-theme--ochre.home-tabbar {
+  --home-ink: #FCF5F3;
+  --home-muted: rgba(252, 245, 243, 0.62);
+}
+/* Tiles alternate: blush (Calm, Lift, Sleep) and ochre (Focus, Ground,
+   Guide me), both with ink symbols and ink titles. */
+.home-theme--ochre .home-category-card {
+  --cat-bg: linear-gradient(180deg, #FDF4F3 0%, #F6D6D2 50%, #DFA29C 100%);
+  --cat-title: #22223B;
+  --cat-sub: #FFFFFF;
+  --cat-edge: #CF918B;
+}
+.home-theme--ochre .home-category-card[data-variant="alt"] {
+  --cat-bg: linear-gradient(180deg, #FBF3E2 0%, #EDD29A 50%, #C99024 100%);
+  --cat-glow: #F2C6C2;
+  --cat-edge: #A87210;
+}
+
+/* Forest Luxe (iconic trios I006: #2D4A3E forest, #722F37 burgundy,
+   #C9A86A champagne gold) on ivory — a gold-mixed off-white. Sleek and
+   quiet: dark matte tiles with a suede-like felt, gold line symbols, fine
+   gold hairlines, and only a whisper of gloss. */
+.home-theme--luxe {
+  --home-bg: #F7F3EA;             /* ivory (gold, very light) */
+  --home-shadow-sm: 0 8px 20px -14px rgba(20, 34, 28, 0.4);
+  --home-shadow-md: 0 14px 32px -18px rgba(20, 34, 28, 0.46);
+  --home-shadow-lg: 0 22px 48px -20px rgba(20, 34, 28, 0.52);
+  --home-hero: #2D4A3E;
+  --home-hero-text: #F7F3EA;
+  --home-hero-soft: #DCCDA8;
+  --home-ink: #1F352C;            /* forest, deep */
+  --home-muted: #6B7A70;
+  --home-icon: #1F352C;
+  --home-accent: #C9A86A;
+  --home-accent-soft: rgba(201, 168, 106, 0.16);
+  --home-card: #2D4A3E;
+  --home-card-alt: #722F37;
+  --home-control: #F7F3EA;
+  --home-control-ink: #2D4A3E;
+  --home-tabbar: #1F352C;
+  --home-border: rgba(201, 168, 106, 0.45);
+  --home-shadow: rgba(20, 34, 28, 0.3);
+  --brand-warm: #722F37;
+  --brand-warm-rgb: 114 47 55;
+  --brand-warm-light: #9A4550;
+  --brand-warm-deep: #5A242B;
+  --brand-warm-deep-rgb: 90 36 43;
+  --brand-warm-ink: #722F37;
+  --brand-cool: #2D4A3E;
+  --brand-cool-rgb: 45 74 62;
+  --brand-cool-light: #4F7263;
+  --brand-cool-deep: #1F352C;
+  --brand-cool-mid: #35574A;
+  --brand-gold: #C9A86A;
+  --brand-gold-rgb: 201 168 106;
+  --brand-done: #C9A86A;
+  --brand-done-rgb: 201 168 106;
+  --brand-shadow-rgb: 20 34 28;
+  --home-week-bg: linear-gradient(128deg, #FBF8F1 0%, #F2EADA 50%, #F8F3E8 70%, #EFE4CE 100%);
+  --home-week-border: rgba(201, 168, 106, 0.6);
+  --cat-glow: #C9A86A;
+  --cat-symbol: #C9A86A;
+  --cat-gloss: 0.18;
+}
+.home-theme--luxe.home-tabbar {
+  --home-ink: #F7F3EA;
+  --home-muted: rgba(247, 243, 234, 0.6);
+}
+/* Tiles alternate forest (Calm, Lift, Sleep) and burgundy (Focus, Ground,
+   Guide me): matte, dark, gold symbol, ivory title, a gold hairline rim. */
+.home-theme--luxe .home-category-card {
+  --cat-bg: linear-gradient(180deg, #3A5E4F 0%, #2D4A3E 55%, #22392F 100%);
+  --cat-title: #F7F3EA;
+  --cat-sub: rgba(247, 243, 234, 0.82);
+  --cat-edge: #172821;
+  border-color: rgba(201, 168, 106, 0.55);
+}
+.home-theme--luxe .home-category-card[data-variant="alt"] {
+  --cat-bg: linear-gradient(180deg, #8A3D47 0%, #722F37 55%, #5A242B 100%);
+  --cat-edge: #401A1F;
+}
+
+/* Art Deco Gatsby (magic trios M002: #0B1E2D midnight navy, #C9A227
+   antique gold, #FFFFFF), used strictly. Sleek and blue: a navy hero and tab
+   bar, a white page warmed a touch with gold, tiles alternating midnight
+   navy and a dusk blue mixed from the same navy, gold symbols and hairlines,
+   felt with a whisper of gloss. */
+.home-theme--deco {
+  --home-bg: #FAF7EF;             /* white, warmed with a little gold */
+  --home-shadow-sm: 0 8px 20px -14px rgba(6, 18, 28, 0.4);
+  --home-shadow-md: 0 14px 32px -18px rgba(6, 18, 28, 0.46);
+  --home-shadow-lg: 0 22px 48px -20px rgba(6, 18, 28, 0.52);
+  --home-hero: #0B1E2D;
+  --home-hero-text: #FFFFFF;
+  --home-hero-soft: #E4D6A8;
+  --home-ink: #0B1E2D;
+  --home-muted: #56687A;
+  --home-icon: #0B1E2D;
+  --home-accent: #C9A227;
+  --home-accent-soft: rgba(201, 162, 39, 0.16);
+  --home-card: #0F2438;
+  --home-card-alt: #3A566F;
+  --home-control: #FFFFFF;
+  --home-control-ink: #0B1E2D;
+  --home-tabbar: #0B1E2D;
+  --home-border: rgba(201, 162, 39, 0.45);
+  --home-shadow: rgba(6, 18, 28, 0.3);
+  --brand-warm: #C9A227;
+  --brand-warm-rgb: 201 162 39;
+  --brand-warm-light: #DDBE55;
+  --brand-warm-deep: #9E7F1A;
+  --brand-warm-deep-rgb: 158 127 26;
+  --brand-warm-ink: #8A6E14;
+  --brand-cool: #0B1E2D;
+  --brand-cool-rgb: 11 30 45;
+  --brand-cool-light: #3A566F;
+  --brand-cool-deep: #06121C;
+  --brand-cool-mid: #14304A;
+  --brand-gold: #C9A227;
+  --brand-gold-rgb: 201 162 39;
+  --brand-done: #C9A227;
+  --brand-done-rgb: 201 162 39;
+  --brand-shadow-rgb: 6 18 28;
+  --home-week-bg: linear-gradient(128deg, #FFFFFF 0%, #F6F1E2 50%, #FDFBF6 70%, #F1E9D2 100%);
+  --home-week-border: rgba(201, 162, 39, 0.6);
+  --cat-glow: #C9A227;
+  --cat-symbol: #C9A227;
+  --cat-gloss: 0.2;
+}
+.home-theme--deco.home-tabbar {
+  --home-ink: #FFFFFF;
+  --home-muted: rgba(255, 255, 255, 0.6);
+}
+.home-theme--deco .home-category-card {
+  --cat-bg: linear-gradient(180deg, #1A3550 0%, #0F2438 55%, #0B1E2D 100%);
+  --cat-title: #FFFFFF;
+  --cat-sub: rgba(255, 255, 255, 0.8);
+  --cat-edge: #040B12;
+  border-color: rgba(201, 162, 39, 0.55);
+}
+.home-theme--deco .home-category-card[data-variant="alt"] {
+  --cat-bg: linear-gradient(180deg, #52708C 0%, #3A566F 55%, #2B4459 100%);
+  --cat-edge: #1B2E3E;
+}
+
+/* Sunset Noir — Blood Orange Twilight (Claude's trios #12: #E8491D blood
+   orange, #5B2A6E plum, #FFDD57 sun) taken down to black. The whole screen
+   is the sky: orange at the top, through plum, into black, with palm
+   silhouettes against it. Minimal and edgy on top of that — black and deep
+   plum tiles with thin hairlines, no heavy gloss, white type. */
+.home-theme--sunset {
+  --home-bg: #060608;
+  --home-shadow-sm: 0 8px 20px -14px rgba(0, 0, 0, 0.6);
+  --home-shadow-md: 0 14px 32px -18px rgba(0, 0, 0, 0.66);
+  --home-shadow-lg: 0 22px 48px -20px rgba(0, 0, 0, 0.72);
+  --home-hero: transparent;
+  --home-hero-text: #FFFFFF;
+  --home-hero-soft: #FFE9D6;
+  --home-ink: #FFF4EA;
+  --home-muted: rgba(255, 244, 234, 0.66);
+  --home-icon: #FFF4EA;
+  --home-accent: #00F5D4;
+  --home-accent-soft: rgba(232, 73, 29, 0.2);
+  --home-card: #120A16;
+  --home-card-alt: #2A1435;
+  --home-control: rgba(11, 6, 16, 0.55);
+  --home-control-ink: #FFFFFF;
+  --home-tabbar: #021420;
+  --home-border: rgba(224, 113, 92, 0.45);
+  --home-shadow: rgba(0, 0, 0, 0.55);
+  --brand-warm: #E0715C;
+  --brand-warm-rgb: 224 113 92;
+  --brand-warm-light: #F5906E;
+  --brand-warm-deep: #C1462F;
+  --brand-warm-deep-rgb: 193 70 47;
+  --brand-warm-ink: #F07A4F;
+  --brand-cool: #003049;
+  --brand-cool-rgb: 0 48 73;
+  --brand-cool-light: #1F6A8C;
+  --brand-cool-deep: #2E1538;
+  --brand-cool-mid: #461F56;
+  --brand-gold: #FFDD57;
+  --brand-gold-rgb: 255 221 87;
+  --brand-done: #00C9B1;
+  --brand-done-rgb: 0 201 177;
+  --brand-shadow-rgb: 0 0 0;
+  --home-week-bg: linear-gradient(150deg, rgba(10, 66, 99, 0.78) 0%, rgba(0, 48, 73, 0.82) 50%, rgba(2, 31, 49, 0.88) 100%);
+  --home-week-border: rgba(0, 245, 212, 0.28);
+  --cat-glow: #E0715C;
+  --cat-symbol: #FFB88A;
+  --cat-gloss: 0.08;
+}
+.home-theme--sunset.home-tabbar {
+  --home-ink: #FFFFFF;
+  --home-muted: rgba(255, 255, 255, 0.55);
+}
+/* Tiles: one material and one accent. Deep-sea navy glass, a thin turquoise
+   hairline, turquoise symbols; the six differ by icon, not by colour. Flat
+   frosted glass — no chunky key edge. */
+.home-theme--sunset .home-category-card {
+  --cat-bg:
+    radial-gradient(circle at 100% 100%, rgba(0, 245, 212, 0.16), transparent 58%),
+    linear-gradient(150deg, #0A4263 0%, #003049 45%, #021F31 100%);
+  --cat-title: #FFFFFF;
+  --cat-sub: rgba(255, 255, 255, 0.78);
+  --cat-symbol: #00F5D4;
+  --cat-glow: #00F5D4;
+  --cat-edge: rgba(0, 12, 20, 0.55);
+  border-color: rgba(0, 245, 212, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 2px 0 0 var(--cat-edge),
+    0 14px 26px -14px rgba(0, 0, 0, 0.6);
+}
+.home-theme--sunset .home-category-card[data-pressed="true"] {
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35), 0 1px 0 0 var(--cat-edge);
+}
+/* The header has no card of its own here — it sits straight on the sky. */
+.home-theme--sunset .home-hero {
+  background: none;
+}
+.home-theme--sunset .home-hero-vignette { display: none; }
+.home-theme--sunset .home-hero-finish,
+.home-theme--sunset .home-hero-palms,
+.home-theme--sunset .home-hero-marble,
+.home-theme--sunset .home-hero-streaks { display: none; }
+.home-theme--sunset .home-page-backdrop {
+  display: block;
+  background:
+    radial-gradient(ellipse 100% 50% at 100% 30%, rgba(255, 130, 70, 0.7) 0%, rgba(240, 110, 60, 0.3) 42%, transparent 74%),
+    radial-gradient(ellipse 130% 45% at 30% 0%, rgba(255, 160, 70, 0.6), transparent 72%),
+    linear-gradient(176deg,
+      #D2522C 0%, #DA5E33 10%, #E0693F 20%, #D8654E 30%, #BC5A58 40%,
+      #8E4F68 50%, #4E3268 58%, #2A1548 66%, #170C2B 75%, #0D0718 85%, #050308 94%, #030205 100%);
+}
+/* Sun, bloom and cloud streaks are one static SVG (sunset-sky.svg). */
+.home-theme--sunset .home-page-art { opacity: 0.68; }
+/* The palm is misty, not a crisp cut-out: purple-tinted, soft and hazy,
+   hanging in from the top left. */
+.home-theme--sunset .home-page-palm {
+  max-width: none;
+}
+/* One big palm whose crown sits just off the top-left corner, fronds
+   hanging down and across the upper half of the screen. */
+.home-theme--sunset .home-page-palm--main {
+  top: -13rem; left: -44rem; height: 70rem; width: auto;
+  transform: scaleX(-1);
+  opacity: 0.22;
+}
+.home-theme--sunset .home-page-palm--small {
+  top: 4rem; left: -29rem; height: 42rem; width: auto;
+  transform: scaleX(-1) rotate(10deg);
+  opacity: 0.1;
+}
+.home-theme--sunset .home-hero-watermark { display: none; }
+/* Begin's play icon carries a soft, static orange glow. */
+.home-theme--sunset .home-week .lucide-play {
+  filter: drop-shadow(0 0 4px rgba(255, 130, 20, 0.6));
+}
+/* The heading fits on one line on a phone. */
+.home-theme--sunset .home-heading { font-size: clamp(1.25rem, 6.2vw, 1.75rem); }
+/* Three compact tiles per row. */
+.home-theme--sunset .home-cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.home-theme--sunset .home-category-card {
+  min-height: 8.4rem; padding: 0.85rem 0.4rem; gap: 0.45rem; border-radius: 1.15rem;
+}
+.home-theme--sunset .home-cat-icon { width: 3.1rem; height: 3.1rem; }
+.home-theme--sunset .home-cat-glyph { width: 1.8rem; height: 1.8rem; }
+.home-theme--sunset .home-cat-label { font-size: 0.95rem; margin-top: 0.1rem; }
+.home-theme--sunset .home-cat-sub { font-size: 0.74rem; line-height: 1.25; }
+
+/* Begin's play icon pulses (transform only, so it stays smooth). */
+@keyframes sunset-play-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.14); }
+}
+.home-theme--sunset .home-week .lucide-play { animation: sunset-play-pulse 1.9s ease-in-out infinite; will-change: transform; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-theme--sunset .home-week .lucide-play,
+  .home-week-shine { animation: none; }
+}
+
+/* "More ways in": about half the size, with a turquoise border. */
+.home-theme--sunset .home-more-card {
+  height: 10.4rem; width: 6.75rem; border-radius: 1.05rem;
+  border: 1.5px solid #00F5D4;
+  box-shadow: 0 0 12px -2px rgba(0, 245, 212, 0.4), 0 10px 22px -14px rgba(0, 0, 0, 0.6);
+}
+.home-theme--sunset .home-more-row { justify-content: center; padding-left: 0.5rem; padding-right: 0.5rem; }
+.home-theme--sunset .home-more-text { padding: 0.6rem; }
+.home-theme--sunset .home-more-eyebrow { font-size: 0.56rem; letter-spacing: 0.1em; }
+.home-theme--sunset .home-more-title { font-size: 0.8rem; margin-top: 0.2rem; line-height: 1.2; }
+.home-theme--sunset .home-more-caption { font-size: 0.64rem; margin-top: 0.15rem; }
+/* Greeting block sits halfway between the tagline and Your Week. */
+.home-theme--sunset .home-greeting { margin-top: 1.1rem; margin-bottom: 0.2rem; max-width: none; text-align: center; }
+.home-theme--sunset .home-greeting h1,
+.home-theme--sunset .home-greeting > p:last-child { display: none; }
+.home-theme--sunset .home-greeting > p:first-child { justify-content: center; font-size: 0.72rem; }
+/* Legibility comes from the sky itself (the sun sits lower, behind the tiles,
+   so the header sits on the deeper orange/rose part of the sky) plus a light
+   text shadow — no separate blobs behind the text. */
+.home-theme--sunset .home-tagline { text-shadow: 0 1px 8px rgba(120, 40, 50, 0.55); }
+.home-theme--sunset .home-hero { padding-bottom: 0.15rem; }
+.home-theme--sunset .home-week-section { padding-top: 0.6rem; }
+
+/* A bigger wordmark: the two round buttons sit up at the top corners and
+   the logo runs almost edge to edge just below them. */
+.home-theme--sunset .home-hero-row { align-items: flex-start; }
+.home-theme--sunset .home-hero-logo {
+  inset: auto;
+  left: 50%;
+  top: 62%;
+  width: 21.5rem;
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+/* Your Week: 7 days in burnt orange taken from the sky, Begin in turquoise,
+   and today's ring / completed days in turquoise — the accent. */
+.home-theme--sunset .home-week {
+  --brand-warm-light: #F07A3E;
+  --brand-warm-deep: #9A3E2A;
+  --brand-warm-deep-rgb: 154 62 42;
+  --brand-warm: #00F5D4;
+  --brand-warm-rgb: 0 245 212;
+  --brand-warm-ink: #00F5D4;
+  --brand-cool-light: #7CFBE6;
+  --brand-cool: #00B5A0;
+  --brand-cool-rgb: 0 181 160;
+  --brand-done: #00C9B1;
+  --brand-done-rgb: 0 201 177;
+  /* "Begin" (the second button): a deep-sea navy label and an orange play
+     icon, so both read clearly on the turquoise. */
+  --power-label-1: #FFFFFF;
+  --power-icon-1: #FF7A14;
+}
+/* Headings stay white — turquoise is kept for things you can tap. */
+.home-theme--sunset .home-heading {
+  color: #FBEBD2;
+  text-shadow: 0 1px 8px rgba(120, 40, 50, 0.5);
+}
+/* Lift the wordmark off the orange sky with a soft, dark halo. */
+.home-theme--sunset .home-hero img[src*="holiday"] {
+  filter: drop-shadow(0 1px 8px rgba(255, 190, 140, 0.45));
+}
+/* A dusty haze and film grain over everything. */
+.home-theme--sunset .home-page-haze {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 8%, rgba(255, 170, 120, 0.18), transparent 70%),
+    linear-gradient(180deg, rgba(255, 240, 228, 0.06) 0%, rgba(255, 232, 215, 0.14) 50%, rgba(30, 20, 44, 0.06) 100%),
+    linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+.home-theme--sunset .home-page-grain {
+  opacity: 0.35;
+  border-radius: 0;
+  mix-blend-mode: normal;
+}
+.home-theme--sunset .home-page-backdrop { contain: strict; transform: translateZ(0); }
+.home-theme--sunset .home-category-card .home-felt,
+.home-theme--sunset .home-cat-sheen { display: none; }
 
 /* A faint paper grain and a very slow ambient drift across the whole Home
    background, instead of a flat, static cream fill. */
 .home-theme {
   background-image:
-    radial-gradient(circle at 15% 15%, rgba(224, 113, 92, 0.05), transparent 40%),
-    radial-gradient(circle at 85% 75%, rgba(14, 42, 82, 0.04), transparent 45%),
+    radial-gradient(circle at 15% 15%, rgb(var(--brand-warm-rgb, 224 113 92) / 0.05), transparent 40%),
+    radial-gradient(circle at 85% 75%, rgb(var(--brand-cool-rgb, 14 42 82) / 0.04), transparent 45%),
     url("/media/textures/felt-grain.svg");
   background-blend-mode: normal, normal, soft-light;
   background-size: 160% 160%, 160% 160%, 200px 200px;
@@ -81,11 +944,34 @@
   .home-theme { animation: none; }
 }
 
+/* Category tiles are raised, glossy keys: lighter at the top, a solid
+   darker "edge" underneath, and a press that sinks the tile onto that edge. */
 .home-category-card {
   border: 1px solid var(--home-border);
+  background: var(--cat-bg, linear-gradient(180deg,
+    color-mix(in srgb, var(--home-card) 55%, white) 0%,
+    var(--home-card) 48%,
+    color-mix(in srgb, var(--home-card) 90%, rgb(var(--brand-shadow-rgb))) 100%));
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.72),
-    4px 5px 14px -4px var(--home-shadow);
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    inset 0 -3px 6px rgb(var(--brand-shadow-rgb) / 0.18),
+    0 7px 0 0 var(--cat-edge, rgb(var(--brand-shadow-rgb) / 0.16)),
+    0 9px 2px -1px rgb(var(--brand-shadow-rgb) / 0.18),
+    0 18px 28px -12px var(--home-shadow);
+  transition: box-shadow 0.12s ease, transform 0.12s ease;
+}
+.home-felt {
+  background-image: url("/media/textures/felt-grain.svg");
+  background-size: 140px 140px;
+  mix-blend-mode: soft-light;
+  opacity: 1;
+}
+.home-category-card[data-pressed="true"] {
+  box-shadow:
+    inset 0 3px 8px rgb(var(--brand-shadow-rgb) / 0.24),
+    0 1px 0 0 var(--cat-edge, rgb(var(--brand-shadow-rgb) / 0.16)),
+    0 3px 6px -4px var(--home-shadow);
 }
 
 .home-hero {
@@ -131,6 +1017,228 @@
     radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04), transparent 55%),
     radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.28), transparent 60%),
     linear-gradient(165deg, #0D2247 0%, #081A34 55%, #050F20 100%);
+}
+
+.home-theme--midcentury .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.08), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.16), transparent 60%),
+    linear-gradient(165deg, #4A4E6E 0%, #3D405B 55%, #2E3048 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--midcentury .home-hero[data-time="morning"] {
+  background-image:
+    radial-gradient(circle at 18% 0%, rgba(242, 204, 143, 0.16), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.14), transparent 60%),
+    linear-gradient(165deg, #555A7C 0%, #42466A 55%, #2E3048 100%);
+}
+.home-theme--midcentury .home-hero[data-time="evening"] {
+  background-image:
+    radial-gradient(circle at 22% 4%, rgba(224, 122, 95, 0.18), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.18), transparent 60%),
+    linear-gradient(165deg, #4A4E6E 0%, #3D405B 55%, #292B40 100%);
+}
+.home-theme--midcentury .home-hero[data-time="night"] {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.26), transparent 60%),
+    linear-gradient(165deg, #35384F 0%, #2A2C40 55%, #1C1D2B 100%);
+}
+
+.home-theme--forest .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.07), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.2), transparent 60%),
+    linear-gradient(165deg, #125440 0%, #0B3D2E 55%, #072A20 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--forest .home-hero[data-time="morning"] {
+  background-image:
+    radial-gradient(circle at 18% 0%, rgba(242, 193, 78, 0.2), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.16), transparent 60%),
+    linear-gradient(165deg, #175E49 0%, #0E4535 55%, #072A20 100%);
+}
+.home-theme--forest .home-hero[data-time="evening"] {
+  background-image:
+    radial-gradient(circle at 22% 4%, rgba(255, 107, 53, 0.2), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.22), transparent 60%),
+    linear-gradient(165deg, #125440 0%, #0B3D2E 55%, #06241B 100%);
+}
+.home-theme--forest .home-hero[data-time="night"] {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.3), transparent 60%),
+    linear-gradient(165deg, #0C3A2C 0%, #072A20 55%, #041A14 100%);
+}
+
+.home-theme--inkpeach .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.07), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.2), transparent 60%),
+    linear-gradient(165deg, #28284F 0%, #1B1B3A 55%, #121229 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--inkpeach .home-hero[data-time="morning"] {
+  background-image:
+    radial-gradient(circle at 18% 0%, rgba(255, 203, 164, 0.2), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.16), transparent 60%),
+    linear-gradient(165deg, #30305A 0%, #1F1F42 55%, #121229 100%);
+}
+.home-theme--inkpeach .home-hero[data-time="evening"] {
+  background-image:
+    radial-gradient(circle at 22% 4%, rgba(255, 203, 164, 0.24), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.22), transparent 60%),
+    linear-gradient(165deg, #28284F 0%, #1B1B3A 55%, #0F0F24 100%);
+}
+.home-theme--inkpeach .home-hero[data-time="night"] {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.3), transparent 60%),
+    linear-gradient(165deg, #1E1E40 0%, #141430 55%, #0A0A1C 100%);
+}
+
+.home-theme--lagoon .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.07), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.2), transparent 60%),
+    linear-gradient(165deg, #2F5563 0%, #264653 55%, #1C353F 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--lagoon .home-hero[data-time="morning"],
+.home-theme--lagoon .home-hero[data-time="evening"] {
+  background-image:
+    radial-gradient(circle at 20% 2%, rgba(233, 196, 106, 0.2), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.18), transparent 60%),
+    linear-gradient(165deg, #2F5563 0%, #264653 55%, #1C353F 100%);
+}
+.home-theme--lagoon .home-hero[data-time="night"] {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.04), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.3), transparent 60%),
+    linear-gradient(165deg, #22404C 0%, #1C353F 55%, #13252C 100%);
+}
+
+.home-theme--cobalt .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.1), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.18), transparent 60%),
+    linear-gradient(165deg, #1D63B5 0%, #1553A0 55%, #0E3F7E 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--cobalt .home-hero[data-time="night"] {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.05), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.28), transparent 60%),
+    linear-gradient(165deg, #164E94 0%, #0E3F7E 55%, #0A2E5E 100%);
+}
+
+.home-theme--cherry .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.1), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.14), transparent 60%),
+    linear-gradient(165deg, #E54A76 0%, #DE3163 55%, #B8244F 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--cherry .home-hero[data-time="night"] {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.05), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.24), transparent 60%),
+    linear-gradient(165deg, #CC2A58 0%, #B8244F 55%, #8E1B3D 100%);
+}
+
+.home-theme--ochre .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.2), transparent 60%),
+    linear-gradient(165deg, #2E2E4E 0%, #22223B 55%, #17172A 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--ochre .home-hero[data-time="morning"],
+.home-theme--ochre .home-hero[data-time="evening"] {
+  background-image:
+    radial-gradient(circle at 20% 2%, rgba(203, 142, 22, 0.16), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.2), transparent 60%),
+    linear-gradient(165deg, #2E2E4E 0%, #22223B 55%, #17172A 100%);
+}
+
+.home-theme--luxe .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.22), transparent 60%),
+    linear-gradient(165deg, #35574A 0%, #2D4A3E 55%, #1F352C 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+.home-theme--luxe .home-hero[data-time="morning"],
+.home-theme--luxe .home-hero[data-time="evening"] {
+  background-image:
+    radial-gradient(circle at 20% 2%, rgba(201, 168, 106, 0.16), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.22), transparent 60%),
+    linear-gradient(165deg, #35574A 0%, #2D4A3E 55%, #1F352C 100%);
+}
+
+.home-theme--deco .home-hero {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(0, 0, 0, 0.24), transparent 60%),
+    linear-gradient(165deg, #14304A 0%, #0B1E2D 55%, #06121C 100%);
+  background-blend-mode: soft-light, soft-light, normal;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  transition: background-image 1.2s ease;
+}
+
+/* Hero "finish" layers (off unless a theme turns them on). */
+.home-hero-finish,
+.home-hero-palms,
+.home-page-backdrop { display: none; }
+
+/* Forest Luxe hero: no marble or streaks — a felt surface with a soft sheen,
+   like the tiles, and a barely-there champagne trellis: fine diagonal
+   lines with a tiny diamond at each crossing. */
+.home-theme--luxe .home-hero-marble,
+.home-theme--luxe .home-hero-streaks,
+.home-theme--deco .home-hero-marble,
+.home-theme--deco .home-hero-streaks,
+.home-theme--sunset .home-hero-marble,
+.home-theme--sunset .home-hero-streaks { display: none; }
+.home-theme--luxe .home-hero-finish,
+.home-theme--deco .home-hero-finish { display: block; }
+.home-theme--luxe .home-hero-pattern,
+.home-theme--deco .home-hero-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'%3E%3Cg fill='none' stroke='%23C9A86A' stroke-width='0.6'%3E%3Cpath d='M0 0L34 34M34 0L0 34'/%3E%3C/g%3E%3Cpath d='M17 14.6L19.4 17L17 19.4L14.6 17Z' fill='%23C9A86A'/%3E%3C/svg%3E");
+  background-size: 34px 34px;
+  opacity: 0.09;
+  mask-image: linear-gradient(180deg, black 0%, black 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, black 0%, black 55%, transparent 100%);
+}
+.home-theme--luxe .home-hero .home-felt,
+.home-theme--deco .home-hero .home-felt,
+.home-theme--sunset .home-hero .home-felt {
+  border-radius: 0;
+  opacity: 0.9;
+}
+.home-theme--luxe .home-hero-gloss,
+.home-theme--deco .home-hero-gloss,
+.home-theme--sunset .home-hero-gloss {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgba(255, 255, 255, 0.13), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(0deg, rgba(201, 168, 106, 0.08) 0%, transparent 22%);
 }
 
 .home-hero-glow {
@@ -256,3 +1364,103 @@ html.reduce-motion .welcome-glow--secondary {
 @media (prefers-reduced-motion: reduce) {
   .welcome-glow, .welcome-glow--secondary { animation: none; opacity: 0.14; }
 }
+
+/* Your Week light sweep: a soft diagonal band moved with transform only. */
+@keyframes home-week-shine {
+  0% { transform: translateX(-140%) skewX(-14deg); opacity: 0; }
+  12% { opacity: 1; }
+  55% { transform: translateX(520%) skewX(-14deg); opacity: 1; }
+  62%, 100% { transform: translateX(520%) skewX(-14deg); opacity: 0; }
+}
+.home-week-shine {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: home-week-shine 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Sunset: Your Week at about 75% of its former size. */
+/* Sunset: Your Week runs the full page width (same margins as everything
+   else) but is short: the seven days sit on one line in the left half, and
+   the two buttons sit in the right half. */
+.home-theme--sunset .home-week-days { grid-template-columns: repeat(7, minmax(0, 1fr)); column-gap: 0.18rem; row-gap: 0; }
+.home-theme--sunset .home-week-days > span { grid-column: auto / span 1 !important; font-size: 0.62rem; }
+.home-theme--sunset .home-week .home-power { flex: 0 1 3.9rem; }
+.home-theme--sunset .home-week .home-power button { border-width: 0; }
+
+/* Sunset: "More ways in" sits closer to the tiles above it. */
+.home-theme--sunset .home-more-section { padding-top: 1.2rem; }
+.home-theme--sunset .home-more-section > div { margin-top: 0.5rem; }
+.home-theme--sunset .home-divider { margin-top: 1.9rem; opacity: 0.5; }
+
+/* Sunset spacing system: 16px page margin, 8px gaps, 16px card radius. */
+.home-theme--sunset .px-5 { padding-left: 1rem; padding-right: 1rem; }
+.home-theme--sunset .mx-5 { margin-left: 1rem; margin-right: 1rem; }
+.home-theme--sunset .home-cat-grid { gap: 0.5rem; }
+.home-theme--sunset .home-category-card { border-radius: 1rem; }
+.home-theme--sunset .home-week { border-radius: 1rem; }
+.home-theme--sunset .home-more-card { border-radius: 1rem; }
+.home-theme--sunset .home-more-row { gap: 0.5rem; padding-left: 0.5rem; padding-right: 0.5rem; }
+.home-theme--sunset .home-greeting { margin-top: 1rem; margin-bottom: 0.25rem; }
+.home-theme--sunset .home-week-section { padding-top: 0.5rem; }
+.home-theme--sunset .home-heading-section { padding-top: 1.5rem; }
+.home-theme--sunset .home-divider { margin-top: 2rem; }
+.home-theme--sunset .home-more-section { padding-top: 1rem; }
+
+/* ---- Premium pass 2 ---- */
+/* 1. No duplicate header buttons: Profile and Insights live in the tab bar. */
+.home-theme--sunset .home-hero-btn { visibility: hidden; }
+/* 2 + 3. Tiles: icon and one-word name only; no ring around the icon. */
+.home-theme--sunset .home-cat-sub { display: none; }
+.home-theme--sunset .home-cat-icon { box-shadow: none; --tw-ring-shadow: 0 0 #0000; width: 2.6rem; height: 2.6rem; }
+.home-theme--sunset .home-cat-glyph { width: 2.1rem; height: 2.1rem; }
+.home-theme--sunset .home-category-card { min-height: 6.4rem; gap: 0.55rem; justify-content: center; }
+.home-theme--sunset .home-cat-label { font-size: 0.92rem; font-weight: 600; margin-top: 0; }
+/* 4. Your Week: dots instead of lettered circles; a Begin pill and a link. */
+.home-theme--sunset .home-week-days > span {
+  width: 0.62rem !important; height: 0.62rem !important; min-width: 0; aspect-ratio: auto;
+  justify-self: center; font-size: 0 !important; border-width: 1.5px;
+}
+.home-theme--sunset .home-week-days { column-gap: 0.35rem; margin-top: 0.55rem; }
+.home-theme--sunset .home-week-begin {
+  background: #00F5D4; color: #03283B;
+  box-shadow: 0 6px 18px -8px rgba(0, 245, 212, 0.7);
+  transition: transform 0.12s ease;
+}
+.home-theme--sunset .home-week-begin:active { transform: scale(0.97); }
+.home-theme--sunset .home-week-begin svg { color: #D9531E; }
+.home-theme--sunset .home-week-link { color: rgba(255, 255, 255, 0.72); }
+/* 6. One label style (small spaced caps); an editorial serif for the heading. */
+.home-theme--sunset .home-greeting > p:first-child,
+.home-theme--sunset .home-week .text-\[0\.58rem\],
+.home-theme--sunset .home-more-section > h2 {
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.2em;
+}
+.home-theme--sunset .home-heading {
+  font-family: var(--font-editorial); font-weight: 400; letter-spacing: -0.01em;
+  font-size: clamp(1.45rem, 7vw, 1.9rem);
+}
+/* 7. More ways in: a calm colour cover instead of tiny screenshots; hairline. */
+.home-theme--sunset .home-more-shot { display: none; }
+.home-theme--sunset .home-more-card {
+  border: 1px solid rgba(0, 245, 212, 0.38);
+  box-shadow: 0 10px 22px -14px rgba(0, 0, 0, 0.6);
+}
+/* 8. Palm pulled out to the edge so the wordmark has clean air. */
+.home-theme--sunset .home-page-palm--main { top: -19rem; left: -52rem; }
+/* 10. Footer sits neatly above the tab bar; no dead space. */
+.home-theme--sunset .home-footer { padding-top: 1.5rem; }
+.home-theme--sunset .home-footer > div { margin-top: 0; }
+.home-theme--sunset .home-bottom-spacer { height: 6.5rem; }
+
+/* ---- Top bar + left-aligned heading (sunset) ---- */
+.home-theme--sunset .home-hero-row { display: none; }
+.home-theme--sunset .home-topbar-btn {
+  color: #FFFFFF; background: rgba(10, 20, 32, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.home-theme--sunset .home-topbar-logo { filter: drop-shadow(0 1px 6px rgba(255, 190, 140, 0.4)); }
+.home-theme--sunset .home-greeting { text-align: left; margin-top: 0.6rem; }
+.home-theme--sunset .home-greeting > p:first-child { justify-content: flex-start; }
+.home-theme--sunset .home-page-palm--main { top: -16rem; }
+.home-theme--sunset .home-topbar-logo { height: 3.6rem; width: auto; max-width: none; margin-right: -0.4rem; }
+.home-theme--sunset .home-tagline { color: #D4FBF4; text-shadow: 0 1px 2px rgba(0, 48, 73, 0.55), 0 2px 14px rgba(0, 48, 73, 0.45); }

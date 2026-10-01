@@ -12,7 +12,7 @@ export default function ParkedNudge({ onOpen }) {
         type="button"
         onClick={onOpen}
         aria-label="Review what you parked last night"
-        className="no-tap flex min-h-11 w-full items-center gap-3 rounded-[18px] border border-[var(--home-ink)]/10 bg-white/55 px-4 py-2.5 text-left backdrop-blur transition-transform active:scale-[0.99]"
+        className="no-tap flex min-h-11 w-full items-center gap-3 rounded-[18px] border border-[var(--home-ink)]/10 bg-[var(--home-card)] px-4 py-2.5 text-left backdrop-blur transition-transform active:scale-[0.99]"
       >
         <span aria-hidden="true" className="text-base leading-none">🅿️</span>
         <span className="min-w-0 flex-1 truncate text-[0.82rem] font-medium text-[var(--home-ink)]">Something's parked from last night</span>

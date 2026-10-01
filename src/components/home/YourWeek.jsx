@@ -46,7 +46,7 @@ export default function YourWeek({ sessions, onOpen }) {
         type="button"
         onClick={onOpen}
         aria-label={`Your week: ${week.line} Open your progress.`}
-        className="w-full rounded-[24px] border border-[var(--home-ink)]/10 bg-white/60 px-5 py-4 text-left shadow-[0_10px_28px_-20px_rgba(17,43,80,0.45)] backdrop-blur"
+        className="w-full rounded-[24px] border border-[var(--home-ink)]/10 bg-[var(--home-card)] px-5 py-4 text-left shadow-[0_10px_28px_-20px_rgb(var(--brand-shadow-rgb)/0.45)] backdrop-blur"
       >
         <div className="flex items-baseline justify-between gap-3">
           <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[var(--home-ink)]/55">Your week</p>
@@ -58,9 +58,9 @@ export default function YourWeek({ sessions, onOpen }) {
               <span
                 className={`grid h-8 w-8 place-items-center rounded-full text-[0.7rem] font-semibold transition ${
                   day.done
-                    ? "bg-[#E0715C] text-white shadow-[0_6px_14px_-8px_rgba(224,113,92,0.9)]"
+                    ? "bg-[var(--brand-done)] text-white shadow-[0_6px_14px_-8px_rgb(var(--brand-done-rgb)/0.9)]"
                     : day.today
-                      ? "border-2 border-[#E0715C]/60 text-[var(--home-ink)]/70"
+                      ? "border-2 border-[rgb(var(--brand-warm-rgb)/0.6)] text-[var(--home-ink)]/70"
                       : day.future
                         ? "border border-dashed border-[var(--home-ink)]/15 text-[var(--home-ink)]/30"
                         : "border border-[var(--home-ink)]/15 text-[var(--home-ink)]/45"

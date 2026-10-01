@@ -2,7 +2,11 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+
+// A static, shareable build (VITE_HASH_ROUTER=1) is served from a sub-path
+// with no server rewrites, so it routes with the URL hash instead.
+const Router = import.meta.env.VITE_HASH_ROUTER === '1' ? HashRouter : BrowserRouter;
 import { lazy, Suspense, useEffect } from 'react';
 import { refreshPlus } from '@/lib/subscription';
 import PageNotFound from './lib/PageNotFound';

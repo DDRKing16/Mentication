@@ -14,11 +14,9 @@ import TodayStrip from "@/components/home/TodayStrip";
 import FirstWinCard from "@/components/home/FirstWinCard";
 import MoreWaysIn from "@/components/home/MoreWaysIn";
 import WhatsNewRibbon from "@/components/home/WhatsNewRibbon";
-import ParkedNudge from "@/components/home/ParkedNudge";
 import { activeProgrammeId, getProgramme, launchStateFor, programmeProgress, programmeStartedAt } from "@/lib/programmes";
 import { computeLocalCalendarStreak } from "@/lib/insights";
 import { HOME_THEME } from "@/lib/homeTheme";
-import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
 import { usePlus } from "@/lib/subscription";
 
 // Tracks the last time Insights was opened, purely on-device, so the small
@@ -76,7 +74,6 @@ export default function Home() {
   const [lastWorked, setLastWorked] = useState(null);
   const [personalBest, setPersonalBest] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
-  const [parkedNotes, setParkedNotes] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [hasNewInsight, setHasNewInsight] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -119,7 +116,6 @@ export default function Home() {
     setLoaded(true);
   };
   useEffect(() => { loadSessions().catch(() => {}); }, []);
-  useEffect(() => { setParkedNotes(hasParkedNotes()); }, []);
 
   const choose = (card) => {
     if (card.unsure) navigate("/reset", { state: { unsure: true } });
@@ -161,9 +157,20 @@ export default function Home() {
 
   return (
     <PullToRefresh onRefresh={loadSessions}>
-      <div className={`home-theme home-theme--${HOME_THEME} min-h-full bg-[var(--home-bg)] text-[var(--home-ink)]`}>
+      <div className={`home-theme home-theme--${HOME_THEME} relative isolate min-h-full bg-[var(--home-bg)] text-[var(--home-ink)]`}>
+        {/* A full-screen backdrop some themes switch on (the sunset sky and
+            palms sit behind everything, not just the header). Hidden by
+            default. */}
+        <div aria-hidden="true" className="home-page-backdrop pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+          <img src="/media/brand/sunset-sky.svg" alt="" draggable={false} className="home-page-art absolute inset-0 h-full w-full select-none object-cover object-right-top" />
+          <img src="/media/brand/palm-silhouette-dusk.svg" alt="" draggable={false} className="home-page-palm home-page-palm--main absolute select-none" />
+          <img src="/media/brand/palm-silhouette-dusk.svg" alt="" draggable={false} className="home-page-palm home-page-palm--small absolute select-none" />
+          <span className="home-page-haze absolute inset-0" />
+          <span className="home-felt home-page-grain absolute inset-0" />
+        </div>
         <div className="mx-auto flex min-h-full max-w-[36rem] flex-col">
           <HomeHero
+            onMenu={() => navigate("/settings")}
             onProfile={() => navigate("/profile")}
             onInsights={() => { markInsightsSeen(); setHasNewInsight(false); navigate("/insights"); }}
             hasNewInsight={hasNewInsight}
@@ -202,11 +209,11 @@ export default function Home() {
             }
           />
 
-          <motion.section {...reveal(2)} className="px-5 pt-5">
-            <h2 className="text-center font-clean text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-[var(--home-ink)]">
+          <motion.section {...reveal(2)} className="home-heading-section px-5 pt-5">
+            <h2 className="home-heading whitespace-nowrap text-center font-clean text-[1.75rem] font-semibold leading-tight tracking-[-0.02em] text-[var(--home-ink)]">
               What do you need right now?
             </h2>
-            <div className="mt-6 grid grid-cols-2 gap-4 min-[430px]:grid-cols-3">
+            <div className="home-cat-grid mt-6 grid grid-cols-2 gap-4 min-[430px]:grid-cols-3">
               {orderedGrid().map((c, i) => (
                 <CategoryCard key={c.id} card={c} index={i} recent={!!recentTint && c.tint === recentTint} onClick={() => choose(c)} />
               ))}
@@ -215,7 +222,7 @@ export default function Home() {
 
           {/* A quiet break between the everyday grid above and the longer,
               optional journeys below, instead of running straight into them. */}
-          <div className="mx-5 mt-9 h-px bg-[var(--home-ink)]/10" />
+          <div className="home-divider mx-5 mt-9 h-px bg-[var(--home-ink)]/10" />
 
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -226,17 +233,11 @@ export default function Home() {
             <MoreWaysIn plusActive={plus.active} onOpen={(route) => navigate(route)} />
           </motion.div>
 
-          {parkedNotes && (
-            <motion.div {...reveal(4)}>
-              <ParkedNudge onOpen={() => navigate("/parking-lot", { state: { fromHome: true } })} />
-            </motion.div>
-          )}
-
-          <div className="px-5 pt-8">
-            <SafetyFooter dark={false} />
+          <div className="home-footer px-5 pt-8">
+            <SafetyFooter home />
           </div>
 
-          <div className="h-32" />
+          <div className="home-bottom-spacer h-32" />
         </div>
       </div>
     </PullToRefresh>

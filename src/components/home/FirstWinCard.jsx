@@ -43,7 +43,7 @@ export default function FirstWinCard({ sessionCount, plusActive, hasActiveProgra
 
   return (
     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="px-5 pt-6">
-      <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-[#112b50] via-[#2a3f6e] to-[#E0715C] p-6 text-white shadow-[0_24px_50px_-28px_rgba(17,43,80,0.9)]">
+      <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-[var(--brand-cool-deep)] via-[var(--brand-cool-mid)] to-[var(--brand-warm)] p-6 text-white shadow-[0_24px_50px_-28px_rgb(var(--brand-shadow-rgb)/0.9)]">
         <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
         <button type="button" onClick={close} aria-label="Not now" className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full text-white/70 hover:text-white">
           <X className="h-5 w-5" />
@@ -57,8 +57,8 @@ export default function FirstWinCard({ sessionCount, plusActive, hasActiveProgra
             <Bell className="h-4 w-4 shrink-0" /> Remind me each evening
           </button>
           {reminderNote && <p className="px-1 text-xs leading-relaxed text-white/80" role="status">{reminderNote}</p>}
-          <button type="button" onClick={go(onProgramme)} className="flex min-h-12 w-full items-center gap-3 rounded-2xl bg-white px-4 text-left text-sm font-semibold text-[#112b50]">
-            <CalendarDays className="h-4 w-4 shrink-0 text-[#E0715C]" /> Try seven calmer days <span className="ml-auto text-xs font-medium text-[#112b50]/60">Free</span>
+          <button type="button" onClick={go(onProgramme)} className="flex min-h-12 w-full items-center gap-3 rounded-2xl bg-[var(--home-card)] px-4 text-left text-sm font-semibold text-[var(--brand-cool-deep)]">
+            <CalendarDays className="h-4 w-4 shrink-0 text-[var(--brand-warm)]" /> Try seven calmer days <span className="ml-auto text-xs font-medium text-[var(--brand-cool-deep)]/60">Free</span>
           </button>
         </div>
 

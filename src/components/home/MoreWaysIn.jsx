@@ -1,9 +1,8 @@
 // "More ways in": Journal, The Good Map and Dear 2100, as one compact
 // horizontal row instead of three full-width blocks stacked on top of each
-// other. Good Map and Dear 2100 show a real screenshot of the journey (the
-// same ones used on the Plus paywall) so the card is a genuine glimpse, not
-// just another coloured slab; Journal gets its own textured treatment since
-// there's nothing to preview — it's a free, everyday tool, not a locked one.
+// other. Each card shows a real screenshot of the journey (Good Map and Dear
+// 2100 use the same ones as the Plus paywall; Journal shows its end-of-entry
+// day summary) so the card is a genuine glimpse, not a coloured slab.
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Mic } from "lucide-react";
@@ -15,9 +14,10 @@ const ITEMS = [
     route: "/journal",
     eyebrow: "Journal",
     title: "Check in with yourself",
-    tint: "#38221E",
-    accent: "#C29B68",
+    tint: "#2E4753",
+    accent: "#E6C9A0",
     icon: Mic,
+    image: "/media/plus-preview/journal.jpg",
   },
   {
     id: "goodMap",
@@ -86,10 +86,10 @@ export default function MoreWaysIn({ plusActive, onOpen }) {
   }, []);
 
   return (
-    <section className="pt-8">
+    <section className="home-more-section pt-8">
       <h2 className="px-5 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--home-ink)]/55">More ways in</h2>
       <div className="relative mt-3">
-        <div ref={rowRef} className="flex snap-x snap-mandatory gap-3 overflow-x-auto scrollbar-none px-5 pb-1" role="list" style={{ maskImage: "linear-gradient(90deg, black 88%, transparent 100%)", WebkitMaskImage: "linear-gradient(90deg, black 88%, transparent 100%)" }}>
+        <div ref={rowRef} className="home-more-row flex snap-x snap-mandatory gap-3 overflow-x-auto scrollbar-none px-5 pb-1" role="list" style={{ maskImage: "linear-gradient(90deg, black 88%, transparent 100%)", WebkitMaskImage: "linear-gradient(90deg, black 88%, transparent 100%)" }}>
           {ITEMS.map((item) => {
             const Icon = item.icon;
             const locked = item.id !== "journal" && !plusActive;
@@ -103,11 +103,11 @@ export default function MoreWaysIn({ plusActive, onOpen }) {
                 onPointerUp={() => setPressed(null)}
                 onPointerLeave={() => setPressed(null)}
                 aria-label={item.title}
-                className="no-tap relative flex h-[15rem] w-[9.5rem] shrink-0 snap-start flex-col justify-end overflow-hidden rounded-[24px] text-left shadow-[0_16px_36px_-20px_rgba(0,0,0,0.55)] transition-transform duration-150"
+                className="home-more-card no-tap relative flex h-[15rem] w-[9.5rem] shrink-0 snap-start flex-col justify-end overflow-hidden rounded-[24px] text-left shadow-[0_16px_36px_-20px_rgba(0,0,0,0.55)] transition-transform duration-150"
                 style={{ background: item.tint, transform: pressed === item.id ? "scale(0.97) rotate(-0.4deg)" : "scale(1)" }}
               >
                 {item.image ? (
-                  <img src={item.image} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover object-top opacity-80" />
+                  <img src={item.image} alt="" aria-hidden="true" className="home-more-shot absolute inset-0 h-full w-full object-cover object-top opacity-80" />
                 ) : (
                   <>
                     {/* A faint ruled-paper texture instead of a flat block,
@@ -131,10 +131,10 @@ export default function MoreWaysIn({ plusActive, onOpen }) {
                     />
                   </span>
                 )}
-                <div className="relative z-10 p-3.5">
-                  <p className="text-[0.6rem] font-semibold uppercase tracking-[0.16em]" style={{ color: item.accent }}>{item.eyebrow}</p>
-                  <p className="mt-1 text-[0.92rem] font-semibold leading-snug text-white">{item.title}</p>
-                  {item.id === "journal" && caption && <p className="mt-1 text-[0.68rem] text-white/75">{caption}</p>}
+                <div className="home-more-text relative z-10 p-3.5">
+                  <p className="home-more-eyebrow text-[0.6rem] font-semibold uppercase tracking-[0.16em]" style={{ color: item.accent }}>{item.eyebrow}</p>
+                  <p className="home-more-title mt-1 text-[0.92rem] font-semibold leading-snug text-white">{item.title}</p>
+                  {item.id === "journal" && caption && <p className="home-more-caption mt-1 text-[0.68rem] text-white/75">{caption}</p>}
                 </div>
               </button>
             );

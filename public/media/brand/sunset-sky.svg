@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 1100" preserveAspectRatio="xMaxYMin slice">
+<defs>
+<radialGradient id="sun" cx="0.5" cy="0.42" r="0.6"><stop offset="0" stop-color="#FFE9C2"/><stop offset="0.45" stop-color="#FFC08C"/><stop offset="0.8" stop-color="#F59872"/><stop offset="1" stop-color="#E9795F"/></radialGradient>
+<radialGradient id="bloom" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFC58F" stop-opacity="0.75"/><stop offset="0.5" stop-color="#F58A6A" stop-opacity="0.28"/><stop offset="1" stop-color="#F58A6A" stop-opacity="0"/></radialGradient>
+<linearGradient id="cl0" x1="0" x2="1"><stop offset="0" stop-color="#FF9F8A" stop-opacity="0"/><stop offset="0.5" stop-color="#F28FA0"/><stop offset="1" stop-color="#FF9F8A" stop-opacity="0"/></linearGradient>
+<linearGradient id="cl1" x1="0" x2="1"><stop offset="0" stop-color="#C98AB0" stop-opacity="0"/><stop offset="0.5" stop-color="#B57AA8"/><stop offset="1" stop-color="#C98AB0" stop-opacity="0"/></linearGradient>
+<linearGradient id="fadeSun" x1="0" y1="0" x2="0" y2="1"><stop offset="0.55" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<mask id="sunMask"><rect width="750" height="1100" fill="url(#fadeSun)"/></mask>
+<filter id="soft" x="-20%" y="-80%" width="140%" height="260%"><feGaussianBlur stdDeviation="14"/></filter>
+</defs>
+<circle cx="600" cy="880" r="330" fill="url(#bloom)"/>
+<g mask="url(#sunMask)"><circle cx="600" cy="880" r="215" fill="url(#sun)"/></g>
+<ellipse cx="340.0" cy="784" rx="380.0" ry="65.0" fill="url(#cl0)" opacity="0.55" filter="url(#soft)"/><ellipse cx="470.0" cy="850" rx="350.0" ry="45.0" fill="url(#cl1)" opacity="0.42" filter="url(#soft)"/><ellipse cx="300.0" cy="927" rx="320.0" ry="35.0" fill="url(#cl0)" opacity="0.38" filter="url(#soft)"/><ellipse cx="480.0" cy="993" rx="300.0" ry="55.0" fill="url(#cl1)" opacity="0.3" filter="url(#soft)"/><ellipse cx="510.0" cy="685" rx="210.0" ry="30.0" fill="url(#cl0)" opacity="0.35" filter="url(#soft)"/>
+</svg>

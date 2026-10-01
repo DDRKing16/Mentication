@@ -4,11 +4,12 @@ import { ShieldCheck, Accessibility } from "lucide-react";
 import WellbeingNotice from "@/components/WellbeingNotice";
 import AccessibilityPanel from "@/components/AccessibilityPanel";
 
-export default function SafetyFooter({ dark = false }) {
+export default function SafetyFooter({ dark = false, home = false }) {
   const [safety, setSafety] = useState(false);
   const [a11y, setA11y] = useState(false);
-  const tone = dark ? "text-cream/72 hover:text-cream" : "text-muted-foreground hover:text-foreground";
-  const dot = dark ? "text-cream/35" : "text-muted-foreground/40";
+  // On Home, follow the active Home theme instead of the app-wide greens.
+  const tone = dark ? "text-cream/72 hover:text-cream" : home ? "text-[var(--home-muted)] hover:text-[var(--home-ink)]" : "text-muted-foreground hover:text-foreground";
+  const dot = dark ? "text-cream/35" : home ? "text-[var(--home-muted)] opacity-40" : "text-muted-foreground/40";
 
   return (
     <>

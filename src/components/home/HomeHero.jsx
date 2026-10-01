@@ -1,8 +1,8 @@
 // @ts-check
 import React, { useEffect, useRef, useState } from "react";
-import { User, BarChart3, Sunrise, Sun, Sunset, Moon } from "lucide-react";
+import { User, BarChart3, Sunrise, Sun, Sunset, Moon, Menu } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { MENTICATION_GREEN_PINK_ASSET, MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET, MENTICATION_SLOGAN } from "@/components/Logo";
+import { MENTICATION_CHERRY_BABYBLUE_ASSET, MENTICATION_FOREST_GOLD_ASSET, MENTICATION_INK_OCHRE_ASSET, MENTICATION_HOLIDAY_ASSET, MENTICATION_NAVY_GOLD_ASSET, MENTICATION_COBALT_RED_ASSET, MENTICATION_GREEN_PINK_ASSET, MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET, MENTICATION_SLOGAN } from "@/components/Logo";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { hapticPattern } from "@/lib/feedback";
 
@@ -37,7 +37,7 @@ function IconButton({ onClick, ariaLabel, children, badge = false }) {
       onClick={onClick}
       onPointerDown={press}
       aria-label={ariaLabel}
-      className="no-tap relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--home-control)] text-[var(--home-control-ink)] shadow-[0_8px_22px_-10px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
+      className="home-hero-btn no-tap relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--home-control)] text-[var(--home-control-ink)] shadow-[0_8px_22px_-10px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
     >
       {ripples.map((id) => (
         <motion.span
@@ -50,12 +50,23 @@ function IconButton({ onClick, ariaLabel, children, badge = false }) {
         />
       ))}
       {children}
-      {badge && <span aria-hidden="true" className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#E0715C] ring-2 ring-[var(--home-control)]" />}
+      {badge && <span aria-hidden="true" className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[var(--brand-warm)] ring-2 ring-[var(--home-control)]" />}
     </button>
   );
 }
 
-export default function HomeHero({ onProfile, onInsights, hasNewInsight = false, headline = "Let’s find your reset for today." }) {
+// The hero wordmark recoloured to match the active Home theme.
+const HERO_LOGO =
+  HOME_THEME === "navy" ? MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET
+    : HOME_THEME === "cobalt" ? MENTICATION_COBALT_RED_ASSET
+      : HOME_THEME === "cherry" ? MENTICATION_CHERRY_BABYBLUE_ASSET
+        : HOME_THEME === "ochre" ? MENTICATION_INK_OCHRE_ASSET
+          : HOME_THEME === "luxe" ? MENTICATION_FOREST_GOLD_ASSET
+            : HOME_THEME === "deco" ? MENTICATION_NAVY_GOLD_ASSET
+              : HOME_THEME === "sunset" ? MENTICATION_HOLIDAY_ASSET
+      : MENTICATION_GREEN_PINK_ASSET;
+
+export default function HomeHero({ onMenu, onProfile, onInsights, hasNewInsight = false, headline = "Let’s find your reset for today." }) {
   const time = timeOfDay();
   const TimeIcon = TIME_ICONS[time];
   const dateLabel = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
@@ -88,7 +99,7 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
             not a gradient with a couple of faint streaks. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
+          className="home-hero-marble pointer-events-none absolute inset-0"
           style={{
             backgroundImage: [
               "radial-gradient(ellipse 55% 40% at 15% 20%, rgba(255,255,255,0.16), transparent 65%)",
@@ -99,15 +110,15 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-80 mix-blend-soft-light"
+          className="home-hero-streaks pointer-events-none absolute inset-0 opacity-30 mix-blend-soft-light"
           style={{
             backgroundImage: [
               "radial-gradient(ellipse 150% 4% at 8% 10%, rgba(255,255,255,0.95), transparent 60%)",
               "radial-gradient(ellipse 130% 3% at 55% 22%, rgba(255,255,255,0.55), transparent 65%)",
-              "radial-gradient(ellipse 140% 5% at 30% 34%, rgba(224,113,92,0.7), transparent 55%)",
+              "radial-gradient(ellipse 140% 5% at 30% 34%, rgb(var(--brand-warm-rgb) / 0.7), transparent 55%)",
               "radial-gradient(ellipse 120% 3% at 80% 46%, rgba(255,255,255,0.7), transparent 60%)",
               "radial-gradient(ellipse 160% 4% at 15% 58%, rgba(255,255,255,0.4), transparent 65%)",
-              "radial-gradient(ellipse 130% 3% at 65% 68%, rgba(224,113,92,0.5), transparent 60%)",
+              "radial-gradient(ellipse 130% 3% at 65% 68%, rgb(var(--brand-warm-rgb) / 0.5), transparent 60%)",
               "radial-gradient(ellipse 150% 5% at 40% 80%, rgba(255,255,255,0.65), transparent 55%)",
               "radial-gradient(ellipse 120% 3% at 90% 92%, rgba(255,255,255,0.45), transparent 60%)",
             ].join(", "),
@@ -115,12 +126,37 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
             filter: "blur(1px)",
           }}
         />
+        {/* An alternative finish some themes switch on instead of the marble
+            and streaks: the same felt grain and soft sheen as the category
+            tiles, plus a very faint repeating pattern. Hidden by default. */}
+        <div aria-hidden="true" className="home-hero-finish pointer-events-none absolute inset-0">
+          <span className="home-hero-pattern absolute inset-0" />
+          <span className="home-felt absolute inset-0" />
+          <span className="home-hero-gloss absolute inset-0" />
+        </div>
+        {/* Palm silhouettes against the sky, for themes that switch them on:
+            a tall one leaning in from the right with its fronds reaching
+            across the top, and a smaller one on the left. Hidden by default. */}
+        <div aria-hidden="true" className="home-hero-palms pointer-events-none absolute inset-0">
+          <img src="/media/brand/palm-silhouette.svg" alt="" draggable={false} className="absolute -bottom-6 -right-16 h-[118%] w-auto select-none" />
+          <img src="/media/brand/palm-silhouette.svg" alt="" draggable={false} className="absolute -bottom-4 -left-20 h-[72%] w-auto select-none -scale-x-100" />
+        </div>
         {/* A faint watermark of the flourish mark and a soft vignette at the
             corners, for a touch more depth than a flat gradient fill. */}
-        <img aria-hidden="true" alt="" draggable={false} src={HOME_THEME === "navy" ? MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET : MENTICATION_GREEN_PINK_ASSET} className="pointer-events-none absolute -right-10 -top-6 h-40 w-40 select-none object-contain opacity-[0.05]" />
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ boxShadow: "inset 0 0 70px 10px rgba(0,0,0,0.18)" }} />
+        <img aria-hidden="true" alt="" draggable={false} src={HERO_LOGO} className="home-hero-watermark pointer-events-none absolute -right-10 -top-6 h-40 w-40 select-none object-contain opacity-[0.05]" />
+        <div aria-hidden="true" className="home-hero-vignette pointer-events-none absolute inset-0" style={{ boxShadow: "inset 0 0 70px 10px rgba(0,0,0,0.18)" }} />
 
-        <div className="relative z-[1] flex items-center justify-between gap-2">
+        {HOME_THEME === "sunset" && (
+          // A slim top bar: a menu button on the left and a small wordmark on
+          // the right, echoing the tab bar at the bottom.
+          <div className="home-topbar relative z-[1] flex h-12 items-center justify-between">
+            <button type="button" onClick={onMenu} aria-label="Menu" className="home-topbar-btn no-tap grid h-10 w-10 place-items-center rounded-full">
+              <Menu className="h-5 w-5" strokeWidth={1.8} />
+            </button>
+            <img src={HERO_LOGO} alt="Mentication" draggable={false} className="home-topbar-logo h-[3.6rem] w-auto -mr-1 select-none" />
+          </div>
+        )}
+        <div className="home-hero-row relative z-[1] flex items-center justify-between gap-2">
         <IconButton onClick={onProfile} ariaLabel="Profile">
           <User className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.6} />
         </IconButton>
@@ -139,8 +175,8 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
         >
           <img
-            src={HOME_THEME === "navy" ? MENTICATION_NAVY_CORAL_TRANSPARENT_ASSET : MENTICATION_GREEN_PINK_ASSET}
-            className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
+            src={HERO_LOGO}
+            className="home-hero-logo pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
             alt=""
             aria-hidden="true"
             draggable={false}
@@ -152,16 +188,22 @@ export default function HomeHero({ onProfile, onInsights, hasNewInsight = false,
         </IconButton>
       </div>
 
-      <p className="relative z-[1] -mt-3 text-center font-[var(--font-editorial)] text-[0.76rem] italic leading-none text-[var(--home-hero-soft)]">
-        {MENTICATION_SLOGAN}
-      </p>
+      {HOME_THEME === "sunset" ? (
+        <h1 className="home-tagline relative z-[1] mt-6 text-left text-[2.15rem] font-bold leading-[1.05] tracking-[-0.02em] text-white [text-shadow:0_2px_14px_rgba(120,40,50,0.45)]">
+          Take your mind<br />on a holiday
+        </h1>
+      ) : (
+        <p className="relative z-[1] -mt-3 text-center font-[var(--font-editorial)] text-[0.76rem] italic leading-none text-[var(--home-hero-soft)]">
+          {MENTICATION_SLOGAN}
+        </p>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         style={{ y: textY }}
-        className="relative z-[1] mt-1.5 max-w-[19rem] text-left"
+        className="home-greeting relative z-[1] mt-1.5 max-w-[19rem] text-left"
       >
         {/* A pale, clearly-legible eyebrow instead of the coral accent, which
             clashed against navy and read muddy rather than clear. */}
