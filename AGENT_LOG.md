@@ -516,3 +516,33 @@ feature that got disconnected from its trigger rather than an accident. Reverted
 it in SUGGESTIONS.md instead, since reconnecting it or deleting it both change how finishing the practice
 works, which is the owner's call (d9ddf27).
 Full test/typecheck/lint/build suite passes clean on every commit.
+
+## 1 Oct -- A real "Larger text" pass found three genuine overlap bugs
+With the brand thread phases and every earlier fallback item done, and every one of the 12 interventions
+already having had its own visual-polish pass, this run tried a different angle: a real headless-browser
+walkthrough at 375x812 with Settings' "Larger text" turned all the way up, which nothing in the log so far
+had checked screen-by-screen. Found and fixed three real, verified overlap bugs, all only visible at the
+largest text size -- normal text size is unchanged in every case.
+First: Tomorrow Parking Lot's "Tomorrow Parking Lot" title sits inside the page itself, but the Back/Home
+buttons float on top of it from a shared component that knows nothing about the title's width. At normal
+size there's room; at the largest size the title ran wide enough to hide behind the Home button. Gave the
+title enough side clearance to wrap onto two lines instead (33f0a08).
+Second: Progressive Muscle Relaxation's opening stage shows a "SETTLE IN" label centred in its own row,
+with a "Start with hands" button floating on top from the right edge with no awareness of the label's
+width. These are the two longest pieces of text either ever shows, and at the largest size they ran into
+each other. Rebuilt the row as three parts -- the button, an invisible mirror of it on the other side, and
+the label truly centred between them -- so there's always equal clearance on both sides at any text size,
+checked across every stage (e86a8ee).
+Third, the most serious: Change the Scene's opening screen has one line of supporting text ("about 4
+minutes...") that was the only text on the screen never given a fixed size like everything else already
+has. At the largest size it grew and wrapped an extra line, pushing the play button down far enough that
+the shared "This isn't helping" dock -- which floats fixed over the whole screen -- rendered its own text
+directly on top of the glowing button. Confirmed with real on-screen coordinates before fixing it: gave
+that line a fixed size and tightened the spacing around the button, both scoped to the largest text size
+only (5981348).
+Also walked Box Breathing, 5-4-3-2-1 Grounding, Urge Surfing, The Happy Bump, Next Easiest Step, and
+several screens of Thought or Fact at the largest text size and found nothing else broken; the three
+standalone builds (Signal Lock, Vector Shift, Night Channel) keep their own chrome clear of overlap, and
+their finished inner builds simply don't scale with this setting, which is expected since they're outside
+what this app's text-size control reaches. Full test/typecheck/lint/build suite passes clean on every
+commit.
