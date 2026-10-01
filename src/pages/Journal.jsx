@@ -320,13 +320,14 @@ export default function Journal() {
 
   // Load daybook from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("daybook");
-    if (stored) {
-      try {
-        setDaybook(JSON.parse(stored));
-      } catch {
-        console.error("Failed to parse daybook from storage");
+    try {
+      const stored = localStorage.getItem("daybook");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) setDaybook(parsed);
       }
+    } catch {
+      console.error("Failed to parse daybook from storage");
     }
   }, []);
 
@@ -408,7 +409,7 @@ export default function Journal() {
 
     const updatedDaybook = [newEntry, ...daybook];
     setDaybook(updatedDaybook);
-    localStorage.setItem("daybook", JSON.stringify(updatedDaybook));
+    try { localStorage.setItem("daybook", JSON.stringify(updatedDaybook)); } catch { /* storage unavailable */ }
     triggerToast("Entry saved to Mentication Archive");
     setStep(0); // return to dashboard
   };
@@ -419,7 +420,7 @@ export default function Journal() {
     playSound('delete');
     const updated = daybook.filter(item => item.id !== id);
     setDaybook(updated);
-    localStorage.setItem("daybook", JSON.stringify(updated));
+    try { localStorage.setItem("daybook", JSON.stringify(updated)); } catch { /* storage unavailable */ }
     triggerToast("Entry deleted");
     if (selectedPastEntry?.id === id) {
       setSelectedPastEntry(null);
@@ -937,8 +938,9 @@ export default function Journal() {
                     
                     {/* Interactive micro text field inside card */}
                     <div className="relative">
-                      <input 
+                      <input
                         type="text"
+                        aria-label="Secondary shades or thoughts"
                         placeholder="Add secondary shades or thoughts..."
                         value={customMoodInput}
                         onChange={(e) => setCustomMoodInput(e.target.value)}
@@ -1032,8 +1034,9 @@ export default function Journal() {
                       }}
                       className="flex gap-2"
                     >
-                      <input 
+                      <input
                         type="text"
+                        aria-label="Custom day activity"
                         placeholder="e.g., Deep meditation, Gardening..."
                         value={customDayInput}
                         onChange={(e) => setCustomDayInput(e.target.value)}
@@ -1228,7 +1231,7 @@ export default function Journal() {
                           {activeRootCard === "sleep" && (
                             <div className="space-y-6">
                               <div>
-                                <label className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/65 block mb-2">
+                                <label htmlFor="journal-sleep-duration" className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/65 block mb-2">
                                   Sleep Duration
                                 </label>
                                 <div className="flex justify-between items-baseline mb-2">
@@ -1238,6 +1241,7 @@ export default function Journal() {
                                   <span className="text-[11px] opacity-60">Ideal sleep: 7.5 - 8.5 hours</span>
                                 </div>
                                 <input
+                                  id="journal-sleep-duration"
                                   type="range"
                                   min="0"
                                   max="12"
@@ -1280,10 +1284,11 @@ export default function Journal() {
 
                               {/* TEXTBOX FOR SLEEP ROOT */}
                               <div className="pt-2 border-t border-[#E5DCD0]/50">
-                                <label className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1.5">
+                                <label htmlFor="journal-sleep-note" className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1.5">
                                   Or write a custom sleep note
                                 </label>
-                                <input 
+                                <input
+                                  id="journal-sleep-note"
                                   type="text"
                                   placeholder="e.g., Woke up once, Vivid dreams..."
                                   value={customSleepInput}
@@ -1462,10 +1467,11 @@ export default function Journal() {
 
                               {/* TEXTBOX FOR WORK ROOT */}
                               <div className="pt-2 border-t border-[#E5DCD0]/50">
-                                <label className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1.5">
+                                <label htmlFor="journal-work-note" className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1.5">
                                   Or add a custom work description
                                 </label>
-                                <input 
+                                <input
+                                  id="journal-work-note"
                                   type="text"
                                   placeholder="e.g. Pitched to client, Redesigned app flow..."
                                   value={customWorkInput}
@@ -1514,10 +1520,11 @@ export default function Journal() {
 
                               {/* TEXTBOX FOR FUEL ROOT */}
                               <div className="pt-2 border-t border-[#E5DCD0]/50">
-                                <label className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1.5">
+                                <label htmlFor="journal-fuel-note" className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1.5">
                                   Or add custom nutrition detail
                                 </label>
-                                <input 
+                                <input
+                                  id="journal-fuel-note"
                                   type="text"
                                   placeholder="e.g. 16-hour Fast, Organic Green Juice..."
                                   value={customFuelInput}
@@ -1662,11 +1669,12 @@ export default function Journal() {
 
                   {/* CUSTOM TEXTBOX FOR FELT GOOD */}
                   <div className="bg-white border border-[#E5DCD0] rounded-[20px] p-2.5 shadow-soft mb-2.5">
-                    <label className="text-[8px] font-bold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1">
+                    <label htmlFor="journal-felt-good-note" className="text-[8px] font-bold uppercase tracking-[0.1em] text-[#38221E]/60 block mb-1">
                       Or type a custom feel-good factor...
                     </label>
                     <div className="flex gap-2">
-                      <input 
+                      <input
+                        id="journal-felt-good-note"
                         type="text"
                         placeholder="e.g. Perfect cup of coffee, Quality conversation..."
                         value={customFeltGoodInput}

@@ -1,5 +1,6 @@
 import InterventionNav from "@/components/brand/InterventionNav";
 import React, { useState, useRef, useEffect } from "react";
+import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { 
   ChevronLeft, 
   Pause, 
@@ -1203,13 +1204,20 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular") =
 };
 
 export default function NextEasiestStepExperience() {
+  const { prefs } = useAccessibilityPrefs();
   // 3. Persistent state initialization from localStorage using 'mentication_nes_v2_app_state'
   const [gameState, setGameState] = useState(() => {
     const saved = localStorage.getItem("mentication_nes_v2_app_state");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed) return { pathLength: "regular", ...parsed };
+        if (parsed) {
+          return {
+            pathLength: "regular",
+            ...parsed,
+            ladder: Array.isArray(parsed.ladder) ? parsed.ladder : [],
+          };
+        }
       } catch (e) {
         console.error("Failed to parse saved state", e);
       }
@@ -1240,7 +1248,11 @@ export default function NextEasiestStepExperience() {
 
   // Synchronize state with localStorage
   useEffect(() => {
-    localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(gameState));
+    try {
+      localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(gameState));
+    } catch {
+      /* storage unavailable (private mode / quota) */
+    }
   }, [gameState]);
 
   // Auto-unlock audio context on first click/touchstart to guarantee sound is ready
@@ -1350,6 +1362,7 @@ export default function NextEasiestStepExperience() {
 
   // Canvas confetti particle burst logic
   const triggerConfetti = () => {
+    if (prefs.reducedMotion) return;
     const canvasEl = canvasRef.current;
     if (!canvasEl) return;
     const ctx = canvasEl.getContext("2d");
@@ -2883,8 +2896,9 @@ export default function NextEasiestStepExperience() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
               </svg>
-              <input 
-                placeholder="Or just type what you are stuck on..." 
+              <input
+                aria-label="What you are stuck on"
+                placeholder="Or just type what you are stuck on..."
                 value={customTaskInput}
                 onChange={(e) => setCustomTaskInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCustomTaskGo()}

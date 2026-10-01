@@ -2,7 +2,7 @@
 // practice was done. A quiet, visible sense of progress, never a guilt trip:
 // an empty week just says it starts whenever you do.
 import React, { useMemo } from "react";
-import { computeLocalCalendarStreak } from "@/lib/insights";
+import { computeLocalCalendarStreak } from "@/lib/streak";
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 

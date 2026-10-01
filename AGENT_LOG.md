@@ -277,3 +277,242 @@ real names; only the "not yet joined" view was missing that lookup. Gave it the 
 all three programmes, both before and after joining, in the browser -- real names everywhere now, and the
 "in progress" view is unchanged. Full test/typecheck/lint/build suite passes clean with no failures at all
 (nothing baseline-excused this run).
+
+## 29 Sep — Home was quietly downloading the whole recommendation engine on every single launch
+Checked docs/BRAND_THREAD.md again first: all six phases are still done, so this block moved to the
+load-speed work. A real production build showed the app's very first download -- the JavaScript every
+phone has to fetch and run before Home can even appear -- was 726KB, and Vite's own build output pointed
+at why: Home already goes out of its way to fetch the intervention data only when it's actually needed
+(it does this the same way already for a couple of other things), but two other things Home always
+loads -- the "days in a row" streak and the "is a programme active" check -- were pulling in that entire
+dataset anyway, unconditionally, defeating the whole point. Split the streak calculation and the
+programme bookkeeping into their own small files that don't need the intervention data, and moved the
+two spots that do need it (working out which day of a programme is open, and starting a programme's
+exercise) to fetch it only at the moment they're actually used -- the exact same pattern already used
+elsewhere in this file (9f4d736). Nothing about what Home shows or does changed. Checked in the browser:
+a brand-new Home, and a Home with an active programme showing "Ready for day 1?" and a working "Day 1"
+button that correctly opens Box Breathing -- both identical to before. A real production build confirms
+the fix: the first download shrank from 726KB to 504KB (from 220KB to 163KB compressed), and the
+recommendation engine now shows up as its own separate piece that only loads when it's actually needed,
+with no more of Vite's own build warnings about it. Full test/typecheck/lint/build suite passes clean.
+
+## 29 Sep — Two more things loading for everyone that only two practices ever use
+Checked docs/BRAND_THREAD.md again: all six phases are still done, with the one open item (Signal Lock's
+two different-looking builds) already flagged in SUGGESTIONS.md for the owner. Continued the load-speed
+work from the same block. Found two more cases of the same shape of bug as the Box Breathing image
+preload and the Home streak/programme fix from earlier runs -- something used by only one or two
+practices, loaded for everyone regardless.
+First: opening ANY reset at all -- Box Breathing, Progressive Muscle Relaxation, 5-4-3-2-1 Grounding,
+Vector Shift, Signal Lock, Change the Scene, Next Easiest Step, Tomorrow Parking Lot, The Happy Bump --
+downloaded a 123KB stylesheet meant only for Thought or Fact and Urge Surfing, because the shared reset
+screen (`ResetFlow.jsx`) imported both interventions' styling at the top of the file, and loaded Thought
+or Fact's own entry screen eagerly instead of on demand like every other intervention's experience
+already does. Moved each stylesheet into the component that actually needs it, and made that entry
+screen load on demand too (5bbf2d2). The shared reset screen's own stylesheet is now gone entirely --
+folded into the two interventions' own on-demand styling instead.
+Second: the app's very first download, on every single launch, included a 16KB stylesheet that's only
+ever used by The Happy Bump -- the exact same mistake the Box Breathing images made before that was
+already fixed. Moved it into the one component that uses it, so it only loads when someone actually opens
+The Happy Bump, Vector Shift or Signal Lock's own build (2729419). The app's first download is 16KB
+smaller as a result.
+Checked both in a real headless-browser run: Thought or Fact, Urge Surfing, Change the Scene (an
+unrelated intervention sharing the same shared file) and The Happy Bump all still open fully styled with
+no console errors, nothing about how any of them look or play changed.
+Also gave The Good Map (added a couple of runs back, never walked end to end since its own narration
+pass) a full run through all 16 sort cards and into the rating screen that follows -- sorted correctly,
+counted correctly, moved smoothly between cards, no console errors, the rating screen's slider and chips
+all worked as expected. Found nothing wrong to fix.
+Full test/typecheck/lint/build suite passes clean.
+
+## 29 Sep — Three accessibility fixes for anyone using a screen reader or Reduce motion
+Brand thread still fully done and load-speed items already covered, so ran a dedicated accessibility
+audit (icon-only buttons, images, custom clickable elements, motion, form labels) across the shared
+player and the interventions' own screens. Confirmed most of the app was already in good shape (every
+icon-only button already has a label, no missing image alt text, no unlabelled custom clickable divs)
+and found three real, narrow gaps.
+First: the app's "Reduce motion" setting only ever switched off CSS animations -- it never reached the
+spinning rings, pulsing dots and rising particles inside the Box/PMR/Grounding player's own visuals, or
+5-4-3-2-1 Grounding's active stage marker, because those are driven by a different animation system
+(framer-motion) that setting never touched. Someone who turned Reduce motion on because motion bothers
+them was still seeing it, continuously, throughout every one of those three practices. Threaded the
+setting all the way down so every one of those animations now holds still instead (e2acff6).
+Second: the on/off switches in Settings, the in-session Accessibility panel, and the reset flow's
+"Optional preferences" row only ever announced their label to a screen reader, never whether the
+setting was on or off -- like being told a light switch's name but not whether the light is on
+(a3f7ae2).
+Third: six text fields (Thought or Fact's evidence entry, Next Easiest Step's custom task box, Change
+the Scene's two custom-activity boxes, and two of Journal's custom-note boxes) only had placeholder
+text as their name, which disappears the moment someone starts typing and isn't reliably read by
+screen readers at all; four more fields in Journal had a real, visible label sitting right next to
+them that was never actually wired up to the field, so a screen reader user focusing the box heard
+nothing. Gave all ten a real, connected name (735b2e0).
+None of the three changed how anything looks, reads, or behaves for someone not using these settings
+-- checked in a real headless-browser run (5-4-3-2-1 Grounding with Reduce motion on and off side by
+side, Settings' full toggle list, and the Journal mood-entry screen) and every screen came back
+pixel-identical. Full test/typecheck/lint/build suite passes clean, plus three new regression tests
+covering each fix.
+(Note: the prior run's session also fixed a Thought or Fact Back-button bug, "Fix Thought or Fact:
+Back button led to a blank screen" (c6216c6), which reached the branch without a matching log line --
+recorded here for the record.)
+
+## 30 Sep -- The single biggest download of any reset, and one more silent Reduce motion gap
+Checked docs/BRAND_THREAD.md again: still all six phases done, with the same items already flagged in
+SUGGESTIONS.md for the owner (Signal Lock's two builds, Next Easiest Step's Momentum Dashboard colours,
+Change the Scene's "Click the play button" line, Vector Shift's "4 STEP" label). Nothing new and safe to
+do there this round, so continued the load-speed thread with a fresh look at what each of the biggest
+chunks in a real production build actually contains.
+First and by far the biggest: the shared reset screen's own bundle was 481KB -- almost as big as the
+app's entire first download -- because of one thing inside it: the complete local narration manifest
+(every spoken line for every practice that has a voice, with its audio file and word-timing data). It
+was only there because the shared reset screen imports Box Breathing's own image/narration warm-up
+helper at the top of the file, and that helper needs the manifest. The warm-up itself was already
+correctly limited to only run when Box Breathing is the practice someone picked -- but the *import* was
+not, so opening Thought or Fact, Next Easiest Step, Tomorrow Parking Lot or any other practice with no
+spoken narration at all still downloaded the entire manifest before the screen could even show. Made
+that one import happen on demand, inside the same check that already gates the warm-up call (90bb349).
+The shared reset screen's own chunk dropped from 481KB to 43KB; the manifest is now its own separate
+piece, fetched only the first time a practice that actually speaks (Box Breathing, Progressive Muscle
+Relaxation, 5-4-3-2-1 Grounding, Change the Scene, Urge Surfing, The Happy Bump, or the Vector
+Shift/Signal Lock/Night Channel step panel) is opened.
+Second: while auditing every place in the app with its own continuously-animating visual (the same kind
+of check that found the Box/PMR/Grounding player's un-gated animations a couple of runs back), found one
+more -- Next Easiest Step's confetti burst when you complete a ladder step draws itself frame by frame
+on a canvas from JavaScript, which is the one kind of motion neither the app-wide CSS rule nor the
+global framer-motion setting can reach, so it kept playing no matter what Reduce motion was set to.
+Gave it the same "do nothing if Reduce motion is on" guard the rest of the app already uses (ad8c121).
+Verified both in a real headless-browser run: opening Thought or Fact now loads only the small reset
+screen bundle and never the narration manifest; Box Breathing still loads it immediately and starts
+exactly as before; Next Easiest Step opens and completes a step cleanly with no console errors with
+Reduce motion on or off. Full test/typecheck/lint/build suite passes clean, plus a new regression test
+for the confetti fix.
+
+## 30 Sep -- Two crash risks in Next Easiest Step and Change the Scene, plus a visual check
+Checked docs/BRAND_THREAD.md again: still all six phases done, same items already flagged in
+SUGGESTIONS.md for the owner, nothing new and safe to do there. The launch-time image preload item
+and the dead-code items from earlier runs are also both already done, so ran a focused audit of the
+12 interventions' own code for real crash risks (corrupted or stale saved state, unguarded storage
+writes) rather than style nits, then verified the two real findings in a headless browser before and
+after the fix.
+First: Next Easiest Step wrote its saved ladder progress to localStorage on every change with no
+try/catch -- every other localStorage write in the app already guards against private browsing or a
+full storage quota throwing, this was the one unguarded write left, and it would have crashed the whole
+practice mid-session for anyone it happened to. It also restored a saved "ladder" straight into state
+without checking it was actually a list, so a stale value left over from an older version of the app
+could crash the screen the moment it opened. Both now fail safely: the write is wrapped, and a
+missing/malformed ladder falls back to empty (d4f16d3).
+Second: Change the Scene read its restored step number straight into an array lookup with no bounds
+check, so a leftover step number from a previous build could crash the practice on open -- its sibling
+component (the shared flagship player) already guards against exactly this with a clamp, Change the
+Scene just didn't have it. Added the same clamp (d4f16d3). Added a regression test file for each fix so
+neither can silently regress (584dd86).
+Also spent time with the headless browser walking Urge Surfing (intensity picker through to the wave
+timer screen) and Tomorrow Parking Lot's capture screen (through to typing a note and the suggestion
+chips) end to end, looking for anything that looked broken. Found nothing to fix -- both already match
+the "one focal thing, full-bleed world" standard the brand doc set, and the different thread colours
+(each intervention's own colourway ink, not a mistake) are working as designed.
+Full test/typecheck/lint/build suite passes clean.
+
+## 30 Sep -- The Journal's save and delete could crash, plus a wide check that found nothing else
+Checked docs/BRAND_THREAD.md again: still all six phases done, same items already flagged in
+SUGGESTIONS.md, nothing new and safe to do there. Went looking for the same kind of crash risk the last
+two runs found (an unguarded localStorage write, or a restored value trusted without checking) across
+every remaining place the app reads or writes on-device storage -- not just the 12 interventions this
+time, but Home, Settings, the backup/restore feature, programmes, reminders, and Plus -- plus the
+navigator APIs (share, vibrate, microphone) and the speech/narration engine's own error handling.
+Found one real gap: the Journal saved and deleted entries by writing the whole diary straight to
+localStorage with no try/catch, the one write left in the app without that guard -- private browsing or
+a full storage quota would have thrown and broken saving or deleting an entry mid-action. It also
+trusted a restored diary to already be a list without checking, so a corrupted or hand-edited entry could
+have crashed the Journal the moment it opened. Both now fail safely, with a regression test guarding it
+(21376bb).
+Everywhere else checked out clean: every other storage write and restore in the app was already wrapped
+and validated; the shared session-recording write every reset goes through has no guard of its own but
+both places that call it already catch a failure so nothing crashes; every free-text field checked across
+Urge Surfing, Tomorrow Parking Lot, The Happy Bump, Settings and the standalone builds already has a real
+accessible name; every place with its own continuously-animating visual already stops under Reduce
+motion, including one (5-4-3-2-1 Grounding's pearl orb) that turned out to already be covered by the
+app-wide CSS rule. Walked Thought or Fact end to end (writing a thought through to editing the exact
+claim) and opened 5-4-3-2-1 Grounding, Vector Shift, Night Channel and Signal Lock in a real headless
+browser -- all read as intended, nothing broken or out of place.
+Full test/typecheck/lint/build suite passes clean.
+
+## 30 Sep -- A visual walkthrough of Box Breathing found one real glass bug
+Checked docs/BRAND_THREAD.md: all six phases still done, same owner-decision items in SUGGESTIONS.md,
+nothing new and safe to change there. Got a headless browser working (dev server + the pre-installed
+Chromium, kept entirely outside the repo) and walked the whole Box Breathing practice end to end --
+Library card, the Threshold opening, the breathing player and every one of its dock popups, the
+mid-practice check-in, and the closing moment through to "Done" -- screenshotting each step at 375x812
+and looking closely at anything that seemed off.
+Found one real bug: the "Let's try something else" sheet (opened from "This isn't helping" during Box
+Breathing, PMR, Grounding and Vector Shift/Signal Lock/Night Channel) was the one popup built on the
+shared glass-surface recipe that never got a blur of its own -- the ambient sound menu, the soundscape
+mixer and the sleep timer all pair that translucent background with a backdrop blur so the screen behind
+reads as soft glass; this sheet didn't, so the screen's own heading showed through faintly, sharp-edged,
+in the gaps between its option rows. Gave it the same blur the other three already use (1f32473).
+Verified before and after in the headless browser, in both a dark world (Box Breathing) and the light
+5-4-3-2-1 Grounding world -- confirmed the ghosting is gone and nothing else about the sheet's look or
+behaviour changed. Added a regression test alongside the existing popup-surface checks, and logged it in
+docs/BRAND_THREAD.md as a fourth slice of that same shared-recipe work (bb23620).
+Full test/typecheck/lint/build suite passes clean.
+
+## 1 Oct -- Progressive Muscle Relaxation's own dedicated visual-polish pass
+With the brand thread phases and every earlier fallback item already done, this run's visual-polish turn
+went to Progressive Muscle Relaxation, the one widely-used intervention that had never had a full
+dedicated pass of its own (every other shared-player practice, and several standalone ones, already had).
+Walked the entire practice end to end in a real headless-browser run at 375x812 (every body-part stage
+from hands through to the closing "come back gradually" step, plus every popup in its control dock) and
+found two real, verified problems.
+First and more serious: below 391px wide -- which covers almost every iPhone in portrait, including the
+375px size this whole pass was run at -- a CSS rule built specifically for Progressive Muscle Relaxation
+hid its "This isn't helping" button completely and moved the remaining button into a small corner chip.
+Box Breathing and 5-4-3-2-1 Grounding, which share the exact same row, kept both buttons at every width.
+That left anyone doing Progressive Muscle Relaxation on a real iPhone with no way to say "this isn't
+working for me, show me something else" -- only a way to skip to the next thing in their plan. Both
+buttons now stay visible and reachable at every width tested (320, 375, 390, 393px), just smaller on the
+narrowest phones so they still fit on one line (86d4969).
+Second: opening the ambient sound menu during the practice let the "Squeeze both hands"-style headline
+text show through behind it, fully readable, not just faintly -- confirmed with a direct check of the
+popup's own styling, which already asks for a background blur, but the blur wasn't actually rendering
+over this particular screen. Traced it to the player's own glowing body visual, which uses dozens of its
+own blur effects elsewhere on the same screen and was confusing the browser's blur sampling for the
+popup -- not something safe to unpick without touching the signature glowing-body look used throughout
+every practice in this player. Fixed it from the popup's side instead: raised its background from 62% to
+94% opaque, so it reads solid no matter whether the blur renders. Still looks like glass, checked side by
+side in both a dark world (Progressive Muscle Relaxation) and the light 5-4-3-2-1 Grounding world. This
+same popup styling is shared by the ambient sound menu, the sleep soundscape mixer and the sleep timer,
+so all three are fixed together (673b75a).
+Two new regression tests guard both fixes. Full test/typecheck/lint/build suite passes clean.
+
+## 1 Oct -- A real crossfade bug in the shared Threshold, found via Thought or Fact's own pass
+With the brand thread phases and every earlier fallback item already done, this run's visual-polish turn
+went to Thought or Fact, the one widely-used shared-player intervention that had never had a full
+dedicated pass of its own. Walked the entire practice end to end in a real headless-browser run at 375x812
+(writing a thought, confirming the claim, the charge sheet, sorting it, all four evidence lanes, the
+ruling screen's "make this mine" editor, and the closing choices) and found two real, verified problems,
+plus one thing worth flagging rather than fixing.
+First and the more significant one, because it touches every one of the twelve interventions, not just
+this one: the shared Threshold that opens every practice fades its whole opaque panel -- logo, wordmark,
+name and all -- out over 550ms as it hands off to the practice underneath. The practice itself is already
+fully visible by the time that fade starts, so for a real stretch of those 550ms the translucent logo and
+intervention name sat directly on top of the practice's own opening buttons -- most visible on Thought or
+Fact, where "Mentication" and "Thought or Fact?" crossed right over "Look at a thought" and "Ground
+first". Made the mark (logo, name, hairline) fade out together in 250ms, well ahead of the panel's own
+550ms dissolve, so it's gone before the panel is translucent enough to show what's behind it (4ede9b6).
+Checked before and after across Thought or Fact, 5-4-3-2-1 Grounding, Box Breathing, The Happy Bump,
+Change the Scene, Urge Surfing and Vector Shift -- the ghosting is gone everywhere and the rest of the
+opening animation is unchanged. Logged in docs/BRAND_THREAD.md (08a391f).
+Second, narrower to this one screen: on the "A truer thought" screen, the card's small-caps heading ("A
+more balanced thought") and its "Make this mine" button share a row. At phone width both wrapped onto two
+lines at once, leaving "A MORE BALANCED / THOUGHT" and "Make this / mine" stacked right on top of each
+other with almost no room between them. The button now stays on one line and drops to its own row,
+right-aligned, when the heading needs the full width. Checked at 375px before and after, and confirmed the
+already-short "Done" state (after tapping in) is unchanged (dba0103).
+Also found, while reading the stage logic rather than the screen: Thought or Fact has a complete, tested
+"Keep what is useful" ending screen (a private save, a short reminder-phrase box) that nothing in the
+current flow ever reaches any more -- every ending choice finishes straight to the shared closing moment
+instead. Tried removing it as dead code first, but a "cannot verify, revert" per the run's own rules --
+an existing test suite explicitly checks that screen exists, which means this was a deliberate, specified
+feature that got disconnected from its trigger rather than an accident. Reverted that change and flagged
+it in SUGGESTIONS.md instead, since reconnecting it or deleting it both change how finishing the practice
+works, which is the owner's call (d9ddf27).
+Full test/typecheck/lint/build suite passes clean on every commit.

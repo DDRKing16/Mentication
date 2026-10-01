@@ -2308,23 +2308,10 @@ html.reduce-motion .pmr-v2-tension-focus { transition-duration: 0ms !important; 
     white-space: nowrap;
   }
 
-  .pmr-v2-actions-wrap {
-    position: absolute;
-    right: 0.45rem;
-    bottom: calc(env(safe-area-inset-bottom) + 4.45rem);
-    z-index: 20;
-    padding: 0;
-  }
-  .pmr-v2-actions {
-    gap: 0;
-    opacity: 0.38;
-  }
-  .pmr-v2-actions button:first-child,
-  .pmr-v2-actions span { display: none; }
-  .pmr-v2-actions button:last-child {
+  .pmr-v2-actions button {
     height: 2.35rem;
-    padding: 0 0.72rem;
-    font-size: 0.68rem;
+    padding: 0 0.6rem;
+    font-size: 0.72rem;
   }
 
   .pmr-v2-control-wrap {

@@ -226,7 +226,7 @@
 .intervention-accent-bg { background-color: var(--intervention-accent); }
 .intervention-themed-surface {
   border-color: color-mix(in srgb, var(--intervention-fg) 14%, transparent);
-  background: color-mix(in srgb, var(--intervention-surface) 62%, transparent);
+  background: color-mix(in srgb, var(--intervention-surface) 94%, transparent);
   box-shadow: 0 20px 60px -24px rgba(0, 0, 0, 0.6);
 }
 .intervention-theme[data-theme-mode="light"] .intervention-themed-surface {

@@ -13,6 +13,8 @@ function Toggle({ label, desc, on, onToggle }) {
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={on}
       onClick={onToggle}
       className="no-tap flex w-full items-center justify-between rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-primary/30 active:scale-[0.99]"
     >
@@ -20,7 +22,7 @@ function Toggle({ label, desc, on, onToggle }) {
         <span className="block font-heading text-lg font-medium text-foreground">{label}</span>
         <span className="block text-sm text-muted-foreground">{desc}</span>
       </span>
-      <span className={"relative h-7 w-12 shrink-0 rounded-full transition-colors " + (on ? "bg-primary" : "bg-secondary")}>
+      <span aria-hidden="true" className={"relative h-7 w-12 shrink-0 rounded-full transition-colors " + (on ? "bg-primary" : "bg-secondary")}>
         <span className={"absolute top-1 h-5 w-5 rounded-full bg-card shadow transition-all " + (on ? "left-6" : "left-1")} />
       </span>
     </button>

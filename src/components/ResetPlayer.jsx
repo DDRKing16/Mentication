@@ -677,6 +677,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   leadMs={ivIndex === 0 && stepIndex === 0 ? vf.leadMs : 250}
                   spoken={spokenFor(step, iv, answers?.direction)}
                   onNarrationEnd={() => { setElapsed(0); setNarrationEnded(true); }}
+                  reducedMotion={a11y.prefs.reducedMotion}
                 />
               ) : isPMRV2 ? (
                 <PMRV2Stage
@@ -711,6 +712,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   stepRemaining={stepRemaining}
                   discreet={discreet}
                   noBreathing={noBreathing}
+                  reducedMotion={a11y.prefs.reducedMotion}
                 />
               )}
 
@@ -877,7 +879,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               role="dialog"
               aria-modal="true"
               aria-labelledby="reset-switch-sheet-title"
-              className="intervention-themed-surface w-full max-w-md rounded-t-3xl border p-6 pb-10 sm:rounded-3xl"
+              className="intervention-themed-surface w-full max-w-md rounded-t-3xl border p-6 pb-10 backdrop-blur-md sm:rounded-3xl"
             >
               <div className="intervention-dot-off mx-auto mb-5 h-1.5 w-10 rounded-full sm:hidden" />
               <h3 id="reset-switch-sheet-title" className="intervention-copy-primary font-heading text-2xl font-medium tracking-tight">Let’s try something else</h3>

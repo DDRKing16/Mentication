@@ -30,37 +30,43 @@ function senseFromTitle(title = "") {
   return "notice";
 }
 
-function Rings({ running, discreet }) {
+function Rings({ running, discreet, reducedMotion }) {
   return (
     <div className="relative flex h-64 w-64 items-center justify-center">
       <motion.span
         className="absolute h-56 w-56 rounded-full border border-dashed border-teal/15"
-        animate={{ rotate: running ? 360 : 0 }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        animate={{ rotate: reducedMotion ? 0 : running ? 360 : 0 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 40, repeat: Infinity, ease: "linear" }}
       />
       {[0, 1, 2, 3, 4].map((i) => (
         <motion.span
           key={i}
           className="absolute rounded-full border border-teal/30"
           style={{ height: 56, width: 56 }}
-          animate={running ? { scale: [1, 4], opacity: [0.55, 0] } : { scale: 1, opacity: discreet ? 0.3 : 0.5 }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: "easeOut", delay: i * 0.9 }}
+          animate={
+            reducedMotion
+              ? { scale: 1, opacity: discreet ? 0.2 : 0.35 }
+              : running
+                ? { scale: [1, 4], opacity: [0.55, 0] }
+                : { scale: 1, opacity: discreet ? 0.3 : 0.5 }
+          }
+          transition={reducedMotion ? { duration: 0 } : { duration: 4.5, repeat: Infinity, ease: "easeOut", delay: i * 0.9 }}
         />
       ))}
       <motion.span
         className="relative h-4 w-4 rounded-full bg-teal shadow-[0_0_22px_hsl(178_55%_45%/0.7)]"
-        animate={{ scale: running ? [1, 1.3, 1] : 1 }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ scale: reducedMotion ? 1 : running ? [1, 1.3, 1] : 1 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
     </div>
   );
 }
 
-export default function GroundingStage({ step, stepRemaining, running, discreet }) {
+export default function GroundingStage({ step, stepRemaining, running, discreet, reducedMotion }) {
   const n = useMemo(() => extractCount(step), [step]);
   const sense = useMemo(() => senseFromTitle(step?.title), [step?.title]);
 
-  if (!n) return <Rings running={running} discreet={discreet} />;
+  if (!n) return <Rings running={running} discreet={discreet} reducedMotion={reducedMotion} />;
 
   const pct = step?.holdSec ? Math.min(1, Math.max(0, 1 - stepRemaining / step.holdSec)) : 0;
   const lit = Math.round(pct * n);
@@ -73,8 +79,8 @@ export default function GroundingStage({ step, stepRemaining, running, discreet 
         <motion.div
           className="absolute h-56 w-56 rounded-full"
           style={{ background: "radial-gradient(circle,hsl(178_55%_45%/0.12),transparent 65%)" }}
-          animate={{ scale: running ? [1, 1.06, 1] : 1, opacity: [0.7, 1, 0.7] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          animate={reducedMotion ? { scale: 1, opacity: 0.85 } : { scale: running ? [1, 1.06, 1] : 1, opacity: [0.7, 1, 0.7] }}
+          transition={reducedMotion ? { duration: 0 } : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
       <svg className="absolute h-64 w-64" viewBox="0 0 256 256">

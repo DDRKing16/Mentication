@@ -14,8 +14,11 @@ import TodayStrip from "@/components/home/TodayStrip";
 import FirstWinCard from "@/components/home/FirstWinCard";
 import MoreWaysIn from "@/components/home/MoreWaysIn";
 import WhatsNewRibbon from "@/components/home/WhatsNewRibbon";
-import { activeProgrammeId, getProgramme, launchStateFor, programmeProgress, programmeStartedAt } from "@/lib/programmes";
-import { computeLocalCalendarStreak } from "@/lib/insights";
+// Only the on-device "which programme is active" bookkeeping is needed
+// eagerly here; `programmeProgress` and `launchStateFor` need the full
+// intervention data, so they're loaded on demand instead (see below).
+import { activeProgrammeId, getProgramme, programmeStartedAt } from "@/lib/programmeStore";
+import { computeLocalCalendarStreak } from "@/lib/streak";
 import { HOME_THEME } from "@/lib/homeTheme";
 import { usePlus } from "@/lib/subscription";
 
@@ -68,6 +71,23 @@ function orderedGrid(now = new Date()) {
   return guide ? [...rest, guide] : rest;
 }
 
+// The one-line greeting under the hero: an open programme day beats a
+// streak, and neither beats plain silence. `programmeProgress` needs the
+// full intervention data, so it's loaded on demand rather than up front.
+async function computeHeroHeadline(sessions) {
+  const id = activeProgrammeId();
+  const programme = id ? getProgramme(id) : null;
+  if (programme) {
+    const { programmeProgress } = await import("@/lib/programmes");
+    const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
+    const today = progress.days[progress.todayIndex];
+    if (!progress.finished && today?.status !== "tomorrow") return `Ready for day ${progress.todayIndex + 1}?`;
+  }
+  const streak = computeLocalCalendarStreak(sessions);
+  if (streak >= 3) return `${streak} days in a row — keep it going.`;
+  return undefined;
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const plus = usePlus();
@@ -84,19 +104,10 @@ export default function Home() {
   // The greeting sometimes names the actual thing worth doing today, instead
   // of the same generic line every single time — but only when there's a
   // real, specific reason to (an open programme day, or a real streak), so
-  // it stays honest rather than performing enthusiasm.
-  const heroHeadline = (() => {
-    const id = activeProgrammeId();
-    const programme = id ? getProgramme(id) : null;
-    if (programme) {
-      const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
-      const today = progress.days[progress.todayIndex];
-      if (!progress.finished && today?.status !== "tomorrow") return `Ready for day ${progress.todayIndex + 1}?`;
-    }
-    const streak = computeLocalCalendarStreak(sessions);
-    if (streak >= 3) return `${streak} days in a row — keep it going.`;
-    return undefined;
-  })();
+  // it stays honest rather than performing enthusiasm. Computed alongside
+  // the rest of the session-derived state in `loadSessions`, since it needs
+  // the same on-demand intervention data as the recommendation engine does.
+  const [heroHeadline, setHeroHeadline] = useState(undefined);
 
   const loadSessions = async () => {
     const [sessions, interventions, recommendations] = await Promise.all([
@@ -112,6 +123,7 @@ export default function Home() {
     // A longer window just for "Your week" and its streak; the engine above keeps its own 30.
     const weekSessions = await sessionStore.list("-created_date", 120);
     setSessions(weekSessions);
+    setHeroHeadline(await computeHeroHeadline(weekSessions));
     setHasNewInsight(hasUnseenInsight(weekSessions));
     setLoaded(true);
   };
@@ -199,7 +211,11 @@ export default function Home() {
             loading={!loaded}
             onOpenWeek={() => navigate("/insights")}
             onOpenProgramme={() => { const id = activeProgrammeId(); navigate(id ? `/programmes/${id}` : "/programmes/calmer-seven"); }}
-            onStartDay={(day) => { const state = launchStateFor(day.id, getProgramme(activeProgrammeId())); if (state) navigate("/reset", { state }); }}
+            onStartDay={async (day) => {
+              const { launchStateFor } = await import("@/lib/programmes");
+              const state = launchStateFor(day.id, getProgramme(activeProgrammeId()));
+              if (state) navigate("/reset", { state });
+            }}
             quick={
               (lastWorked || personalBest)
                 ? { eyebrow: "Worked last time", title: "Repeat your most effective reset", onClick: doLastWorked }

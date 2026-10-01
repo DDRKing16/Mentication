@@ -78,7 +78,7 @@ const CATEGORIES = [
   },
 ];
 
-const STAGES = ["fit", "capture", "claims", "charge", "sort", "evidence", "ruling", "rerate", "direction", "complete"];
+const STAGES = ["fit", "capture", "claims", "charge", "sort", "evidence", "ruling", "direction", "complete"];
 
 const THINKING_TRAPS = [
   { id: "mind-reading", title: "Mind reading", body: "Assuming you know what another person thinks.", icon: Brain },
@@ -280,7 +280,7 @@ function EvidenceColumn({ type, title, subtitle, entries, draft, onDraft, onAdd,
         </AnimatePresence>
       </div>
       <div className="tof-evidence-entry">
-        <input value={draft} onChange={(event) => onDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); onAdd(); } }} placeholder={type === "support" ? "One observable detail…" : "One exception or unknown…"} />
+        <input aria-label={title} value={draft} onChange={(event) => onDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); onAdd(); } }} placeholder={type === "support" ? "One observable detail…" : "One exception or unknown…"} />
         <button onClick={onAdd} disabled={!draft.trim()} aria-label={`Add ${title.toLowerCase()}`}><Plus /></button>
       </div>
     </section>
@@ -342,23 +342,10 @@ function RulingStage({ fairerView, initialFairerView, distortions = [], rating, 
         <details className="tof-fairer-view__notes"><summary>What informed this</summary><div>{distortions.length > 0 && <p><strong>Patterns you chose:</strong> {distortions.join(", ")}.</p>}{summary.length > 0 && <p>{summary.join(" ")}</p>}{summary.length === 0 && <p>No extra evidence was needed for this to be a useful first perspective.</p>}</div></details>
         {editing && <button type="button" className="tof-text-action tof-fairer-view__restore" onClick={() => updateFairerView(initialFairerView)}>Restore first draft</button>}
       </div>
-      <label className="tof-ruling__rating"><span>How true does the original thought feel now?</span><output>{rating} / 10</output><input type="range" min="0" max="10" step="1" value={rating} onChange={(event) => setRating(Number(event.target.value))} aria-label="How true the original thought feels now, from zero to ten" /></label>
+      <label className="tof-ruling__rating"><span>How true does the original thought feel now?</span><output>{rating} / 10</output><input type="range" min="0" max="10" step="1" value={rating} onChange={(event) => setRating(Number(event.target.value))} aria-label="How true the original thought feels now, from zero to ten" aria-valuetext={`${rating} out of 10 now`} /></label>
       <div className="tof-ruling-actions"><button type="button" className="tof-text-action" onClick={onUnresolved}>Keep it unresolved</button><CourtButton onClick={onContinue}>Continue <ArrowRight /></CourtButton></div>
     </motion.div>
   );
-}
-
-function ReRateStage({ claim, adaptiveThought, before, value, setValue, onContinue, onSkip }) {
-  const beforeLabel = Number.isInteger(before) ? `${before} out of 10 before` : "No starting rating";
-  return <motion.div className="tof-belief-rating tof-rerate tof-stage" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: .24 }}>
-    <CourtHeading title="How true does this feel now, after looking at the full picture?" />
-    <section className="tof-belief-rating__claim"><small>Your original thought</small><q>{claim}</q></section>
-    <section className="tof-rerate__adaptive"><small>A more balanced thought</small><p>{adaptiveThought}</p></section>
-    <label className="tof-belief-rating__slider"><span><strong>{value}</strong><small>out of 10 now · {beforeLabel}</small></span><input type="range" min="0" max="10" step="1" value={value} onChange={(event) => setValue(Number(event.target.value))} aria-label="How true the original thought feels now, from zero to ten" aria-valuetext={`${value} out of 10 now`} /></label>
-    <div className="tof-belief-rating__ends"><span>Not at all convincing</span><span>Completely convincing</span></div>
-    <p className="tof-belief-rating__note">A change is not required. The point is to notice what feels different, if anything.</p>
-    <div className="tof-belief-rating__actions"><CourtButton onClick={onContinue}>Choose what helps now <ArrowRight /></CourtButton><button type="button" className="tof-text-action" onClick={onSkip}>Skip rating</button></div>
-  </motion.div>;
 }
 
 function DirectionStage({ hasPrediction, hasActionable, hasOpenQuestions, predictionText, knownContext, openContext, onLeave, onAction, onTest, onGround }) {
@@ -415,7 +402,9 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
     const active = getActiveFlagship();
     return active?.interventionId === "factCheck" ? active : null;
   }, []);
-  const [stage, setStage] = useState(restored?.data?.stage || (initialThought ? "claims" : "fit"));
+  const [stage, setStage] = useState(
+    restored?.data?.stage && STAGES.includes(restored.data.stage) ? restored.data.stage : (initialThought ? "claims" : "fit"),
+  );
   const hasCompletedBefore = useMemo(() => getFlagshipPreferences().events?.some((event) => event.interventionId === "factCheck" && event.completed), []);
   const [data, setData] = useState(restored?.data || {
     stage: "fit",
@@ -434,7 +423,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   const startedAt = useRef(Date.now());
 
   const stageIndex = Math.max(0, STAGES.indexOf(stage));
-  const stageAnnouncement = { fit: "Thought or Fact. Choose how you would like to begin.", capture: "Thought capture. Enter one thought in your own words.", claims: "Review an editable claim.", charge: "Choose any thinking shortcuts that might be present, or none.", sort: "Choose the closest description for the statement.", evidence: "Make room for evidence that supports and challenges the conclusion.", ruling: "Review your more balanced thought.", rerate: "Notice how true the original thought feels now.", direction: "Choose what would be useful now.", complete: "Your private reflection is ready." }[stage];
+  const stageAnnouncement = { fit: "Thought or Fact. Choose how you would like to begin.", capture: "Thought capture. Enter one thought in your own words.", claims: "Review an editable claim.", charge: "Choose any thinking shortcuts that might be present, or none.", sort: "Choose the closest description for the statement.", evidence: "Make room for evidence that supports and challenges the conclusion.", ruling: "Review your more balanced thought.", direction: "Choose what would be useful now.", complete: "Your private reflection is ready." }[stage];
   const shellStage = stageIndex < 2 ? 1 : stageIndex < 5 ? 2 : 3;
   const update = (patch) => setData((current) => ({ ...current, ...patch }));
   const go = (nextStage, patch = {}) => {
@@ -510,7 +499,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   };
 
   const back = () => {
-    const previous = { capture: "fit", claims: "capture", charge: "claims", sort: "charge", evidence: "sort", ruling: "evidence", rerate: "ruling", direction: "rerate", complete: "direction" }[stage];
+    const previous = { capture: "fit", claims: "capture", charge: "claims", sort: "charge", evidence: "sort", ruling: "evidence", direction: "ruling", complete: "direction" }[stage];
     if (previous) go(previous);
     else onExit?.();
   };

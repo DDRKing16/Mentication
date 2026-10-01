@@ -29,6 +29,17 @@ describe("the player's popups use the per-intervention theme, not a fixed colour
     expect(files.resetPlayer).toMatch(/showAmbient[\s\S]{0,500}intervention-themed-surface/);
   });
 
+  // The "Let's try something else" switch sheet is translucent
+  // (intervention-themed-surface is ~94% opacity) with no blur of its own,
+  // which let the screen behind it show through, faint but readable, in the
+  // gaps between its option rows. Every other popup built on the same
+  // surface class (the ambient menu above, SoundscapeMixer, SleepTimerSheet)
+  // pairs it with a backdrop-blur so the content behind reads as soft glass,
+  // not a ghost. The switch sheet was the one place missing it.
+  it("the switch sheet blurs what's behind it, like every other themed popup", () => {
+    expect(files.resetPlayer).toMatch(/reset-switch-sheet-title[\s\S]{0,300}intervention-themed-surface[^"]*backdrop-blur/);
+  });
+
   // A popup animated with framer-motion cannot also rely on a CSS transform
   // class (e.g. -translate-x-1/2) for centring: framer-motion writes its own
   // `transform` inline style for the open/close motion, which silently wins
@@ -40,5 +51,19 @@ describe("the player's popups use the per-intervention theme, not a fixed colour
     expect(files.sleepTimerSheet).not.toMatch(/-translate-x-1\/2/);
     const ambientSection = files.resetPlayer.match(/showAmbient[\s\S]{0,600}/)?.[0] || "";
     expect(ambientSection).not.toMatch(/-translate-x-1\/2/);
+  });
+
+  // The shared surface's own backdrop-blur does not reliably blur what's
+  // behind it on every screen -- the player's many glowing, blurred visuals
+  // (body glow, orbs) can defeat it, letting text underneath show through
+  // crisp and readable despite the blur. Found on the ambient sound popup
+  // over Progressive Muscle Relaxation's headline. The background itself
+  // must stay nearly opaque so popups read as solid regardless of whether
+  // the blur actually renders.
+  it("the themed surface's own background stays nearly opaque, not just blurred", () => {
+    const css = readFileSync("src/index.css", "utf8");
+    const rule = css.match(/\.intervention-themed-surface\s*\{[\s\S]*?\}/)?.[0] || "";
+    const pct = Number(rule.match(/--intervention-surface\)\s*(\d+)%/)?.[1] || 0);
+    expect(pct).toBeGreaterThanOrEqual(90);
   });
 });

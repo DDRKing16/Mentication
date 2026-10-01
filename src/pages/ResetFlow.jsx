@@ -9,23 +9,23 @@ import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
 import BrandClosing from "@/components/brand/BrandClosing";
 import { isInteractiveFlagship, isNewFlagship } from "@/lib/flagshipExperienceRouting";
-import ThoughtOrFactEntry from "@/components/thought-or-fact/ThoughtOrFactEntry";
 import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/components/reset-flow/ResetSetupScreens";
 
 // Each intervention's own guided experience is a large, self-contained
 // world (its own screens, motion and — for a couple of them — thousands of
 // lines of markup). Only one ever runs per session, so they load on demand
 // once the pathway is known, instead of every one of them riding along in
-// this shared flow's bundle for every reset.
+// this shared flow's bundle for every reset. Each one's own stylesheet
+// (imported inside the component itself, not here) rides along with it.
 const ResetPlayer = lazy(() => import("@/components/ResetPlayer"));
 const FlagshipExperience = lazy(() => import("@/components/FlagshipExperience"));
 const NewFlagshipExperience = lazy(() => import("@/components/NewFlagshipExperiences"));
+const ThoughtOrFactEntry = lazy(() => import("@/components/thought-or-fact/ThoughtOrFactEntry"));
 const ThoughtOrFactExperience = lazy(() => import("@/components/ThoughtOrFactExperience"));
 const UrgeSurfExperience = lazy(() => import("@/components/UrgeSurfExperience"));
 const NextEasiestStepExperience = lazy(() => import("@/components/NextEasiestStepExperience"));
 const ChangeSceneExperience = lazy(() => import("@/components/ChangeSceneExperience"));
 const TomorrowParkingExperience = lazy(() => import("@/components/TomorrowParkingExperience"));
-import { warmNarration, warmBoxV2Images } from "@/lib/preloadBoxV2";
 import {
   buildPathway,
   buildSegment,
@@ -49,9 +49,6 @@ import {
   UNSURE_FIRST_STEP,
   unsureSecondStep,
 } from "@/lib/resetFlowConfig";
-import "@/styles/thought-or-fact.css";
-import "@/styles/urge-surfing.css";
-import "@/styles/happy-bump.css";
 
 export default function ResetFlow() {
   const navigate = useNavigate();
@@ -191,11 +188,22 @@ export default function ResetFlow() {
   // Preload the first Box Breathing V2 narration and its two background
   // images as soon as the intervention is selected, rather than at every app
   // launch, so it still starts instantly without paying that cost up front.
+  // The local narration manifest this pulls in is sizeable, so it's fetched
+  // on demand here too -- only a reset that actually opens with Box
+  // Breathing pays for it, not every reset.
   useEffect(() => {
     const first = pathway[0];
     if (first?.id === "boxV2") {
-      warmNarration(first, answers.direction);
-      warmBoxV2Images();
+      import("@/lib/preloadBoxV2")
+        .then(({ warmNarration, warmBoxV2Images }) => {
+          warmNarration(first, answers.direction);
+          warmBoxV2Images();
+        })
+        .catch(() => {
+          // Warming is a head start, not a requirement -- Box Breathing's
+          // own screen still loads and plays narration itself if this
+          // fetch fails (e.g. offline).
+        });
     }
   }, [pathway, answers.direction]);
 
@@ -501,19 +509,21 @@ export default function ResetFlow() {
     }
     if (isThoughtOrFactEntry) {
       return (
-        <ThoughtOrFactEntry
-          answers={answers}
-          ready={tofReady}
-          thought={tofEntryThought}
-          voiceSeconds={tofVoiceSeconds}
-          voiceState={tofVoiceState}
-          onBegin={beginGuided}
-          onReady={() => setTofReady(true)}
-          onReturnToWriting={returnToThoughtWriting}
-          onStartVoice={startThoughtVoiceEntry}
-          onStopVoice={stopThoughtVoiceEntry}
-          onThoughtChange={setTofEntryThought}
-        />
+        <Suspense fallback={<BuildingResetScreen />}>
+          <ThoughtOrFactEntry
+            answers={answers}
+            ready={tofReady}
+            thought={tofEntryThought}
+            voiceSeconds={tofVoiceSeconds}
+            voiceState={tofVoiceState}
+            onBegin={beginGuided}
+            onReady={() => setTofReady(true)}
+            onReturnToWriting={returnToThoughtWriting}
+            onStartVoice={startThoughtVoiceEntry}
+            onStopVoice={stopThoughtVoiceEntry}
+            onThoughtChange={setTofEntryThought}
+          />
+        </Suspense>
       );
     }
 

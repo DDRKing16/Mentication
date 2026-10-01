@@ -12,6 +12,7 @@ import { HAPPY_BUMP_NARRATION } from "@/lib/happyBumpNarration";
 import { useGuideVoice } from "@/hooks/useGuideVoice";
 import { useVoiceDictation } from "@/hooks/useVoiceDictation";
 import { voiceFor } from "@/lib/spoken";
+import "@/styles/happy-bump.css";
 
 const ID = "happyBump";
 const DURATION_SECONDS = 300;

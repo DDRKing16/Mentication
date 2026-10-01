@@ -26,6 +26,8 @@ export default function PreferencesRow({ answers, setAnswers }) {
             <button
               key={p.key}
               type="button"
+              role="switch"
+              aria-checked={on}
               onClick={() => toggle(p.key)}
               title={p.hint}
               className={

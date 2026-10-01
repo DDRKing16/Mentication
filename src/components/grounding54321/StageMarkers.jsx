@@ -5,7 +5,7 @@ import { STAGES } from "@/lib/grounding54321Layout";
 // Five small stage markers at the top of the scene. The active stage glows
 // softly, completed stages stay subtly filled, and upcoming stages use faint
 // outlines.
-export default function StageMarkers({ activeSense }) {
+export default function StageMarkers({ activeSense, reducedMotion }) {
   const activeIndex = Math.max(0, STAGES.findIndex((s) => s.sense === activeSense));
   return (
     <div className="flex items-center gap-2.5">
@@ -14,12 +14,18 @@ export default function StageMarkers({ activeSense }) {
         const done = i < activeIndex;
         return (
           <span key={s.sense} className="relative flex h-2.5 w-2.5 items-center justify-center">
-            {active && (
+            {active && !reducedMotion && (
               <motion.span
                 className="absolute h-2.5 w-2.5 rounded-full"
                 style={{ background: s.accent }}
                 animate={{ opacity: [0.45, 0.9, 0.45], scale: [1, 1.3, 1] }}
                 transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              />
+            )}
+            {active && reducedMotion && (
+              <span
+                className="absolute h-2.5 w-2.5 rounded-full"
+                style={{ background: s.accent, opacity: 0.7 }}
               />
             )}
             <span

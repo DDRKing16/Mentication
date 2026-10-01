@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowLeft, ArrowRight, LockKeyhole, Mic, Scale, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import "@/styles/thought-or-fact.css";
 
 function EntryHeader({ backLabel = "Go back", onBack }) {
   const navigate = useNavigate();
