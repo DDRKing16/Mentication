@@ -482,3 +482,37 @@ side in both a dark world (Progressive Muscle Relaxation) and the light 5-4-3-2-
 same popup styling is shared by the ambient sound menu, the sleep soundscape mixer and the sleep timer,
 so all three are fixed together (673b75a).
 Two new regression tests guard both fixes. Full test/typecheck/lint/build suite passes clean.
+
+## 1 Oct -- A real crossfade bug in the shared Threshold, found via Thought or Fact's own pass
+With the brand thread phases and every earlier fallback item already done, this run's visual-polish turn
+went to Thought or Fact, the one widely-used shared-player intervention that had never had a full
+dedicated pass of its own. Walked the entire practice end to end in a real headless-browser run at 375x812
+(writing a thought, confirming the claim, the charge sheet, sorting it, all four evidence lanes, the
+ruling screen's "make this mine" editor, and the closing choices) and found two real, verified problems,
+plus one thing worth flagging rather than fixing.
+First and the more significant one, because it touches every one of the twelve interventions, not just
+this one: the shared Threshold that opens every practice fades its whole opaque panel -- logo, wordmark,
+name and all -- out over 550ms as it hands off to the practice underneath. The practice itself is already
+fully visible by the time that fade starts, so for a real stretch of those 550ms the translucent logo and
+intervention name sat directly on top of the practice's own opening buttons -- most visible on Thought or
+Fact, where "Mentication" and "Thought or Fact?" crossed right over "Look at a thought" and "Ground
+first". Made the mark (logo, name, hairline) fade out together in 250ms, well ahead of the panel's own
+550ms dissolve, so it's gone before the panel is translucent enough to show what's behind it (4ede9b6).
+Checked before and after across Thought or Fact, 5-4-3-2-1 Grounding, Box Breathing, The Happy Bump,
+Change the Scene, Urge Surfing and Vector Shift -- the ghosting is gone everywhere and the rest of the
+opening animation is unchanged. Logged in docs/BRAND_THREAD.md (08a391f).
+Second, narrower to this one screen: on the "A truer thought" screen, the card's small-caps heading ("A
+more balanced thought") and its "Make this mine" button share a row. At phone width both wrapped onto two
+lines at once, leaving "A MORE BALANCED / THOUGHT" and "Make this / mine" stacked right on top of each
+other with almost no room between them. The button now stays on one line and drops to its own row,
+right-aligned, when the heading needs the full width. Checked at 375px before and after, and confirmed the
+already-short "Done" state (after tapping in) is unchanged (dba0103).
+Also found, while reading the stage logic rather than the screen: Thought or Fact has a complete, tested
+"Keep what is useful" ending screen (a private save, a short reminder-phrase box) that nothing in the
+current flow ever reaches any more -- every ending choice finishes straight to the shared closing moment
+instead. Tried removing it as dead code first, but a "cannot verify, revert" per the run's own rules --
+an existing test suite explicitly checks that screen exists, which means this was a deliberate, specified
+feature that got disconnected from its trigger rather than an accident. Reverted that change and flagged
+it in SUGGESTIONS.md instead, since reconnecting it or deleting it both change how finishing the practice
+works, which is the owner's call (d9ddf27).
+Full test/typecheck/lint/build suite passes clean on every commit.
