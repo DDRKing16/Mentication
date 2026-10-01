@@ -454,3 +454,31 @@ Verified before and after in the headless browser, in both a dark world (Box Bre
 behaviour changed. Added a regression test alongside the existing popup-surface checks, and logged it in
 docs/BRAND_THREAD.md as a fourth slice of that same shared-recipe work (bb23620).
 Full test/typecheck/lint/build suite passes clean.
+
+## 1 Oct -- Progressive Muscle Relaxation's own dedicated visual-polish pass
+With the brand thread phases and every earlier fallback item already done, this run's visual-polish turn
+went to Progressive Muscle Relaxation, the one widely-used intervention that had never had a full
+dedicated pass of its own (every other shared-player practice, and several standalone ones, already had).
+Walked the entire practice end to end in a real headless-browser run at 375x812 (every body-part stage
+from hands through to the closing "come back gradually" step, plus every popup in its control dock) and
+found two real, verified problems.
+First and more serious: below 391px wide -- which covers almost every iPhone in portrait, including the
+375px size this whole pass was run at -- a CSS rule built specifically for Progressive Muscle Relaxation
+hid its "This isn't helping" button completely and moved the remaining button into a small corner chip.
+Box Breathing and 5-4-3-2-1 Grounding, which share the exact same row, kept both buttons at every width.
+That left anyone doing Progressive Muscle Relaxation on a real iPhone with no way to say "this isn't
+working for me, show me something else" -- only a way to skip to the next thing in their plan. Both
+buttons now stay visible and reachable at every width tested (320, 375, 390, 393px), just smaller on the
+narrowest phones so they still fit on one line (86d4969).
+Second: opening the ambient sound menu during the practice let the "Squeeze both hands"-style headline
+text show through behind it, fully readable, not just faintly -- confirmed with a direct check of the
+popup's own styling, which already asks for a background blur, but the blur wasn't actually rendering
+over this particular screen. Traced it to the player's own glowing body visual, which uses dozens of its
+own blur effects elsewhere on the same screen and was confusing the browser's blur sampling for the
+popup -- not something safe to unpick without touching the signature glowing-body look used throughout
+every practice in this player. Fixed it from the popup's side instead: raised its background from 62% to
+94% opaque, so it reads solid no matter whether the blur renders. Still looks like glass, checked side by
+side in both a dark world (Progressive Muscle Relaxation) and the light 5-4-3-2-1 Grounding world. This
+same popup styling is shared by the ambient sound menu, the sleep soundscape mixer and the sleep timer,
+so all three are fixed together (673b75a).
+Two new regression tests guard both fixes. Full test/typecheck/lint/build suite passes clean.
