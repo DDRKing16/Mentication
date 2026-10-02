@@ -33,7 +33,7 @@
 .tpl {
   --tpl-radius: 1.125rem;
   --tpl-font-display: "Lora TPL", "Iowan Old Style", Georgia, serif;
-  --tpl-font-sans: "Nunito Sans TPL", "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tpl-font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --tpl-bg: oklch(0.145 0.023 310);
   --tpl-fg: oklch(0.88 0.026 312);

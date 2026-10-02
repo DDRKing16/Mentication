@@ -1600,7 +1600,7 @@ export default function NextEasiestStepExperience() {
           --shadow-card-hover: 0 18px 36px rgba(90, 36, 48, 0.12);
           --shadow-focus: 0 24px 48px rgba(0,0,0,0.20);
           --font-headline: 'Fraunces', 'Recoleta', Georgia, serif;
-          --font-body: 'Inter', -apple-system, sans-serif;
+          --font-body: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
           
           font-family: var(--font-body);
           color: var(--text-burgundy);

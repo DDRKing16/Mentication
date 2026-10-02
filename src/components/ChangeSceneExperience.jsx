@@ -1211,7 +1211,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               display: block;
               margin-bottom: 4px;
               color: #ffe58a;
-              font-family: system-ui, sans-serif;
+              font-family: var(--font-body);
               font-size: 9px;
               font-weight: 800;
               letter-spacing: 0.13em;
@@ -1608,7 +1608,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               cursor: pointer;
               font-size: 12.5px;
               font-weight: 700;
-              font-family: system-ui, -apple-system, sans-serif;
+              font-family: var(--font-body);
               letter-spacing: 0.01em;
               transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
               text-align: left;
