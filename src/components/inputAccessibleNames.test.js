@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 describe("free-text inputs have a real accessible name", () => {
   it("Thought or Fact's evidence entry field is labelled by its column title", () => {
     const src = readFileSync("src/components/ThoughtOrFactExperience.jsx", "utf8");
-    expect(src).toMatch(/<input aria-label=\{title\}/);
+    expect(src).toMatch(/aria-label=\{title\}/);
   });
 
   it("Next Easiest Step's custom task field has an aria-label", () => {

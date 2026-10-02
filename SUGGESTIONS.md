@@ -92,19 +92,3 @@ Shown once, after someone's first finished reset:
   your finished design (not to be hand-edited without asking), so flagging
   the mismatch rather than guessing at fixing text inside that file myself.
 
-- **Thought or Fact has a whole finished "save this privately" ending screen
-  that nobody can ever reach.** `ThoughtOrFactExperience.jsx` has a complete,
-  working "Keep what is useful" screen — your original thought, a fairer
-  view, a place to save a private note and write yourself a short reminder
-  phrase for if the thought comes back. It's real, finished code, and there
-  are tests that check it's there. But every single ending choice on the
-  screen before it ("Leave this here for now", "Stop here", and the rest)
-  skips straight past it to the app's shared closing screen instead — there
-  is no button or path left anywhere that ever shows it to anyone. This
-  looks like it was quietly cut off from the rest of the practice at some
-  point, maybe when the shared closing moment was added for every
-  intervention. Didn't touch it myself: bringing it back changes how
-  finishing Thought or Fact works (one more screen, a "save privately"
-  choice, a reminder-phrase box) which felt like your call, not mine. If
-  you don't want it, it'd be a clean, safe deletion instead — just say
-  which way you'd like it.
