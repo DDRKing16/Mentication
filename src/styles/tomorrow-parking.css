@@ -32,7 +32,7 @@
 
 .tpl {
   --tpl-radius: 1.125rem;
-  --tpl-font-display: "Lora TPL", "Iowan Old Style", Georgia, serif;
+  --tpl-font-display: "EB Garamond", ui-serif, Georgia, serif;
   --tpl-font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --tpl-bg: oklch(0.145 0.023 310);

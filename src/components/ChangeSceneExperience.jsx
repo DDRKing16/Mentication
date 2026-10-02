@@ -835,7 +835,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               will-change: filter, opacity;
             }
             .change-scene-v2 h1 {
-              font-family: Iowan Old Style, Baskerville, "Times New Roman", serif !important;
+              font-family: "EB Garamond", ui-serif, Georgia, serif !important;
               font-weight: 700;
               letter-spacing: -0.045em;
               text-wrap: balance;
@@ -1053,7 +1053,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
             .change-scene-v2 .guided-suggestions-heading {
               margin: 0 0 6px;
               color: #4b3720;
-              font-family: Iowan Old Style, Baskerville, Georgia, serif;
+              font-family: "EB Garamond", ui-serif, Georgia, serif;
               font-size: 15px;
               font-weight: 700;
               letter-spacing: -0.02em;
@@ -1075,7 +1075,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
             .change-scene-v2 .next-steps p {
               margin: 0 0 3px;
               color: #5d4022;
-              font-family: Iowan Old Style, Baskerville, Georgia, serif;
+              font-family: "EB Garamond", ui-serif, Georgia, serif;
               font-size: 11px;
               font-weight: 700;
             }
@@ -1174,7 +1174,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               background: rgba(255,255,255,0.055);
               color: #fff9df;
               cursor: pointer;
-              font-family: Iowan Old Style, Baskerville, Georgia, serif;
+              font-family: "EB Garamond", ui-serif, Georgia, serif;
               font-size: 14.5px;
               line-height: 1.2;
               text-align: left;
@@ -1258,7 +1258,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               width: min(86%, 318px);
               margin: 0 auto;
               color: #fff7d1;
-              font-family: Iowan Old Style, Baskerville, "Times New Roman", serif;
+              font-family: "EB Garamond", ui-serif, Georgia, serif;
               font-size: 19px;
               font-weight: 500;
               letter-spacing: -0.02em;

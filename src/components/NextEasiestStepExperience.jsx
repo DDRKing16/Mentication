@@ -1599,7 +1599,7 @@ export default function NextEasiestStepExperience() {
           --shadow-card: 0 12px 24px rgba(90, 36, 48, 0.08);
           --shadow-card-hover: 0 18px 36px rgba(90, 36, 48, 0.12);
           --shadow-focus: 0 24px 48px rgba(0,0,0,0.20);
-          --font-headline: 'Fraunces', 'Recoleta', Georgia, serif;
+          --font-headline: 'EB Garamond', ui-serif, Georgia, serif;
           --font-body: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
           
           font-family: var(--font-body);
@@ -3589,7 +3589,7 @@ export default function NextEasiestStepExperience() {
             <div style={{ position: "relative", zIndex: 5, textAlign: "center" }}>
               <div className="micro" style={{ color: "#a5f3fc", fontWeight: "800", opacity: 0.9, marginBottom: "8px", fontSize: "10px", letterSpacing: "0.1em", paddingLeft: "40px" /* offset for ribbon */ }}>DAILY CONTEMPLATION</div>
               <p style={{
-                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontFamily: "'EB Garamond', ui-serif, Georgia, serif",
                 fontSize: "15.5px",
                 lineHeight: "1.5",
                 fontWeight: "bold",
