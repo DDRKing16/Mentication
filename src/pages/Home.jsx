@@ -4,6 +4,7 @@
 // time-of-day recommendation) route to the existing /reset entry unchanged.
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { ChevronRight, Layers } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { sessionStore } from "@/lib/localData";
 import SafetyFooter from "@/components/SafetyFooter";
@@ -234,6 +235,25 @@ export default function Home() {
                 <CategoryCard key={c.id} card={c} index={i} recent={!!recentTint && c.tint === recentTint} onClick={() => choose(c)} />
               ))}
             </div>
+            {/* Restructure: a thin bar the width of Your Week, under the six
+                buttons. It opens the category holding Foundations, Dear 2100
+                and The Good Map. */}
+            <button
+              type="button"
+              onClick={() => navigate("/restructure")}
+              aria-label="Restructure: Foundations, Dear 2100 and The Good Map"
+              data-sfx="select"
+              className="home-restructure no-tap mt-4 flex h-14 w-full items-center justify-between gap-3 rounded-[1.1rem] px-4 text-left transition-transform duration-150 active:scale-[0.985]"
+            >
+              <span className="flex items-center gap-3">
+                <Layers className="h-[1.15rem] w-[1.15rem] shrink-0 text-[var(--home-accent)]" strokeWidth={1.7} aria-hidden="true" />
+                <span>
+                  <span className="block font-heading text-[1.02rem] font-semibold leading-tight text-[var(--home-ink)]">Restructure</span>
+                  <span className="block text-[0.68rem] font-medium leading-tight text-[var(--home-muted)]">Foundations · Dear 2100 · The Good Map</span>
+                </span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-[var(--home-muted)]" aria-hidden="true" />
+            </button>
           </motion.section>
 
           {/* A quiet break between the everyday grid above and the longer,

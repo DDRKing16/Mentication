@@ -48,6 +48,7 @@ export const INTERVENTION_ATMOSPHERE = Object.freeze({
   tomorrowParking: { background: "#0C0A10", glow: "rgba(214, 120, 100, 0.14)", tone: "dark" },
   nightChannel: { background: "#02050B", glow: "rgba(158, 182, 255, 0.14)", tone: "dark" },
   goodMap: { background: "#12030A", glow: "rgba(62, 232, 170, 0.16)", tone: "dark" },
+  foundations: { background: "#020712", glow: "rgba(127, 227, 214, 0.14)", tone: "dark" },
 });
 
 /** The atmosphere for an intervention id, falling back to Mentication navy. */
@@ -79,6 +80,7 @@ export const INTERVENTION_COLOURWAY = Object.freeze({
   tomorrowParking: "cream-red",
   nightChannel: "sky-lilac",
   goodMap: "jade-champagne",
+  foundations: "sky-lilac",
 });
 
 const DEFAULT_COLOURWAY = "cream-rose-sage";

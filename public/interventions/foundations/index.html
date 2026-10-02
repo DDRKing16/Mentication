@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mentication · Foundations — Midnight Mineral</title>
+<link rel="stylesheet" href="./foundations.css">
+</head>
+<body>
+<main class="app" id="app">
+  <div class="choice-light-layer" aria-hidden="true"></div><div class="ambient a"></div><div class="ambient b"></div>
+  <div class="status" aria-hidden="true"><span>9:41</span><div class="system"><span class="signal"><i></i><i></i><i></i></span><span>◒</span><span class="battery"></span></div></div>
+  <header class="topbar"><button class="navbtn" id="back" hidden>← Back</button><div class="brand" id="brand"><span class="mark"></span><span>Mentication</span></div><span class="step" id="step">Foundations · 01</span></header>
+  <div class="progress"><i id="progress"></i><nav class="flow-nav" id="flowNav" aria-label="Foundation journey"></nav></div>
+  <div class="screens">
+    <section class="screen active" data-screen="intro">
+      <h1 class="intro-title">Foundations</h1>
+      <p class="intro-statement">A stronger base changes <em>what life asks of you.</em></p>
+      <div class="foundation-zone">
+        <div class="orbit-energy" aria-hidden="true"><i></i></div>
+        <div class="foundation" id="foundation"><div class="slab"></div>
+          <button class="block active" data-label="Sleep and rhythm" aria-label="Sleep and rhythm"></button><button class="block" data-label="Nutrition and hydration" aria-label="Nutrition and hydration"></button><button class="block" data-label="Movement" aria-label="Movement"></button><button class="block" data-label="Recovery and rest" aria-label="Recovery and rest"></button><button class="block" data-label="Daily structure" aria-label="Daily structure"></button><button class="block" data-label="Getting into action" aria-label="Getting into action"></button><button class="block" data-label="Reliable support" aria-label="Reliable support"></button><button class="block" data-label="Stability" aria-label="Stability"></button>
+        </div>
+        <div class="foundation-caption"><b id="foundationLabel">Sleep and rhythm</b></div>
+        <div class="energy-thread" aria-hidden="true"><i></i></div>
+      </div>
+      <div class="footer"><button class="primary" data-next="scan"><span>See how your foundation is sitting</span><span class="cta-track" aria-hidden="true"><i></i></span><span class="arrow">→</span></button><button class="ghost resume-plan" id="resumePlan" hidden>Open my saved weekly plan →</button></div>
+    </section>
+
+    <section class="screen" data-screen="scan">
+      <div class="domain-tag"><i></i><span id="questionDomain">The whole picture</span></div>
+      <div class="question-copy"><h2 id="questionText">How much have <em>the basics</em> been helping lately?</h2>
+      <p class="small mono" id="questionContext">Sleep · energy · routine · recovery · support</p></div>
+      <div class="balance-zone"><div class="balance" id="balance"><div class="plinth"><div class="orb"></div><div class="plinth-top"></div></div><div class="pivot"></div></div></div>
+      <div class="answer"><strong id="answerText" aria-live="polite">Choose a response below</strong></div>
+      <div class="scale"><div class="scale-line"></div><span class="selection-current" aria-hidden="true"></span><div class="scale-dots" role="group" aria-label="Rate from one to five"><button class="scale-point" type="button" data-value="0" aria-label="1, working against me" aria-pressed="false"><span><em>1</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="1" aria-label="2" aria-pressed="false"><span><em>2</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="2" aria-label="3, mixed" aria-pressed="false"><span><em>3</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="3" aria-label="4" aria-pressed="false"><span><em>4</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="4" aria-label="5, supporting me" aria-pressed="false"><span><em>5</em><b aria-hidden="true">Continue →</b></span></button></div><input class="range" id="range" type="range" min="0" max="4" step="1" value="2" aria-label="Response"></div>
+      <div class="endlabels"><span>Working against me</span><span>Supporting me</span></div>
+      <p class="scale-help">Choose a number, then tap it again to continue.</p>
+      <div class="footer"><button class="primary" id="questionContinue" disabled><span>Continue</span><span class="arrow">→</span></button></div>
+    </section>
+
+    <section class="screen" data-screen="snapshot">
+      <p class="eyebrow">Your foundation today</p><h2>This is how the base <em>appears to be sitting.</em></h2>
+      <div class="foundation-model" id="foundationModel" aria-live="polite">
+        <div class="model-orbit" id="modelOrbit"></div>
+        <div class="model-assembly">
+          <div class="capacity-orb"><div><strong id="snapshotTitle">A mixed base</strong><span>Descriptive, not diagnostic</span></div></div>
+          <div class="load-beam"></div><div class="support-frame" id="supportFrame"></div><div class="ground-plate"></div>
+        </div>
+        <div class="model-detail priority-summary" id="modelDetail"><span class="detail-kicker">Needs the most support</span><strong>Sleep and rhythm</strong><span>It may be placing pressure on energy and follow-through.</span></div>
+      </div>
+      <div class="footer"><button class="priority-why-trigger" id="openPriorityWhy" type="button" aria-haspopup="dialog" aria-controls="priorityExplanation">Why this area?</button><button class="primary" id="snapshotContinue" data-next="choices"><span>See 4 small ways to strengthen it</span><span class="arrow">→</span></button></div>
+      <div class="priority-explanation" id="priorityExplanation" role="dialog" aria-modal="true" aria-labelledby="priorityExplanationTitle" aria-hidden="true" inert>
+        <button class="priority-explanation-close" id="closePriorityWhy" type="button" aria-label="Close explanation">×</button>
+        <p class="eyebrow">Why this area?</p><h2 id="priorityExplanationTitle"><em id="priorityName">Sleep and rhythm</em><span id="priorityExplanationContext"> may be affecting more than one part of the base.</span></h2>
+        <div class="pathway-guidebar"><p>Follow the pathway to see how these pressures connect.</p><button id="playPathway" type="button"><span aria-hidden="true">▶</span> Play pathway</button></div>
+        <div class="pathway-story" id="pathwayStory">
+          <svg class="pathway-lines" viewBox="0 0 332 318" aria-hidden="true">
+            <defs><marker id="pathArrowDim" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="rgba(159,197,239,.40)"/></marker></defs>
+            <path class="pathway-segment" pathLength="1" d="M139 26 C164 28 169 72 187 72" marker-end="url(#pathArrowDim)"/><path class="pathway-segment" pathLength="1" d="M187 72 C151 75 106 118 61 118" marker-end="url(#pathArrowDim)"/><path class="pathway-segment" pathLength="1" d="M61 118 C116 120 153 164 187 164" marker-end="url(#pathArrowDim)"/>
+            <path class="pathway-segment-current" pathLength="1" data-path-segment="0" d="M139 26 C164 28 169 72 187 72"/><path class="pathway-segment-current" pathLength="1" data-path-segment="1" d="M187 72 C151 75 106 118 61 118"/><path class="pathway-segment-current" pathLength="1" data-path-segment="2" d="M61 118 C116 120 153 164 187 164"/>
+          </svg>
+          <div class="pathway-nodes" id="logicPath"></div><div class="pathway-insight" aria-live="polite" aria-atomic="true"><span id="pathwayInsightLabel">Pathway insight · 01/04</span><strong id="pathwayInsightTitle">Irregular rhythm</strong><p id="rationaleCopy"></p></div>
+        </div>
+        <p class="pathway-caveat">A starting hypothesis, not a verdict.</p>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="choices">
+      <p class="eyebrow">One thing this week</p><h2>One small step for <em id="choiceDomain">the base.</em></h2><p class="small choice-guidance">Choose the easiest place to begin.</p>
+      <div class="choice-sheet"><div class="choice-sheet-heading"><span>Pick one</span><strong id="choiceSheetDomain">Sleep and rhythm</strong></div><div class="minimal-choices" id="actionChoices"></div></div>
+      <div class="footer"><button class="primary" id="choiceContinue" disabled><span>Make this realistic</span><span class="arrow">→</span></button></div>
+    </section>
+
+    <section class="screen" data-screen="dose">
+      <p class="eyebrow">Make it realistic</p><h2>How small should <em>we make it?</em></h2><p class="chosen-action"><span>Your choice</span><strong id="doseActionTitle"></strong></p>
+      <div class="dose-path" id="dosePath">
+        <svg viewBox="0 0 336 272" aria-hidden="true"><path class="dose-wire" d="M34 226 C88 235 88 164 150 169 S214 86 300 51"/><path class="dose-current" d="M34 226 C88 235 88 164 150 169 S214 86 300 51"/></svg>
+        <div class="dose-token" aria-hidden="true"><i></i></div>
+        <div class="dose-list" id="doseList"></div>
+        <div class="dose-preview" id="dosePreview" aria-live="polite"><span>Dose preview</span><strong>Select a distance</strong><p>Choose the version most likely to happen.</p></div>
+      </div>
+      <div class="footer"><button class="primary" id="doseContinue" disabled><span>Create my weekly plan</span><span class="arrow">→</span></button></div>
+    </section>
+
+    <section class="screen" data-screen="plan">
+      <p class="eyebrow">Your weekly plan</p><h2>One thing. <em>This week.</em></h2>
+      <div class="weekly-plan-card" id="weeklyPlanCard"><span class="weekly-plan-kicker">This week</span><span class="weekly-plan-domain" id="planDomain"></span><h3 id="planTitle"></h3><p class="weekly-plan-instruction" id="planInstruction"></p><div class="weekly-plan-meta"><span>One action</span><span id="planDose"></span><span>This week</span></div><button class="weekly-plan-why" id="planWhyToggle" type="button" aria-expanded="false">Why this was suggested <span>＋</span></button><div class="weekly-plan-why-copy" id="planWhyDisclosure" hidden><p id="planWhy"></p><small>A practical hypothesis, not a promise.</small></div></div>
+      <div class="footer"><button class="primary" id="savePlan"><span>Save my weekly plan</span><span class="arrow">→</span></button><button class="ghost" id="changePlan" style="width:100%">Change my plan</button></div>
+    </section>
+
+    <section class="screen" data-screen="saved">
+      <div class="success-orbit"><div class="success-core"><div><b id="savedTitle">Plan ready.</b><span id="savedStatus">One thing this week</span></div></div></div>
+      <h2 style="text-align:center">The next step is <em>small enough to begin.</em></h2><p class="lede" id="savedCopy" style="text-align:center">Try your one small action, then check what helped.</p>
+      <button class="ghost" id="viewSavedPlan">View my plan →</button>
+      <div class="footer"><button class="primary" data-next="reviewIntro"><span>Preview the follow-up</span><span class="arrow">→</span></button><button class="ghost" data-next="finish" style="width:100%">Finish for now</button></div>
+    </section>
+
+    <section class="screen" data-screen="reviewIntro">
+      <p class="eyebrow">After you have tried it</p><h2>A small check-in. <em>A clearer next step.</em></h2><div class="learning"><div class="learning-row"><i>1</i><div><b>Did it happen?</b><span>Even a small start counts. If it did not happen, we can make it easier.</span></div></div><div class="learning-row"><i>2</i><div><b>Did it fit your energy?</b><span>Notice how much it asked of you.</span></div></div><div class="learning-row"><i>3</i><div><b>Was it useful?</b><span>Keep what helped. Adjust what did not.</span></div></div></div>
+      <div class="footer"><button class="primary" data-next="review"><span>Complete a sample review</span><span class="arrow">→</span></button></div>
+    </section>
+
+    <section class="screen" data-screen="review">
+      <p class="eyebrow">Check what happened</p><h2>How did the experiment <em>actually go?</em></h2>
+      <div class="review-q"><b>How much did you try?</b><div class="review-scale" data-review="tried" role="group" aria-label="How much did you try?"></div><div class="review-anchors"><span>Not yet</span><span>As planned</span></div></div><div class="review-q" data-review-followup><b>How manageable was it?</b><div class="review-scale" data-review="effort" role="group" aria-label="How manageable was it?"></div><div class="review-anchors"><span>Too much</span><span>Easy to repeat</span></div></div><div class="review-q" data-review-followup><b>How helpful did it feel?</b><div class="review-scale" data-review="help" role="group" aria-label="How helpful did it feel?"></div><div class="review-anchors"><span>Not helpful</span><span>Very helpful</span></div></div><p class="review-not-yet" id="reviewNotYet" hidden>That's useful to know. We can start with a smaller step.</p>
+      <div class="footer"><button class="primary" id="reviewContinue" disabled><span>Use what happened</span><span class="arrow">→</span></button></div>
+    </section>
+
+    <section class="screen" data-screen="learned">
+      <p class="eyebrow">Foundations adapts</p><h2 id="learnedTitle">Keep the mechanism. Adjust the dose.</h2><div class="logic"><div class="logic-path"><span class="logic-pill">What was planned</span><span class="logic-arrow">→</span><span class="logic-pill">What happened</span><span class="logic-arrow">→</span><span class="logic-pill">A better next move</span></div><p id="learnedCopy">The experience becomes useful data. Foundations can make the next action smaller, change the route, or stabilise what worked.</p></div>
+      <div class="success-orbit" style="width:210px;height:210px;margin-top:18px"><div class="success-core" style="width:125px;height:125px"><div><b style="font-size:21px">A little clearer.</b><span>One step at a time</span></div></div></div>
+      <div class="footer"><button class="primary" data-next="finish"><span>Complete Foundations</span><span class="arrow">→</span></button></div>
+    </section>
+
+    <section class="screen" data-screen="finish">
+      <div class="spacer"></div><p class="eyebrow" style="text-align:center">Your base is now visible</p><h1 style="text-align:center">Start where change has the <em>best chance of holding.</em></h1><p class="lede" style="text-align:center">Foundations will build from what is realistic, useful and repeatable — one tested step at a time.</p><div class="spacer"></div>
+      <div class="footer"><button class="primary" id="restart"><span>View the flow again</span><span class="arrow">↻</span></button></div>
+    </section>
+  </div>
+</main>
+<script src="./foundations.js"></script>
+</body>
+</html>

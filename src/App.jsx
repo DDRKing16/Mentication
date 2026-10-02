@@ -36,6 +36,8 @@ const ParkingLot = lazy(() => import('@/pages/ParkingLot'));
 const SignalLock = lazy(() => import('@/pages/SignalLock'));
 const VectorShift = lazy(() => import('@/pages/VectorShift'));
 const GoodMap = lazy(() => import('@/pages/GoodMap'));
+const Foundations = lazy(() => import('@/pages/Foundations'));
+const Restructure = lazy(() => import('@/pages/Restructure'));
 const Plus = lazy(() => import('@/pages/Plus'));
 const ProgrammeList = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeList })));
 const ProgrammeDetail = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeDetail })));
@@ -108,6 +110,8 @@ const MenticationRoutes = () => {
                 <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
                 <Route path="/vector-shift" element={<OnboardingGate><VectorShift /></OnboardingGate>} />
                 <Route path="/good-map" element={<OnboardingGate><GoodMap /></OnboardingGate>} />
+                <Route path="/foundations" element={<OnboardingGate><Foundations /></OnboardingGate>} />
+                <Route path="/restructure" element={<OnboardingGate><Restructure /></OnboardingGate>} />
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
             </Suspense>

@@ -713,7 +713,7 @@
    silhouettes against it. Minimal and edgy on top of that — black and deep
    plum tiles with thin hairlines, no heavy gloss, white type. */
 .home-theme--sunset {
-  --home-bg: #060608;
+  --home-bg: #2F2052;
   --home-shadow-sm: 0 8px 20px -14px rgba(0, 0, 0, 0.6);
   --home-shadow-md: 0 14px 32px -18px rgba(0, 0, 0, 0.66);
   --home-shadow-lg: 0 22px 48px -20px rgba(0, 0, 0, 0.72);
@@ -795,7 +795,7 @@
     radial-gradient(ellipse 130% 45% at 30% 0%, rgba(255, 160, 70, 0.6), transparent 72%),
     linear-gradient(176deg,
       #F08A5E 0%, #F59A6C 8%, #EFA07C 16%, #DC9388 24%, #B8809A 31%,
-      #7B5588 38%, #3E2660 44%, #1B0F34 50%, #0A0614 57%, #040208 65%, #000000 75%, #000000 100%);
+      #8E6396 38%, #6E4A86 46%, #573A78 56%, #46306A 68%, #3A2760 82%, #2F2052 100%);
 }
 /* Sun, bloom and cloud streaks are one static SVG (sunset-sky.svg). */
 .home-theme--sunset .home-page-art { opacity: 0.38; }
@@ -1480,4 +1480,39 @@ html.reduce-motion .welcome-glow--secondary {
   max-width: none;
   height: auto;
   filter: drop-shadow(0 2px 10px rgba(90, 20, 50, 0.5));
+}
+
+/* Sunset tagline: live text in the same system serif as the Dear 2100 "You'll be judged regardless" screen (temporary stand-in for the traced lettering). */
+.home-theme--sunset .home-tagline-text {
+  display: block;
+  font-family: "Urbanist", "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 11.4vw, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-align: left;
+  color: #FBF7EC;
+  -webkit-text-stroke: 0.018em rgba(0, 0, 0, 0.35);
+  paint-order: stroke fill;
+  stroke-linejoin: round;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Tara sits on the right of the hero, in the gap between the tagline and the Your Week card. */
+.home-theme--sunset .home-tara {
+  right: 0.7rem;
+  bottom: 0;
+  height: 5.1rem;
+  width: auto;
+  opacity: 0.68;
+  /* Fades her lower body into the sky so she blends in rather than sitting on top. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 38%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 38%, transparent 96%);
+}
+
+/* Restructure: a thin bar under the six buttons, styled like the Your Week card so it follows the palette. */
+.home-restructure {
+  background: var(--home-week-bg, var(--home-card));
+  border: 1px solid var(--home-week-border, var(--home-border));
+  box-shadow: var(--home-shadow-sm);
 }
