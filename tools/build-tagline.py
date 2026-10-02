@@ -1,36 +1,89 @@
-"""Hand-drawn connected lettering for the Home tagline -> public/media/brand/tagline-script.svg
-Glyphs are single strokes (y up = negative), entry/exit joins at (0,-6)/(w,-6)."""
+"""Hand-drawn pen-signature lettering for the Home tagline -> public/media/brand/tagline-script.svg
+Strokes are sampled and rendered as tapered, pressure-varying filled shapes (thicker on downstrokes).
+Glyph units: baseline y=0, y up is negative; entry/exit joins at (0,-4)/(w,-4)."""
+import math, random, re
 G = {
- "T": (46, "M2,-76 C14,-82 36,-82 54,-79 M30,-80 C27,-52 25,-22 29,-8 C31,0 37,0 42,-6"),
- "a": (34, "M0,-6 C6,-10 14,-30 24,-33 C14,-36 3,-30 3,-16 C3,-4 12,0 20,-8 C24,-13 26,-22 27,-33 C27,-14 27,-6 30,-4 C32,-3 33,-5 34,-6"),
- "k": (36, "M0,-6 C6,-24 14,-62 20,-80 C23,-90 28,-86 24,-72 C18,-50 12,-22 12,-8 M27,-34 C25,-26 17,-18 14,-16 C21,-14 27,-12 23,-7 C27,-6 31,-4 36,-6"),
- "e": (28, "M0,-6 C6,-14 22,-22 22,-29 C22,-36 9,-36 6,-24 C3,-10 8,-1 15,-1 C21,-1 25,-5 28,-6"),
- "y": (38, "M0,-6 C2,-22 3,-30 4,-34 C6,-14 12,-3 20,-10 C26,-16 28,-28 28,-34 C28,-8 22,20 12,32 C4,40 -6,30 6,22 C16,16 30,6 38,-6"),
- "o": (30, "M0,-6 C5,-14 9,-30 16,-34 C6,-36 2,-24 3,-12 C4,-2 14,0 20,-10 C23,-18 20,-30 16,-34 C22,-30 26,-14 30,-6"),
- "u": (36, "M0,-6 C2,-20 3,-30 4,-34 C4,-14 8,-3 16,-6 C22,-9 25,-20 26,-34 C26,-16 26,-8 28,-5 C31,-3 34,-5 36,-6"),
- "r": (26, "M0,-6 C3,-20 4,-30 5,-34 C5,-22 5,-12 6,-8 C8,-24 16,-38 24,-34 C27,-32 28,-30 28,-30"),
- "m": (52, "M0,-6 C3,-20 4,-30 5,-35 C5,-22 5,-10 6,-6 C8,-24 14,-36 20,-30 C24,-26 22,-12 22,-6 C24,-24 30,-36 36,-30 C40,-26 38,-12 40,-6 C43,-4 48,-4 52,-6"),
- "i": (18, "M0,-6 C3,-18 4,-28 5,-34 C5,-22 5,-10 8,-4 C10,-2 14,-4 18,-6 M7,-50 L7.6,-49.4"),
- "n": (38, "M0,-6 C3,-20 4,-30 5,-35 C5,-22 5,-10 6,-6 C8,-24 14,-36 20,-30 C24,-26 22,-12 22,-6 C25,-4 30,-4 38,-6"),
- "d": (42, "M0,-6 C6,-10 14,-30 24,-33 C14,-36 3,-30 3,-16 C3,-4 12,0 20,-8 C24,-13 28,-40 32,-70 C34,-84 40,-88 38,-76 C36,-60 31,-30 30,-14 C29,-6 34,-2 42,-6"),
- "l": (26, "M0,-6 C6,-24 14,-62 20,-80 C23,-90 28,-86 24,-72 C18,-50 14,-22 16,-10 C17,-4 22,-3 26,-6"),
- "h": (42, "M0,-6 C6,-24 14,-62 20,-80 C23,-90 28,-86 24,-72 C18,-50 12,-22 12,-8 C14,-26 22,-36 28,-30 C32,-26 30,-12 30,-8 C32,-4 36,-4 42,-6"),
+ "T": (62, "M-12,-98 C20,-108 60,-108 104,-98 M56,-104 C47,-70 42,-30 46,-8 C48,-1 54,0 62,-5"),
+ "a": (38, "M0,-4 C6,-10 14,-26 26,-30 C14,-34 4,-26 4,-14 C4,-2 16,0 24,-10 C28,-16 30,-24 31,-32 C30,-14 30,-6 33,-3 C35,-2 36,-4 38,-5"),
+ "k": (52, "M0,-4 C8,-30 22,-80 34,-100 C42,-112 50,-104 42,-86 C32,-60 20,-26 20,-8 M20,-14 C28,-20 36,-28 38,-34 C36,-24 28,-16 24,-14 C32,-14 38,-10 34,-4 C40,-3 46,-3 52,-5"),
+ "e": (32, "M0,-4 C8,-10 24,-16 24,-24 C24,-32 10,-32 7,-20 C4,-8 10,0 18,0 C25,0 29,-3 32,-4"),
+ "y": (46, "M0,-4 C3,-16 5,-26 6,-30 C8,-12 14,-2 24,-8 C30,-14 32,-24 33,-32 C34,-10 28,18 16,38 C6,52 -12,44 -2,32 C10,22 34,10 46,-4"),
+ "o": (34, "M0,-4 C5,-12 10,-26 18,-30 C8,-32 3,-20 4,-10 C5,0 16,0 22,-10 C25,-16 24,-26 18,-30 C26,-28 30,-14 34,-4"),
+ "u": (44, "M0,-4 C3,-16 5,-26 6,-30 C5,-12 10,-2 20,-6 C26,-9 30,-20 32,-30 C32,-16 31,-8 34,-4 C37,-2 41,-3 44,-4"),
+ "r": (30, "M0,-4 C3,-16 5,-26 6,-30 C6,-18 6,-10 8,-6 C10,-20 18,-34 28,-30 C32,-28 33,-24 33,-24"),
+ "m": (64, "M0,-4 C3,-16 5,-26 6,-31 C6,-18 6,-8 8,-4 C10,-22 16,-34 24,-30 C28,-26 26,-12 26,-4 C28,-22 36,-34 44,-30 C48,-26 46,-12 46,-4 C50,-2 56,-3 64,-4"),
+ "i": (22, "M0,-4 C3,-16 5,-26 6,-30 C6,-18 6,-8 10,-3 C13,-1 18,-3 22,-4 M9,-44 L9.8,-43"),
+ "n": (46, "M0,-4 C3,-16 5,-26 6,-31 C6,-18 6,-8 8,-4 C10,-22 18,-34 26,-30 C30,-26 28,-12 28,-4 C32,-2 38,-3 46,-4"),
+ "d": (50, "M0,-4 C6,-10 14,-26 26,-30 C14,-34 4,-26 4,-14 C4,-2 16,0 24,-10 C30,-20 36,-60 44,-92 C48,-106 56,-108 52,-94 C46,-70 38,-30 38,-12 C38,-4 44,-2 52,-4"),
+ "l": (38, "M0,-4 C8,-30 22,-80 34,-100 C42,-112 50,-104 42,-86 C32,-60 22,-24 24,-10 C25,-2 32,-2 38,-5"),
+ "h": (58, "M0,-4 C8,-30 22,-80 34,-100 C42,-112 50,-104 42,-86 C32,-60 20,-26 20,-8 C22,-22 30,-34 38,-28 C44,-24 40,-10 40,-6 C44,-2 50,-2 58,-5"),
 }
-SPACE = 24
-def line(text):
-    x, parts = 0, []
+SPACE = 30
+BASE = 8.2
+rnd = random.Random(7)
+
+def bez(p0, p1, p2, p3, n=22):
+    out = []
+    for i in range(n + 1):
+        t = i / n; u = 1 - t
+        out.append((u**3*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t**3*p3[0],
+                    u**3*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t**3*p3[1]))
+    return out
+
+def subpaths(d):
+    subs = []
+    for part in re.findall(r"M[^M]+", d):
+        nums = [float(x) for x in re.findall(r"-?\d+\.?\d*", part)]
+        pts = [(nums[i], nums[i+1]) for i in range(0, len(nums), 2)]
+        pl, cur, i = [pts[0]], pts[0], 1
+        if "C" in part:
+            while i + 2 < len(pts) + 0 and i + 2 <= len(pts) - 1 + 0:
+                seg = bez(cur, pts[i], pts[i+1], pts[i+2]); pl += seg[1:]; cur = pts[i+2]; i += 3
+        else:  # M x,y L x,y or lone dot
+            if len(pts) > 1: pl = [pts[0], pts[1]]
+        subs.append(pl)
+    return subs
+
+def tapered(pl, sc=1.0):
+    """Filled outline of a pen stroke; thicker on downstrokes, pointed at ends."""
+    n = len(pl)
+    if n < 2: return ""
+    L, R, acc, total = [], [], [0.0], 0.0
+    for i in range(1, n):
+        total += math.dist(pl[i], pl[i-1]); acc.append(total)
+    for i, p in enumerate(pl):
+        a, b = pl[max(i-1, 0)], pl[min(i+1, n-1)]
+        dx, dy = b[0]-a[0], b[1]-a[1]; ln = math.hypot(dx, dy) or 1
+        nx, ny = -dy/ln, dx/ln
+        t = acc[i] / total if total else 0
+        ends = (math.sin(math.pi * t)) ** 0.45 if total > 6 else 1
+        press = 0.62 + 0.58 * max(0.0, dy/ln)  # downstroke = pressure
+        w = BASE * sc * max(0.18, ends) * press / 2 + 0.12
+        L.append((p[0]+nx*w, p[1]+ny*w)); R.append((p[0]-nx*w, p[1]-ny*w))
+    pts = L + R[::-1]
+    return "M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in pts) + "Z"
+
+def line(text, y0=0.0):
+    x, out = 0.0, []
     for ch in text:
         if ch == " ": x += SPACE; continue
         w, d = G[ch]
-        parts.append(f'<path transform="translate({x},0)" d="{d}"/>')
-        x += w
-    return x, "".join(parts)
-w1, l1 = line("Take your mind")
-w2, l2 = line("on a holiday")
-SW = 6.6
-swash = f'<path d="M-6,52 C{w2*0.3:.0f},40 {w2*0.7:.0f},44 {w2+14:.0f},30" stroke-width="4"/>'
-W = max(w1, w2 + 24) + 40
-svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -112 {W} 250" fill="none" stroke="#D4FBF4" stroke-width="{SW}" stroke-linecap="round" stroke-linejoin="round">
-<g transform="skewX(-12)"><g transform="translate(0,0)">{l1}</g><g transform="translate(24,96)">{l2}{swash}</g></g></svg>'''
+        s = rnd.uniform(0.95, 1.06) if ch != "T" else 1.08
+        dy = rnd.uniform(-2.2, 2.2)
+        for pl in subpaths(d):
+            pts = [(x + px * s, y0 + dy + py * s) for px, py in pl]
+            out.append(tapered(pts))
+        x += w * s
+    return x, "".join(f'<path d="{p}"/>' for p in out)
+
+w1, l1 = line("Take your mind", 0)
+w2, l2 = line("on a holiday", 108)
+def sw(x0, y, x1, y1, bend):
+    pl = bez((x0, y), (x0 + (x1-x0)*.3, y + bend), (x0 + (x1-x0)*.7, y - bend*.4), (x1, y1), 40)
+    return f'<path d="{tapered(pl, 1.1)}"/>'
+swash = sw(10, 70+108, w2+30, 56+108, 12)
+W = max(w1, w2) + 90
+svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -122 {W:.0f} 300" fill="#D4FBF4">
+<g transform="skewX(-20)">{l1}<g transform="translate(26,0)">{l2}{swash}</g></g></svg>'''
 open("public/media/brand/tagline-script.svg", "w").write(svg)
 print(W)
