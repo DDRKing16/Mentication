@@ -189,7 +189,7 @@ export default function HomeHero({ onMenu, onProfile, onInsights, hasNewInsight 
       </div>
 
       {HOME_THEME === "sunset" ? (
-        <h1 className="home-tagline relative z-[1] mt-6 text-left text-[2.15rem] font-bold leading-[1.05] tracking-[-0.02em] text-white [text-shadow:0_2px_14px_rgba(120,40,50,0.45)]">
+        <h1 className="home-tagline relative z-[1] mt-6 text-left text-[2.15rem] font-bold text-white [text-shadow:0_2px_14px_rgba(120,40,50,0.45)]">
           Take your mind<br />on a holiday
         </h1>
       ) : (

@@ -794,11 +794,11 @@
     radial-gradient(ellipse 100% 50% at 100% 30%, rgba(255, 130, 70, 0.7) 0%, rgba(240, 110, 60, 0.3) 42%, transparent 74%),
     radial-gradient(ellipse 130% 45% at 30% 0%, rgba(255, 160, 70, 0.6), transparent 72%),
     linear-gradient(176deg,
-      #D2522C 0%, #DA5E33 10%, #E0693F 20%, #D8654E 30%, #BC5A58 40%,
-      #8E4F68 50%, #4E3268 58%, #2A1548 66%, #170C2B 75%, #0D0718 85%, #050308 94%, #030205 100%);
+      #F08A5E 0%, #F59A6C 8%, #EFA07C 16%, #DC9388 24%, #B8809A 31%,
+      #7B5588 38%, #3E2660 44%, #1B0F34 50%, #0A0614 57%, #040208 65%, #000000 75%, #000000 100%);
 }
 /* Sun, bloom and cloud streaks are one static SVG (sunset-sky.svg). */
-.home-theme--sunset .home-page-art { opacity: 0.68; }
+.home-theme--sunset .home-page-art { opacity: 0.38; }
 /* The palm is misty, not a crisp cut-out: purple-tinted, soft and hazy,
    hanging in from the top left. */
 .home-theme--sunset .home-page-palm {
@@ -1464,3 +1464,21 @@ html.reduce-motion .welcome-glow--secondary {
 .home-theme--sunset .home-page-palm--main { top: -16rem; }
 .home-theme--sunset .home-topbar-logo { height: 3.6rem; width: auto; max-width: none; margin-right: -0.4rem; }
 .home-theme--sunset .home-tagline { color: #D4FBF4; text-shadow: 0 1px 2px rgba(0, 48, 73, 0.55), 0 2px 14px rgba(0, 48, 73, 0.45); }
+
+/* Sunset tagline: elegant high-contrast italic display serif. */
+@font-face {
+  font-family: "Sunset Display";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/dear2100/playfair-display/playfair-display-latin-700-italic.woff2) format("woff2");
+}
+.home-theme--sunset .home-tagline {
+  text-shadow: 0 1px 2px rgba(90, 20, 50, 0.55), 0 3px 18px rgba(90, 20, 50, 0.5);
+  font-family: "Sunset Display", "Playfair Display", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 11.5vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+}
