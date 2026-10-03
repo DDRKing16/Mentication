@@ -241,4 +241,16 @@
   resizeObserver.observe(track);
   window.addEventListener('load', () => { refreshCarousel(); reportHeight(); });
   window.addEventListener('pagehide', () => { resizeObserver.disconnect(); cancelAnimationFrame(resizeFrame); }, { once: true });
+  // Background music. Browsers block sound until the visitor interacts, so
+  // playback starts on the first tap or keypress anywhere in the home document.
+  const bgMusic = document.getElementById('bg-music');
+  bgMusic.volume = 0.35;
+  const startMusic = () => {
+    bgMusic.play().then(() => {
+      document.removeEventListener('pointerdown', startMusic, true);
+      document.removeEventListener('keydown', startMusic, true);
+    }).catch(() => {});
+  };
+  document.addEventListener('pointerdown', startMusic, true);
+  document.addEventListener('keydown', startMusic, true);
 })();

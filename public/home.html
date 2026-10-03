@@ -1697,6 +1697,7 @@ body:has(dialog[open]) {
 <dialog id="accessibility-dialog" class="sheet" aria-labelledby="accessibility-title"><div class="sheet-heading"><h2 id="accessibility-title">Accessibility</h2><button type="button" class="round-button" data-close aria-label="Close accessibility"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div><p class="sheet-intro">Make this space feel right for you.</p><label class="preference"><span><strong>Larger text</strong><small>Show larger, adjustable text on artwork cards.</small></span><input type="checkbox" id="large-text" role="switch"><span class="switch" aria-hidden="true"></span></label><label class="preference"><span><strong>Higher contrast</strong><small>Clearer surfaces, text, and boundaries.</small></span><input type="checkbox" id="high-contrast" role="switch"><span class="switch" aria-hidden="true"></span></label><label class="preference"><span><strong>Reduce motion</strong><small>Keep transitions still and gentle.</small></span><input type="checkbox" id="reduce-motion" role="switch"><span class="switch" aria-hidden="true"></span></label><p class="preference-note" id="preference-note">Your preferences stay in this browser.</p></dialog>
 <dialog id="destination-dialog" class="sheet" aria-labelledby="destination-title"><div class="sheet-heading"><h2 id="destination-title"></h2><button type="button" class="round-button" data-close aria-label="Close preview"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div><p class="sheet-intro">Home-screen preview</p><p>This package contains the approved home screen. This destination opens the existing experience when connected to your MentiCation app.</p><button type="button" class="return-button" data-close>Back to Home</button></dialog>
 <div id="status" class="sr-only" role="status" aria-live="polite"></div>
+<audio id="bg-music" src="/audio/home-ambient.mp3" loop preload="auto" aria-hidden="true"></audio>
 <script>
 /* MentiCation home. No dependencies, tracking, remote fonts, or account data. */
 (() => {
@@ -1941,6 +1942,18 @@ body:has(dialog[open]) {
   resizeObserver.observe(track);
   window.addEventListener('load', () => { refreshCarousel(); reportHeight(); });
   window.addEventListener('pagehide', () => { resizeObserver.disconnect(); cancelAnimationFrame(resizeFrame); }, { once: true });
+  // Background music. Browsers block sound until the visitor interacts, so
+  // playback starts on the first tap or keypress anywhere in the home document.
+  const bgMusic = document.getElementById('bg-music');
+  bgMusic.volume = 0.35;
+  const startMusic = () => {
+    bgMusic.play().then(() => {
+      document.removeEventListener('pointerdown', startMusic, true);
+      document.removeEventListener('keydown', startMusic, true);
+    }).catch(() => {});
+  };
+  document.addEventListener('pointerdown', startMusic, true);
+  document.addEventListener('keydown', startMusic, true);
 })();
 
 </script>
