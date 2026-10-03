@@ -121,6 +121,7 @@ export default function Home() {
     if (route === "journal") { navigate("/journal"); return; }
     if (route === "good-map") { navigate("/good-map"); return; }
     if (route === "dear-2100") { navigate("/dear-2100"); return; }
+    if (route === "palace") { navigate("/palace"); return; }
     if (route === "library") { navigate("/library"); return; }
     if (route === "my-plan") { navigate("/plan"); return; }
     if (route === "profile") { navigate("/profile"); return; }
