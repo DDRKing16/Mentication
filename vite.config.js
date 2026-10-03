@@ -12,6 +12,12 @@ export default defineConfig({
   plugins: [
     react(),
   ],
+  // The preview proxy reaches this server under rotating sandbox hostnames,
+  // so accept any host rather than an allowlist that goes stale.
+  server: {
+    host: true,
+    allowedHosts: true,
+  },
   test: {
     // The .claude/worktrees folder holds separate, isolated agent
     // checkouts of this same repo. Their test files must never be picked
