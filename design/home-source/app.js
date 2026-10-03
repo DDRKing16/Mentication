@@ -102,6 +102,33 @@
     if (bridgeConnected) { sendBridge('navigate', { route }); return; }
     showDestinationPreview(route, opener);
   }
+  // Lava-lamp layer drawn inside each goal's own clip shape, so only the blob lights up.
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const LAVA_BALLS = [
+    { x: .28, r: 22, dur: 6.2, delay: 0 },
+    { x: .62, r: 15, dur: 5.1, delay: -2.4 },
+    { x: .80, r: 11, dur: 4.4, delay: -1.1 },
+    { x: .44, r: 9, dur: 3.8, delay: -3.2 }
+  ];
+  document.querySelectorAll('.goal .artwork g[clip-path]').forEach(group => {
+    const { width, height } = group.ownerSVGElement.viewBox.baseVal;
+    const glow = document.createElementNS(SVG_NS, 'rect');
+    glow.setAttribute('class', 'lava-glow');
+    glow.setAttribute('width', width);
+    glow.setAttribute('height', height);
+    group.append(glow);
+    LAVA_BALLS.forEach(ball => {
+      const circle = document.createElementNS(SVG_NS, 'circle');
+      circle.setAttribute('class', 'lava-ball');
+      circle.setAttribute('cx', ball.x * width);
+      circle.setAttribute('cy', -ball.r * 1.5);
+      circle.setAttribute('r', ball.r);
+      circle.style.setProperty('--dur', `${ball.dur}s`);
+      circle.style.setProperty('--delay', `${ball.delay}s`);
+      group.append(circle);
+    });
+  });
+
   document.querySelectorAll('[data-route]').forEach(button => button.addEventListener('click', () => {
     // Goal blobs play a short lava-lamp pulse before the destination opens;
     // skipped when the visitor prefers stillness.
