@@ -30,7 +30,6 @@ export default function Plus() {
   const navigate = useNavigate();
   const location = useLocation();
   const plus = usePlus();
-  const [plan, setPlan] = useState("annual");
   const [prices, setPrices] = useState(FALLBACK_PRICES);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
@@ -47,7 +46,7 @@ export default function Plus() {
     setBusy("buy");
     setMessage("");
     try {
-      const result = await purchasePlus(plan);
+      const result = await purchasePlus("monthly");
       if (result.active && returnTo) navigate(`/${returnTo}`, { replace: true });
     } catch (e) {
       // Cancelling the Apple sheet isn't an error worth shouting about.
@@ -113,26 +112,14 @@ export default function Plus() {
 
         {!plus.active && (
           <>
-            <div className="mt-8 grid gap-3" role="radiogroup" aria-label="Choose a plan">
-              {[
-                { key: "annual", label: "Yearly", price: prices.annual ?? PRICE_UNKNOWN, note: "Best value" },
-                { key: "monthly", label: "Monthly", price: prices.monthly ?? PRICE_UNKNOWN, note: "" },
-              ].map((option) => (
-                <button
-                  key={option.key}
-                  type="button"
-                  role="radio"
-                  aria-checked={plan === option.key}
-                  onClick={() => setPlan(option.key)}
-                  className={`flex min-h-[4.25rem] items-center justify-between rounded-[20px] border px-5 text-left transition ${plan === option.key ? "border-[#E0715C] bg-[#E0715C]/12" : "border-white/15 bg-white/[0.03]"}`}
-                >
-                  <span>
-                    <span className="block font-semibold">{option.label}</span>
-                    <span className="block text-sm text-[#F6EFE2]/70">{option.price}</span>
-                  </span>
-                  {option.note && <span className="rounded-full bg-[#E0715C] px-3 py-1 text-xs font-semibold text-white">{option.note}</span>}
-                </button>
-              ))}
+            <div className="mt-8 rounded-[20px] border border-[#E0715C] bg-[#E0715C]/12 px-5 py-4 text-left" aria-label="Plus plan">
+              <span className="flex items-center justify-between gap-3">
+                <span>
+                  <span className="block font-semibold">Monthly</span>
+                  <span className="mt-0.5 block text-sm text-[#F6EFE2]/70">{prices.monthly ?? PRICE_UNKNOWN}</span>
+                </span>
+                <span className="rounded-full bg-[#E0715C] px-3 py-1 text-xs font-semibold text-white">{PLUS_TRIAL_DAYS}-day free trial</span>
+              </span>
             </div>
 
             <button
@@ -144,7 +131,7 @@ export default function Plus() {
               {busy === "buy" ? "Opening the App Store…" : `Start ${PLUS_TRIAL_DAYS}-day free trial`}
             </button>
             <p className="mt-3 text-center text-xs leading-relaxed text-[#F6EFE2]/60">
-              {PLUS_TRIAL_DAYS} days free, then {(plan === "annual" ? prices.annual : prices.monthly) ?? "your local price (shown at checkout)"}. Renews automatically until cancelled. Cancel anytime in your iPhone's Settings, at least 24 hours before the trial ends, and you won't be charged.
+              {PLUS_TRIAL_DAYS} days free, then {(prices.monthly ?? "your local price (shown at checkout)")}. Renews automatically until cancelled. Cancel anytime in your iPhone's Settings, at least 24 hours before the trial ends, and you won't be charged.
             </p>
           </>
         )}

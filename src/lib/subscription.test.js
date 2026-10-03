@@ -44,7 +44,7 @@ describe("Mentication Plus", () => {
 
   it("only counts current, un-refunded Plus purchases", async () => {
     const { isLivePlusPurchase, PLUS_PRODUCTS } = await freshModule();
-    const base = { productIdentifier: PLUS_PRODUCTS.annual, expirationDate: future };
+    const base = { productIdentifier: PLUS_PRODUCTS.monthly, expirationDate: future };
     expect(isLivePlusPurchase(base)).toBe(true);
     expect(isLivePlusPurchase({ ...base, productIdentifier: "com.other.app.thing" })).toBe(false);
     expect(isLivePlusPurchase({ ...base, expirationDate: past })).toBe(false);
@@ -56,7 +56,7 @@ describe("Mentication Plus", () => {
 
   it("offers a clearly marked test purchase only in development, outside the app", async () => {
     const plus = await freshModule();
-    const result = await plus.purchasePlus("annual");
+    const result = await plus.purchasePlus();
     expect(result).toMatchObject({ active: true, test: true });
     plus.clearTestPlus();
     expect(plus.isPlusActive()).toBe(false);
@@ -74,9 +74,9 @@ describe("Mentication Plus", () => {
       PURCHASE_TYPE: { SUBS: "subs" },
     }));
     const plus = await freshModule();
-    // A wrong-currency guess (the fallback text is Australian dollars) would
-    // mislead anyone not on the Australian store, so a failed fetch must come
-    // back as null, never as FALLBACK_PRICES.
-    expect(await plus.loadPlusPrices()).toEqual({ annual: null, monthly: null });
+    // A wrong-currency guess (the fallback text is US dollars) would mislead
+    // anyone not on the US store, so a failed fetch must come back as null,
+    // never as FALLBACK_PRICES.
+    expect(await plus.loadPlusPrices()).toEqual({ monthly: null });
   });
 });
