@@ -104,16 +104,17 @@
   }
   // Lava-lamp layer drawn inside each goal's own clip shape, so only the blob lights up.
   const SVG_NS = 'http://www.w3.org/2000/svg';
+  // Squash ratios vary per ball so each one reads as a blob, not a circle.
   const LAVA_BALLS = [
-    { x: .28, r: 22, dur: 6.2, delay: 0 },
-    { x: .62, r: 15, dur: 5.1, delay: -2.4 },
-    { x: .80, r: 11, dur: 4.4, delay: -1.1 },
-    { x: .44, r: 9, dur: 3.8, delay: -3.2 }
+    { x: .28, r: 22, squash: 1.35, dur: 6.2, delay: 0 },
+    { x: .62, r: 15, squash: .78, dur: 5.1, delay: -2.4 },
+    { x: .80, r: 11, squash: 1.25, dur: 4.4, delay: -1.1 },
+    { x: .44, r: 9, squash: 1.08, dur: 3.8, delay: -3.2 }
   ];
   // Each card's balls take a deep shade of the card's own colour, via multiply.
   const BALL_COLOURS = {
     lift: '#c96a2e', focus: '#3f6fd1', calm: '#7d55bd',
-    ground: '#3f8f52', sleep: '#4a7fd9', guide: '#3f9d9a'
+    ground: '#3f8f52', sleep: '#4a7fd9', guide: '#c08a2d'
   };
   document.querySelectorAll('.goal .artwork g[clip-path]').forEach(group => {
     const { width, height } = group.ownerSVGElement.viewBox.baseVal;
@@ -124,15 +125,16 @@
     glow.setAttribute('height', height);
     group.append(glow);
     LAVA_BALLS.forEach(ball => {
-      const circle = document.createElementNS(SVG_NS, 'circle');
-      circle.setAttribute('class', 'lava-ball');
-      circle.setAttribute('fill', colour);
-      circle.setAttribute('cx', ball.x * width);
-      circle.setAttribute('cy', -ball.r * 1.5);
-      circle.setAttribute('r', ball.r);
-      circle.style.setProperty('--dur', `${ball.dur}s`);
-      circle.style.setProperty('--delay', `${ball.delay}s`);
-      group.append(circle);
+      const blob = document.createElementNS(SVG_NS, 'ellipse');
+      blob.setAttribute('class', 'lava-ball');
+      blob.setAttribute('fill', colour);
+      blob.setAttribute('cx', ball.x * width);
+      blob.setAttribute('cy', -ball.r * 1.6);
+      blob.setAttribute('rx', ball.r);
+      blob.setAttribute('ry', ball.r * ball.squash);
+      blob.style.setProperty('--dur', `${ball.dur}s`);
+      blob.style.setProperty('--delay', `${ball.delay}s`);
+      group.append(blob);
     });
   });
 
