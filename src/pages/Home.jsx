@@ -4,7 +4,7 @@
 // time-of-day recommendation) route to the existing /reset entry unchanged.
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Layers } from "lucide-react";
+import { Layers } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { sessionStore } from "@/lib/localData";
 import SafetyFooter from "@/components/SafetyFooter";
@@ -256,10 +256,10 @@ export default function Home() {
               className="home-restructure no-tap mt-4 flex min-h-[5.75rem] w-full items-center justify-between gap-3 rounded-[1.4rem] py-3 pl-4 pr-3 text-left transition-transform duration-150 active:scale-[0.985]"
             >
               <span className="flex min-w-0 items-center gap-3">
-                <Layers className="h-[1.15rem] w-[1.15rem] shrink-0 text-[#4C7CA8]" strokeWidth={1.7} aria-hidden="true" />
+                <Layers className="home-restructure-icon h-[1.15rem] w-[1.15rem] shrink-0" strokeWidth={1.7} aria-hidden="true" />
                 <span>
-                  <span className="block font-heading text-[1.02rem] font-semibold leading-tight text-[#16324A]">Restructure</span>
-                  <span className="block text-[0.68rem] font-medium leading-tight text-[#4C6E8F]">Foundations · Dear 2100 · The Good Map</span>
+                  <span className="home-restructure-title block font-heading text-[1.02rem] font-semibold leading-tight">Restructure</span>
+                  <span className="home-restructure-sub block text-[0.68rem] font-medium leading-tight">Foundations · Dear 2100 · The Good Map</span>
                 </span>
               </span>
               <span className="flex shrink-0 items-center pr-1.5">

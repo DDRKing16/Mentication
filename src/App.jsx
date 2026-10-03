@@ -59,7 +59,10 @@ const OnboardingGate = ({ children }) => (
 const pageVariants = {
   enter: (dir) => ({ x: dir >= 0 ? "20%" : "-10%", opacity: 0.5 }),
   center: { x: 0, opacity: 1 },
-  exit: (dir) => ({ x: dir >= 0 ? "-10%" : "20%", opacity: 0.4 }),
+  // The outgoing page clears quickly (mode="wait" holds the new page until it
+  // finishes), so navigation starts sooner — the enter still eases gently, so
+  // the change reads smooth rather than abrupt.
+  exit: (dir) => ({ x: dir >= 0 ? "-10%" : "20%", opacity: 0.4, transition: { duration: 0.06, ease: [0.22, 1, 0.36, 1] } }),
 };
 
 const MenticationRoutes = () => {
