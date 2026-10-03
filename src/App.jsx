@@ -128,6 +128,36 @@ function App() {
   useEffect(() => installFeedback(), []);
   // Ask Apple once per launch whether Plus is active (kept on the device for offline use).
   useEffect(() => { void refreshPlus(); }, []);
+  // Warm every lazy route's module while the app sits idle, so the first tap
+  // on any destination resolves instantly instead of waiting on a chunk fetch
+  // behind the route transition.
+  useEffect(() => {
+    const warm = () => {
+      import("@/pages/ResetFlow");
+      import("@/components/NextEasiestStepExperience");
+      import("@/pages/Crisis");
+      import("@/pages/Privacy");
+      import("@/pages/Welcome");
+      import("@/pages/Journal");
+      import("@/pages/Dear2100");
+      import("@/pages/NightChannel");
+      import("@/pages/ParkingLot");
+      import("@/pages/SignalLock");
+      import("@/pages/VectorShift");
+      import("@/pages/GoodMap");
+      import("@/pages/Foundations");
+      import("@/pages/Restructure");
+      import("@/pages/Plus");
+      import("@/pages/Programmes");
+      import("@/pages/InterventionLibrary");
+      import("@/pages/RegulationProfile");
+      import("@/pages/MyPlan");
+      import("@/pages/EffectivenessDashboard");
+      import("@/pages/Settings");
+    };
+    const idle = (cb) => (typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(cb, { timeout: 4000 }) : window.setTimeout(cb, 1200));
+    idle(warm);
+  }, []);
   return (
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>

@@ -26,6 +26,15 @@ import { usePlus } from "@/lib/subscription";
 // Tracks the last time Insights was opened, purely on-device, so the small
 // dot on its icon can mean "there's a session since you last looked" rather
 // than always being on or always being off.
+// Real screens from the three Restructure journeys — the same previews the
+// Plus paywall and Restructure page use — shown on the cream-blue home card
+// so it shows what each journey actually is.
+const RESTRUCTURE_PREVIEWS = [
+  "/media/plus-preview/foundations.jpg",
+  "/media/plus-preview/dear2100.jpg",
+  "/media/plus-preview/good-map.jpg",
+];
+
 const INSIGHTS_SEEN_KEY = "mentication.insightsSeen.v1";
 const markInsightsSeen = () => { try { localStorage.setItem(INSIGHTS_SEEN_KEY, new Date().toISOString()); } catch { /* storage unavailable */ } };
 const hasUnseenInsight = (sessions) => {
@@ -235,24 +244,37 @@ export default function Home() {
                 <CategoryCard key={c.id} card={c} index={i} recent={!!recentTint && c.tint === recentTint} onClick={() => choose(c)} />
               ))}
             </div>
-            {/* Restructure: a thin bar the width of Your Week, under the six
-                buttons. It opens the category holding Foundations, Dear 2100
-                and The Good Map. */}
+            {/* Restructure: a cream-blue card the width of Your Week, under the
+                six buttons, with a real screen from each of its three journeys
+                fanned on the right as a preview of what they are. It opens the
+                category holding Foundations, Dear 2100 and The Good Map. */}
             <button
               type="button"
               onClick={() => navigate("/restructure")}
               aria-label="Restructure: Foundations, Dear 2100 and The Good Map"
               data-sfx="select"
-              className="home-restructure no-tap mt-4 flex h-14 w-full items-center justify-between gap-3 rounded-[1.1rem] px-4 text-left transition-transform duration-150 active:scale-[0.985]"
+              className="home-restructure no-tap mt-4 flex min-h-[5.75rem] w-full items-center justify-between gap-3 rounded-[1.4rem] py-3 pl-4 pr-3 text-left transition-transform duration-150 active:scale-[0.985]"
             >
-              <span className="flex items-center gap-3">
-                <Layers className="h-[1.15rem] w-[1.15rem] shrink-0 text-[var(--home-accent)]" strokeWidth={1.7} aria-hidden="true" />
+              <span className="flex min-w-0 items-center gap-3">
+                <Layers className="h-[1.15rem] w-[1.15rem] shrink-0 text-[#4C7CA8]" strokeWidth={1.7} aria-hidden="true" />
                 <span>
-                  <span className="block font-heading text-[1.02rem] font-semibold leading-tight text-[var(--home-ink)]">Restructure</span>
-                  <span className="block text-[0.68rem] font-medium leading-tight text-[var(--home-muted)]">Foundations · Dear 2100 · The Good Map</span>
+                  <span className="block font-heading text-[1.02rem] font-semibold leading-tight text-[#16324A]">Restructure</span>
+                  <span className="block text-[0.68rem] font-medium leading-tight text-[#4C6E8F]">Foundations · Dear 2100 · The Good Map</span>
                 </span>
               </span>
-              <ChevronRight className="h-4 w-4 shrink-0 text-[var(--home-muted)]" aria-hidden="true" />
+              <span className="flex shrink-0 items-center pr-1.5">
+                {RESTRUCTURE_PREVIEWS.map((src, i) => (
+                  <img
+                    key={src}
+                    src={src}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    className="h-[3.4rem] w-[2.6rem] rounded-[0.5rem] border border-white/80 bg-[#0A1B33] object-cover object-top shadow-[0_6px_14px_-8px_rgba(13,42,72,0.55)]"
+                    style={{ transform: `rotate(${(i - 1) * 8}deg)`, zIndex: RESTRUCTURE_PREVIEWS.length - i, marginLeft: i ? "-0.45rem" : 0 }}
+                  />
+                ))}
+              </span>
             </button>
           </motion.section>
 
