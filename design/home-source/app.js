@@ -249,7 +249,10 @@
     bgMusic.play().then(() => {
       document.removeEventListener('pointerdown', startMusic, true);
       document.removeEventListener('keydown', startMusic, true);
-    }).catch(() => {});
+    }).catch(error => {
+      // Surface the reason (autoplay policy, missing file) instead of failing silently.
+      console.error('[home] background music could not start:', error?.name, error?.message);
+    });
   };
   document.addEventListener('pointerdown', startMusic, true);
   document.addEventListener('keydown', startMusic, true);

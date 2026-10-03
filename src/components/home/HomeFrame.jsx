@@ -103,6 +103,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         ref={frame}
         title="MentiCation home"
         src={homeSrc}
+        allow="autoplay"
         sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
         onLoad={() => { setReady(false); send('connect'); }}
         style={{ display: 'block', width: '100%', height, border: 0, maxWidth: 949, margin: '0 auto' }}
