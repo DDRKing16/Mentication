@@ -110,8 +110,14 @@
     { x: .80, r: 11, dur: 4.4, delay: -1.1 },
     { x: .44, r: 9, dur: 3.8, delay: -3.2 }
   ];
+  // Each card's balls take a deep shade of the card's own colour, via multiply.
+  const BALL_COLOURS = {
+    lift: '#c96a2e', focus: '#3f6fd1', calm: '#7d55bd',
+    ground: '#3f8f52', sleep: '#4a7fd9', guide: '#3f9d9a'
+  };
   document.querySelectorAll('.goal .artwork g[clip-path]').forEach(group => {
     const { width, height } = group.ownerSVGElement.viewBox.baseVal;
+    const colour = BALL_COLOURS[group.closest('.goal').dataset.route];
     const glow = document.createElementNS(SVG_NS, 'rect');
     glow.setAttribute('class', 'lava-glow');
     glow.setAttribute('width', width);
@@ -120,6 +126,7 @@
     LAVA_BALLS.forEach(ball => {
       const circle = document.createElementNS(SVG_NS, 'circle');
       circle.setAttribute('class', 'lava-ball');
+      circle.setAttribute('fill', colour);
       circle.setAttribute('cx', ball.x * width);
       circle.setAttribute('cy', -ball.r * 1.5);
       circle.setAttribute('r', ball.r);

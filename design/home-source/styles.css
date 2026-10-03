@@ -465,7 +465,6 @@ main:focus {
 }
 
 .lava-ball {
-  fill:#2a1c24;
   mix-blend-mode:multiply;
   filter:blur(2.5px);
   transform-box:fill-box;
