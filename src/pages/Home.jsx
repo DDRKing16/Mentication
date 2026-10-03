@@ -7,6 +7,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeFrame from "@/components/home/HomeFrame";
+import StreakBadge from "@/components/home/StreakBadge";
 import { sessionStore } from "@/lib/localData";
 import { hasCompletedOnboarding } from "@/lib/onboarding";
 import { buildRecommendation } from "@/lib/recommend";
@@ -131,5 +132,10 @@ export default function Home() {
     }
   }, [beginWeek, navigate, today]);
 
-  return <HomeFrame onNavigate={onNavigate} week={week} today={today} />;
+  return (
+    <div className="relative">
+      <StreakBadge />
+      <HomeFrame onNavigate={onNavigate} week={week} today={today} />
+    </div>
+  );
 }

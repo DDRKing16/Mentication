@@ -41,6 +41,7 @@ import { sessionStore } from "@/lib/localData";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
+import { maybeRequestReview } from "@/lib/reviewPrompt";
 import {
   createInitialResetAnswers,
   INTENSITY_QUESTION,
@@ -131,6 +132,26 @@ export default function ResetFlow() {
     }
   }, [stepParam]);
   useEffect(() => () => { if (buildingTimer.current) clearTimeout(buildingTimer.current); }, []);
+
+  // Review prompt: fire once per completion, after the "done" screen (which
+  // only renders once BrandClosing's animation has finished). Waits a
+  // further 800-1200ms so it never competes with the completion animation
+  // itself, per Apple's own guidance. The streak itself needs no extra
+  // bookkeeping here — it's derived live from session history wherever it's
+  // displayed (see src/lib/streak.js's computeLocalCalendarStreak).
+  const completionHandledRef = useRef(false);
+  useEffect(() => {
+    if (phase !== "done") { completionHandledRef.current = false; return; }
+    if (completionHandledRef.current) return;
+    completionHandledRef.current = true;
+    const delay = 800 + Math.round(Math.random() * 400);
+    const t = setTimeout(() => {
+      sessionStore.list("-created_date", 1000).then((sessions) => {
+        maybeRequestReview(sessions.length);
+      }).catch(() => {});
+    }, delay);
+    return () => clearTimeout(t);
+  }, [phase]);
 
   // Completion reliably returns the user home: after the affirming done
   // screen, gently auto-advance to home. Any tap cancels by changing the phase
