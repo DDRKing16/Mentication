@@ -119,6 +119,16 @@ button svg {
   pointer-events:none;
 }
 
+/* Desktop reads a touch large, so the whole composition is zoomed out
+   slightly — same layout, content and proportions, just smaller on screen
+   so more fits in one view. */
+@media (min-width:949px) {
+  .home-shell {
+    zoom:.86;
+    max-width:1103px;
+  }
+}
+
 .hero {
   position:relative;
   width:100%;
@@ -273,16 +283,22 @@ main:focus {
 .week-day:nth-child(7) .week-circle { top:27px; }
 
 .week-day.is-current .week-circle {
-  width:21px;
-  height:21px;
-  margin:-10.5px 0 0 -10.5px;
-  background:#c9612e;
-  border-color:#ffd9b8;
-  box-shadow:0 0 0 4px #c9612e2b,0 0 18px #c9612e59;
+  width:22px;
+  height:22px;
+  margin:-11px 0 0 -11px;
+  background:#e8742f;
+  border-color:#ffe2c2;
+  animation:current-glow 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes current-glow {
+  from { box-shadow:0 0 0 4px #e8742f2e,0 0 16px #ff9a4d73,0 0 30px #ff9a4d33; }
+  to { box-shadow:0 0 0 6px #e8742f40,0 0 28px #ff9a4d99,0 0 50px #ff9a4d52; }
 }
 
 .week-day.is-current::after {
-  color:#f2a06b;
+  color:#ffb47e;
+  text-shadow:0 0 12px #ff9a4d8c;
 }
 
 .week-flag {
@@ -329,6 +345,7 @@ main:focus {
   align-items:center;
   justify-content:center;
   gap:19px;
+  position:relative;
   min-height:69px;
   border-radius:99px;
   color:var(--ink);
@@ -346,12 +363,46 @@ main:focus {
 }
 
 .begin-button:hover {
-  box-shadow:0 8px 28px #ffd6b632;
+  box-shadow:0 8px 28px #ffd6b632,0 0 22px #ffd9a85c,inset 0 0 22px #ffe0b559;
   transform:translateY(-2px);
 }
 
 .begin-button:active {
   transform:scale(.975);
+}
+
+/* Hover lighting: an LED beam chases the border and bleeds inward, like a
+   light strip wrapped around the pill. */
+@property --led-sweep {
+  syntax:"<angle>";
+  inherits:false;
+  initial-value:0deg;
+}
+
+.begin-button::before {
+  content:"";
+  position:absolute;
+  inset:-3px;
+  border-radius:inherit;
+  padding:3px;
+  background:conic-gradient(from var(--led-sweep),transparent 0deg,#ffdcae 55deg,#fff6e6 95deg,#ffbe7a 130deg,transparent 195deg,transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;
+  filter:drop-shadow(0 0 7px #ffd9a8aa);
+  opacity:0;
+  transition:opacity .3s ease;
+  pointer-events:none;
+}
+
+.begin-button:hover::before,.begin-button:focus-visible::before {
+  opacity:1;
+  animation:led-run 2.2s linear infinite;
+}
+
+@keyframes led-run {
+  to { --led-sweep:360deg; }
 }
 
 .seven-days {
@@ -419,36 +470,57 @@ main:focus {
   border-radius:25%;
 }
 
-/* Lava-lamp blobs: a soft glow and a slow wobble while hovered or focused,
-   and a squishier one-off pulse the moment one is chosen. */
+/* Lava-lamp blobs: no wobble. Hovering pours a warm light that slowly drifts
+   through the card like a lava lamp; clicking plays one gentle pulse only. */
+.goal {
+  isolation:isolate;
+}
+
+.goal::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:25%;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .45s var(--ease);
+  mix-blend-mode:screen;
+  filter:blur(9px);
+  background-image:
+    radial-gradient(closest-side at 40% 32%,#ffe9c794,#ffd39c42 48%,transparent 76%),
+    radial-gradient(closest-side at 60% 72%,#ffb87a5e,transparent 70%);
+  background-size:170% 170%,200% 200%;
+  background-repeat:no-repeat;
+}
+
 .goal:hover,.goal:focus-visible {
-  animation:goal-bobble 1.7s ease-in-out infinite;
-  filter:brightness(1.07) drop-shadow(0 0 16px #ffd9b35c);
+  filter:brightness(1.17) drop-shadow(0 0 26px #ffcf9c80);
+}
+
+.goal:hover::after,.goal:focus-visible::after {
+  opacity:1;
+  animation:lava-drift 3.4s ease-in-out infinite alternate;
 }
 
 .goal:active {
-  animation:none;
-  transform:scale(.95);
-  filter:brightness(1.05) drop-shadow(0 0 12px #ffd9b345);
+  transform:scale(.96);
+  filter:brightness(1.1) drop-shadow(0 0 16px #ffd9b35c);
 }
 
 .goal.is-blobbing {
   animation:goal-lava .46s var(--ease) 1;
-  filter:brightness(1.12) drop-shadow(0 0 24px #ffc89480);
+  filter:brightness(1.16) drop-shadow(0 0 26px #ffc8948c);
 }
 
-@keyframes goal-bobble {
-  0%,100% { transform:scale(1); }
-  30% { transform:scale(1.05,.95) rotate(-1.4deg); }
-  62% { transform:scale(.955,1.05) rotate(1.4deg); }
-  82% { transform:scale(1.02,.985); }
+@keyframes lava-drift {
+  from { background-position:10% 14%,88% 84%; }
+  to { background-position:88% 82%,12% 18%; }
 }
 
 @keyframes goal-lava {
   0% { transform:scale(1); }
-  30% { transform:scale(.86,1.14); }
-  55% { transform:scale(1.12,.9) rotate(2deg); }
-  78% { transform:scale(.94,1.06) rotate(-1.5deg); }
+  35% { transform:scale(1.035,.965); }
+  70% { transform:scale(.975,1.025); }
   100% { transform:scale(1); }
 }
 
