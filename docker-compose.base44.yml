@@ -11,6 +11,9 @@ services:
       # Vite >= 6.1 appends this to its allowed hosts list so the preview
       # proxy hostname is accepted. The platform sets this value.
       - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+      # The browser asks this public relay URL for AI-written steps; the
+      # provider key stays inside the relay, never in the app bundle.
+      - VITE_AI_URL=https://8000-${BASE44_PUBLIC_HOST_SUFFIX}
     command: ["sh", "-ec", "npm ci --no-audit --no-fund && exec npx vite --host 0.0.0.0 --port 5173"]
     restart: on-failure
     healthcheck:
@@ -19,6 +22,26 @@ services:
       timeout: 5s
       retries: 6
       start_period: 40s
+
+  ai-relay:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    env_file:
+      - /run/base44/app.env
+    command: ["node", "server/ai-proxy.mjs"]
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
 
 volumes:
   node_modules:

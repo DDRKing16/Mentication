@@ -18,6 +18,7 @@ import {
   Home
 } from "lucide-react";
 import { consumeNextStepHandoff } from "@/lib/tomorrowParking/storage";
+import { generateTaskSteps } from "@/lib/aiSteps";
 
 // Category to Lucide icon mapping for Image 1 premium grid
 const CATEGORY_ICONS = {
@@ -1109,12 +1110,14 @@ const CATEGORY_STYLES = {
   errands: { border: "#C7D2FE", bg: "#EEF2FF", text: "#3730A3", iconBg: "rgba(199, 210, 254, 0.2)" }
 };
 
-const generateLadder = (category, taskKey, brainState, pathLength = "regular") => {
+const generateLadder = (category, taskKey, brainState, pathLength = "regular", overrideSteps = null) => {
   let baseSteps = [];
-  const capitalizedTaskName = taskKey.replace(/-/g, " ").replace(/\\b\\w/g, c => c.toUpperCase());
+  const capitalizedTaskName = taskKey.replace(/-/g, " ").replace(/(^|[\s-])\w/g, c => c.toUpperCase());
   
-  // Custom or pre-defined task check
-  if (category === "custom" || !TASK_STEPS[taskKey]) {
+  // AI-written steps win, then hand-crafted steps, then the generic fallback.
+  if (overrideSteps) {
+    baseSteps = overrideSteps;
+  } else if (category === "custom" || !TASK_STEPS[taskKey]) {
     // Generate custom/generic steps seamlessly using capitalizedTaskName
     baseSteps = [
       { title: `Acknowledge the intention for ${capitalizedTaskName}`, micro: "Take a deep breath and accept the space you are in.", time: "<15 sec", easier: ["Close your eyes and breathe", "Just sit comfortably"] },
@@ -1242,6 +1245,7 @@ export default function NextEasiestStepExperience() {
   const [showPause, setShowPause] = useState(false);
   const [easierOptionsVisible, setEasierOptionsVisible] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   const canvasRef = useRef(null);
   const audioCtxRef = useRef(null);
@@ -1440,9 +1444,18 @@ export default function NextEasiestStepExperience() {
     setGameState(prev => ({ ...prev, screen: screenName }));
   };
 
-  const handleSelectCategoryTask = (catKey, taskObj) => {
+  const handleSelectCategoryTask = async (catKey, taskObj) => {
     playClick();
-    const ladderSteps = generateLadder(catKey, taskObj.id, gameState.brainState, gameState.pathLength);
+    // Tasks without hand-crafted steps get AI-written ones (falls back to the
+    // generic ladder if the AI relay is unavailable).
+    const needsAI = !TASK_STEPS[taskObj.id];
+    let aiSteps = null;
+    if (needsAI) {
+      setAiGenerating(true);
+      aiSteps = await generateTaskSteps(taskObj.name, { pathLength: gameState.pathLength });
+      setAiGenerating(false);
+    }
+    const ladderSteps = generateLadder(catKey, taskObj.id, gameState.brainState, gameState.pathLength, aiSteps);
     setGameState(prev => ({
       ...prev,
       category: catKey,
@@ -1457,12 +1470,17 @@ export default function NextEasiestStepExperience() {
     setSelectedSubcategory(null);
   };
 
-  const handleCustomTaskGo = () => {
-    if (!customTaskInput.trim()) return;
+  const handleCustomTaskGo = async () => {
+    if (!customTaskInput.trim() || aiGenerating) return;
     playClick();
     const cleanInput = customTaskInput.trim();
     const taskSlug = cleanInput.toLowerCase().replace(/\s+/g, "-");
-    const ladderSteps = generateLadder("work", taskSlug, gameState.brainState, gameState.pathLength);
+    // A typed task is always its own thing, so the steps are written by AI
+    // (the generic ladder is only the fallback when the relay is unavailable).
+    setAiGenerating(true);
+    const aiSteps = await generateTaskSteps(cleanInput, { pathLength: gameState.pathLength });
+    setAiGenerating(false);
+    const ladderSteps = generateLadder("work", taskSlug, gameState.brainState, gameState.pathLength, aiSteps);
     setGameState(prev => ({
       ...prev,
       category: "custom",
@@ -1573,6 +1591,31 @@ export default function NextEasiestStepExperience() {
     >
       {/* Shared Home button on every screen, and Back on the opening screen (inner screens keep their own step-back arrows). */}
       <InterventionNav back={gameState.screen === "landing"} home tone="dark" />
+      {/* While the AI writes task-specific steps, a small overlay keeps the
+          tap responsive instead of leaving the screen unchanged. */}
+      {aiGenerating && (
+        <div
+          role="status"
+          aria-label="Writing your steps"
+          style={{
+            position: "fixed", inset: 0, zIndex: 90,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "12px",
+            background: "rgba(2, 7, 18, 0.55)", backdropFilter: "blur(4px)",
+            color: "#FFFFFF", fontWeight: "800", fontSize: "15px",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{
+              width: "22px", height: "22px", borderRadius: "50%",
+              border: "3px solid rgba(255,255,255,0.3)", borderTopColor: "#FFFFFF",
+              animation: "nes-ai-spin 0.9s linear infinite",
+            }}
+          />
+          Writing your steps…
+          <style>{`@keyframes nes-ai-spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
       {/* Scope-contained inject tokens and components styling for precision rendering */}
       <style dangerouslySetInnerHTML={{ __html: `
         .nes-v2-wrap {
