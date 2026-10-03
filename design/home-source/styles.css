@@ -690,53 +690,59 @@ main:focus {
   align-self:start;
 }
 
-/* Discovery cards show a real screenshot of the destination screen, with the
-   label over a soft scrim so the caption stays in the approved style. */
+/* Discovery cards read like app icons: the whole destination screen,
+   zoomed out, floats as a rounded mini-screen on a warm cream tile with the
+   label beneath it. */
 .preview-art {
   display:block;
   width:100%;
   height:auto;
   aspect-ratio:273/204;
-  background:#1b252b;
+}
+
+.preview-backdrop {
+  fill:#f2e3d2;
 }
 
 .preview-art image {
-  filter:saturate(.96);
+  filter:saturate(.96) drop-shadow(0 10px 16px rgba(6,24,39,.32));
+}
+
+.preview-frame {
+  fill:none;
+  stroke:rgba(6,24,39,.22);
+  stroke-width:1.5;
 }
 
 .preview-scrim {
-  position:absolute;
-  inset:0;
-  background:linear-gradient(180deg,rgba(11,25,32,0) 42%,rgba(11,25,32,.74) 100%);
-  pointer-events:none;
+  display:none;
 }
 
 .preview-label {
   position:absolute;
   left:15px;
   right:15px;
-  bottom:13px;
+  bottom:10px;
   display:flex;
   flex-direction:column;
   gap:3px;
-  text-align:left;
-  color:#fff7ec;
+  text-align:center;
+  color:#4a3423;
   pointer-events:none;
 }
 
 .preview-label span {
-  font-size:10px;
-  letter-spacing:2.1px;
+  font-size:9px;
+  letter-spacing:2px;
   text-transform:uppercase;
-  opacity:.82;
+  opacity:.72;
 }
 
 .preview-label strong {
   font-family:Georgia,serif;
   font-weight:500;
-  font-size:20px;
+  font-size:16px;
   line-height:1.18;
-  text-shadow:0 1px 14px rgba(0,0,0,.5);
 }
 
 [data-large-text=true] .preview-label,[data-large-text=true] .preview-scrim {
