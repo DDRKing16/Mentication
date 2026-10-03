@@ -300,6 +300,21 @@
   box-shadow: 0 20px 60px -24px rgba(0, 0, 0, 0.7);
 }
 
+/* ---- Peace Palace ambient motion (stilled by html.reduce-motion above) ---- */
+@keyframes palace-star-twinkle {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.15; }
+}
+.palace-star { animation: palace-star-twinkle 4.5s ease-in-out infinite; }
+
+@keyframes palace-blob-wobble {
+  0%, 100% { transform: translateX(0) scaleY(1); }
+  33% { transform: translateX(-7px) scaleY(1.12); }
+  66% { transform: translateX(6px) scaleY(0.92); }
+}
+.palace-blob { animation: palace-blob-wobble 11s ease-in-out infinite; }
+.palace-blob-slow { animation-duration: 16s; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

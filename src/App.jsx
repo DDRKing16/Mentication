@@ -39,6 +39,7 @@ const GoodMap = lazy(() => import('@/pages/GoodMap'));
 const Foundations = lazy(() => import('@/pages/Foundations'));
 const Restructure = lazy(() => import('@/pages/Restructure'));
 const Plus = lazy(() => import('@/pages/Plus'));
+const Palace = lazy(() => import('@/pages/Palace'));
 const ProgrammeList = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeList })));
 const ProgrammeDetail = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeDetail })));
 
@@ -108,6 +109,7 @@ const MenticationRoutes = () => {
                 <Route path="/support" element={<Crisis />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/plus" element={<Plus />} />
+                <Route path="/palace" element={<OnboardingGate><Palace /></OnboardingGate>} />
                 <Route path="/programmes" element={<ProgrammeList />} />
                 <Route path="/programmes/:id" element={<ProgrammeDetail />} />
                 <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
@@ -151,6 +153,7 @@ function App() {
       import("@/pages/Foundations");
       import("@/pages/Restructure");
       import("@/pages/Plus");
+      import("@/pages/Palace");
       import("@/pages/Programmes");
       import("@/pages/InterventionLibrary");
       import("@/pages/RegulationProfile");

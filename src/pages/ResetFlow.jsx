@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "rea
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
+import { Castle, ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
 import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
@@ -984,6 +984,19 @@ export default function ResetFlow() {
           <p className="mx-auto mt-4 max-w-sm text-lg text-muted-foreground text-balance">
             That’s the whole practice. Come back any time you need to.
           </p>
+          {(attemptLogRef.current || []).some((a) => a?.exit_reason === "completed") && (
+            <motion.button
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              onClick={() => navigate("/palace", { replace: true })}
+              data-sfx="select"
+              className="mx-auto mt-5 flex items-center gap-2 rounded-full border border-teal/30 bg-teal/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-teal/50"
+            >
+              <Castle className="h-4 w-4 text-teal" strokeWidth={1.8} />
+              Your Peace Palace grew — visit it
+            </motion.button>
+          )}
         </div>
 
         {weekCount > 0 && (
