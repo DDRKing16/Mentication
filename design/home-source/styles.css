@@ -120,12 +120,12 @@ button svg {
 }
 
 /* Desktop reads a touch large, so the whole composition is zoomed out
-   slightly — same layout, content and proportions, just smaller on screen
-   so more fits in one view. */
+   uniformly — the shell keeps its authored 949px width and zoom shrinks
+   every element together, so more of the app fits in one view. */
 @media (min-width:949px) {
   .home-shell {
     zoom:.78;
-    max-width:1217px;
+    max-width:949px;
   }
 }
 
