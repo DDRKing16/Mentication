@@ -31,6 +31,18 @@ Start with `README.md` for setup, validation and iOS workflow.
   `@capgo/native-purchases` (subscriptions; talks only to Apple's StoreKit, no
   third-party server). Ask before adding anything else.
 
+## Home screen
+
+- Home (`src/pages/Home.jsx`) renders the approved home screen through the
+  isolated adapter `src/components/home/HomeFrame.jsx` +
+  `src/components/home/home-document.js` (generated from the owner's approved
+  package — do not hand-edit the document). Route IDs from the document map to
+  app destinations in Home.jsx; weekly circles show real `calmer-seven`
+  programme progress (read-only). HomeFrame lazy-loads the 2.4MB document as
+  its own chunk on purpose.
+- Because the document carries its own bottom navigation, AppShell hides the
+  host `TabBar` on `/`.
+
 ## Base44 dev environment
 
 - `docker-compose.base44.yml` runs the Vite dev server (`web`) plus `ai-relay`

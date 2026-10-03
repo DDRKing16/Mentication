@@ -73,7 +73,9 @@ export default function AppShell() {
           </Suspense>
         </div>
       )}
-      <TabBar />
+      {/* The approved home document carries its own bottom navigation, so the
+          host tab bar would duplicate it on Home. */}
+      {pathname !== "/" && <TabBar />}
     </div>
   );
 }
