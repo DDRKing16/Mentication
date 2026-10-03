@@ -33,13 +33,15 @@ Start with `README.md` for setup, validation and iOS workflow.
 
 ## Home screen
 
-- Home (`src/pages/Home.jsx`) renders the approved home screen through the
-  isolated adapter `src/components/home/HomeFrame.jsx` +
-  `src/components/home/home-document.js` (generated from the owner's approved
-  package — do not hand-edit the document). Route IDs from the document map to
-  app destinations in Home.jsx; weekly circles show real `calmer-seven`
-  programme progress (read-only). HomeFrame lazy-loads the 2.4MB document as
-  its own chunk on purpose.
+- Home (`src/pages/Home.jsx`) renders the home screen through the isolated
+  adapter `src/components/home/HomeFrame.jsx` + the generated
+  `src/components/home/home-document.js`. Edit the design in the vanilla
+  source at `design/home-source/` (index.html + styles.css + app.js) and
+  regenerate with `node scripts/build-home-document.mjs` — never hand-edit the
+  generated document. Route IDs map to app destinations in Home.jsx; the
+  weekly pathway shows real `calmer-seven` programme progress (read-only;
+  goal-card clicks play a ~460ms lava-lamp pulse before navigating).
+  HomeFrame lazy-loads the 2.4MB document as its own chunk on purpose.
 - Because the document carries its own bottom navigation, AppShell hides the
   host `TabBar` on `/`.
 
