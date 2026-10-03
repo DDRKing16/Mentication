@@ -697,7 +697,7 @@ main:focus {
   display:block;
   width:100%;
   height:auto;
-  aspect-ratio:273/204;
+  aspect-ratio:273/232;
 }
 
 .preview-backdrop {
@@ -705,13 +705,18 @@ main:focus {
 }
 
 .preview-art image {
-  filter:saturate(.96) drop-shadow(0 10px 16px rgba(6,24,39,.32));
+  filter:saturate(.96);
+}
+
+.preview-tint {
+  fill:rgba(56,36,28,.30);
 }
 
 .preview-frame {
   fill:none;
-  stroke:rgba(6,24,39,.22);
+  stroke:rgba(6,24,39,.32);
   stroke-width:1.5;
+  filter:drop-shadow(0 7px 12px rgba(6,24,39,.28));
 }
 
 .preview-scrim {
