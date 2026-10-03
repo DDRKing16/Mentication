@@ -70,7 +70,6 @@ export default function ResetFlow() {
 
   const [endIntensity, setEndIntensity] = useState(null);
   const [tofEntryThought, setTofEntryThought] = useState("");
-  const [tofReady, setTofReady] = useState(false);
   const [tofVoiceState, setTofVoiceState] = useState("idle");
   const [tofVoiceSeconds, setTofVoiceSeconds] = useState(0);
   const voiceStreamRef = useRef(null);
@@ -524,12 +523,10 @@ export default function ResetFlow() {
         <Suspense fallback={<BuildingResetScreen />}>
           <ThoughtOrFactEntry
             answers={answers}
-            ready={tofReady}
             thought={tofEntryThought}
             voiceSeconds={tofVoiceSeconds}
             voiceState={tofVoiceState}
             onBegin={beginGuided}
-            onReady={() => setTofReady(true)}
             onReturnToWriting={returnToThoughtWriting}
             onStartVoice={startThoughtVoiceEntry}
             onStopVoice={stopThoughtVoiceEntry}
