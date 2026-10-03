@@ -8,6 +8,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeFrame from "@/components/home/HomeFrame";
 import { sessionStore } from "@/lib/localData";
+import { hasCompletedOnboarding } from "@/lib/onboarding";
+import { buildRecommendation } from "@/lib/recommend";
 import {
   activeProgrammeId,
   getProgramme,
@@ -48,11 +50,34 @@ async function readWeekState() {
 export default function Home() {
   const navigate = useNavigate();
   const [week, setWeek] = useState({ currentDay: null, completedDays: [] });
+  // "Your reset for today" appears only for returning users: onboarding done
+  // and at least one session in history. Payload matches My Plan's card.
+  const [today, setToday] = useState(null);
 
   useEffect(() => {
     let live = true;
     readWeekState()
       .then((state) => { if (live) setWeek(state); })
+      .catch(() => {});
+    return () => { live = false; };
+  }, []);
+
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      if (!hasCompletedOnboarding()) return null;
+      const sessions = await sessionStore.list("-created_date", 30);
+      if (!sessions.length) return null;
+      const recommendation = buildRecommendation(sessions);
+      return {
+        title: recommendation.title,
+        meta: `${recommendation.minutes} min · ${recommendation.tag}`,
+        pathway: recommendation.pathway,
+        direction: recommendation.direction,
+        min: recommendation.min,
+      };
+    })()
+      .then((payload) => { if (live) setToday(payload); })
       .catch(() => {});
     return () => { live = false; };
   }, []);
@@ -80,6 +105,16 @@ export default function Home() {
   const onNavigate = useCallback((route) => {
     if (route === "home") return; // the document scrolls itself to the top
     if (route === "begin") { void beginWeek(); return; }
+    if (route === "recommended" && today?.pathway?.length) {
+      navigate("/reset", {
+        state: {
+          prebuilt: true, pathway: today.pathway, direction: today.direction,
+          directionLabel: today.title, intensity: 5, whereFelt: "both",
+          timeMin: today.min, audio: "yes", movement: "seated",
+        },
+      });
+      return;
+    }
     if (route === "seven-calmer-days") { navigate("/programmes/calmer-seven"); return; }
     if (route === "restructure") { navigate("/restructure"); return; }
     if (route === "journal") { navigate("/journal"); return; }
@@ -94,7 +129,7 @@ export default function Home() {
     if (DIRECTION_LABELS[route]) {
       navigate("/reset", { state: { direction: route, directionLabel: DIRECTION_LABELS[route] } });
     }
-  }, [beginWeek, navigate]);
+  }, [beginWeek, navigate, today]);
 
-  return <HomeFrame onNavigate={onNavigate} week={week} />;
+  return <HomeFrame onNavigate={onNavigate} week={week} today={today} />;
 }

@@ -1,39 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// The home document is a ~2.4MB self-contained page (all artwork inlined), so
-// it's fetched as its own async chunk when Home mounts instead of riding in
-// the main bundle.
-const loadHomeDocument = () => import('./home-document.js');
+// The home document is a self-contained static HTML asset (public/home.html,
+// built from design/home-source). Serving it as `src` lets the browser stream
+// and parse it directly — no JS bundle chunk carries the document anymore.
+const homeSrc = `${import.meta.env.BASE_URL}home.html`;
 
 const routes = new Set([
   'lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'begin',
   'seven-calmer-days', 'restructure', 'journal', 'good-map', 'dear-2100',
-  'library', 'my-plan', 'profile', 'insights', 'settings'
+  'library', 'my-plan', 'profile', 'insights', 'settings', 'recommended'
 ]);
 
 /**
  * Isolated adapter for an existing React / Base44 host.
  * onNavigate receives a route ID, never an untrusted URL.
- * The host supplies its existing navigation function and authoritative week state.
+ * The host supplies its existing navigation function, authoritative week state
+ * and — for returning users — the "Your reset for today" card payload.
  * No database, authentication, router package, or page names are assumed.
  */
-export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] } }) {
+export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null }) {
   const frame = useRef(null);
-  const callbacks = useRef({ onNavigate, week });
-  callbacks.current = { onNavigate, week };
+  const callbacks = useRef({ onNavigate, week, today });
+  callbacks.current = { onNavigate, week, today };
   const bridgeId = useRef(null);
   const [height, setHeight] = useState(1700);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
-  const [homeDocument, setHomeDocument] = useState(null);
-
-  useEffect(() => {
-    let live = true;
-    loadHomeDocument()
-      .then((m) => { if (live) setHomeDocument(m.default); })
-      .catch(() => { if (live) setError('Home could not be loaded. Please try again.'); });
-    return () => { live = false; };
-  }, []);
 
   function send(type, extra = {}) {
     if (!frame.current?.contentWindow || !bridgeId.current) return;
@@ -66,6 +58,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
       if (data.type === 'ready') {
         setReady(true);
         send('week', { week: callbacks.current.week });
+        if (callbacks.current.today) send('today', { today: callbacks.current.today });
         reportViewport();
       } else if (data.type === 'height' && Number.isFinite(data.height) && data.height > 0 && data.height < 20000) {
         setHeight(Math.ceil(data.height));
@@ -96,20 +89,24 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
     if (ready) send('week', { week });
   }, [week, ready]);
 
+  useEffect(() => {
+    if (ready && today) send('today', { today });
+  }, [today, ready]);
+
   if (typeof onNavigate !== 'function') {
     throw new TypeError('HomeFrame requires the host onNavigate(routeId) function.');
   }
   return (
     <section aria-label="MentiCation home" style={{ background: '#49392f', minHeight: '100svh' }}>
       {error && <p role="alert" style={{ color: '#fff4e9', padding: '12px 20px', margin: 0 }}>{error}</p>}
-      {homeDocument && <iframe
+      <iframe
         ref={frame}
         title="MentiCation home"
-        srcDoc={homeDocument}
+        src={homeSrc}
         sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
         onLoad={() => { setReady(false); send('connect'); }}
         style={{ display: 'block', width: '100%', height, border: 0, maxWidth: 949, margin: '0 auto' }}
-      />}
+      />
     </section>
   );
 }

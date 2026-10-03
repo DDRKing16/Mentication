@@ -416,6 +416,89 @@ main:focus {
   margin:0 0 10px 8px;
 }
 
+/* Your reset for today — shown to returning users by the host. */
+.today {
+  margin-top:27px;
+}
+
+.today-button {
+  display:flex;
+  align-items:center;
+  gap:18px;
+  width:100%;
+  padding:22px 26px;
+  border:1.5px solid #efddd56d;
+  border-radius:40px;
+  background:linear-gradient(125deg,#c5a79657,#5b514f63);
+  box-shadow:inset 0 1px 1px #ffffff16,0 15px 40px #22171412;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  text-align:left;
+  transition:transform .28s var(--ease),box-shadow .22s ease;
+}
+
+.today-button:hover {
+  transform:translateY(-2px);
+  box-shadow:inset 0 1px 1px #ffffff16,0 15px 40px #22171412,0 0 20px #ffd9a84d;
+}
+
+.today-button:active {
+  transform:scale(.985);
+}
+
+.today-copy {
+  min-width:0;
+}
+
+.today-eyebrow {
+  display:block;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:4.5px;
+  text-transform:uppercase;
+  color:#dcc7b8;
+}
+
+.today-title {
+  display:block;
+  margin-top:7px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:28px;
+  line-height:1.3;
+  letter-spacing:.3px;
+}
+
+.today-meta {
+  display:block;
+  margin-top:5px;
+  font-size:16px;
+  line-height:1.35;
+  color:#f3e3d6cc;
+}
+
+.today-play {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  width:56px;
+  height:56px;
+  margin-left:auto;
+  border-radius:50%;
+  color:var(--ink);
+  background:linear-gradient(110deg,#ffe9d6,#ffe1c9);
+  box-shadow:0 5px 20px #eec6a416;
+}
+
+.today-play .icon {
+  width:22px;
+  height:22px;
+}
+
+[data-large-text=true] .today-title {
+  font-size:32px;
+}
+
 .goal-grid {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));

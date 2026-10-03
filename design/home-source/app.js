@@ -7,7 +7,8 @@
     guide: 'Guide me', begin: 'Begin', 'seven-calmer-days': '7 calmer days',
     restructure: 'Restructure', journal: 'Check in with yourself',
     'good-map': 'See what makes life feel good', 'dear-2100': 'Go after what you’ve avoided',
-    library: 'Library', 'my-plan': 'My Plan', profile: 'Profile', insights: 'Insights', settings: 'Settings'
+    library: 'Library', 'my-plan': 'My Plan', profile: 'Profile', insights: 'Insights', settings: 'Settings',
+    recommended: 'Your reset for today'
   });
   const preferenceKey = 'mentication.home.accessibility.v1';
   const preferenceNames = ['large-text', 'high-contrast', 'reduce-motion'];
@@ -186,6 +187,16 @@
     while (completed.has(contiguous)) contiguous++;
     document.querySelector('.week-track').style.setProperty('--progress', `${Math.max(0, contiguous - 1) / 6 * 100}%`);
   }
+  function setToday(today) {
+    if (!today || typeof today !== 'object' || Array.isArray(today)) throw new TypeError('today must be an object.');
+    const title = typeof today.title === 'string' ? today.title.trim() : '';
+    if (!title || title.length > 80) throw new TypeError('today.title must be a string of 1 to 80 characters.');
+    const meta = typeof today.meta === 'string' ? today.meta.trim().slice(0, 60) : '';
+    document.getElementById('today-title').textContent = title;
+    document.getElementById('today-meta').textContent = meta;
+    document.getElementById('today-card').hidden = false;
+    reportHeight();
+  }
   function reportHeight() {
     cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(() => sendBridge('height', { height: Math.ceil(document.getElementById('home-shell').getBoundingClientRect().height) }));
@@ -205,17 +216,21 @@
       root.style.setProperty('--dialog-max-height', `${Math.max(100, data.height - 32)}px`);
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'week') {
       try { setWeek(data.week); } catch { sendBridge('error', { code: 'INVALID_WEEK' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'today') {
+      try { setToday(data.today); } catch { sendBridge('error', { code: 'INVALID_TODAY' }); }
     }
   });
   window.MenticationHome = Object.freeze({
     version: '1.0.0',
     routes: ROUTES,
-    configure({ navigate: handler, week } = {}) {
+    configure({ navigate: handler, week, today } = {}) {
       if (handler !== undefined && typeof handler !== 'function') throw new TypeError('navigate must be a function.');
       if (handler) navigateHandler = handler;
       if (week !== undefined) setWeek(week);
+      if (today !== undefined) setToday(today);
     },
-    setWeek
+    setWeek,
+    setToday
   });
   applyPreferences(readPreferences());
   if (!storageAvailable) document.getElementById('preference-note').textContent = 'Your preferences apply while this page is open.';

@@ -1,5 +1,7 @@
-// Rebuilds src/components/home/home-document.js from the editable vanilla
-// source in design/home-source (index.html + styles.css + app.js + assets).
+// Rebuilds public/home.html from the editable vanilla source in
+// design/home-source (index.html + styles.css + app.js + assets). The home
+// document is shipped as a static HTML asset so the browser streams and
+// parses it directly instead of downloading and parsing a 2.4MB JS string.
 // Run with: node scripts/build-home-document.mjs
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -23,8 +25,5 @@ html = html.replace('<link rel="stylesheet" href="styles.css">', `<style>\n${css
 html = html.replace('<script defer src="app.js"></script>', '');
 html = html.replace('</body>', `<script>\n${js.replaceAll('</script', '<\\/script')}\n</script>\n</body>`);
 
-writeFileSync(
-  resolve(root, 'src/components/home/home-document.js'),
-  '// Generated from design/home-source (owner-directed edits to the approved design). Do not hand-edit — change the source and run: node scripts/build-home-document.mjs\nexport default ' + JSON.stringify(html) + ';\n',
-);
-console.log('Rebuilt src/components/home/home-document.js:', Buffer.byteLength(html), 'bytes');
+writeFileSync(resolve(root, 'public/home.html'), html);
+console.log('Rebuilt public/home.html:', Buffer.byteLength(html), 'bytes');
