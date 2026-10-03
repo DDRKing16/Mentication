@@ -160,6 +160,13 @@ export default function ResetFlow() {
 
   useEffect(() => () => releaseThoughtVoice(), []);
 
+  // The mic permission is asked for once per session: the granted stream is
+  // kept (muted between notes) and reused, so the browser never re-prompts
+  // for every voice note. It is fully released only when the flow unmounts.
+  const muteThoughtVoice = () => {
+    voiceStreamRef.current?.getAudioTracks().forEach((track) => { track.enabled = false; });
+  };
+
   const startThoughtVoiceEntry = async () => {
     setTofVoiceSeconds(0);
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -167,20 +174,25 @@ export default function ResetFlow() {
       return;
     }
     try {
-      voiceStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!voiceStreamRef.current) {
+        voiceStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } else {
+        voiceStreamRef.current.getAudioTracks().forEach((track) => { track.enabled = true; });
+      }
       setTofVoiceState("listening");
     } catch {
+      voiceStreamRef.current = null;
       setTofVoiceState("idle");
     }
   };
 
   const stopThoughtVoiceEntry = () => {
-    releaseThoughtVoice();
+    muteThoughtVoice();
     setTofVoiceState("stopped");
   };
 
   const returnToThoughtWriting = () => {
-    releaseThoughtVoice();
+    muteThoughtVoice();
     setTofVoiceSeconds(0);
     setTofVoiceState("idle");
   };

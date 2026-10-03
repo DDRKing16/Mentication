@@ -15,6 +15,10 @@ const dataUri = (file, mime) => `data:${mime};base64,${readFileSync(resolve(dir,
 
 html = html.replaceAll('assets/images/approved-homescreen.png', dataUri('assets/images/approved-homescreen.png', 'image/png'));
 html = html.replaceAll('assets/icons/favicon.svg', dataUri('assets/icons/favicon.svg', 'image/svg+xml'));
+// Real in-app screenshots used by the discovery cards.
+for (const shot of ['journal', 'good-map', 'dear2100']) {
+  html = html.replaceAll(`assets/preview/${shot}.jpg`, dataUri(`assets/preview/${shot}.jpg`, 'image/jpeg'));
+}
 html = html.replace('<link rel="stylesheet" href="styles.css">', `<style>\n${css}\n</style>`);
 html = html.replace('<script defer src="app.js"></script>', '');
 html = html.replace('</body>', `<script>\n${js.replaceAll('</script', '<\\/script')}\n</script>\n</body>`);

@@ -124,8 +124,8 @@ button svg {
    so more fits in one view. */
 @media (min-width:949px) {
   .home-shell {
-    zoom:.86;
-    max-width:1103px;
+    zoom:.78;
+    max-width:1217px;
   }
 }
 
@@ -605,6 +605,59 @@ main:focus {
   border-radius:24px;
   overflow:hidden;
   align-self:start;
+}
+
+/* Discovery cards show a real screenshot of the destination screen, with the
+   label over a soft scrim so the caption stays in the approved style. */
+.preview-art {
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:273/204;
+  background:#1b252b;
+}
+
+.preview-art image {
+  filter:saturate(.96);
+}
+
+.preview-scrim {
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(11,25,32,0) 42%,rgba(11,25,32,.74) 100%);
+  pointer-events:none;
+}
+
+.preview-label {
+  position:absolute;
+  left:15px;
+  right:15px;
+  bottom:13px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  text-align:left;
+  color:#fff7ec;
+  pointer-events:none;
+}
+
+.preview-label span {
+  font-size:10px;
+  letter-spacing:2.1px;
+  text-transform:uppercase;
+  opacity:.82;
+}
+
+.preview-label strong {
+  font-family:Georgia,serif;
+  font-weight:500;
+  font-size:20px;
+  line-height:1.18;
+  text-shadow:0 1px 14px rgba(0,0,0,.5);
+}
+
+[data-large-text=true] .preview-label,[data-large-text=true] .preview-scrim {
+  display:none;
 }
 
 .support-links {
