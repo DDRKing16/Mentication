@@ -55,7 +55,10 @@ async function callOpenAI(task, pathLength) {
       messages: [{ role: "user", content: buildPrompt(task, pathLength) }],
     }),
   });
-  if (!res.ok) throw new Error(`OpenAI ${res.status}`);
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`OpenAI ${res.status} ${detail.slice(0, 300)}`);
+  }
   const data = await res.json();
   return JSON.parse(data.choices?.[0]?.message?.content || "{}");
 }

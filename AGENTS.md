@@ -31,6 +31,18 @@ Start with `README.md` for setup, validation and iOS workflow.
   `@capgo/native-purchases` (subscriptions; talks only to Apple's StoreKit, no
   third-party server). Ask before adding anything else.
 
+## Base44 dev environment
+
+- `docker-compose.base44.yml` runs the Vite dev server (`web`) plus `ai-relay`
+  (`server/ai-proxy.mjs`) — a tiny HTTP relay so AI-written steps for
+  custom/unlibrary tasks never need a provider key inside the app bundle.
+  The relay reads `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` from the platform
+  env file; with none it answers 503 and the app falls back to the built-in
+  generic ladder. The browser reaches it via `VITE_AI_URL`.
+- Verify after changes: `npm run lint` (must pass) and `npm run typecheck`
+  (one pre-existing ResetFlow error at src/pages/ResetFlow.jsx:515 is known
+  and not from new work).
+
 ## Rules for every AI agent (Copilot, Codex, Claude, others)
 
 See `.github/copilot-instructions.md`. In short: never change `main` directly (work on
