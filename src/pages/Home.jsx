@@ -12,6 +12,7 @@ import { sessionStore } from "@/lib/localData";
 import { hasCompletedOnboarding } from "@/lib/onboarding";
 import { buildRecommendation } from "@/lib/recommend";
 import { derivePeacePalace } from "@/lib/peacePalace";
+import { computeLocalCalendarStreak } from "@/lib/streak";
 import {
   activeProgrammeId,
   getProgramme,
@@ -20,6 +21,11 @@ import {
 } from "@/lib/programmeStore";
 
 const WEEK_PROGRAMME_ID = "calmer-seven";
+
+// The premium piece. The owner sets these when a real piece exists; while
+// launchAt is unset nothing is genuinely imminent, so the Premium card is
+// culled from "More for you" rather than sitting there as a permanent teaser.
+const PREMIUM_PIECE = { title: "", launchAt: null };
 
 const DIRECTION_LABELS = {
   lift: "Lift",
@@ -61,6 +67,8 @@ export default function Home() {
   // A quiet, on-device-only read of the daybook for the Journal card's
   // "last entry" line — never anything about what was written.
   const [journal, setJournal] = useState(null);
+  // Which "More for you" cards earn their place today, and what they preview.
+  const [more, setMore] = useState(null);
 
   useEffect(() => {
     try {
@@ -70,9 +78,12 @@ export default function Home() {
       const then = new Date(latest);
       if (Number.isNaN(then.getTime())) return;
       const days = Math.floor((Date.now() - then.getTime()) / 864e5);
+      const anchorLine =
+        typeof daybook?.[0]?.anchor === "string" ? daybook[0].anchor.trim().replace(/\s+/g, " ") : "";
       setJournal({
         caption: days <= 0 ? "Entry saved today" : days === 1 ? "Last entry yesterday" : `Last entry ${days} days ago`,
         entries: daybook.length,
+        line: anchorLine.slice(0, 70),
       });
     } catch { /* on-device read only */ }
   }, []);
@@ -89,6 +100,28 @@ export default function Home() {
           nextName: p.next?.name || "",
           stonesToNext: p.stonesToNext,
           progress: p.next ? p.growth / p.next.at : 1,
+        });
+        // Sort and cull "More for you" from the same real history: the
+        // Journal speaks when the streak is at risk, the Palace when a
+        // practice is still pending today, Premium only when its launch is
+        // genuinely imminent.
+        const todayKey = new Date().toLocaleDateString("en-CA");
+        const practicedToday = sessions.some((session) => {
+          const when = session?.created_date;
+          const day = when instanceof Date ? when : new Date(when);
+          if (Number.isNaN(day.getTime()) || day.toLocaleDateString("en-CA") !== todayKey) return false;
+          return Array.isArray(session.attempts) && session.attempts.length > 0;
+        });
+        const streak = computeLocalCalendarStreak(sessions);
+        const launch = PREMIUM_PIECE.launchAt ? new Date(PREMIUM_PIECE.launchAt) : null;
+        const premiumImminent = Boolean(
+          launch && !Number.isNaN(launch.getTime()) &&
+          launch.getTime() > Date.now() && launch.getTime() - Date.now() <= 14 * 864e5,
+        );
+        setMore({
+          journal: { show: streak > 0 && !practicedToday },
+          palace: { show: !practicedToday },
+          premium: { show: premiumImminent, title: PREMIUM_PIECE.title },
         });
       })
       .catch(() => {});
@@ -177,7 +210,7 @@ export default function Home() {
   return (
     <div className="relative">
       <StreakBadge />
-      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} />
+      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
     </div>
   );
 }

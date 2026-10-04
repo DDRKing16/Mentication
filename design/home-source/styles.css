@@ -716,9 +716,7 @@ main:focus {
 }
 
 .more-track {
-  display:grid;
-  grid-auto-flow:column;
-  grid-auto-columns:calc((100% - 24px)/3);
+  display:flex;
   gap:12px;
   overflow:auto;
   scroll-snap-type:x mandatory;
@@ -740,8 +738,28 @@ main:focus {
   scroll-snap-align:start;
   border-radius:24px;
   overflow:hidden;
-  align-self:start;
+  align-self:flex-start;
+  flex:0 0 auto;
 }
+
+/* Hierarchy through geometry, not order: the Palace is the hero (52%, and
+   taller), the Journal medium, Premium small. app.js re-scales these
+   whenever a card is culled for the day (track[data-count]). */
+.palace-card { width:calc(52% - 6.24px); }
+.journal-card { width:calc(30% - 3.6px); }
+.premium-card { width:calc(18% - 2.16px); }
+
+/* Tactile: the goal cards lift and press, so these three answer with a soft
+   glow of their own theme light — same product, same grammar. */
+@media(hover:hover) {
+  .journal-card:hover:not(:disabled) { box-shadow:0 18px 42px -18px #0c152666,0 0 26px #c9926b3d; }
+  .palace-card:hover:not(:disabled) { box-shadow:0 20px 46px -18px #0c1526cc,0 0 34px #00f5d440; }
+  .premium-card:hover:not(:disabled) { box-shadow:0 18px 42px -18px #00000073,0 0 28px #ffd9a03d; }
+}
+.journal-card:focus-visible { box-shadow:0 18px 42px -18px #0c152666,0 0 26px #c9926b3d; }
+.palace-card:focus-visible { box-shadow:0 20px 46px -18px #0c1526cc,0 0 34px #00f5d440; }
+.premium-card:focus-visible { box-shadow:0 18px 42px -18px #00000073,0 0 28px #ffd9a03d; }
+[data-reduce-motion=true] .discovery:hover:not(:disabled) { transform:none; }
 
 /* Discovery cards read like app icons: the whole destination screen,
    zoomed out, floats as a rounded mini-screen on a warm cream tile with the
@@ -1791,11 +1809,18 @@ body:has(dialog[open]) {
   .restructure-name { font-size:15px; }
   .restructure-sub { display:none; }
   .restructure-icon { width:40px; height:40px; }
+  /* Narrow screens scroll the row, so the shares breathe out instead. */
+  .palace-card { width:calc(62% - 4px); }
+  .journal-card { width:calc(42% - 4px); }
+  .premium-card { width:calc(42% - 4px); }
 }
 [data-high-contrast=true] .restructure-panel { background:#061827; border-color:#fff; }
 
 /* More for you: live Peace Palace card and the premium placeholder. */
-.palace-card, .premium-card { position:relative; aspect-ratio:273/232; }
+.palace-card, .premium-card { position:relative; }
+.palace-card { aspect-ratio:273/296; }
+.premium-card { aspect-ratio:273/200; }
+.premium-card .preview-label { left:10px; right:10px; }
 .palace-card-art, .palace-card-art svg { position:absolute; inset:0; display:block; width:100%; height:100%; }
 .palace-card {
   border:1px solid #00f5d433;
@@ -1833,7 +1858,7 @@ body:has(dialog[open]) {
 }
 .premium-art {
   position:absolute;
-  top:24%;
+  top:18%;
   left:50%;
   width:42px;
   height:42px;

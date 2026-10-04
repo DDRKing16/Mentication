@@ -194,7 +194,7 @@
     track.tabIndex = max > 2 ? 0 : -1;
   }
   function scrollCards(direction) {
-    const card = track.querySelector('.discovery');
+    const card = track.querySelector('.discovery:not([hidden])');
     const gap = parseFloat(getComputedStyle(track).columnGap) || 12;
     track.scrollBy({ left: direction * (card.getBoundingClientRect().width + gap), behavior: prefersStillness() ? 'instant' : 'smooth' });
   }
@@ -253,16 +253,17 @@
     document.getElementById('palace-badge-art').innerHTML = palaceSvg(level, { id: 'home-palace-badge', viewBox: badgeCrops[level] });
     document.getElementById('palace-card-chip').textContent = levelText;
     document.getElementById('palace-badge-level').textContent = levelText;
-    if (name) document.getElementById('palace-card-name').textContent = name;
-    const nextLine = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} to ${nextName.toLowerCase()}` : 'Your palace is complete';
-    document.getElementById('palace-card-next').textContent = nextLine;
-    document.getElementById('palace-badge-next').textContent = nextLine;
+    // Earn the tap: the card previews the stage you will walk into next.
+    document.getElementById('palace-card-name').textContent = nextName || name;
+    const badgeLine = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} to ${nextName.toLowerCase()}` : 'Your palace is complete';
+    document.getElementById('palace-badge-next').textContent = badgeLine;
+    document.getElementById('palace-card-next').textContent = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} from here` : badgeLine;
     const stages = document.getElementById('palace-card-stages');
     if (stages) {
       stages.innerHTML = Array.from({ length: 7 }, (_, i) =>
         `<span class="${i < level ? 'is-built' : i === level ? 'is-current' : ''}"></span>`).join('');
     }
-    document.getElementById('palace-card').setAttribute('aria-label', `PEACE PALACE. ${levelText}${name ? `, ${name}` : ''}`);
+    document.getElementById('palace-card').setAttribute('aria-label', `PEACE PALACE. ${levelText}${nextName ? `. Next up, ${nextName}` : name ? `, ${name}` : ''}`);
     document.getElementById('palace-badge-icon').setAttribute('aria-label', `Your Peace Palace, ${levelText.toLowerCase()}`);
   }
   // Journal card: a quiet, on-device line about the archive ("Last entry
@@ -270,12 +271,56 @@
   function setJournal(journal) {
     if (!journal || typeof journal !== 'object' || Array.isArray(journal)) throw new TypeError('journal must be an object.');
     const caption = typeof journal.caption === 'string' ? journal.caption.trim().slice(0, 60) : '';
-    if (!caption) return;
+    const line = typeof journal.line === 'string' ? journal.line.trim().replace(/\s+/g, ' ').slice(0, 70) : '';
+    if (!caption && !line) return;
     const status = document.getElementById('journal-card-status');
     if (!status) return;
-    status.textContent = caption;
-    document.querySelector('.journal-card')?.setAttribute('aria-label', `JOURNAL. Check in with yourself. ${caption}`);
+    // Earn the tap: preview the first line of the last entry on the card.
+    status.textContent = line ? `\u201C${line}\u201D` : caption;
+    document.querySelector('.journal-card')?.setAttribute('aria-label', `JOURNAL. Check in with yourself. ${status.textContent}`);
     reportHeight();
+  }
+  // Sort and cull the row: a card earns its place on the day (Journal when
+  // the streak is at risk, Palace when a practice is pending, Premium when a
+  // launch is genuinely imminent). If nothing qualifies the row steps aside.
+  function layoutCards() {
+    const cards = {
+      palace: document.getElementById('palace-card'),
+      journal: document.querySelector('.journal-card'),
+      premium: premiumCard
+    };
+    const visible = Object.keys(cards).filter(key => !cards[key].hidden);
+    track.dataset.count = String(visible.length);
+    document.querySelector('.more').hidden = visible.length === 0;
+    if (visible.length === 2) {
+      const lead = visible.includes('palace') ? 'palace' : 'journal';
+      visible.forEach(key => {
+        const share = key === lead ? .62 : .38;
+        cards[key].style.width = `calc(${share * 100}% - ${(12 * share).toFixed(2)}px)`;
+      });
+      if (visible.includes('palace')) cards.palace.style.aspectRatio = '273/232';
+    } else {
+      Object.values(cards).forEach(card => { card.style.width = ''; card.style.aspectRatio = ''; });
+    }
+    refreshCarousel();
+    reportHeight();
+  }
+  function setMore(more) {
+    if (!more || typeof more !== 'object' || Array.isArray(more)) throw new TypeError('more must be an object.');
+    const cards = {
+      palace: document.getElementById('palace-card'),
+      journal: document.querySelector('.journal-card'),
+      premium: premiumCard
+    };
+    for (const key of ['palace', 'journal', 'premium']) {
+      const rule = more[key];
+      if (!rule || typeof rule !== 'object') continue;
+      if (typeof rule.show === 'boolean') cards[key].hidden = !rule.show;
+      if (key === 'premium' && typeof rule.title === 'string' && rule.title.trim()) {
+        document.getElementById('premium-card-title').textContent = rule.title.trim().slice(0, 60);
+      }
+    }
+    layoutCards();
   }
   function reportHeight() {
     cancelAnimationFrame(resizeFrame);
@@ -302,23 +347,27 @@
       try { setPalace(data.palace); } catch { sendBridge('error', { code: 'INVALID_PALACE' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'journal') {
       try { setJournal(data.journal); } catch { sendBridge('error', { code: 'INVALID_JOURNAL' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'more') {
+      try { setMore(data.more); } catch { sendBridge('error', { code: 'INVALID_MORE' }); }
     }
   });
   window.MenticationHome = Object.freeze({
     version: '1.0.0',
     routes: ROUTES,
-    configure({ navigate: handler, week, today, palace, journal } = {}) {
+    configure({ navigate: handler, week, today, palace, journal, more } = {}) {
       if (handler !== undefined && typeof handler !== 'function') throw new TypeError('navigate must be a function.');
       if (handler) navigateHandler = handler;
       if (week !== undefined) setWeek(week);
       if (today !== undefined) setToday(today);
       if (palace !== undefined) setPalace(palace);
       if (journal !== undefined) setJournal(journal);
+      if (more !== undefined) setMore(more);
     },
     setWeek,
     setToday,
     setPalace,
-    setJournal
+    setJournal,
+    setMore
   });
   setPalace({ level: 0, name: 'The quiet clearing', nextName: 'The shack', stonesToNext: 4, progress: 0 });
   applyPreferences(readPreferences());

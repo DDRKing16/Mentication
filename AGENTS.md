@@ -51,6 +51,15 @@ Start with `README.md` for setup, validation and iOS workflow.
   Rebuild home.html after editing palaceArt.js.
 - Because the document carries its own bottom navigation, AppShell hides the
   host `TabBar` on `/`.
+- "More for you" is a hierarchy, not a grid: Palace 52% (taller, 273/296),
+  Journal 30%, Premium 18%; Home.jsx culls cards per day via the `more`
+  bridge message (Journal when the streak is at risk, Palace when no
+  practice is logged today, Premium only while PREMIUM_PIECE.launchAt is
+  within 14 days — unset in Home.jsx means Premium is culled). If no card
+  qualifies the whole section hides. Cards preview content: the Journal
+  card quotes the last entry's `anchor` line, the Palace card shows the
+  next stage's name. Two visible cards re-scale to 62/38 (palace leads);
+  one card keeps its CSS width.
 - Pending from the owner (do not invent values): they will upload real palace
   artwork images and the full progression points (stage names/thresholds —
   they mentioned "Four Foundations" and "get to 100 in the Good Map") to
