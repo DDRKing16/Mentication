@@ -111,11 +111,11 @@ export default function ResetFlow() {
     return () => { mounted = false; };
   }, []);
 
-  // Home's ambient track follows the reset setup, then stops exactly when
-  // the user enters a specific intervention.
+  // Home ambient continues through every setup / rating / pathway screen.
+  // It stops only once the user has explicitly begun an intervention.
   useEffect(() => {
-    if (phase === "unsure" || phase === "questions" || phase === "pathway") resumeHomeAmbient();
-    else pauseHomeAmbient();
+    if (phase === "guiding") pauseHomeAmbient();
+    else resumeHomeAmbient();
   }, [phase]);
 
   // immediate mode skips questions — show a brief building animation, then the pathway
