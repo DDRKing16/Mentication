@@ -5,6 +5,7 @@
 // document's route IDs to the app's real destinations and feeds it real
 // weekly progress. Presentation of the document itself is untouched.
 import React, { useCallback, useEffect, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import HomeFrame from "@/components/home/HomeFrame";
 import StreakBadge from "@/components/home/StreakBadge";
@@ -13,6 +14,7 @@ import { hasCompletedOnboarding } from "@/lib/onboarding";
 import { buildRecommendation } from "@/lib/recommend";
 import { derivePeacePalace } from "@/lib/peacePalace";
 import { computeLocalCalendarStreak } from "@/lib/streak";
+import { AMBIENT_MUTED_KEY, AMBIENT_STATE_EVENT, setAmbientMuted } from "@/components/AmbientHomeMusic";
 import {
   activeProgrammeId,
   getProgramme,
@@ -69,6 +71,15 @@ export default function Home() {
   const [journal, setJournal] = useState(null);
   // Which "More for you" cards earn their place today, and what they preview.
   const [more, setMore] = useState(null);
+  const [musicMuted, setMusicMuted] = useState(() => {
+    try { return localStorage.getItem(AMBIENT_MUTED_KEY) === "1"; } catch { return false; }
+  });
+
+  useEffect(() => {
+    const syncMusic = (event) => setMusicMuted(Boolean(event?.detail?.muted));
+    window.addEventListener(AMBIENT_STATE_EVENT, syncMusic);
+    return () => window.removeEventListener(AMBIENT_STATE_EVENT, syncMusic);
+  }, []);
 
   useEffect(() => {
     try {
@@ -210,6 +221,15 @@ export default function Home() {
   return (
     <div className="relative">
       <StreakBadge />
+      <button
+        type="button"
+        aria-label={musicMuted ? "Turn home music on" : "Mute home music"}
+        aria-pressed={musicMuted}
+        onClick={() => setAmbientMuted(!musicMuted)}
+        className="fixed right-4 top-[max(1rem,env(safe-area-inset-top))] z-[65] grid min-h-11 min-w-11 place-items-center rounded-full border border-white/25 bg-black/25 text-white shadow-lg backdrop-blur-md"
+      >
+        {musicMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+      </button>
       <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
     </div>
   );
