@@ -2,7 +2,7 @@ name: NodeJS with Webpack
 
 on:
   push:
-    branches: [ "main", "Chat-GPT" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
