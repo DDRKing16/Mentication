@@ -391,6 +391,14 @@
   const bgMusic = document.getElementById('bg-music');
   bgMusic.volume = 0.35;
   const startMusic = () => {
+    // In the real app the parent owns the persistent audio element so music
+    // survives route changes and resumes from the same position.
+    if (bridgeConnected) {
+      sendBridge('ambient-start');
+      document.removeEventListener('pointerdown', startMusic, true);
+      document.removeEventListener('keydown', startMusic, true);
+      return;
+    }
     bgMusic.play().then(() => {
       document.removeEventListener('pointerdown', startMusic, true);
       document.removeEventListener('keydown', startMusic, true);
