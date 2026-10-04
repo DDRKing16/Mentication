@@ -383,6 +383,8 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   };
 
   const fragments = data.fragments?.length ? data.fragments : splitThought(data.thought);
+  const currentFragmentIndex = Math.max(0, fragments.findIndex((fragment) => !data.assignments?.[fragment.id]));
+  const currentFragment = fragments[currentFragmentIndex === -1 ? Math.max(0, fragments.length - 1) : currentFragmentIndex] || { id: "fragment-0", text: data.refinedClaim || data.thought };
   const sortIndex = Math.min(Math.max(0, data.sortIndex || 0), Math.max(0, fragments.length - 1));
   const currentFragment = fragments[sortIndex] || { id: "fragment-0", text: data.refinedClaim || data.thought };
 
