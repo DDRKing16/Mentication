@@ -306,14 +306,14 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
     audioOn={narrationOn}
     onAudio={() => setNarrationOn((on) => !on)}
     accent={accent}
-    className={`flagship-shell flagship-${id} overflow-hidden`}
+    className={`flagship-shell flagship-${id}`}
     field={<div className="pointer-events-none fixed inset-0 flagship-atmosphere" aria-hidden="true"/>}
   >
-    <div className="mx-auto flex min-h-[calc(100dvh-170px)] w-full max-w-5xl flex-col px-5 pb-8 pt-3 sm:px-8">
-      <div className="grid flex-1 items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
-        <div className="flex min-h-52 items-center justify-center"><SignatureVisual id={id} step={step} reducedMotion={a11y.prefs.reducedMotion}/></div>
+    <div className="mx-auto flex min-h-[calc(100dvh-190px)] w-full max-w-5xl flex-col px-4 pb-6 pt-2 sm:min-h-[calc(100dvh-170px)] sm:px-8 sm:pb-8 sm:pt-3">
+      <div className="grid flex-1 items-center gap-4 sm:gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+        <div className="flex min-h-32 items-center justify-center sm:min-h-52"><SignatureVisual id={id} step={step} reducedMotion={a11y.prefs.reducedMotion}/></div>
         <AnimatePresence mode="wait">
-          <motion.section aria-live="polite" key={`${id}-${step}`} initial={a11y.prefs.reducedMotion ? {opacity:0} : {opacity:0,y:18}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} className="intervention-content-card rounded-[2rem] p-6 sm:p-8">
+          <motion.section aria-live="polite" key={`${id}-${step}`} initial={a11y.prefs.reducedMotion ? {opacity:0} : {opacity:0,y:18}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} className="intervention-content-card rounded-[1.6rem] p-5 sm:rounded-[2rem] sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--flag-accent)]">{current.eyebrow || `${step + 1} / ${screens.length}`}</p>
             <h1 className="mt-3 font-heading text-3xl font-medium leading-tight sm:text-4xl">{current.prompt}</h1>
             {current.body && <p className="mt-4 text-base leading-relaxed text-white/70">{current.body}</p>}
