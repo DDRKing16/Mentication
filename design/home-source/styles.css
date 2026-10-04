@@ -812,8 +812,7 @@ main:focus {
 .journal-dot { fill:#c9926b; }
 
 /* Ambient card motion — quiet, bespoke, and only for these two cards:
-   the Journal's handwriting writes itself across the top rule, and the
-   Premium star breathes with a muted warm glow. */
+   the Journal's handwriting writes itself across the top rule. */
 @media (prefers-reduced-motion: no-preference) {
   .journal-script {
     stroke-dasharray:200;
@@ -825,7 +824,6 @@ main:focus {
     transform-origin:center;
     animation:journal-dot-breathe 4.5s ease-in-out infinite;
   }
-  .premium-art { animation:premium-star-glow 6s ease-in-out infinite; }
 }
 @keyframes journal-write {
   0% { stroke-dashoffset:200; opacity:.75; }
@@ -836,48 +834,6 @@ main:focus {
 @keyframes journal-dot-breathe {
   0%,100% { transform:scale(1); opacity:1; }
   50% { transform:scale(1.45); opacity:.65; }
-}
-@keyframes premium-star-glow {
-  0%,100% { opacity:.75; filter:drop-shadow(0 0 0 #ffd9a000); }
-  50% { opacity:1; filter:drop-shadow(0 0 8px #ffd9a06b); }
-}
-/* The star's own finish: a slow light sweep travels the gold, and two
-   sparkles twinkle quietly at rest. Hovering the card lights the whole
-   thing up — brighter gold, a warm halo, and a quick shine pass. */
-.premium-shine { animation:premium-shine-sweep 7s ease-in-out infinite; }
-.premium-sparkle {
-  transform-box:fill-box;
-  transform-origin:center;
-  animation:premium-sparkle 3.2s ease-in-out infinite;
-}
-.premium-sparkle-small { animation-delay:1.6s; }
-@keyframes premium-shine-sweep {
-  0%,72% { transform:translateX(-66px); }
-  96%,100% { transform:translateX(92px); }
-}
-@keyframes premium-sparkle {
-  0%,100% { opacity:.35; transform:scale(.8); }
-  50% { opacity:1; transform:scale(1.15); }
-}
-@keyframes premium-star-lit {
-  0%,100% { opacity:1; filter:brightness(1.16) drop-shadow(0 0 6px #ffd9a0cc) drop-shadow(0 0 22px #ffd9a05e); }
-  50% { opacity:1; filter:brightness(1.22) drop-shadow(0 0 10px #ffd9a0) drop-shadow(0 0 30px #ffd9a08c); }
-}
-@media(hover:hover) {
-  .premium-card:hover:not(:disabled) .premium-art { animation:premium-star-lit 1.8s ease-in-out infinite; }
-  .premium-card:hover:not(:disabled) .premium-shine { animation-duration:1.8s; }
-}
-.premium-card:focus-visible .premium-art { animation:premium-star-lit 1.8s ease-in-out infinite; }
-.premium-card:focus-visible .premium-shine { animation-duration:1.8s; }
-[data-reduce-motion=true] .journal-script { animation:none; stroke-dasharray:none; stroke-dashoffset:0; }
-[data-reduce-motion=true] .journal-dot,
-[data-reduce-motion=true] .premium-art,
-[data-reduce-motion=true] .premium-shine,
-[data-reduce-motion=true] .premium-sparkle { animation:none; }
-[data-reduce-motion=true] .premium-card:hover:not(:disabled) .premium-art,
-[data-reduce-motion=true] .premium-card:focus-visible .premium-art {
-  animation:none;
-  filter:brightness(1.16) drop-shadow(0 0 6px #ffd9a0cc) drop-shadow(0 0 22px #ffd9a05e);
 }
 
 .preview-label span {
@@ -1876,25 +1832,20 @@ body:has(dialog[open]) {
 .premium-card {
   border:1.5px dashed #efddd58a;
   cursor:pointer;
-  /* Deep premium table felt: a dimmed lamplight falloff over strong felt
-     grain and a cloudy mottle, so the weave stays visible up close. */
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.24 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23f)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.11' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.14 0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23m)'/%3E%3C/svg%3E"),
-    radial-gradient(115% 120% at 50% 4%, #2b7a4d 0%, #1d5a37 40%, #14432a 68%, #0a2c1c 100%);
+  /* The approved premium felt artwork fills the card; the solid color is
+     only the backdrop while the photo loads. */
+  overflow:hidden;
+  background:#0a2c1c;
 }
-.premium-felt { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-.premium-art {
+.premium-photo {
   position:absolute;
-  top:16%;
-  left:50%;
-  width:43%;
-  aspect-ratio:1;
-  transform:translateX(-50%);
-  opacity:.75;
-}
-.premium-art svg { display:block; width:100%; height:100%; overflow:visible; }
-.premium-label strong { opacity:.85; }
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+}.premium-label strong { opacity:.85; }
 .premium-label em { color:#ffd9a0; }
 .premium-field { display:block; margin-top:16px; text-align:left; }
 .premium-field span { display:block; font-size:12px; font-weight:600; color:#fff4e9; margin-bottom:6px; }
