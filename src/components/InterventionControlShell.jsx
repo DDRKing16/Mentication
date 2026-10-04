@@ -39,7 +39,7 @@ export default function InterventionControlShell({
   };
 
   return (
-    <div className={`${className} intervention-control-shell min-h-dvh text-white ${active ? "pb-32" : "pb-16"}`} style={{ "--intervention-accent": accent, "--nf-accent": accent, "--flag-accent": accent }} data-intervention={id} data-quiet={quiet || undefined}>
+    <div className={`${className} intervention-control-shell min-h-dvh overflow-x-hidden text-white ${active ? "pb-32" : "pb-20"}`} style={{ "--intervention-accent": accent, "--nf-accent": accent, "--flag-accent": accent }} data-intervention={id} data-quiet={quiet || undefined}>
       {field}
       <header className="relative z-20 flex items-center justify-between gap-3 p-4 sm:p-6">
         <button onClick={onBack} aria-label="Go back" className="brand-chrome-btn grid min-h-11 min-w-11 place-items-center rounded-full"><ArrowLeft className="h-5 w-5" /></button>
@@ -56,7 +56,7 @@ export default function InterventionControlShell({
       {/* The Mentication Thread: progress is a coral thread being drawn. */}
       <BrandThreadProgress id={id} stage={stage} stages={stages} />
 
-      <main className="relative z-10">{children}</main>
+      <main className="relative z-10 min-h-0">{children}</main>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto flex w-full flex-col items-center gap-2 bg-gradient-to-t from-black/55 via-black/25 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
         {bottomActionLabel && onBottomAction
