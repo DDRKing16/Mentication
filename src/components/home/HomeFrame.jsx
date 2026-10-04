@@ -57,6 +57,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
           data.bridgeId !== bridgeId.current) return;
       if (data.type === 'ready') {
         setReady(true);
+        send('audio-owner', { owner: 'host' });
         send('week', { week: callbacks.current.week });
         if (callbacks.current.today) send('today', { today: callbacks.current.today });
         if (callbacks.current.palace) send('palace', { palace: callbacks.current.palace });
