@@ -136,6 +136,18 @@
   border: 1px solid var(--tof-line); background: transparent; color: var(--tof-text);
 }
 .tof-pill[aria-pressed="true"] { background: rgba(0, 245, 212, 0.14); border-color: rgba(0, 245, 212, 0.6); color: var(--tof-accent); }
+.tof-lens-actions { margin-left: auto; display: flex; gap: 0.4rem; }
+.tof-lens-actions button {
+  min-height: 2.5rem; border-radius: 999px; border: 1px solid var(--tof-line);
+  background: transparent; color: var(--tof-text); padding: 0 0.75rem; font: inherit; font-size: 0.8rem;
+}
+.tof-lens-actions button[aria-pressed="true"] {
+  border-color: rgba(0, 245, 212, 0.72); background: rgba(0, 245, 212, 0.14); color: var(--tof-accent);
+}
+@media (max-width: 430px) {
+  .tof-option { align-items: flex-start; flex-wrap: wrap; }
+  .tof-lens-actions { width: 100%; margin-left: 0; padding-left: 2.35rem; }
+}
 
 /* ---- Evidence ---- */
 .tof-evidence { display: flex; flex-direction: column; gap: 2rem; }
