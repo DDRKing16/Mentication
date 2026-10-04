@@ -15,7 +15,7 @@ export default function StandaloneFrame({ id, name, src, background = "#02050B",
         <div className="relative shrink-0" style={{ height: "calc(3.5rem + env(safe-area-inset-top))" }}>
           <InterventionNav position="absolute" tone={tone} back={nav.back !== false} home={nav.home !== false} />
         </div>
-        <iframe title={name} src={src} className="min-h-0 w-full flex-1 border-0" allow="autoplay" />
+        <iframe title={name} src={src} className="min-h-0 w-full flex-1 border-0" allow="autoplay" style={{ width: "100%", maxWidth: "none" }} />
       </main>
     </WithBrandThreshold>
   );
