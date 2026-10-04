@@ -140,17 +140,26 @@ const fade = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, ex
 function CaptureStage({ thought, setThought, onContinue }) {
   const hasThought = cleanSentence(thought).length >= 3;
   const nearingLimit = thought.length >= 320;
+  const suggestions = [
+    "I made a mistake.",
+    "Something is going to go wrong.",
+    "They probably think badly of me.",
+    "I should be handling this better.",
+  ];
   return (
     <motion.div className="tof-stage" {...fade}>
-      <Heading title="What’s the thought?" body="Write it as it appears in your mind. One is enough." />
-      <textarea className="tof-field" value={thought} onChange={(event) => setThought(event.target.value)} maxLength={360} rows={5} placeholder="For example: I made a mistake." aria-label="The thought you want to look at" aria-describedby="tof-capture-privacy" />
+      <Heading title="What’s the thought?" body="Type your own, or tap a starting point and edit it if needed." />
+      <div className="tof-chips" aria-label="Suggested thoughts">
+        {suggestions.map((suggestion) => <button key={suggestion} type="button" className="tof-pill" onClick={() => setThought(suggestion)}>{suggestion}</button>)}
+      </div>
+      <textarea className="tof-field" value={thought} onChange={(event) => setThought(event.target.value)} maxLength={360} rows={4} placeholder="For example: I made a mistake." aria-label="The thought you want to look at" aria-describedby="tof-capture-privacy" />
       <p id="tof-capture-privacy" className="tof-note"><LockKeyhole aria-hidden="true" /> Private on this device{nearingLimit ? ` · ${thought.length}/360` : ""}</p>
       <div className="tof-actions"><Button disabled={!hasThought} onClick={onContinue}>Continue <ArrowRight /></Button></div>
     </motion.div>
   );
 }
 
-function SortStage({ claim, selected, setSelected, onSelect }) {
+function SortStage({ claim, selected, setSelected, onSelect, currentIndex = 0, total = 1 }) {
   const matches = findThinkingTrapLanguage(claim);
   const suggested = matches.map(({ id }) => id);
   const toggle = (id) => setSelected(selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id]);
@@ -158,7 +167,7 @@ function SortStage({ claim, selected, setSelected, onSelect }) {
   const otherTraps = THINKING_TRAPS.filter((trap) => !suggested.includes(trap.id));
   return (
     <motion.div className="tof-stage" {...fade}>
-      <Heading eyebrow="Your thought" title="What kind of thought is this?" />
+      <Heading eyebrow={total > 1 ? `Part ${currentIndex + 1} of ${total}` : "Your thought"} title="What kind of thought is this?" />
       <q className="tof-quote">{claim}</q>
       <div className="tof-options" role="group" aria-label="Ways to describe this thought">
         {CATEGORIES.map((category) => {
@@ -354,6 +363,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
     certaintyBefore: Number.isInteger(initialCertainty) ? initialCertainty : null,
     certaintyAfter: Number.isInteger(initialCertainty) ? initialCertainty : 5,
     fragments: [],
+    sortIndex: 0,
     assignments: {},
     support: [],
     alternatives: [],
@@ -373,6 +383,8 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   };
 
   const fragments = data.fragments?.length ? data.fragments : splitThought(data.thought);
+  const sortIndex = Math.min(Math.max(0, data.sortIndex || 0), Math.max(0, fragments.length - 1));
+  const currentFragment = fragments[sortIndex] || { id: "fragment-0", text: data.refinedClaim || data.thought };
 
   useEffect(() => {
     saveActiveFlagship({ interventionId: "factCheck", step: stageIndex, data: normaliseThoughtOrFactDraft({ ...data, fragments, stage }) });
@@ -438,8 +450,12 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   };
 
   const back = () => {
+    if (stage === "sort" && sortIndex > 0) {
+      update({ sortIndex: sortIndex - 1 });
+      return;
+    }
     const previous = { sort: "capture", evidence: "sort", ruling: "evidence", direction: "ruling", complete: "direction" }[stage];
-    if (previous) go(previous);
+    if (previous) go(previous, previous === "sort" ? { sortIndex: Math.max(0, fragments.length - 1) } : {});
     else onExit?.();
   };
 
@@ -466,8 +482,12 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
         <div className="tof-live-region sr-only" role="status" aria-live="polite">{stageAnnouncement}</div>
         {stepFor(stage) > 0 && <Steps current={stepFor(stage)} />}
         <AnimatePresence initial={false}>
-          {stage === "capture" && <CaptureStage key="capture" thought={data.thought} setThought={(thought) => update({ thought })} onContinue={() => go("sort", { refinedClaim: data.thought, fragments: splitThought(data.thought), assignments: {} })} />}
-          {stage === "sort" && <SortStage key="sort" claim={data.refinedClaim ?? data.thought} selected={data.distortions || []} setSelected={(distortions) => update({ distortions })} onSelect={(category) => { const assignments = Object.fromEntries(fragments.map((fragment) => [fragment.id, category])); go("evidence", { assignments }); }} />}
+          {stage === "capture" && <CaptureStage key="capture" thought={data.thought} setThought={(thought) => update({ thought })} onContinue={() => go("sort", { refinedClaim: data.thought, fragments: splitThought(data.thought), assignments: {}, sortIndex: 0 })} />}
+          {stage === "sort" && <SortStage key={`sort-${sortIndex}`} claim={currentFragment.text} currentIndex={sortIndex} total={fragments.length || 1} selected={data.distortions || []} setSelected={(distortions) => update({ distortions })} onSelect={(category) => {
+            const assignments = { ...(data.assignments || {}), [currentFragment.id]: category };
+            if (sortIndex < fragments.length - 1) update({ assignments, sortIndex: sortIndex + 1 });
+            else go("evidence", { assignments, sortIndex });
+          }} />}
           {stage === "evidence" && <EvidenceStage key="evidence" data={data} update={update} onContinue={() => go("ruling", { fairerView: createFairerView() })} />}
           {stage === "ruling" && <RulingStage key="ruling" fairerView={data.fairerView || createFairerView()} initialFairerView={createFairerView()} certaintyBefore={data.certaintyBefore} rating={Number.isInteger(data.certaintyAfter) && data.certaintyAfter >= 0 && data.certaintyAfter <= 10 ? data.certaintyAfter : 5} setRating={(certaintyAfter) => update({ certaintyAfter })} updateFairerView={(fairerView) => update({ fairerView })} onContinue={() => go("direction")} onUnresolved={() => go("direction", { direction: "unresolved" })} />}
           {stage === "direction" && <DirectionStage key="direction" hasPrediction={hasPrediction} hasActionable={hasActionable} predictionText={predictionText} knownContext={knownContext} openContext={openContext} onFinish={() => go("complete")} onAction={() => launch("nextAction")} onTest={() => { recordHandoffDecision("factCheck", "testPrediction", "accepted"); clearActiveFlagship("factCheck"); navigate("/reset", { replace: true, state: { prebuilt: true, pathway: ["testPrediction"], direction: "lift", directionLabel: "Test the Prediction", intensity: answers?.intensity || 5, whereFelt: "thoughts", timeMin: 4, audio: answers?.audio || "yes" } }); }} onGround={() => launch("grounding54321V2")} />}
