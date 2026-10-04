@@ -185,16 +185,8 @@
   });
 
   document.querySelectorAll('[data-route]').forEach(button => button.addEventListener('click', () => {
-    // Goal blobs play a short lava-lamp pulse before the destination opens;
-    // skipped when the visitor prefers stillness.
-    if (button.classList.contains('goal') && !prefersStillness()) {
-      button.classList.add('is-blobbing');
-      setTimeout(() => {
-        button.classList.remove('is-blobbing');
-        navigate(button.dataset.route, button);
-      }, 460);
-      return;
-    }
+    // Navigate immediately. Avoid delaying route changes for decorative tap
+    // feedback because the pause is perceptible and can cause audio stutter.
     navigate(button.dataset.route, button);
   }));
 
