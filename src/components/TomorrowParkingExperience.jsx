@@ -135,7 +135,7 @@ export default function TomorrowParkingExperience({ intervention, onAttemptEvent
   }
 
   return (
-    <main className="tpl" style={{ position: "relative", overflow: "hidden" }} data-intervention={ID}>
+    <main className="tpl" style={{ position: "relative", overflowX: "hidden", overflowY: "auto", overscrollBehaviorY: "contain" }} data-intervention={ID}>
       {step !== "darkness" && <ThoughtLines still={backgrounded} intensity={0.5} style={{ opacity: 0.7 }} />}
 
       <div className="tpl-frame">

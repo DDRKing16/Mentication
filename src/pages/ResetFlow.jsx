@@ -41,6 +41,7 @@ import { sessionStore } from "@/lib/localData";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
+import { pauseHomeAmbient, resumeHomeAmbient } from "@/lib/homeAmbient";
 import { maybeRequestReview } from "@/lib/reviewPrompt";
 import {
   createInitialResetAnswers,
@@ -109,6 +110,13 @@ export default function ResetFlow() {
     }).catch(() => {});
     return () => { mounted = false; };
   }, []);
+
+  // Home ambient continues through every setup / rating / pathway screen.
+  // It stops only once the user has explicitly begun an intervention.
+  useEffect(() => {
+    if (phase === "guiding") pauseHomeAmbient();
+    else resumeHomeAmbient();
+  }, [phase]);
 
   // immediate mode skips questions — show a brief building animation, then the pathway
   useEffect(() => {
@@ -355,20 +363,19 @@ export default function ResetFlow() {
   const beginGuided = () => {
     const first = pathway[0];
     if (!first) return;
+    pauseHomeAmbient();
     attemptLogRef.current = [];
     pendingCompletionRef.current = null;
     setActivePathway([first]);
     setUsedIds([first.id]);
     setPlanRemaining(Math.max(0, (answers.timeMin || 5) - segmentMinutes([first])));
     setLastValue(answers.intensity ?? 5);
-    window.dispatchEvent(new Event("mentication:ambient-pause"));
     advance({ phase: "guiding" });
   };
 
   const onSegmentComplete = () => {
     setCheckinValue(lastValue);
     setRemaining(null);
-    window.dispatchEvent(new Event("mentication:ambient-resume"));
     advance({ phase: "checkpoint" });
   };
 
@@ -397,7 +404,6 @@ export default function ResetFlow() {
     }
     setLastValue(nextIntensity);
     setCheckinValue(null);
-    window.dispatchEvent(new Event("mentication:ambient-pause"));
     advance({ phase: "guiding" });
   };
 
@@ -408,7 +414,6 @@ export default function ResetFlow() {
     commitPendingPulse(nextIntensity);
     setLastValue(nextIntensity);
     setCheckinValue(null);
-    window.dispatchEvent(new Event("mentication:ambient-pause"));
     advance({ phase: "guiding" });
   };
 
@@ -445,7 +450,6 @@ export default function ResetFlow() {
     const finalValue = checkinValue ?? lastValue;
     commitPendingPulse(finalValue);
     setEndIntensity(finalValue);
-    window.dispatchEvent(new Event("mentication:ambient-resume"));
     advance({ phase: "reflect" });
   };
 

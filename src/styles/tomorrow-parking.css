@@ -136,13 +136,13 @@
   display: flex;
   min-height: 100dvh;
   width: 100%;
-  max-width: 100%;
+  max-width: none;
   flex-direction: column;
-  padding: calc(env(safe-area-inset-top, 0px) + 1rem) 1rem calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
+  padding: calc(env(safe-area-inset-top, 0px) + 1.25rem) 1.25rem calc(env(safe-area-inset-bottom, 0px) + 2.5rem);
 }
 
-@media (min-width: 600px) {
-  .tpl-frame { padding-left: 1.5rem; padding-right: 1.5rem; }
+@media (min-width: 360px) {
+  .tpl-frame { padding-left: 1.1rem; padding-right: 1.1rem; }
 }
 
 .tpl-topbar {
@@ -729,4 +729,26 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* Short-screen fit pass: preserve the full composition first, with scrolling only as fallback. */
+@media (max-height: 760px) {
+  .tpl-frame {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 0.65rem);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+  .tpl-h1 { font-size: 1.75rem; }
+  .tpl-lede { margin-top: 0.35rem; font-size: 0.98rem; }
+  .tpl-writing { min-height: 13.5rem; margin-top: 0.75rem; }
+  .tpl-writing__label { padding-top: 0.9rem; }
+  .tpl-writing__input {
+    min-height: 6rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.65rem;
+    font-size: 1.15rem;
+    line-height: 1.85rem;
+  }
+  .tpl-suggest { padding: 0.75rem; }
+  .tpl-btn--lg { min-height: 3.15rem; }
+  .tpl-chip { min-height: 2.6rem; padding-top: 0.4rem; padding-bottom: 0.4rem; }
 }

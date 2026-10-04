@@ -134,7 +134,18 @@
     }
     const event = new CustomEvent('mentication:navigate', { bubbles: true, cancelable: true, detail: { route, label: ROUTES[route] } });
     if (!window.dispatchEvent(event)) return;
-    if (bridgeConnected) { sendBridge('navigate', { route }); return; }
+    if (bridgeConnected) {
+      sendBridge('navigate', {
+        route,
+        ambient: {
+          currentTime: Number.isFinite(bgMusic.currentTime) ? bgMusic.currentTime : 0,
+          volume: bgMusic.volume,
+          playing: !bgMusic.paused,
+        },
+      });
+      if (!bgMusic.paused) bgMusic.pause();
+      return;
+    }
     showDestinationPreview(route, opener);
   }
   // Lava-lamp layer drawn inside each goal's own clip shape, so only the blob lights up.
@@ -174,16 +185,8 @@
   });
 
   document.querySelectorAll('[data-route]').forEach(button => button.addEventListener('click', () => {
-    // Goal blobs play a short lava-lamp pulse before the destination opens;
-    // skipped when the visitor prefers stillness.
-    if (button.classList.contains('goal') && !prefersStillness()) {
-      button.classList.add('is-blobbing');
-      setTimeout(() => {
-        button.classList.remove('is-blobbing');
-        navigate(button.dataset.route, button);
-      }, 460);
-      return;
-    }
+    // Navigate immediately. Avoid delaying route changes for decorative tap
+    // feedback because the pause is perceptible and can cause audio stutter.
     navigate(button.dataset.route, button);
   }));
 
@@ -329,9 +332,6 @@
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'viewport' && Number.isFinite(data.top) && data.top >= 0 && Number.isFinite(data.height) && data.height >= 1 && data.height <= 20000) {
       root.style.setProperty('--dialog-top', `${data.top + data.height / 2}px`);
       root.style.setProperty('--dialog-max-height', `${Math.max(100, data.height - 32)}px`);
-    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'audio-owner' && data.owner === 'host') {
-      root.dataset.hostAudio = 'true';
-      document.getElementById('bg-music')?.pause();
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'week') {
       try { setWeek(data.week); } catch { sendBridge('error', { code: 'INVALID_WEEK' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'today') {
@@ -391,7 +391,14 @@
   const bgMusic = document.getElementById('bg-music');
   bgMusic.volume = 0.35;
   const startMusic = () => {
-    if (root.dataset.hostAudio === 'true') return;
+    // In the real app the parent owns the persistent audio element so music
+    // survives route changes and resumes from the same position.
+    if (bridgeConnected) {
+      sendBridge('ambient-start');
+      document.removeEventListener('pointerdown', startMusic, true);
+      document.removeEventListener('keydown', startMusic, true);
+      return;
+    }
     bgMusic.play().then(() => {
       document.removeEventListener('pointerdown', startMusic, true);
       document.removeEventListener('keydown', startMusic, true);

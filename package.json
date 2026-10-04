@@ -15,7 +15,8 @@
     "ios:open": "npx cap open ios",
     "test": "vitest run",
     "narration:audit": "node scripts/final50-narration.mjs --audit",
-    "narration:generate-final50": "node scripts/final50-narration.mjs --generate"
+    "narration:generate-final50": "node scripts/final50-narration.mjs --generate",
+    "prebuild": "node scripts/build-home-document.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.1",

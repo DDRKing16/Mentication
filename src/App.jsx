@@ -20,7 +20,6 @@ import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
 import { hasCompletedOnboarding } from '@/lib/onboarding';
 import WithBrandThreshold from '@/components/brand/WithBrandThreshold';
-import AmbientHomeMusic from '@/components/AmbientHomeMusic';
 
 // Route page components are loaded on demand to keep the initial bundle small.
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
@@ -77,7 +76,7 @@ const MenticationRoutes = () => {
 
   return (
     <DirectionContext.Provider value={direction}>
-      <AnimatePresence mode="wait" custom={direction} initial={false}>
+      <AnimatePresence mode="sync" custom={direction} initial={false}>
         <motion.div
           key={groupKey}
           custom={direction}
@@ -85,7 +84,7 @@ const MenticationRoutes = () => {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
           className="min-h-full"
         >
           <ErrorBoundary key={groupKey}>
@@ -170,7 +169,6 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <ScrollToTop />
-          <AmbientHomeMusic />
           <MenticationRoutes />
         </Router>
         <Toaster />

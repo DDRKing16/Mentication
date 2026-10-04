@@ -1,0 +1,106 @@
+name: Owner mobile audit
+
+on:
+  push:
+    branches: [Chat-GPT]
+    paths:
+      - '.github/workflows/owner-mobile-audit.yml'
+      - 'scripts/owner-audit/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: owner-mobile-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    if: github.ref == 'refs/heads/Chat-GPT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install existing dependencies
+        run: npm ci
+      - name: Record baseline checks
+        run: |
+          mkdir -p audit-results
+          npm test -- --reporter=json --outputFile=audit-results/baseline-tests.json > audit-results/baseline-tests.log 2>&1 || true
+          npm run lint > audit-results/baseline-lint.log 2>&1 || true
+          npm run typecheck > audit-results/baseline-types.log 2>&1 || true
+      - name: Apply reviewed owner corrections when present
+        run: |
+          if test -f scripts/owner-audit/apply.mjs; then
+            node scripts/owner-audit/apply.mjs
+          fi
+          git diff --exit-code -- src/components/HappyBumpExperience.jsx src/styles/happy-bump.css
+      - name: Build the actual application
+        run: npm run build
+      - name: Record final checks
+        run: |
+          npm test -- --reporter=json --outputFile=audit-results/final-tests.json > audit-results/final-tests.log 2>&1 || true
+          npm run lint > audit-results/final-lint.log 2>&1 || true
+          npm run typecheck > audit-results/final-types.log 2>&1 || true
+          if test -f scripts/owner-audit/compare-checks.mjs; then
+            node scripts/owner-audit/compare-checks.mjs
+          fi
+      - name: Install isolated browser test tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/owner-browser" --no-save --package-lock=false playwright@1.63.0
+          "$RUNNER_TEMP/owner-browser/node_modules/.bin/playwright" install --with-deps chromium webkit
+      - name: Open and inspect phone-sized previews
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/owner-browser/node_modules/playwright/index.mjs
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > audit-results/preview.log 2>&1 &
+          if test -f scripts/owner-audit/check.mjs; then
+            node scripts/owner-audit/check.mjs
+          else
+            node --input-type=module <<'JS'
+          import fs from 'node:fs/promises';
+          const { chromium } = await import(process.env.PLAYWRIGHT_MODULE);
+          const browser = await chromium.launch();
+          const context = await browser.newContext({ viewport: { width: 393, height: 852 }, isMobile: true, hasTouch: true });
+          await context.addInitScript(() => localStorage.setItem('haven_onboarded', '1'));
+          const page = await context.newPage();
+          for (const route of ['/', '/night-channel', '/signal-lock', '/vector-shift']) {
+            await page.goto('http://127.0.0.1:4173' + route);
+            await page.waitForTimeout(2500);
+            const frames = await Promise.all(page.frames().map(async frame => ({ url: frame.url(), text: (await frame.locator('body').innerText()).slice(0, 6000), dimensions: await frame.evaluate(() => ({ width: innerWidth, height: innerHeight, scrollWidth: document.documentElement.scrollWidth, scrollHeight: document.documentElement.scrollHeight })) })));
+            console.log('BASELINE_SCREEN ' + JSON.stringify({ route, frames }));
+            await page.screenshot({ path: 'audit-results/baseline-' + (route.slice(1) || 'home') + '.png' });
+          }
+          await browser.close();
+          await fs.writeFile('audit-results/baseline-note.txt', 'Baseline only: no owner correction script was present.\n');
+          JS
+          fi
+      - name: Publish only validated corrections to the working branch
+        run: |
+          if ! test -f audit-results/changed-paths.json; then exit 0; fi
+          git fetch origin Chat-GPT --depth=1
+          test "$(git rev-parse origin/Chat-GPT)" = "$GITHUB_SHA"
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const paths = JSON.parse(fs.readFileSync('audit-results/changed-paths.json', 'utf8'));
+          const allowed = /^(src\/|design\/home-source\/|public\/home\.html$)/;
+          if (!Array.isArray(paths) || paths.some(path => !allowed.test(path) || path.includes('..') || /HappyBumpExperience|happy-bump\.css/.test(path))) throw new Error('Unexpected correction path');
+          execFileSync('git', ['add', '--', ...paths, 'public/home.html']);
+          JS
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Apply verified owner audit corrections: music, pathways and mobile fit'
+          git push origin HEAD:Chat-GPT
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: owner-mobile-audit-${{ github.run_id }}
+          path: audit-results/
+          retention-days: 7

@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { handoffHomeAmbient, resumeHomeAmbient } from '@/lib/homeAmbient';
 
 // The home document is a self-contained static HTML asset (public/home.html,
 // built from design/home-source). Serving it as `src` lets the browser stream
 // and parse it directly — no JS bundle chunk carries the document anymore.
 const homeSrc = `${import.meta.env.BASE_URL}home.html`;
+
+const ambientResetRoutes = new Set(['lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'begin', 'recommended']);
 
 const routes = new Set([
   'lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'begin',
@@ -57,7 +60,6 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
           data.bridgeId !== bridgeId.current) return;
       if (data.type === 'ready') {
         setReady(true);
-        send('audio-owner', { owner: 'host' });
         send('week', { week: callbacks.current.week });
         if (callbacks.current.today) send('today', { today: callbacks.current.today });
         if (callbacks.current.palace) send('palace', { palace: callbacks.current.palace });
@@ -68,7 +70,12 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         setHeight(Math.ceil(data.height));
       } else if (data.type === 'home') {
         frame.current?.scrollIntoView({ block: 'start', behavior: data.reduceMotion ? 'instant' : 'smooth' });
+      } else if (data.type === 'ambient-start') {
+        resumeHomeAmbient();
       } else if (data.type === 'navigate' && routes.has(data.route)) {
+        if (ambientResetRoutes.has(data.route) && data.ambient?.playing) {
+          handoffHomeAmbient({ currentTime: data.ambient.currentTime, volume: data.ambient.volume });
+        }
         Promise.resolve().then(() => callbacks.current.onNavigate(data.route)).catch(() => {
           setError('This experience could not open. Please try again.');
         });

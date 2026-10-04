@@ -606,7 +606,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       </div>
 
       {/* stage */}
-      <div className={`relative flex flex-1 flex-col items-center justify-center ${isPMRV2 ? "px-4 sm:px-6" : "px-6"}`}>
+      <div className={`relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
         <AnimatePresence mode="wait">
           {transition ? (
             <motion.div
@@ -647,7 +647,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -16, filter: "blur(8px)" }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="flex w-full max-w-md flex-col items-center gap-6 pb-2"
+              className="flex w-full max-w-md flex-col items-center gap-4 pb-1 sm:gap-6 sm:pb-2"
             >
               {isBoxV2 ? (
                 <BoxBreathingV2Stage

@@ -1912,6 +1912,209 @@ body:has(dialog[open]) {
 .palace-star { animation:palace-star-twinkle 4.5s ease-in-out infinite; }
 [data-reduce-motion=true] .palace-star { animation:none; }
 
+
+
+/* Compact Your week card — reduce vertical dominance without removing content. */
+.week-panel {
+  min-height:0;
+  padding:10px 18px 7px 24px;
+  gap:14px;
+  border-radius:30px;
+}
+.week-info h2 {
+  font-size:12px;
+  line-height:1.25;
+  letter-spacing:3px;
+}
+.week-info h2 .icon {
+  width:12px;
+  height:12px;
+}
+.week-info p {
+  margin:4px 0 0;
+  font-size:13px;
+  line-height:1.2;
+}
+.week-track-wrap {
+  margin-top:6px;
+}
+.week-track {
+  height:38px;
+}
+.week-day::after {
+  font-size:9px;
+}
+.week-actions {
+  gap:5px;
+}
+.begin-button {
+  min-height:35px;
+  gap:9px;
+  font-size:14px;
+}
+.begin-button::before {
+  content:"";
+  position:absolute;
+  inset:-5px 0;
+}
+.begin-button .icon {
+  width:14px;
+  height:14px;
+}
+.palace-badge {
+  gap:3px 7px;
+}
+.palace-badge-icon {
+  width:48px;
+  height:48px;
+  padding:4px;
+  border-radius:12px;
+}
+.palace-badge-art {
+  border-radius:8px;
+}
+.palace-badge-title {
+  font-size:8px;
+  letter-spacing:1.2px;
+}
+.palace-badge-strip strong {
+  font-size:11px;
+}
+.palace-badge-strip em {
+  font-size:8px;
+}
+.palace-badge-line {
+  gap:3px;
+}
+.seven-days {
+  min-height:22px;
+  padding:0 4px;
+  gap:4px;
+  font-size:11px;
+}
+.seven-days .icon {
+  width:14px;
+}
+
+@media (min-width:701px) and (max-width:948px) {
+  .week-panel {
+    min-height:0;
+    padding:1.05cqw 1.9cqw .74cqw 2.53cqw;
+    gap:1.48cqw;
+    border-radius:3.16cqw;
+  }
+  .week-info h2 {
+    font-size:1.26cqw;
+    letter-spacing:.32cqw;
+  }
+  .week-info p {
+    font-size:1.37cqw;
+    margin:.42cqw 0 0;
+  }
+  .week-track-wrap {
+    margin-top:.63cqw;
+  }
+  .begin-button {
+    min-height:3.69cqw;
+    font-size:1.47cqw;
+  }
+  .seven-days {
+    min-height:22px;
+    font-size:1.16cqw;
+  }
+}
+
+@media(max-width:700px) {
+  .week-panel {
+    grid-template-columns:minmax(0,1fr) minmax(128px,42%);
+    align-items:center;
+    padding:10px 11px 8px 14px;
+    gap:9px;
+    border-radius:22px;
+  }
+  .week-info h2 {
+    font-size:10px;
+    letter-spacing:2.2px;
+  }
+  .week-info h2 .icon {
+    width:10px;
+    height:10px;
+  }
+  .week-track-wrap {
+    margin-top:5px;
+    max-width:none;
+  }
+  .week-track {
+    height:34px;
+  }
+  .week-path {
+    height:30px;
+  }
+  .week-day::after {
+    font-size:8px;
+    letter-spacing:1px;
+  }
+  .week-circle {
+    width:12px;
+    height:12px;
+    margin:-6px 0 0 -6px;
+  }
+  .week-day.is-current .week-circle {
+    width:15px;
+    height:15px;
+    margin:-7.5px 0 0 -7.5px;
+  }
+  .week-info p {
+    font-size:11px;
+    margin:2px 0 0;
+  }
+  .week-actions {
+    grid-template-columns:1fr;
+    gap:4px;
+  }
+  .begin-button {
+    min-height:42px;
+    font-size:18px;
+    gap:8px;
+  }
+  .begin-button .icon {
+    width:18px;
+    height:18px;
+  }
+  .palace-badge {
+    gap:2px 5px;
+  }
+  .palace-badge-icon {
+    width:46px;
+    height:46px;
+    padding:4px;
+  }
+  .seven-days {
+    min-height:20px;
+    justify-content:flex-end;
+    font-size:10px;
+    padding:0;
+  }
+  .palace-badge-strip strong {
+    font-size:10px;
+  }
+  .palace-badge-title,
+  .palace-badge-strip em {
+    font-size:7px;
+  }
+}
+
+@media(max-width:420px) {
+  .week-panel {
+    grid-template-columns:minmax(0,1fr) 132px;
+  }
+  .seven-days {
+    white-space:normal;
+    line-height:1.05;
+    text-align:right;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2241,7 +2444,18 @@ function palaceSvg(level, options) {
     }
     const event = new CustomEvent('mentication:navigate', { bubbles: true, cancelable: true, detail: { route, label: ROUTES[route] } });
     if (!window.dispatchEvent(event)) return;
-    if (bridgeConnected) { sendBridge('navigate', { route }); return; }
+    if (bridgeConnected) {
+      sendBridge('navigate', {
+        route,
+        ambient: {
+          currentTime: Number.isFinite(bgMusic.currentTime) ? bgMusic.currentTime : 0,
+          volume: bgMusic.volume,
+          playing: !bgMusic.paused,
+        },
+      });
+      if (!bgMusic.paused) bgMusic.pause();
+      return;
+    }
     showDestinationPreview(route, opener);
   }
   // Lava-lamp layer drawn inside each goal's own clip shape, so only the blob lights up.
