@@ -150,29 +150,33 @@ function CaptureStage({ thought, setThought, onContinue }) {
   );
 }
 
-function SortStage({ claim, selected, setSelected, onSelect }) {
+function SortStage({ claim, selected, setSelected, reviewed = {}, setReviewed, onContinue }) {
   const matches = findThinkingTrapLanguage(claim);
   const suggested = matches.map(({ id }) => id);
   const toggle = (id) => setSelected(selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id]);
   const suggestedTraps = THINKING_TRAPS.filter((trap) => suggested.includes(trap.id));
   const otherTraps = THINKING_TRAPS.filter((trap) => !suggested.includes(trap.id));
+  const complete = CATEGORIES.every((category) => reviewed[category.id] === "yes" || reviewed[category.id] === "no");
   return (
     <motion.div className="tof-stage" {...fade}>
-      <Heading eyebrow="Your thought" title="What kind of thought is this?" />
+      <Heading eyebrow="Your thought" title="Check it from every angle." body="Work through each lens. There is no right category." />
       <q className="tof-quote">{claim}</q>
-      <div className="tof-options" role="group" aria-label="Ways to describe this thought">
+      <div className="tof-options" role="group" aria-label="Thought lenses to check">
         {CATEGORIES.map((category) => {
           const Icon = category.icon;
+          const answer = reviewed[category.id];
           return (
-            <button key={category.id} type="button" className="tof-option" onClick={() => onSelect(category.id)}>
+            <section key={category.id} className="tof-option" aria-label={category.label}>
               <Icon aria-hidden="true" />
               <span><strong>{category.label}</strong><small>{category.short}</small></span>
-              <ChevronRight aria-hidden="true" />
-            </button>
+              <div className="tof-lens-actions">
+                <button type="button" aria-pressed={answer === "yes"} onClick={() => setReviewed({ ...reviewed, [category.id]: "yes" })}>Fits</button>
+                <button type="button" aria-pressed={answer === "no"} onClick={() => setReviewed({ ...reviewed, [category.id]: "no" })}>Not this</button>
+              </div>
+            </section>
           );
         })}
       </div>
-      <p className="tof-sub">Choose the closest fit. You can adjust it later.</p>
       <section className="tof-patterns" aria-label="Thinking patterns">
         {suggestedTraps.length > 0 && <>
           <h2>Your words may include</h2>
@@ -191,6 +195,9 @@ function SortStage({ claim, selected, setSelected, onSelect }) {
           </div>
         </details>
       </section>
+      <div className="tof-actions">
+        <Button disabled={!complete} onClick={onContinue}>Continue <ArrowRight /></Button>
+      </div>
     </motion.div>
   );
 }
@@ -467,7 +474,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
         {stepFor(stage) > 0 && <Steps current={stepFor(stage)} />}
         <AnimatePresence initial={false}>
           {stage === "capture" && <CaptureStage key="capture" thought={data.thought} setThought={(thought) => update({ thought })} onContinue={() => go("sort", { refinedClaim: data.thought, fragments: splitThought(data.thought), assignments: {} })} />}
-          {stage === "sort" && <SortStage key="sort" claim={data.refinedClaim ?? data.thought} selected={data.distortions || []} setSelected={(distortions) => update({ distortions })} onSelect={(category) => { const assignments = Object.fromEntries(fragments.map((fragment) => [fragment.id, category])); go("evidence", { assignments }); }} />}
+          {stage === "sort" && <SortStage key="sort" claim={data.refinedClaim ?? data.thought} selected={data.distortions || []} setSelected={(distortions) => update({ distortions })} reviewed={data.categoryReview || {}} setReviewed={(categoryReview) => update({ categoryReview })} onContinue={() => { const fits = CATEGORIES.filter((category) => data.categoryReview?.[category.id] === "yes").map((category) => category.id); const category = fits[0] || "interpretation"; const assignments = Object.fromEntries(fragments.map((fragment) => [fragment.id, category])); go("evidence", { assignments, reviewedCategories: fits }); }} />}
           {stage === "evidence" && <EvidenceStage key="evidence" data={data} update={update} onContinue={() => go("ruling", { fairerView: createFairerView() })} />}
           {stage === "ruling" && <RulingStage key="ruling" fairerView={data.fairerView || createFairerView()} initialFairerView={createFairerView()} certaintyBefore={data.certaintyBefore} rating={Number.isInteger(data.certaintyAfter) && data.certaintyAfter >= 0 && data.certaintyAfter <= 10 ? data.certaintyAfter : 5} setRating={(certaintyAfter) => update({ certaintyAfter })} updateFairerView={(fairerView) => update({ fairerView })} onContinue={() => go("direction")} onUnresolved={() => go("direction", { direction: "unresolved" })} />}
           {stage === "direction" && <DirectionStage key="direction" hasPrediction={hasPrediction} hasActionable={hasActionable} predictionText={predictionText} knownContext={knownContext} openContext={openContext} onFinish={() => go("complete")} onAction={() => launch("nextAction")} onTest={() => { recordHandoffDecision("factCheck", "testPrediction", "accepted"); clearActiveFlagship("factCheck"); navigate("/reset", { replace: true, state: { prebuilt: true, pathway: ["testPrediction"], direction: "lift", directionLabel: "Test the Prediction", intensity: answers?.intensity || 5, whereFelt: "thoughts", timeMin: 4, audio: answers?.audio || "yes" } }); }} onGround={() => launch("grounding54321V2")} />}
