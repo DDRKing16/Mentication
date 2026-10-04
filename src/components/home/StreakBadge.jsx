@@ -31,7 +31,7 @@ export default function StreakBadge() {
 
   return (
     <div
-      className="pointer-events-none absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 backdrop-blur-sm"
+      className="pointer-events-none absolute right-20 top-14 z-10 flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1.5 backdrop-blur-sm"
       aria-label={`${count} day streak`}
     >
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#C9A84C" strokeWidth="1.5" aria-hidden="true">

@@ -226,7 +226,7 @@ export default function Home() {
           setMusicMuted(next);
         }}
         className="fixed right-4 z-[65] grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-black/30 text-white shadow-lg backdrop-blur-md active:scale-95"
-        style={{ top: "max(0.75rem, env(safe-area-inset-top))" }}
+        style={{ top: "calc(max(0.75rem, env(safe-area-inset-top)) + 44px)" }}
       >
         {musicMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </button>
