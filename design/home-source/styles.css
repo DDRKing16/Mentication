@@ -1385,6 +1385,8 @@ body:has(dialog[open]) {
     margin-right:0;
     padding-right:0;
     padding-top:6px;
+    overflow:hidden;
+    scroll-snap-type:none;
   }
   .discovery {
     border-radius:16px;
