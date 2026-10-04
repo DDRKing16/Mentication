@@ -144,6 +144,9 @@ function CaptureStage({ thought, setThought, onContinue }) {
     <motion.div className="tof-stage" {...fade}>
       <Heading title="What’s the thought?" body="Write it as it appears in your mind. One is enough." />
       <textarea className="tof-field" value={thought} onChange={(event) => setThought(event.target.value)} maxLength={360} rows={5} placeholder="For example: I made a mistake." aria-label="The thought you want to look at" aria-describedby="tof-capture-privacy" />
+      <div className="tof-chips" aria-label="Suggested thoughts">
+        {["I made a mistake.", "They might be upset with me.", "Something bad could happen."].map((suggestion) => <button key={suggestion} type="button" className="tof-pill" onClick={() => setThought(suggestion)}>{suggestion}</button>)}
+      </div>
       <p id="tof-capture-privacy" className="tof-note"><LockKeyhole aria-hidden="true" /> Private on this device{nearingLimit ? ` · ${thought.length}/360` : ""}</p>
       <div className="tof-actions"><Button disabled={!hasThought} onClick={onContinue}>Continue <ArrowRight /></Button></div>
     </motion.div>
@@ -202,7 +205,7 @@ function SortStage({ claim, selected, setSelected, reviewed = {}, setReviewed, o
   );
 }
 
-function EvidenceField({ title, hint, placeholder, entries, draft, setDraft, onAdd, onRemove }) {
+function EvidenceField({ title, hint, placeholder, entries, draft, setDraft, onAdd, onRemove, suggestions = [], onSuggestion }) {
   return (
     <section className="tof-evidence-block" aria-label={title}>
       <div><h2>{title}</h2><p>{hint}</p></div>
@@ -216,6 +219,11 @@ function EvidenceField({ title, hint, placeholder, entries, draft, setDraft, onA
               </motion.div>
             ))}
           </AnimatePresence>
+        </div>
+      )}
+      {entries.length < 3 && suggestions.length > 0 && (
+        <div className="tof-chips" aria-label={`${title} suggestions`}>
+          {suggestions.map((suggestion) => <button key={suggestion} type="button" className="tof-pill" onClick={() => onSuggestion?.(suggestion)}>{suggestion}</button>)}
         </div>
       )}
       {entries.length < 3 && (
@@ -242,12 +250,17 @@ function EvidenceStage({ data, update, onContinue }) {
     setDrafts((current) => ({ ...current, [lane.id]: "" }));
   };
   const remove = (lane, index) => update({ [lane.key]: (data[lane.key] || []).filter((_, entryIndex) => entryIndex !== index) });
+  const addSuggestion = (lane, suggestion) => {
+    const entries = data[lane.key] || [];
+    if (entries.length >= 3 || entries.includes(suggestion)) return;
+    update({ [lane.key]: [...entries, suggestion] });
+  };
   return (
     <motion.div className="tof-stage" {...fade}>
       <Heading title="Look at it from both sides." body="None of this has to be perfect, and you can skip any of it." />
       <div className="tof-evidence">
         {lanes.map((lane) => (
-          <EvidenceField key={lane.id} title={lane.title} hint={lane.hint} placeholder={lane.placeholder} entries={data[lane.key] || []} draft={drafts[lane.id]} setDraft={(value) => setDrafts((current) => ({ ...current, [lane.id]: value }))} onAdd={() => add(lane)} onRemove={(index) => remove(lane, index)} />
+          <EvidenceField key={lane.id} title={lane.title} hint={lane.hint} placeholder={lane.placeholder} entries={data[lane.key] || []} draft={drafts[lane.id]} setDraft={(value) => setDrafts((current) => ({ ...current, [lane.id]: value }))} onAdd={() => add(lane)} onRemove={(index) => remove(lane, index)} suggestions={lane.id === "support" ? ["I noticed something specific.", "This has happened before.", "Someone said this directly."] : ["There may be another explanation.", "I do not know the full picture yet.", "There is at least one exception."]} onSuggestion={(suggestion) => addSuggestion(lane, suggestion)} />
         ))}
       </div>
       <div className="tof-actions">
@@ -334,6 +347,9 @@ function CompletionStage({ thought, fairerView, returnPhrase, setReturnPhrase, s
       <label className="tof-evidence-block">
         <p>If this thought returns, I can remember:</p>
         <input className="tof-field" value={returnPhrase} onChange={(event) => setReturnPhrase(event.target.value)} maxLength={140} placeholder="A short phrase for yourself" />
+        <div className="tof-chips" aria-label="Suggested reminder phrases">
+          {["I can wait for more information.", "A feeling is not the whole picture.", "I can come back to what I know."].map((suggestion) => <button key={suggestion} type="button" className="tof-pill" onClick={() => setReturnPhrase(suggestion)}>{suggestion}</button>)}
+        </div>
       </label>
       <div className="tof-actions">
         <Button onClick={onFinish}>Finish</Button>
