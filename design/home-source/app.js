@@ -329,6 +329,9 @@
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'viewport' && Number.isFinite(data.top) && data.top >= 0 && Number.isFinite(data.height) && data.height >= 1 && data.height <= 20000) {
       root.style.setProperty('--dialog-top', `${data.top + data.height / 2}px`);
       root.style.setProperty('--dialog-max-height', `${Math.max(100, data.height - 32)}px`);
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'audio-owner' && data.owner === 'host') {
+      root.dataset.hostAudio = 'true';
+      document.getElementById('bg-music')?.pause();
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'week') {
       try { setWeek(data.week); } catch { sendBridge('error', { code: 'INVALID_WEEK' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'today') {
@@ -388,6 +391,7 @@
   const bgMusic = document.getElementById('bg-music');
   bgMusic.volume = 0.35;
   const startMusic = () => {
+    if (root.dataset.hostAudio === 'true') return;
     bgMusic.play().then(() => {
       document.removeEventListener('pointerdown', startMusic, true);
       document.removeEventListener('keydown', startMusic, true);
