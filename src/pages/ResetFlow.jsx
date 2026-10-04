@@ -41,6 +41,7 @@ import { sessionStore } from "@/lib/localData";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
+import { pauseHomeAmbient, resumeHomeAmbient } from "@/lib/homeAmbient";
 import { maybeRequestReview } from "@/lib/reviewPrompt";
 import {
   createInitialResetAnswers,
@@ -109,6 +110,13 @@ export default function ResetFlow() {
     }).catch(() => {});
     return () => { mounted = false; };
   }, []);
+
+  // Home's ambient track follows the reset setup, then stops exactly when
+  // the user enters a specific intervention.
+  useEffect(() => {
+    if (phase === "unsure" || phase === "questions" || phase === "pathway") resumeHomeAmbient();
+    else pauseHomeAmbient();
+  }, [phase]);
 
   // immediate mode skips questions — show a brief building animation, then the pathway
   useEffect(() => {
@@ -355,6 +363,7 @@ export default function ResetFlow() {
   const beginGuided = () => {
     const first = pathway[0];
     if (!first) return;
+    pauseHomeAmbient();
     attemptLogRef.current = [];
     pendingCompletionRef.current = null;
     setActivePathway([first]);
