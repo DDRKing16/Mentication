@@ -1845,7 +1845,44 @@ body:has(dialog[open]) {
   height:100%;
   object-fit:cover;
   object-position:center;
-}.premium-label strong { opacity:.85; }
+  /* A light shine rests on the artwork; hovering or pressing the card
+     brightens it and sweeps a brighter shine across the felt. */
+  filter:brightness(1.03) saturate(1.02);
+  transition:filter .35s ease;
+}
+.premium-card::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg, transparent 34%, #fffdf2 48%, #fffdf2 52%, transparent 66%) no-repeat -58% 0 / 220% 100%,
+    radial-gradient(90% 55% at 50% 0%, #fff8e2 0%, transparent 62%);
+  opacity:.16;
+  transition:opacity .35s ease;
+}
+.premium-label { z-index:2; }
+@keyframes premium-shine-sweep {
+  from { background-position:-58% 0, 0 0; }
+  to { background-position:172% 0, 0 0; }
+}
+@media(hover:hover) {
+  .premium-card:hover:not(:disabled) .premium-photo { filter:brightness(1.14) saturate(1.06); }
+  .premium-card:hover:not(:disabled)::after {
+    opacity:.45;
+    animation:premium-shine-sweep 1.5s ease-in-out;
+  }
+}
+.premium-card:active:not(:disabled) .premium-photo { filter:brightness(1.2) saturate(1.08); }
+.premium-card:active:not(:disabled)::after { opacity:.5; }
+.premium-card:focus-visible .premium-photo { filter:brightness(1.14) saturate(1.06); }
+.premium-card:focus-visible::after { opacity:.45; animation:premium-shine-sweep 1.5s ease-in-out; }
+[data-reduce-motion=true] .premium-card:active:not(:disabled) .premium-photo,
+[data-reduce-motion=true] .premium-card:focus-visible .premium-photo { filter:brightness(1.14) saturate(1.06); }
+[data-reduce-motion=true] .premium-card:hover:not(:disabled)::after,
+[data-reduce-motion=true] .premium-card:active:not(:disabled)::after,
+[data-reduce-motion=true] .premium-card:focus-visible::after { animation:none; }.premium-label strong { opacity:.85; }
 .premium-label em { color:#ffd9a0; }
 .premium-field { display:block; margin-top:16px; text-align:left; }
 .premium-field span { display:block; font-size:12px; font-weight:600; color:#fff4e9; margin-bottom:6px; }
