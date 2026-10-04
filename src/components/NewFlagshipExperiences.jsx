@@ -36,12 +36,12 @@ function Shell({ id, stage, children, onBack, onExit, dark = false, active = fal
   const meta = FLAGSHIP_REGISTRY[id];
   const accent = id === "vectorShift" ? "#00ff88" : id === "signalLock" ? "#ffd36b" : "#9eb6ff";
   return <InterventionControlShell id={id} goal={meta.primaryGoal} title={meta.displayName} stage={stage} onBack={onBack} onExit={onExit} active={active} paused={paused} onPause={onPause} onSimplify={onSimplify || onBack} simplifyLabel={id === "signalLock" ? "Reduce the target" : "Make this route simpler"} onDifferent={onExit} dark={dark} accent={accent} className={`new-flagship nf-${id} ${dark ? "nf-dark" : ""}`} field={<div className="nf-field" aria-hidden="true"/>}>
-    <div className="mx-auto flex min-h-[calc(100dvh-170px)] w-full max-w-3xl flex-col justify-center px-5 py-6">{children}</div>
+    <div className="mx-auto flex min-h-[calc(100dvh-190px)] w-full max-w-3xl flex-col justify-center px-4 py-3 sm:min-h-[calc(100dvh-170px)] sm:px-5 sm:py-6">{children}</div>
   </InterventionControlShell>;
 }
 
 function Panel({ eyebrow, title, body, children }) {
-  return <section aria-live="polite" className="brand-chrome-card intervention-content-card rounded-[2rem] p-6 sm:p-8"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nf-accent)]">{eyebrow}</p><h1 className="mt-3 font-heading text-3xl leading-tight sm:text-4xl">{title}</h1>{body&&<p className="mt-4 leading-relaxed text-white/68">{body}</p>}{children}</section>;
+  return <section aria-live="polite" className="brand-chrome-card intervention-content-card rounded-[1.6rem] p-5 sm:rounded-[2rem] sm:p-8"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nf-accent)]">{eyebrow}</p><h1 className="mt-3 font-heading text-3xl leading-tight sm:text-4xl">{title}</h1>{body&&<p className="mt-4 leading-relaxed text-white/68">{body}</p>}{children}</section>;
 }
 
 function Handoff({ from, context, launch }) {
