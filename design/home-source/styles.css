@@ -796,6 +796,40 @@ main:focus {
 .journal-script { fill:none; stroke:#8a6a4a; stroke-width:1.7; stroke-linecap:round; opacity:.75; }
 .journal-dot { fill:#c9926b; }
 
+/* Ambient card motion — quiet, bespoke, and only for these two cards:
+   the Journal's handwriting writes itself across the top rule, and the
+   Premium star breathes with a muted warm glow. */
+@media (prefers-reduced-motion: no-preference) {
+  .journal-script {
+    stroke-dasharray:200;
+    stroke-dashoffset:200;
+    animation:journal-write 9s ease-in-out infinite;
+  }
+  .journal-dot {
+    transform-box:fill-box;
+    transform-origin:center;
+    animation:journal-dot-breathe 4.5s ease-in-out infinite;
+  }
+  .premium-art { animation:premium-star-glow 6s ease-in-out infinite; }
+}
+@keyframes journal-write {
+  0% { stroke-dashoffset:200; opacity:.75; }
+  55% { stroke-dashoffset:0; opacity:.75; }
+  82% { opacity:.75; }
+  100% { stroke-dashoffset:0; opacity:0; }
+}
+@keyframes journal-dot-breathe {
+  0%,100% { transform:scale(1); opacity:1; }
+  50% { transform:scale(1.45); opacity:.65; }
+}
+@keyframes premium-star-glow {
+  0%,100% { opacity:.75; filter:drop-shadow(0 0 0 #ffd9a000); }
+  50% { opacity:1; filter:drop-shadow(0 0 5px #ffd9a05c); }
+}
+[data-reduce-motion=true] .journal-script { animation:none; stroke-dasharray:none; stroke-dashoffset:0; }
+[data-reduce-motion=true] .journal-dot,
+[data-reduce-motion=true] .premium-art { animation:none; }
+
 .preview-label span {
   font-size:9px;
   letter-spacing:2px;
