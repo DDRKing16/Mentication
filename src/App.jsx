@@ -20,6 +20,7 @@ import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
 import { hasCompletedOnboarding } from '@/lib/onboarding';
 import WithBrandThreshold from '@/components/brand/WithBrandThreshold';
+import AmbientHomeMusic from '@/components/AmbientHomeMusic';
 
 // Route page components are loaded on demand to keep the initial bundle small.
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
@@ -169,6 +170,7 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <ScrollToTop />
+          <AmbientHomeMusic />
           <MenticationRoutes />
         </Router>
         <Toaster />
