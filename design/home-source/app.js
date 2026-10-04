@@ -134,7 +134,18 @@
     }
     const event = new CustomEvent('mentication:navigate', { bubbles: true, cancelable: true, detail: { route, label: ROUTES[route] } });
     if (!window.dispatchEvent(event)) return;
-    if (bridgeConnected) { sendBridge('navigate', { route }); return; }
+    if (bridgeConnected) {
+      sendBridge('navigate', {
+        route,
+        ambient: {
+          currentTime: Number.isFinite(bgMusic.currentTime) ? bgMusic.currentTime : 0,
+          volume: bgMusic.volume,
+          playing: !bgMusic.paused,
+        },
+      });
+      if (!bgMusic.paused) bgMusic.pause();
+      return;
+    }
     showDestinationPreview(route, opener);
   }
   // Lava-lamp layer drawn inside each goal's own clip shape, so only the blob lights up.
