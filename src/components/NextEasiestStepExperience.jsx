@@ -1651,7 +1651,7 @@ export default function NextEasiestStepExperience() {
           color: var(--text-burgundy);
           min-height: 100dvh;
           width: 100%;
-          max-width: 390px;
+          max-width: none;
           margin: 0 auto;
           position: relative;
           box-sizing: border-box;
