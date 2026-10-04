@@ -209,13 +209,29 @@
     const toNext = Number.isInteger(palace.stonesToNext) && palace.stonesToNext > 0 ? palace.stonesToNext : 0;
     const progress = Number.isFinite(palace.progress) ? Math.max(0, Math.min(1, palace.progress)) : 0;
     const levelText = `Level ${level + 1} of 7`;
+    // A crop per stage so the badge thumb always shows the building itself,
+    // whether it is one sprout or the full palace.
+    const badgeCrops = [
+      '140 148 120 127', '120 118 180 157', '95 98 230 177',
+      '85 73 260 202', '70 53 300 222', '60 38 330 237', '55 23 345 252'
+    ];
     document.getElementById('palace-card-art').innerHTML = palaceSvg(level, { id: 'home-palace-card', viewBox: '40 8 320 272' });
-    document.getElementById('palace-badge-art').innerHTML = palaceSvg(level, { id: 'home-palace-badge', viewBox: '80 40 240 240' });
+    document.getElementById('palace-badge-art').innerHTML = palaceSvg(level, { id: 'home-palace-badge', viewBox: badgeCrops[level] });
     document.getElementById('palace-card-chip').textContent = levelText;
     document.getElementById('palace-badge-level').textContent = `Lv ${level + 1}`;
-    if (name) document.getElementById('palace-card-name').textContent = name;
-    document.getElementById('palace-card-next').textContent = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} to ${nextName.toLowerCase()}` : 'Your palace is complete';
-    document.getElementById('palace-card-progress').style.width = `${Math.round((nextName ? progress : 1) * 100)}%`;
+    if (name) {
+      document.getElementById('palace-card-name').textContent = name;
+      document.getElementById('palace-badge-name').textContent = name;
+    }
+    const nextLine = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} to ${nextName.toLowerCase()}` : 'Your palace is complete';
+    document.getElementById('palace-card-next').textContent = nextLine;
+    document.getElementById('palace-badge-next').textContent = nextLine;
+    document.getElementById('palace-badge-progress').style.width = `${Math.round((nextName ? progress : 1) * 100)}%`;
+    const stages = document.getElementById('palace-card-stages');
+    if (stages) {
+      stages.innerHTML = Array.from({ length: 7 }, (_, i) =>
+        `<span class="${i < level ? 'is-built' : i === level ? 'is-current' : ''}"></span>`).join('');
+    }
     document.getElementById('palace-card').setAttribute('aria-label', `PEACE PALACE. ${levelText}${name ? `, ${name}` : ''}`);
     document.getElementById('palace-badge').setAttribute('aria-label', `Your Peace Palace, ${levelText.toLowerCase()}`);
   }
