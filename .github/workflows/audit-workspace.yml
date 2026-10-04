@@ -8,27 +8,15 @@ permissions:
 jobs:
   workspace:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci && npm run build
-      - name: Package the existing application for isolated verification
+      - name: Package existing catalogue and narration fixtures
         run: |
           mkdir -p audit-workspace
-          node --input-type=module <<'JS'
-          import fs from 'node:fs';
-          import {execFileSync} from 'node:child_process';
-          const candidates = ['src', 'design', 'public', 'scripts', 'tests', 'test', 'node_modules', 'dist', 'package.json', 'package-lock.json', 'vite.config.js', 'vite.config.ts', 'tailwind.config.js', 'tailwind.config.ts', 'postcss.config.js', 'postcss.config.cjs', 'eslint.config.js', 'jsconfig.json', 'index.html', 'AGENTS.md'];
-          const paths = candidates.filter(p => fs.existsSync(p));
-          execFileSync('tar', ['-czf', 'audit-workspace/app-workspace.tar.gz', ...paths], {stdio: 'inherit'});
-          execFileSync('git', ['rev-parse', 'HEAD'], {stdio: ['ignore', fs.openSync('audit-workspace/source-commit.txt', 'w'), 'inherit']});
-          JS
+          tar -czf audit-workspace/audit-fixtures.tar.gz intervention-library narration-manifest.json
       - uses: actions/upload-artifact@v5
         with:
-          name: isolated-app-workspace
+          name: isolated-audit-fixtures
           path: audit-workspace/
           retention-days: 1
