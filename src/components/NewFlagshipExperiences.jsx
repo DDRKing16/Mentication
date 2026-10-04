@@ -11,8 +11,8 @@ import { NEW_FLAGSHIP_IDS, isNewFlagship } from "@/lib/flagshipExperienceRouting
 
 export { NEW_FLAGSHIP_IDS, isNewFlagship };
 
-const optionClass = "min-h-14 rounded-2xl border border-white/15 bg-white/[0.06] p-4 text-left transition hover:border-[var(--nf-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--nf-accent)]";
-const primaryClass = "min-h-12 w-full rounded-full bg-[var(--nf-accent)] px-5 font-semibold text-slate-950 disabled:opacity-40";
+const optionClass = "intervention-choice min-h-14 rounded-2xl p-4 text-left";
+const primaryClass = "intervention-primary min-h-12 w-full rounded-full px-5 font-semibold text-slate-950";
 
 function usePersistedExperience(id, initial) {
   const restored = useMemo(() => {
@@ -41,7 +41,7 @@ function Shell({ id, stage, children, onBack, onExit, dark = false, active = fal
 }
 
 function Panel({ eyebrow, title, body, children }) {
-  return <section aria-live="polite" className="brand-chrome-card rounded-[2rem] p-6 sm:p-8"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nf-accent)]">{eyebrow}</p><h1 className="mt-3 font-heading text-3xl leading-tight sm:text-4xl">{title}</h1>{body&&<p className="mt-4 leading-relaxed text-white/68">{body}</p>}{children}</section>;
+  return <section aria-live="polite" className="brand-chrome-card intervention-content-card rounded-[2rem] p-6 sm:p-8"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nf-accent)]">{eyebrow}</p><h1 className="mt-3 font-heading text-3xl leading-tight sm:text-4xl">{title}</h1>{body&&<p className="mt-4 leading-relaxed text-white/68">{body}</p>}{children}</section>;
 }
 
 function Handoff({ from, context, launch }) {
