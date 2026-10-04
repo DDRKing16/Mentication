@@ -809,7 +809,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
 
             @media (max-width: 640px) {
               .change-scene-v2 { padding-left: 10px; padding-right: 10px; }
-              .change-scene-v2 .shell { padding: 10px 12px 18px; border-radius: 20px; }
+              .change-scene-v2 .shell { padding: 10px 12px 6px; border-radius: 20px; }
               .change-scene-v2 .brand { margin-bottom: 4px; }
               .change-scene-v2 .brand-pill { padding: 5px 12px; font-size: 9px; }
               .change-scene-v2 .instruction-screen { padding-top: 0; }
