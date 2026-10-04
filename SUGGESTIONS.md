@@ -92,3 +92,15 @@ Shown once, after someone's first finished reset:
   your finished design (not to be hand-edited without asking), so flagging
   the mismatch rather than guessing at fixing text inside that file myself.
 
+- **The new Home screen's Premium card carries its "PREMIUM CONTENT / Coming
+  soon" wording baked into the photo itself**
+  (`design/home-source/assets/preview/premium-felt.jpg`), rather than as
+  real on-screen text like the Journal and Peace Palace cards next to it, so
+  at the card's actual phone size (about 120×120px) it reads as little gold
+  flecks rather than words. Left as supplied since it's provided artwork,
+  not something to redraw without asking — but worth knowing the wording on
+  that card is close to unreadable in practice. (Fixed a real bug that was
+  sitting right next to this: the card's own culling logic, which should
+  hide it unless a launch is genuinely imminent, wasn't actually working —
+  see AGENT_LOG.md.)
+

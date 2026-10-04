@@ -583,6 +583,14 @@ main:focus {
   will-change:auto;
 }
 
+/* This class's own `display:block` otherwise outranks the browser's default
+   `[hidden]{display:none}` rule (same specificity, but this is an author
+   style), so a card the host culls via its own `hidden` property -- Journal,
+   Peace Palace or Premium in "More for you" -- would keep rendering anyway. */
+.art-control[hidden] {
+  display:none;
+}
+
 .art-control:hover {
   transform:translateY(-3px);
   filter:brightness(1.06);
@@ -745,6 +753,18 @@ main:focus {
 
 .more-track::-webkit-scrollbar {
   display:none;
+}
+
+/* Journal, Peace Palace and Premium can each be culled for the day (see
+   setMore in app.js); the row always reserves three equal columns, so when
+   fewer cards are showing the remaining ones grow to fill it instead of
+   leaving empty space. */
+.more-track[data-count="1"] {
+  grid-auto-columns:100%;
+}
+
+.more-track[data-count="2"] {
+  grid-auto-columns:calc((100% - 12px)/2);
 }
 
 .discovery {
@@ -1398,6 +1418,12 @@ body:has(dialog[open]) {
     padding-top:6px;
     overflow:hidden;
     scroll-snap-type:none;
+  }
+  .more-track[data-count="1"] {
+    grid-auto-columns:100%;
+  }
+  .more-track[data-count="2"] {
+    grid-auto-columns:calc((100% - 8px)/2);
   }
   .discovery {
     border-radius:16px;
@@ -2372,6 +2398,21 @@ function palaceSvg(level, options) {
     refreshCarousel();
     reportHeight();
   }
+  // The host app's own Settings already has a real Reduce motion / Higher
+  // contrast / Larger text toggle; this sandboxed document can't read that
+  // app's storage directly, so the host sends its current values down the
+  // bridge instead (see 'preferences' below) and we apply them the same way
+  // a tap in this document's own Accessibility sheet would.
+  function setPreferences(preferences) {
+    if (!preferences || typeof preferences !== 'object' || Array.isArray(preferences)) {
+      throw new TypeError('preferences must be an object.');
+    }
+    const merged = { ...readPreferences() };
+    preferenceNames.forEach(name => {
+      if (typeof preferences[name] === 'boolean') merged[name] = preferences[name];
+    });
+    applyPreferences(merged);
+  }
   function savePreferences() {
     const preferences = Object.fromEntries(preferenceNames.map(name => [name, document.getElementById(name).checked]));
     applyPreferences(preferences);
@@ -2675,12 +2716,14 @@ function palaceSvg(level, options) {
       try { setJournal(data.journal); } catch { sendBridge('error', { code: 'INVALID_JOURNAL' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'more') {
       try { setMore(data.more); } catch { sendBridge('error', { code: 'INVALID_MORE' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'preferences') {
+      try { setPreferences(data.preferences); } catch { sendBridge('error', { code: 'INVALID_PREFERENCES' }); }
     }
   });
   window.MenticationHome = Object.freeze({
     version: '1.0.0',
     routes: ROUTES,
-    configure({ navigate: handler, week, today, palace, journal, more } = {}) {
+    configure({ navigate: handler, week, today, palace, journal, more, preferences } = {}) {
       if (handler !== undefined && typeof handler !== 'function') throw new TypeError('navigate must be a function.');
       if (handler) navigateHandler = handler;
       if (week !== undefined) setWeek(week);
@@ -2688,12 +2731,14 @@ function palaceSvg(level, options) {
       if (palace !== undefined) setPalace(palace);
       if (journal !== undefined) setJournal(journal);
       if (more !== undefined) setMore(more);
+      if (preferences !== undefined) setPreferences(preferences);
     },
     setWeek,
     setToday,
     setPalace,
     setJournal,
-    setMore
+    setMore,
+    setPreferences
   });
   setPalace({ level: 0, name: 'The quiet clearing', nextName: 'The shack', stonesToNext: 4, progress: 0 });
   applyPreferences(readPreferences());

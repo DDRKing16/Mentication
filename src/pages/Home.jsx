@@ -4,11 +4,12 @@
 // cards and bottom navigation are all inside it). This page only bridges the
 // document's route IDs to the app's real destinations and feeds it real
 // weekly progress. Presentation of the document itself is untouched.
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
 import HomeFrame from "@/components/home/HomeFrame";
 import StreakBadge from "@/components/home/StreakBadge";
+import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { sessionStore } from "@/lib/localData";
 import { hasCompletedOnboarding } from "@/lib/onboarding";
 import { buildRecommendation } from "@/lib/recommend";
@@ -72,6 +73,16 @@ export default function Home() {
   // Which "More for you" cards earn their place today, and what they preview.
   const [more, setMore] = useState(null);
   const [musicMuted, setMusicMuted] = useState(() => isHomeAmbientMuted());
+  // The home document is sandboxed to an opaque origin, so it can't read this
+  // app's own accessibility storage directly -- its Reduce motion / Higher
+  // contrast / Larger text have to be sent down the bridge like everything
+  // else it shows.
+  const { prefs } = useAccessibilityPrefs();
+  const homePreferences = useMemo(() => ({
+    "reduce-motion": !!prefs.reducedMotion,
+    "high-contrast": !!prefs.highContrast,
+    "large-text": !!prefs.largeText,
+  }), [prefs.reducedMotion, prefs.highContrast, prefs.largeText]);
 
   useEffect(() => {
     resumeHomeAmbient();
@@ -230,7 +241,7 @@ export default function Home() {
       >
         {musicMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </button>
-      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
+      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} preferences={homePreferences} />
     </div>
   );
 }

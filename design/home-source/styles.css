@@ -574,6 +574,14 @@ main:focus {
   will-change:auto;
 }
 
+/* This class's own `display:block` otherwise outranks the browser's default
+   `[hidden]{display:none}` rule (same specificity, but this is an author
+   style), so a card the host culls via its own `hidden` property -- Journal,
+   Peace Palace or Premium in "More for you" -- would keep rendering anyway. */
+.art-control[hidden] {
+  display:none;
+}
+
 .art-control:hover {
   transform:translateY(-3px);
   filter:brightness(1.06);
@@ -736,6 +744,18 @@ main:focus {
 
 .more-track::-webkit-scrollbar {
   display:none;
+}
+
+/* Journal, Peace Palace and Premium can each be culled for the day (see
+   setMore in app.js); the row always reserves three equal columns, so when
+   fewer cards are showing the remaining ones grow to fill it instead of
+   leaving empty space. */
+.more-track[data-count="1"] {
+  grid-auto-columns:100%;
+}
+
+.more-track[data-count="2"] {
+  grid-auto-columns:calc((100% - 12px)/2);
 }
 
 .discovery {
@@ -1389,6 +1409,12 @@ body:has(dialog[open]) {
     padding-top:6px;
     overflow:hidden;
     scroll-snap-type:none;
+  }
+  .more-track[data-count="1"] {
+    grid-auto-columns:100%;
+  }
+  .more-track[data-count="2"] {
+    grid-auto-columns:calc((100% - 8px)/2);
   }
   .discovery {
     border-radius:16px;

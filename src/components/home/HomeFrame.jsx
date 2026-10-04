@@ -21,10 +21,10 @@ const routes = new Set([
  * and — for returning users — the "Your reset for today" card payload.
  * No database, authentication, router package, or page names are assumed.
  */
-export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null, more = null }) {
+export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null, more = null, preferences = null }) {
   const frame = useRef(null);
-  const callbacks = useRef({ onNavigate, week, today, palace, journal, more });
-  callbacks.current = { onNavigate, week, today, palace, journal, more };
+  const callbacks = useRef({ onNavigate, week, today, palace, journal, more, preferences });
+  callbacks.current = { onNavigate, week, today, palace, journal, more, preferences };
   const bridgeId = useRef(null);
   const [height, setHeight] = useState(1700);
   const [ready, setReady] = useState(false);
@@ -65,6 +65,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         if (callbacks.current.palace) send('palace', { palace: callbacks.current.palace });
         if (callbacks.current.journal) send('journal', { journal: callbacks.current.journal });
         if (callbacks.current.more) send('more', { more: callbacks.current.more });
+        if (callbacks.current.preferences) send('preferences', { preferences: callbacks.current.preferences });
         reportViewport();
       } else if (data.type === 'height' && Number.isFinite(data.height) && data.height > 0 && data.height < 20000) {
         setHeight(Math.ceil(data.height));
@@ -116,6 +117,10 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
   useEffect(() => {
     if (ready && more) send('more', { more });
   }, [more, ready]);
+
+  useEffect(() => {
+    if (ready && preferences) send('preferences', { preferences });
+  }, [preferences, ready]);
 
   if (typeof onNavigate !== 'function') {
     throw new TypeError('HomeFrame requires the host onNavigate(routeId) function.');

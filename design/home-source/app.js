@@ -39,6 +39,21 @@
     refreshCarousel();
     reportHeight();
   }
+  // The host app's own Settings already has a real Reduce motion / Higher
+  // contrast / Larger text toggle; this sandboxed document can't read that
+  // app's storage directly, so the host sends its current values down the
+  // bridge instead (see 'preferences' below) and we apply them the same way
+  // a tap in this document's own Accessibility sheet would.
+  function setPreferences(preferences) {
+    if (!preferences || typeof preferences !== 'object' || Array.isArray(preferences)) {
+      throw new TypeError('preferences must be an object.');
+    }
+    const merged = { ...readPreferences() };
+    preferenceNames.forEach(name => {
+      if (typeof preferences[name] === 'boolean') merged[name] = preferences[name];
+    });
+    applyPreferences(merged);
+  }
   function savePreferences() {
     const preferences = Object.fromEntries(preferenceNames.map(name => [name, document.getElementById(name).checked]));
     applyPreferences(preferences);
@@ -342,12 +357,14 @@
       try { setJournal(data.journal); } catch { sendBridge('error', { code: 'INVALID_JOURNAL' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'more') {
       try { setMore(data.more); } catch { sendBridge('error', { code: 'INVALID_MORE' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'preferences') {
+      try { setPreferences(data.preferences); } catch { sendBridge('error', { code: 'INVALID_PREFERENCES' }); }
     }
   });
   window.MenticationHome = Object.freeze({
     version: '1.0.0',
     routes: ROUTES,
-    configure({ navigate: handler, week, today, palace, journal, more } = {}) {
+    configure({ navigate: handler, week, today, palace, journal, more, preferences } = {}) {
       if (handler !== undefined && typeof handler !== 'function') throw new TypeError('navigate must be a function.');
       if (handler) navigateHandler = handler;
       if (week !== undefined) setWeek(week);
@@ -355,12 +372,14 @@
       if (palace !== undefined) setPalace(palace);
       if (journal !== undefined) setJournal(journal);
       if (more !== undefined) setMore(more);
+      if (preferences !== undefined) setPreferences(preferences);
     },
     setWeek,
     setToday,
     setPalace,
     setJournal,
-    setMore
+    setMore,
+    setPreferences
   });
   setPalace({ level: 0, name: 'The quiet clearing', nextName: 'The shack', stonesToNext: 4, progress: 0 });
   applyPreferences(readPreferences());
