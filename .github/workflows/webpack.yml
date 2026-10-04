@@ -2,7 +2,7 @@ name: NodeJS with Webpack
 
 on:
   push:
-    branches: [ "main", "Chat-GPT" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -31,18 +31,3 @@ jobs:
       if: matrix.node-version == '22.x'
       run: npm test
 
-    - name: Mobile preview QA
-      if: matrix.node-version == '22.x' && github.event_name == 'push'
-      run: |
-        npm install --no-save playwright@1.55.0
-        npx playwright install chromium
-        npm run preview -- --host 127.0.0.1 > /tmp/mentation-preview.log 2>&1 &
-        for i in {1..30}; do curl -fsS http://127.0.0.1:4173 >/dev/null && break; sleep 1; done
-        node scripts/preview-qa.mjs
-
-    - name: Upload mobile preview screenshots
-      if: matrix.node-version == '22.x' && github.event_name == 'push'
-      uses: actions/upload-artifact@v4
-      with:
-        name: mobile-preview
-        path: qa-preview/*.png
