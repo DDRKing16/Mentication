@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { handoffHomeAmbient } from '@/lib/homeAmbient';
+import { handoffHomeAmbient, resumeHomeAmbient } from '@/lib/homeAmbient';
 
 // The home document is a self-contained static HTML asset (public/home.html,
 // built from design/home-source). Serving it as `src` lets the browser stream
@@ -70,6 +70,8 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         setHeight(Math.ceil(data.height));
       } else if (data.type === 'home') {
         frame.current?.scrollIntoView({ block: 'start', behavior: data.reduceMotion ? 'instant' : 'smooth' });
+      } else if (data.type === 'ambient-start') {
+        resumeHomeAmbient();
       } else if (data.type === 'navigate' && routes.has(data.route)) {
         if (ambientResetRoutes.has(data.route) && data.ambient?.playing) {
           handoffHomeAmbient({ currentTime: data.ambient.currentTime, volume: data.ambient.volume });
