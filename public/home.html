@@ -1598,12 +1598,11 @@ body:has(dialog[open]) {
 .palace-badge {
   display:flex;
   align-items:center;
-  gap:10px;
-  justify-self:start;
-  max-width:100%;
-  padding:7px 14px 7px 7px;
+  gap:14px;
+  width:100%;
+  padding:8px 16px 8px 8px;
   border:1px solid #00f5d44d;
-  border-radius:18px;
+  border-radius:22px;
   background:linear-gradient(120deg,#0e1a30,#1c2b4c);
   color:#fff4e9;
   text-align:left;
@@ -1612,18 +1611,18 @@ body:has(dialog[open]) {
 .palace-badge:hover { transform:translateY(-1px); box-shadow:0 0 22px #00f5d42e; }
 .palace-badge-art {
   flex:0 0 auto;
-  width:58px;
-  height:48px;
-  border-radius:12px;
+  width:64px;
+  height:64px;
+  border-radius:14px;
   overflow:hidden;
   box-shadow:0 0 0 1px #ffffff24,0 5px 12px #0c152666;
 }
 .palace-badge-art svg { display:block; width:100%; height:100%; }
-.palace-badge-text { display:flex; flex-direction:column; gap:3px; min-width:0; line-height:1.15; text-align:left; }
-.palace-badge-text strong { font-family:Georgia,serif; font-weight:500; font-size:14px; white-space:nowrap; }
-.palace-badge-progress { display:block; width:120px; height:3px; border-radius:2px; background:#ffffff26; overflow:hidden; }
+.palace-badge-text { flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; line-height:1.15; text-align:left; }
+.palace-badge-text strong { font-family:Georgia,serif; font-weight:500; font-size:15px; white-space:nowrap; }
+.palace-badge-progress { display:block; width:100%; height:3px; border-radius:2px; background:#ffffff26; overflow:hidden; }
 .palace-badge-progress-fill { display:block; height:100%; width:0; background:#00f5d4; border-radius:2px; transition:width .6s var(--ease); }
-.palace-badge-text em { font-style:normal; font-size:9.5px; opacity:.72; white-space:nowrap; }
+.palace-badge-text em { font-style:normal; font-size:10.5px; opacity:.72; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* Restructure: one panel split evenly into thirds, an icon per destination. */
 .restructure-panel {
