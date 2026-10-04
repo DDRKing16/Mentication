@@ -729,34 +729,34 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               --button-bg: ${theme.buttonBg};
               --button-text: ${theme.buttonText};
               width: 100%;
-              height: calc(100dvh - 126px);
-              min-height: 0;
+              min-height: calc(100dvh - 170px);
+              height: auto;
               display: flex;
-              align-items: center;
+              align-items: flex-start;
               justify-content: center;
-              padding: 8px 16px 12px;
+              padding: 6px 16px 84px;
               margin: 0;
               box-sizing: border-box;
-              overflow: hidden;
+              overflow: visible;
             }
 
             @media (max-height: 740px) {
-              .change-scene-v2 { height: calc(100dvh - 168px); }
+              .change-scene-v2 { min-height: calc(100dvh - 184px); padding-top: 2px; }
             }
 
             .change-scene-v2 .shell {
               width: 100%;
               max-width: 520px;
               margin: 0 auto;
-              height: 100%;
-              max-height: 780px;
+              height: auto;
+              max-height: none;
               min-height: 0;
-              padding: 18px 20px 40px;
+              padding: 16px 18px 28px;
               box-sizing: border-box;
               display: flex;
               flex-direction: column;
               justify-content: flex-start;
-              overflow: hidden;
+              overflow: visible;
               border-radius: 24px;
               position: relative;
               background: var(--paper);
@@ -807,6 +807,17 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               box-shadow: 0 0 8px var(--accent);
             }
 
+            @media (max-width: 640px) {
+              .change-scene-v2 { padding-left: 10px; padding-right: 10px; }
+              .change-scene-v2 .shell { padding: 12px 14px 22px; border-radius: 20px; }
+              .change-scene-v2 .brand { margin-bottom: 4px; }
+              .change-scene-v2 .brand-pill { padding: 5px 12px; font-size: 9px; }
+              .change-scene-v2 .instruction-screen { padding-top: 0; }
+              .change-scene-v2 .visual { height: 82px; margin-bottom: 4px; }
+              .change-scene-v2 .scene-visual { height: 70px; margin-bottom: 7px; }
+              .change-scene-v2 h1 { font-size: clamp(1.72rem, 7.7vw, 2.2rem) !important; line-height: .98 !important; }
+            }
+
             .change-scene-v2 .content {
               display: flex;
               flex-direction: column;
@@ -852,7 +863,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
 
             .change-scene-v2 .visual {
               position: relative;
-              height: 120px;
+              height: 104px;
               margin-bottom: 8px;
               display: flex;
               align-items: center;
@@ -866,7 +877,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
             }
             .change-scene-v2 .scene-visual {
               position: relative;
-              height: 96px;
+              height: 84px;
               display: grid;
               place-items: center;
               overflow: hidden;
