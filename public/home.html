@@ -725,7 +725,9 @@ main:focus {
 }
 
 .more-track {
-  display:flex;
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:calc((100% - 24px)/3);
   gap:12px;
   overflow:auto;
   scroll-snap-type:x mandatory;
@@ -747,16 +749,8 @@ main:focus {
   scroll-snap-align:start;
   border-radius:24px;
   overflow:hidden;
-  align-self:flex-start;
-  flex:0 0 auto;
+  align-self:start;
 }
-
-/* Hierarchy through geometry, not order: the Palace is the hero (52%, and
-   taller), the Journal medium, Premium small. app.js re-scales these
-   whenever a card is culled for the day (track[data-count]). */
-.palace-card { width:calc(52% - 6.24px); }
-.journal-card { width:calc(30% - 3.6px); }
-.premium-card { width:calc(18% - 2.16px); }
 
 /* Tactile: the goal cards lift and press, so these three answer with a soft
    glow of their own theme light — same product, same grammar. */
@@ -1818,18 +1812,11 @@ body:has(dialog[open]) {
   .restructure-name { font-size:15px; }
   .restructure-sub { display:none; }
   .restructure-icon { width:40px; height:40px; }
-  /* Narrow screens scroll the row, so the shares breathe out instead. */
-  .palace-card { width:calc(62% - 4px); }
-  .journal-card { width:calc(42% - 4px); }
-  .premium-card { width:calc(42% - 4px); }
 }
 [data-high-contrast=true] .restructure-panel { background:#061827; border-color:#fff; }
 
 /* More for you: live Peace Palace card and the premium placeholder. */
-.palace-card, .premium-card { position:relative; }
-.palace-card { aspect-ratio:273/296; }
-.premium-card { aspect-ratio:273/200; }
-.premium-card .preview-label { left:10px; right:10px; }
+.palace-card, .premium-card { position:relative; aspect-ratio:273/232; }
 .palace-card-art, .palace-card-art svg { position:absolute; inset:0; display:block; width:100%; height:100%; }
 .palace-card {
   border:1px solid #00f5d433;
@@ -1867,7 +1854,7 @@ body:has(dialog[open]) {
 }
 .premium-art {
   position:absolute;
-  top:18%;
+  top:24%;
   left:50%;
   width:42px;
   height:42px;
@@ -2384,16 +2371,6 @@ function palaceSvg(level, options) {
     const visible = Object.keys(cards).filter(key => !cards[key].hidden);
     track.dataset.count = String(visible.length);
     document.querySelector('.more').hidden = visible.length === 0;
-    if (visible.length === 2) {
-      const lead = visible.includes('palace') ? 'palace' : 'journal';
-      visible.forEach(key => {
-        const share = key === lead ? .62 : .38;
-        cards[key].style.width = `calc(${share * 100}% - ${(12 * share).toFixed(2)}px)`;
-      });
-      if (visible.includes('palace')) cards.palace.style.aspectRatio = '273/232';
-    } else {
-      Object.values(cards).forEach(card => { card.style.width = ''; card.style.aspectRatio = ''; });
-    }
     refreshCarousel();
     reportHeight();
   }

@@ -292,16 +292,6 @@
     const visible = Object.keys(cards).filter(key => !cards[key].hidden);
     track.dataset.count = String(visible.length);
     document.querySelector('.more').hidden = visible.length === 0;
-    if (visible.length === 2) {
-      const lead = visible.includes('palace') ? 'palace' : 'journal';
-      visible.forEach(key => {
-        const share = key === lead ? .62 : .38;
-        cards[key].style.width = `calc(${share * 100}% - ${(12 * share).toFixed(2)}px)`;
-      });
-      if (visible.includes('palace')) cards.palace.style.aspectRatio = '273/232';
-    } else {
-      Object.values(cards).forEach(card => { card.style.width = ''; card.style.aspectRatio = ''; });
-    }
     refreshCarousel();
     reportHeight();
   }
