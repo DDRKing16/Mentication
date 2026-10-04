@@ -1037,7 +1037,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               z-index: 1;
             }
             .change-scene-v2 .instruction-popup-shell .guided-suggestions {
-              width: min(76%, 206px);
+              width: min(100%, 440px);
               height: 102px;
               margin: 8px 0 0 0;
               padding: 11px 12px 8px;
@@ -1159,7 +1159,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
             .change-scene-v2 .instruction-popup-shell {
               position: relative;
               z-index: 3;
-              width: min(90%, 313px);
+              width: min(100%, 480px);
               margin: 12px auto 0;
             }
             .change-scene-v2 .instruction-popup-shell .prompt {
