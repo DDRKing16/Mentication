@@ -76,6 +76,13 @@ export function createInitialResetAnswers(entry) {
     immediate: Boolean(entry?.immediate),
     intensity: entry?.intensity ?? (entry?.immediate ? 9 : null),
     whereFelt: entry?.whereFelt ?? (entry?.direction ? (WHERE_FELT_DEFAULT[entry.direction] || "both") : null),
+    // For Lift, intensity remains positive mood; never infer distress from it.
+    distress: typeof entry?.distress === "number" ? entry.distress : null,
+    contraindicationTags: Array.isArray(entry?.contraindicationTags) ? entry.contraindicationTags : [],
+    unsuitableSubstates: Array.isArray(entry?.unsuitableSubstates) ? entry.unsuitableSubstates : [],
+    requiredResources: Array.isArray(entry?.requiredResources) ? entry.requiredResources : [],
+    acute: Boolean(entry?.acute),
+    disconnected: Boolean(entry?.disconnected),
     timeMin: entry?.timeMin ?? 5,
     audio: entry?.audio ?? "yes",
     movement: entry?.movement ?? "seated",

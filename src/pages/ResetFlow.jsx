@@ -35,6 +35,7 @@ import {
   computeEffectiveness,
   buildAttemptRecord,
   coarseContextKey,
+  RECOMMENDATION_ENGINE_VERSION,
 } from "@/lib/interventions";
 import FlowHomeButton from "@/components/FlowHomeButton";
 import { sessionStore } from "@/lib/localData";
@@ -98,6 +99,7 @@ export default function ResetFlow() {
   const sessionHistoryRef = useRef([]);
   const attemptLogRef = useRef([]);
   const pendingCompletionRef = useRef(null);
+  const sessionSavedRef = useRef(false);
   const [weekCount, setWeekCount] = useState(0);
   useEffect(() => {
     let mounted = true;
@@ -361,6 +363,8 @@ export default function ResetFlow() {
   };
 
   const beginGuided = () => {
+    sessionSavedRef.current = false;
+    setSaving(false);
     const first = pathway[0];
     if (!first) return;
     pauseHomeAmbient();
@@ -383,6 +387,31 @@ export default function ResetFlow() {
     const nextIntensity = checkinValue ?? lastValue ?? answers.intensity ?? 5;
     const resolvedDirection = opts.direction || answers.direction;
     const resolvedWhereFelt = opts.whereFelt || answers.whereFelt;
+    if (resolvedDirection !== answers.direction && (resolvedDirection === "lift" || answers.direction === "lift")) {
+      // Save the completed work under its original scale before asking for a
+      // fresh rating in another goal. Never relabel mood as distress or erase
+      // the attempts when Begin starts the newly checked-in reset.
+      const fresh = createInitialResetAnswers({ ...answers, direction: resolvedDirection, directionLabel: DIRECTIONS.find((item) => item.id === resolvedDirection)?.label, intensity: null, distress: null, whereFelt: resolvedWhereFelt, immediate: false });
+      completeSession({ silent: true, endIntensityOverride: nextIntensity, onFinished: () => {
+        setAnswers(fresh);
+        setPhase("questions");
+        setActivePathway(null);
+        setUsedIds([]);
+        setPlanRemaining(0);
+        setEndIntensity(null);
+        setSaving(false);
+        setWhatHelped("");
+        setWouldUseAgain(null);
+        setCheckinValue(null);
+        attemptLogRef.current = [];
+        pendingCompletionRef.current = null;
+        sessionSavedRef.current = false;
+        startTimeRef.current = Date.now();
+        flowStack.current = [{ phase: "questions", unsureStep: 0 }];
+        navigate("/reset", { replace: true, state: fresh });
+      } });
+      return;
+    }
     const nextAnswers = {
       ...answers,
       direction: resolvedDirection,
@@ -454,14 +483,19 @@ export default function ResetFlow() {
   };
 
   const completeSession = (options = {}) => {
+    if (sessionSavedRef.current) return;
+    sessionSavedRef.current = true;
+    setSaving(true);
     if (!options.silent && !answers.discreet && !answers.noAudio) playComplete();
     const payload = {
+      id: globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`,
+      created_date: new Date().toISOString(),
       state: answers.direction,
       state_label: answers.directionLabel,
       direction: answers.direction,
       direction_label: answers.directionLabel,
       intensity_start: answers.intensity,
-      intensity_end: options.endIntensityOverride ?? endIntensity,
+      intensity_end: Object.prototype.hasOwnProperty.call(options, "endIntensityOverride") ? options.endIntensityOverride : endIntensity,
       where_felt: answers.whereFelt,
       time_min: answers.timeMin,
       audio: answers.audio,
@@ -475,7 +509,7 @@ export default function ResetFlow() {
         intensity: answers.intensity,
         where_felt: answers.whereFelt,
       },
-      recommendation_engine_version: "3.1.0-core25",
+      recommendation_engine_version: RECOMMENDATION_ENGINE_VERSION,
       what_helped: whatHelped.trim() || undefined,
       would_use_again: wouldUseAgain || undefined,
       duration_sec: Math.round((Date.now() - startTimeRef.current) / 1000),
@@ -496,7 +530,8 @@ export default function ResetFlow() {
     // Either way, the Closing brand moment plays first so every session
     // resolves into the logo and swash the same way before it hands off.
     const finish = () => {
-      if (options.direct) navigate(options.navigateTo || "/", { replace: true });
+      if (options.onFinished) { options.onFinished(); return; }
+      if (options.direct) navigate(options.navigateTo || "/", { replace: true, state: options.liftFollowup ? { completedSession: payload } : undefined });
       else advance({ phase: "done" });
     };
     setClosing({ id: usedIds[usedIds.length - 1] || pathway[0]?.id, onDone: finish });
@@ -546,7 +581,7 @@ export default function ResetFlow() {
   // ---------- PATHWAY OVERVIEW ----------
   if (phase === "pathway") {
     if (!pathway.length) {
-      return <NoSafeMatchScreen onAdjust={() => advance({ phase: "questions" })} />;
+      return <NoSafeMatchScreen onAdjust={() => { setAnswers((value) => ({ ...value, immediate: false })); advance({ phase: "questions" }); }} />;
     }
     if (isThoughtOrFactEntry) {
       return (
@@ -612,15 +647,16 @@ export default function ResetFlow() {
           answers={{ ...answers, intensity: lastValue }}
           onAttemptEvent={handleAttemptEvent}
           onComplete={(result) => {
-            commitPendingPulse(lastValue);
-            setEndIntensity(lastValue);
+            commitPendingPulse(null);
+            setEndIntensity(null);
             if (result?.skipReflection) {
               completeSession({
                 direct: true,
                 silent: true,
-                endIntensityOverride: lastValue,
+                endIntensityOverride: null,
                 interventionOutcome: result.outcome,
-                navigateTo: result.navigateTo,
+                navigateTo: interventionId === "happyBump" && answers.direction === "lift" ? "/lift-followup" : result.navigateTo,
+                liftFollowup: interventionId === "happyBump" && answers.direction === "lift",
               });
               return;
             }
@@ -1117,10 +1153,27 @@ export default function ResetFlow() {
               <IntensityDial value={answers.intensity ?? 5} onChange={(value) => setAnswer("intensity", value)} direction={answers.direction} />
             </div>
 
+            {answers.direction === "lift" && <div className="mt-8">
+              <label className="flex flex-col gap-3 text-primary">
+                How distressed are you right now?
+                <select aria-label="Current distress" className="min-h-12 rounded-xl border border-border bg-card px-3" value={answers.distress ?? ""} onChange={(event) => setAnswer("distress", event.target.value === "" ? null : Number(event.target.value))}>
+                  <option value="">Choose a rating</option>
+                  {Array.from({ length: 11 }, (_, value) => <option key={value} value={value}>{value}{value === 0 ? " · No distress" : value === 10 ? " · Extreme distress" : ""}</option>)}
+                </select>
+              </label>
+              <p className="mt-2 text-sm text-muted-foreground">This is separate from your mood and helps us choose a suitable reset.</p>
+            </div>}
+
+            <label className="mt-6 flex flex-col gap-3 text-primary">
+              Time available
+              <select aria-label="Time available" className="min-h-12 rounded-xl border border-border bg-card px-3" value={answers.timeMin} onChange={(event) => setAnswer("timeMin", Number(event.target.value))}>
+                {[...new Set([3, 5, 10, 15, answers.timeMin])].sort((a, b) => a - b).map((minutes) => <option key={minutes} value={minutes}>{minutes} minutes</option>)}
+              </select>
+            </label>
             <div className="mt-10 flex justify-center">
               <Button
                 size="lg"
-                disabled={answers.intensity === null}
+                disabled={answers.intensity === null || (answers.direction === "lift" && answers.distress === null)}
                 onClick={nextQuestion}
                 className="h-16 w-full max-w-sm rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95 disabled:opacity-40 disabled:shadow-none"
               >

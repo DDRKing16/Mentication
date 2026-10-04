@@ -33,9 +33,9 @@ export function NoSafeMatchScreen({ onAdjust }) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center gap-5 px-6 text-center">
       <FlowHomeButton />
-      <h1 className="font-heading text-3xl font-medium text-primary">No safe match for these settings</h1>
+      <h1 className="font-heading text-3xl font-medium text-primary">No matching reset for these settings</h1>
       <p className="max-w-md text-muted-foreground">
-        Adjust the intensity or session preferences and try again. Mentication will not bypass hard eligibility rules to force a recommendation.
+        None of the available practices fits your goal, intensity, time and setting together. Keep your intensity honest. You can choose another goal or allow more time if that works for you, or return Home. Some practices are unavailable in your current setting.
       </p>
       <Button onClick={onAdjust} className="rounded-full">Adjust settings</Button>
     </div>
@@ -51,7 +51,7 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
         </div>
         <div className="flex flex-1 flex-col justify-center">
           <h1 className="font-heading text-[1.8rem] font-semibold leading-tight tracking-[-0.025em] text-primary text-balance sm:text-4xl">
-            Your {answers.timeMin}-minute reset
+            {pathway[0]?.id === "happyBump" ? "Your flexible reset" : `Your ${answers.timeMin}-minute reset`}
           </h1>
           <p className="mt-2 max-w-lg text-[0.98rem] leading-relaxed text-muted-foreground text-balance">
             {isPrebuilt
@@ -67,7 +67,7 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
           >
             <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <span>First activity</span>
-              <span>{answers.timeMin} min</span>
+              <span>{pathway[0]?.durationMax ? `${pathway[0].durationMin}–${pathway[0].durationMax}` : pathway[0]?.durationMin} min</span>
             </div>
             <h2 className="mt-3 font-heading text-[1.35rem] font-semibold tracking-[-0.02em] text-foreground">
               {pathway[0]?.name}
@@ -75,6 +75,7 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{pathway[0]?.why}</p>
           </motion.section>
 
+          {pathway[0]?.id === "happyBump" && <p className="mt-4 text-sm text-muted-foreground">Allow 5–15 minutes, depending on your walk and pace. For a shorter reset, keep the walk short or use Skip ahead. We’ll check in before suggesting anything else.</p>}
           {!isPrebuilt && <PreferencesRow answers={answers} setAnswers={setAnswers} />}
         </div>
 

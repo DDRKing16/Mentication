@@ -12,10 +12,12 @@ export function pickSlot(hour) {
 
 export function buildRecommendation(sessions = []) {
   const slot = pickSlot(new Date().getHours());
+  // Time of day/history cannot supply a current mood or distress answer.
+  if (slot.direction === "lift") return { ...slot, requiresCheckIn: true, pathway: [], minutes: null };
   const effectiveness = computeEffectiveness(sessions);
   const pathway = buildPathway(
     { direction: slot.direction, intensity: 5, whereFelt: "both", timeMin: slot.min, location: "home", audio: "yes", movement: "seated" },
     effectiveness
   );
-  return { ...slot, pathway: pathway.map((iv) => iv.id), minutes: segmentMinutes(pathway) };
+  return { ...slot, requiresCheckIn: false, pathway: pathway.map((iv) => iv.id), minutes: segmentMinutes(pathway) };
 }

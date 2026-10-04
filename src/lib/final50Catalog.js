@@ -297,6 +297,7 @@ const CONTENT_OVERRIDES = {
     why: "A short sequence of movement, hydration, connection and one small action can build momentum without waiting for motivation.",
     directions: ["lift", "calm", "focus"],
     durationMin: 5,
+    durationMax: 15,
     cognitiveLoad: 1,
     physicalDemand: 2,
     environment: "any",

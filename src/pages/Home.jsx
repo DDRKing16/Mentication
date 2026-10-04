@@ -152,7 +152,8 @@ export default function Home() {
       const recommendation = buildRecommendation(sessions);
       return {
         title: recommendation.title,
-        meta: `${recommendation.minutes} min · ${recommendation.tag}`,
+        meta: recommendation.requiresCheckIn ? "Check in to choose your Lift reset" : `${recommendation.minutes} min · ${recommendation.tag}`,
+        requiresCheckIn: recommendation.requiresCheckIn,
         pathway: recommendation.pathway,
         direction: recommendation.direction,
         min: recommendation.min,
@@ -186,11 +187,11 @@ export default function Home() {
   const onNavigate = useCallback((route) => {
     if (route === "home") return; // the document scrolls itself to the top
     if (route === "begin") { void beginWeek(); return; }
-    if (route === "recommended" && today?.pathway?.length) {
+    if (route === "recommended" && (today?.requiresCheckIn || today?.pathway?.length)) {
       navigate("/reset", {
         state: {
-          prebuilt: true, pathway: today.pathway, direction: today.direction,
-          directionLabel: today.title, intensity: 5, whereFelt: "both",
+          prebuilt: !today.requiresCheckIn, pathway: today.pathway, direction: today.direction,
+          directionLabel: today.title, intensity: today.requiresCheckIn ? null : 5, whereFelt: "both",
           timeMin: today.min, audio: "yes", movement: "seated",
         },
       });

@@ -44,7 +44,19 @@ export function v3Hash01(str) {
 
 export function interventionDurationSeconds(iv) {
   const sec = (iv?.steps || []).reduce((total, step) => total + (Number(step?.holdSec) || 0), 0);
-  return Math.max(1, sec || (Number(iv?.durationMin) || 1) * 60);
+  // Interactive and standalone experiences carry placeholder step timers.
+  // Budget the full declared practice, never compress its approved dose.
+  return Math.max(1, sec, (Number(iv?.durationMin) || 0) * 60);
+}
+
+// Lift's intensity is its positive-mood rating for saved-session compatibility.
+// Its approved suitability ranges refer to a separately answered distress rating.
+export function suitabilityIntensityV3(answers = {}) {
+  if (answers.direction === "lift") {
+    const value = answers.distress;
+    return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 10 ? value : NaN;
+  }
+  return Number.isFinite(Number(answers.intensity)) ? Number(answers.intensity) : 5;
 }
 
 export function contextKeyV3(answers = {}) {
@@ -58,7 +70,11 @@ export function contextKeyV3(answers = {}) {
   const where = answers.whereFelt || "both";
   const location = answers.location || "home";
   const mode = answers.majorPreference || answers.preferenceMode || answers.mode || "standard";
-  return [direction, subtype, band, where, location, mode].join("|");
+  const key = [direction, subtype, band, where, location, mode].join("|");
+  if (direction !== "lift") return key;
+  const distress = suitabilityIntensityV3(answers);
+  const distressBand = !Number.isFinite(distress) ? "unknown" : distress >= 9 ? "9-10" : distress >= 7 ? "7-8" : distress >= 4 ? "4-6" : "0-3";
+  return `${key}|distress:${distressBand}`;
 }
 
 export function inferProfileV3(answers = {}) {
@@ -104,8 +120,10 @@ export function inferProfileV3(answers = {}) {
       substates.add("acute");
     }
   } else if (dir === "lift") {
-    tags.add("low_mood");
-    substates.add("low_mood");
+    if (intensity <= 4) { tags.add("low_mood"); substates.add("low_mood"); }
+    if (suitabilityIntensityV3(answers) >= 8) {
+      tags.add("acute"); substates.add("acute"); states.add("panicky");
+    }
     if (intensity <= 3 || answers.tired || answers.exhausted) {
       tags.add("tired");
       tags.add("low_energy");
@@ -160,6 +178,7 @@ export function inferProfileV3(answers = {}) {
     }
   });
 
+  if (answers.acute) { tags.add("acute"); substates.add("acute"); states.add("panicky"); }
   if (answers.subtype) substates.add(answers.subtype);
   return { states, tags, substates };
 }
@@ -173,13 +192,14 @@ export function hardEligibleV3(iv, answers = {}, profile = inferProfileV3(answer
   const dirs = iv.algorithmDirections || iv.directions || [];
   if (direction && !dirs.includes(direction)) return false;
 
-  const intensity = Number.isFinite(Number(answers.intensity)) ? Number(answers.intensity) : 5;
+  const intensity = suitabilityIntensityV3(answers);
+  if (!Number.isFinite(intensity)) return false;
   if (intensity < Number(iv.intensityMin ?? 0) || intensity > Number(iv.intensityMax ?? 10)) return false;
 
   const timeMin = Number(answers.timeMin ?? 5);
   if (Number(iv.durationMin ?? 0) > timeMin) return false;
   if (answers.remainingTime != null) {
-    const remainingSeconds = Math.max(0, Number(answers.remainingTime) * 60 + 30);
+    const remainingSeconds = Math.max(0, Number(answers.remainingTime) * 60);
     if (interventionDurationSeconds(iv) > remainingSeconds) return false;
   }
 
@@ -300,7 +320,8 @@ function maxCognitiveLoadForIntensity(intensity) {
 }
 
 export function loadArousalFitV3(iv, answers = {}) {
-  const intensity = Number.isFinite(Number(answers.intensity)) ? Number(answers.intensity) : 5;
+  const intensity = suitabilityIntensityV3(answers);
+  const activationNeeded = answers.direction === "lift" ? Number(answers.intensity) <= 4 : answers.direction === "focus" && intensity <= 4;
   const maxLoad = maxCognitiveLoadForIntensity(intensity);
   const load = Number(iv.cognitiveLoad ?? 2);
   const cognitiveFit = clamp01(1 - 0.45 * Math.max(0, load - maxLoad));
@@ -309,7 +330,7 @@ export function loadArousalFitV3(iv, answers = {}) {
   if (intensity >= 9) {
     if (iv.arousal === "raise") return 0;
     arousalFit = iv.arousal === "lower" ? 1 : 0.70;
-  } else if ((answers.direction === "lift" || answers.direction === "focus") && intensity <= 4) {
+  } else if (activationNeeded && intensity < 7) {
     arousalFit = iv.arousal === "raise" ? 1 : iv.arousal === "steady" ? 0.75 : 0.55;
   } else if (intensity >= 7) {
     arousalFit = iv.arousal === "lower" ? 1 : iv.arousal === "steady" ? 0.75 : 0.35;
@@ -408,7 +429,7 @@ export function scoreInterventionV3(iv, answers, effectiveness = {}, options = {
 
   const components = {
     S: stateFitV3(iv, profile),
-    I: intensityFitV3(iv, answers.intensity),
+    I: intensityFitV3(iv, suitabilityIntensityV3(answers)),
     P: personalFitV3(iv, answers, effectiveness),
     T: targetFitV3(iv, answers),
     D: directionFitV3(iv, answers),
@@ -516,6 +537,25 @@ export function computeEffectivenessV3(sessions = [], helpers = {}) {
       if (iv?.category) categoryUsage[iv.category] = (categoryUsage[iv.category] || 0) + 1;
     });
 
+    const answeredIds = new Set((session.attempts || [])
+      .filter((attempt) => rewardForResponse(attempt?.response) != null)
+      .map((attempt) => resolveId(attempt.intervention_id)).filter(Boolean));
+    const completedIds = [...new Set([
+      ...(session.completed_pathway || []),
+      ...(session.attempts || []).filter((attempt) => attempt.exit_reason === "completed")
+        .map((attempt) => attempt.intervention_id),
+    ].map(resolveId).filter(Boolean))];
+    const preference = lower(session.would_use_again);
+    if (completedIds.length === 1 && ["yes", "no"].includes(preference)) {
+      const id = completedIds[0];
+      if (!answeredIds.has(id)) {
+        const weight = 0.5 * recencyWeight45Days(session.created_date || session.createdAt, nowMs);
+        const reward = preference === "yes" ? 1 : 0;
+        addSample(interventionSamples, id, reward, weight);
+        if (fallbackContext) addSample(contextSamples, `${fallbackContext}::${id}`, reward, weight);
+      }
+    }
+
     (session.attempts || []).forEach((attempt) => {
       const response = lower(attempt?.response);
       if (!response || response === "not_answered") return; // unanswered is not neutral evidence
@@ -576,7 +616,8 @@ export function immediateEligibleV3(iv, answers = {}, profile = inferProfileV3(a
   const roles = new Set(asArray(iv.pathwayRoles).map(lower));
   if (!(roles.has("rescue") || roles.has("opener"))) return false;
   if (!["lower", "steady"].includes(iv.arousal)) return false;
-  if (Number(iv.durationMin ?? 99) > 3) return false;
+  // Duration is already constrained by the requested time in hardEligibleV3.
+  // The old three-minute pool cap excluded every current rescue practice.
   if (["temperature-shock", "breath-hold", "paced-hold"].includes(iv.mechanism)) return false;
   if ((iv.mechanismFamily || iv.category) === "cognitive") return false;
   return true;

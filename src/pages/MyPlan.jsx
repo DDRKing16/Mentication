@@ -29,11 +29,11 @@ export default function MyPlan() {
   }, []);
 
   const doRecommend = () => {
-    if (!recommendation?.pathway?.length) return;
+    if (!recommendation || (!recommendation.requiresCheckIn && !recommendation.pathway?.length)) return;
     navigate("/reset", {
       state: {
-        prebuilt: true, pathway: recommendation.pathway, direction: recommendation.direction,
-        directionLabel: recommendation.title, intensity: 5, whereFelt: "both",
+        prebuilt: !recommendation.requiresCheckIn, pathway: recommendation.pathway, direction: recommendation.direction,
+        directionLabel: recommendation.title, intensity: recommendation.requiresCheckIn ? null : 5, whereFelt: "both",
         timeMin: recommendation.min, audio: "yes", movement: "seated",
       },
     });
@@ -84,7 +84,7 @@ export default function MyPlan() {
             <div className="mt-3">
               <RecommendedCard
                 title={recommendation.title}
-                descriptor={`${recommendation.minutes} min · ${recommendation.tag}`}
+                descriptor={recommendation.requiresCheckIn ? "Check in to choose your Lift reset" : `${recommendation.minutes} min · ${recommendation.tag}`}
                 onClick={doRecommend}
               />
             </div>

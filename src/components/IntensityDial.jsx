@@ -62,7 +62,7 @@ export default function IntensityDial({ value, onChange, mood = false, direction
           step={1}
           value={v}
           onChange={(e) => onChange(Number(e.target.value))}
-          aria-label="How intense is it right now"
+          aria-label={key === "lift" ? "How is your mood right now" : "How intense is it right now"}
           className={sliderClass}
         />
         <div className="mt-3 flex justify-between text-xs font-medium text-muted-foreground">

@@ -7,6 +7,7 @@ import {
   interventionDurationSeconds,
   scoreInterventionV3,
   immediateEligibleV3,
+  suitabilityIntensityV3,
 } from "./recommendationV3.js";
 import {
   createCore25Catalogue,
@@ -20,7 +21,7 @@ import {
 // intensity, time, location, audio, movement, and previous effectiveness —
 // and assemble a coherent, mechanism-diverse pathway.
 
-export const RECOMMENDATION_ENGINE_VERSION = "3.3.0-flagship17";
+export const RECOMMENDATION_ENGINE_VERSION = "3.4.0-current-catalogue";
 export { CORE_25_CATALOGUE_VERSION };
 
 export const STATES = [
@@ -1456,7 +1457,7 @@ export const improvementOf = (s) =>
     : null;
 
 export const segmentMinutes = (pathway = []) => {
-  const sec = pathway.reduce((sum, iv) => sum + (iv.steps || []).reduce((s, st) => s + (st.holdSec || 0), 0), 0);
+  const sec = pathway.reduce((sum, iv) => sum + interventionDurationSeconds(iv), 0);
   return Math.max(1, Math.round(sec / 60));
 };
 
@@ -1471,7 +1472,9 @@ export const segmentMinutes = (pathway = []) => {
 //   totalUses          — denominator for category share
 export function computeEffectiveness(sessions = []) {
   return computeEffectivenessV3(sessions, {
-    resolveId: idFor,
+    // Migration may suggest a successor for a retired practice, but its
+    // feedback is not evidence that the user tried or benefited from that successor.
+    resolveId: (key) => INTERVENTIONS.find((iv) => iv.id === key || iv.name === key)?.id,
     getIntervention: byId,
     contextKeyFor: coarseContextKey,
   });
@@ -1627,25 +1630,6 @@ function highDistressFamilyPriority(iv) {
   return 4;
 }
 
-function isStrongHappyBumpAlternative(candidates, effectiveness = {}) {
-  const happyBumpFit = Number(effectiveness.happyBump);
-  if (!Number.isFinite(happyBumpFit) || happyBumpFit >= 0.55) return false;
-  return candidates.some((candidate) =>
-    candidate.id !== "happyBump" &&
-    Number.isFinite(Number(effectiveness[candidate.id])) &&
-    Number(effectiveness[candidate.id]) >= 0.7
-  );
-}
-
-function liftOpeningPriority(iv, answers, effectiveness, slot) {
-  if (iv.id !== "happyBump" || answers.direction !== "lift" || slot !== "opener") return 0;
-  // An explicit current rejection is a preference, not an invitation to
-  // overpower the user with a default. A well-supported alternative also wins.
-  if (dislikePenalty(iv.id, iv.mechanism) >= 7) return Number.NEGATIVE_INFINITY;
-  if (isStrongHappyBumpAlternative(INTERVENTIONS, effectiveness)) return 0;
-  return 18;
-}
-
 function chooseRankedV3(candidates, a, effectiveness, {
   slot = "core",
   usedMechanisms = new Set(),
@@ -1654,7 +1638,8 @@ function chooseRankedV3(candidates, a, effectiveness, {
   immediate = false,
 } = {}) {
   const profile = inferProfileV3(a);
-  const scored = candidates
+  let scored = candidates
+    .filter((iv) => !(a.direction === "lift" && iv.id === "goodMap"))
     .map((iv) => {
       const result = scoreInterventionV3(iv, a, effectiveness, {
         profile,
@@ -1665,17 +1650,32 @@ function chooseRankedV3(candidates, a, effectiveness, {
         seed,
         dislikePenalty,
       });
-      return { iv, result, priority: liftOpeningPriority(iv, a, effectiveness, slot) };
+      return { iv, result };
     })
-    .filter((x) => x.result.eligible && Number.isFinite(x.result.score) && Number.isFinite(x.priority))
-    .sort((x, y) => (y.result.score + y.priority) - (x.result.score + x.priority));
+    .filter((x) => x.result.eligible && Number.isFinite(x.result.score))
+    .sort((x, y) => y.result.score - x.result.score);
 
   if (!scored.length) return null;
+
+  // Owner-approved Lift sequence takes precedence over personal ranking:
+  // Happy Bump once, when hard-eligible, then a fresh check-in.
+  if (a.direction === "lift" && slot === "opener") {
+    const happyBump = scored.find(({ iv }) => iv.id === "happyBump");
+    if (happyBump) return happyBump;
+  }
+
+  // Prefer a suitable alternative to repeating something the user found
+  // unhelpful. Evidence is already shrunk toward neutral for sparse history.
+  // If every eligible option has negative feedback, keep the ranking rather
+  // than substitute an unsafe or wrong-goal practice.
+  const alternatives = scored.filter(({ iv, result }) =>
+    result.components.P >= 0.5 && dislikePenalty(iv.id, iv.mechanism) < 7);
+  if (alternatives.length) scored = alternatives;
 
   // Pathway rule (not an extra score): during high distress, if several
   // interventions are competitively ranked, prefer the more bottom-up family
   // for the opener: physiological -> sensory/somatic -> emotion -> cognitive.
-  if (!immediate && slot === "opener" && Number(a.intensity) >= 7) {
+  if (!immediate && slot === "opener" && suitabilityIntensityV3(a) >= 7) {
     const top = scored[0].result.score;
     const competitive = scored.filter((x) => x.result.score >= top - 3);
     competitive.sort((x, y) => {
@@ -1712,6 +1712,9 @@ function buildV3Sequence(answers, effectiveness = {}, opts = {}) {
 
     let candidates = INTERVENTIONS.filter((iv) => {
       if (usedIds.has(iv.id)) return false;
+      // Good Map remains available directly, but an automatic Lift journey
+      // is offered separately after a fresh post-Happy-Bump mood/distress check.
+      if (a.direction === "lift" && iv.id === "goodMap") return false;
       if (!hardEligibleV3(iv, localAnswers, profile)) return false;
       if (immediate && !immediateEligibleV3(iv, localAnswers, profile)) return false;
       return true;
@@ -1742,6 +1745,9 @@ function buildV3Sequence(answers, effectiveness = {}, opts = {}) {
     if (iv.mechanism) usedMechanisms.add(iv.mechanism);
     usedFamilies.add(familyOf(iv));
     remainingSeconds = Math.max(0, remainingSeconds - interventionDurationSeconds(iv));
+    // Its flexible duration and mandatory post-practice check-in mean we do
+    // not pre-plan a second activity using the minimum five-minute estimate.
+    if (a.direction === "lift" && iv.id === "happyBump") break;
     if (remainingSeconds < 30) break;
   }
 
@@ -1789,7 +1795,7 @@ export function immediatePathway(intensity, answers = {}, effectiveness = {}) {
   };
 
   // Immediate mode uses the same V3 scorer, but the candidate pool is restricted
-  // to low-load opener/rescue practices, lower/steady arousal, <=3 minutes,
+  // to low-load opener/rescue practices, lower/steady arousal, within the requested time,
   // with no strong cold, breath holds, cognitive restructuring, or exploration.
   return buildV3Sequence(a, effectiveness, {
     count: 3,
