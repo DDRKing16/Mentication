@@ -76,7 +76,7 @@ const MenticationRoutes = () => {
 
   return (
     <DirectionContext.Provider value={direction}>
-      <AnimatePresence mode="wait" custom={direction} initial={false}>
+      <AnimatePresence mode="sync" custom={direction} initial={false}>
         <motion.div
           key={groupKey}
           custom={direction}
@@ -84,7 +84,7 @@ const MenticationRoutes = () => {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
           className="min-h-full"
         >
           <ErrorBoundary key={groupKey}>
