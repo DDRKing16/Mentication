@@ -135,6 +135,56 @@ button svg {
   aspect-ratio:949/453;
 }
 
+/* Crisp HTML greeting sitting over the artwork (the baked-in one was erased
+   from the image so the ambient blur never softens it). Follows the visitor's
+   clock: morning/afternoon/evening, with a matching icon in the headline
+   underline's turquoise. */
+.hero-greeting {
+  position:absolute;
+  left:5%;
+  top:91%;
+  transform:translateY(-50%);
+  display:flex;
+  align-items:center;
+  gap:2cqw;
+  margin:0;
+  font-size:2cqw;
+  color:#f2e8de;
+  pointer-events:none;
+  z-index:2;
+}
+
+.hero-greeting-icon {
+  width:3.4cqw;
+  min-width:14px;
+  color:#73e9ea;
+}
+
+.hero-greeting-icon svg {
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+.hero-greeting-icon .moon {
+  display:none;
+}
+
+.hero-greeting[data-part="evening"] .hero-greeting-icon .sun {
+  display:none;
+}
+
+.hero-greeting[data-part="evening"] .hero-greeting-icon .moon {
+  display:block;
+}
+
+.hero-greeting-text {
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
 .artwork {
   display:block;
   width:100%;

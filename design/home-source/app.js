@@ -273,6 +273,17 @@
   });
   setPalace({ level: 0, name: 'The quiet clearing', nextName: 'The shack', stonesToNext: 4, progress: 0 });
   applyPreferences(readPreferences());
+  // Timezone-aware greeting. The crisp HTML overlay replaces the erased
+  // baked-in text, so it always renders sharp above the ambient blur.
+  const greeting = document.getElementById('hero-greeting');
+  const greetingText = document.getElementById('hero-greeting-text');
+  if (greeting && greetingText) {
+    const GREETINGS = { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening' };
+    const hour = new Date().getHours();
+    const part = hour < 5 ? 'evening' : hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+    greeting.dataset.part = part;
+    greetingText.textContent = GREETINGS[part];
+  }
   if (!storageAvailable) document.getElementById('preference-note').textContent = 'Your preferences apply while this page is open.';
   // The supplied image highlights its fifth circle. Preserve that visual in the preview.
   // Base44 must supply actual user/week state; the image is not evidence of completion.
