@@ -67,7 +67,12 @@ function ThoughtEntryScreen({ answers, thought, onThoughtChange, onStartVoice, o
         <div className="tof-stage">
           <div className="tof-heading">
             <h1>What’s the thought?</h1>
-            <span className="tof-sub">Write it as it appears in your mind. One is enough.</span>
+            <span className="tof-sub">Tap a close example, use voice, or write it in your own words.</span>
+          </div>
+          <div className="tof-chips" aria-label="Suggested thoughts">
+            {["I made a mistake.", "Something is going to go wrong.", "They probably think badly of me.", "I should be handling this better."].map((suggestion) => (
+              <button key={suggestion} type="button" className="tof-pill" aria-pressed={thought === suggestion} onClick={() => onThoughtChange(suggestion)}>{suggestion}</button>
+            ))}
           </div>
           <div className="tof-field-wrap">
             <textarea
