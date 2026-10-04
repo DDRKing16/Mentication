@@ -27,6 +27,10 @@ jobs:
         npm ci
         npm run build
 
+    - name: Test
+      if: matrix.node-version == '22.x'
+      run: npm test
+
     - name: Mobile preview QA
       if: matrix.node-version == '22.x' && github.event_name == 'push'
       run: |
