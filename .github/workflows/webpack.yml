@@ -26,3 +26,17 @@ jobs:
       run: |
         npm ci
         npm run build
+
+    - name: Mobile preview QA
+      if: matrix.node-version == '22.x' && github.event_name == 'push'
+      run: |
+        npm install --no-save playwright@1.55.0
+        npx playwright install chromium
+        npm run preview -- --host 127.0.0.1 > /tmp/mentation-preview.log 2>&1 &
+        for i in {1..30}; do curl -fsS http://127.0.0.1:4173 >/dev/null && break; sleep 1; done
+        node scripts/preview-qa.mjs
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add qa-preview/*.png
+        git commit -m "QA mobile preview screenshots [skip ci]" || exit 0
+        git push origin HEAD:Chat-GPT
