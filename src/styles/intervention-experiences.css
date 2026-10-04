@@ -2497,3 +2497,53 @@ html.large-text .intervention-control-shell{font-size:112.5%}
 html.one-handed .intervention-control-shell main{max-width:38rem;margin-inline:auto}
 @media(max-width:640px){.intervention-control-shell .font-heading.text-3xl{font-size:1.7rem}}
 @media(prefers-reduced-motion:reduce){.intervention-control-shell *,.intervention-control-shell *::before,.intervention-control-shell *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+/* Premium consistency pass — 2026-10-04. Shared presentation only. */
+.intervention-content-card {
+  border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(155deg, rgba(255,255,255,.075), rgba(255,255,255,.025) 55%), rgba(4,18,31,.72);
+  box-shadow: 0 26px 70px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter: blur(22px) saturate(1.08);
+  -webkit-backdrop-filter: blur(22px) saturate(1.08);
+}
+.intervention-choice {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.055);
+  color: rgba(255,255,255,.92);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+  transition: transform 180ms cubic-bezier(.22,1,.36,1), border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+.intervention-choice:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--intervention-accent) 58%, rgba(255,255,255,.18));
+  background: rgba(255,255,255,.085);
+  box-shadow: 0 10px 28px rgba(0,0,0,.12);
+}
+.intervention-choice:active { transform: translateY(0) scale(.99); }
+.intervention-choice[aria-pressed="true"],
+.intervention-choice.is-selected {
+  border-color: color-mix(in srgb, var(--intervention-accent) 78%, white 6%);
+  background: color-mix(in srgb, var(--intervention-accent) 14%, rgba(255,255,255,.05));
+}
+.intervention-primary {
+  border: 1px solid color-mix(in srgb, var(--intervention-accent) 72%, white 12%);
+  background: var(--intervention-accent);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--intervention-accent) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.32);
+  transition: transform 180ms cubic-bezier(.22,1,.36,1), filter 180ms ease, box-shadow 180ms ease;
+}
+.intervention-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.045) saturate(1.02);
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--intervention-accent) 24%, transparent), inset 0 1px 0 rgba(255,255,255,.38);
+}
+.intervention-primary:active:not(:disabled) { transform: translateY(0) scale(.99); }
+.intervention-primary:disabled { opacity: .42; filter: saturate(.65); cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  .intervention-choice, .intervention-primary { transition: none !important; }
+  .intervention-choice:hover, .intervention-primary:hover:not(:disabled) { transform: none; }
+}
+html.reduce-motion .intervention-choice,
+html.reduce-motion .intervention-primary { transition: none !important; }
+html.reduce-motion .intervention-choice:hover,
+html.reduce-motion .intervention-primary:hover:not(:disabled) { transform: none; }
