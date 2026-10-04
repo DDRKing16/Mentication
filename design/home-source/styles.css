@@ -1876,12 +1876,12 @@ body:has(dialog[open]) {
 .premium-card {
   border:1.5px dashed #efddd58a;
   cursor:pointer;
-  /* Green table felt: a warm spotlight falloff over fine felt grain and a
-     soft cloudy mottle, the way real felt reads under lamplight. */
+  /* Deep premium table felt: a dimmed lamplight falloff over strong felt
+     grain and a cloudy mottle, so the weave stays visible up close. */
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23f)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.11' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23m)'/%3E%3C/svg%3E"),
-    radial-gradient(115% 120% at 50% 6%, #3a9a63 0%, #26744a 42%, #1b5a38 70%, #123f27 100%);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.24 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.11' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.14 0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23m)'/%3E%3C/svg%3E"),
+    radial-gradient(115% 120% at 50% 4%, #2b7a4d 0%, #1d5a37 40%, #14432a 68%, #0a2c1c 100%);
 }
 .premium-felt { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 .premium-art {
