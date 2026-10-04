@@ -235,20 +235,20 @@ main:focus {
 .week-panel {
   display:grid;
   grid-template-columns:1fr 42%;
-  align-items:start;
-  gap:24px;
-  min-height:120px;
-  padding:20px 26px 9px 39px;
+  align-items:center;
+  gap:14px;
+  min-height:0;
+  padding:9px 18px 7px 24px;
   border:1.5px solid #efddd56d;
-  border-radius:40px;
+  border-radius:28px;
   background:linear-gradient(125deg,#c5a79657,#5b514f63);
   box-shadow:inset 0 1px 1px #ffffff16,0 15px 40px #22171412;
   backdrop-filter:blur(18px);
   -webkit-backdrop-filter:blur(18px);
 }
 
-/* Your week card is 20% shorter: every vertical size inside it was scaled
-   to 80% (width untouched). */
+/* Compact weekly panel: roughly half the previous vertical footprint while
+   preserving the full seven-day readout and comfortable tap targets. */
 .week-info h2 {
   display:flex;
   align-items:center;
@@ -267,15 +267,15 @@ main:focus {
 }
 
 .week-info p {
-  margin:10px 0 8px;
-  font-size:16px;
-  line-height:1.35;
+  margin:3px 0 0;
+  font-size:13px;
+  line-height:1.2;
 }
 
 .week-track-wrap {
   position:relative;
   max-width:335px;
-  margin:14px 0 0;
+  margin:5px 0 0;
 }
 
 .week-path {
@@ -283,7 +283,7 @@ main:focus {
   top:0;
   left:0;
   width:100%;
-  height:38px;
+  height:26px;
   color:#f8e5d86b;
   overflow:visible;
   pointer-events:none;
@@ -297,7 +297,7 @@ main:focus {
   display:grid;
   grid-template-columns:repeat(7,1fr);
   position:relative;
-  height:53px;
+  height:34px;
 }
 
 .week-day {
@@ -310,7 +310,7 @@ main:focus {
   left:50%;
   bottom:0;
   transform:translateX(-50%);
-  font-size:10px;
+  font-size:8px;
   font-weight:600;
   letter-spacing:1.5px;
   color:#dcc7b8;
@@ -318,30 +318,30 @@ main:focus {
 
 .week-circle {
   position:absolute;
-  top:var(--wave-y,22px);
+  top:var(--wave-y,14px);
   left:50%;
-  width:14px;
-  height:14px;
-  margin:-7px 0 0 -7px;
-  border:1.6px solid #fff1e2;
+  width:10px;
+  height:10px;
+  margin:-5px 0 0 -5px;
+  border:1.4px solid #fff1e2;
   border-radius:50%;
   background:#967b6c;
   box-shadow:0 0 0 3px #9b7d6b33;
   transition:background .3s var(--ease),box-shadow .3s ease,top .3s var(--ease);
 }
 
-.week-day:nth-child(1) .week-circle { top:18px; }
-.week-day:nth-child(2) .week-circle { top:10px; }
-.week-day:nth-child(3) .week-circle { top:9px; }
-.week-day:nth-child(4) .week-circle { top:17px; }
-.week-day:nth-child(5) .week-circle { top:23px; }
-.week-day:nth-child(6) .week-circle { top:26px; }
-.week-day:nth-child(7) .week-circle { top:22px; }
+.week-day:nth-child(1) .week-circle { top:11px; }
+.week-day:nth-child(2) .week-circle { top:6px; }
+.week-day:nth-child(3) .week-circle { top:5px; }
+.week-day:nth-child(4) .week-circle { top:10px; }
+.week-day:nth-child(5) .week-circle { top:14px; }
+.week-day:nth-child(6) .week-circle { top:16px; }
+.week-day:nth-child(7) .week-circle { top:13px; }
 
 .week-day.is-current .week-circle {
-  width:18px;
-  height:18px;
-  margin:-9px 0 0 -9px;
+  width:13px;
+  height:13px;
+  margin:-6.5px 0 0 -6.5px;
   background:#e8742f;
   border-color:#ffe2c2;
   animation:current-glow 2.2s ease-in-out infinite alternate;
@@ -360,10 +360,10 @@ main:focus {
 .week-flag {
   display:none;
   position:absolute;
-  top:-16px;
+  top:-10px;
   left:50%;
-  width:14px;
-  height:18px;
+  width:10px;
+  height:13px;
   margin-left:-2px;
   transform:scale(0);
   transform-origin:50% 90%;
@@ -393,29 +393,29 @@ main:focus {
 
 .week-actions {
   display:grid;
-  gap:10px;
+  gap:3px;
 }
 
 .begin-button {
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:12px;
+  gap:8px;
   position:relative;
-  min-height:44px;
+  min-height:35px;
   border-radius:99px;
   color:var(--ink);
   background:linear-gradient(110deg,#ffe9d6,#ffe1c9);
   box-shadow:0 5px 20px #eec6a416;
   transition:transform .22s var(--ease),box-shadow .22s ease;
   font-family:Georgia,serif;
-  font-size:17px;
+  font-size:14px;
   font-weight:700;
 }
 
 .begin-button .icon {
-  width:18px;
-  height:18px;
+  width:14px;
+  height:14px;
 }
 
 .begin-button:hover {
@@ -442,16 +442,16 @@ main:focus {
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:6px;
-  min-height:26px;
-  padding:0 10px;
+  gap:4px;
+  min-height:18px;
+  padding:0 4px;
   background:transparent;
-  font-size:14px;
+  font-size:10px;
   white-space:nowrap;
 }
 
 .seven-days .icon {
-  width:18px;
+  width:12px;
 }
 
 .seven-days:hover {
@@ -1699,16 +1699,16 @@ body:has(dialog[open]) {
   grid-template-columns:auto 1fr;
   grid-template-areas:"icon seven" "icon strip";
   grid-template-rows:auto auto;
-  gap:6px 10px;
-  align-items:end;
+  gap:2px 6px;
+  align-items:center;
 }
 .palace-badge-icon {
   grid-area:icon;
-  width:70px;
-  height:70px;
-  padding:6px;
+  width:38px;
+  height:38px;
+  padding:3px;
   border:1px solid #ffe1c9;
-  border-radius:16px;
+  border-radius:10px;
   background:linear-gradient(120deg,#0e1a30,#1c2b4c);
   transition:transform .28s var(--ease),box-shadow .28s ease;
 }
@@ -1718,7 +1718,7 @@ body:has(dialog[open]) {
   display:block;
   width:100%;
   height:100%;
-  border-radius:11px;
+  border-radius:7px;
   overflow:hidden;
   box-shadow:0 0 0 1px #ffffff24,0 5px 12px #0c152666;
 }
@@ -1737,11 +1737,11 @@ body:has(dialog[open]) {
   white-space:nowrap;
   overflow:hidden;
 }
-.palace-badge-title { font-size:9px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; opacity:.65; }
-.palace-badge-strip strong { flex:0 0 auto; font-family:Georgia,serif; font-weight:500; font-size:13px; }
+.palace-badge-title { font-size:7px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; opacity:.65; }
+.palace-badge-strip strong { flex:0 0 auto; font-family:Georgia,serif; font-weight:500; font-size:10px; }
 .palace-badge-sep { opacity:.4; }
 .palace-badge-line { display:flex; align-items:center; gap:5px; max-width:100%; }
-.palace-badge-strip em { font-style:normal; font-size:9px; opacity:.72; overflow:hidden; text-overflow:ellipsis; }
+.palace-badge-strip em { font-style:normal; font-size:7px; opacity:.72; overflow:hidden; text-overflow:ellipsis; }
 
 /* Restructure: one panel split evenly into thirds, an icon per destination. */
 .restructure-panel {
@@ -2016,11 +2016,11 @@ body:has(dialog[open]) {
 
 @media(max-width:700px) {
   .week-panel {
-    grid-template-columns:minmax(0,1fr) minmax(128px,42%);
+    grid-template-columns:minmax(0,1fr) minmax(118px,40%);
     align-items:center;
-    padding:10px 11px 8px 14px;
-    gap:9px;
-    border-radius:22px;
+    padding:6px 8px 5px 10px;
+    gap:7px;
+    border-radius:18px;
   }
   .week-info h2 {
     font-size:10px;
@@ -2035,10 +2035,10 @@ body:has(dialog[open]) {
     max-width:none;
   }
   .week-track {
-    height:34px;
+    height:28px;
   }
   .week-path {
-    height:30px;
+    height:22px;
   }
   .week-day::after {
     font-size:8px;
@@ -2060,29 +2060,29 @@ body:has(dialog[open]) {
   }
   .week-actions {
     grid-template-columns:1fr;
-    gap:4px;
+    gap:2px;
   }
   .begin-button {
-    min-height:42px;
-    font-size:18px;
-    gap:8px;
+    min-height:34px;
+    font-size:14px;
+    gap:6px;
   }
   .begin-button .icon {
-    width:18px;
-    height:18px;
+    width:14px;
+    height:14px;
   }
   .palace-badge {
     gap:2px 5px;
   }
   .palace-badge-icon {
-    width:46px;
-    height:46px;
-    padding:4px;
+    width:34px;
+    height:34px;
+    padding:3px;
   }
   .seven-days {
-    min-height:20px;
+    min-height:16px;
     justify-content:flex-end;
-    font-size:10px;
+    font-size:9px;
     padding:0;
   }
   .palace-badge-strip strong {
