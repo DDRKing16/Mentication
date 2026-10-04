@@ -344,22 +344,22 @@ main:focus {
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:19px;
+  gap:15px;
   position:relative;
-  min-height:69px;
+  min-height:55px;
   border-radius:99px;
   color:var(--ink);
   background:linear-gradient(110deg,#ffe9d6,#ffe1c9);
   box-shadow:0 5px 20px #eec6a416;
   transition:transform .22s var(--ease),box-shadow .22s ease;
   font-family:Georgia,serif;
-  font-size:26px;
+  font-size:21px;
   font-weight:700;
 }
 
 .begin-button .icon {
-  width:28px;
-  height:28px;
+  width:22px;
+  height:22px;
 }
 
 .begin-button:hover {
@@ -1133,8 +1133,8 @@ body:has(dialog[open]) {
     max-width:35.3cqw;
   }
   .begin-button {
-    min-height:7.27cqw;
-    font-size:2.74cqw;
+    min-height:5.82cqw;
+    font-size:2.19cqw;
   }
   .seven-days {
     font-size:1.9cqw;
@@ -1599,8 +1599,8 @@ body:has(dialog[open]) {
 }
 .palace-badge-icon {
   grid-area:icon;
-  width:132px;
-  height:132px;
+  width:98px;
+  height:98px;
   padding:7px;
   border:1px solid #00f5d44d;
   border-radius:20px;
