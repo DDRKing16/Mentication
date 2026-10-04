@@ -1,5 +1,6 @@
 let audio = null;
 let resumeArmed = false;
+let muted = false;
 
 const MUSIC_URL = "/audio/home-ambient.mp3";
 const MUSIC_VOLUME = 0.35;
@@ -11,6 +12,7 @@ function ensureAudio() {
     audio.loop = true;
     audio.preload = "auto";
     audio.volume = MUSIC_VOLUME;
+    audio.muted = muted;
   }
   return audio;
 }
@@ -36,13 +38,30 @@ export function handoffHomeAmbient({ currentTime = 0, volume = MUSIC_VOLUME } = 
     try { current.currentTime = currentTime; } catch { /* metadata may not be ready yet */ }
   }
   current.volume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume)) : MUSIC_VOLUME;
-  current.play().catch(() => armResume());
+  current.muted = muted;
+  if (!muted) current.play().catch(() => armResume());
 }
 
 export function resumeHomeAmbient() {
   const current = ensureAudio();
-  if (!current || !current.paused) return;
+  if (!current || muted || !current.paused) return;
+  current.muted = false;
   current.play().catch(() => armResume());
+}
+
+export function setHomeAmbientMuted(nextMuted) {
+  muted = Boolean(nextMuted);
+  const current = ensureAudio();
+  if (current) {
+    current.muted = muted;
+    if (muted) current.pause();
+    else if (current.paused) current.play().catch(() => armResume());
+  }
+  return muted;
+}
+
+export function isHomeAmbientMuted() {
+  return muted;
 }
 
 export function pauseHomeAmbient() {
