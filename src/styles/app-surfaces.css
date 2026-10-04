@@ -1511,8 +1511,15 @@ html.reduce-motion .welcome-glow--secondary {
 }
 
 /* Restructure: a thin bar under the six buttons, styled like the Your Week card so it follows the palette. */
+/* Restructure home card: a calm cream-blue so it reads as its own quiet
+   category, with the three journey previews fanned on its right side. */
+/* The card wears the same turquoise as the Begin pill, with the pill's
+   deep-sea navy text so everything on it reads clearly. */
 .home-restructure {
-  background: var(--home-week-bg, var(--home-card));
-  border: 1px solid var(--home-week-border, var(--home-border));
-  box-shadow: var(--home-shadow-sm);
+  background: #00F5D4;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 18px -8px rgba(0, 245, 212, 0.7), 0 16px 30px -20px rgba(21, 60, 96, 0.5);
 }
+.home-restructure .home-restructure-icon { color: #03283B; }
+.home-restructure .home-restructure-title { color: #03283B; }
+.home-restructure .home-restructure-sub { color: rgba(3, 40, 59, 0.7); }

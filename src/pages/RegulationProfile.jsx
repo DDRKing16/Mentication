@@ -1,11 +1,12 @@
 // @ts-check
-import React, { useEffect, useState, lazy, Suspense } from "react";
+import React, { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Sparkles, TrendingDown, Repeat, Layers, History } from "lucide-react";
+import { Castle, ChevronLeft, Sparkles, TrendingDown, Repeat, Layers, History } from "lucide-react";
 import { deleteAllLocalAppData, sessionStore } from "@/lib/localData";
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
+import { derivePeacePalace } from "@/lib/peacePalace";
 import { usePremium } from "@/hooks/usePremium";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import SafetyFooter from "@/components/SafetyFooter";
@@ -38,6 +39,7 @@ export default function RegulationProfile() {
   const [weekCount, setWeekCount] = useState(0);
   const [sessions, setSessions] = useState([]);
   const { isPremium } = usePremium();
+  const palace = useMemo(() => derivePeacePalace(sessions), [sessions]);
 
   const deleteAll = async () => {
     setDeleting(true);
@@ -163,6 +165,22 @@ export default function RegulationProfile() {
             </span>
           </button>
         )}
+
+        <button
+          onClick={() => navigate("/palace")}
+          data-sfx="select"
+          className="mt-4 flex w-full items-center gap-3 rounded-2xl border border-primary/15 bg-primary/5 px-5 py-4 text-left transition-all hover:border-primary/30 active:scale-[0.99]"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+            <Castle className="h-5 w-5" strokeWidth={1.8} />
+          </span>
+          <span className="flex-1">
+            <span className="block font-heading text-base font-medium tracking-tight text-primary">Your Peace Palace</span>
+            <span className="block text-sm text-muted-foreground">
+              A place that grows with every practice{palace.completedCount > 0 ? ` · now at ${palace.stage.name.toLowerCase()}` : " · nothing built yet"}
+            </span>
+          </span>
+        </button>
 
         <Suspense fallback={<ResetHistoryFallback />}>
           <ResetHistory sessions={sessions} />

@@ -39,6 +39,7 @@ const GoodMap = lazy(() => import('@/pages/GoodMap'));
 const Foundations = lazy(() => import('@/pages/Foundations'));
 const Restructure = lazy(() => import('@/pages/Restructure'));
 const Plus = lazy(() => import('@/pages/Plus'));
+const Palace = lazy(() => import('@/pages/Palace'));
 const ProgrammeList = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeList })));
 const ProgrammeDetail = lazy(() => import('@/pages/Programmes').then((m) => ({ default: m.ProgrammeDetail })));
 
@@ -59,7 +60,10 @@ const OnboardingGate = ({ children }) => (
 const pageVariants = {
   enter: (dir) => ({ x: dir >= 0 ? "20%" : "-10%", opacity: 0.5 }),
   center: { x: 0, opacity: 1 },
-  exit: (dir) => ({ x: dir >= 0 ? "-10%" : "20%", opacity: 0.4 }),
+  // The outgoing page clears quickly (mode="wait" holds the new page until it
+  // finishes), so navigation starts sooner — the enter still eases gently, so
+  // the change reads smooth rather than abrupt.
+  exit: (dir) => ({ x: dir >= 0 ? "-10%" : "20%", opacity: 0.4, transition: { duration: 0.06, ease: [0.22, 1, 0.36, 1] } }),
 };
 
 const MenticationRoutes = () => {
@@ -105,6 +109,7 @@ const MenticationRoutes = () => {
                 <Route path="/support" element={<Crisis />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/plus" element={<Plus />} />
+                <Route path="/palace" element={<OnboardingGate><Palace /></OnboardingGate>} />
                 <Route path="/programmes" element={<ProgrammeList />} />
                 <Route path="/programmes/:id" element={<ProgrammeDetail />} />
                 <Route path="/signal-lock" element={<OnboardingGate><SignalLock /></OnboardingGate>} />
@@ -128,6 +133,37 @@ function App() {
   useEffect(() => installFeedback(), []);
   // Ask Apple once per launch whether Plus is active (kept on the device for offline use).
   useEffect(() => { void refreshPlus(); }, []);
+  // Warm every lazy route's module while the app sits idle, so the first tap
+  // on any destination resolves instantly instead of waiting on a chunk fetch
+  // behind the route transition.
+  useEffect(() => {
+    const warm = () => {
+      import("@/pages/ResetFlow");
+      import("@/components/NextEasiestStepExperience");
+      import("@/pages/Crisis");
+      import("@/pages/Privacy");
+      import("@/pages/Welcome");
+      import("@/pages/Journal");
+      import("@/pages/Dear2100");
+      import("@/pages/NightChannel");
+      import("@/pages/ParkingLot");
+      import("@/pages/SignalLock");
+      import("@/pages/VectorShift");
+      import("@/pages/GoodMap");
+      import("@/pages/Foundations");
+      import("@/pages/Restructure");
+      import("@/pages/Plus");
+      import("@/pages/Palace");
+      import("@/pages/Programmes");
+      import("@/pages/InterventionLibrary");
+      import("@/pages/RegulationProfile");
+      import("@/pages/MyPlan");
+      import("@/pages/EffectivenessDashboard");
+      import("@/pages/Settings");
+    };
+    const idle = (cb) => (typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(cb, { timeout: 4000 }) : window.setTimeout(cb, 1200));
+    idle(warm);
+  }, []);
   return (
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>

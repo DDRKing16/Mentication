@@ -21,6 +21,7 @@ export const RESTRUCTURE_ITEMS = [
     title: "Find the one foundation to strengthen this week",
     tint: "#06142A",
     accent: "#7FE3D6",
+    image: "/media/plus-preview/foundations.jpg",
     plus: false,
   },
   { ...byId("dear2100"), title: "Go after what you've avoided", plus: true },

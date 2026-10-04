@@ -10,21 +10,23 @@
 import { useSyncExternalStore } from "react";
 import { Capacitor } from "@capacitor/core";
 
-// These must match the product IDs created in App Store Connect exactly.
+// Must match the product ID created in App Store Connect exactly. There is
+// one plan: a single monthly subscription. The 7-day free trial is Apple's
+// introductory offer on that product, configured in App Store Connect.
 export const PLUS_PRODUCTS = Object.freeze({
-  annual: "com.mentation.app.plus.annual",
   monthly: "com.mentation.app.plus.monthly",
 });
 const PRODUCT_IDS = Object.values(PLUS_PRODUCTS);
 
-// Length of the free trial configured on the products in App Store Connect.
+// Length of the free trial configured on the product in App Store Connect.
 // Shown on the Plus screen; keep it in step with what is set up there.
 export const PLUS_TRIAL_DAYS = 7;
 
-// Shown until the App Store has returned real, local prices.
+// Shown until the App Store has returned real, local prices. The baseline
+// price point is US$7.99/month — Apple converts it to each store's local
+// currency, so this is only ever a placeholder in the browser.
 export const FALLBACK_PRICES = Object.freeze({
-  annual: "A$59.99/year",
-  monthly: "A$9.99/month",
+  monthly: "US$7.99/month",
 });
 
 const CACHE_KEY = "mentication.plus.v1";
@@ -101,7 +103,7 @@ export async function refreshPlus() {
 }
 
 /**
- * Real, local prices from the App Store: { annual, monthly } price strings.
+ * Real, local prices from the App Store: { monthly } price strings.
  * On the phone, a price that couldn't be confirmed comes back as `null`
  * rather than the placeholder text below — showing e.g. "A$59.99" as if
  * final would be the wrong currency for anyone not on the Australian store.
@@ -116,17 +118,14 @@ export async function loadPlusPrices() {
       const product = (products || []).find((p) => p.identifier === id);
       return product ? `${product.priceString}${suffix}` : null;
     };
-    return {
-      annual: price(PLUS_PRODUCTS.annual, "/year"),
-      monthly: price(PLUS_PRODUCTS.monthly, "/month"),
-    };
+    return { monthly: price(PLUS_PRODUCTS.monthly, "/month") };
   } catch {
-    return { annual: null, monthly: null };
+    return { monthly: null };
   }
 }
 
-/** Start the App Store purchase for "annual" or "monthly". */
-export async function purchasePlus(plan) {
+/** Start the App Store purchase for the monthly plan. */
+export async function purchasePlus(plan = "monthly") {
   const productId = PLUS_PRODUCTS[plan];
   if (!productId) throw new Error("Unknown plan.");
   if (!isNative()) {

@@ -18,6 +18,8 @@ import {
   Home
 } from "lucide-react";
 import { consumeNextStepHandoff } from "@/lib/tomorrowParking/storage";
+import { generateTaskSteps } from "@/lib/aiSteps";
+import { findLibraryTask } from "@/lib/taskLibrary";
 
 // Category to Lucide icon mapping for Image 1 premium grid
 const CATEGORY_ICONS = {
@@ -1109,34 +1111,26 @@ const CATEGORY_STYLES = {
   errands: { border: "#C7D2FE", bg: "#EEF2FF", text: "#3730A3", iconBg: "rgba(199, 210, 254, 0.2)" }
 };
 
-const generateLadder = (category, taskKey, brainState, pathLength = "regular") => {
+const generateLadder = (category, taskKey, brainState, pathLength = "regular", overrideSteps = null) => {
   let baseSteps = [];
-  const capitalizedTaskName = taskKey.replace(/-/g, " ").replace(/\\b\\w/g, c => c.toUpperCase());
+  const capitalizedTaskName = taskKey.replace(/-/g, " ").replace(/(^|[\s-])\w/g, c => c.toUpperCase());
   
-  // Custom or pre-defined task check
-  if (category === "custom" || !TASK_STEPS[taskKey]) {
-    // Generate custom/generic steps seamlessly using capitalizedTaskName
+  // AI-written steps win, then hand-crafted steps, then the generic fallback.
+  if (overrideSteps) {
+    baseSteps = overrideSteps;
+  } else if (category === "custom" || !TASK_STEPS[taskKey]) {
+    // Last-resort fallback: straight into the work, no ritual padding.
     baseSteps = [
-      { title: `Acknowledge the intention for ${capitalizedTaskName}`, micro: "Take a deep breath and accept the space you are in.", time: "<15 sec", easier: ["Close your eyes and breathe", "Just sit comfortably"] },
-      { title: `Prepare your immediate space for ${capitalizedTaskName}`, micro: "Clear any visual distraction within your arm's reach.", time: "<20 sec", easier: ["Move one small item", "Straighten chair"] },
-      { title: `Locate your primary tool for ${capitalizedTaskName}`, micro: "Find the first device, tool, notebook, or item you will need.", time: "<15 sec", easier: ["Glance around for tool", "Think of main item"] },
-      { title: `Position your primary tool for ${capitalizedTaskName}`, micro: "Place it comfortably right in front of you.", time: "<15 sec", easier: ["Set down main tool", "Look at tool placement"] },
-      { title: `Eliminate digital noise for ${capitalizedTaskName}`, micro: "Minimize unrelated tabs or silence your phone notifications.", time: "<20 sec", easier: ["Mute phone sound", "Minimize one tab"] },
-      { title: `Open the workspace or app for ${capitalizedTaskName}`, micro: "Launch the software, document, or walk to the physical location.", time: "<20 sec", easier: ["Click app to open", "Look toward work area"] },
-      { title: `Set up a clean slate for ${capitalizedTaskName}`, micro: "Open a blank document, clean surface, or fresh area.", time: "<15 sec", easier: ["Press Cmd+N", "Look at clean space"] },
-      { title: `Create a simple title or label for ${capitalizedTaskName}`, micro: "Write down the name of what you are doing to ground yourself.", time: "<15 sec", easier: ["Type first draft letter", "Scribble down one keyword"] },
-      { title: `Draft your checklist for ${capitalizedTaskName}`, micro: "Write down just 1 or 2 small actions you want to do.", time: "<25 sec", easier: ["Write bullet point", "Think of first subtask"] },
-      { title: `Review the first small checkpoint of ${capitalizedTaskName}`, micro: "Look at the very first action without doing it yet.", time: "<15 sec", easier: ["Glance at checklist", "Breathe out gently"] },
-      { title: `Perform the first 1-minute action for ${capitalizedTaskName}`, micro: "Spend just 60 seconds on the easiest part.", time: "<60 sec", easier: ["Do first easiest movement", "Focus for 15 seconds"] },
-      { title: `Acknowledge your progress on ${capitalizedTaskName}`, micro: "Take a brief pause and feel good about starting.", time: "<15 sec", easier: ["Smile once", "Take deep breath"] },
-      { title: `Focus on the second micro-step of ${capitalizedTaskName}`, micro: "Execute the next small movement or detail.", time: "<30 sec", easier: ["Do next simple step", "Think of next action"] },
-      { title: `Check your alignment on ${capitalizedTaskName}`, micro: "Ensure you are staying with the micro-task, keeping it simple.", time: "<20 sec", easier: ["Adjust sitting posture", "Verify current focus"] },
-      { title: `Spend another 2 minutes on ${capitalizedTaskName}`, micro: "Keep a steady, relaxed pace. Do not rush.", time: "<120 sec", easier: ["Do 30 seconds of work", "Keep hands relaxed"] },
-      { title: `Observe how the momentum is building for ${capitalizedTaskName}`, micro: "Notice that starting was the hardest part.", time: "<20 sec", easier: ["Breathe in deep", "Look at completed part"] },
-      { title: `Perform one more quiet step for ${capitalizedTaskName}`, micro: "Add another tiny piece to your work.", time: "<45 sec", easier: ["Add small detail", "Write next line"] },
-      { title: `Draft or outline the next phase for ${capitalizedTaskName}`, micro: "Scribble down your next thoughts or directions.", time: "<30 sec", easier: ["Jot down outline notes", "Think of future steps"] },
-      { title: `Begin transitioning out of the start phase of ${capitalizedTaskName}`, micro: "Complete your current micro-action smoothly.", time: "<30 sec", easier: ["Finishing current stroke", "Rest your hands"] },
-      { title: `Celebrate taking action on ${capitalizedTaskName}`, micro: "You have successfully broken the ice and built momentum!", time: "<15 sec", easier: ["Smile at progress", "Release tension"] }
+      { title: `Do the easiest visible piece of ${capitalizedTaskName}`, micro: "Name the smallest concrete action it needs and do it now — even badly.", time: "<60 sec", easier: ["Do 10 seconds only", "Do the first click or move"] },
+      { title: `Gather what ${capitalizedTaskName} needs`, micro: "Pull the tools, files or ingredients into arm's reach.", time: "<60 sec", easier: ["Grab just one tool", "Open the one app or page"] },
+      { title: `Start the first real part of ${capitalizedTaskName}`, micro: "Begin the core work — rough is fine, momentum matters.", time: "<60 sec", easier: ["Do it badly on purpose", "Work for 30 seconds"] },
+      { title: `Keep working on ${capitalizedTaskName} for two minutes`, micro: "Stay on this task only; park every stray idea on paper instead.", time: "<120 sec", easier: ["Work for 60 seconds", "Slow the pace, don't stop"] },
+      { title: `Check where ${capitalizedTaskName} stands`, micro: "Look at what's done so far and name the next piece out loud.", time: "<30 sec", easier: ["One glance only", "Point at the next piece"] },
+      { title: `Do the next piece of ${capitalizedTaskName}`, micro: "Take the piece you just named and complete it.", time: "<120 sec", easier: ["Do half of it", "Do the simplest version"] },
+      { title: `Fix the roughest edge of ${capitalizedTaskName}`, micro: "One improvement pass over the messiest part.", time: "<120 sec", easier: ["Improve one line or corner", "Set a two-minute timer"] },
+      { title: `Finish the final piece of ${capitalizedTaskName}`, micro: "Complete the last remaining piece so it's actually done.", time: "<180 sec", easier: ["Do 80% and call it", "Finish one sub-part"] },
+      { title: `Put away the tools from ${capitalizedTaskName}`, micro: "Return everything this task used to its place.", time: "<60 sec", easier: ["Put away one tool", "Close the tabs or apps"] },
+      { title: `Confirm ${capitalizedTaskName} is done`, micro: "Look at the finished result — it's done, not perfect.", time: "<30 sec", easier: ["Tick it off silently", "Tell someone it's done"] },
     ];
   } else {
     // Retrieve the 20 pre-defined hand-crafted steps
@@ -1242,6 +1236,7 @@ export default function NextEasiestStepExperience() {
   const [showPause, setShowPause] = useState(false);
   const [easierOptionsVisible, setEasierOptionsVisible] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   const canvasRef = useRef(null);
   const audioCtxRef = useRef(null);
@@ -1440,9 +1435,24 @@ export default function NextEasiestStepExperience() {
     setGameState(prev => ({ ...prev, screen: screenName }));
   };
 
-  const handleSelectCategoryTask = (catKey, taskObj) => {
+  const handleSelectCategoryTask = async (catKey, taskObj) => {
     playClick();
-    const ladderSteps = generateLadder(catKey, taskObj.id, gameState.brainState, gameState.pathLength);
+    // Tasks without hand-crafted steps get AI-written ones (falls back to the
+    // generic ladder if the AI relay is unavailable).
+    const needsAI = !TASK_STEPS[taskObj.id];
+    let aiSteps = null;
+    if (needsAI) {
+      // Library match first (instant, task-specific), AI only if it misses.
+      const libMatch = findLibraryTask(taskObj.name);
+      if (libMatch) {
+        aiSteps = libMatch.steps;
+      } else {
+        setAiGenerating(true);
+        aiSteps = await generateTaskSteps(taskObj.name, { pathLength: gameState.pathLength });
+        setAiGenerating(false);
+      }
+    }
+    const ladderSteps = generateLadder(catKey, taskObj.id, gameState.brainState, gameState.pathLength, aiSteps);
     setGameState(prev => ({
       ...prev,
       category: catKey,
@@ -1457,12 +1467,22 @@ export default function NextEasiestStepExperience() {
     setSelectedSubcategory(null);
   };
 
-  const handleCustomTaskGo = () => {
-    if (!customTaskInput.trim()) return;
+  const handleCustomTaskGo = async () => {
+    if (!customTaskInput.trim() || aiGenerating) return;
     playClick();
     const cleanInput = customTaskInput.trim();
     const taskSlug = cleanInput.toLowerCase().replace(/\s+/g, "-");
-    const ladderSteps = generateLadder("work", taskSlug, gameState.brainState, gameState.pathLength);
+    // A typed task is always its own thing: the big library provides its own
+    // steps when it matches, AI writes them when it doesn't, and the generic
+    // ladder is only the last-resort fallback.
+    const libMatch = findLibraryTask(cleanInput);
+    let aiSteps = null;
+    if (!libMatch) {
+      setAiGenerating(true);
+      aiSteps = await generateTaskSteps(cleanInput, { pathLength: gameState.pathLength });
+      setAiGenerating(false);
+    }
+    const ladderSteps = generateLadder("work", taskSlug, gameState.brainState, gameState.pathLength, libMatch?.steps || aiSteps);
     setGameState(prev => ({
       ...prev,
       category: "custom",
@@ -1573,6 +1593,31 @@ export default function NextEasiestStepExperience() {
     >
       {/* Shared Home button on every screen, and Back on the opening screen (inner screens keep their own step-back arrows). */}
       <InterventionNav back={gameState.screen === "landing"} home tone="dark" />
+      {/* While the AI writes task-specific steps, a small overlay keeps the
+          tap responsive instead of leaving the screen unchanged. */}
+      {aiGenerating && (
+        <div
+          role="status"
+          aria-label="Writing your steps"
+          style={{
+            position: "fixed", inset: 0, zIndex: 90,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "12px",
+            background: "rgba(2, 7, 18, 0.55)", backdropFilter: "blur(4px)",
+            color: "#FFFFFF", fontWeight: "800", fontSize: "15px",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{
+              width: "22px", height: "22px", borderRadius: "50%",
+              border: "3px solid rgba(255,255,255,0.3)", borderTopColor: "#FFFFFF",
+              animation: "nes-ai-spin 0.9s linear infinite",
+            }}
+          />
+          Writing your steps…
+          <style>{`@keyframes nes-ai-spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
       {/* Scope-contained inject tokens and components styling for precision rendering */}
       <style dangerouslySetInnerHTML={{ __html: `
         .nes-v2-wrap {

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "rea
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
+import { Castle, ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
 import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
@@ -41,6 +41,7 @@ import { sessionStore } from "@/lib/localData";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
 import { recordHandoffDecision } from "@/lib/flagshipMemory";
+import { maybeRequestReview } from "@/lib/reviewPrompt";
 import {
   createInitialResetAnswers,
   INTENSITY_QUESTION,
@@ -70,7 +71,6 @@ export default function ResetFlow() {
 
   const [endIntensity, setEndIntensity] = useState(null);
   const [tofEntryThought, setTofEntryThought] = useState("");
-  const [tofReady, setTofReady] = useState(false);
   const [tofVoiceState, setTofVoiceState] = useState("idle");
   const [tofVoiceSeconds, setTofVoiceSeconds] = useState(0);
   const voiceStreamRef = useRef(null);
@@ -133,6 +133,26 @@ export default function ResetFlow() {
   }, [stepParam]);
   useEffect(() => () => { if (buildingTimer.current) clearTimeout(buildingTimer.current); }, []);
 
+  // Review prompt: fire once per completion, after the "done" screen (which
+  // only renders once BrandClosing's animation has finished). Waits a
+  // further 800-1200ms so it never competes with the completion animation
+  // itself, per Apple's own guidance. The streak itself needs no extra
+  // bookkeeping here — it's derived live from session history wherever it's
+  // displayed (see src/lib/streak.js's computeLocalCalendarStreak).
+  const completionHandledRef = useRef(false);
+  useEffect(() => {
+    if (phase !== "done") { completionHandledRef.current = false; return; }
+    if (completionHandledRef.current) return;
+    completionHandledRef.current = true;
+    const delay = 800 + Math.round(Math.random() * 400);
+    const t = setTimeout(() => {
+      sessionStore.list("-created_date", 1000).then((sessions) => {
+        maybeRequestReview(sessions.length);
+      }).catch(() => {});
+    }, delay);
+    return () => clearTimeout(t);
+  }, [phase]);
+
   // Completion reliably returns the user home: after the affirming done
   // screen, gently auto-advance to home. Any tap cancels by changing the phase
   // or navigating.
@@ -160,6 +180,13 @@ export default function ResetFlow() {
 
   useEffect(() => () => releaseThoughtVoice(), []);
 
+  // The mic permission is asked for once per session: the granted stream is
+  // kept (muted between notes) and reused, so the browser never re-prompts
+  // for every voice note. It is fully released only when the flow unmounts.
+  const muteThoughtVoice = () => {
+    voiceStreamRef.current?.getAudioTracks().forEach((track) => { track.enabled = false; });
+  };
+
   const startThoughtVoiceEntry = async () => {
     setTofVoiceSeconds(0);
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -167,20 +194,25 @@ export default function ResetFlow() {
       return;
     }
     try {
-      voiceStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!voiceStreamRef.current) {
+        voiceStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } else {
+        voiceStreamRef.current.getAudioTracks().forEach((track) => { track.enabled = true; });
+      }
       setTofVoiceState("listening");
     } catch {
+      voiceStreamRef.current = null;
       setTofVoiceState("idle");
     }
   };
 
   const stopThoughtVoiceEntry = () => {
-    releaseThoughtVoice();
+    muteThoughtVoice();
     setTofVoiceState("stopped");
   };
 
   const returnToThoughtWriting = () => {
-    releaseThoughtVoice();
+    muteThoughtVoice();
     setTofVoiceSeconds(0);
     setTofVoiceState("idle");
   };
@@ -512,12 +544,10 @@ export default function ResetFlow() {
         <Suspense fallback={<BuildingResetScreen />}>
           <ThoughtOrFactEntry
             answers={answers}
-            ready={tofReady}
             thought={tofEntryThought}
             voiceSeconds={tofVoiceSeconds}
             voiceState={tofVoiceState}
             onBegin={beginGuided}
-            onReady={() => setTofReady(true)}
             onReturnToWriting={returnToThoughtWriting}
             onStartVoice={startThoughtVoiceEntry}
             onStopVoice={stopThoughtVoiceEntry}
@@ -954,6 +984,19 @@ export default function ResetFlow() {
           <p className="mx-auto mt-4 max-w-sm text-lg text-muted-foreground text-balance">
             That’s the whole practice. Come back any time you need to.
           </p>
+          {(attemptLogRef.current || []).some((a) => a?.exit_reason === "completed") && (
+            <motion.button
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              onClick={() => navigate("/palace", { replace: true })}
+              data-sfx="select"
+              className="mx-auto mt-5 flex items-center gap-2 rounded-full border border-teal/30 bg-teal/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-teal/50"
+            >
+              <Castle className="h-4 w-4 text-teal" strokeWidth={1.8} />
+              Your Peace Palace grew — visit it
+            </motion.button>
+          )}
         </div>
 
         {weekCount > 0 && (

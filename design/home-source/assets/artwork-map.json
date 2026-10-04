@@ -1,0 +1,74 @@
+{
+  "source": "assets/images/approved-homescreen.png",
+  "width": 949,
+  "height": 1657,
+  "regions": {
+    "hero": [
+      0,
+      0,
+      949,
+      453
+    ],
+    "lift": [
+      51,
+      692,
+      280,
+      170
+    ],
+    "focus": [
+      338,
+      692,
+      279,
+      170
+    ],
+    "calm": [
+      623,
+      691,
+      280,
+      171
+    ],
+    "ground": [
+      53,
+      863,
+      279,
+      163
+    ],
+    "sleep": [
+      340,
+      864,
+      273,
+      161
+    ],
+    "guide": [
+      620,
+      864,
+      283,
+      163
+    ],
+    "restructure": [
+      57,
+      1041,
+      839,
+      99
+    ],
+    "journal": [
+      58,
+      1201,
+      273,
+      204
+    ],
+    "good-map": [
+      341,
+      1201,
+      275,
+      205
+    ],
+    "dear-2100": [
+      622,
+      1201,
+      273,
+      204
+    ]
+  },
+  "note": "Unmodified reference, rendered using lossless SVG viewports. No generated replacement imagery."
+}

@@ -1,0 +1,17 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "OPENAI_API_KEY",
+      "description": "OpenAI API key (platform.openai.com → API keys) used by the server/ai-proxy.mjs relay for AI-written steps on custom tasks. Account currently has no credits (insufficient_quota).",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "ANTHROPIC_API_KEY",
+      "description": "Optional Anthropic API key (console.anthropic.com) used by the relay only when no OpenAI key is set.",
+      "requiredAtBoot": false
+    }
+  ]
+}
