@@ -51,6 +51,12 @@ Start with `README.md` for setup, validation and iOS workflow.
   Rebuild home.html after editing palaceArt.js.
 - Because the document carries its own bottom navigation, AppShell hides the
   host `TabBar` on `/`.
+- Pending from the owner (do not invent values): they will upload real palace
+  artwork images and the full progression points (stage names/thresholds —
+  they mentioned "Four Foundations" and "get to 100 in the Good Map") to
+  replace the current SVG placeholder crops and PALACE_STAGES. The home badge
+  intentionally shows only "Level N of 7" + "N stones to <next stage>" — no
+  stage name; swap artwork in `setPalace` (design/home-source/app.js).
 
 ## Base44 dev environment
 

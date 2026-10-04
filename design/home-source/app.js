@@ -209,20 +209,18 @@
     const toNext = Number.isInteger(palace.stonesToNext) && palace.stonesToNext > 0 ? palace.stonesToNext : 0;
     const progress = Number.isFinite(palace.progress) ? Math.max(0, Math.min(1, palace.progress)) : 0;
     const levelText = `Level ${level + 1} of 7`;
-    // A crop per stage so the badge thumb always shows the building itself,
-    // whether it is one sprout or the full palace.
+    // A tight crop per stage so the badge thumb always shows the building
+    // itself, whether it is one sprout or the full palace. Placeholder only:
+    // the owner will supply real palace artwork images to swap in here.
     const badgeCrops = [
-      '140 148 120 127', '120 118 180 157', '95 98 230 177',
-      '85 73 260 202', '70 53 300 222', '60 38 330 237', '55 23 345 252'
+      '150 148 100 127', '138 122 128 140', '105 100 190 165',
+      '90 72 245 193', '75 52 275 213', '65 36 310 229', '58 22 335 243'
     ];
     document.getElementById('palace-card-art').innerHTML = palaceSvg(level, { id: 'home-palace-card', viewBox: '40 8 320 272' });
     document.getElementById('palace-badge-art').innerHTML = palaceSvg(level, { id: 'home-palace-badge', viewBox: badgeCrops[level] });
     document.getElementById('palace-card-chip').textContent = levelText;
-    document.getElementById('palace-badge-level').textContent = `Lv ${level + 1}`;
-    if (name) {
-      document.getElementById('palace-card-name').textContent = name;
-      document.getElementById('palace-badge-name').textContent = name;
-    }
+    document.getElementById('palace-badge-level').textContent = levelText;
+    if (name) document.getElementById('palace-card-name').textContent = name;
     const nextLine = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} to ${nextName.toLowerCase()}` : 'Your palace is complete';
     document.getElementById('palace-card-next').textContent = nextLine;
     document.getElementById('palace-badge-next').textContent = nextLine;

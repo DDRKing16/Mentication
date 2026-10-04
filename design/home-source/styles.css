@@ -1589,8 +1589,10 @@ body:has(dialog[open]) {
 .palace-badge {
   display:flex;
   align-items:center;
-  gap:11px;
-  padding:8px 12px 8px 8px;
+  gap:10px;
+  justify-self:start;
+  max-width:100%;
+  padding:7px 14px 7px 7px;
   border:1px solid #00f5d44d;
   border-radius:18px;
   background:linear-gradient(120deg,#0e1a30,#1c2b4c);
@@ -1601,29 +1603,18 @@ body:has(dialog[open]) {
 .palace-badge:hover { transform:translateY(-1px); box-shadow:0 0 22px #00f5d42e; }
 .palace-badge-art {
   flex:0 0 auto;
-  width:68px;
-  height:56px;
-  border-radius:13px;
+  width:58px;
+  height:48px;
+  border-radius:12px;
   overflow:hidden;
   box-shadow:0 0 0 1px #ffffff24,0 5px 12px #0c152666;
 }
 .palace-badge-art svg { display:block; width:100%; height:100%; }
-.palace-badge-text { flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; line-height:1.15; text-align:left; }
-.palace-badge-eyebrow { font-size:7.5px; letter-spacing:2px; text-transform:uppercase; color:#00f5d4; opacity:.92; }
-.palace-badge-text strong { font-family:Georgia,serif; font-weight:500; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.palace-badge-progress { display:block; height:3px; border-radius:2px; background:#ffffff26; overflow:hidden; }
+.palace-badge-text { display:flex; flex-direction:column; gap:3px; min-width:0; line-height:1.15; text-align:left; }
+.palace-badge-text strong { font-family:Georgia,serif; font-weight:500; font-size:14px; white-space:nowrap; }
+.palace-badge-progress { display:block; width:120px; height:3px; border-radius:2px; background:#ffffff26; overflow:hidden; }
 .palace-badge-progress-fill { display:block; height:100%; width:0; background:#00f5d4; border-radius:2px; transition:width .6s var(--ease); }
-.palace-badge-text em { font-style:normal; font-size:9.5px; opacity:.72; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.palace-badge-level {
-  flex:0 0 auto;
-  padding:3px 8px;
-  border-radius:999px;
-  background:#00f5d4;
-  color:#061827;
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:1px;
-}
+.palace-badge-text em { font-style:normal; font-size:9.5px; opacity:.72; white-space:nowrap; }
 
 /* Restructure: one panel split evenly into thirds, an icon per destination. */
 .restructure-panel {
