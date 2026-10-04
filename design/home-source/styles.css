@@ -1380,14 +1380,34 @@ body:has(dialog[open]) {
     min-width:5px;
   }
   .more-track {
-    grid-auto-columns:76%;
-    gap:12px;
-    margin-right:-20px;
-    padding-right:20px;
+    grid-auto-columns:calc((100% - 16px)/3);
+    gap:8px;
+    margin-right:0;
+    padding-right:0;
     padding-top:6px;
   }
   .discovery {
-    border-radius:21px;
+    border-radius:16px;
+  }
+  .preview-label {
+    left:7px;
+    right:7px;
+    bottom:6px;
+    gap:2px;
+  }
+  .preview-label span {
+    font-size:7px;
+    letter-spacing:1.2px;
+  }
+  .preview-label strong {
+    font-size:11px;
+    line-height:1.12;
+  }
+  .preview-label em {
+    font-size:8px;
+  }
+  .carousel-controls {
+    display:none;
   }
   .support-links {
     gap:15px;
@@ -1468,8 +1488,8 @@ body:has(dialog[open]) {
     font-size:9px;
   }
   .more-track {
-    margin-right:-15px;
-    padding-right:15px;
+    margin-right:0;
+    padding-right:0;
   }
 }
 
