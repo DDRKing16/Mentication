@@ -46,15 +46,15 @@ function suggestionsFor(field) {
   return ["I’m not sure yet", "Something small", "A simple first answer"];
 }
 
-function setNativeValue(field, value) {
-  const proto = field instanceof HTMLTextAreaElement
-    ? window.HTMLTextAreaElement?.prototype
-    : window.HTMLInputElement?.prototype;
+function setNativeValue(field, value, doc) {
+  const view = doc.defaultView || window;
+  const isTextArea = field.tagName === "TEXTAREA";
+  const proto = isTextArea ? view.HTMLTextAreaElement?.prototype : view.HTMLInputElement?.prototype;
   const setter = proto && Object.getOwnPropertyDescriptor(proto, "value")?.set;
   if (setter) setter.call(field, value);
   else field.value = value;
-  field.dispatchEvent(new Event("input", { bubbles: true }));
-  field.dispatchEvent(new Event("change", { bubbles: true }));
+  field.dispatchEvent(new view.Event("input", { bubbles: true }));
+  field.dispatchEvent(new view.Event("change", { bubbles: true }));
   field.focus();
 }
 
@@ -85,10 +85,13 @@ function ensureStyle(doc) {
   doc.head?.appendChild(style);
 }
 
-function eligible(field) {
-  if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) return false;
+function eligible(field, doc) {
+  const view = doc.defaultView || window;
+  const isInput = view.HTMLInputElement && field instanceof view.HTMLInputElement;
+  const isTextArea = view.HTMLTextAreaElement && field instanceof view.HTMLTextAreaElement;
+  if (!isInput && !isTextArea) return false;
   if (field.disabled || field.readOnly || field.hidden) return false;
-  if (field instanceof HTMLInputElement) {
+  if (isInput) {
     const type = (field.type || "text").toLowerCase();
     if (!["text", "search", "email", "url", "tel"].includes(type)) return false;
   }
@@ -97,7 +100,7 @@ function eligible(field) {
 }
 
 function enhanceField(field, doc) {
-  if (!eligible(field) || field.hasAttribute(MARK)) return;
+  if (!eligible(field, doc) || field.hasAttribute(MARK)) return;
   field.setAttribute(MARK, "true");
 
   const rail = doc.createElement("div");
@@ -110,7 +113,7 @@ function enhanceField(field, doc) {
     button.type = "button";
     button.className = "mentation-answer-chip";
     button.textContent = answer;
-    button.addEventListener("click", () => setNativeValue(field, answer));
+    button.addEventListener("click", () => setNativeValue(field, answer, doc));
     rail.appendChild(button);
   });
 
@@ -126,7 +129,8 @@ export function installClickableSuggestions(doc = document) {
   };
 
   scan();
-  const observer = new MutationObserver((mutations) => {
+  const Observer = doc.defaultView?.MutationObserver || MutationObserver;
+  const observer = new Observer((mutations) => {
     for (const mutation of mutations) {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType !== 1) return;
