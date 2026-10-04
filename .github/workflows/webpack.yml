@@ -2,7 +2,7 @@ name: NodeJS with Webpack
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "Chat-GPT" ]
   pull_request:
     branches: [ "main" ]
 
@@ -30,4 +30,20 @@ jobs:
     - name: Test
       if: matrix.node-version == '22.x'
       run: npm test
+
+    - name: Final Change Scene preview
+      if: matrix.node-version == '22.x' && github.event_name == 'push'
+      run: |
+        npm install --no-save playwright@1.55.0
+        npx playwright install chromium
+        npm run preview -- --host 127.0.0.1 > /tmp/mentation-preview.log 2>&1 &
+        for i in {1..30}; do curl -fsS http://127.0.0.1:4173 >/dev/null && break; sleep 1; done
+        node scripts/change-scene-final-qa.mjs
+
+    - name: Upload final Change Scene preview
+      if: matrix.node-version == '22.x' && github.event_name == 'push'
+      uses: actions/upload-artifact@v4
+      with:
+        name: change-scene-final-preview
+        path: qa-preview/change-scene-final.png
 
