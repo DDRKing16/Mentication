@@ -8,7 +8,7 @@ await page.addInitScript(() => localStorage.setItem("haven_onboarded", "1"));
 await fs.mkdir("qa-preview", { recursive: true });
 
 async function snap(name, pathway) {
-  await page.goto(base + "/", { waitUntil: "networkidle" });
+  await page.goto(base + "/", { waitUntil: "domcontentloaded", timeout: 15000 });
   if (pathway) {
     const state = {
       prebuilt: true,
@@ -22,8 +22,8 @@ async function snap(name, pathway) {
       movement: "seated"
     };
     await page.evaluate((s) => history.replaceState({ usr: s, key: "qa", idx: 0 }, "", "/reset"), state);
-    await page.reload({ waitUntil: "networkidle" });
-    await page.waitForTimeout(2200);
+    await page.reload({ waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(800);
   } else {
     await page.waitForTimeout(1200);
   }
