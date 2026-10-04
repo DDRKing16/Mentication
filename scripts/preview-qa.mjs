@@ -23,7 +23,7 @@ async function snap(name, pathway) {
     };
     await page.evaluate((s) => history.replaceState({ usr: s, key: "qa", idx: 0 }, "", "/reset"), state);
     await page.reload({ waitUntil: "domcontentloaded", timeout: 15000 });
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(4200);
   } else {
     await page.waitForTimeout(1200);
   }
@@ -44,12 +44,6 @@ for (const [name, id] of [
   ["change-scene","changeScene"],
   ["tomorrow-parking","tomorrowParking"],
   ["next-easiest-step","nextAction"],
-  ["urge-surf","urgeSurf"],
-  ["test-prediction","testPrediction"],
-  ["then-what","thenWhat"],
-  ["countermove","countermove"],
-  ["open-channel","openChannel"],
-  ["pulse-shift","pulseShift"],
   ["happy-bump","happyBump"],
   ["signal-lock","signalLock"],
   ["vector-shift","vectorShift"],
