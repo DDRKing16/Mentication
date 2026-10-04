@@ -154,6 +154,19 @@ function SignatureVisual({ id, step, reducedMotion }) {
   return <div className="signature compress"><div/><div/><div/><motion.span {...motionProps}/></div>;
 }
 
+function tapSuggestionsFor(id, current, data) {
+  const key = current?.key;
+  if (id === "testPrediction" && key === "outcome") return ["It happened as predicted", "It partly happened", "Something different happened", "It is still unclear"];
+  if (id === "testPrediction" && current?.kind === "capture") return ["If I try, I will fail.", "If I speak up, they will react badly.", "If I start, I will not cope."];
+  if (id === "thenWhat" && current?.kind === "capture") return ["The moment it goes wrong.", "The part where I feel exposed.", "The point where I think I cannot cope."];
+  if (id === "thenWhat" && current?.kind === "coping") return ["Pause, contact someone safe, then take one practical step.", "Handle the first problem, ask for help, and reassess.", "Protect what matters, use available support, then decide the next move."];
+  if (id === "countermove" && current?.kind === "action") return [countermoveFor(data.pull, data.trajectory), "Do the smallest opposite move.", "Stay engaged for two more minutes."];
+  if (id === "openChannel" && current?.kind === "message") return ["Hey, just checking in. No pressure to reply.", "I went quiet for a bit. Wanted to reopen the line.", "Thinking of you and wanted to say hello."];
+  if (id === "nextAction" && current?.kind === "action") return [nextActionFor(data.barrier), "Open it and do the first visible step.", "Set a two-minute timer and begin."];
+  if (id === "activationMenu" && current?.kind === "action") return [current.defaultValue || "Do one small worthwhile thing.", "Take a five-minute version of it.", "Choose the easiest version available."];
+  return current?.defaultValue ? [current.defaultValue] : ["Use a simple example", "Choose the easiest reasonable answer", "Skip detail and continue"];
+}
+
 function Handoff({ rule, onAccept, onDismiss }) {
   if (!rule) return null;
   const target = FLAGSHIP_REGISTRY[rule.to];
@@ -289,6 +302,7 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
   if (!current) return null;
   const needsText = ["capture", "action", "coping"].includes(current.kind);
   const message = current.kind === "message";
+  const tapSuggestions = (needsText || message) ? tapSuggestionsFor(id, current, data) : [];
   const completionLike = ["completion", "parking-complete"].includes(current.kind) || (current.kind === "return" && !!data.status) || (isLast && !current.options);
   const statusLabel = data.status === "partial" ? "Partly completed is movement." : data.status === "couldnt" ? "This is information about the barrier, not a failure." : data.completionNote;
 
@@ -309,8 +323,8 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
     className={`flagship-shell flagship-${id}`}
     field={<div className="pointer-events-none fixed inset-0 flagship-atmosphere" aria-hidden="true"/>}
   >
-    <div className="mx-auto flex min-h-[calc(100dvh-190px)] w-full max-w-5xl flex-col px-4 pb-6 pt-2 sm:min-h-[calc(100dvh-170px)] sm:px-8 sm:pb-8 sm:pt-3">
-      <div className="grid flex-1 items-center gap-4 sm:gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+    <div className="flex min-h-[calc(100dvh-176px)] w-full flex-col px-3 pb-4 pt-1 sm:px-5 sm:pb-6">
+      <div className="grid flex-1 items-center gap-3 sm:gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:gap-8">
         <div className="flex min-h-32 items-center justify-center sm:min-h-52"><SignatureVisual id={id} step={step} reducedMotion={a11y.prefs.reducedMotion}/></div>
         <AnimatePresence mode="wait">
           <motion.section aria-live="polite" key={`${id}-${step}`} initial={a11y.prefs.reducedMotion ? {opacity:0} : {opacity:0,y:18}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}} className="intervention-content-card rounded-[1.6rem] p-5 sm:rounded-[2rem] sm:p-8">
@@ -324,9 +338,9 @@ export default function FlagshipExperience({ intervention, answers, onComplete, 
 
             {current.kind === "intro" && <button onClick={()=>setStep(step+1)} className="intervention-primary mt-6 min-h-12 w-full rounded-full px-5 font-semibold text-slate-950">Continue <ArrowRight className="ml-2 inline h-4 w-4"/></button>}
 
-            {needsText && <div className="mt-6"><textarea aria-label={current.prompt} value={draft} onChange={(e)=>setDraft(e.target.value)} placeholder={current.placeholder || "Edit this action..."} rows={4} className="w-full rounded-2xl border border-white/15 bg-black/20 p-4 text-base text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[var(--flag-accent)]"/><p className="mt-2 text-xs text-white/45">Private active-state text: stored locally, never sent to analytics.</p><button disabled={!draft.trim()} onClick={()=>setValue(draft.trim())} className="intervention-primary mt-4 min-h-12 w-full rounded-full px-5 font-semibold text-slate-950">Continue <ArrowRight className="ml-2 inline h-4 w-4"/></button></div>}
+            {needsText && <div className="mt-6"><div className="mb-3 grid gap-2 sm:grid-cols-2">{tapSuggestions.map((suggestion)=><button key={suggestion} type="button" onClick={()=>setDraft(suggestion)} className="intervention-choice min-h-11 rounded-2xl px-4 py-3 text-left text-sm">{suggestion}</button>)}</div><textarea aria-label={current.prompt} value={draft} onChange={(e)=>setDraft(e.target.value)} placeholder={current.placeholder || "Edit this action..."} rows={3} className="w-full rounded-2xl border border-white/15 bg-black/20 p-4 text-base text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-[var(--flag-accent)]"/><p className="mt-2 text-xs text-white/45">Typing is optional. Tap an answer above or edit it. Private active-state text stays local.</p><button disabled={!draft.trim()} onClick={()=>setValue(draft.trim())} className="intervention-primary mt-4 min-h-12 w-full rounded-full px-5 font-semibold text-slate-950">Continue <ArrowRight className="ml-2 inline h-4 w-4"/></button></div>}
 
-            {message && <div className="mt-6"><div className="flex gap-2">{["Light","Honest","Direct"].map(t=><button key={t} onClick={()=>{setData({...data,tone:t.toLowerCase()});setDraft(t==="Light"?"Hey - I went quiet for a bit. No pressure, but I wanted to reopen the line.":t==="Honest"?"I pulled away and did not know how to explain it. I would like to reconnect in a way that feels manageable.":"I have been out of contact. I want to reopen communication, if that is welcome.")}} className="min-h-11 flex-1 rounded-full border border-white/15 text-sm">{t}</button>)}</div><textarea aria-label="Editable contact message" value={draft} onChange={(e)=>setDraft(e.target.value)} rows={4} className="mt-3 w-full rounded-2xl border border-white/15 bg-black/20 p-4 text-white focus:outline-none focus:ring-2 focus:ring-[var(--flag-accent)]"/><button disabled={!draft.trim()} onClick={()=>setValue("reviewed-locally")} className="intervention-primary mt-4 min-h-12 w-full rounded-full px-5 font-semibold text-slate-950">I reviewed the action</button></div>}
+            {message && <div className="mt-6"><div className="grid gap-2 sm:grid-cols-3">{tapSuggestions.slice(0,3).map((suggestion)=><button key={suggestion} type="button" onClick={()=>setDraft(suggestion)} className="intervention-choice min-h-11 rounded-2xl px-3 py-3 text-left text-sm">{suggestion}</button>)}</div><textarea aria-label="Editable contact message" value={draft} onChange={(e)=>setDraft(e.target.value)} rows={3} className="mt-3 w-full rounded-2xl border border-white/15 bg-black/20 p-4 text-white focus:outline-none focus:ring-2 focus:ring-[var(--flag-accent)]"/><p className="mt-2 text-xs text-white/45">Typing is optional. Any suggestion can be used as-is.</p><button disabled={!draft.trim()} onClick={()=>setValue("reviewed-locally")} className="intervention-primary mt-4 min-h-12 w-full rounded-full px-5 font-semibold text-slate-950">I reviewed the action</button></div>}
 
             {current.kind === "movement" && <div className="mt-6"><div className="rounded-2xl border border-[var(--flag-accent)]/30 bg-white/[0.05] p-5"><p className="text-sm font-semibold text-[var(--flag-accent)]">Accessible movement</p><p className="mt-2 text-white/80">{current.body}</p><p className="mt-3 text-xs text-white/50">Seated and low-mobility alternatives are valid. Stop or skip at any time.</p></div><button onClick={()=>setValue("movement-complete")} className="intervention-primary mt-4 min-h-12 w-full rounded-full px-5 font-semibold text-slate-950">Continue when ready</button></div>}
 
