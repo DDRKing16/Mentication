@@ -748,7 +748,7 @@ main:focus {
 @media(hover:hover) {
   .journal-card:hover:not(:disabled) { box-shadow:0 18px 42px -18px #0c152666,0 0 26px #c9926b3d; }
   .palace-card:hover:not(:disabled) { box-shadow:0 20px 46px -18px #0c1526cc,0 0 34px #00f5d440; }
-  .premium-card:hover:not(:disabled) { box-shadow:0 18px 42px -18px #00000073,0 0 28px #ffd9a03d; }
+  .premium-card:hover:not(:disabled) { box-shadow:0 18px 42px -18px #00000073,0 0 34px #ffd9a05c; }
 }
 .journal-card:focus-visible { box-shadow:0 18px 42px -18px #0c152666,0 0 26px #c9926b3d; }
 .palace-card:focus-visible { box-shadow:0 20px 46px -18px #0c1526cc,0 0 34px #00f5d440; }
@@ -839,11 +839,46 @@ main:focus {
 }
 @keyframes premium-star-glow {
   0%,100% { opacity:.75; filter:drop-shadow(0 0 0 #ffd9a000); }
-  50% { opacity:1; filter:drop-shadow(0 0 5px #ffd9a05c); }
+  50% { opacity:1; filter:drop-shadow(0 0 8px #ffd9a06b); }
 }
+/* The star's own finish: a slow light sweep travels the gold, and two
+   sparkles twinkle quietly at rest. Hovering the card lights the whole
+   thing up — brighter gold, a warm halo, and a quick shine pass. */
+.premium-shine { animation:premium-shine-sweep 7s ease-in-out infinite; }
+.premium-sparkle {
+  transform-box:fill-box;
+  transform-origin:center;
+  animation:premium-sparkle 3.2s ease-in-out infinite;
+}
+.premium-sparkle-small { animation-delay:1.6s; }
+@keyframes premium-shine-sweep {
+  0%,72% { transform:translateX(-66px); }
+  96%,100% { transform:translateX(92px); }
+}
+@keyframes premium-sparkle {
+  0%,100% { opacity:.35; transform:scale(.8); }
+  50% { opacity:1; transform:scale(1.15); }
+}
+@keyframes premium-star-lit {
+  0%,100% { opacity:1; filter:brightness(1.16) drop-shadow(0 0 6px #ffd9a0cc) drop-shadow(0 0 22px #ffd9a05e); }
+  50% { opacity:1; filter:brightness(1.22) drop-shadow(0 0 10px #ffd9a0) drop-shadow(0 0 30px #ffd9a08c); }
+}
+@media(hover:hover) {
+  .premium-card:hover:not(:disabled) .premium-art { animation:premium-star-lit 1.8s ease-in-out infinite; }
+  .premium-card:hover:not(:disabled) .premium-shine { animation-duration:1.8s; }
+}
+.premium-card:focus-visible .premium-art { animation:premium-star-lit 1.8s ease-in-out infinite; }
+.premium-card:focus-visible .premium-shine { animation-duration:1.8s; }
 [data-reduce-motion=true] .journal-script { animation:none; stroke-dasharray:none; stroke-dashoffset:0; }
 [data-reduce-motion=true] .journal-dot,
-[data-reduce-motion=true] .premium-art { animation:none; }
+[data-reduce-motion=true] .premium-art,
+[data-reduce-motion=true] .premium-shine,
+[data-reduce-motion=true] .premium-sparkle { animation:none; }
+[data-reduce-motion=true] .premium-card:hover:not(:disabled) .premium-art,
+[data-reduce-motion=true] .premium-card:focus-visible .premium-art {
+  animation:none;
+  filter:brightness(1.16) drop-shadow(0 0 6px #ffd9a0cc) drop-shadow(0 0 22px #ffd9a05e);
+}
 
 .preview-label span {
   font-size:9px;
@@ -1845,15 +1880,14 @@ body:has(dialog[open]) {
 }
 .premium-art {
   position:absolute;
-  top:24%;
+  top:15%;
   left:50%;
-  width:42px;
-  height:42px;
+  width:54%;
+  aspect-ratio:1;
   transform:translateX(-50%);
-  color:#ffd9a0;
   opacity:.75;
 }
-.premium-art svg { width:100%; height:100%; }
+.premium-art svg { display:block; width:100%; height:100%; overflow:visible; }
 .premium-label strong { opacity:.85; }
 .premium-label em { color:#ffd9a0; }
 .premium-field { display:block; margin-top:16px; text-align:left; }
