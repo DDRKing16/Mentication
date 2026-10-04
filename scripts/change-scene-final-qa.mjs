@@ -1,0 +1,15 @@
+import { chromium } from "playwright";
+import fs from "node:fs/promises";
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:390,height:844}});
+await page.addInitScript(()=>localStorage.setItem("haven_onboarded","1"));
+await fs.mkdir("qa-preview",{recursive:true});
+await page.goto("http://127.0.0.1:4173/",{waitUntil:"domcontentloaded",timeout:15000});
+const state={prebuilt:true,pathway:["changeScene"],direction:"lift",directionLabel:"Change the Scene",intensity:5,whereFelt:"both",timeMin:5,audio:"no",movement:"seated"};
+await page.evaluate(s=>history.replaceState({usr:s,key:"qa",idx:0},"","/reset"),state);
+await page.reload({waitUntil:"domcontentloaded",timeout:15000});
+await page.waitForTimeout(4200);
+const metrics=await page.evaluate(()=>({innerWidth,innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight}));
+console.log(JSON.stringify(metrics));
+await page.screenshot({path:"qa-preview/change-scene-final.png",fullPage:false});
+await browser.close();
