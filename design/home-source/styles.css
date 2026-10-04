@@ -337,7 +337,7 @@ main:focus {
 
 .week-actions {
   display:grid;
-  gap:6px;
+  gap:12px;
 }
 
 .begin-button {
@@ -1586,34 +1586,55 @@ body:has(dialog[open]) {
   justify-content:space-between;
   gap:12px;
 }
+/* L-shaped piece: a tall square icon fills the open space left of the
+   "or try 7 calmer days" link, and a thin one-line strip runs the full
+   width beneath it. */
 .palace-badge {
-  display:flex;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  grid-template-areas:"icon seven" "strip strip";
+  gap:10px 14px;
   align-items:center;
-  gap:14px;
-  width:100%;
-  padding:8px 16px 8px 8px;
+}
+.palace-badge-icon {
+  grid-area:icon;
+  width:88px;
+  height:88px;
+  padding:7px;
   border:1px solid #00f5d44d;
-  border-radius:22px;
+  border-radius:20px;
   background:linear-gradient(120deg,#0e1a30,#1c2b4c);
-  color:#fff4e9;
-  text-align:left;
   transition:transform .28s var(--ease),box-shadow .28s ease;
 }
-.palace-badge:hover { transform:translateY(-1px); box-shadow:0 0 22px #00f5d42e; }
+.palace-badge-icon:hover { transform:translateY(-1px); box-shadow:0 0 22px #00f5d42e; }
+.palace-badge-icon:active { transform:scale(.97); }
 .palace-badge-art {
-  flex:0 0 auto;
-  width:64px;
-  height:64px;
+  display:block;
+  width:100%;
+  height:100%;
   border-radius:14px;
   overflow:hidden;
   box-shadow:0 0 0 1px #ffffff24,0 5px 12px #0c152666;
 }
 .palace-badge-art svg { display:block; width:100%; height:100%; }
-.palace-badge-text { flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; line-height:1.15; text-align:left; }
-.palace-badge-text strong { font-family:Georgia,serif; font-weight:500; font-size:15px; white-space:nowrap; }
-.palace-badge-progress { display:block; width:100%; height:3px; border-radius:2px; background:#ffffff26; overflow:hidden; }
-.palace-badge-progress-fill { display:block; height:100%; width:0; background:#00f5d4; border-radius:2px; transition:width .6s var(--ease); }
-.palace-badge-text em { font-style:normal; font-size:10.5px; opacity:.72; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.palace-badge .seven-days { grid-area:seven; justify-self:end; }
+.palace-badge-strip {
+  grid-area:strip;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-height:34px;
+  padding:7px 16px;
+  border:1px solid #00f5d43d;
+  border-radius:999px;
+  background:linear-gradient(120deg,#0e1a30,#1c2b4c);
+  color:#fff4e9;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.palace-badge-strip strong { flex:0 0 auto; font-family:Georgia,serif; font-weight:500; font-size:14px; }
+.palace-badge-sep { opacity:.4; }
+.palace-badge-strip em { font-style:normal; font-size:11.5px; opacity:.72; overflow:hidden; text-overflow:ellipsis; }
 
 /* Restructure: one panel split evenly into thirds, an icon per destination. */
 .restructure-panel {

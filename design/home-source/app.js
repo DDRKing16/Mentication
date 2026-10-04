@@ -224,14 +224,13 @@
     const nextLine = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} to ${nextName.toLowerCase()}` : 'Your palace is complete';
     document.getElementById('palace-card-next').textContent = nextLine;
     document.getElementById('palace-badge-next').textContent = nextLine;
-    document.getElementById('palace-badge-progress').style.width = `${Math.round((nextName ? progress : 1) * 100)}%`;
     const stages = document.getElementById('palace-card-stages');
     if (stages) {
       stages.innerHTML = Array.from({ length: 7 }, (_, i) =>
         `<span class="${i < level ? 'is-built' : i === level ? 'is-current' : ''}"></span>`).join('');
     }
     document.getElementById('palace-card').setAttribute('aria-label', `PEACE PALACE. ${levelText}${name ? `, ${name}` : ''}`);
-    document.getElementById('palace-badge').setAttribute('aria-label', `Your Peace Palace, ${levelText.toLowerCase()}`);
+    document.getElementById('palace-badge-icon').setAttribute('aria-label', `Your Peace Palace, ${levelText.toLowerCase()}`);
   }
   function reportHeight() {
     cancelAnimationFrame(resizeFrame);
