@@ -18,10 +18,10 @@ const routes = new Set([
  * and — for returning users — the "Your reset for today" card payload.
  * No database, authentication, router package, or page names are assumed.
  */
-export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null }) {
+export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null }) {
   const frame = useRef(null);
-  const callbacks = useRef({ onNavigate, week, today, palace });
-  callbacks.current = { onNavigate, week, today, palace };
+  const callbacks = useRef({ onNavigate, week, today, palace, journal });
+  callbacks.current = { onNavigate, week, today, palace, journal };
   const bridgeId = useRef(null);
   const [height, setHeight] = useState(1700);
   const [ready, setReady] = useState(false);
@@ -60,6 +60,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         send('week', { week: callbacks.current.week });
         if (callbacks.current.today) send('today', { today: callbacks.current.today });
         if (callbacks.current.palace) send('palace', { palace: callbacks.current.palace });
+        if (callbacks.current.journal) send('journal', { journal: callbacks.current.journal });
         reportViewport();
       } else if (data.type === 'height' && Number.isFinite(data.height) && data.height > 0 && data.height < 20000) {
         setHeight(Math.ceil(data.height));
@@ -97,6 +98,10 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
   useEffect(() => {
     if (ready && palace) send('palace', { palace });
   }, [palace, ready]);
+
+  useEffect(() => {
+    if (ready && journal) send('journal', { journal });
+  }, [journal, ready]);
 
   if (typeof onNavigate !== 'function') {
     throw new TypeError('HomeFrame requires the host onNavigate(routeId) function.');

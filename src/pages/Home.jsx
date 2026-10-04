@@ -58,6 +58,24 @@ export default function Home() {
   // The user's current Peace Palace level, shown on the More for you card
   // and the Your week badge.
   const [palace, setPalace] = useState(null);
+  // A quiet, on-device-only read of the daybook for the Journal card's
+  // "last entry" line — never anything about what was written.
+  const [journal, setJournal] = useState(null);
+
+  useEffect(() => {
+    try {
+      const daybook = JSON.parse(localStorage.getItem("daybook") || "[]");
+      const latest = daybook?.[0]?.date;
+      if (!latest) return;
+      const then = new Date(latest);
+      if (Number.isNaN(then.getTime())) return;
+      const days = Math.floor((Date.now() - then.getTime()) / 864e5);
+      setJournal({
+        caption: days <= 0 ? "Entry saved today" : days === 1 ? "Last entry yesterday" : `Last entry ${days} days ago`,
+        entries: daybook.length,
+      });
+    } catch { /* on-device read only */ }
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -159,7 +177,7 @@ export default function Home() {
   return (
     <div className="relative">
       <StreakBadge />
-      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} />
+      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} />
     </div>
   );
 }

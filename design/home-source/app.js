@@ -232,6 +232,18 @@
     document.getElementById('palace-card').setAttribute('aria-label', `PEACE PALACE. ${levelText}${name ? `, ${name}` : ''}`);
     document.getElementById('palace-badge-icon').setAttribute('aria-label', `Your Peace Palace, ${levelText.toLowerCase()}`);
   }
+  // Journal card: a quiet, on-device line about the archive ("Last entry
+  // 3 days ago"), never anything about what was written.
+  function setJournal(journal) {
+    if (!journal || typeof journal !== 'object' || Array.isArray(journal)) throw new TypeError('journal must be an object.');
+    const caption = typeof journal.caption === 'string' ? journal.caption.trim().slice(0, 60) : '';
+    if (!caption) return;
+    const status = document.getElementById('journal-card-status');
+    if (!status) return;
+    status.textContent = caption;
+    document.querySelector('.journal-card')?.setAttribute('aria-label', `JOURNAL. Check in with yourself. ${caption}`);
+    reportHeight();
+  }
   function reportHeight() {
     cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(() => sendBridge('height', { height: Math.ceil(document.getElementById('home-shell').getBoundingClientRect().height) }));
@@ -255,21 +267,25 @@
       try { setToday(data.today); } catch { sendBridge('error', { code: 'INVALID_TODAY' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'palace') {
       try { setPalace(data.palace); } catch { sendBridge('error', { code: 'INVALID_PALACE' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'journal') {
+      try { setJournal(data.journal); } catch { sendBridge('error', { code: 'INVALID_JOURNAL' }); }
     }
   });
   window.MenticationHome = Object.freeze({
     version: '1.0.0',
     routes: ROUTES,
-    configure({ navigate: handler, week, today, palace } = {}) {
+    configure({ navigate: handler, week, today, palace, journal } = {}) {
       if (handler !== undefined && typeof handler !== 'function') throw new TypeError('navigate must be a function.');
       if (handler) navigateHandler = handler;
       if (week !== undefined) setWeek(week);
       if (today !== undefined) setToday(today);
       if (palace !== undefined) setPalace(palace);
+      if (journal !== undefined) setJournal(journal);
     },
     setWeek,
     setToday,
-    setPalace
+    setPalace,
+    setJournal
   });
   setPalace({ level: 0, name: 'The quiet clearing', nextName: 'The shack', stonesToNext: 4, progress: 0 });
   applyPreferences(readPreferences());

@@ -810,6 +810,13 @@ main:focus {
   line-height:1.18;
 }
 
+.journal-card .preview-label em {
+  font-family:Georgia,serif;
+  font-style:italic;
+  font-size:11px;
+  opacity:.68;
+}
+
 [data-large-text=true] .preview-label,[data-large-text=true] .preview-scrim {
   display:none;
 }
