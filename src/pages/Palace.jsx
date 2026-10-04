@@ -51,7 +51,8 @@ export default function Palace() {
 
         {palace && (
           <div className="mt-6">
-            <div className="flex items-baseline justify-between gap-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal">Level {level + 1} of 7</p>
+            <div className="mt-1 flex items-baseline justify-between gap-3">
               <h2 className="font-heading text-xl font-medium tracking-tight text-primary">{stage.name}</h2>
               <span className="shrink-0 text-sm tabular-nums text-muted-foreground">
                 {palace.growth} stone{palace.growth === 1 ? "" : "s"}

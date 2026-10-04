@@ -11,6 +11,7 @@ import StreakBadge from "@/components/home/StreakBadge";
 import { sessionStore } from "@/lib/localData";
 import { hasCompletedOnboarding } from "@/lib/onboarding";
 import { buildRecommendation } from "@/lib/recommend";
+import { derivePeacePalace } from "@/lib/peacePalace";
 import {
   activeProgrammeId,
   getProgramme,
@@ -54,6 +55,27 @@ export default function Home() {
   // "Your reset for today" appears only for returning users: onboarding done
   // and at least one session in history. Payload matches My Plan's card.
   const [today, setToday] = useState(null);
+  // The user's current Peace Palace level, shown on the More for you card
+  // and the Your week badge.
+  const [palace, setPalace] = useState(null);
+
+  useEffect(() => {
+    let live = true;
+    sessionStore.list("-created_date", 500)
+      .then((sessions) => {
+        if (!live) return;
+        const p = derivePeacePalace(sessions);
+        setPalace({
+          level: p.level,
+          name: p.stage.name,
+          nextName: p.next?.name || "",
+          stonesToNext: p.stonesToNext,
+          progress: p.next ? p.growth / p.next.at : 1,
+        });
+      })
+      .catch(() => {});
+    return () => { live = false; };
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -122,6 +144,7 @@ export default function Home() {
     if (route === "good-map") { navigate("/good-map"); return; }
     if (route === "dear-2100") { navigate("/dear-2100"); return; }
     if (route === "palace") { navigate("/palace"); return; }
+    if (route === "foundations") { navigate("/foundations"); return; }
     if (route === "library") { navigate("/library"); return; }
     if (route === "my-plan") { navigate("/plan"); return; }
     if (route === "profile") { navigate("/profile"); return; }
@@ -136,7 +159,7 @@ export default function Home() {
   return (
     <div className="relative">
       <StreakBadge />
-      <HomeFrame onNavigate={onNavigate} week={week} today={today} />
+      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} />
     </div>
   );
 }

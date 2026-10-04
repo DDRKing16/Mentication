@@ -7,7 +7,7 @@ const homeSrc = `${import.meta.env.BASE_URL}home.html`;
 
 const routes = new Set([
   'lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'begin',
-  'seven-calmer-days', 'restructure', 'journal', 'good-map', 'dear-2100',
+  'seven-calmer-days', 'restructure', 'foundations', 'journal', 'good-map', 'dear-2100', 'palace',
   'library', 'my-plan', 'profile', 'insights', 'settings', 'recommended'
 ]);
 
@@ -18,10 +18,10 @@ const routes = new Set([
  * and — for returning users — the "Your reset for today" card payload.
  * No database, authentication, router package, or page names are assumed.
  */
-export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null }) {
+export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null }) {
   const frame = useRef(null);
-  const callbacks = useRef({ onNavigate, week, today });
-  callbacks.current = { onNavigate, week, today };
+  const callbacks = useRef({ onNavigate, week, today, palace });
+  callbacks.current = { onNavigate, week, today, palace };
   const bridgeId = useRef(null);
   const [height, setHeight] = useState(1700);
   const [ready, setReady] = useState(false);
@@ -59,6 +59,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         setReady(true);
         send('week', { week: callbacks.current.week });
         if (callbacks.current.today) send('today', { today: callbacks.current.today });
+        if (callbacks.current.palace) send('palace', { palace: callbacks.current.palace });
         reportViewport();
       } else if (data.type === 'height' && Number.isFinite(data.height) && data.height > 0 && data.height < 20000) {
         setHeight(Math.ceil(data.height));
@@ -69,7 +70,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
           setError('This experience could not open. Please try again.');
         });
       } else if (data.type === 'error') {
-        setError('Weekly progress could not be displayed.');
+        if (data.code !== 'INVALID_PALACE') setError('Weekly progress could not be displayed.');
       }
     }
     window.addEventListener('message', receive);
@@ -92,6 +93,10 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
   useEffect(() => {
     if (ready && today) send('today', { today });
   }, [today, ready]);
+
+  useEffect(() => {
+    if (ready && palace) send('palace', { palace });
+  }, [palace, ready]);
 
   if (typeof onNavigate !== 'function') {
     throw new TypeError('HomeFrame requires the host onNavigate(routeId) function.');

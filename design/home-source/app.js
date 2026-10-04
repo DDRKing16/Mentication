@@ -5,7 +5,8 @@
   const ROUTES = Object.freeze({
     home: 'Home', lift: 'Lift', focus: 'Focus', calm: 'Calm', ground: 'Ground', sleep: 'Sleep',
     guide: 'Guide me', begin: 'Begin', 'seven-calmer-days': '7 calmer days',
-    restructure: 'Restructure', journal: 'Check in with yourself',
+    restructure: 'Restructure', foundations: 'Foundations', journal: 'Check in with yourself',
+    palace: 'Peace Palace',
     'good-map': 'See what makes life feel good', 'dear-2100': 'Go after what you’ve avoided',
     library: 'Library', 'my-plan': 'My Plan', profile: 'Profile', insights: 'Insights', settings: 'Settings',
     recommended: 'Your reset for today'
@@ -197,6 +198,27 @@
     document.getElementById('today-card').hidden = false;
     reportHeight();
   }
+  // Peace Palace: the same drawing as the app's Palace page (palaceSvg is
+  // inlined from src/lib/palaceArt.js by scripts/build-home-document.mjs).
+  function setPalace(palace) {
+    if (!palace || typeof palace !== 'object') throw new TypeError('palace must be an object.');
+    const level = palace.level;
+    if (!Number.isInteger(level) || level < 0 || level > 6) throw new TypeError('palace.level must be an integer from 0 through 6.');
+    const name = typeof palace.name === 'string' ? palace.name.trim().slice(0, 40) : '';
+    const nextName = typeof palace.nextName === 'string' ? palace.nextName.trim().slice(0, 40) : '';
+    const toNext = Number.isInteger(palace.stonesToNext) && palace.stonesToNext > 0 ? palace.stonesToNext : 0;
+    const progress = Number.isFinite(palace.progress) ? Math.max(0, Math.min(1, palace.progress)) : 0;
+    const levelText = `Level ${level + 1} of 7`;
+    document.getElementById('palace-card-art').innerHTML = palaceSvg(level, { id: 'home-palace-card', viewBox: '40 8 320 272' });
+    document.getElementById('palace-badge-art').innerHTML = palaceSvg(level, { id: 'home-palace-badge', viewBox: '80 40 240 240' });
+    document.getElementById('palace-card-chip').textContent = levelText;
+    document.getElementById('palace-badge-level').textContent = `Lv ${level + 1}`;
+    if (name) document.getElementById('palace-card-name').textContent = name;
+    document.getElementById('palace-card-next').textContent = nextName ? `${toNext} stone${toNext === 1 ? '' : 's'} to ${nextName.toLowerCase()}` : 'Your palace is complete';
+    document.getElementById('palace-card-progress').style.width = `${Math.round((nextName ? progress : 1) * 100)}%`;
+    document.getElementById('palace-card').setAttribute('aria-label', `PEACE PALACE. ${levelText}${name ? `, ${name}` : ''}`);
+    document.getElementById('palace-badge').setAttribute('aria-label', `Your Peace Palace, ${levelText.toLowerCase()}`);
+  }
   function reportHeight() {
     cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(() => sendBridge('height', { height: Math.ceil(document.getElementById('home-shell').getBoundingClientRect().height) }));
@@ -218,20 +240,25 @@
       try { setWeek(data.week); } catch { sendBridge('error', { code: 'INVALID_WEEK' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'today') {
       try { setToday(data.today); } catch { sendBridge('error', { code: 'INVALID_TODAY' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'palace') {
+      try { setPalace(data.palace); } catch { sendBridge('error', { code: 'INVALID_PALACE' }); }
     }
   });
   window.MenticationHome = Object.freeze({
     version: '1.0.0',
     routes: ROUTES,
-    configure({ navigate: handler, week, today } = {}) {
+    configure({ navigate: handler, week, today, palace } = {}) {
       if (handler !== undefined && typeof handler !== 'function') throw new TypeError('navigate must be a function.');
       if (handler) navigateHandler = handler;
       if (week !== undefined) setWeek(week);
       if (today !== undefined) setToday(today);
+      if (palace !== undefined) setPalace(palace);
     },
     setWeek,
-    setToday
+    setToday,
+    setPalace
   });
+  setPalace({ level: 0, name: 'The quiet clearing', nextName: 'The shack', stonesToNext: 4, progress: 0 });
   applyPreferences(readPreferences());
   if (!storageAvailable) document.getElementById('preference-note').textContent = 'Your preferences apply while this page is open.';
   // The supplied image highlights its fifth circle. Preserve that visual in the preview.

@@ -12,11 +12,11 @@ import { getIntervention } from "./interventions";
 // `level` (the index) drives which parts of the palace are drawn.
 export const PALACE_STAGES = [
   { at: 0, name: "The quiet clearing", blurb: "A still place, waiting. Every practice plants something here." },
-  { at: 4, name: "First stones", blurb: "A foundation is laid — evidence that you show up for yourself." },
-  { at: 10, name: "The gate & the path", blurb: "A path has worn itself in through repeated visits. The gate stands open." },
-  { at: 18, name: "The walls", blurb: "Walls now surround the grounds. A refuge is taking shape." },
+  { at: 4, name: "The shack", blurb: "A small shelter of your own — evidence that you show up for yourself." },
+  { at: 10, name: "The cottage", blurb: "Stone walls, a warm window and a path worn in by repeated visits." },
+  { at: 18, name: "The manor", blurb: "Two storeys and walled grounds. A refuge is taking shape." },
   { at: 28, name: "The towers", blurb: "Towers rise above the walls, built from many finished practices." },
-  { at: 40, name: "The great hall", blurb: "The great hall stands complete. Your palace is a real place now." },
+  { at: 40, name: "The castle", blurb: "A keep and a spire stand complete. Your palace is a real place now." },
   { at: 56, name: "The palace in bloom", blurb: "Flowering gardens, lit windows, your flag raised. The palace is complete." },
 ];
 

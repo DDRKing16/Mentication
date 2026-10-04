@@ -12,7 +12,10 @@ const dir = resolve(root, 'design/home-source');
 
 let html = readFileSync(resolve(dir, 'index.html'), 'utf8');
 const css = readFileSync(resolve(dir, 'styles.css'), 'utf8');
-const js = readFileSync(resolve(dir, 'app.js'), 'utf8');
+// The Peace Palace drawing is shared with the React app: inline it (minus
+// its `export`) ahead of app.js so both show the identical building.
+const palaceArt = readFileSync(resolve(root, 'src/lib/palaceArt.js'), 'utf8').replace(/^export /gm, '');
+const js = `${palaceArt}\n${readFileSync(resolve(dir, 'app.js'), 'utf8')}`;
 const dataUri = (file, mime) => `data:${mime};base64,${readFileSync(resolve(dir, file)).toString('base64')}`;
 
 html = html.replaceAll('assets/images/approved-homescreen.png', dataUri('assets/images/approved-homescreen.png', 'image/png'));
