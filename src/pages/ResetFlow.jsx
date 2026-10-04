@@ -361,12 +361,14 @@ export default function ResetFlow() {
     setUsedIds([first.id]);
     setPlanRemaining(Math.max(0, (answers.timeMin || 5) - segmentMinutes([first])));
     setLastValue(answers.intensity ?? 5);
+    window.dispatchEvent(new Event("mentication:ambient-pause"));
     advance({ phase: "guiding" });
   };
 
   const onSegmentComplete = () => {
     setCheckinValue(lastValue);
     setRemaining(null);
+    window.dispatchEvent(new Event("mentication:ambient-resume"));
     advance({ phase: "checkpoint" });
   };
 
@@ -395,6 +397,7 @@ export default function ResetFlow() {
     }
     setLastValue(nextIntensity);
     setCheckinValue(null);
+    window.dispatchEvent(new Event("mentication:ambient-pause"));
     advance({ phase: "guiding" });
   };
 
@@ -405,6 +408,7 @@ export default function ResetFlow() {
     commitPendingPulse(nextIntensity);
     setLastValue(nextIntensity);
     setCheckinValue(null);
+    window.dispatchEvent(new Event("mentication:ambient-pause"));
     advance({ phase: "guiding" });
   };
 
@@ -441,6 +445,7 @@ export default function ResetFlow() {
     const finalValue = checkinValue ?? lastValue;
     commitPendingPulse(finalValue);
     setEndIntensity(finalValue);
+    window.dispatchEvent(new Event("mentication:ambient-resume"));
     advance({ phase: "reflect" });
   };
 
