@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft, Search, X, ArrowRight } from "lucide-react";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
 import { getBrandAtmosphere, getBrandInk, getBrandLogoParts } from "@/lib/interventionBrand";
-import { INTERVENTIONS } from "@/lib/interventions";
+import { ARCHIVED_INTERVENTIONS, INTERVENTIONS } from "@/lib/interventions";
 
 const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "sleep"];
 const CATEGORY_LABELS = {
@@ -29,6 +29,16 @@ const FILTERS = [
   { key: "sleep", label: "Sleep-friendly", test: (iv) => iv.bedtime },
   { key: "noBreathing", label: "No breathing", test: (iv) => iv.category !== "breathing" },
 ];
+
+const IGNITION_POINT_INTERVENTION = {
+  ...ARCHIVED_INTERVENTIONS.find((iv) => iv.id === "activationMenu"),
+  id: "activationMenu",
+  name: "Ignition Point",
+  primaryDirection: "lift",
+  directions: ["lift", "focus"],
+  durationMin: 3,
+  why: "Choose one small source of pleasure, mastery, connection or progress toward a dream, then make the first move.",
+};
 
 const DEAR_2100_INTERVENTION = {
   id: "dear2100",
@@ -144,7 +154,7 @@ export default function InterventionLibrary() {
   const grouped = useMemo(() => {
     const term = q.trim().toLowerCase();
     const activeFilters = FILTERS.filter((f) => filters[f.key]);
-    const allItems = [...INTERVENTIONS, DEAR_2100_INTERVENTION];
+    const allItems = [...INTERVENTIONS, IGNITION_POINT_INTERVENTION, DEAR_2100_INTERVENTION];
     let list = allItems.filter((iv) => {
       if (cat && iv.primaryDirection !== cat) return false;
       if (activeFilters.length && !activeFilters.every((f) => f.test(iv))) return false;
