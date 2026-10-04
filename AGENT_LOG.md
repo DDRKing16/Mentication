@@ -546,3 +546,42 @@ standalone builds (Signal Lock, Vector Shift, Night Channel) keep their own chro
 their finished inner builds simply don't scale with this setting, which is expected since they're outside
 what this app's text-size control reaches. Full test/typecheck/lint/build suite passes clean on every
 commit.
+
+## 4 Oct -- The new Home screen redesign hadn't been looked at yet, so this run audited it
+This run's merge brought in a substantial Home screen redesign from main (the hero photo, Peace
+Palace, ambient music, the "More for you" row) that no earlier run had seen, since it's brand new.
+Checked docs/BRAND_THREAD.md first -- all six phases and the remaining owner-decision items are
+unchanged -- so spent the block giving this new screen the same kind of real, verified pass every
+intervention has already had.
+First: `public/home.html` (the built screen users actually get) was stale -- the owner's own source
+edits (a smaller "Your week" card, a proper 3-card "More for you" row, routing Home's background
+music through the persistent player) were never rebuilt and committed, so the live screen was still
+running an older layout and was missing audio behaviour the rest of the app already expected. Rebuilt
+it from its own source with the project's existing build script (e9ced6e). Also deleted a second,
+unused ambient-music component left over from the same merge that duplicated the one actually in use
+and was never wired into anything (e9ced6e).
+Second: in a real headless-browser run at 375x812, the mute button -- and, for anyone with a practice
+streak, the streak badge too -- floats on top of the hero photo in the exact spot the photo's own
+hand-drawn "Mentication" logo sits, hiding it completely once a streak shows. Moved both down and
+apart into the clear sky just under the logo, checked with no streak, a one-digit streak, a two-digit
+streak, and at a narrower 320px phone width (5469b1f).
+Third, the more serious one: the "More for you" row is supposed to show only the cards that earn
+their place that day (Journal only when a streak is at risk, Peace Palace only when nothing's been
+practiced yet today, Premium only if a launch is genuinely close) -- the code computing that was
+already correct, but the card-hiding never actually took effect, because the CSS class every card
+uses already sets its own `display:block`, which silently overrides the browser's default rule for
+hiding something. Every card kept showing regardless, which is why Premium always appeared to
+everyone. Fixed the CSS so hiding actually works, and sized the row so the cards left showing fill
+the space properly instead of leaving an empty gap (4196bff). Verified in the browser across a fresh
+account (Palace only, full width), an active streak with nothing done yet today (two cards, split
+evenly) and having already practiced today (the row disappears cleanly).
+Fourth: the home screen's own Reduce motion / Higher contrast / Larger text toggle is cut off from
+the rest of the app (it lives in a sandboxed frame that can't read the app's own saved settings), so
+turning Reduce motion on in Settings didn't quiet this screen's animations at all even though the
+screen's own code already fully supports it. Sent the app's real setting down the same bridge
+connection already used for everything else this screen is told, and confirmed it takes effect
+immediately (4196bff).
+Flagged rather than changed: the Premium card's "Coming soon" wording is baked into its photo rather
+than real text, so at the card's actual phone size it's too small to read -- noted in SUGGESTIONS.md
+since it's supplied artwork, not something to redraw without asking.
+Full test/typecheck/lint/build suite passes clean on every commit.
