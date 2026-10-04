@@ -284,6 +284,9 @@
     greeting.dataset.part = part;
     greetingText.textContent = GREETINGS[part];
   }
+  // The journal card's illustrated page carries today's real date.
+  const journalDate = document.getElementById('journal-card-date');
+  if (journalDate) journalDate.textContent = new Date().toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' });
   if (!storageAvailable) document.getElementById('preference-note').textContent = 'Your preferences apply while this page is open.';
   // The supplied image highlights its fifth circle. Preserve that visual in the preview.
   // Base44 must supply actual user/week state; the image is not evidence of completion.

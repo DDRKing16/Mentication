@@ -786,6 +786,16 @@ main:focus {
   pointer-events:none;
 }
 
+/* Journal card: an illustrated page, not a screenshot of the app. */
+.journal-page { fill:#fffdf7; stroke:#e3cdb4; stroke-width:1.5; }
+.journal-page-shadow { fill:rgba(6,24,39,.09); }
+.journal-tape { fill:#e8d3b8; opacity:.9; }
+.journal-date { font-family:Georgia,serif; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; fill:#b08968; }
+.journal-hand { font-family:Georgia,serif; font-style:italic; font-size:16px; fill:#4a3423; }
+.journal-rule { stroke:#e9d9c3; stroke-width:1; }
+.journal-script { fill:none; stroke:#8a6a4a; stroke-width:1.7; stroke-linecap:round; opacity:.75; }
+.journal-dot { fill:#c9926b; }
+
 .preview-label span {
   font-size:9px;
   letter-spacing:2px;
