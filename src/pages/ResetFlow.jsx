@@ -7,6 +7,7 @@ import { Castle, ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from 
 import IntensityDial from "@/components/IntensityDial";
 import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
+import { backgroundMusic } from "@/lib/backgroundMusic";
 import BrandClosing from "@/components/brand/BrandClosing";
 import { isInteractiveFlagship, isNewFlagship } from "@/lib/flagshipExperienceRouting";
 import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/components/reset-flow/ResetSetupScreens";
@@ -161,6 +162,13 @@ export default function ResetFlow() {
     const t = setTimeout(() => navigate("/", { replace: true }), 4500);
     return () => clearTimeout(t);
   }, [phase, navigate]);
+
+  // The mood questions are setup, not the intervention: the home document's
+  // ambient music keeps playing through them (handed off in Home.jsx) and
+  // stops only once the practice itself begins here.
+  useEffect(() => {
+    if (phase === "guiding") backgroundMusic.stop();
+  }, [phase]);
 
   const pathway = useMemo(() => {
     return entry?.prebuilt ? pathwayByIds(entry.pathway) : buildPathway(answers, effectiveness);

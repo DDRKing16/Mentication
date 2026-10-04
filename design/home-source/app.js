@@ -339,6 +339,15 @@
       try { setJournal(data.journal); } catch { sendBridge('error', { code: 'INVALID_JOURNAL' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'more') {
       try { setMore(data.more); } catch { sendBridge('error', { code: 'INVALID_MORE' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'music') {
+      // The host pauses this document's music and takes the position, so the
+      // same track continues outside the frame when an intervention entry opens.
+      if (data.action === 'pause') {
+        const wasPlaying = !bgMusic.paused;
+        const time = bgMusic.currentTime;
+        if (wasPlaying) bgMusic.pause();
+        sendBridge('music', { wasPlaying, time });
+      }
     }
   });
   window.MenticationHome = Object.freeze({
@@ -385,8 +394,9 @@
   window.addEventListener('pagehide', () => { resizeObserver.disconnect(); cancelAnimationFrame(resizeFrame); }, { once: true });
   // Background music. Browsers block sound until the visitor interacts, so
   // playback starts on the first tap or keypress anywhere in the home document
-  // and keeps playing while the visitor browses tabs; the home frame is only
-  // torn down when an intervention opens, which stops the track.
+  // and keeps playing while the visitor browses tabs. When an intervention
+  // entry opens, the host pauses this track via the bridge and continues it
+  // from the same position; the practice itself stops it (see ResetFlow).
   const bgMusic = document.getElementById('bg-music');
   bgMusic.volume = 0.35;
   const startMusic = () => {

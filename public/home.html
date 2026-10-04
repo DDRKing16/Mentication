@@ -2446,6 +2446,15 @@ function palaceSvg(level, options) {
       try { setJournal(data.journal); } catch { sendBridge('error', { code: 'INVALID_JOURNAL' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'more') {
       try { setMore(data.more); } catch { sendBridge('error', { code: 'INVALID_MORE' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'music') {
+      // The host pauses this document's music and takes the position, so the
+      // same track continues outside the frame when an intervention entry opens.
+      if (data.action === 'pause') {
+        const wasPlaying = !bgMusic.paused;
+        const time = bgMusic.currentTime;
+        if (wasPlaying) bgMusic.pause();
+        sendBridge('music', { wasPlaying, time });
+      }
     }
   });
   window.MenticationHome = Object.freeze({

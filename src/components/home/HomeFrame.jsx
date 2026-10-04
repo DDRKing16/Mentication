@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 // The home document is a self-contained static HTML asset (public/home.html,
 // built from design/home-source). Serving it as `src` lets the browser stream
@@ -18,7 +18,19 @@ const routes = new Set([
  * and — for returning users — the "Your reset for today" card payload.
  * No database, authentication, router package, or page names are assumed.
  */
-export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null, more = null }) {
+/**
+ * @typedef {{
+ *   onNavigate: (route: string) => void | Promise<void>,
+ *   week?: { currentDay: string | null, completedDays: number[] },
+ *   today?: { title: string, meta: string, pathway: string[], direction: string, min: number } | null,
+ *   palace?: { level: number, name: string, nextName: string, stonesToNext: number, progress: number } | null,
+ *   journal?: { caption: string, entries: number, line: string } | null,
+ *   more?: { journal: { show: boolean }, palace: { show: boolean }, premium: { show: boolean, title: string } } | null,
+ * }} HomeFrameProps
+ */
+
+/** @type {import("react").ForwardRefExoticComponent<import("react").PropsWithoutRef<HomeFrameProps> & import("react").RefAttributes<{ pauseMusic(): Promise<{ wasPlaying: boolean, time: number }> }>>} */
+const HomeFrame = forwardRef(function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null, more = null }, ref) {
   const frame = useRef(null);
   const callbacks = useRef({ onNavigate, week, today, palace, journal, more });
   callbacks.current = { onNavigate, week, today, palace, journal, more };
@@ -26,6 +38,28 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
   const [height, setHeight] = useState(1700);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
+  const musicAcks = useRef([]);
+
+  // Asks the home document to pause its ambient music and report where it
+  // stopped, so the host can continue the same track seamlessly when an
+  // intervention entry opens (see Home.jsx). Resolves via the bridge ack or
+  // shortly after, so a silent frame simply reports "nothing was playing".
+  function pauseMusic() {
+    return new Promise((resolve) => {
+      const acks = musicAcks.current;
+      const done = (result) => {
+        const index = acks.indexOf(done);
+        if (index >= 0) acks.splice(index, 1);
+        window.clearTimeout(timer);
+        resolve(result);
+      };
+      const timer = window.setTimeout(() => done({ wasPlaying: false, time: 0 }), 350);
+      acks.push(done);
+      send('music', { action: 'pause' });
+    });
+  }
+
+  useImperativeHandle(ref, () => ({ pauseMusic }), []);
 
   function send(type, extra = {}) {
     if (!frame.current?.contentWindow || !bridgeId.current) return;
@@ -71,6 +105,9 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         Promise.resolve().then(() => callbacks.current.onNavigate(data.route)).catch(() => {
           setError('This experience could not open. Please try again.');
         });
+      } else if (data.type === 'music') {
+        const resolve = musicAcks.current.shift();
+        if (resolve) resolve({ wasPlaying: data.wasPlaying === true, time: Number.isFinite(data.time) ? data.time : 0 });
       } else if (data.type === 'error') {
         if (data.code === 'INVALID_MORE') setError('Your cards could not be updated.');
         else if (data.code !== 'INVALID_PALACE') setError('Weekly progress could not be displayed.');
@@ -126,4 +163,5 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
       />
     </section>
   );
-}
+});
+export default HomeFrame;

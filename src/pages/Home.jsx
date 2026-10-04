@@ -4,7 +4,7 @@
 // cards and bottom navigation are all inside it). This page only bridges the
 // document's route IDs to the app's real destinations and feeds it real
 // weekly progress. Presentation of the document itself is untouched.
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeFrame from "@/components/home/HomeFrame";
 import StreakBadge from "@/components/home/StreakBadge";
@@ -13,6 +13,7 @@ import { hasCompletedOnboarding } from "@/lib/onboarding";
 import { buildRecommendation } from "@/lib/recommend";
 import { derivePeacePalace } from "@/lib/peacePalace";
 import { computeLocalCalendarStreak } from "@/lib/streak";
+import { backgroundMusic } from "@/lib/backgroundMusic";
 import {
   activeProgrammeId,
   getProgramme,
@@ -156,6 +157,21 @@ export default function Home() {
     return () => { live = false; };
   }, []);
 
+  // The home document owns the ambient music while on Home, but its frame is
+  // torn down the moment an intervention entry opens. Before that navigation
+  // the frame pauses its track and reports where it stopped, and the host
+  // continues it seamlessly — the music then stops only when the practice
+  // itself begins (see ResetFlow).
+  const frameRef = useRef(null);
+  const handOffMusic = useCallback(async () => {
+    const ack = await (frameRef.current?.pauseMusic() ?? { wasPlaying: false, time: 0 });
+    if (ack.wasPlaying) void backgroundMusic.handoff(ack.time || 0);
+  }, []);
+
+  // Returning to Home tears the hand-off track down; the frame restarts its
+  // own music on the next tap.
+  useEffect(() => { backgroundMusic.stop(); }, []);
+
   // Begin starts (or continues) the seven calmer days and opens today's
   // practice the same way the Programmes page does. If the week is finished
   // or today's day hasn't opened yet, it shows the programme itself.
@@ -172,14 +188,15 @@ export default function Home() {
       return;
     }
     const state = launchStateFor(today.id, programme);
-    if (state) navigate("/reset", { state });
+    if (state) { await handOffMusic(); navigate("/reset", { state }); }
     else navigate("/programmes/calmer-seven");
-  }, [navigate]);
+  }, [handOffMusic, navigate]);
 
-  const onNavigate = useCallback((route) => {
+  const onNavigate = useCallback(async (route) => {
     if (route === "home") return; // the document scrolls itself to the top
     if (route === "begin") { void beginWeek(); return; }
     if (route === "recommended" && today?.pathway?.length) {
+      await handOffMusic();
       navigate("/reset", {
         state: {
           prebuilt: true, pathway: today.pathway, direction: today.direction,
@@ -201,16 +218,17 @@ export default function Home() {
     if (route === "profile") { navigate("/profile"); return; }
     if (route === "insights") { navigate("/insights"); return; }
     if (route === "settings") { navigate("/settings"); return; }
-    if (route === "guide") { navigate("/reset", { state: { unsure: true } }); return; }
+    if (route === "guide") { await handOffMusic(); navigate("/reset", { state: { unsure: true } }); return; }
     if (DIRECTION_LABELS[route]) {
+      await handOffMusic();
       navigate("/reset", { state: { direction: route, directionLabel: DIRECTION_LABELS[route] } });
     }
-  }, [beginWeek, navigate, today]);
+  }, [beginWeek, handOffMusic, navigate, today]);
 
   return (
     <div className="relative">
       <StreakBadge />
-      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
+      <HomeFrame ref={frameRef} onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
     </div>
   );
 }
