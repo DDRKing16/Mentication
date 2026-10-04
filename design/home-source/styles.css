@@ -561,6 +561,8 @@ main:focus {
   gap:5px 9px;
   margin:0 -7px;
 }
+.goal[data-route="calm"]{order:1}.goal[data-route="lift"]{order:2}.goal[data-route="focus"]{order:3}.goal[data-route="ground"]{order:4}.goal[data-route="sleep"]{order:5}.goal[data-route="guide"]{order:6}
+
 
 .art-control {
   display:block;
