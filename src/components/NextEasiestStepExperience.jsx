@@ -1649,7 +1649,7 @@ export default function NextEasiestStepExperience() {
           
           font-family: var(--font-body);
           color: var(--text-burgundy);
-          min-height: 100vh;
+          min-height: 100dvh;
           width: 100%;
           max-width: 390px;
           margin: 0 auto;
@@ -1890,7 +1890,7 @@ export default function NextEasiestStepExperience() {
 
         .nes-v2-wrap .screen {
           width: 100%;
-          min-height: 100vh;
+          min-height: 100dvh;
           padding: 24px;
           display: flex;
           flex-direction: column;
@@ -2146,12 +2146,13 @@ export default function NextEasiestStepExperience() {
         <div className="screen grain" style={{ 
           display: "flex", 
           flexDirection: "column", 
-          height: "100vh", 
-          padding: "20px 20px 48px 20px", 
+          minHeight: "100dvh", 
+          padding: "16px 20px 32px 20px", 
           position: "relative", 
           justifyContent: "space-between",
           boxSizing: "border-box",
-          overflow: "hidden"
+          overflowX: "hidden",
+          overflowY: "visible"
         }}>
           
           {/* Beautiful Arched Curve Background */}
@@ -2507,7 +2508,7 @@ export default function NextEasiestStepExperience() {
 
       {/* ==================== 3. INTENT SCREEN ==================== */}
       {gameState.screen === "intent" && (
-        <div className="screen grain" style={{ display: "flex", flexDirection: "column", minHeight: "100vh", position: "relative", padding: "14px 16px" }}>
+        <div className="screen grain" style={{ display: "flex", flexDirection: "column", minHeight: "100dvh", position: "relative", padding: "14px 16px" }}>
           
           {/* Beautiful Curved Framing Arch */}
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "260px", pointerEvents: "none", zIndex: 1, overflow: "hidden" }}>
@@ -2988,7 +2989,7 @@ export default function NextEasiestStepExperience() {
 
       {/* ==================== 4. FOCUS SCREEN (Refined spacing, centering, and sizing) ==================== */}
       {gameState.screen === "focus" && (
-        <div className="screen" style={{ background: "transparent", color: PRIMARY_LIGHT, display: "flex", flexDirection: "column", minHeight: "100vh", position: "relative", padding: "24px 20px" }}>
+        <div className="screen" style={{ background: "transparent", color: PRIMARY_LIGHT, display: "flex", flexDirection: "column", minHeight: "100dvh", position: "relative", padding: "24px 20px" }}>
           
           {/* Confetti canvas overlay container */}
           <canvas 
@@ -3366,7 +3367,7 @@ export default function NextEasiestStepExperience() {
         <div className="screen grain" style={{ 
           display: "flex", 
           flexDirection: "column", 
-          minHeight: "100vh", 
+          minHeight: "100dvh", 
           position: "relative", 
           padding: "16px 20px 24px 20px",
           background: "#123563" // Deep blue that is slightly dark but nowhere near as dark as before
