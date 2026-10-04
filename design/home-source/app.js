@@ -383,8 +383,9 @@
   resizeObserver.observe(track);
   window.addEventListener('load', () => { refreshCarousel(); reportHeight(); });
   window.addEventListener('pagehide', () => { resizeObserver.disconnect(); cancelAnimationFrame(resizeFrame); }, { once: true });
-  // Background music. Browsers block sound until the visitor interacts, so
-  // playback starts on the first tap or keypress anywhere in the home document.
+  // Background music. Play as soon as the home document appears; if the browser
+  // blocks autoplay before any interaction, fall back to starting on the first
+  // tap or keypress anywhere in the home document.
   const bgMusic = document.getElementById('bg-music');
   bgMusic.volume = 0.35;
   const startMusic = () => {
@@ -396,6 +397,7 @@
       console.error('[home] background music could not start:', error?.name, error?.message);
     });
   };
+  startMusic();
   document.addEventListener('pointerdown', startMusic, true);
   document.addEventListener('keydown', startMusic, true);
 })();
