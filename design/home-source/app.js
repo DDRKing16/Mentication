@@ -71,6 +71,39 @@
   });
   document.getElementById('menu-open').addEventListener('click', event => openDialog('menu-dialog', event.currentTarget));
   document.getElementById('accessibility-open').addEventListener('click', event => openDialog('accessibility-dialog', event.currentTarget));
+  // Premium: a quiet notify-me capture, stored on this device only.
+  const notifyKey = 'mentication.plus.notify.v1';
+  const premiumCard = document.getElementById('premium-card');
+  const premiumForm = document.getElementById('premium-notify-form');
+  const premiumEmail = document.getElementById('premium-email');
+  const premiumNote = document.getElementById('premium-note');
+  function readNotify() {
+    try { return JSON.parse(localStorage.getItem(notifyKey) || 'null'); } catch { return null; }
+  }
+  function applyNotify(saved) {
+    const savedEmail = typeof saved?.email === 'string' ? saved.email : '';
+    const on = Boolean(savedEmail);
+    document.getElementById('premium-signup').hidden = on;
+    document.getElementById('premium-confirmed').hidden = !on;
+    if (on) document.getElementById('premium-confirmed-email').textContent = savedEmail;
+    const cardStatus = document.getElementById('premium-card-status');
+    if (cardStatus) cardStatus.hidden = !on;
+    if (on) premiumCard.setAttribute('aria-label', 'Premium content. You’re on the notification list');
+    reportHeight();
+  }
+  premiumCard.addEventListener('click', event => openDialog('premium-dialog', event.currentTarget));
+  premiumForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const email = premiumEmail.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { premiumEmail.reportValidity?.(); return; }
+    try { localStorage.setItem(notifyKey, JSON.stringify({ email, savedAt: new Date().toISOString() })); }
+    catch {
+      storageAvailable = false;
+      if (premiumNote) premiumNote.textContent = 'Your email applies while this page is open — it could not be saved in this browser.';
+    }
+    applyNotify({ email });
+  });
+  applyNotify(readNotify());
   preferenceNames.forEach(name => document.getElementById(name).addEventListener('change', savePreferences));
 
   function sendBridge(type, payload = {}) {
