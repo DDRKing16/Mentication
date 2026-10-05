@@ -112,3 +112,18 @@ Shown once, after someone's first finished reset:
   something about the practice (on-screen visuals, spoken guidance) is a
   product/clinical call, not something to guess at and wire up myself.
 
+- **Signal Lock's own "here's how we help" pitch screen doesn't respect
+  Reduce motion.** Right after answering "Yes" to "Would you like to focus
+  more right now?", four bullet points type themselves out on screen one
+  letter at a time, and the "Tap to start" button only appears once all four
+  are done — about 8 seconds with nothing to tap, even with Mentication's
+  in-app Reduce motion setting turned on (walked the whole flow in a real
+  headless-browser run this round, with and without the setting, to confirm
+  it makes no difference here). Every other timed moment in the app either
+  finishes in under 2 seconds or is skipped outright once Reduce motion is
+  on; this is the one exception. It's drawn by a small typing loop inside
+  `public/signal-lock/index.html` (the finished, minified build), not
+  something an agent should hand-edit without your go-ahead given how easy
+  it would be to mis-wire a single-file build like that. Flagging rather
+  than guessing at a fix.
+
