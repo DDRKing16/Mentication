@@ -19,7 +19,7 @@ export function goalPointChange(baseline, direction, after) {
   return after-baseline.value;
 }
 
-export const MATCHED_ASSESSMENT_IDS = new Set(['happyBump', 'boxV2', 'progressive-muscle-relaxation-v2', 'grounding54321V2', 'urgeSurf', 'factCheck']);
+export const MATCHED_ASSESSMENT_IDS = new Set(['happyBump', 'boxV2', 'progressive-muscle-relaxation-v2', 'grounding54321V2', 'urgeSurf', 'factCheck', 'changeScene']);
 export function hasGoalBaseline(answers) {
   return goalPointChange(answers?.goal_baseline, answers?.direction, answers?.goal_baseline?.value) === 0;
 }

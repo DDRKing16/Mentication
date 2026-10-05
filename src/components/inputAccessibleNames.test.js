@@ -17,9 +17,11 @@ describe("free-text inputs have a real accessible name", () => {
     expect(src).toMatch(/aria-label="What you are stuck on"/);
   });
 
-  it("Change the Scene's two custom-activity fields have an aria-label", () => {
-    const src = readFileSync("src/components/ChangeSceneExperience.jsx", "utf8");
-    expect(src.match(/aria-label="Custom shift activity"/g)?.length).toBe(2);
+  it("Change the Scene's onward check-in controls have accessible names", () => {
+    const src = readFileSync("src/pages/ChangeSceneFollowup.jsx", "utf8");
+    for (const name of ["Current distress", "Current setting", "Time available now"]) {
+      expect(src).toContain(`aria-label="${name}"`);
+    }
   });
 
   it("Journal's custom-text fields are labelled, either directly or via a linked <label>", () => {

@@ -1115,7 +1115,7 @@ const LIFT = [
     { title: "What comes back?", body: "A feeling, a voice, the weather that day.", holdSec: 40 },
     { title: "Let it linger", body: "Stay with it a few more breaths.", holdSec: 20 },
   ] }),
-  make({ id: "changeScene", name: "Change the Scene", category: "lift", mechanism: "environment-shift", why: "A small change of scene breaks a stuck state when willpower can't.", targets: ["body", "thoughts"], states: ["any"], directions: ["lift"], durationMin: 2, cognitiveLoad: 1, physicalDemand: 1, environment: "any", eyes: "either", audio: "optional", movement: "seated", discreet: true, energy: "energising", arousal: "steady", basePriority: 5, steps: [
+  make({ id: "changeScene", name: "Change the Scene", category: "lift", mechanism: "environment-shift", why: "Try a small change around you, one action at a time.", targets: ["body", "thoughts"], states: ["any"], directions: ["lift"], durationMin: 2, cognitiveLoad: 1, physicalDemand: 1, environment: "any", eyes: "either", audio: "optional", movement: "seated", discreet: true, energy: "energising", arousal: "steady", basePriority: 5, steps: [
     { title: "Move", body: "Another room, the balcony, the kitchen, a different chair. Anywhere but here.", holdSec: 15 },
     { title: "Settle there", body: "Look around the new spot.", holdSec: 45 },
     { title: "One different thing", body: "A drink, a window, a sound you hadn't noticed.", holdSec: 45 },
