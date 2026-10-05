@@ -663,3 +663,24 @@ place left in the app where that setting makes no difference. Logged in SUGGESTI
 hand-edited, since fixing it means changing behaviour inside that finished, minified build, which needs
 the owner's say-so first.
 Full test/typecheck/lint/build suite passes clean on every commit.
+
+## 5 Oct -- Vector Shift's own dedicated pass, the last of the three standalone builds
+Checked docs/BRAND_THREAD.md: all six phases still done, same owner-decision items already in
+SUGGESTIONS.md. Of the twelve interventions, Vector Shift was the one that hadn't had its own full
+walkthrough yet (Signal Lock and Night Channel already had theirs). Got a real headless-browser run going
+at 375x812 and walked both versions of it end to end: the finished standalone build (`/vector-shift`,
+reached from the Library or a direct link) through Align, the Serpent minigame, the word puzzle, Reframe
+and the closing "Vector Stabilizing" screen; and the separate, plainer version used when Vector Shift is
+one step inside a longer built plan, through the same sequence.
+Found and fixed one real accessibility gap in the finished standalone build: the Serpent stage's four
+D-pad direction buttons (up/left/down/right) show only an arrow glyph with nothing else, so a screen
+reader has nothing to read out for any of them -- the exact same near-miss already fixed in the other
+version's own Serpent stage a few runs back, just never carried over to this one. Gave each a real
+aria-label (a79d713). Checked before and after in the browser -- nothing about how anything looks changed.
+Nothing else broken found in either version -- no console errors, no dead-end screens, no overlap.
+Flagged three wording/design gaps in SUGGESTIONS.md rather than guessing at fixes: the plainer version of
+Vector Shift repeats the same "4 STEP" vs six-step mismatch already flagged for the finished build, in a
+second place; Change the Scene collects a chip choice, a "cozy" toggle and a planned thing that nothing on
+screen ever lets anyone actually set; and 5-4-3-2-1 Grounding's player accepts a "discreet" setting it
+never reads (4cc7747).
+Full test/typecheck/lint/build suite passes clean on every commit.
