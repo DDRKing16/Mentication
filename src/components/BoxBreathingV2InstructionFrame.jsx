@@ -5,6 +5,7 @@
 // future Mentication interventions. Spec: docs/box-breathing-v2-spec.md
 // =====================================================================
 import React from "react";
+import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { BOX_V2_SQUARE_STYLE } from "@/lib/boxV2Layout";
 import { spokenFor } from "@/lib/spoken";
 import { useBoxV2WordReveal } from "@/hooks/useBoxV2WordReveal";
@@ -28,6 +29,7 @@ const REVEAL_FADE_MS = 160;
 // are owned by useBoxV2WordReveal; this component only renders the result.
 
 export default function BoxBreathingV2InstructionFrame({ step, showBody = true, isOpening = false, isClosing = false, narrate, running, rate = 0.82, leadMs = 0, onNarrationEnd }) {
+  const { prefs } = useAccessibilityPrefs();
   const spoken = spokenFor(step);
   const { tokens, visibleCount } = useBoxV2WordReveal({
     body: step?.body || "",
@@ -40,7 +42,8 @@ export default function BoxBreathingV2InstructionFrame({ step, showBody = true, 
   });
 
   return (
-    <div className="relative flex items-center justify-center bg-transparent" style={BOX_V2_SQUARE_STYLE}>
+    <div className="relative flex items-center justify-center bg-transparent" style={{ width: "min(90vw, 54dvh, 24.25rem)", minHeight: BOX_V2_SQUARE_STYLE.height }}>
+      <style>{`.box-v2-player[data-box-motion="full"] .box-v2-instruction-copy span { transition-duration: 160ms !important; }`}</style>
       <div
         className="pointer-events-none absolute inset-[-8%]"
         style={{
@@ -58,19 +61,21 @@ export default function BoxBreathingV2InstructionFrame({ step, showBody = true, 
           {step.title}
         </h2>
         {showBody && (
-          <p className="mt-5 max-w-sm text-[1.05rem] leading-[1.7] text-cream/75 text-balance">
-            {tokens.map((tok, i) => {
+          <p className="box-v2-instruction-copy mt-5 max-w-sm text-[1.05rem] leading-[1.7] text-cream/75 text-balance">
+            <span className="sr-only">{step?.body}</span>
+            <span aria-hidden="true">{tokens.map((tok, i) => {
               if (tok.space) return <span key={i}>{tok.text}</span>;
-              const visible = tok.wordIndex < visibleCount;
+              const visible = prefs.reducedMotion || tok.wordIndex < visibleCount;
               return (
                 <span
                   key={i}
-                  style={{ opacity: visible ? 1 : 0, transition: `opacity ${REVEAL_FADE_MS}ms ease` }}
+                  aria-hidden="true"
+                  style={{ opacity: visible ? 1 : 0, transition: prefs.reducedMotion ? "none" : `opacity ${REVEAL_FADE_MS}ms ease` }}
                 >
                   {tok.text}
                 </span>
               );
-            })}
+            })}</span>
           </p>
         )}
       </div>

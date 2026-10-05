@@ -1,3 +1,4 @@
+import { resetNavigationEntry, freshResetEntry } from "@/lib/resetNavigation";
 import { captureGoalBaseline, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
 import { withAttemptHelpfulness } from "@/lib/attemptFeedback";
 // @ts-check
@@ -43,7 +44,7 @@ import FlowHomeButton from "@/components/FlowHomeButton";
 import { sessionStore } from "@/lib/localData";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
-import { recordHandoffDecision } from "@/lib/flagshipMemory";
+import { recordHandoffDecision, clearActiveFlagship } from "@/lib/flagshipMemory";
 import { pauseHomeAmbient, resumeHomeAmbient } from "@/lib/homeAmbient";
 import { maybeRequestReview } from "@/lib/reviewPrompt";
 import {
@@ -64,7 +65,7 @@ export default function ResetFlow() {
   const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
   const needsAnsweredBaseline = directEntryPathway.some((item) => MATCHED_ASSESSMENT_IDS.has(item.id)) && !hasGoalBaseline(entry);
   const startsDirectFlagship = !needsAnsweredBaseline && directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
-  const initialPhase = needsAnsweredBaseline ? "questions" : startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
+  const initialPhase = needsAnsweredBaseline ? "questions" : ["questions", "pathway", "guiding"].includes(entry?.reset_phase) ? entry.reset_phase : startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
@@ -89,14 +90,15 @@ export default function ResetFlow() {
   // { id, onDone } while it plays; null the rest of the time.
   const [closing, setClosing] = useState(null);
   // coaching loop state
-  const [activePathway, setActivePathway] = useState(startsDirectFlagship ? directEntryPathway : null);
-  const [usedIds, setUsedIds] = useState(startsDirectFlagship ? directEntryPathway.map((item) => item.id) : []);
+  const [activePathway, setActivePathway] = useState(initialPhase === "guiding" ? directEntryPathway : null);
+  const [usedIds, setUsedIds] = useState(initialPhase === "guiding" ? directEntryPathway.map((item) => item.id) : []);
   const [planRemaining, setPlanRemaining] = useState(0);
   const [lastValue, setLastValue] = useState(answers.intensity ?? 5);
   const [checkinValue, setCheckinValue] = useState(null);
   const [remaining, setRemaining] = useState(null);
   const [showSwitch, setShowSwitch] = useState(false);
-  const startTimeRef = useRef(Date.now());
+  const startTimeRef = useRef(entry?.reset_started_at || Date.now());
+  const sessionIdRef = useRef(entry?.reset_session_id || globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`);
 
   const [effectiveness, setEffectiveness] = useState({});
   const sessionHistoryRef = useRef([]);
@@ -265,14 +267,14 @@ export default function ResetFlow() {
 
   const setAnswer = (key, value) => setAnswers((a) => ({ ...a, [key]: value, ...(key === "intensity" ? { goal_baseline:captureGoalBaseline(a.direction, value) } : {}) }));
 
-  const advance = (snap, nextEntry = entry) => {
+  const advance = (snap, nextEntry = entry, nextAnswers = answers) => {
     flowStack.current.push({
       phase: snap.phase,
       unsureStep: snap.unsureStep ?? unsureStep,
     });
     setPhase(snap.phase);
     if (snap.unsureStep != null) setUnsureStep(snap.unsureStep);
-    navigate(`/reset?step=${flowStack.current.length - 1}`, { state: nextEntry });
+    navigate(`/reset?step=${flowStack.current.length - 1}`, { state: resetNavigationEntry(nextEntry, nextAnswers, snap.phase, { id:sessionIdRef.current, startedAt:startTimeRef.current }) });
   };
   const goBack = () => {
     if (flowStack.current.length > 1) navigate(-1);
@@ -359,7 +361,7 @@ export default function ResetFlow() {
       endedAt: new Date(event.timestamp || Date.now()).toISOString(),
       completedPercentage: event.completedPercentage ?? 1,
       response,
-      exitReason: "completed",
+      exitReason: event.exitReason || "completed",
       coarseContextKey: coarseContextKey(currentAttemptContext(lastValue)),
     });
     attemptLogRef.current = [...attemptLogRef.current, withAttemptHelpfulness(record, event.helpfulness)];
@@ -380,14 +382,14 @@ export default function ResetFlow() {
     setUsedIds([first.id]);
     setPlanRemaining(Math.max(0, (answers.timeMin || 5) - segmentMinutes([first])));
     setLastValue(answers.intensity ?? 5);
-    // Preserve the answered Lift context on refresh while the Happy Bump
-    // experience restores its own private, non-text progress.
-    advance({ phase: "guiding" }, first.id === "happyBump" ? { ...answers, prebuilt:true, pathway:[first.id] } : entry);
+    // Every practice keeps its original explicit baseline across refresh.
+    // Private exercise progress remains owned by the experience.
+    advance({ phase: "guiding" }, { ...entry, prebuilt:true, pathway:[first.id] });
   };
 
   const startGoalReassessment = (result) => {
     const item = activePathway?.[0];
-    const event = pendingCompletionRef.current || (item ? { interventionId:item.id, mechanism:item.mechanism, action:"completed", completedPercentage:1, timestamp:Date.now() } : null);
+    const event = pendingCompletionRef.current || (item ? { interventionId:item.id, mechanism:item.mechanism, action:"completed", exitReason:result.exitReason || "completed", completedPercentage:1, timestamp:Date.now() } : null);
     if (event) pendingCompletionRef.current = { ...event, ...(result.helpfulness ? { helpfulness:result.helpfulness } : {}) };
     goalCompletionRef.current = result;
     setGoalEndRating(null);
@@ -396,7 +398,7 @@ export default function ResetFlow() {
 
   const onSegmentComplete = (result) => {
     if (result?.requireGoalReassessment) { startGoalReassessment(result); return; }
-    setCheckinValue(lastValue);
+    setCheckinValue(null);
     setRemaining(null);
     advance({ phase: "checkpoint" });
   };
@@ -409,7 +411,7 @@ export default function ResetFlow() {
       // Save the completed work under its original scale before asking for a
       // fresh rating in another goal. Never relabel mood as distress or erase
       // the attempts when Begin starts the newly checked-in reset.
-      const fresh = createInitialResetAnswers({ ...answers, direction: resolvedDirection, directionLabel: DIRECTIONS.find((item) => item.id === resolvedDirection)?.label, intensity: null, distress: null, whereFelt: resolvedWhereFelt, immediate: false });
+      const fresh = createInitialResetAnswers({ ...answers, goal_baseline:null, direction: resolvedDirection, directionLabel: DIRECTIONS.find((item) => item.id === resolvedDirection)?.label, intensity: null, distress: null, whereFelt: resolvedWhereFelt, immediate: false });
       completeSession({ silent: true, endIntensityOverride: nextIntensity, onFinished: () => {
         setAnswers(fresh);
         setPhase("questions");
@@ -424,6 +426,7 @@ export default function ResetFlow() {
         attemptLogRef.current = [];
         pendingCompletionRef.current = null;
         sessionSavedRef.current = false;
+        sessionIdRef.current = globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`;
         startTimeRef.current = Date.now();
         flowStack.current = [{ phase: "questions", unsureStep: 0 }];
         navigate("/reset", { replace: true, state: fresh });
@@ -451,17 +454,16 @@ export default function ResetFlow() {
     }
     setLastValue(nextIntensity);
     setCheckinValue(null);
-    advance({ phase: "guiding" });
+    advance({ phase: "guiding" }, { ...entry, prebuilt:true, pathway:seg.map(item => item.id) }, nextAnswers);
   };
 
   // Re-run the segment the user just finished — same practice, fresh start.
   const repeatLast = () => {
     if (!activePathway || !activePathway.length) return;
-    const nextIntensity = checkinValue ?? lastValue;
-    commitPendingPulse(nextIntensity);
-    setLastValue(nextIntensity);
-    setCheckinValue(null);
-    advance({ phase: "guiding" });
+    // Repeating is a new attempt. Save the previous attempt without inventing
+    // a rating, then collect a fresh baseline instead of reusing its old one.
+    commitPendingPulse(checkinValue);
+    completeSession({ silent:true, endIntensityOverride:checkinValue, onFinished:restartSame });
   };
 
   const continueCoaching = () => {
@@ -506,7 +508,7 @@ export default function ResetFlow() {
     setSaving(true);
     if (!options.silent && !answers.discreet && !answers.noAudio) playComplete();
     const payload = {
-      id: globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`,
+      id: sessionIdRef.current,
       created_date: new Date().toISOString(),
       state: answers.direction,
       state_label: answers.directionLabel,
@@ -572,10 +574,14 @@ export default function ResetFlow() {
 
   // quietly re-run the just-completed pathway from the overview
   const restartSame = () => {
+    const fresh = freshResetEntry(entry, answers);
+    setAnswers(createInitialResetAnswers(fresh));
+    sessionIdRef.current = globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`;
+    clearActiveFlagship();
     if (buildingTimer.current) clearTimeout(buildingTimer.current);
-    flowStack.current = [{ phase: "pathway", unsureStep: 0 }];
+    flowStack.current = [{ phase: "questions", unsureStep: 0 }];
     startTimeRef.current = Date.now();
-    setPhase("pathway");
+    setPhase("questions");
     setUnsureStep(0);
     setBuilding(false);
     setActivePathway(null);
@@ -589,7 +595,7 @@ export default function ResetFlow() {
     setCheckinValue(null);
     attemptLogRef.current = [];
     pendingCompletionRef.current = null;
-    navigate(`/reset?step=0`, { state: entry });
+    navigate(`/reset?step=0`, { state: fresh });
   };
 
   // ---------- BUILDING ----------

@@ -8,7 +8,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getNarration } from "@/lib/narrationService";
 
 const FADE_IN_MS = 300;
-const FADE_OUT_MS = 160;
 const ease = (t) => t * t * (3 - 2 * t);
 
 // Split the displayed body into tokens (words / whitespace / punctuation-only
@@ -126,7 +125,16 @@ export function useBoxV2WordReveal({ body, spoken, rate = 0.82, leadMs = 0, narr
   // the lead and plays from 0; resuming after a pause just continues.
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !ready || failed || revealAll) return;
+    clearTimeout(leadRef.current);
+    if (!audio) return;
+    if (!running || !narrate) {
+      // A hidden page may not run another animation frame: pause immediately,
+      // and cancel a pending lead-in so it cannot start audio in the background.
+      cancelAnimationFrame(fadeIdRef.current);
+      audio.pause();
+      return;
+    }
+    if (!ready || failed || revealAll) return;
     audio.onended = () => fireEnd();
     if (narrate && running) {
       if (!startedRef.current) {
@@ -150,9 +158,8 @@ export function useBoxV2WordReveal({ body, spoken, rate = 0.82, leadMs = 0, narr
         if (p && p.then) p.then(up).catch(() => {});
         else up();
       }
-    } else {
-      if (!audio.paused) fadeTo(audio, 0, FADE_OUT_MS, () => audio.pause());
     }
+    return () => clearTimeout(leadRef.current);
   }, [narrate, running, ready, failed, revealAll, rate, leadMs, fireEnd]);
 
   // Reveal words by reading the audio element's currentTime against the
@@ -190,7 +197,7 @@ export function useBoxV2WordReveal({ body, spoken, rate = 0.82, leadMs = 0, narr
   // Autoplay can block the narration audio in strict / iframe contexts. A
   // one-time tap unlocks it so the instruction is never silent.
   useEffect(() => {
-    if (!narrate) return;
+    if (!narrate || !running) return;
     const unlock = () => {
       const audio = audioRef.current;
       if (audio && audio.paused && !revealAll) {
@@ -204,7 +211,7 @@ export function useBoxV2WordReveal({ body, spoken, rate = 0.82, leadMs = 0, narr
     window.addEventListener("pointerdown", unlock, { once: true });
     return () => window.removeEventListener("pointerdown", unlock);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [narrate]);
+  }, [narrate, running]);
 
   return { tokens, wordCount, visibleCount: revealAll ? wordCount : visible, revealAll };
 }

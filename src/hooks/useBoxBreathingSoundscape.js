@@ -26,7 +26,7 @@ const DUCK_FADE = 0.5; // seconds — duck / return transitions
 
 const ease = (t) => t * t * (3 - 2 * t);
 
-export function useBoxBreathingSoundscape({ active, narrationActive }) {
+export function useBoxBreathingSoundscape({ active, narrationActive, running = true }) {
   const audioRef = useRef(null);
   const rafRef = useRef(0);
 
@@ -82,6 +82,11 @@ export function useBoxBreathingSoundscape({ active, narrationActive }) {
       rafRef.current = requestAnimationFrame(step);
     };
 
+    if (active && !running) {
+      cancelAnimationFrame(rafRef.current);
+      audio.pause();
+      return;
+    }
     if (active) {
       const target = narrationActive ? DUCK_VOL : BASE_VOL;
       const starting = audio.volume < 0.02;
@@ -90,17 +95,17 @@ export function useBoxBreathingSoundscape({ active, narrationActive }) {
     } else {
       fadeTo(0, FADE_OUT, () => { try { audio.pause(); } catch { /* */ } });
     }
-  }, [active, narrationActive]);
+  }, [active, narrationActive, running]);
 
   // Autoplay can block the unmuted soundscape in strict / iframe contexts. A
   // one-time tap anywhere unlocks it so the ambient bed is never silent.
   useEffect(() => {
-    if (!active) return;
+    if (!active || !running) return;
     const unlock = () => {
       const a = audioRef.current;
       if (a && a.paused) a.play().catch(() => { /* */ });
     };
     window.addEventListener("pointerdown", unlock, { once: true });
     return () => window.removeEventListener("pointerdown", unlock);
-  }, [active]);
+  }, [active, running]);
 }

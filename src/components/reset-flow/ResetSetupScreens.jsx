@@ -51,7 +51,7 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
         </div>
         <div className="flex flex-1 flex-col justify-center">
           <h1 className="font-heading text-[1.8rem] font-semibold leading-tight tracking-[-0.025em] text-primary text-balance sm:text-4xl">
-            {pathway[0]?.id === "happyBump" ? "Your flexible reset" : `Your ${answers.timeMin}-minute reset`}
+            {["happyBump", "progressive-muscle-relaxation-v2"].includes(pathway[0]?.id) ? "Your flexible reset" : `Your ${answers.timeMin}-minute reset`}
           </h1>
           <p className="mt-2 max-w-lg text-[0.98rem] leading-relaxed text-muted-foreground text-balance">
             {isPrebuilt
@@ -67,7 +67,7 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
           >
             <div className="flex items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <span>First activity</span>
-              <span>{pathway[0]?.durationMax ? `${pathway[0].durationMin}–${pathway[0].durationMax}` : pathway[0]?.durationMin} min</span>
+              <span>{pathway[0]?.id === "progressive-muscle-relaxation-v2" ? "2–5" : pathway[0]?.durationMax ? `${pathway[0].durationMin}–${pathway[0].durationMax}` : pathway[0]?.durationMin} min</span>
             </div>
             <h2 className="mt-3 font-heading text-[1.35rem] font-semibold tracking-[-0.02em] text-foreground">
               {pathway[0]?.name}
@@ -76,6 +76,7 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
           </motion.section>
 
           {pathway[0]?.id === "happyBump" && <p className="mt-4 text-sm text-muted-foreground">Allow 5–15 minutes, depending on your walk and pace. For a shorter reset, keep the walk short or use Skip ahead. We’ll check in before suggesting anything else.</p>}
+          {pathway[0]?.id === "progressive-muscle-relaxation-v2" && <p className="mt-4 text-sm text-muted-foreground">Choose short or full, with gentle tension or release only. Allow about 2–5 minutes; you can skip any area or stop.</p>}
           {!isPrebuilt && <PreferencesRow answers={answers} setAnswers={setAnswers} />}
         </div>
 
