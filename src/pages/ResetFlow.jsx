@@ -1,4 +1,4 @@
-import { attemptEventDisposition, resetCompletionSnapshot } from '@/lib/resetCompletion';
+import { attemptEventDisposition, resetCompletionSnapshot, finalAssessmentEvent } from '@/lib/resetCompletion';
 import { resetNavigationEntry, freshResetEntry } from "@/lib/resetNavigation";
 import { captureGoalBaseline, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
 import { withAttemptHelpfulness } from "@/lib/attemptFeedback";
@@ -392,8 +392,7 @@ export default function ResetFlow() {
 
   const startGoalReassessment = (result) => {
     const item = activePathway?.[0];
-    const event = pendingCompletionRef.current || (item ? { interventionId:item.id, mechanism:item.mechanism, action:"completed", exitReason:result.exitReason || "completed", completedPercentage:1, timestamp:Date.now() } : null);
-    if (event) pendingCompletionRef.current = { ...event, ...(result.helpfulness ? { helpfulness:result.helpfulness } : {}) };
+    pendingCompletionRef.current = finalAssessmentEvent(pendingCompletionRef.current, item, result);
     goalCompletionRef.current = result;
     setGoalEndRating(null);
     advance({ phase:"goalReassessment" }, { ...entry, prebuilt:true, pathway:activePathway.map(item => item.id), reset_completion:{ event:pendingCompletionRef.current, result } });

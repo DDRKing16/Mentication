@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { attemptEventDisposition, resetCompletionSnapshot, coarseCompletionOutcome } from './resetCompletion';
+import { attemptEventDisposition, resetCompletionSnapshot, coarseCompletionOutcome, finalAssessmentEvent } from './resetCompletion';
 import { resetNavigationEntry, freshResetEntry } from './resetNavigation';
 import { captureGoalBaseline, goalPointChange } from './goalAssessment';
 
@@ -91,4 +91,24 @@ describe('approved Change Scene coarse handoff', () => {
 it('retains Tomorrow Parking bedside identity and verified coarse save without note text', () => {
   const snapshot = resetCompletionSnapshot({event:{...event,interventionId:'tomorrowParking'},result:{interventionId:'tomorrowParking',outcome:{parked:true,durationSec:60,note:'PRIVATE'},navigateTo:'/parking-lot'}},'tomorrowParking');
   expect(snapshot.result).toEqual({requireGoalReassessment:true,interventionId:'tomorrowParking',outcome:{parked:true,durationSec:60},navigateTo:'/parking-lot'});
+});
+
+
+describe('iframe completion event without invented full completion', () => {
+  const item = {id:'vectorShift', mechanism:'attention'};
+  it('records a deliberate stop as exited with the supplied partial fraction', () => {
+    const event = finalAssessmentEvent(null,item,{exitReason:'stopped',completedPercentage:0.4},2000);
+    expect(event).toMatchObject({interventionId:'vectorShift',action:'completed',exitReason:'exited',completedPercentage:0.4,timestamp:2000});
+    expect(finalAssessmentEvent(null,item,{exitReason:'stopped'},2000).completedPercentage).toBe(0);
+  });
+  it('preserves a real pending skipped event and reports only explicit helpfulness', () => {
+    const pending = {...event,exitReason:'skipped',completedPercentage:0.25};
+    expect(finalAssessmentEvent(pending,item,{helpfulness:'worse'})).toEqual({...pending,helpfulness:'worse'});
+    expect(finalAssessmentEvent(null,item,{}).completedPercentage).toBe(1);
+    expect(finalAssessmentEvent(null,null,{})).toBeNull();
+  });
+  it('retains only the coarse Vector gameplay report through refresh', () => {
+    const outcome = {skippedStages:[2,4,4,'PRIVATE'],easierMode:true,gameplayOnly:true,scoreText:'PRIVATE'};
+    expect(coarseCompletionOutcome(outcome,'vectorShift')).toEqual({skippedStages:[2,4],easierMode:true,gameplayOnly:true});
+  });
 });

@@ -22,6 +22,21 @@ const ENUMS = {
   choiceOutcome: ['yes', 'a_little', 'not_yet', 'stronger', 'need_support'],
 };
 
+// Iframe adapters can complete without emitting a separate attempt event.
+// Preserve their measured fraction; stopping must never imply a full practice.
+export function finalAssessmentEvent(pending, item, result = {}, timestamp = Date.now()) {
+  if (!pending && !item?.id) return null;
+  const exit = pending?.exitReason || result.exitReason || 'completed';
+  const exitReason = exit === 'stopped' ? 'exited' : EXITS.includes(exit) ? exit : 'exited';
+  const percentage = pending?.completedPercentage ?? result.completedPercentage;
+  return {
+    ...(pending || {interventionId:item.id, mechanism:item.mechanism, action:'completed', timestamp}),
+    exitReason,
+    completedPercentage: bounded(percentage, 0, 1) ? percentage : exitReason === 'completed' ? 1 : 0,
+    ...(HELPFULNESS.includes(result.helpfulness) ? {helpfulness:result.helpfulness} : {}),
+  };
+}
+
 // This is deliberately an allowlist, not a recursive copy of experience state.
 // Unknown/new outcome fields require an explicit privacy review here.
 export function coarseCompletionOutcome(outcome, interventionId) {
@@ -44,6 +59,10 @@ export function coarseCompletionOutcome(outcome, interventionId) {
   if (Array.isArray(outcome.skippedRegions)) clean.skippedRegions = [...new Set(outcome.skippedRegions.filter(region => ['whole', 'hands', 'shoulders', 'face', 'torso', 'hips', 'thighs', 'lowerLegs'].includes(region)))];
   if (outcome.classificationCounts && typeof outcome.classificationCounts === 'object') {
     clean.classificationCounts = Object.fromEntries(['mixed', 'not-sure', 'fact', 'interpretation', 'prediction', 'catastrophe', 'feeling'].filter(key => Number.isInteger(outcome.classificationCounts[key]) && bounded(outcome.classificationCounts[key], 0, 10000)).map(key => [key, outcome.classificationCounts[key]]));
+  }
+  if (interventionId === 'vectorShift') {
+    for (const key of ['easierMode', 'gameplayOnly']) if (typeof outcome[key] === 'boolean') clean[key] = outcome[key];
+    if (Array.isArray(outcome.skippedStages)) clean.skippedStages = [...new Set(outcome.skippedStages.filter(stage => Number.isInteger(stage) && stage >= 2 && stage <= 6))];
   }
   if (interventionId === 'changeScene') {
     if (typeof outcome.handoffToken === 'string' && UUID.test(outcome.handoffToken)) clean.handoffToken = outcome.handoffToken;
