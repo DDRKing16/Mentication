@@ -1,3 +1,4 @@
+import { attemptEventDisposition, resetCompletionSnapshot } from '@/lib/resetCompletion';
 import { resetNavigationEntry, freshResetEntry } from "@/lib/resetNavigation";
 import { captureGoalBaseline, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
 import { withAttemptHelpfulness } from "@/lib/attemptFeedback";
@@ -65,7 +66,8 @@ export default function ResetFlow() {
   const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
   const needsAnsweredBaseline = directEntryPathway.some((item) => MATCHED_ASSESSMENT_IDS.has(item.id)) && !hasGoalBaseline(entry);
   const startsDirectFlagship = !needsAnsweredBaseline && directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
-  const initialPhase = needsAnsweredBaseline ? "questions" : ["questions", "pathway", "guiding"].includes(entry?.reset_phase) ? entry.reset_phase : startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
+  const restoredCompletion = entry?.reset_phase === "goalReassessment" ? resetCompletionSnapshot(entry.reset_completion, directEntryPathway[0]?.id) : null;
+  const initialPhase = restoredCompletion ? "goalReassessment" : needsAnsweredBaseline ? "questions" : ["questions", "pathway", "guiding"].includes(entry?.reset_phase) ? entry.reset_phase : startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
@@ -90,8 +92,8 @@ export default function ResetFlow() {
   // { id, onDone } while it plays; null the rest of the time.
   const [closing, setClosing] = useState(null);
   // coaching loop state
-  const [activePathway, setActivePathway] = useState(initialPhase === "guiding" ? directEntryPathway : null);
-  const [usedIds, setUsedIds] = useState(initialPhase === "guiding" ? directEntryPathway.map((item) => item.id) : []);
+  const [activePathway, setActivePathway] = useState(["guiding", "goalReassessment"].includes(initialPhase) ? directEntryPathway : null);
+  const [usedIds, setUsedIds] = useState(["guiding", "goalReassessment"].includes(initialPhase) ? directEntryPathway.map((item) => item.id) : []);
   const [planRemaining, setPlanRemaining] = useState(0);
   const [lastValue, setLastValue] = useState(answers.intensity ?? 5);
   const [checkinValue, setCheckinValue] = useState(null);
@@ -103,8 +105,8 @@ export default function ResetFlow() {
   const [effectiveness, setEffectiveness] = useState({});
   const sessionHistoryRef = useRef([]);
   const attemptLogRef = useRef([]);
-  const pendingCompletionRef = useRef(null);
-  const goalCompletionRef = useRef(null);
+  const pendingCompletionRef = useRef(restoredCompletion ? { ...restoredCompletion.event, mechanism:directEntryPathway[0]?.mechanism } : null);
+  const goalCompletionRef = useRef(restoredCompletion?.result || null);
   const [goalEndRating, setGoalEndRating] = useState(null);
   const sessionSavedRef = useRef(false);
   const [weekCount, setWeekCount] = useState(0);
@@ -308,8 +310,9 @@ export default function ResetFlow() {
   };
 
   const handleAttemptEvent = (event) => {
-    if (!event?.interventionId) return;
-    if (event.action === "completed") {
+    const disposition = attemptEventDisposition(event);
+    if (disposition === "ignore") return;
+    if (disposition === "pending") {
       pendingCompletionRef.current = event;
       return;
     }
@@ -322,7 +325,7 @@ export default function ResetFlow() {
       endedAt: new Date(event.timestamp || Date.now()).toISOString(),
       completedPercentage: event.completedPercentage ?? (event.action === "switched" ? 0.5 : 0.25),
       response,
-      exitReason: event.action === "switched" ? "switched" : "skipped",
+      exitReason: event.action,
       switchPreference: event.switchReason || null,
       coarseContextKey: coarseContextKey(currentAttemptContext(lastValue)),
     });
@@ -393,7 +396,7 @@ export default function ResetFlow() {
     if (event) pendingCompletionRef.current = { ...event, ...(result.helpfulness ? { helpfulness:result.helpfulness } : {}) };
     goalCompletionRef.current = result;
     setGoalEndRating(null);
-    advance({ phase:"goalReassessment" });
+    advance({ phase:"goalReassessment" }, { ...entry, prebuilt:true, pathway:activePathway.map(item => item.id), reset_completion:{ event:pendingCompletionRef.current, result } });
   };
 
   const onSegmentComplete = (result) => {

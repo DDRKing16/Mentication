@@ -1,12 +1,15 @@
+import { resetCompletionSnapshot } from './resetCompletion.js';
 import { captureGoalBaseline, hasGoalBaseline } from './goalAssessment.js';
 
 // Only coarse routing/context data belongs in history.state. Never copy an
-// experience's thought, task, note, transcript or mechanism outcome into it.
+// experience's thought, task, note or transcript into it. Final outcomes use
+// a separate explicit coarse-field allowlist.
 const CONTEXT_KEYS = ['direction', 'intensity', 'distress', 'whereFelt', 'timeMin', 'audio', 'movement', 'location', 'immediate', 'discreet', 'eyesOpen', 'noBreathing', 'noAudio', 'bedtime', 'subtype', 'acute', 'disconnected', 'contraindicationTags', 'unsuitableSubstates', 'requiredResources'];
 const LABELS = { lift:'Lift', calm:'Calm', ground:'Ground', focus:'Focus', reset:'Reset', sleep:'Sleep' };
 export function resetNavigationEntry(entry, answers, phase, session = {}) {
   const context = Object.fromEntries(CONTEXT_KEYS.filter(key => answers[key] !== undefined).map(key => [key, answers[key]]));
   const baseline = hasGoalBaseline(answers) ? captureGoalBaseline(answers.direction, answers.goal_baseline.value) : null;
+  const completion = phase === 'goalReassessment' ? resetCompletionSnapshot(entry?.reset_completion, entry?.pathway?.[0]) : null;
   return {
     ...context,
     directionLabel: LABELS[answers.direction] || '',
@@ -14,9 +17,8 @@ export function resetNavigationEntry(entry, answers, phase, session = {}) {
     prebuilt: Boolean(entry?.prebuilt),
     pathway: Array.isArray(entry?.pathway) ? [...entry.pathway] : [],
     unsure: Boolean(entry?.unsure),
-    // A mechanism's private final state remains owned by that experience.
-    // Refresh during its final assessment returns to that resumable experience.
-    reset_phase: ['questions', 'pathway', 'guiding'].includes(phase) ? phase : 'guiding',
+    reset_phase: completion ? 'goalReassessment' : ['questions', 'pathway', 'guiding'].includes(phase) ? phase : 'guiding',
+    ...(completion ? { reset_completion:completion } : {}),
     reset_session_id: session.id || entry?.reset_session_id,
     reset_started_at: session.startedAt || entry?.reset_started_at,
   };
