@@ -206,3 +206,40 @@ request:
 All approved behaviours verified against the locked code. No changes made to
 functionality — only production-lock headers, this spec, and two stale code
 comments corrected to match the approved free-run crystal behaviour.
+
+## Approved accessibility and continuity refinement — 5 October 2026
+
+The founder explicitly approved this bounded update to the locked experience.
+The current glass-square asset, narration content/rate and four-second
+inhale/hold/exhale/hold sequence are retained. The earlier visual descriptions
+above are historical; they do not authorize replacing the current artwork.
+
+- Full motion remains the unsaved default unless the operating system requests
+  reduced motion. The in-player Reduced motion button uses the existing saved
+  accessibility preference and can explicitly override that initial OS default.
+  Reduced mode uses a still glass square and track, immediate phase text and
+  fully readable instruction text; narration continues with its existing timing.
+- The paced step measures 64 seconds of active time for four rounds. Hidden-page,
+  page-hide and native app-inactive events pause the Box player. Returning does
+  not restart it: Play resumes from the retained phase position. A RAF gap over
+  one second also pauses rather than skipping breath phases. Each pause/resume
+  invalidates the old frame timestamp.
+- Phase seconds, current round and remaining rounds are readable without motion.
+  A polite atomic live region announces phase/round edges and pause/resume, not
+  every second or animation frame. Decorative numbers and the artwork are hidden
+  from the accessibility tree.
+- Comfort copy points to natural breathing, the existing alternative picker and
+  Exit. Opening the alternative picker pauses Box; cancelling leaves it paused.
+  No breathing protocol or safety/recommendation eligibility gate is changed.
+- Instruction lead-in timers are cancelled on pause; paused narration and
+  soundscape cannot be restarted by a generic autoplay-unlock tap.
+- The square's viewport cap reserves space for these controls on short screens;
+  the stage remains scrollable for enlarged text while the fixed controls stay
+  reachable.
+
+The shared explicit-helpfulness and same-question before/after assessment are
+owned by the coordinated shared-feedback change, not this Box-only patch. A
+Library-supplied default intensity is not an answered baseline. Combined
+integration must verify positive/unchanged/worse/unanswered feedback and
+exactly-once consumption before treating all five requested improvements as
+complete.

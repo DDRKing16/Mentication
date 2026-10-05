@@ -546,3 +546,26 @@ standalone builds (Signal Lock, Vector Shift, Night Channel) keep their own chro
 their finished inner builds simply don't scale with this setting, which is expected since they're outside
 what this app's text-size control reaches. Full test/typecheck/lint/build suite passes clean on every
 commit.
+
+### 2026-10-05 — Box Breathing accessibility and active-time continuity
+
+Task-owned isolated clone on existing Chat-GPT, fresh baseline 440c477. Founder
+approved reduced motion, background continuity, readable phase/round status,
+comfort/alternative/stop, and shared explicit helpfulness. This local patch owns
+the first four and leaves coordinated shared assessment/learning integration to
+its existing owner. No push, main edit, hosting configuration or dependency change.
+
+Changes: Box-specific lifecycle pause and protected active-time clock; static
+reduced visuals/labels/instructions with existing saved preference and OS default;
+phase/round text and phase-edge live region; comfort copy; alternative-picker
+pause; immediate instruction/soundscape pause and lead-in cancellation; responsive
+space for controls. Narration content and 4×4×4 rounds remain unchanged.
+
+Initial validation passed: 37 Vitest files / 228 tests, lint, typecheck, build and
+V3 algorithm verification. Hosted preview was inspected in isolated muted Chrome
+before edits. Local browser checks cover 390×844 and 1440×1000, repeated pause,
+120-second paused interval, reduced/full/OS override, alternate cancellation,
+background lifecycle, completion, and no runtime errors. Further small-phone,
+enlarged-text, exit/back/refresh and integrated cadence results are recorded in
+the task-owned box-qa evidence folder and final handoff. Native iOS and actual
+VoiceOver speech are not verified by the desktop headless browser.

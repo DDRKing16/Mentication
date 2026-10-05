@@ -9,6 +9,7 @@ export default function BoxBreathingV2Stage({
   running,
   discreet,
   onComplete,
+  onInterrupted,
   paced = false,
   showBody = true,
   isOpening = false,
@@ -29,6 +30,7 @@ export default function BoxBreathingV2Stage({
               running={running}
               discreet={discreet}
               onComplete={onComplete}
+              onInterrupted={onInterrupted}
             />
           </div>
         ) : (
