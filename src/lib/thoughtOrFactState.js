@@ -44,30 +44,28 @@ export function suggestThinkingTraps(statement = "") {
   return findThinkingTrapLanguage(statement).map(({ id }) => id);
 }
 
-export function buildBalancedThought({ thought = "", distortions = [], evidenceAgainst = [], alternatives = [] } = {}) {
-  const text = cleanText(thought).replace(/[.!?]+$/, "");
-  const active = distortions.length ? distortions : suggestThinkingTraps(text);
-  const hateFocus = text.match(/\bi hate\s+(.+?)(?:\s+because\b|\s+and\b|$)/i)?.[1]?.replace(/^all\s+/i, "");
-  const opening = hateFocus
-    ? `I’m feeling fed up with ${hateFocus} right now.`
-    : `I’m noticing the thought that ${text}.`;
-  const perspective = active.includes("emotional-reasoning") && active.includes("overgeneralising")
-    ? "That feeling is real, but it does not prove every person is the same."
-    : active.includes("overgeneralising")
-      ? "One painful experience does not tell me what every person or every future moment will be like."
-      : active.includes("mind-reading") || active.includes("jumping-to-conclusions")
-        ? "I cannot know what other people think without clearer evidence."
-        : active.includes("catastrophising")
-          ? "A difficult possibility is not proof that the worst outcome will happen."
-          : active.includes("all-or-nothing")
-            ? "This is not a choice between total failure and total success."
-            : "This thought matters, and it may not be the whole picture.";
-  const exception = evidenceAgainst[0]
-    ? `“${cleanText(evidenceAgainst[0])}” is an exception worth holding alongside it.`
-    : alternatives[0]
-      ? `Another possibility is: ${cleanText(alternatives[0])}.`
-      : "I can leave room for exceptions and information I do not have yet.";
-  return [opening, perspective, exception].join(" ");
+export const BELIEF_QUESTION = "How true does the original thought feel right now?";
+export const BELIEF_ANCHORS = "0 = not at all true · 10 = completely true";
+export const beliefRating = (value) => Number.isInteger(value) && value >= 0 && value <= 10 ? value : null;
+
+export function commitEvidenceDrafts(data = {}, drafts = {}) {
+  return Object.fromEntries([["support", "support"], ["against", "evidenceAgainst"]].map(([id, key]) => {
+    const entries = normaliseEntries(data[key]);
+    const text = cleanText(drafts[id]);
+    return [key, text && entries.length < 3 ? [...entries, text] : entries];
+  }));
+}
+
+export function buildBalancedThought({ thought = "", facts = [], support = [], evidenceAgainst = [], alternatives = [] } = {}) {
+  const known = [...new Set(normaliseEntries([...facts, ...support]))];
+  const other = normaliseEntries(evidenceAgainst);
+  const open = normaliseEntries(alternatives);
+  return [
+    `My original thought: “${cleanText(thought)}”`,
+    known.length ? `Facts and supporting details I want to keep: ${known.join(" ")}` : "I do not have to dismiss this concern or decide it is false.",
+    other.length ? `Other details to hold alongside it: ${other.join(" ")}` : "",
+    open.length ? `What remains possible or uncertain: ${open.join(" ")}` : "I can distinguish what is known from what is still uncertain.",
+  ].filter(Boolean).join(" ");
 }
 
 export function normaliseThoughtOrFactDraft(draft = {}) {
@@ -76,11 +74,16 @@ export function normaliseThoughtOrFactDraft(draft = {}) {
     .filter((fragment) => fragment.id && fragment.text);
   const validIds = new Set(fragments.map((fragment) => fragment.id));
   const assignments = Object.fromEntries(Object.entries(draft.assignments || {})
-    .filter(([id, category]) => validIds.has(id) && ["fact", "interpretation", "prediction", "catastrophe", "feeling", "open"].includes(category)));
+    .filter(([id, category]) => validIds.has(id) && ["fact", "interpretation", "prediction", "catastrophe", "feeling", "open", "mixed", "not-sure"].includes(category)));
 
   return {
     ...draft,
     thought: cleanText(draft.thought),
+    beliefVersion: 2,
+    // Old drafts may contain a default or a mood score, not an answered belief rating.
+    certaintyBefore: draft.beliefVersion === 2 ? beliefRating(draft.certaintyBefore) : null,
+    certaintyAfter: draft.beliefVersion === 2 ? beliefRating(draft.certaintyAfter) : null,
+    balancedConfirmed: draft.balancedConfirmed === true,
     fragments,
     assignments,
     fairerView: {

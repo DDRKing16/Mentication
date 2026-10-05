@@ -140,12 +140,12 @@ describe("elite 18 contract", () => {
     ]));
   });
 
-  it("builds a short balanced thought from the person's words, chosen pattern, and exception", () => {
+  it("keeps the original words and other evidence in a draft without inferring a distortion", () => {
     expect(buildBalancedThought({
       thought: "I hate all people in Melbourne because I just feel like everyone is cooked.",
       distortions: ["overgeneralising", "emotional-reasoning"],
       evidenceAgainst: ["My sister and two friends have treated me well"],
-    })).toBe("I’m feeling fed up with people in Melbourne right now. That feeling is real, but it does not prove every person is the same. “My sister and two friends have treated me well” is an exception worth holding alongside it.");
+    })).toBe("My original thought: “I hate all people in Melbourne because I just feel like everyone is cooked.” I do not have to dismiss this concern or decide it is false. Other details to hold alongside it: My sister and two friends have treated me well I can distinguish what is known from what is still uncertain.");
   });
 
   it("keeps Thought or Fact learning memory free of the person's words and evidence", () => {
@@ -170,7 +170,7 @@ describe("elite 18 contract", () => {
 
   it("keeps the Thought or Fact flow short, private, and fully reachable", () => {
     const src = fs.readFileSync("src/components/ThoughtOrFactExperience.jsx", "utf8");
-    expect(src).toContain('const STAGES = ["capture", "sort", "evidence", "ruling", "direction", "complete"]');
+    expect(src).toContain('const STAGES = ["capture", "belief", "sort", "evidence", "ruling", "direction", "complete"]');
     expect(src).toContain('onFinish={() => go("complete")}');
     expect(src).toContain("Private on this device");
     expect(src).toContain("Skip for now");
