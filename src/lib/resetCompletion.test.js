@@ -112,3 +112,9 @@ describe('iframe completion event without invented full completion', () => {
     expect(coarseCompletionOutcome(outcome,'vectorShift')).toEqual({skippedStages:[2,4],easierMode:true,gameplayOnly:true});
   });
 });
+
+it('retains Next Easiest Step coarse progress without task or ladder text', () => {
+  const outcome = {type:'next-easiest-step',completedSteps:1,skippedSteps:2,gettingStarted:'same',task:'PRIVATE',ladder:[{title:'PRIVATE'}]};
+  const snapshot = resetCompletionSnapshot({event:{...event,interventionId:'nextAction'},result:{outcome}},'nextAction');
+  expect(snapshot.result.outcome).toEqual({type:'next-easiest-step',completedSteps:1,skippedSteps:2,gettingStarted:'same'});
+});

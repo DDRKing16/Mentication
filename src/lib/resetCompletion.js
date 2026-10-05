@@ -12,7 +12,7 @@ const EXITS = ['completed', 'switched', 'skipped', 'exited'];
 const finite = value => typeof value === 'number' && Number.isFinite(value);
 const bounded = (value, min, max) => finite(value) && value >= min && value <= max;
 const ENUMS = {
-  type: ['pmr'], kind: ['box_breathing'],
+  type: ['pmr', 'next-easiest-step'], kind: ['box_breathing'],
   tensionResponse: ['less_tension', 'same', 'easier_to_notice', 'more_uncomfortable', 'unknown'],
   mode: ['contrast', 'release'], length: ['full', 'short'],
   presence: ['more_present', 'unchanged', 'more_unsettled'],
@@ -59,6 +59,10 @@ export function coarseCompletionOutcome(outcome, interventionId) {
   if (Array.isArray(outcome.skippedRegions)) clean.skippedRegions = [...new Set(outcome.skippedRegions.filter(region => ['whole', 'hands', 'shoulders', 'face', 'torso', 'hips', 'thighs', 'lowerLegs'].includes(region)))];
   if (outcome.classificationCounts && typeof outcome.classificationCounts === 'object') {
     clean.classificationCounts = Object.fromEntries(['mixed', 'not-sure', 'fact', 'interpretation', 'prediction', 'catastrophe', 'feeling'].filter(key => Number.isInteger(outcome.classificationCounts[key]) && bounded(outcome.classificationCounts[key], 0, 10000)).map(key => [key, outcome.classificationCounts[key]]));
+  }
+  if (interventionId === 'nextAction') {
+    for (const key of ['completedSteps', 'skippedSteps']) if (Number.isInteger(outcome[key]) && bounded(outcome[key], 0, 20)) clean[key] = outcome[key];
+    if (outcome.gettingStarted === null || ['easier', 'same', 'harder', 'unsure'].includes(outcome.gettingStarted)) clean.gettingStarted = outcome.gettingStarted;
   }
   if (interventionId === 'vectorShift') {
     for (const key of ['easierMode', 'gameplayOnly']) if (typeof outcome[key] === 'boolean') clean[key] = outcome[key];
