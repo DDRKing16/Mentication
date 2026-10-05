@@ -29,3 +29,16 @@ export function freshResetEntry(entry, answers) {
   delete fresh.reset_started_at;
   return fresh;
 }
+
+// Browser Back preserves forward entries. Only a new navigation after going
+// back replaces that forward branch, matching the browser's history behavior.
+export function appendResetFlowSnapshot(stack, index, snapshot) {
+  const next = stack.slice(0, index + 1);
+  next[index + 1] = snapshot;
+  return next;
+}
+export function resetFlowHistorySnapshot(stack, index, entry) {
+  if (stack[index]) return stack[index];
+  if (entry?.reset_phase === 'goalReassessment' && resetCompletionSnapshot(entry.reset_completion, entry.pathway?.[0])) return {phase:'goalReassessment',unsureStep:0};
+  return ['questions','pathway','guiding'].includes(entry?.reset_phase) ? {phase:entry.reset_phase,unsureStep:0} : null;
+}

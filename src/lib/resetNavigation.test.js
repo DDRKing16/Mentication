@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { captureGoalBaseline, hasGoalBaseline } from './goalAssessment';
-import { resetNavigationEntry, freshResetEntry } from './resetNavigation';
+import { resetNavigationEntry, freshResetEntry, appendResetFlowSnapshot, resetFlowHistorySnapshot } from './resetNavigation';
 import { createInitialResetAnswers } from './resetFlowConfig';
 import { buildAttemptRecord } from './interventions';
 
@@ -41,5 +41,29 @@ describe('coarse reset refresh and new-attempt snapshots', () => {
     const record=buildAttemptRecord({interventionId:'progressive-muscle-relaxation-v2',exitReason:event.exitReason || 'completed',completedPercentage:event.completedPercentage});
     expect(record.exit_reason).toBe('exited');
     expect([record].filter(attempt=>attempt.exit_reason==='completed')).toHaveLength(0);
+  });
+});
+
+
+describe('browser Back and Forward within a reset', () => {
+  it('preserves the guiding entry when Back visits the overview and Forward returns', () => {
+    let stack = [{phase:'questions',unsureStep:0}];
+    stack = appendResetFlowSnapshot(stack,0,{phase:'pathway',unsureStep:0});
+    stack = appendResetFlowSnapshot(stack,1,{phase:'guiding',unsureStep:0});
+    expect(resetFlowHistorySnapshot(stack,1,{}).phase).toBe('pathway');
+    expect(resetFlowHistorySnapshot(stack,2,{}).phase).toBe('guiding');
+    expect(stack).toHaveLength(3);
+  });
+  it('discards forward state only when the user makes a new choice after Back', () => {
+    const old = [{phase:'questions'},{phase:'pathway'},{phase:'guiding'},{phase:'goalReassessment'}];
+    const next = appendResetFlowSnapshot(old,1,{phase:'questions'});
+    expect(next).toEqual([{phase:'questions'},{phase:'pathway'},{phase:'questions'}]);
+    expect(old).toHaveLength(4);
+  });
+  it('restores a persisted entry after refresh when the in-memory stack is absent', () => {
+    const stack = [];
+    expect(resetFlowHistorySnapshot(stack,1,{reset_phase:'pathway'}).phase).toBe('pathway');
+    expect(resetFlowHistorySnapshot(stack,2,{reset_phase:'guiding'}).phase).toBe('guiding');
+    expect(resetFlowHistorySnapshot(stack,2,{reset_phase:'unknown'})).toBeNull();
   });
 });

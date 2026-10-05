@@ -1,5 +1,5 @@
 import { attemptEventDisposition, resetCompletionSnapshot, finalAssessmentEvent } from '@/lib/resetCompletion';
-import { resetNavigationEntry, freshResetEntry } from "@/lib/resetNavigation";
+import { resetNavigationEntry, freshResetEntry, appendResetFlowSnapshot, resetFlowHistorySnapshot } from "@/lib/resetNavigation";
 import { captureGoalBaseline, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
 import { withAttemptHelpfulness } from "@/lib/attemptFeedback";
 // @ts-check
@@ -72,9 +72,10 @@ export default function ResetFlow() {
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
   // swipe-back steps chronologically through the flow instead of exiting.
-  const flowStack = useRef([{ phase: initialPhase, unsureStep: 0 }]);
-  const buildingTimer = useRef(null);
   const stepParam = useMemo(() => parseInt(new URLSearchParams(location.search).get("step") || "0", 10) || 0, [location.search]);
+  const flowStack = useRef(Object.assign([], { [stepParam]: { phase: initialPhase, unsureStep: 0 } }));
+  const restoredStepRef = useRef(stepParam);
+  const buildingTimer = useRef(null);
   const [answers, setAnswers] = useState(() => createInitialResetAnswers(entry));
 
   const [endIntensity, setEndIntensity] = useState(null);
@@ -137,17 +138,16 @@ export default function ResetFlow() {
     }
   }, [entry?.immediate]);
 
-  // restore flow state when the user navigates back (iOS swipe-back)
+  // Restore both browser Back and Forward, including history after refresh.
   useEffect(() => {
-    if (stepParam < flowStack.current.length - 1) {
+    if (restoredStepRef.current === stepParam) return;
+    restoredStepRef.current = stepParam;
+    const snap = resetFlowHistorySnapshot(flowStack.current, stepParam, entry) || { phase:initialPhase, unsureStep:0 };
+    if (snap) {
       if (buildingTimer.current) { clearTimeout(buildingTimer.current); buildingTimer.current = null; }
-      const snap = flowStack.current[stepParam];
-      flowStack.current = flowStack.current.slice(0, stepParam + 1);
-      if (snap) {
-        setPhase(snap.phase);
-        setUnsureStep(snap.unsureStep ?? 0);
-        setBuilding(false);
-      }
+      setPhase(snap.phase);
+      setUnsureStep(snap.unsureStep ?? 0);
+      setBuilding(false);
     }
   }, [stepParam]);
   useEffect(() => () => { if (buildingTimer.current) clearTimeout(buildingTimer.current); }, []);
@@ -270,7 +270,7 @@ export default function ResetFlow() {
   const setAnswer = (key, value) => setAnswers((a) => ({ ...a, [key]: value, ...(key === "intensity" ? { goal_baseline:captureGoalBaseline(a.direction, value) } : {}) }));
 
   const advance = (snap, nextEntry = entry, nextAnswers = answers) => {
-    flowStack.current.push({
+    flowStack.current = appendResetFlowSnapshot(flowStack.current, stepParam, {
       phase: snap.phase,
       unsureStep: snap.unsureStep ?? unsureStep,
     });
@@ -279,7 +279,7 @@ export default function ResetFlow() {
     navigate(`/reset?step=${flowStack.current.length - 1}`, { state: resetNavigationEntry(nextEntry, nextAnswers, snap.phase, { id:sessionIdRef.current, startedAt:startTimeRef.current }) });
   };
   const goBack = () => {
-    if (flowStack.current.length > 1) navigate(-1);
+    if (stepParam > 0) navigate(-1);
     else navigate("/");
   };
 
