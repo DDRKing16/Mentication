@@ -53,7 +53,7 @@ export function ProgrammeList() {
           const Icon = ICONS[programme.goal] || Wind;
           const startedAt = programmeStartedAt(programme.id);
           const progress = startedAt ? programmeProgress(programme, sessions, startedAt) : null;
-          const locked = programme.plus && !plus.active;
+          const locked = programme.plus && !plus.hasAccess;
           return (
             <li key={programme.id}>
               <button
@@ -102,7 +102,7 @@ export function ProgrammeDetail() {
     return <Shell onBack={() => navigate("/programmes")}><p className="mt-8 text-muted-foreground">That programme isn't available.</p></Shell>;
   }
 
-  const locked = programme.plus && !plus.active;
+  const locked = programme.plus && !plus.hasAccess;
   const begin = () => {
     if (locked) { navigate(`/plus?from=programmes/${programme.id}`); return; }
     startProgramme(programme.id);

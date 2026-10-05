@@ -80,3 +80,32 @@ describe("Mentication Plus", () => {
     expect(await plus.loadPlusPrices()).toEqual({ monthly: null });
   });
 });
+
+describe("founder preview isolation", () => {
+  beforeEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    vi.doMock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: () => false } }));
+  });
+
+  it.each([
+    ["1", "mentication-chatgpt-preview.onrender.com", true],
+    ["", "mentication-chatgpt-preview.onrender.com", false],
+    ["1", "mentication.com", false],
+    ["1", "localhost", false],
+  ])("requires build opt-in %s and exact preview host %s", async (flag, hostname, enabled) => {
+    vi.stubEnv("VITE_FOUNDER_PREVIEW", flag);
+    vi.stubGlobal("window", { location: { hostname } });
+    const plus = await freshModule();
+    expect(plus.founderPreview).toBe(enabled);
+    expect(plus.getPlus().active).toBe(false);
+    expect(localStorage.getItem("mentication.plus.v1")).toBe(null);
+  });
+
+  it("never enables native app access", async () => {
+    vi.stubEnv("VITE_FOUNDER_PREVIEW", "1");
+    vi.stubGlobal("window", { location: { hostname: "mentication-chatgpt-preview.onrender.com" } });
+    vi.doMock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: () => true } }));
+    expect((await freshModule()).founderPreview).toBe(false);
+  });
+});

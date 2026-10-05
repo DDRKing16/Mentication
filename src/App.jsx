@@ -1,3 +1,4 @@
+import { founderPreview } from "@/lib/subscription";
 // @ts-check
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -173,6 +174,7 @@ function App() {
           <ScrollToTop />
           <MenticationRoutes />
         </Router>
+        {founderPreview && <div role="status" style={{ position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 9999, pointerEvents: "none", borderRadius: "0 0 8px 8px", padding: "2px 10px", background: "#0A1F3D", color: "#F6EFE2", fontSize: 10, whiteSpace: "nowrap" }}>Founder preview · testing access · no subscription</div>}
         <Toaster />
       </QueryClientProvider>
     </MotionConfig>

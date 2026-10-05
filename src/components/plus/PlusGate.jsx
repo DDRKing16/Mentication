@@ -8,7 +8,7 @@ import { usePlus } from "@/lib/subscription";
 export default function PlusGate({ route, name, promise, detail, background = "#0A1F3D", previewImage, children }) {
   const plus = usePlus();
   const navigate = useNavigate();
-  if (plus.active) return children;
+  if (plus.hasAccess) return children;
   return (
     <div className="fixed inset-0 overflow-y-auto text-[#F6EFE2]" style={{ background }}>
       {previewImage && (
