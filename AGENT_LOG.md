@@ -612,3 +612,26 @@ between them and it, unlike the rest of the app. Fixing it means wiring a new co
 separate finished builds rather than a quick change, so left for a future pass rather than attempted
 in the time left this run.
 Full test/typecheck/lint/build suite passes clean on every commit.
+
+## 5 Oct -- Reduce motion gaps closed, a real "stuck overlay" bug fixed, dead code cleared
+Checked docs/BRAND_THREAD.md: all phases still done, same owner-decision items already in
+SUGGESTIONS.md. Ran an accessibility/robustness audit across the nine interventions that aren't the
+three finished standalone builds, in a real headless-browser run at 375x812.
+Found and fixed: three interventions (Change the Scene, Next Easiest Step, Tomorrow Parking Lot) run
+their own looping glow/pulse/drift animations outside the app's shared animation system, so turning on
+Mentication's own in-app Reduce motion setting (separate from the phone's own setting) did nothing to
+them -- only the phone-level setting was respected. Added the same guard every other intervention's
+styling already uses, so the in-app toggle now reaches all three too (4918e5e).
+Found and fixed a real bug in Next Easiest Step: when it needs to write AI steps for a task with no
+hand-crafted ones and the connection stalls (reachable but never answering), there was no timeout, so
+the "Writing your steps..." screen -- which sits on top of the Back and Home buttons -- could stay up
+forever with no way out except force-closing the app. Added a 15-second limit so it now always falls
+back to the built-in steps instead (4918e5e).
+Cleared six pieces of confirmed-unused code the linter had been quietly flagging (an entire unused
+visual component, an unused colour table, a few unused variables and one leftover "Saving..." button
+state whose setter was never called, so that button could never actually show it) -- checked each one
+wasn't read anywhere else first, so nothing about how the app looks or behaves changed (4b8ba36).
+Left alone and flagged in SUGGESTIONS.md instead: a reset's "eyes open" answer is collected but never
+used anywhere -- deciding whether that should change something about the practice is a product call,
+not an agent's to guess at.
+Full test/typecheck/lint/build suite passes clean on every commit.

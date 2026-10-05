@@ -104,3 +104,11 @@ Shown once, after someone's first finished reset:
   hide it unless a launch is genuinely imminent, wasn't actually working —
   see AGENT_LOG.md.)
 
+- **A reset's "eyes open" answer is collected but never actually used.**
+  `ResetPlayer.jsx` reads it from the session's answers into an `eyesOpen`
+  variable, but nothing in the file (or anywhere else) ever reads that
+  variable again — it has no effect on what's shown or said during the
+  practice. Not touched, since whether "eyes open" is meant to change
+  something about the practice (on-screen visuals, spoken guidance) is a
+  product/clinical call, not something to guess at and wire up myself.
+
