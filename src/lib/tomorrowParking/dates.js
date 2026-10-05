@@ -41,7 +41,11 @@ export function savedWhenLabel(iso, now = new Date()) {
   const savedHour = saved.getHours();
   const nightHours = savedHour >= 18 || savedHour < 6;
 
-  if (nightHours && hoursAgo < 20 && dayDelta <= 1) return "Last night";
+  if (hoursAgo < 0) return formatDateTime(iso);
+  if (hoursAgo >= 0 && hoursAgo < 1 / 60) return "Just saved";
+  // Never call a note from this evening "last night", or a future timestamp recent.
+  const morningAfter = now.getHours() >= 6 && (dayDelta === 1 && savedHour >= 18 || dayDelta === 0 && savedHour < 6);
+  if (nightHours && morningAfter && hoursAgo >= 0 && hoursAgo < 20) return "Last night";
   if (dayDelta === 0) return `Earlier today, ${formatDateTime(iso)}`;
   if (dayDelta === 1) return `Yesterday, ${formatDateTime(iso)}`;
   return formatDateTime(iso);

@@ -1,3 +1,4 @@
+import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, Search, X, ArrowRight } from "lucide-react";
@@ -216,6 +217,8 @@ export default function InterventionLibrary() {
             </button>
           )}
         </div>
+
+        {<button type="button" className="mt-4 w-full rounded-2xl border border-border bg-card p-4 text-left" onClick={() => navigate("/parking-lot")}><span className="block font-medium">Your parking lot</span><span className="text-sm text-muted-foreground">{hasParkedNotes() ? "Saved on this device · Review when ready →" : "View notes saved on this device →"}</span></button>}
 
         {/* category navigation */}
         <div className="mt-4 -mx-5 overflow-x-auto scrollbar-none px-5 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="Practice categories">

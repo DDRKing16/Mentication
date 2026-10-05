@@ -649,7 +649,7 @@ export default function ResetFlow() {
       commitPendingPulse(goalPointChange(answers.goal_baseline, answers.direction, rating) == null ? null : rating);
       completeSession({ direct:true, silent:true, endIntensityOverride:rating, interventionOutcome:result.outcome, navigateTo:result.navigateTo });
     };
-    return <main className="calmbg min-h-[100dvh] px-5 py-6"><div className="mx-auto flex max-w-lg flex-col gap-6">
+    return <main className={`${goalCompletionRef.current?.interventionId === "tomorrowParking" ? "tpl tpl--bedside tpl-goal" : "calmbg"} min-h-[100dvh] px-5 py-6`}><div className="mx-auto flex max-w-lg flex-col gap-6">
       <FlowHomeButton /><h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
       <p className="text-muted-foreground">The same question as at the start. Confirm an honest rating, or skip. You do not need to feel better.</p>
       <IntensityDial value={goalEndRating ?? 5} onChange={setGoalEndRating} direction={answers.direction} />
@@ -692,6 +692,13 @@ export default function ResetFlow() {
           initialThought={interventionId === "factCheck" ? tofEntryThought : undefined}
           initialCertainty={interventionId === "factCheck" ? answers.intensity : undefined}
           answers={{ ...answers, intensity: lastValue }}
+          onGoalBaseline={(baseline) => {
+            if (!baseline?.answered) return;
+            const next = { ...answers, intensity: baseline.value, goal_baseline: baseline };
+            setAnswers(next);
+            setLastValue(baseline.value);
+            navigate(`${location.pathname}${location.search}`, { replace: true, state: resetNavigationEntry(entry, next, "guiding", { id: sessionIdRef.current, startedAt: startTimeRef.current }) });
+          }}
           onAttemptEvent={handleAttemptEvent}
           onComplete={(result) => {
             if (result?.helpfulness && pendingCompletionRef.current) pendingCompletionRef.current = { ...pendingCompletionRef.current, helpfulness:result.helpfulness };

@@ -752,3 +752,55 @@
   .tpl-btn--lg { min-height: 3.15rem; }
   .tpl-chip { min-height: 2.6rem; padding-top: 0.4rem; padding-bottom: 0.4rem; }
 }
+
+/* Bedside composition: bounded, dark, and close to the writing. */
+.tpl--bedside { position: relative; overflow-x: clip; --tpl-bg: #14121c; --tpl-fg: #eee5e6; --tpl-muted-fg: #bcb0c3; --tpl-card: #211d2a; --tpl-glass: #211d2a; --tpl-border: #494052; --tpl-note: #2b2532; --tpl-note-fg: #e4d9df; --tpl-note-edge: #554452; --tpl-note-highlight: #65515d; --tpl-shutter: #784e48; --tpl-shutter-edge: #b48173; }
+.tpl-frame { max-width: 660px; }
+.tpl--bedside .tpl-frame { padding-top: max(2rem, env(safe-area-inset-top)); min-height: 100dvh; }
+.tpl-night-header { margin-bottom: 1.75rem; }
+.tpl-night-header .tpl-eyebrow { letter-spacing: .12em; margin: 0; padding: 0; }
+.tpl-kicker { margin: 0 0 .6rem; color: var(--tpl-primary); font-size: .8rem; letter-spacing: .035em; }
+.tpl--bedside .tpl-h1 { font-size: clamp(2.35rem, 5vw, 3.5rem); line-height: 1.02; }
+.tpl--bedside .tpl-lede { font-size: 1rem; margin: .75rem 0 0; }
+.tpl-capture, .tpl-seal, .tpl-parked { flex: 0 0 auto; }
+.tpl-urgency { border: 0; padding: 0; margin: 1.6rem 0 0; }
+.tpl-urgency legend { font-size: .9rem; margin-bottom: .65rem; color: var(--tpl-muted-fg); }
+.tpl-urgency .tpl-btn { font-size: .9rem; padding: .6rem .65rem; border-radius: .8rem; }
+.tpl-selected { border-color: var(--tpl-primary); }
+.tpl--bedside .tpl-writing { flex: none; min-height: 0; margin-top: 1.15rem; border-radius: 1rem; box-shadow: inset 0 1px #68515b33; }
+.tpl--bedside .tpl-writing__input { min-height: 8rem; font-size: 1.1rem; line-height: 1.65; resize: vertical; }
+.tpl--bedside .tpl-writing__input:focus-visible { outline-offset: -4px; }
+.tpl--bedside .tpl-xs { margin: .65rem 0 1rem; }
+.tpl-storage { margin: 1.15rem 0; font-size: .85rem; color: var(--tpl-muted-fg); }
+.tpl-storage p { margin: 0; }
+.tpl-details { font-size: .85rem; color: var(--tpl-muted-fg); }
+.tpl-details summary { cursor: pointer; min-height: 44px; padding: .7rem 0; text-decoration: underline; text-underline-offset: 4px; }
+.tpl-details p { line-height: 1.7; }
+.tpl-details input[type=range] { width: 100%; accent-color: var(--tpl-primary); min-height: 44px; }
+.tpl-scale { display: flex; justify-content: space-between; gap: 1rem; font-size: .8rem; }
+.tpl--bedside .tpl-shutter-track { height: 15rem; border-radius: 1rem; }
+.tpl--bedside .tpl-shutter-note { padding: 5rem 1rem 1rem; font-size: 1rem; line-height: 1.7; }
+.tpl--bedside .tpl-shutter-live:empty { display: none; }
+.tpl--bedside .tpl-handle-wrap { padding: .35rem .5rem .5rem; gap: .3rem; }
+.tpl--bedside .tpl-handle { height: 1.3rem; width: 5rem; }
+.tpl--bedside .tpl-handle__hint { font-size: .75rem; }
+.tpl-parked { text-align: center; }
+.tpl-parked .tpl-object { margin: 1.75rem auto 2rem; width: 11rem; height: 8rem; }
+.tpl-parked .tpl-row { justify-content: center; }
+.tpl--bedside .tpl-darkness { padding: 2rem 0; gap: 2rem; }
+.tpl--bedside .tpl-darkness__dot { margin: 0; }
+.tpl-leave { position: fixed; inset: auto 1rem max(1rem, env(safe-area-inset-bottom)); z-index: 90; max-width: 600px; margin-inline: auto; color: var(--tpl-fg); }
+.tpl-leave::backdrop { background: #09070edb; }
+.tpl[data-reduced-motion=true] *, .tpl[data-reduced-motion=true] *::before, .tpl[data-reduced-motion=true] *::after { animation: none !important; transition: none !important; }
+.tpl--daylight .tpl-frame { padding-top: 5rem !important; }
+.tpl--daylight .tpl-row { flex-wrap: wrap; }
+.tpl--daylight .tpl-btn { padding-block: .65rem; }
+@media (min-width: 800px) { .tpl--bedside .tpl-frame { padding-top: 2.5rem; padding-bottom: 3rem; } .tpl-night-header { margin-bottom: 2.5rem; } }
+
+/* Keep the optional shared, matched check-in in this bedside palette. */
+.tpl-goal { --background: 258 21% 9%; --foreground: 353 21% 92%; --primary: 18 43% 73%; --primary-foreground: 258 21% 9%; --muted-foreground: 278 12% 73%; --secondary: 271 20% 17%; --border: 271 12% 29%; --indigo: 18 35% 68%; }
+.tpl-goal .reset-slider { background: #51404c; accent-color: #c69888; }
+.tpl-goal button[aria-label] { min-height: 44px; }
+
+.tpl--daylight .tpl-btn--primary { background: var(--tpl-primary); border-color: var(--tpl-primary); color: var(--tpl-primary-fg); }
+.tpl-chip { gap: .4rem; }

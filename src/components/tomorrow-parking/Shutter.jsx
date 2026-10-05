@@ -2,27 +2,31 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import ThoughtLines from "./ThoughtLines";
 
-// The glass shutter. One weighted downward gesture closes the door over the
-// note. Closing prepares the note; the separate button remains the deliberate
-// confirmation that writes it to storage.
-//
-// Accessibility: an ARIA slider with keyboard support (Arrow/Page/Home/End,
-// Enter or Space to complete). Drag is never the only route — the parent always
-// renders an equally prominent button.
-export default function Shutter({ noteText, onClosed, disabled = false, reducedMotion = false }) {
+// Closing and saving are one action. Both the gesture and button use finish;
+// success is shown only after the storage adapter verifies the write.
+export default function Shutter({ noteText, onClosed, onSettled, retry = false, disabled = false, reducedMotion = false }) {
   const trackRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [closing, setClosing] = useState(false);
   const completedRef = useRef(false);
+  const timer = useRef(null);
+  const progressRef = useRef(0);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const finish = useCallback(() => {
-    if (completedRef.current) return;
+    if (disabled || completedRef.current) return;
     completedRef.current = true;
+    if (!onClosed()) {
+      completedRef.current = false;
+      setProgress(0);
+      progressRef.current = 0;
+      return;
+    }
     setClosing(true);
     setProgress(1);
-    window.setTimeout(onClosed, reducedMotion ? 20 : 860);
-  }, [onClosed, reducedMotion]);
+    timer.current = window.setTimeout(onSettled, reducedMotion ? 0 : 650);
+  }, [disabled, onClosed, onSettled, reducedMotion]);
 
   const setFromPointer = useCallback((clientY) => {
     const el = trackRef.current;
@@ -31,7 +35,8 @@ export default function Shutter({ noteText, onClosed, disabled = false, reducedM
     const restingHeight = rect.height * 0.25;
     const travel = Math.max(1, rect.height - restingHeight);
     const next = (clientY - rect.top - restingHeight / 2) / travel;
-    setProgress(Math.min(1, Math.max(0, next)));
+    progressRef.current = Math.min(1, Math.max(0, next));
+    setProgress(progressRef.current);
   }, []);
 
   useEffect(() => {
@@ -39,22 +44,17 @@ export default function Shutter({ noteText, onClosed, disabled = false, reducedM
     const move = (e) => setFromPointer(e.clientY);
     const up = () => {
       setDragging(false);
-      // Predictable threshold: an incomplete drag returns to rest.
-      setProgress((p) => {
-        if (p >= 0.6) {
-          finish();
-          return 1;
-        }
-        return 0;
-      });
+      if (progressRef.current >= 0.6) finish();
+      else { progressRef.current = 0; setProgress(0); }
     };
+    const cancel = () => { setDragging(false); progressRef.current = 0; setProgress(0); };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
-    window.addEventListener("pointercancel", up);
+    window.addEventListener("pointercancel", cancel);
     return () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
-      window.removeEventListener("pointercancel", up);
+      window.removeEventListener("pointercancel", cancel);
     };
   }, [dragging, setFromPointer, finish]);
 
@@ -94,7 +94,9 @@ export default function Shutter({ noteText, onClosed, disabled = false, reducedM
         <div
           role="slider"
           tabIndex={disabled ? -1 : 0}
-          aria-label="Glass shutter. Slide down to close before parking your note."
+          aria-label="Slide down to close and save your note. Or press Enter."
+          aria-orientation="vertical"
+          aria-describedby="tpl-storage-summary"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={pct}
@@ -110,7 +112,7 @@ export default function Shutter({ noteText, onClosed, disabled = false, reducedM
           className="tpl-shutter-door"
           style={{
             transform: `translateY(${((progress - 1) * 75).toFixed(2)}%)`,
-            transition: dragging ? "none" : "transform 860ms cubic-bezier(0.16,0.86,0.24,1)",
+            transition: dragging || reducedMotion ? "none" : "transform 860ms cubic-bezier(0.16,0.86,0.24,1)",
           }}
         >
           <div aria-hidden="true" className="tpl-shutter-door__sheen" />
@@ -123,13 +125,14 @@ export default function Shutter({ noteText, onClosed, disabled = false, reducedM
               {[0, 1, 2, 3].map((i) => <span key={i} aria-hidden="true" className="tpl-handle__grip" />)}
               {progress < 0.05 && <ChevronDown aria-hidden="true" style={{ marginLeft: 6, width: 16, height: 16, color: "var(--tpl-shutter-fg)" }} />}
             </div>
-            <span className="tpl-handle__hint">{progress >= 1 ? "Closed" : "Slide down to close"}</span>
+            <span className="tpl-handle__hint">{progress >= 1 ? "Saved" : "Pull to close & save"}</span>
           </div>
         </div>
       </div>
 
+      <button type="button" className="tpl-btn tpl-btn--primary tpl-btn--block tpl-btn--lg" style={{ marginTop: "1rem" }} onClick={finish} disabled={disabled || closing} aria-describedby="tpl-storage-summary">{closing ? "Saved" : retry ? "Try again — close and save" : "Close and save"}</button>
       <p aria-live="polite" className="tpl-shutter-live">
-        {progress >= 1 ? "Closed. Park it when you're ready." : progress > 0.05 ? "Keep sliding" : ""}
+        {progress >= 1 ? "Saved on this device." : progress > 0.05 ? "Keep sliding" : ""}
       </p>
     </div>
   );

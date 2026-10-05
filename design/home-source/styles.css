@@ -2128,3 +2128,10 @@ body:has(dialog[open]) {
     text-align:right;
   }
 }
+
+/* Metadata-only way back to a saved Tomorrow Parking Lot note. */
+.parking-return { margin: 16px 0; }
+.parking-return[hidden] { display: none; }
+.parking-return button { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; width: 100%; text-align: left; padding: 16px 20px; border: 1px solid #baa59066; border-radius: 16px; background: #2f2736; color: #f2e8df; cursor: pointer; }
+.parking-return button span:first-child { font-size: 18px; }
+.parking-return button span:last-child { font-size: 13px; color: #d0bec5; align-self: center; }

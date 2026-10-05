@@ -115,12 +115,16 @@ describe("Tomorrow Parking Lot storage", () => {
     expect(window.localStorage.getItem("mentation.flagship.preferences.v1")).toBe("{}");
   });
 
-  it("ignores malformed containers and invalid entries without deleting data", () => {
+  it("reports malformed containers and blocks writes without deleting data", () => {
     window.localStorage.setItem(RECORDS_KEY, "{not json");
-    expect(loadRecords()).toEqual([]);
+    expect(() => loadRecords()).toThrow(SaveVerificationError);
+    expect(tryLoadRecords().ok).toBe(false);
+    expect(() => parkNote({ text: "New synthetic note" })).toThrow(SaveVerificationError);
     expect(window.localStorage.getItem(RECORDS_KEY)).toBe("{not json");
     window.localStorage.setItem(RECORDS_KEY, JSON.stringify({ records: [{ id: "x" }, { id: "ok", text: "fine", createdAt: NIGHT.toISOString(), updatedAt: NIGHT.toISOString(), expiresAt: "2099-01-01T00:00:00.000Z" }] }));
-    expect(loadRecords().map((r) => r.id)).toEqual(["ok"]);
+    const before = window.localStorage.getItem(RECORDS_KEY);
+    expect(() => parkNote({ text: "New synthetic note" })).toThrow(SaveVerificationError);
+    expect(window.localStorage.getItem(RECORDS_KEY)).toBe(before);
   });
 
   it("keeps drafts in the session only and expires them", () => {
@@ -146,6 +150,25 @@ describe("Tomorrow Parking Lot storage", () => {
     expect(consumeNextStepHandoff()).toBeNull();
   });
 
+  it("preserves saved notes after failed edits and deletes, then allows retry", () => {
+    const record = parkNote({ id: "synthetic-retry", text: "Synthetic original" });
+    const storage = window.localStorage;
+    const original = storage.setItem.bind(storage);
+    storage.setItem = (key, value) => { if (key === RECORDS_KEY) throw new Error("Synthetic quota failure"); original(key, value); };
+    expect(() => updateNoteText(record.id, "Synthetic edit")).toThrow();
+    expect(() => deleteRecord(record.id)).toThrow();
+    expect(loadRecords()[0].text).toBe("Synthetic original");
+    storage.setItem = original;
+    updateNoteText(record.id, "Synthetic edit");
+    expect(loadRecords()).toHaveLength(1);
+    expect(loadRecords()[0].text).toBe("Synthetic edit");
+  });
+
+  it("reports unavailable draft recovery", () => {
+    window.sessionStorage = new BrokenStorage();
+    expect(writeDraft("Synthetic draft")).toBe(false);
+  });
+
   it("exposes verification failures as a distinct error", () => {
     expect(new SaveVerificationError().name).toBe("SaveVerificationError");
   });
@@ -157,6 +180,14 @@ describe("Tomorrow Parking Lot dates and export", () => {
     expect(savedWhenLabel(saved, new Date("2026-09-14T08:00:00"))).toBe("Last night");
     expect(savedWhenLabel(saved, new Date("2026-09-15T08:00:00"))).not.toBe("Last night");
     expect(savedWhenLabel("2026-09-14T13:00:00", new Date("2026-09-14T15:00:00"))).toMatch(/^Earlier today/);
+  });
+
+  it("never calls a just-created or future note last night", () => {
+    expect(savedWhenLabel("2026-10-05T22:30:00", new Date("2026-10-05T22:30:01"))).toBe("Just saved");
+    expect(savedWhenLabel("2026-10-05T22:30:00", new Date("2026-10-05T23:30:00"))).toMatch(/^Earlier today/);
+    expect(savedWhenLabel("2026-10-06T03:00:00", new Date("2026-10-06T03:01:00"))).not.toBe("Last night");
+    expect(savedWhenLabel("2026-10-06T03:00:00", new Date("2026-10-06T09:00:00"))).toBe("Last night");
+    expect(savedWhenLabel("2026-10-06T22:30:00", new Date("2026-10-05T22:30:00"))).not.toBe("Last night");
   });
 
   it("counts remaining days", () => {

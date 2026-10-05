@@ -130,10 +130,11 @@ function readAllRaw() {
     parsed = JSON.parse(rawText);
   } catch {
     // Malformed container: never delete the user's data automatically.
-    return [];
+    throw new SaveVerificationError("Stored notes could not be read. Existing data was preserved.");
   }
   const list = parsed && typeof parsed === "object" ? parsed.records : null;
-  if (!Array.isArray(list)) return [];
+  if (!Array.isArray(list)) throw new SaveVerificationError("Stored notes are not a readable list.");
+  if (list.some((item) => !validate(item))) throw new SaveVerificationError("Some stored notes could not be read. Existing data was preserved.");
   return list.map(validate).filter(Boolean);
 }
 
@@ -248,9 +249,9 @@ export function deleteAllRecords() {
 export function readDraft(now = new Date()) {
   const s = sessionStore();
   if (!s) return null;
-  const raw = s.getItem(DRAFT_KEY);
-  if (!raw) return null;
   try {
+    const raw = s.getItem(DRAFT_KEY);
+    if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (typeof parsed.text !== "string" || !isIso(parsed.updatedAt)) return null;
     if ((now.getTime() - Date.parse(parsed.updatedAt)) / 3_600_000 > DRAFT_TTL_HOURS) {
@@ -265,20 +266,20 @@ export function readDraft(now = new Date()) {
 
 export function writeDraft(text, recordId, now = new Date()) {
   const s = sessionStore();
-  if (!s) return;
+  if (!s) return false;
   if (text.trim().length === 0) {
-    s.removeItem(DRAFT_KEY);
-    return;
+    try { s.removeItem(DRAFT_KEY); return true; } catch { return false; }
   }
   try {
     s.setItem(DRAFT_KEY, JSON.stringify({ text, updatedAt: now.toISOString(), ...(recordId ? { recordId } : {}) }));
   } catch {
-    /* best-effort */
+    return false;
   }
+  return true;
 }
 
 export function clearDraft() {
-  sessionStore()?.removeItem(DRAFT_KEY);
+  try { sessionStore()?.removeItem(DRAFT_KEY); } catch { /* A saved note remains saved even if draft cleanup fails. */ }
 }
 
 /* -------------------------------- consents -------------------------------- */

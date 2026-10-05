@@ -9,7 +9,7 @@
     palace: 'Peace Palace',
     'good-map': 'See what makes life feel good', 'dear-2100': 'Go after what you’ve avoided',
     library: 'Library', 'my-plan': 'My Plan', profile: 'Profile', insights: 'Insights', settings: 'Settings',
-    recommended: 'Your reset for today'
+    recommended: 'Your reset for today', 'parking-lot': 'Your parking lot'
   });
   const preferenceKey = 'mentication.home.accessibility.v1';
   const preferenceNames = ['large-text', 'high-contrast', 'reduce-motion'];
@@ -340,6 +340,9 @@
       try { setPalace(data.palace); } catch { sendBridge('error', { code: 'INVALID_PALACE' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'journal') {
       try { setJournal(data.journal); } catch { sendBridge('error', { code: 'INVALID_JOURNAL' }); }
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'parking') {
+      document.getElementById('parking-return').hidden = data.parking !== true;
+      reportHeight();
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'more') {
       try { setMore(data.more); } catch { sendBridge('error', { code: 'INVALID_MORE' }); }
     }

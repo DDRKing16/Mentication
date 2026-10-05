@@ -1,165 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, CalendarPlus, ListTree, Pencil, SunMedium, Trash2 } from "lucide-react";
-import ParkedObject from "@/components/tomorrow-parking/ParkedObject";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, CalendarPlus, ListTree, Pencil, Trash2 } from "lucide-react";
 import InterventionNav from "@/components/brand/InterventionNav";
-import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { daysRemaining, formatDate, savedWhenLabel, timeZoneLabel } from "@/lib/tomorrowParking/dates";
 import { GENERIC_EVENT_TITLE, buildIcs, downloadIcs } from "@/lib/tomorrowParking/ics";
-import {
-  RETENTION_DAYS, deleteRecord, migrateLegacyPending, newId, readLegacyPending, setOrganisation,
-  stageNextStepHandoff, tryLoadRecords, updateNoteText,
-} from "@/lib/tomorrowParking/storage";
+import { RETENTION_DAYS, deleteRecord, migrateLegacyPending, newId, readLegacyPending, setOrganisation, stageNextStepHandoff, tryLoadRecords, updateNoteText } from "@/lib/tomorrowParking/storage";
 import "@/styles/tomorrow-parking.css";
 
 const NIGHT_ENTRY_STATE = { prebuilt: true, pathway: ["tomorrowParking"], direction: "sleep", startedFrom: "parkingLot" };
 
-// Daytime review. Never reached automatically from the night flow: it is a
-// separate visit, and nothing here is sorted, rated or analysed on the user's
-// behalf.
 export default function ParkingLot() {
   const navigate = useNavigate();
-  const location = useLocation();
-  // Opening this straight from Home's quick action is a fresh entry into
-  // Mentication and gets the Threshold; arriving here from "Review in
-  // daylight" already just played the Closing moment, so it goes straight in.
-  const freshEntry = location.state?.fromHome === true;
-  const [ready, setReady] = useState(false);
-  const [view, setView] = useState("arrival");
-  const [records, setRecords] = useState([]);
-  const [legacyFound, setLegacyFound] = useState(false);
+  const [loaded, setLoaded] = useState(() => tryLoadRecords());
+  const [legacyFound, setLegacyFound] = useState(() => Boolean(readLegacyPending()));
   const [notice, setNotice] = useState(null);
-
-  const refresh = () => setRecords(tryLoadRecords().records);
-
+  const refresh = () => setLoaded(tryLoadRecords());
   useEffect(() => {
-    refresh();
-    setLegacyFound(Boolean(readLegacyPending()));
-    setReady(true);
+    const reload = () => refresh();
+    window.addEventListener("focus", reload);
+    window.addEventListener("storage", reload);
+    return () => { window.removeEventListener("focus", reload); window.removeEventListener("storage", reload); };
   }, []);
-
-  const latest = records[0];
-  const goNight = () => navigate("/reset", { state: NIGHT_ENTRY_STATE });
-
-  return (
-    <WithBrandThreshold id={freshEntry ? "tomorrowParking" : undefined} name={freshEntry ? "Tomorrow Parking Lot" : undefined}>
-    <main className="tpl tpl--daylight">
-      <InterventionNav tone="light" />
-      <div className="tpl-frame" style={{ paddingTop: "2rem" }}>
-        <p className="tpl-eyebrow tpl-center">Tomorrow Parking Lot</p>
-
-        {!ready && <p className="tpl-small tpl-muted tpl-center" style={{ marginTop: "3rem" }}>Loading…</p>}
-
-        {ready && view === "arrival" && (
-          <div className="tpl-rise" style={{ display: "flex", flex: 1, flexDirection: "column", justifyContent: "center", paddingBlock: "1rem" }}>
-            <h1 className="tpl-display tpl-h1 tpl-h1--center" style={{ marginTop: "1.5rem" }}>
-              {latest && savedWhenLabel(latest.createdAt) === "Last night" ? "Last night’s parking lot" : records.length > 0 ? "Your parking lot" : "Nothing is parked"}
-            </h1>
-            <p className="tpl-lede tpl-lede--center" style={{ marginTop: "0.75rem" }}>
-              {records.length > 0 ? "It is ready when you are." : "Whenever you park something at night, it will wait for you here."}
-            </p>
-
-            <ParkedObject caption={records.length > 0 ? "Held overnight" : "Empty"} />
-
-            {records.length > 0 && (
-              <p className="tpl-small tpl-muted tpl-center" style={{ marginTop: "1.5rem" }}>
-                {records.length === 1 ? "One note" : `${records.length} notes`}
-                {latest ? `, held since ${savedWhenLabel(latest.createdAt).toLowerCase()}` : ""}.
-              </p>
-            )}
-
-            <div className="tpl-stack" style={{ marginTop: "2rem" }}>
-              <button type="button" className="tpl-btn tpl-btn--primary tpl-btn--block tpl-btn--lg" onClick={() => setView("review")}>
-                {records.length > 0 ? "Open when ready" : "Open the review"}
-              </button>
-              <button type="button" className="tpl-link" style={{ width: "100%" }} onClick={() => setView("closed")}>Come back later</button>
-            </div>
-
-            {legacyFound && (
-              <div className="tpl-card" style={{ marginTop: "2rem" }}>
-                <p className="tpl-small" style={{ margin: 0 }}>An older parked item from a previous version of this app is still on this device. You can bring it across as a note.</p>
-                <button
-                  type="button"
-                  className="tpl-btn tpl-btn--outline"
-                  style={{ marginTop: "0.75rem" }}
-                  onClick={() => {
-                    try {
-                      migrateLegacyPending();
-                      refresh();
-                      setLegacyFound(Boolean(readLegacyPending()));
-                      setNotice("The older item was brought across as a note.");
-                    } catch {
-                      setNotice("The older item could not be brought across. It has been left exactly where it was.");
-                    }
-                  }}
-                >
-                  Bring it across
-                </button>
-              </div>
-            )}
-
-            <div className="tpl-center" style={{ marginTop: "auto", paddingTop: "2.5rem" }}>
-              <Link to="/" className="tpl-link">Back home</Link>
-              <span className="tpl-muted" style={{ padding: "0 0.5rem", opacity: 0.5 }}>·</span>
-              <button type="button" className="tpl-link" onClick={goNight}>Go to the night space</button>
-            </div>
-          </div>
-        )}
-
-        {ready && view === "closed" && (
-          <div className="tpl-rise tpl-center" style={{ display: "flex", flex: 1, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <h1 className="tpl-display tpl-h1">Still parked</h1>
-            <p className="tpl-small tpl-muted" style={{ marginTop: "0.75rem", maxWidth: "20rem", lineHeight: 1.8 }}>
-              Nothing was changed or deleted. Everything is kept for {RETENTION_DAYS} days from when you saved or last edited it.
-            </p>
-            <div className="tpl-row" style={{ marginTop: "2rem" }}>
-              <button type="button" className="tpl-btn tpl-btn--secondary" onClick={() => setView("arrival")}>Back</button>
-              <Link to="/" className="tpl-btn tpl-btn--outline">Home</Link>
-            </div>
-          </div>
-        )}
-
-        {ready && view === "review" && (
-          <div className="tpl-rise" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
-            <h1 className="tpl-display tpl-h1 tpl-h1--center" style={{ marginTop: "1.5rem" }}>What you parked</h1>
-            <p className="tpl-lede tpl-lede--center" style={{ marginTop: "0.75rem" }}>Organise it now — or leave it for later.</p>
-
-            {notice && <p role="status" className="tpl-status">{notice}</p>}
-
-            {records.length === 0 ? (
-              <div className="tpl-card tpl-center" style={{ marginTop: "2.5rem" }}>
-                <p className="tpl-small tpl-muted" style={{ margin: 0 }}>There are no parked notes on this device right now.</p>
-                <button type="button" className="tpl-btn tpl-btn--outline" style={{ marginTop: "1rem" }} onClick={goNight}>Open the night space</button>
-              </div>
-            ) : (
-              <ul className="tpl-stack" style={{ listStyle: "none", margin: "1.75rem 0 0", padding: 0, gap: "1.25rem" }}>
-                {records.map((record) => (
-                  <li key={record.id}>
-                    <RecordCard record={record} onChanged={(message) => { refresh(); setNotice(message); }} />
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <p className="tpl-xs tpl-muted tpl-center" style={{ marginTop: "2rem", lineHeight: 1.7 }}>
-              Nothing was required from you overnight. Nothing here was sorted, counted, rated or analysed — any grouping below is one you chose yourself. Times shown in {timeZoneLabel()}.
-            </p>
-
-            <div className="tpl-center" style={{ marginTop: "auto", paddingTop: "2rem" }}>
-              <button type="button" className="tpl-link" onClick={() => setView("closed")}>Leave everything parked</button>
-              <span className="tpl-muted" style={{ padding: "0 0.5rem", opacity: 0.5 }}>·</span>
-              <Link to="/" className="tpl-link">Back home</Link>
-            </div>
-          </div>
-        )}
-
-        <div style={{ marginTop: "2.5rem", display: "flex", justifyContent: "center" }}>
-          <span className="tpl-pill"><SunMedium aria-hidden="true" size={16} /> Daytime only</span>
-        </div>
-      </div>
-    </main>
-    </WithBrandThreshold>
-  );
+  return <main className="tpl tpl--daylight">
+    <InterventionNav tone="light" />
+    <div className="tpl-frame">
+      <p className="tpl-eyebrow">Tomorrow Parking Lot</p>
+      <h1 className="tpl-display tpl-h1" style={{ marginTop: "1rem" }}>Your parking lot</h1>
+      <p className="tpl-lede">One useful next step, when you’re ready.</p>
+      {notice && <p className="tpl-status" role="status">{notice}</p>}
+      {!loaded.ok ? <section className="tpl-alert" role="alert"><p>Your notes couldn’t be read. This does not mean they are gone. Existing stored data has been left in place.</p><button className="tpl-btn tpl-btn--primary" onClick={refresh}>Try loading again</button></section> : loaded.records.length ? <ul className="tpl-stack" style={{ listStyle: "none", padding: 0, marginTop: "1.5rem" }}>{loaded.records.map(record => <li key={record.id}><RecordCard record={record} onChanged={(message) => { refresh(); setNotice(message); }} /></li>)}</ul> : <section className="tpl-card" style={{ marginTop: "1.5rem" }}><p>No saved notes on this device.</p><p className="tpl-small tpl-muted">Park a thought tonight and find it here later.</p></section>}
+      {legacyFound && <details className="tpl-details"><summary>Recover an older parked item</summary><p>An item from a previous version is still on this device.</p><button className="tpl-link" onClick={() => { try { migrateLegacyPending(); refresh(); setLegacyFound(Boolean(readLegacyPending())); setNotice("The older item was brought across."); } catch { setNotice("The older item could not be brought across. It is still in its original location."); } }}>Bring it across</button></details>}
+      <div className="tpl-row" style={{ marginTop: "1.5rem" }}><Link className="tpl-btn tpl-btn--outline" to="/">Leave it parked · Home</Link><button className="tpl-btn tpl-btn--outline" onClick={() => navigate("/reset", { state: NIGHT_ENTRY_STATE })}>Park another thought</button></div>
+      <p className="tpl-xs tpl-muted" style={{ marginTop: "1.5rem" }}>Device only · kept for {RETENTION_DAYS} days from saving or editing. No reminders, encryption or backup. Times in {timeZoneLabel()}.</p>
+    </div>
+  </main>;
 }
 
 /* ------------------------------ record card -------------------------------- */
@@ -195,13 +69,16 @@ function RecordCard({ record, onChanged }) {
         </div>
       )}
 
-      <div className="tpl-wrap" style={{ marginTop: "1.25rem" }}>
+      <button type="button" className="tpl-btn tpl-btn--primary tpl-btn--block" style={{ marginTop: "1.25rem" }} onClick={() => open("handoff")}><ArrowRight aria-hidden="true" size={16} /> Find one next step</button>
+      <details className="tpl-details"><summary>Edit or manage this note</summary>
+      <div className="tpl-wrap">
         <button type="button" className="tpl-chip" onClick={() => open("edit")}><Pencil aria-hidden="true" size={16} /> Edit</button>
         <button type="button" className="tpl-chip" onClick={() => open("organise")}><ListTree aria-hidden="true" size={16} /> Organise</button>
-        <button type="button" className="tpl-chip" onClick={() => open("handoff")}><ArrowRight aria-hidden="true" size={16} /> Next easiest step</button>
         <button type="button" className="tpl-chip" onClick={() => open("calendar")}><CalendarPlus aria-hidden="true" size={16} /> Add to calendar</button>
         <button type="button" className="tpl-chip" style={{ color: "var(--tpl-destructive)", borderColor: "color-mix(in oklab, var(--tpl-destructive) 40%, transparent)" }} onClick={() => open("delete")}><Trash2 aria-hidden="true" size={16} /> Delete</button>
       </div>
+
+      </details>
 
       {error && <p role="alert" className="tpl-small" style={{ marginTop: "1rem", color: "var(--tpl-destructive)" }}>{error}</p>}
 
@@ -214,13 +91,14 @@ function RecordCard({ record, onChanged }) {
               type="button"
               className="tpl-btn tpl-btn--primary"
               style={{ flex: 1 }}
+              disabled={!draft.trim()}
               onClick={() => {
                 try {
                   updateNoteText(record.id, draft);
                   setPanel("none");
                   onChanged("Your edit was saved.");
                 } catch {
-                  setError("The edit could not be saved on this device. Your note is unchanged and your text is still in the box.");
+                  setError("We couldn’t confirm the edit. Your text is still in the box. Try saving again; it will update the same note.");
                 }
               }}
             >
@@ -260,7 +138,7 @@ function RecordCard({ record, onChanged }) {
                   deleteRecord(record.id);
                   onChanged("The note was deleted from this device.");
                 } catch {
-                  setError("The note could not be deleted. It is still stored.");
+                  setError("We couldn’t confirm deletion. Try loading your parking lot again before retrying.");
                 }
               }}
             >

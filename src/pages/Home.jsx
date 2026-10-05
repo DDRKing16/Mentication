@@ -7,6 +7,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
+import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
 import HomeFrame from "@/components/home/HomeFrame";
 import StreakBadge from "@/components/home/StreakBadge";
 import { sessionStore } from "@/lib/localData";
@@ -59,6 +60,13 @@ async function readWeekState() {
 
 export default function Home() {
   const navigate = useNavigate();
+  const [parking, setParking] = useState(() => hasParkedNotes());
+  useEffect(() => {
+    const refresh = () => setParking(hasParkedNotes());
+    window.addEventListener("focus", refresh);
+    window.addEventListener("storage", refresh);
+    return () => { window.removeEventListener("focus", refresh); window.removeEventListener("storage", refresh); };
+  }, []);
   const [week, setWeek] = useState({ currentDay: null, completedDays: [] });
   // "Your reset for today" appears only for returning users: onboarding done
   // and at least one session in history. Payload matches My Plan's card.
@@ -204,6 +212,7 @@ export default function Home() {
     if (route === "dear-2100") { navigate("/dear-2100"); return; }
     if (route === "palace") { navigate("/palace"); return; }
     if (route === "foundations") { navigate("/foundations"); return; }
+    if (route === "parking-lot") { navigate("/parking-lot"); return; }
     if (route === "library") { navigate("/library"); return; }
     if (route === "my-plan") { navigate("/plan"); return; }
     if (route === "profile") { navigate("/profile"); return; }
@@ -231,7 +240,7 @@ export default function Home() {
       >
         {musicMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </button>
-      <HomeFrame onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
+      <HomeFrame parking={parking} onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
     </div>
   );
 }
