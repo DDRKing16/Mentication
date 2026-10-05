@@ -684,3 +684,32 @@ second place; Change the Scene collects a chip choice, a "cozy" toggle and a pla
 screen ever lets anyone actually set; and 5-4-3-2-1 Grounding's player accepts a "discreet" setting it
 never reads (4cc7747).
 Full test/typecheck/lint/build suite passes clean on every commit.
+
+## 5 Oct -- Home's first download shrank by a quarter, The Happy Bump got its own dedicated pass
+Checked docs/BRAND_THREAD.md: all six phases still done, same owner-decision items already in
+SUGGESTIONS.md, nothing new and safe to do there. Moved to the load-speed item next in the work order.
+A real production build showed the app's first download was still 667KB (202KB compressed) even after
+earlier passes trimmed it -- tracing it down, Home.jsx statically imported two functions
+(buildRecommendation for "Your reset for today", derivePeacePalace for the Peace Palace level badge) that
+both end up pulling in the entire intervention catalog, even though both only ever run inside async
+effects, after onboarding and session checks. A static import still bundles that whole catalog into the
+one chunk every phone downloads at launch, used or not. Converted both to load on demand at the point
+they're actually called, the same pattern already used elsewhere in this same file (f61a0c0). Checked in
+a real headless-browser run with a seeded session: Home's Peace Palace badge and "Your reset for today"
+card both still appear correctly, nothing about what Home shows or does changed. A real production build
+confirms it: the app's first download dropped from 667KB to 449KB (202KB to 147KB compressed) -- the
+catalog now loads in its own piece only when a screen that actually needs it opens.
+Got a headless-browser run going and gave The Happy Bump -- the one intervention among the twelve that
+had never had its own dedicated visual-polish pass -- a full walkthrough at 375x812, start to finish
+(energy check-in, hydrate, air and light, the walk, reaching out, one small task, the three reflection
+prompts, picking a wellbeing area and a step, planning what's next, re-rating, and the finished-bump
+screen). Found one real, verified bug: on the "What are you looking forward to?" reflection step only,
+the voice-dictation mic button next to the text field rendered about a third of its circle past the right
+edge of a 375px phone -- the same field one step earlier ("What are you grateful for?") and one step
+later sized correctly, so this wasn't visible on every screen, only this one. Traced it to the field's
+wrapping label having no explicit width, leaving the browser to size it from its suggestion-chip rail's
+content instead of stretching it to fit the phone, for that step's particular mix of suggestion text.
+Giving the label an explicit full width fixes it for good regardless of what text ends up in it
+(02e6d28). Checked every other screen in the flow before and after -- identical, including the two
+reflection steps that already looked right.
+Full test/typecheck/lint/build suite passes clean on every commit.
