@@ -31,7 +31,7 @@ export function buildUrgeSurfLearningRecord({
 } = {}) {
   return {
     category: permitted(categoryKey, URGE_CATEGORY_KEYS, "unspecified"),
-    windowSeconds: normaliseChoiceWindow(windowSeconds),
+    windowSeconds: windowSeconds === 600 ? 600 : normaliseChoiceWindow(windowSeconds),
     intensityBefore: intensity(intensityBefore),
     intensityNow: intensity(intensityNow),
     action: permitted(action, URGE_ACTION_KEYS, "wait"),

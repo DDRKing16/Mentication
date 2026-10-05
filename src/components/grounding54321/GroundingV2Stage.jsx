@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useWordReveal } from "@/hooks/useWordReveal";
 import GroundingScene from "@/components/grounding54321/GroundingScene";
 import StageMarkers from "@/components/grounding54321/StageMarkers";
@@ -31,6 +31,10 @@ export default function GroundingV2Stage({
 }) {
   const [narrationDone, setNarrationDone] = useState(false);
   const [showAlternative, setShowAlternative] = useState(false);
+  const alternativeRef = useRef(null);
+  useEffect(() => {
+    if (showAlternative) alternativeRef.current?.scrollIntoView({ block: "nearest" });
+  }, [showAlternative]);
 
   const holdSec = step?.holdSec ?? 10;
   const sense = step?.sense;
@@ -112,7 +116,7 @@ export default function GroundingV2Stage({
 
       <GroundingScene sense={sense} progress={progress} running={running} reducedMotion={reducedMotion} discreet={discreet} />
 
-      {(showBody || !narrate || reducedMotion) && (
+      {(showBody || !narrate || reducedMotion || !running) && (
         <div className="grounding-instruction -mt-8 flex w-full max-w-md flex-col items-center gap-1.5 px-4 text-center sm:-mt-7">
           <p
             className="grounding-instruction-sentence text-[17px] leading-[1.7] text-balance sm:text-[19px]"
@@ -120,7 +124,7 @@ export default function GroundingV2Stage({
           >
             {tokens.map((t, i) => {
               if (t.space) return <span key={i}>{t.text}</span>;
-              const vis = reducedMotion || !narrate || revealAll || (t.wordIndex != null && t.wordIndex < visibleCount);
+              const vis = reducedMotion || !narrate || !running || revealAll || (t.wordIndex != null && t.wordIndex < visibleCount);
               return (
                 <span key={i} style={{ opacity: vis ? 1 : 0 }}>
                   {t.text}
@@ -134,7 +138,7 @@ export default function GroundingV2Stage({
         <p className="text-sm">Take as long as you need. You can move on without finding every item.</p>
         {GROUNDING_ALTERNATIVES[sense] && <>
           <button type="button" className="rounded-full border border-current px-5 py-3 text-sm" aria-expanded={showAlternative} onClick={() => setShowAlternative((value) => !value)}>Try another sense instead</button>
-          {showAlternative && <p className="text-base leading-relaxed" role="status">{GROUNDING_ALTERNATIVES[sense]}</p>}
+          {showAlternative && <p ref={alternativeRef} className="text-base leading-relaxed" role="status">{GROUNDING_ALTERNATIVES[sense]}</p>}
         </>}
       </div>
     </div>

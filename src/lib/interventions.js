@@ -1346,12 +1346,12 @@ const EMOTION = [
   ] }),
   make({ id: "urgeSurf", name: "Urge Surfing", category: "emotion", mechanism: "distress-tolerance", why: "A pause to notice an urge and choose a next step, whether it eases, stays steady, or grows.", targets: ["body", "thoughts"], states: ["any"], directions: ["calm", "reset"], durationMin: 4, cognitiveLoad: 3, physicalDemand: 1, environment: "any", eyes: "closed", audio: "optional", movement: "none", discreet: true, energy: "calming", arousal: "lower", basePriority: 5, steps: [
     { title: "Notice the urge", body: "Checking, reacting, messaging, avoiding, quitting, snapping. Name it quietly.", holdSec: 20 },
-    { title: "Where in the body?", body: "Where do you feel it pulling?", holdSec: 25 },
+    { title: "Where in the body?", body: "Notice a body sensation, an outside trigger, or simply that the urge is here. Not sure is okay.", holdSec: 25 },
     { title: "Rate it", body: "How strong, one to ten.", holdSec: 20 },
-    { title: "Imagine a wave", body: "Rising, peaking, falling. Urges do that.", holdSec: 60 },
+    { title: "Imagine a wave", body: "Use the wave as an image. Your urge may rise, stay steady, or ease on its own timing.", holdSec: 60 },
     { title: "Don't act yet", body: "Notice what happens without needing the urge to change. You can pause or stop whenever you need.", holdSec: 60 },
-    { title: "Re-rate", body: "A little lower, maybe? Or the same — that's okay too.", holdSec: 25 },
-    { title: "If it's still high", body: "Ride another wave. You don't have to act on it.", holdSec: 30 },
+    { title: "Re-rate", body: "How strong is the urge, one to ten? It may be lower, unchanged, or stronger.", holdSec: 25 },
+    { title: "If it's still high", body: "Choose a safe next step: pause longer, move away from a trigger, choose a substitute, or reach out for support.", holdSec: 30 },
   ] }),
   make({ id: "rideWave", name: "Ride the Wave", category: "emotion", mechanism: "emotion-acceptance", why: "Staying with an emotion while it shifts teaches that it won't last forever.", targets: ["body", "thoughts"], states: ["any"], directions: ["calm", "reset"], durationMin: 4, cognitiveLoad: 2, physicalDemand: 1, environment: "any", eyes: "closed", audio: "optional", movement: "none", discreet: true, gentle: true, energy: "calming", arousal: "lower", closing: true, basePriority: 5, steps: [
     { title: "Find where it sits", body: "The emotion, somewhere in the body.", holdSec: 25 },

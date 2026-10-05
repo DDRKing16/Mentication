@@ -46,4 +46,8 @@ describe("Urge Surfing state", () => {
     expect(buildUrgeSurfLearningRecord({ intensityBefore: 0, intensityNow: null, choiceOutcome: null }))
       .toMatchObject({ intensityBefore: null, intensityNow: null, choiceOutcome: null });
   });
+  it("records the real ten-minute extension rather than relabelling it as 60 seconds", () => {
+    expect(buildUrgeSurfLearningRecord({ windowSeconds: 600 }).windowSeconds).toBe(600);
+  });
+
 });

@@ -1,5 +1,5 @@
 import { useFlowNav } from "@/components/brand/InterventionNav";
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Check, ChevronLeft, ExternalLink, Pause, Play, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -46,8 +46,8 @@ const INTENSITY_ANCHORS = "1 · Very mild — 10 · Extremely strong";
 
 const PRACTICE_STAGES = [
   { label: "Notice", title: "Meet the wave", copy: "Notice the urge or its trigger without needing to locate it in your body or make it change.", spoken: URGE_SURF_NARRATION.stages[0] },
-  { label: "Allow", title: "Make room", copy: "Let the feeling gather. Soften around it instead of pushing it away.", spoken: URGE_SURF_NARRATION.stages[1] },
-  { label: "Rise", title: "Ride the lift", copy: "As it builds, breathe into the edges. You can feel this without following it.", spoken: URGE_SURF_NARRATION.stages[2] },
+  { label: "Allow", title: "Make room", copy: "Allow whatever you notice, if comfortable. You can stop at any time.", spoken: URGE_SURF_NARRATION.stages[1] },
+  { label: "Rise", title: "Ride the lift", copy: "Whether steady or changing, take one comfortable breath. You can feel the urge without following it.", spoken: URGE_SURF_NARRATION.stages[2] },
   { label: "Observe", title: "Notice what changes", copy: "The urge may rise, stay steady, or ease. Notice what is true for you.", spoken: URGE_SURF_NARRATION.stages[3] },
   { label: "Steady", title: "Find a little steadiness", copy: "If it helps, loosen your jaw, shoulders, or hands. The urge does not have to soften.", spoken: URGE_SURF_NARRATION.stages[4] },
   { label: "Choose", title: "Consider your next step", copy: "Notice the urge as this practice ends. You can choose a next step even if it is still strong.", spoken: URGE_SURF_NARRATION.stages[5] },
@@ -420,6 +420,12 @@ function PostRatingStage({ session, dispatch, audioEnabled }) {
 function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
   const navigate = useNavigate();
   const [nextAction, setNextAction] = useState(null);
+  const nextActionRef = useRef(null);
+  useEffect(() => {
+    if (!nextAction) return;
+    nextActionRef.current?.scrollIntoView({ block: "start" });
+    nextActionRef.current?.focus({ preventScroll: true });
+  }, [nextAction]);
   const totalSeconds = Math.round(session.timer.totalElapsedMs / 1000);
   useUrgeNarration(URGE_SURF_NARRATION.complete, audioEnabled);
   return (
@@ -431,19 +437,22 @@ function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
         <p>{session.postIntensity == null ? "No final intensity rating was recorded." : `Urge intensity: ${session.initialIntensity} → ${session.postIntensity}. ${Math.abs(session.postIntensity - session.initialIntensity)} points ${session.postIntensity < session.initialIntensity ? "lower" : session.postIntensity > session.initialIntensity ? "higher" : "change"}.`}</p>
         <p>{session.choiceOutcome === "stronger" ? "You can stop focusing on the urge, move away from the trigger, or reach out for support." : "The urge may still be here. Choose what would help you through the next few minutes."}</p>
         <div className="urge-lovable__time-rule"><span />{formatDuration(totalSeconds)} with the wave<span /></div>
+        <fieldset className="urge-lovable__outcomes"><legend>Was this practice helpful? Optional — helps future suggestions on this device.</legend>
+          {[["helpful", "Helpful"], ["same", "No difference"], ["worse", "Made things worse"], ["unsure", "Not sure"]].map(([value, label]) => <button key={value} type="button" className={session.helpfulness === value ? "is-selected" : ""} aria-pressed={session.helpfulness === value} onClick={() => dispatch({ type: "HELPFULNESS_SELECTED", value })}>{label}</button>)}
+        </fieldset>
         <label className="urge-lovable__save">
           <input type="checkbox" checked={session.savePreference} onChange={(event) => dispatch({ type: "SAVE_PREFERENCE_SET", value: event.target.checked })} />
-          <span><strong>Save a small local learning record</strong><small>No anchor words, body locations, or voice content are included.</small></span>
+          <span><strong>Include urge ratings and choice feedback in my local record</strong><small>No anchor words, body locations, or voice content are included.</small></span>
         </label>
         <div className="urge-lovable__finish-actions">
-          <PrimaryButton onClick={() => onFinish("wait")}>Return home</PrimaryButton>
+          <PrimaryButton onClick={() => onFinish("wait")}>Continue to final rating</PrimaryButton>
           <button type="button" onClick={() => dispatch({ type: "REPEAT_WAVE" })}>Ride it again</button>
           <button type="button" onClick={() => dispatch({ type: "EXTEND_TIMER" })}>Wait 10 more minutes</button>
           <button type="button" onClick={() => setNextAction("leave")}>Leave the trigger</button>
           <button type="button" onClick={() => setNextAction("substitute")}>Choose a substitute</button>
           <button type="button" onClick={() => { dispatch({ type: "COMPLETION_ROUTE_SELECTED", route: "support" }); navigate("/support"); }}>Reach out for support</button>
         </div>
-        {nextAction && <section aria-live="polite"><h2>{nextAction === "leave" ? "Create some distance" : "Choose one substitute"}</h2><p>{nextAction === "leave" ? "If safe, close the app or put the triggering item out of reach. Move to another room or a place where you feel supported. Pick where you will go before continuing." : "Pick one safe action for the next few minutes: sip water, walk to another room, hold a familiar object, or contact someone supportive. Decide which one you will do now."}</p><PrimaryButton onClick={() => onFinish(nextAction)}>I have a next step · finish</PrimaryButton><button type="button" className="urge-lovable__text-button" onClick={() => setNextAction(null)}>Back to choices</button></section>}
+        {nextAction && <section ref={nextActionRef} tabIndex={-1} aria-live="polite" aria-labelledby="urge-next-action-title"><h2 id="urge-next-action-title">{nextAction === "leave" ? "Create some distance" : "Choose one substitute"}</h2><p>{nextAction === "leave" ? "If safe, close the app or put the triggering item out of reach. Move to another room or a place where you feel supported. Pick where you will go before continuing." : "Pick one safe action for the next few minutes: sip water, walk to another room, hold a familiar object, or contact someone supportive. Decide which one you will do now."}</p><PrimaryButton onClick={() => onFinish(nextAction)}>I have a next step · finish</PrimaryButton><button type="button" className="urge-lovable__text-button" onClick={() => setNextAction(null)}>Back to choices</button></section>}
         <a className="urge-lovable__support-link" href="https://findahelpline.com" target="_blank" rel="noreferrer">Need immediate support? <ExternalLink aria-hidden="true" /></a>
       </div>
     </Shell>
@@ -466,7 +475,7 @@ export default function UrgeSurfExperience({ answers, onExit, onComplete }) {
       action,
       choiceOutcome: state.choiceOutcome,
     }) : undefined;
-    onComplete?.({ requireGoalReassessment: true, outcome });
+    onComplete?.({ requireGoalReassessment: true, helpfulness: state.helpfulness, outcome });
   };
 
   if (state.currentRoute === "urge.body") return <BodyStage session={state} dispatch={send} audioEnabled={audioEnabled} />;

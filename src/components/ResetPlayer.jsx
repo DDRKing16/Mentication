@@ -502,12 +502,12 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     stopVoice();
     setShowGroundingFeedback(true);
   };
-  const completeGrounding = (presence) => {
-    const outcome = { interventionId: iv.id, presence };
+  const completeGrounding = (presence, helpfulness) => {
+    const outcome = { interventionId: iv.id, presence, stoppedEarly: !isLastStep };
     onAttemptEvent?.({ interventionId: iv.id, mechanism: iv.mechanism,
-      action: isLastStep ? "completed" : "skipped", timestamp: Date.now() });
+      action: "completed", completedPercentage: isLastStep ? 1 : stepIndex / iv.steps.length, timestamp: Date.now() });
     setShowGroundingFeedback(false);
-    if (isLastIv) { onComplete({ requireGoalReassessment: true, outcome }); return; }
+    if (isLastIv) { onComplete({ requireGoalReassessment: true, helpfulness, outcome }); return; }
     setIvIndex((index) => index + 1);
     setStepIndex(0);
     setElapsed(0);
