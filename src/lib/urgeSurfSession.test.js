@@ -167,4 +167,32 @@ describe("Urge Surfing session", () => {
     expect(extended.timer.segmentDurationMs).toBe(600_000);
     expect(reduceUrgeSession(extended, { type: "EXTEND_TIMER", nowEpochMs: 93_000 })).toEqual(extended);
   });
+  it.each(["external", "not_sure"])("allows %s without inventing body sensations", (key) => {
+    let state = reduceUrgeSession(createUrgeSession(), { type: "INITIAL_INTENSITY_SET", value: 6 });
+    state = reduceUrgeSession(state, { type: "NAVIGATE", route: "urge.body" });
+    state = reduceUrgeSession(state, { type: "ENVIRONMENT_CUE_SET", key });
+    state = reduceUrgeSession(state, { type: "NAVIGATE", route: "urge.anchor" });
+    expect(state).toMatchObject({ currentRoute: "urge.anchor", bodyRegionKey: null, sensationKeys: [] });
+    expect(reduceUrgeSession(state, { type: "TIMER_STARTED" }).status).toBe("timer_active");
+  });
+
+  it("retains an explicitly confirmed unchanged rating and worse choice outcome", () => {
+    let state = reduceUrgeSession(readySession(), { type: "POST_INTENSITY_SELECTED", value: 8 });
+    state = reduceUrgeSession(state, { type: "CHOICE_OUTCOME_SELECTED", value: "stronger" });
+    state = reduceUrgeSession(state, { type: "CHOICE_OUTCOME_SET", value: state.choiceOutcome });
+    const back = reduceUrgeSession(state, { type: "NAVIGATE_BACK" });
+    expect(back).toMatchObject({ currentRoute: "urge.postRating", postIntensity: 8, choiceOutcome: "stronger" });
+    expect(reduceUrgeSession(back, { type: "POST_RATING_SKIPPED" }))
+      .toMatchObject({ postIntensity: null, choiceOutcome: null, currentRoute: "urge.complete" });
+  });
+
+  it.each(["EXTEND_TIMER", "REPEAT_WAVE"])("clears old ratings for %s", (type) => {
+    let state = reduceUrgeSession(readySession(), { type: "TIMER_STARTED", nowEpochMs: 1_000 });
+    state = reduceUrgeSession(state, { type: "TIMER_ELAPSED", nowEpochMs: 61_000 });
+    state = reduceUrgeSession(state, { type: "POST_INTENSITY_SELECTED", value: 8 });
+    state = reduceUrgeSession(state, { type: "CHOICE_OUTCOME_SET", value: "not_yet" });
+    expect(reduceUrgeSession(state, { type, nowEpochMs: 62_000 }))
+      .toMatchObject({ currentRoute: "urge.timer", postIntensity: null, choiceOutcome: null });
+  });
+
 });

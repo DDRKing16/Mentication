@@ -30,6 +30,7 @@ export function createUrgeSession(nowEpochMs = Date.now()) {
     sensationKeys: [],
     anchorText: "",
     choiceOutcome: null,
+    helpfulness: null,
     completionRoute: null,
     savePreference: false,
     timer: { segmentIndex: 0, segmentDurationMs: URGE_SURF_DEFAULTS.durationSeconds * 1000, segmentStartedAtEpochMs: null, segmentEndsAtEpochMs: null, pausedRemainingMs: null, totalElapsedMs: 0, hapticsEnabled: false, completionReason: null },
@@ -49,17 +50,17 @@ const validDuration = (value) => {
     Math.abs(seconds * 1000 - requested) < Math.abs(closest * 1000 - requested) ? seconds : closest
   ), URGE_SURF_DEFAULTS.durations[0]) * 1000;
 };
+const hasObservation = (state) => Boolean(state.environmentCueKey || (state.bodyRegionKey && state.sensationKeys.length));
 const canStartTimer = (state) => Boolean(
   validIntensity(state.initialIntensity)
-  && (state.bodyRegionKey || state.environmentCueKey)
-  && state.sensationKeys.length
+  && hasObservation(state)
 );
 const canNavigateTo = (state, route) => {
   if (state.currentRoute === "urge.name" && route === "urge.body") {
     return Boolean(validIntensity(state.initialIntensity));
   }
   if (state.currentRoute === "urge.body" && route === "urge.anchor") {
-    return Boolean((state.bodyRegionKey || state.environmentCueKey) && state.sensationKeys.length);
+    return hasObservation(state);
   }
   return false;
 };
@@ -71,9 +72,10 @@ export function reduceUrgeSession(session, event) {
   if (event.type === "INITIAL_INTENSITY_SET") return next({ initialIntensity: validIntensity(event.value) ?? state.initialIntensity });
   if (event.type === "CATEGORY_TOGGLED") return next({ categoryKeys: state.categoryKeys.includes(event.key) ? [] : [event.key] });
   if (event.type === "BODY_REGION_SET") return next({ bodyRegionKey: event.key, environmentCueKey: null });
-  if (event.type === "ENVIRONMENT_CUE_SET") return next({ environmentCueKey: event.key, bodyRegionKey: null });
+  if (event.type === "ENVIRONMENT_CUE_SET") return next({ environmentCueKey: event.key, bodyRegionKey: null, sensationKeys: [] });
   if (event.type === "SENSATION_TOGGLED") return next({ sensationKeys: state.sensationKeys.includes(event.key) ? [] : [event.key] });
   if (event.type === "ANCHOR_CHANGED") return next({ anchorText: String(event.value || "").slice(0, 120) });
+  if (event.type === "HELPFULNESS_SELECTED") return next({ helpfulness: ["helpful", "same", "worse", "unsure"].includes(event.value) ? event.value : null });
   if (event.type === "SAVE_PREFERENCE_SET") return next({ savePreference: event.value === true });
   if (event.type === "VOICE_OPENED") return next({ currentRoute: "urge.voice" });
   if (event.type === "VOICE_CANCELLED") return next({ currentRoute: "urge.name" });
@@ -115,12 +117,14 @@ export function reduceUrgeSession(session, event) {
   }
   if (event.type === "POST_INTENSITY_SELECTED") return next({ postIntensity: validIntensity(event.value) });
   if (event.type === "POST_INTENSITY_SET") return next({ postIntensity: validIntensity(event.value), currentRoute: "urge.complete" });
+  if (event.type === "CHOICE_OUTCOME_SELECTED") return next({ choiceOutcome: event.value || null });
+  if (event.type === "POST_RATING_SKIPPED") return next({ postIntensity: null, choiceOutcome: null, currentRoute: "urge.complete" });
   if (event.type === "CHOICE_OUTCOME_SET") return next({ choiceOutcome: event.value || null, currentRoute: "urge.complete" });
   if (event.type === "COMPLETION_ROUTE_SELECTED") return next({ completionRoute: event.route, status: "completed" });
   if (event.type === "EXTEND_TIMER") {
     if (state.currentRoute !== "urge.complete" || state.status !== "timer_complete") return state;
     const duration = URGE_SURF_DEFAULTS.extensionSeconds * 1000;
-    return next({ status: "timer_active", currentRoute: "urge.timer", timer: { ...state.timer, segmentIndex: state.timer.segmentIndex + 1, segmentDurationMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null } });
+    return next({ status: "timer_active", currentRoute: "urge.timer", postIntensity: null, choiceOutcome: null, helpfulness: null, timer: { ...state.timer, segmentIndex: state.timer.segmentIndex + 1, segmentDurationMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null } });
   }
   if (event.type === "REPEAT_WAVE") {
     // Rides the same wave again: same length as the one just finished,
@@ -132,6 +136,7 @@ export function reduceUrgeSession(session, event) {
       currentRoute: "urge.timer",
       postIntensity: null,
       choiceOutcome: null,
+      helpfulness: null,
       timer: { ...state.timer, segmentIndex: state.timer.segmentIndex + 1, segmentDurationMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null },
     });
   }

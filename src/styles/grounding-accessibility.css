@@ -1,0 +1,18 @@
+/* Keep the approved scene intact; motion is optional and pauses with practice. */
+.grounding-accessible-scene[data-paused="true"] *,
+.grounding-accessible-scene[data-paused="true"] *::before,
+.grounding-accessible-scene[data-paused="true"] *::after {
+  animation-play-state: paused !important;
+}
+.grounding-accessible-scene[data-reduced-motion="true"] *,
+.grounding-accessible-scene[data-reduced-motion="true"] *::before,
+.grounding-accessible-scene[data-reduced-motion="true"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+[data-grounding-reduced="true"] .grounding-v2-ambient,
+[data-grounding-reduced="true"] .animate-soft-pulse {
+  animation: none !important;
+  transition: none !important;
+}
+.grounding-accessible-scene { flex-shrink: 0; }

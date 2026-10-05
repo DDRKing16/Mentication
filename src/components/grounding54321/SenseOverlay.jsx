@@ -148,7 +148,7 @@ function TasteGlowOverlay({ progress }) {
   );
 }
 
-export default function SenseOverlay({ sense, progress = 0 }) {
+export default function SenseOverlay({ sense, progress = 0, hapticsEnabled = true }) {
   const orbHapticFiredRef = useRef(false);
 
   useEffect(() => {
@@ -156,7 +156,7 @@ export default function SenseOverlay({ sense, progress = 0 }) {
   }, [sense]);
 
   useEffect(() => {
-    if (!sense || orbHapticFiredRef.current) return;
+    if (!hapticsEnabled || !sense || orbHapticFiredRef.current) return;
     if (progress < 0.12) return;
     orbHapticFiredRef.current = true;
     switch (sense) {
@@ -178,7 +178,7 @@ export default function SenseOverlay({ sense, progress = 0 }) {
       default:
         break;
     }
-  }, [sense, progress]);
+  }, [sense, progress, hapticsEnabled]);
 
   let stageOverlay = null;
 

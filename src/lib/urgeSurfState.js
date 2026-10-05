@@ -9,7 +9,7 @@ function permitted(value, values, fallback) {
 }
 
 function intensity(value) {
-  return Number.isInteger(value) && value >= 0 && value <= 10 ? value : null;
+  return Number.isInteger(value) && value >= 1 && value <= 10 ? value : null;
 }
 
 export function normaliseChoiceWindow(value) {
@@ -31,10 +31,10 @@ export function buildUrgeSurfLearningRecord({
 } = {}) {
   return {
     category: permitted(categoryKey, URGE_CATEGORY_KEYS, "unspecified"),
-    windowSeconds: normaliseChoiceWindow(windowSeconds),
+    windowSeconds: windowSeconds === 600 ? 600 : normaliseChoiceWindow(windowSeconds),
     intensityBefore: intensity(intensityBefore),
     intensityNow: intensity(intensityNow),
     action: permitted(action, URGE_ACTION_KEYS, "wait"),
-    choiceOutcome: permitted(choiceOutcome, URGE_CHOICE_OUTCOMES, "not_yet"),
+    choiceOutcome: permitted(choiceOutcome, URGE_CHOICE_OUTCOMES, null),
   };
 }
