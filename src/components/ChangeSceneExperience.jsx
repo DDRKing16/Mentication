@@ -204,6 +204,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const dialog=useRef(null);
   const restoreFocus=useRef(null);
   const completed=useRef(false);
+  const startedAt=useRef(Date.now());
   const {prefs}=useAccessibilityPrefs();
   const {speak,stop}=useGuideVoice();
   const {step}=session;
@@ -219,13 +220,13 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   useEffect(()=>{setShowAlternatives(false);heading.current?.focus();},[step]);
   useEffect(()=>{stop();if(audioOn)speak(prompt,{voice:voiceFor('lift')});return ()=>stop();},[prompt,audioOn,speak,stop]);
   useEffect(()=>{
-    if(!showAdapt)return;
+    if(!showAdapt&&!showAccessibility)return;
     restoreFocus.current=document.activeElement;
     const node=dialog.current;
     const focusable=()=>Array.from(node.querySelectorAll('button:not(:disabled),[tabindex="0"]'));
     focusable()[0]?.focus();
     const handle=(event)=>{
-      if(event.key==='Escape'){event.preventDefault();setShowAdapt(false);}
+      if(event.key==='Escape'){event.preventDefault();setShowAdapt(false);setShowAccessibility(false);}
       if(event.key==='Tab'){
         const items=focusable(),first=items[0],last=items.at(-1);
         if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
@@ -234,7 +235,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
     };
     node.addEventListener('keydown',handle);
     return ()=>{node.removeEventListener('keydown',handle);restoreFocus.current?.focus();};
-  },[showAdapt]);
+  },[showAdapt,showAccessibility]);
   const go=(next)=>setSession(s=>({...s,step:Math.max(0,Math.min(7,next))}));
   const record=(event)=>setSession(s=>sceneAction(s,step,event));
   const finish=(target)=>{
@@ -243,7 +244,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
     stop();
     clearActiveFlagship(ID);
     rememberFlagshipEvent({interventionId:ID,completed:outcome.confirmedActions>0,options:{confirmedActions:outcome.confirmedActions,skippedActions:outcome.skippedActions}});
-    onAttemptEvent?.({interventionId:ID,mechanism:intervention.mechanism,action:'completed',exitReason:outcome.confirmedActions?'completed':'skipped',completedPercentage:outcome.confirmedActions/6,timestamp:Date.now()});
+    onAttemptEvent?.({interventionId:ID,mechanism:intervention.mechanism,action:'completed',startedAt:startedAt.current,exitReason:outcome.confirmedActions?'completed':'skipped',completedPercentage:outcome.confirmedActions/6,timestamp:Date.now()});
     onComplete?.({requireGoalReassessment:true,exitReason:outcome.confirmedActions?'completed':'skipped',helpfulness:session.helpfulness,outcome:{...outcome,...(target?{handoffToken:handoffToken.current}:{})},navigateTo:target?`/scene-followup?practice=${target}&session=${handoffToken.current}`:undefined});
   };
   const changeMechanism=()=>{setShowAdapt(false);finish('different');};
@@ -284,8 +285,8 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       </>}
     </main>
     <footer className="scene-controls"><button aria-label={audioOn?'Mute audio':'Enable audio'} aria-pressed={audioOn} onClick={()=>setAudioOn(!audioOn)}>{audioOn?'Audio on':'Audio off'}</button>{audioOn&&!narrationAvailable&&<span className="scene-caption">This instruction is text-only.</span>}<button onClick={()=>setShowAdapt(true)}>This is not helping</button></footer>
-    {showAdapt && <div className="scene-modal" onClick={e=>{if(e.target===e.currentTarget)setShowAdapt(false);}}><section ref={dialog} role="dialog" aria-modal="true" aria-labelledby="scene-adapt-heading"><h2 id="scene-adapt-heading">What would fit better?</h2>{step>0&&step<7&&<button onClick={()=>{record(choice==='primary'?'alternative':'primary');setShowAdapt(false);}}>Try the other action</button>}{<button onClick={changeMechanism}>Use a different mechanism</button>}<button onClick={onExit}>Stop deliberately</button><button onClick={()=>setShowAdapt(false)}>Continue here</button></section></div>}
-    {showAccessibility&&<AccessibilityPanel onClose={()=>setShowAccessibility(false)} dark />}
+    {showAdapt && <div className="scene-modal" onClick={e=>{if(e.target===e.currentTarget)setShowAdapt(false);}}><section ref={dialog} role="dialog" aria-modal="true" aria-labelledby="scene-adapt-heading"><h2 id="scene-adapt-heading">What would fit better?</h2>{step>0&&step<7&&<button onClick={()=>{record(choice==='primary'?'alternative':'primary');setShowAdapt(false);}}>Try the other action</button>}{<button onClick={changeMechanism}>Use a different mechanism</button>}<button onClick={()=>{clearActiveFlagship(ID);stop();onExit?.();}}>Stop deliberately</button><button onClick={()=>setShowAdapt(false)}>Continue here</button></section></div>}
+    {showAccessibility&&<div ref={dialog} className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Accessibility options"><AccessibilityPanel onClose={()=>setShowAccessibility(false)} dark /></div>}
   </div>;
 }
 const SCENE_STYLES=`
@@ -297,6 +298,6 @@ const SCENE_STYLES=`
 .scene-progress{display:flex;gap:4px;justify-content:space-between}.scene-progress button{flex:1;min-width:0;display:flex;align-items:center;flex-direction:column;font-size:12px;gap:4px}.scene-progress button:disabled{cursor:default;opacity:.65}.scene-progress button>span{display:grid;place-items:center;width:26px;height:26px;border:2px solid #a2f9b888;border-radius:50%}.scene-progress [aria-current] span{background:#f4c95d;color:#581825;border-color:#f4c95d}.scene-progress small{font-size:11px}
 .scene-kicker{text-align:center;text-transform:uppercase;letter-spacing:.12em;font-size:13px}.scene-card h1{font-family:'EB Garamond',Georgia,serif;font-size:clamp(36px,8vw,52px);line-height:1.07;text-align:center;font-weight:700;letter-spacing:-.025em;margin:0}.scene-art{height:140px;max-width:220px;width:100%;margin:0 auto}.scene-art svg{width:100%;height:100%}.scene-prompt{font-size:21px;line-height:1.45;text-align:center;max-width:480px;margin:auto}.scene-caption{font-size:16px;line-height:1.5;text-align:center;color:inherit;opacity:.85}.scene-primary{background:#a2f9b8;color:#581825;border:2px solid #a2f9b8;border-radius:999px;padding:14px 24px;font-weight:800;box-shadow:0 5px 0 #163c2c;align-self:stretch}.scene-secondary{padding:8px;text-decoration:underline;text-underline-offset:4px}.scene-options{border:1px solid #a2f9b855;border-radius:18px;padding:8px 14px}.scene-options summary{display:list-item;align-content:center;font-weight:600;list-style-position:inside}.scene-options button{display:block;text-align:left;width:100%;padding:12px;border-radius:12px;margin:8px 0;background:#1c4434;color:#a2f9b8;border:1px solid #a2f9b844}.scene-options button[aria-pressed=true]{border-color:#f4c95d}.scene-options p{padding:8px;font-size:16px}.scene-confirmed{display:grid;gap:14px;text-align:center}.scene-confirmed>button:not(.scene-primary){text-decoration:underline}.scene-summary{font-size:18px;line-height:1.5}.scene-feedback{display:grid;grid-template-columns:1fr 1fr;gap:10px}.scene-feedback legend{font-size:20px;margin-bottom:12px}.scene-feedback legend span{font-size:16px}.scene-feedback button{border:1px solid #a2f9b866;border-radius:14px;padding:10px}.scene-feedback [aria-pressed=true]{background:#a2f9b8;color:#581825}.scene-controls{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:24px 16px 0}.scene-controls button{border:1px solid #a2f9b855;border-radius:999px;padding:10px 20px}.scene-modal{position:fixed;inset:0;z-index:100;background:#000a;display:grid;place-items:center;padding:20px}.scene-modal section{width:100%;max-width:440px;background:#1c4434;border:1px solid #a2f9b8;padding:24px;border-radius:24px;display:grid;gap:14px}.scene-modal h2{font-family:'EB Garamond',serif;font-size:28px}.scene-modal button{padding:12px;border:1px solid #a2f9b866;border-radius:12px;text-align:left}
 .scene-step-1,.scene-step-2,.scene-step-3,.scene-step-4{background:#daf1eb;color:#123a30}.scene-step-1 .scene-card,.scene-step-2 .scene-card,.scene-step-3 .scene-card,.scene-step-4 .scene-card{background:radial-gradient(ellipse at 10% 90%,#a2f9b855,transparent 60%),#daf1eb;border-color:#123a3044}.scene-step-1 .scene-chrome button,.scene-step-2 .scene-chrome button,.scene-step-3 .scene-chrome button,.scene-step-4 .scene-chrome button{border-color:#123a3055}.scene-step-1 .scene-progress button>span,.scene-step-2 .scene-progress button>span,.scene-step-3 .scene-progress button>span,.scene-step-4 .scene-progress button>span{border-color:#123a3088}.scene-modal{color:#a2f9b8}
-@media(max-width:680px){.scene-card{margin:0 12px;padding:20px 18px;gap:16px}.scene-art{height:110px}.scene-progress small{font-size:10px}.scene-prompt{font-size:20px}.scene-chrome{padding:12px}.scene-chrome button{min-width:44px;min-height:44px}.scene-progress button{min-height:48px}.scene-feedback{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.scene-card{margin:0 12px;padding:20px 18px;gap:16px}.scene-art{height:110px}.scene-progress small{display:none}.scene-progress button{font-size:14px}.scene-prompt{font-size:20px}.scene-chrome{padding:12px}.scene-chrome button{min-width:44px;min-height:44px}.scene-progress button{min-height:48px}.scene-feedback{grid-template-columns:1fr 1fr}}
 html.large-text .scene-experience button,html.large-text .scene-experience p{font-size:1.2rem}html.large-text .scene-prompt{font-size:1.4rem}
 `;
