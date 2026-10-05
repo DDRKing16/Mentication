@@ -12,8 +12,6 @@ import StreakBadge from "@/components/home/StreakBadge";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { sessionStore } from "@/lib/localData";
 import { hasCompletedOnboarding } from "@/lib/onboarding";
-import { buildRecommendation } from "@/lib/recommend";
-import { derivePeacePalace } from "@/lib/peacePalace";
 import { computeLocalCalendarStreak } from "@/lib/streak";
 import { isHomeAmbientMuted, resumeHomeAmbient, setHomeAmbientMuted } from "@/lib/homeAmbient";
 import {
@@ -108,8 +106,8 @@ export default function Home() {
 
   useEffect(() => {
     let live = true;
-    sessionStore.list("-created_date", 500)
-      .then((sessions) => {
+    Promise.all([sessionStore.list("-created_date", 500), import("@/lib/peacePalace")])
+      .then(([sessions, { derivePeacePalace }]) => {
         if (!live) return;
         const p = derivePeacePalace(sessions);
         setPalace({
@@ -160,6 +158,7 @@ export default function Home() {
       if (!hasCompletedOnboarding()) return null;
       const sessions = await sessionStore.list("-created_date", 30);
       if (!sessions.length) return null;
+      const { buildRecommendation } = await import("@/lib/recommend");
       const recommendation = buildRecommendation(sessions);
       return {
         title: recommendation.title,
