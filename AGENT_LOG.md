@@ -585,3 +585,30 @@ Flagged rather than changed: the Premium card's "Coming soon" wording is baked i
 than real text, so at the card's actual phone size it's too small to read -- noted in SUGGESTIONS.md
 since it's supplied artwork, not something to redraw without asking.
 Full test/typecheck/lint/build suite passes clean on every commit.
+
+## 5 Oct -- Night Channel's own dedicated pass found a real session-ending bug
+Checked docs/BRAND_THREAD.md: all six phases still done, same owner-decision items already in
+SUGGESTIONS.md. Night Channel (one of the three finished standalone builds) had never had its own
+full walkthrough the way the other eleven interventions already had, so this run gave it one in a
+real headless-browser run at 375x812, walking the opening screen, the channel picker, the Spotify/
+Apple Music/Audible connect flows, every duration option, and the volume/texture sliders.
+Found one real, serious bug: the screen's own wording promises "tap anywhere to pause," and there's
+a dedicated Pause button too, but tapping either one didn't pause anything -- it ended the whole
+listening session and dropped straight back to the very first channel-picking screen, losing the
+chosen duration, volume and texture along the way. The screen that shows the timer, volume and
+texture was wired to disappear the instant audio wasn't playing, instead of just switching its own
+label to "Paused" the way the player's own code already clearly intended. Added a proper "session
+started" flag kept separate from "is playing right now" so pausing now does exactly what it already
+claimed to -- the timer, volume and texture stay on screen and correctly hold still while paused
+(d7f5f3e). Checked pausing and resuming from the orb, from the dedicated Pause button, and after
+picking a track from Spotify, Apple Music or a channel in the picker while already listening --
+every path now pauses in place instead of exiting.
+Also found and fixed three icon-only buttons with no name for a screen reader: the channel picker's
+close (X), each channel's own play button, and the "attach your own audio" control per channel
+(53e5a8c). Checked before and after in the browser -- nothing about how anything looks changed.
+Found one gap not fixed this round: Night Channel, Signal Lock and Vector Shift (the three finished
+standalone builds) don't receive the app's own Reduce motion setting at all -- there's no connection
+between them and it, unlike the rest of the app. Fixing it means wiring a new connection into three
+separate finished builds rather than a quick change, so left for a future pass rather than attempted
+in the time left this run.
+Full test/typecheck/lint/build suite passes clean on every commit.
