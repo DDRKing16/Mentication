@@ -206,3 +206,55 @@ request:
 All approved behaviours verified against the locked code. No changes made to
 functionality — only production-lock headers, this spec, and two stale code
 comments corrected to match the approved free-run crystal behaviour.
+
+## Approved accessibility and continuity refinement — 5 October 2026
+
+The founder explicitly approved this bounded update to the locked experience.
+The current glass-square asset, narration content/rate and four-second
+inhale/hold/exhale/hold sequence are retained. The earlier visual descriptions
+above are historical; they do not authorize replacing the current artwork.
+
+- Full motion remains the unsaved default unless the operating system requests
+  reduced motion. The in-player Reduced motion button uses the existing saved
+  accessibility preference and can explicitly override that initial OS default.
+  Reduced mode uses a still glass square and track, immediate phase text and
+  fully readable instruction text; narration continues with its existing timing.
+- The paced step measures 64 seconds of active time for four rounds. Hidden-page,
+  page-hide and native app-inactive events pause the Box player. Returning does
+  not restart it: Play resumes from the retained phase position. A RAF gap over
+  one second also pauses rather than skipping breath phases. Each pause/resume
+  invalidates the old frame timestamp.
+- Phase seconds, current round and remaining rounds are readable without motion.
+  A polite atomic live region announces phase/round edges and pause/resume, not
+  every second or animation frame. Decorative numbers and the artwork are hidden
+  from the accessibility tree.
+- Comfort copy points to natural breathing, the existing alternative picker and
+  Exit. Opening the alternative picker pauses Box; cancelling leaves it paused.
+  No breathing protocol or safety/recommendation eligibility gate is changed.
+- Instruction lead-in timers are cancelled on pause; paused narration and
+  soundscape cannot be restarted by a generic autoplay-unlock tap.
+- The square's viewport cap reserves space for these controls on short screens;
+  the stage remains scrollable for enlarged text while the fixed controls stay
+  reachable.
+
+Shared feedback integration (c3c1500) is now consumed by Box's optional Helpful /
+No change / Felt worse / Not sure screen, with an explicit skip. Submission is
+guarded against repeat taps. The shared goal assessment then repeats the answered
+starting question, scale, anchors and direction; skipped ratings remain missing.
+A Library-supplied default does not qualify as an answered baseline. Raw starting
+and ending ratings stay separate from helpfulness, whose explicit answer supplies
+one recommendation-learning response. “Finish here” retains a skipped exit and
+partial completion; it is never relabelled as a completed practice.
+
+Verification: rendered 16-phase sequence measured 4,000 ms per phase and 64,000 ms
+of active breathing. Browser coverage includes phone/desktop, short viewport and
+enlarged text, pause/resume, pagehide and long RAF-gap interruption, full/reduced
+motion and OS override, Back/Exit/refresh, natural completion, all helpfulness
+options and duplicate-submit protection. Device-native iOS lifecycle and actual
+VoiceOver speech require device verification. A headless CDP freeze experiment is
+not treated as evidence of native app switching.
+
+The shared baseline-resume correction (06c2582) has been integrated. Phone and
+desktop browser tests confirm the original answered baseline/session survive
+refresh, while a new Library attempt requires a fresh explicit rating. Refresh
+restarts Box's exercise presentation; it does not resume a stale breathing phase.

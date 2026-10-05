@@ -268,15 +268,23 @@ const STYLES = `
 
   .box-v2-breath-loom.is-discreet { opacity: 0.72; }
 
-  @media (prefers-reduced-motion: reduce) {
-    .box-v2-glass-square,
-    .box-v2-memory-loops { transform: none !important; }
-    .box-v2-breath-aura--rim { transform: scale(1.05) !important; }
-    .box-v2-breath-aura--environment { transform: scale(1.5) !important; }
-    .box-v2-memory-loop { transition: none; }
-    .box-v2-glass-shimmer,
-    .box-v2-glass-shimmer::before { animation: none; }
+  .box-v2-breath-loom.is-reduced-motion .box-v2-glass-shimmer,
+  .box-v2-breath-loom.is-reduced-motion .box-v2-glass-shimmer::before {
+    animation: none !important;
   }
+  .box-v2-breath-loom.is-reduced-motion .box-v2-memory-loop { transition: none; }
+  /* Explicit full motion overrides the OS default only inside this player. */
+  .box-v2-breath-loom:not(.is-reduced-motion) .box-v2-glass-shimmer {
+    animation-duration: 26s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .box-v2-breath-loom:not(.is-reduced-motion) .box-v2-glass-shimmer::before {
+    animation-duration: 38s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .box-v2-breath-loom:not(.is-reduced-motion) .box-v2-memory-loop { transition-duration: 1400ms !important; }
+  .box-v2-breath-loom.is-paused .box-v2-glass-shimmer,
+  .box-v2-breath-loom.is-paused .box-v2-glass-shimmer::before { animation-play-state: paused; }
 `;
 
 function BoxBreathingV2BreathLoomInner(

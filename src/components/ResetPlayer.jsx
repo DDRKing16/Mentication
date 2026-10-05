@@ -1,15 +1,16 @@
 import { useFlowNav } from "@/components/brand/InterventionNav";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import {
   X, Play, Pause, Volume2, VolumeX, Type, Clock, EyeOff, Waves, Moon, Layers,
   Activity, Brain, Feather, Zap, Shuffle, ChevronRight, ArrowLeft } from "lucide-react";
 import StageVisual, { stageModeFor } from "@/components/StageVisual";
 import BrandThreadProgress from "@/components/brand/BrandThreadProgress";
+import BoxBreathingV2Feedback from "@/components/BoxBreathingV2Feedback";
 import BoxBreathingV2Stage from "@/components/BoxBreathingV2Stage";
 import GroundingFeedback from "@/components/grounding54321/GroundingFeedback";
 import GroundingV2Stage from "@/components/grounding54321/GroundingV2Stage";
-import PMRV2Stage from "@/components/PMRV2Stage";
+import PMRExperience from "@/components/pmr/PMRExperience";
 import {
   suggestSwitch, suggestAdaptiveAlternative, transitionSentence, SWITCH_MODES,
 } from "@/lib/interventions";
@@ -19,9 +20,9 @@ import { useGuideVoice } from "@/hooks/useGuideVoice";
 import { useSoundscapeMixer } from "@/hooks/useSoundscapeMixer";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { useEscapeToClose } from "@/hooks/useEscapeToClose";
+import { useBoxBreathingActivityPause } from "@/hooks/useBoxBreathingActivityPause";
 import { useBoxBreathingSoundscape } from "@/hooks/useBoxBreathingSoundscape";
 import { useGroundingSoundscape } from "@/hooks/useGroundingSoundscape";
-import { usePMRSoundscape } from "@/hooks/usePMRSoundscape";
 import SoundscapeMixer from "@/components/SoundscapeMixer";
 import SleepTimerSheet from "@/components/SleepTimerSheet";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
@@ -62,6 +63,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   useEscapeToClose(showAmbient, () => setShowAmbient(false));
   const [stepsDone, setStepsDone] = useState(0);
   const transitionTimer = useRef(null);
+  const [boxFeedback, setBoxFeedback] = useState(null);
+  const boxFeedbackSent = useRef(false);
 
   const iv = remaining[ivIndex];
   const step = iv?.steps[stepIndex];
@@ -70,7 +73,9 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // completion itself — fully isolated from the shared stage/breath components.
   const isBoxV2Paced = step?.boxV2 === true;
   const isBoxV2 = iv?.id === "boxV2";
+  const boxReducedMotion = isBoxV2 && a11y.prefs.reducedMotion;
   const isGroundingV2 = iv?.id === "grounding54321V2";
+  const playerReducedMotion = boxReducedMotion || (isGroundingV2 && a11y.prefs.reducedMotion);
   const isPMRV2 = iv?.id === "progressive-muscle-relaxation-v2";
   const interventionPalette = useMemo(
     () => paletteForIntervention(iv, answers?.direction),
@@ -83,22 +88,21 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // The Box Breathing V2 soundscape plays for the whole intervention — through
   // the paced 4·4·4·4 cycle AND the following "Rest" step — so it simply
   // continues from the end of the breathing sequence rather than fading out.
-  useBoxBreathingSoundscape({ active: isBoxV2, narrationActive });
+  useBoxBreathingSoundscape({ active: isBoxV2, narrationActive, running });
   // 5-4-3-2-1 Grounding V2 plays its own uploaded MP3 soundscape (with the same
   // volume + narration ducking as Box Breathing) throughout the whole exercise.
   useGroundingSoundscape({ active: isGroundingV2 && !noAudio && narrate && running && !showGroundingFeedback, narrationActive, sense: step?.sense });
-  usePMRSoundscape({
-    active: isPMRV2 && !noAudio && !discreet,
-    running,
-    narrationActive,
-    phase: step?.phase,
-    stepIndex,
-  });
   const isLastStep = step != null && stepIndex === iv.steps.length - 1;
   const isLastIv = ivIndex === remaining.length - 1;
 
   // ---- narration (natural guide voice) ----
   const { speak, stop: stopVoice, pause: pauseVoice, resume: resumeVoice, preload } = useGuideVoice();
+  const pauseBox = useCallback(() => {
+    setRunning(false);
+    pauseVoice();
+  }, [pauseVoice]);
+  useBoxBreathingActivityPause(isBoxV2, pauseBox);
+
   const vf = useMemo(() => voiceFor(answers?.direction), [answers?.direction]);
 
   // warm the cache so the first lines start without a gap
@@ -163,11 +167,11 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // A one-time tap anywhere in the player resumes the narrator if it was muted
   // by an autoplay block, so sound is never permanently lost.
   useEffect(() => {
-    const unlock = () => { if (narrate) resumeVoice(); };
+    const unlock = () => { if (narrate && (!isBoxV2 || running)) resumeVoice(); };
     window.addEventListener("pointerdown", unlock, { once: true });
     return () => window.removeEventListener("pointerdown", unlock);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isBoxV2, running, narrate]);
 
   // Auto-start the ambient soundscape under the narration when enabled
   // (default on). Skipped for discreet / no-audio sessions and for sleep
@@ -197,7 +201,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
   // ---- media session: lock screen & background controls ----
   useEffect(() => {
-    if (typeof navigator === "undefined" || !navigator.mediaSession) return;
+    if (isPMRV2 || typeof navigator === "undefined" || !navigator.mediaSession) return;
     try {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: iv?.name || "Reset",
@@ -237,13 +241,33 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
   // ---- step timer ----
   useEffect(() => {
-    if (!running || transition || !step || (isGroundingV2 && narrate && !narrationEnded)) return;
+    if (!running || transition || !step || isPMRV2 || (isGroundingV2 && narrate && !narrationEnded)) return;
     const t = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(t);
-  }, [running, transition, ivIndex, stepIndex, isGroundingV2, narrate, narrationEnded]);
+  }, [running, transition, ivIndex, stepIndex, isGroundingV2, narrate, narrationEnded, isPMRV2]);
+
+  const finishBoxSequence = useCallback((exitReason = "completed") => {
+    if (boxFeedback) return;
+    const total = iv.steps.reduce((sum, item) => sum + item.holdSec, 0);
+    const completed = iv.steps.slice(0, stepIndex).reduce((sum, item) => sum + item.holdSec, 0)
+      + Math.min(elapsed, step?.holdSec || 0);
+    setBoxFeedback({ exitReason, completedPercentage: exitReason === "completed" ? 1 : Math.min(0.99, completed / total) });
+    setRunning(false);
+    stopVoice();
+  }, [boxFeedback, iv, stepIndex, elapsed, step, stopVoice]);
+
+  const submitBoxFeedback = (helpfulness) => {
+    if (!boxFeedback || boxFeedbackSent.current) return;
+    boxFeedbackSent.current = true;
+    onAttemptEvent?.({ interventionId: iv.id, mechanism: iv.mechanism,
+      action: "completed", ...boxFeedback, timestamp: Date.now() });
+    onComplete({ requireGoalReassessment: true, ...(helpfulness ? { helpfulness } : {}),
+      outcome: { kind: "box_breathing", completion: boxFeedback.exitReason } });
+  };
 
   const goNextStep = useCallback(() => {
     if (!step) return;
+    if (isBoxV2 && isLastStep && isLastIv) { finishBoxSequence(); return; }
     if (!discreet) haptic(10);
     if (!isLastStep) {
       setStepsDone((s) => s + 1);
@@ -287,13 +311,13 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       stopVoice();
       onComplete();
     }
-  }, [step, isLastStep, isLastIv, ivIndex, remaining, onComplete, iv, onAttemptEvent]);
+  }, [step, isLastStep, isLastIv, ivIndex, remaining, onComplete, iv, onAttemptEvent, isBoxV2, finishBoxSequence]);
 
   // auto-advance when step time elapses — but wait for the narrator to finish
   // the current line when narration is on, so the voice never gets cut off.
   // A safety cap (holdSec + 45s) prevents a step hanging if audio fails to load.
   useEffect(() => {
-    if (!running || transition || !step) return;
+    if (!running || transition || !step || isPMRV2) return;
     // Grounding uses suggested time only; the person chooses when to move on.
     if (isGroundingV2) return;
     // Box Breathing V2's paced step is driven entirely by its own master clock;
@@ -309,7 +333,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     const safetyCap = spoken ? step.holdSec + 45 : step.holdSec;
     if (elapsed >= safetyCap) { goNextStep(); return; }
     if (elapsed >= step.holdSec && !waitForVoice) goNextStep();
-  }, [elapsed, running, transition, step, goNextStep, narrate, narrationEnded, answers?.direction, isBoxV2Paced, isGroundingV2]);
+  }, [elapsed, running, transition, step, goNextStep, narrate, narrationEnded, answers?.direction, isBoxV2Paced, isGroundingV2, isPMRV2]);
 
   // ---- controls ----
   const togglePause = () => {
@@ -351,67 +375,6 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     mixer.stopAll();
     goBack();
   };
-
-  // ---- PMR V2: move directly to the next muscle group ----
-  // Individual muscle phases skip the matching release phase and land on the
-  // next region. Intro and whole-body closing phases advance one stage at a
-  // time so this control remains available throughout the full experience.
-  const nextPMRStageIndex = useMemo(() => {
-    if (!isPMRV2 || !step || !Array.isArray(iv?.steps)) return -1;
-
-    const currentRegion = step.region;
-
-    if (stepIndex >= iv.steps.length - 1) return iv.steps.length;
-
-    if (!currentRegion || currentRegion === "whole") {
-      return stepIndex + 1;
-    }
-
-    for (let i = stepIndex + 1; i < iv.steps.length; i += 1) {
-      const candidate = iv.steps[i];
-
-      if (candidate?.region && candidate.region !== currentRegion) {
-        return i;
-      }
-    }
-
-    return iv.steps.length;
-  }, [isPMRV2, step, stepIndex, iv?.steps]);
-
-  const nextPMRBodyPart = useCallback(() => {
-    if (nextPMRStageIndex < 0) return;
-
-    if (transitionTimer.current) {
-      clearTimeout(transitionTimer.current);
-    }
-
-    // Stop the current narration before changing stages so clips cannot overlap.
-    stopVoice();
-
-    setTransition(null);
-
-    if (nextPMRStageIndex >= iv.steps.length) {
-      setNarrationEnded(true);
-      goNextStep();
-      return;
-    }
-
-    // Count skipped PMR stages as completed for overall progress.
-    setStepsDone((done) =>
-      done + Math.max(1, nextPMRStageIndex - stepIndex)
-    );
-
-    setStepIndex(nextPMRStageIndex);
-    setElapsed(0);
-    setNarrationEnded(false);
-    setRunning(true);
-  }, [
-    nextPMRStageIndex,
-    stepIndex,
-    stopVoice,
-    iv?.steps?.length,
-    goNextStep,
-  ]);
 
   // ---- "this isn't helping" switch ----
   const doSwitch = (mode) => {
@@ -464,6 +427,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
   // ---- skip to the next activity ----
   const skipToNext = () => {
+    if (isBoxV2 && isLastIv) { finishBoxSequence("skipped"); return; }
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     setStepsDone((s) => s + 1);
     stopVoice();
@@ -505,7 +469,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   const completeGrounding = (presence, helpfulness) => {
     const outcome = { interventionId: iv.id, presence, stoppedEarly: !isLastStep };
     onAttemptEvent?.({ interventionId: iv.id, mechanism: iv.mechanism,
-      action: "completed", completedPercentage: isLastStep ? 1 : stepIndex / iv.steps.length, timestamp: Date.now() });
+      action: "completed", exitReason: isLastStep ? "completed" : "skipped", completedPercentage: isLastStep ? 1 : stepIndex / iv.steps.length, timestamp: Date.now() });
     setShowGroundingFeedback(false);
     if (isLastIv) { onComplete({ requireGoalReassessment: true, helpfulness, outcome }); return; }
     setIvIndex((index) => index + 1);
@@ -579,13 +543,22 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     }
   }, [isGroundingV2, groundingSense]);
 
+  if (isPMRV2) return <PMRExperience key={`${iv.id}-${ivIndex}`} intervention={iv} answers={answers}
+    onExit={onExit} onAttemptEvent={onAttemptEvent}
+    onComplete={(result) => {
+      if (isLastIv) onComplete(result);
+      else { setIvIndex(i => i + 1); setStepIndex(0); setElapsed(0); }
+    }} />;
+
   return (
+    <MotionConfig reducedMotion={playerReducedMotion ? "always" : "never"}>
     <div
-      className="intervention-theme fixed inset-0 z-50 flex flex-col overflow-hidden"
+      className={`intervention-theme ${isBoxV2 ? "box-v2-player" : ""} fixed inset-0 z-50 flex flex-col overflow-hidden`}
+      data-box-motion={isBoxV2 ? (boxReducedMotion ? "reduced" : "full") : undefined}
       data-grounding-reduced={isGroundingV2 && a11y.prefs.reducedMotion}
       data-intervention-theme={interventionPalette.id}
       data-theme-mode={interventionPalette.mode}
-      style={interventionThemeStyle(interventionPalette)}
+      style={{ ...interventionThemeStyle(interventionPalette), ...(isBoxV2 ? { overflow: "clip" } : {}) }}
     >
       {/* immersive ambient backdrop */}
       <div className="pointer-events-none absolute inset-0" style={{ display: isGroundingV2 ? "none" : "block" }}>
@@ -593,7 +566,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         <motion.div
           className="absolute left-1/2 top-1/2 h-[140vmin] w-[140vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{ background: "radial-gradient(circle at center, rgb(var(--intervention-accent-rgb) / 0.18) 0%, rgb(var(--intervention-accent-rgb) / 0.05) 30%, transparent 60%)" }}
-          animate={{ opacity: running ? [0.7, 1, 0.7] : 0.5, scale: [1, 1.04, 1] }}
+          animate={boxReducedMotion ? { opacity: 0.7, scale: 1 } : { opacity: running ? [0.7, 1, 0.7] : 0.5, scale: [1, 1.04, 1] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <div className="intervention-player-vignette absolute inset-0" />
@@ -605,7 +578,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       {isBoxV2 && <div className="pointer-events-none absolute inset-0 bg-[var(--intervention-bg)]" />}
 
       {/* The Mentication Thread: progress as a coral line, in this intervention's own colourway. */}
-      <BrandThreadProgress id={iv?.id} progress={progress} variant="hairline" />
+      <BrandThreadProgress id={iv?.id} progress={progress} variant="hairline" reducedMotion={playerReducedMotion} />
 
       {/* top bar */}
       <div className="relative flex items-center justify-between px-6 safe-top-lg">
@@ -622,7 +595,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
           {/* PMR V2 owns a single restrained heading rendered in its own stage, so the generic label is skipped here to avoid a duplicate. */}
           {!isPMRV2 && (
             <div className="intervention-copy-muted flex items-center gap-2.5 text-[0.7rem] font-medium uppercase tracking-[0.22em]">
-              <span className="intervention-accent-bg h-1.5 w-1.5 rounded-full animate-soft-pulse" />
+              <span className={`intervention-accent-bg h-1.5 w-1.5 rounded-full ${boxReducedMotion ? "" : "animate-soft-pulse"}`} />
               <span>Mentication · {String(answers?.direction || "").toLowerCase() || "reset"}</span>
             </div>
           )}
@@ -638,17 +611,19 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       </div>
 
       {/* stage */}
-      <div className={`relative flex min-h-0 flex-1 flex-col items-center ${isGroundingV2 ? "justify-start" : "justify-center"} overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
+      <div className={`relative flex min-h-0 flex-1 flex-col items-center ${isBoxV2 || isGroundingV2 ? "justify-start" : "justify-center"} overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
         <AnimatePresence mode="wait">
-          {isGroundingV2 && showGroundingFeedback ? (
-            <GroundingFeedback onComplete={completeGrounding} />
+          {boxFeedback ? (
+            <BoxBreathingV2Feedback key="box-feedback" onContinue={submitBoxFeedback} />
+          ) : isGroundingV2 && showGroundingFeedback ? (
+            <GroundingFeedback key="grounding-feedback" onComplete={completeGrounding} />
           ) : transition ? (
             <motion.div
               key="transition"
               initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -18, filter: "blur(6px)" }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: boxReducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="flex max-w-md cursor-pointer flex-col items-center text-center"
               onClick={() => {
                 if (transitionTimer.current) clearTimeout(transitionTimer.current);
@@ -677,16 +652,17 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                     ? `pmr-${ivIndex}`
                     : `${ivIndex}-${stepIndex}`
               }
-              initial={isPMRV2 || (isGroundingV2 && a11y.prefs.reducedMotion) ? false : { opacity: 0, y: 16, filter: "blur(8px)" }}
+              initial={isPMRV2 || playerReducedMotion ? false : { opacity: 0, y: 16, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={isGroundingV2 && a11y.prefs.reducedMotion ? { opacity: 0 } : { opacity: 0, y: -16, filter: "blur(8px)" }}
-              transition={{ duration: isGroundingV2 && a11y.prefs.reducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="flex w-full max-w-md flex-col items-center gap-4 pb-1 sm:gap-6 sm:pb-2"
+              exit={playerReducedMotion ? { opacity: 0 } : { opacity: 0, y: -16, filter: "blur(8px)" }}
+              transition={{ duration: playerReducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className={`flex w-full max-w-md flex-col items-center gap-4 pb-1 sm:gap-6 sm:pb-2 ${isBoxV2 ? "my-auto shrink-0" : ""}`}
             >
               {isBoxV2 ? (
                 <BoxBreathingV2Stage
                   step={step}
-                  running={running}
+                  running={running && !showSwitch}
+                  onInterrupted={pauseBox}
                   discreet={discreet}
                   paced={isBoxV2Paced}
                   showBody={captions}
@@ -712,28 +688,6 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   spoken={spokenFor(step, iv, answers?.direction)}
                   onNarrationEnd={() => { setElapsed(0); setNarrationEnded(true); }}
                   reducedMotion={a11y.prefs.reducedMotion}
-                />
-              ) : isPMRV2 ? (
-                <PMRV2Stage
-                  step={step}
-                  steps={iv.steps}
-                  stepIndex={stepIndex}
-                  elapsed={elapsed}
-                  running={running}
-                  showBody={captions}
-                  narrate={narrate}
-                  rate={vf.rate}
-                  leadMs={ivIndex === 0 && stepIndex === 0 ? vf.leadMs : 250}
-                  spoken={spokenFor(step, iv, answers?.direction)}
-                  onNarrationEnd={() => setNarrationEnded(true)}
-                  onNextBodyPart={nextPMRStageIndex >= 0 ? nextPMRBodyPart : undefined}
-                  nextBodyPartLabel={
-                    step?.phase === "intro"
-                      ? "Start with hands"
-                      : step?.phase === "return"
-                        ? "Finish"
-                        : "Next body part"
-                  }
                 />
               ) : (
                 <StageVisual
@@ -761,8 +715,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               key="resting"
               initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={isGroundingV2 && a11y.prefs.reducedMotion ? { opacity: 0 } : { opacity: 0, y: -16, filter: "blur(8px)" }}
-              transition={{ duration: isGroundingV2 && a11y.prefs.reducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
+              exit={playerReducedMotion ? { opacity: 0 } : { opacity: 0, y: -16, filter: "blur(8px)" }}
+              transition={{ duration: playerReducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="flex max-w-md flex-col items-center text-center"
             >
               <span className="intervention-copy-muted text-[0.7rem] font-medium uppercase tracking-[0.24em]">A moment to rest</span>
@@ -784,11 +738,24 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         {!isLastStep && <button type="button" className="rounded-full bg-white/80 px-5 py-3 font-medium" onClick={goNextStep}>{step?.sense === "taste" ? "Recenter when ready" : "Next sense"}</button>}
         <button type="button" className="rounded-full border px-5 py-3" onClick={finishGrounding}>{isLastStep ? "Finish grounding" : "Finish grounding early"}</button>
       </div>}
+      {!boxFeedback && <>
+      {isBoxV2 && (
+        <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
+          <p className="text-xs leading-relaxed text-cream/75">
+            If holds feel uncomfortable, breathe naturally. Choose “This isn’t helping” for another practice, or Exit to stop.
+          </p>
+          <button type="button" aria-pressed={a11y.prefs.reducedMotion}
+            onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}
+            className="mt-1 min-h-11 rounded-full px-4 text-xs text-cream/80 underline underline-offset-4">
+            Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}
+          </button>
+        </div>
+      )}
       {/* adaptive actions — calm, integrated chips */}
       <div style={isGroundingV2 ? { display: "none" } : undefined} className={`flex items-center justify-center px-6 pb-1 pt-3 ${isPMRV2 ? "pmr-v2-actions-wrap" : ""}`}>
         <div className={"flex items-center gap-1 rounded-full p-1 backdrop-blur-md " + (isPMRV2 ? "pmr-v2-actions " : "") + (lightChrome ? "border border-[#1A2E26]/10 bg-white/40" : "border border-white/[0.08] bg-white/[0.03]")}>
           <button
-            onClick={() => isGroundingV2 ? finishGrounding() : setShowSwitch(true)}
+            onClick={() => { if (isGroundingV2) { finishGrounding(); return; } if (isBoxV2) pauseBox(); setShowSwitch(true); }}
             className={"no-tap flex h-12 items-center rounded-full px-5 text-sm font-medium transition-all " + (lightChrome ? "text-[#1A2E26]/65 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/65 hover:bg-white/10 hover:text-cream")}
           >
             This isn’t helping
@@ -847,6 +814,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         </div>
       </div>
 
+      </>}
       <AnimatePresence>
         {showAmbient && (
           <div className="pointer-events-none absolute inset-x-0 bottom-32 z-50 flex justify-center px-4">
@@ -955,6 +923,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         )}
       </AnimatePresence>
     </div>
+    </MotionConfig>
   );
 }
 

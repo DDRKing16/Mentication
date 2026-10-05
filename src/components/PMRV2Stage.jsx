@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
-import { useWordReveal } from "@/hooks/useWordReveal";
+import { pmrCueState } from "@/lib/pmrSession";
 import { hapticPattern } from "@/lib/feedback";
 
 const BODY_ASSET = "/media/images/pmr-body-neutral-cutout.png";
@@ -165,17 +165,6 @@ const PHASE_COPY = {
 
 function clamp01(value) {
   return Math.max(0, Math.min(1, value));
-}
-
-function releasedRegionsBefore(steps, stepIndex) {
-  if (!Array.isArray(steps)) return [];
-  const released = new Set();
-  steps.slice(0, stepIndex).forEach((item) => {
-    if (item?.phase === "release" && BODY_REGIONS.includes(item.region)) {
-      released.add(item.region);
-    }
-  });
-  return [...released];
 }
 
 function GlowBoxes({ name, active, phase, settled }) {
@@ -455,16 +444,11 @@ function SectionProgress({ region, phase }) {
 
 export default function PMRV2Stage({
   step,
-  steps = [],
+  released = [],
   stepIndex,
   running,
   showBody = true,
-  narrate = false,
-  rate = 0.82,
-  leadMs = 0,
-  spoken = "",
   elapsed = 0,
-  onNarrationEnd,
   onNextBodyPart,
   nextBodyPartLabel = "Next body part",
 }) {
@@ -472,20 +456,15 @@ export default function PMRV2Stage({
   const previousStep = useRef(null);
   const region = step?.region || "whole";
   const phase = step?.phase || "rest";
-  const released = useMemo(() => releasedRegionsBefore(steps, stepIndex), [steps, stepIndex]);
   const duration = Math.max(1, Number(step?.holdSec) || 1);
   const phaseProgress = clamp01(elapsed / duration);
 
-  const { tokens, visibleCount, revealAll } = useWordReveal({
-    body: step?.body,
-    spoken,
-    rate,
-    leadMs,
-    narrate,
-    running,
-    onEnd: onNarrationEnd,
-    allowRemoteFallback: false,
-  });
+  const { visibleCount, alignment } = pmrCueState(step, elapsed);
+  const tokens = useMemo(() => {
+    let wordIndex = 0;
+    return (step?.body || "").split(/(\s+)/).filter(Boolean).map(text =>
+      /\s/.test(text) ? { text, space: true } : { text, wordIndex: wordIndex++ });
+  }, [step?.body]);
 
   const releaseCueWordIndex = useMemo(
     () => findPMRReleaseCue(tokens),
@@ -498,22 +477,20 @@ export default function PMRV2Stage({
   );
 
   const narrationHasReachedRelease =
-    narrate &&
     releaseCueWordIndex != null &&
     visibleCount > releaseCueWordIndex;
 
   const narrationHasReachedTension =
-    narrate &&
     tensionCueWordIndex != null &&
     visibleCount > tensionCueWordIndex;
 
   const fallbackTensionReached =
     phase === "tense" &&
-    (!narrate || tensionCueWordIndex == null) &&
+    (!alignment.length || tensionCueWordIndex == null) &&
     phaseProgress >= 0.12;
 
   const fallbackReleaseReached =
-    !narrate &&
+    !alignment.length &&
     phase === "tense" &&
     phaseProgress >= 0.72;
 
@@ -562,7 +539,7 @@ export default function PMRV2Stage({
   const faceFocus = useMemo(() => {
     if (region !== "face" || phase !== "release") return "jaw";
 
-    if (!narrate) {
+    if (!alignment.length) {
       if (phaseProgress >= 0.64) return "forehead";
       if (phaseProgress >= 0.34) return "eyes";
       return "jaw";
@@ -580,7 +557,7 @@ export default function PMRV2Stage({
   }, [
     region,
     phase,
-    narrate,
+    alignment.length,
     phaseProgress,
     foreheadCueWordIndex,
     eyesCueWordIndex,
@@ -592,7 +569,7 @@ export default function PMRV2Stage({
 
   const introState = useMemo(() => {
     const narratedCueReached = (cueIndex, fallbackProgress) => {
-      if (!narrate || cueIndex == null) return phaseProgress >= fallbackProgress;
+      if (!alignment.length || cueIndex == null) return phaseProgress >= fallbackProgress;
       return visibleCount > cueIndex;
     };
 
@@ -607,7 +584,7 @@ export default function PMRV2Stage({
     };
   }, [
     phase,
-    narrate,
+    alignment.length,
     phaseProgress,
     visibleCount,
     introBackCueWordIndex,
@@ -633,7 +610,7 @@ export default function PMRV2Stage({
       <BodyFigure
         region={region}
         phase={phase}
-        movementPhase={movementPhase}
+        movementPhase={running ? movementPhase : "idle"}
         released={released}
         reducedMotion={a11y.prefs.reducedMotion}
         stepIndex={stepIndex}
@@ -657,7 +634,7 @@ export default function PMRV2Stage({
           )}
 
           <div className={`pmr-v2-phase-chip is-${phase}`}>
-            {PHASE_COPY[phase] || "REST"}
+            {!running ? "PAUSED · RELAX" : phase === "tense" && movementPhase === "release" ? "LET GO" : PHASE_COPY[phase] || "REST"}
           </div>
 
           {onNextBodyPart && (
@@ -674,14 +651,14 @@ export default function PMRV2Stage({
             </button>
           )}
         </div>
-        <h2 className="pmr-v2-instruction">{step?.title}</h2>
+        <h2 className="pmr-v2-instruction" aria-live="polite" aria-atomic="true">{!running ? "Let your body rest" : phase === "tense" && movementPhase === "release" ? "Let go" : step?.title}</h2>
         <p className="pmr-v2-region-label">{REGION_LABELS[region]}</p>
 
         {showBody && (
-          <p className="pmr-v2-caption" aria-live="polite">
+          <p className="pmr-v2-caption" >
             {tokens.map((token, index) => {
               if (token.space) return <span key={index}>{token.text}</span>;
-              const visible = revealAll || (token.wordIndex != null && token.wordIndex < visibleCount);
+              const visible = true;
               return (
                 <span key={index} style={{ opacity: visible ? 1 : 0 }}>
                   {token.text}
@@ -695,7 +672,7 @@ export default function PMRV2Stage({
 
         <div className="pmr-v2-safety">
           <span aria-hidden="true">⌁</span>
-          Skip any area that feels painful or uncomfortable.
+          Breathe normally. Relax, skip or stop at any time. Never push through pain.
         </div>
       </div>
     </div>

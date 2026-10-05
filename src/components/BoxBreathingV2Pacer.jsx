@@ -6,6 +6,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
+import { createBoxBreathingClock, BOX_PHASE_MS as PHASE_MS, BOX_ROUND_MS as ROUND_MS } from "@/lib/boxBreathingClock";
 import { haptic, setHapticsEnabled } from "@/lib/feedback";
 import BoxBreathingV2BreathLoom, {
   getBoxBreathingV2BreathState,
@@ -19,8 +20,6 @@ import {
 // One master clock drives the full experience. Nothing below owns an
 // independent breathing timer, which keeps the glass, tracer, phase text and
 // environmental light perfectly locked together.
-const PHASE_MS = 4000;
-const ROUND_MS = PHASE_MS * 4;
 const DEFAULT_ROUNDS = 4;
 const TRAIL_LENGTH = 0.085;
 
@@ -31,10 +30,14 @@ export default function BoxBreathingV2Pacer({
   running = true,
   discreet = false,
   onComplete,
+  onInterrupted,
   rounds = DEFAULT_ROUNDS,
 }) {
   const a11y = useAccessibilityPrefs();
   const [phaseIndex, setPhaseIndex] = useState(0);
+  const [status, setStatus] = useState({ seconds: 4, round: 1, remainingRounds: rounds });
+  const clockRef = useRef(null);
+  if (!clockRef.current) clockRef.current = createBoxBreathingClock(rounds);
   const [rewardPulse, setRewardPulse] = useState(0);
   const phaseTone =
     phaseIndex === 0
@@ -53,12 +56,13 @@ export default function BoxBreathingV2Pacer({
   const playerRootRef = useRef(null);
   const LRef = useRef(0);
   const elapsedRef = useRef(0);
-  const lastRef = useRef(null);
   const lastIndexRef = useRef(-1);
   const completedRoundRef = useRef(0);
   const doneRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+  const interruptedRef = useRef(onInterrupted);
+  interruptedRef.current = onInterrupted;
   const totalMs = rounds * ROUND_MS;
 
   useEffect(() => {
@@ -82,7 +86,10 @@ export default function BoxBreathingV2Pacer({
         ? p.getPointAtLength(0)
         : null;
 
-    const visual = getBoxBreathingV2BreathState(0, 0, a11y.prefs.reducedMotion);
+    const inRound = elapsedRef.current % ROUND_MS;
+    const index = Math.floor(inRound / PHASE_MS);
+    const progress = (inRound % PHASE_MS) / PHASE_MS;
+    const visual = getBoxBreathingV2BreathState(index, progress, a11y.prefs.reducedMotion);
     if (tracerSvgRef.current) {
       tracerSvgRef.current.style.transform = `scaleX(${visual.scaleX}) scaleY(${visual.scaleY})`;
     }
@@ -91,9 +98,9 @@ export default function BoxBreathingV2Pacer({
     }
 
     updateBoxBreathingV2BreathLoom(loomRef.current, {
-      phaseIndex: 0,
-      phaseProgress: 0,
-      completedCycles: 0,
+      phaseIndex: index,
+      phaseProgress: progress,
+      completedCycles: Math.floor(elapsedRef.current / ROUND_MS),
       tracerPoint: startPoint,
       trackOpacity: 0,
       reducedMotion: a11y.prefs.reducedMotion,
@@ -101,25 +108,27 @@ export default function BoxBreathingV2Pacer({
   }, [a11y.prefs.reducedMotion]);
 
   // Master clock: tracing, breathing scale, environmental light and labels all
-  // derive from this elapsed value. React only re-renders on phase/cycle edges.
+  // derive from this elapsed value. React updates text at second/phase edges;
+  // the live region changes only on phase/cycle edges or pause/resume.
   useEffect(() => {
     let raf;
+    clockRef.current.suspend();
     const loop = (now) => {
-      if (lastRef.current == null) lastRef.current = now;
-      const dt = now - lastRef.current;
-      lastRef.current = now;
-
-      if (running && !doneRef.current) {
-        elapsedRef.current = Math.min(elapsedRef.current + dt, totalMs);
-        const inRound = elapsedRef.current % ROUND_MS;
-        const index = Math.min(PHASE_LABELS.length - 1, Math.floor(inRound / PHASE_MS));
-        const progress = (inRound - index * PHASE_MS) / PHASE_MS;
+      const frame = clockRef.current.tick(now, running, !document.hidden);
+      if (frame.interruption) interruptedRef.current?.();
+      if (!doneRef.current && !frame.interruption && !document.hidden) {
+        elapsedRef.current = frame.elapsed;
+        const index = frame.phase;
+        const progress = frame.progress;
+        setStatus((previous) => previous.seconds === frame.seconds && previous.round === frame.round
+          && previous.remainingRounds === frame.remainingRounds ? previous
+          : { seconds: frame.seconds, round: frame.round, remainingRounds: frame.remainingRounds });
         const visual = getBoxBreathingV2BreathState(index, progress, a11y.prefs.reducedMotion);
 
         if (index !== lastIndexRef.current) {
           lastIndexRef.current = index;
           setPhaseIndex(index);
-          if (!discreet) haptic(10);
+          if (running && !discreet) haptic(10);
         }
 
         // A quiet completion wave after each full 16-second circuit. It is
@@ -143,7 +152,7 @@ export default function BoxBreathingV2Pacer({
         }
 
         // 0..1 over the 16-second circuit.
-        const t = (index + progress) / 4;
+        const t = a11y.prefs.reducedMotion ? 0 : (index + progress) / 4;
         const drawn = pathRef.current;
         const trail = trailRef.current;
         const dot = dotRef.current;
@@ -151,9 +160,9 @@ export default function BoxBreathingV2Pacer({
         let trackOpacity = 0;
 
         if (drawn) {
-          const drawOffset = 1 - t;
+          const drawOffset = a11y.prefs.reducedMotion ? 0 : 1 - t;
           drawn.style.strokeDashoffset = String(drawOffset);
-          const op = t < 0.06 ? t / 0.06 : t > 0.94 ? (1 - t) / 0.06 : 1;
+          const op = a11y.prefs.reducedMotion ? 0.35 : t < 0.06 ? t / 0.06 : t > 0.94 ? (1 - t) / 0.06 : 1;
           trackOpacity = op;
           const glowBoost = 0.72 + 0.28 * Math.sin((t * Math.PI * 2) + 0.6);
           drawn.style.opacity = String(op * 0.92);
@@ -163,7 +172,7 @@ export default function BoxBreathingV2Pacer({
           // than leaving the tracer feeling like a conventional progress bar.
           if (trail) {
             trail.style.strokeDashoffset = String(TRAIL_LENGTH - t);
-            trail.style.opacity = String(op * 0.64);
+            trail.style.opacity = a11y.prefs.reducedMotion ? "0" : String(op * 0.64);
             trail.style.filter = `drop-shadow(0 0 ${6 + glowBoost * 5}px rgba(172, 242, 214, 0.34)) blur(0.35px)`;
           }
 
@@ -176,7 +185,7 @@ export default function BoxBreathingV2Pacer({
             const cornerEnergy = Math.max(0, 1 - distanceFromCorner / 0.11);
             const cornerScale = 1 + cornerEnergy * 0.22;
             dot.setAttribute("transform", `translate(${pt.x} ${pt.y}) scale(${cornerScale})`);
-            dot.style.opacity = String(op);
+            dot.style.opacity = a11y.prefs.reducedMotion ? "0" : String(op);
             dot.style.filter = `drop-shadow(0 0 ${3 + glowBoost * 3 + cornerEnergy * 3}px rgba(205, 244, 231, 0.82))`;
           }
         }
@@ -211,7 +220,7 @@ export default function BoxBreathingV2Pacer({
   return (
     <div className="flex w-full flex-col items-center">
       {/* Current 4-second segment is indicated without adding another timer. */}
-      <div className="mb-2 text-center sm:mb-2.5">
+      <div aria-hidden="true" className="mb-2 text-center sm:mb-2.5">
         <p className="text-[0.62rem] font-medium uppercase tracking-[0.27em] text-cream/52">
           Breathe
         </p>
@@ -221,12 +230,12 @@ export default function BoxBreathingV2Pacer({
               <motion.span
                 animate={{
                   opacity: phaseIndex === index ? 1 : 0.42,
-                  scale: phaseIndex === index ? 1.055 : 1,
+                  scale: !a11y.prefs.reducedMotion && phaseIndex === index ? 1.055 : 1,
                   textShadow: phaseIndex === index
                     ? "0 0 14px rgba(177, 240, 216, 0.28)"
                     : "0 0 0 rgba(177, 240, 216, 0)",
                 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: a11y.prefs.reducedMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="text-cream"
               >
                 {value}
@@ -240,6 +249,7 @@ export default function BoxBreathingV2Pacer({
       </div>
 
       <div
+        aria-hidden="true"
         className="relative flex items-center justify-center"
         style={{ width: BOX_V2_SQUARE_STYLE.width, height: BOX_V2_SQUARE_STYLE.height }}
       >
@@ -337,7 +347,11 @@ export default function BoxBreathingV2Pacer({
       </div>
 
       <div className="relative mt-4 h-9 w-full sm:mt-5">
-        <AnimatePresence initial={false} mode="popLayout">
+        {a11y.prefs.reducedMotion ? (
+          <span className="absolute inset-0 text-center font-heading text-[1.35rem] font-medium uppercase tracking-[0.18em] text-cream">
+            {PHASE_LABELS[phaseIndex]}
+          </span>
+        ) : <AnimatePresence initial={false} mode="popLayout">
           <motion.span
             key={phaseIndex}
             initial={{
@@ -371,8 +385,21 @@ export default function BoxBreathingV2Pacer({
           >
             {PHASE_LABELS[phaseIndex]}
           </motion.span>
-        </AnimatePresence>
+        </AnimatePresence>}
       </div>
+      <p className="mt-1 text-center text-sm text-cream/75" aria-live="off">
+        {running ? `${status.seconds} ${status.seconds === 1 ? "second" : "seconds"}` : "Paused · press Play when ready"}
+        {" · "}Round {status.round} of {rounds}
+      </p>
+      <p className="mt-1 text-center text-xs text-cream/65" aria-live="off">
+        {status.remainingRounds > 0
+          ? `${status.remainingRounds} ${status.remainingRounds === 1 ? "round" : "rounds"} remaining, including this one`
+          : "Breathing rounds complete"}
+      </p>
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {running ? `${PHASE_LABELS[phaseIndex]} for four seconds. Round ${status.round} of ${rounds}.`
+          : "Breathing paused. Press Play when you are ready to continue."}
+      </p>
     </div>
   );
 }

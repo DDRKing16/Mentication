@@ -17,9 +17,11 @@
 // Both use explicit width/height (never inset-only on the <svg>, which is a
 // replaced element that would otherwise honour only `left` and drift off-centre).
 
+// Reserve room for the approved comfort/motion controls and readable phase
+// status on short viewports; the stage can still scroll with enlarged text.
 export const BOX_V2_SQUARE_STYLE = {
-  width: "min(90vw, 54dvh, 24.25rem)",
-  height: "min(90vw, 54dvh, 24.25rem)",
+  width: "min(90vw, 54dvh, 24.25rem, max(10rem, calc(100dvh - 33rem)))",
+  height: "min(90vw, 54dvh, 24.25rem, max(10rem, calc(100dvh - 33rem)))",
 };
 
 // SVG rounded-square path, clockwise starting at the bottom-left corner and
