@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import InterventionControlShell from "@/components/InterventionControlShell";
 import "@/styles/thought-or-fact.css";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
-import { buildBalancedThought, buildThoughtOrFactLearningRecord, findThinkingTrapLanguage, normaliseThoughtOrFactDraft } from "@/lib/thoughtOrFactState";
+import { BELIEF_QUESTION, BELIEF_ANCHORS, beliefRating, commitEvidenceDrafts, buildBalancedThought, buildThoughtOrFactLearningRecord, findThinkingTrapLanguage, normaliseThoughtOrFactDraft } from "@/lib/thoughtOrFactState";
 import {
   clearActiveFlagship,
   getActiveFlagship,
@@ -35,6 +35,8 @@ const RECORD_KEY = "mentation.thought-or-fact.records.v1";
 
 // What kind of thought is this? One tap, no lesson.
 const CATEGORIES = [
+  { id: "mixed", label: "Mixed", short: "Facts and interpretations together", icon: Scale },
+  { id: "not-sure", label: "Not sure", short: "Leave the classification open", icon: CircleHelp },
   { id: "fact", label: "Fact", short: "Something that could be verified", icon: Eye },
   { id: "interpretation", label: "Interpretation", short: "One possible meaning", icon: FileText },
   { id: "prediction", label: "Prediction", short: "A guess about the future", icon: FlaskConical },
@@ -59,7 +61,7 @@ const THINKING_TRAPS = [
 ];
 
 // capture -> sort -> evidence -> ruling -> direction -> complete
-const STAGES = ["capture", "sort", "evidence", "ruling", "direction", "complete"];
+const STAGES = ["capture", "belief", "sort", "evidence", "ruling", "direction", "complete"];
 // Older saved drafts used stages that no longer exist; map them forward.
 const LEGACY_STAGES = { fit: "capture", claims: "sort", charge: "sort" };
 const STEP_COUNT = 4;
@@ -80,7 +82,7 @@ function splitThought(value) {
 function defaultFairerView(thought, fragments, assignments, alternatives, uncertainties, evidence = {}) {
   const collect = (ids) => fragments.filter((fragment) => ids.includes(assignments[fragment.id])).map((fragment) => fragment.text);
   return {
-    adaptive: buildBalancedThought({ thought, distortions: evidence.distortions, evidenceAgainst: evidence.evidenceAgainst, alternatives: [...alternatives, ...uncertainties, ...(evidence.interpretations || [])] }),
+    adaptive: buildBalancedThought({ thought, facts: [...(evidence.facts || []), ...collect(["fact"])], support: evidence.support, evidenceAgainst: evidence.evidenceAgainst, alternatives: [...alternatives, ...uncertainties, ...(evidence.interpretations || [])] }),
     known: (evidence.support?.length ? evidence.support : (evidence.facts?.length ? evidence.facts : collect(["fact"]))).join(" "),
     against: (evidence.evidenceAgainst || []).join(" "),
     added: (evidence.interpretations?.length ? evidence.interpretations : []).join(" "),
@@ -100,7 +102,6 @@ function readSavedRecords() {
 function saveRecord(record) {
   try {
     const existing = readSavedRecords();
-    if (existing.some((item) => item.thought === record.thought && item.ruling === record.ruling)) return true;
     const next = [record, ...existing].slice(0, 24);
     localStorage.setItem(RECORD_KEY, JSON.stringify(next));
     return true;
@@ -136,6 +137,27 @@ function Button({ children, secondary = false, className = "", ...props }) {
 }
 
 const fade = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -10, transition: { duration: 0.12 } }, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } };
+
+function BeliefRating({ value, onChange }) {
+  return <fieldset className="tof-rating">
+    <legend className="tof-rating__q">{BELIEF_QUESTION}</legend>
+    <p className="tof-sub">{BELIEF_ANCHORS}</p>
+    <div className="tof-chips" role="group" aria-label={BELIEF_QUESTION}>
+      {Array.from({ length: 11 }, (_, rating) => <button type="button" className="tof-pill" key={rating} aria-pressed={value === rating} onClick={() => onChange(rating)}>{rating}</button>)}
+    </div>
+    <p className="tof-note">{value === null ? "No rating selected" : `${value} out of 10`}</p>
+    <button type="button" className="tof-text-action" onClick={() => onChange(null)}>Skip belief rating</button>
+  </fieldset>;
+}
+
+function BeliefStage({ thought, value, onChange, onContinue }) {
+  return <motion.div className="tof-stage" {...fade}>
+    <Heading title="Before you look closer." body="Rate your belief in this thought. This is separate from how you feel." />
+    <q className="tof-quote">{thought}</q>
+    <BeliefRating value={value} onChange={onChange} />
+    <div className="tof-actions"><Button onClick={onContinue}>Continue <ArrowRight /></Button></div>
+  </motion.div>;
+}
 
 function CaptureStage({ thought, setThought, onContinue }) {
   const hasThought = cleanSentence(thought).length >= 3;
@@ -253,19 +275,19 @@ function EvidenceStage({ data, update, onContinue }) {
         ))}
       </div>
       <div className="tof-actions">
-        <Button onClick={onContinue}>Continue <ArrowRight /></Button>
-        <button type="button" className="tof-text-action" onClick={onContinue}>Skip for now</button>
+        <Button onClick={() => onContinue(commitEvidenceDrafts(data, drafts))}>Continue <ArrowRight /></Button>
+        <button type="button" className="tof-text-action" onClick={() => onContinue(commitEvidenceDrafts(data, drafts))}>Skip for now</button>
       </div>
     </motion.div>
   );
 }
 
-function RulingStage({ fairerView, initialFairerView, certaintyBefore, rating, setRating, onContinue, onUnresolved, updateFairerView }) {
+function RulingStage({ thought, confirmed, setConfirmed, fairerView, initialFairerView, certaintyBefore, rating, setRating, onContinue, onUnresolved, updateFairerView }) {
   const [editing, setEditing] = useState(false);
   const summary = [fairerView.known, fairerView.against, fairerView.added, fairerView.open].filter(Boolean);
   return (
     <motion.div className="tof-stage" {...fade}>
-      <Heading title="A fairer way to say it." />
+      <Heading title="A draft to check." body="Keep the facts, including difficult ones. Keep uncertainty where the answer is not known. Edit this until it fits." />
       <section className="tof-fairer" aria-label="A more balanced thought">
         {editing
           ? <textarea className="tof-field" value={fairerView.adaptive} onChange={(event) => updateFairerView({ ...fairerView, adaptive: event.target.value })} aria-label="A more balanced thought" />
@@ -276,14 +298,12 @@ function RulingStage({ fairerView, initialFairerView, certaintyBefore, rating, s
         </div>
       </section>
       {summary.length > 0 && <details className="tof-details"><summary>What informed this</summary><p>{summary.join(" ")}</p></details>}
-      <label className="tof-rating">
-        <span className="tof-rating__q">How true does the original thought feel now?</span>
-        <output>{rating}<small>/ 10</small></output>
-        <input type="range" min="0" max="10" step="1" value={rating} onChange={(event) => setRating(Number(event.target.value))} aria-label="How true the original thought feels now, from zero to ten" aria-valuetext={`${rating} out of 10 now`} />
-        {Number.isInteger(certaintyBefore) && <span className="tof-rating__before">It felt {certaintyBefore} out of 10 when you started.</span>}
-      </label>
+      <label className="tof-check"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>This statement preserves the facts and uncertainty, and fits what I mean.</span></label>
+      <q className="tof-quote">{thought}</q>
+      <BeliefRating value={rating} onChange={setRating} />
+      {Number.isInteger(certaintyBefore) && <p className="tof-note">Your starting rating was {certaintyBefore} out of 10. Staying the same or feeling more certain is okay.</p>}
       <div className="tof-actions">
-        <Button onClick={onContinue}>Continue <ArrowRight /></Button>
+        <Button disabled={!confirmed || !fairerView.adaptive?.trim()} onClick={onContinue}>Continue <ArrowRight /></Button>
         <button type="button" className="tof-text-action" onClick={onUnresolved}>Keep it unresolved</button>
       </div>
     </motion.div>
@@ -322,15 +342,15 @@ function DirectionStage({ hasPrediction, hasActionable, predictionText, knownCon
   );
 }
 
-function CompletionStage({ thought, fairerView, returnPhrase, setReturnPhrase, saved, onSave, onFinish }) {
-  const fairerSummary = fairerView?.adaptive || [fairerView?.known, fairerView?.added, fairerView?.open].filter(Boolean).join(" ") || "It can remain unresolved for now.";
+function CompletionStage({ confirmed, saveError, thought, fairerView, returnPhrase, setReturnPhrase, saved, onSave, onFinish }) {
+  const fairerSummary = (confirmed ? fairerView?.adaptive : "This remains unresolved. I do not need to dismiss the facts or force a new conclusion.") || [fairerView?.known, fairerView?.added, fairerView?.open].filter(Boolean).join(" ") || "It can remain unresolved for now.";
   return (
     <motion.div className="tof-stage" {...fade}>
       <Heading title="Keep what’s useful." body="A thought can be important without being the whole story." />
       <section className="tof-fairer" aria-label="Your private reflection">
         <p className="tof-heading"><span className="tof-sub">Original thought</span></p>
         <q className="tof-quote">{thought}</q>
-        <p className="tof-heading"><span className="tof-sub">A fairer view</span></p>
+        <p className="tof-heading"><span className="tof-sub">{confirmed ? "Your confirmed statement" : "Left unresolved"}</span></p>
         <p className="tof-fairer__body">{fairerSummary}</p>
       </section>
       <label className="tof-evidence-block">
@@ -338,6 +358,8 @@ function CompletionStage({ thought, fairerView, returnPhrase, setReturnPhrase, s
         <input className="tof-field" value={returnPhrase} onChange={(event) => setReturnPhrase(event.target.value)} maxLength={140} placeholder="A short phrase for yourself" />
       </label>
       <div className="tof-actions">
+        <p className="tof-sub">Your automatic draft is cleared when you finish. Save is optional and keeps a separate reflection on this device.</p>
+        {saveError && <p role="alert">Saving did not work. Your reflection has not been saved.</p>}
         <Button onClick={onFinish}>Finish</Button>
         <button type="button" className="tof-text-action" disabled={saved} onClick={onSave}>{saved ? "Saved on this device" : "Save privately on this device"}</button>
       </div>
@@ -345,23 +367,25 @@ function CompletionStage({ thought, fairerView, returnPhrase, setReturnPhrase, s
   );
 }
 
-export default function ThoughtOrFactExperience({ intervention, answers, initialThought = "", initialCertainty, onComplete, onAttemptEvent, onExit }) {
+export default function ThoughtOrFactExperience({ intervention, answers, initialThought = "", onComplete, onAttemptEvent, onExit }) {
   const navigate = useNavigate();
   const a11y = useAccessibilityPrefs();
   const restored = useMemo(() => {
     const active = getActiveFlagship();
-    return active?.interventionId === "factCheck" ? active : null;
+    return active?.interventionId === "factCheck" ? { ...active, data: normaliseThoughtOrFactDraft(active.data) } : null;
   }, []);
   const restoredStage = restored?.data?.stage ? (LEGACY_STAGES[restored.data.stage] || restored.data.stage) : null;
   const [stage, setStage] = useState(
-    restoredStage && STAGES.includes(restoredStage) ? restoredStage : (initialThought ? "sort" : "capture"),
+    restoredStage && STAGES.includes(restoredStage) ? restoredStage : (initialThought ? "belief" : "capture"),
   );
   const [data, setData] = useState(restored?.data || {
     stage: "capture",
     thought: initialThought,
     refinedClaim: initialThought,
-    certaintyBefore: Number.isInteger(initialCertainty) ? initialCertainty : null,
-    certaintyAfter: Number.isInteger(initialCertainty) ? initialCertainty : 5,
+    beliefVersion: 2,
+    certaintyBefore: null,
+    certaintyAfter: null,
+    balancedConfirmed: false,
     fragments: [],
     sortIndex: 0,
     assignments: {},
@@ -374,7 +398,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   const startedAt = useRef(Date.now());
 
   const stageIndex = Math.max(0, STAGES.indexOf(stage));
-  const stageAnnouncement = { capture: "Thought capture. Enter one thought in your own words.", sort: "Choose the closest description for the thought.", evidence: "Look at the thought from both sides. Everything here is optional.", ruling: "Review your more balanced thought.", direction: "Choose what would be useful now.", complete: "Your private reflection is ready." }[stage];
+  const stageAnnouncement = { belief: "Rate how true the original thought feels, or leave it unanswered.", capture: "Thought capture. Enter one thought in your own words.", sort: "Choose the closest description for the thought.", evidence: "Look at the thought from both sides. Everything here is optional.", ruling: "Review your more balanced thought.", direction: "Choose what would be useful now.", complete: "Your private reflection is ready." }[stage];
   const update = (patch) => setData((current) => ({ ...current, ...patch }));
   const go = (nextStage, patch = {}) => {
     setStage(nextStage);
@@ -414,7 +438,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
     });
   };
 
-  const createFairerView = () => defaultFairerView(data.thought, fragments, data.assignments || {}, data.alternatives || [], data.uncertainty || [], data);
+  const createFairerView = (patch = {}) => defaultFairerView(data.thought, fragments, data.assignments || {}, data.alternatives || [], data.uncertainty || [], { ...data, ...patch });
 
   const finish = (saved = data.saved) => {
     const learningRecord = buildThoughtOrFactLearningRecord({
@@ -427,11 +451,12 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
     rememberFlagshipEvent({
       interventionId: "factCheck",
       completed: true,
-      options: learningRecord,
+      // The shared preference sanitizer turns null into "selected"; omit missing measurements.
+      options: Object.fromEntries(Object.entries(learningRecord).filter(([, value]) => value !== null)),
     });
     clearActiveFlagship("factCheck");
     onAttemptEvent?.({ interventionId: "factCheck", mechanism: intervention.mechanism, action: "completed", completedPercentage: 1, timestamp: Date.now(), startedAt: startedAt.current });
-    onComplete?.({ skipReflection: true, outcome: { classificationCounts: counts, certaintyBefore: data.certaintyBefore, certaintyAfter: data.certaintyAfter, saved } });
+    onComplete?.({ requireGoalReassessment: true, outcome: { classificationCounts: counts, certaintyBefore: data.certaintyBefore, certaintyAfter: data.certaintyAfter, saved } });
   };
 
   const handleSave = () => {
@@ -439,14 +464,15 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
       id: globalThis.crypto?.randomUUID?.() || `tof-${Date.now()}`,
       createdAt: new Date().toISOString(),
       thought: data.thought,
-      ruling: [data.fairerView?.known, data.fairerView?.added, data.fairerView?.open].filter(Boolean).join(" "),
-      fairerView: data.fairerView,
+      ruling: data.balancedConfirmed ? data.fairerView?.adaptive : "Left unresolved",
+      fairerView: data.balancedConfirmed ? data.fairerView : null,
+      balancedConfirmed: data.balancedConfirmed === true,
       returnPhrase: data.returnPhrase,
       certaintyBefore: data.certaintyBefore,
       certaintyAfter: data.certaintyAfter,
       classifications: counts,
     });
-    update({ saved });
+    update({ saved, saveError: !saved });
   };
 
   const back = () => {
@@ -454,7 +480,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
       update({ sortIndex: sortIndex - 1 });
       return;
     }
-    const previous = { sort: "capture", evidence: "sort", ruling: "evidence", direction: "ruling", complete: "direction" }[stage];
+    const previous = { belief: "capture", sort: "belief", evidence: "sort", ruling: "evidence", direction: "ruling", complete: "direction" }[stage];
     if (previous) go(previous, previous === "sort" ? { sortIndex: Math.max(0, fragments.length - 1) } : {});
     else onExit?.();
   };
@@ -470,7 +496,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
       quiet
       onBack={back}
       onExit={onExit}
-      onSimplify={() => go(stage === "evidence" ? "ruling" : stage, stage === "evidence" ? { fairerView: createFairerView() } : {})}
+      onSimplify={() => go(stage === "evidence" ? "ruling" : stage, stage === "evidence" ? { fairerView: createFairerView(), balancedConfirmed: false, saved: false } : {})}
       simplifyLabel={stage === "evidence" ? "Skip to a balanced thought" : "Use less guidance"}
       onDifferent={() => launch("grounding54321V2")}
       accent="#00f5d4"
@@ -480,18 +506,20 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
     >
       <div className="tof-experience" data-tof-stage={stage}>
         <div className="tof-live-region sr-only" role="status" aria-live="polite">{stageAnnouncement}</div>
+        <p className="tof-note"><LockKeyhole aria-hidden="true" /> Private on this device. Your thought and progress are automatically stored here as a draft, resumable for 24 hours after your last change. Evidence is kept when you tap Add or Continue. Finish clears the draft; optional Save keeps a separate copy.</p>
         {stepFor(stage) > 0 && <Steps current={stepFor(stage)} />}
         <AnimatePresence initial={false}>
-          {stage === "capture" && <CaptureStage key="capture" thought={data.thought} setThought={(thought) => update({ thought })} onContinue={() => go("sort", { refinedClaim: data.thought, fragments: splitThought(data.thought), assignments: {}, sortIndex: 0 })} />}
+          {stage === "capture" && <CaptureStage key="capture" thought={data.thought} setThought={(thought) => update({ thought })} onContinue={() => go("belief", { certaintyBefore: null, certaintyAfter: null, balancedConfirmed: false, refinedClaim: data.thought, fragments: splitThought(data.thought), assignments: {}, sortIndex: 0 })} />}
+          {stage === "belief" && <BeliefStage key="belief" thought={data.thought} value={beliefRating(data.certaintyBefore)} onChange={(certaintyBefore) => update({ certaintyBefore })} onContinue={() => go("sort")} />}
           {stage === "sort" && <SortStage key={`sort-${sortIndex}`} claim={currentFragment.text} currentIndex={sortIndex} total={fragments.length || 1} selected={data.distortions || []} setSelected={(distortions) => update({ distortions })} onSelect={(category) => {
             const assignments = { ...(data.assignments || {}), [currentFragment.id]: category };
             if (sortIndex < fragments.length - 1) update({ assignments, sortIndex: sortIndex + 1 });
             else go("evidence", { assignments, sortIndex });
           }} />}
-          {stage === "evidence" && <EvidenceStage key="evidence" data={data} update={update} onContinue={() => go("ruling", { fairerView: createFairerView() })} />}
-          {stage === "ruling" && <RulingStage key="ruling" fairerView={data.fairerView || createFairerView()} initialFairerView={createFairerView()} certaintyBefore={data.certaintyBefore} rating={Number.isInteger(data.certaintyAfter) && data.certaintyAfter >= 0 && data.certaintyAfter <= 10 ? data.certaintyAfter : 5} setRating={(certaintyAfter) => update({ certaintyAfter })} updateFairerView={(fairerView) => update({ fairerView })} onContinue={() => go("direction")} onUnresolved={() => go("direction", { direction: "unresolved" })} />}
+          {stage === "evidence" && <EvidenceStage key="evidence" data={data} update={update} onContinue={(patch) => go("ruling", { ...patch, fairerView: createFairerView(patch), balancedConfirmed: false, saved: false })} />}
+          {stage === "ruling" && <RulingStage key="ruling" thought={data.thought} confirmed={data.balancedConfirmed === true} setConfirmed={(balancedConfirmed) => update({ balancedConfirmed, saved: false })} fairerView={data.fairerView || createFairerView()} initialFairerView={createFairerView()} certaintyBefore={data.certaintyBefore} rating={beliefRating(data.certaintyAfter)} setRating={(certaintyAfter) => update({ certaintyAfter, saved: false })} updateFairerView={(fairerView) => update({ fairerView, balancedConfirmed: false, saved: false })} onContinue={() => go("direction")} onUnresolved={() => go("direction", { direction: "unresolved", balancedConfirmed: false, saved: false })} />}
           {stage === "direction" && <DirectionStage key="direction" hasPrediction={hasPrediction} hasActionable={hasActionable} predictionText={predictionText} knownContext={knownContext} openContext={openContext} onFinish={() => go("complete")} onAction={() => launch("nextAction")} onTest={() => { recordHandoffDecision("factCheck", "testPrediction", "accepted"); clearActiveFlagship("factCheck"); navigate("/reset", { replace: true, state: { prebuilt: true, pathway: ["testPrediction"], direction: "lift", directionLabel: "Test the Prediction", intensity: answers?.intensity || 5, whereFelt: "thoughts", timeMin: 4, audio: answers?.audio || "yes" } }); }} onGround={() => launch("grounding54321V2")} />}
-          {stage === "complete" && <CompletionStage key="complete" thought={data.thought} fairerView={data.fairerView} returnPhrase={data.returnPhrase || ""} setReturnPhrase={(returnPhrase) => update({ returnPhrase })} saved={data.saved} onSave={handleSave} onFinish={() => finish()} />}
+          {stage === "complete" && <CompletionStage key="complete" confirmed={data.balancedConfirmed === true} saveError={data.saveError} thought={data.thought} fairerView={data.fairerView} returnPhrase={data.returnPhrase || ""} setReturnPhrase={(returnPhrase) => update({ returnPhrase, saved: false })} saved={data.saved} onSave={handleSave} onFinish={() => finish()} />}
         </AnimatePresence>
       </div>
     </InterventionControlShell>
