@@ -47,6 +47,7 @@ describe("device-local application data", () => {
     window.localStorage.setItem("haven_a11y", JSON.stringify({ reducedMotion: true }));
     window.localStorage.setItem("haven.a11y.v2", JSON.stringify({ largeText: true }));
     window.localStorage.setItem("unrelated.product", "keep");
+    window.localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify({ task: "Synthetic private task" }));
     expect(exportLocalAppData().sessions).toHaveLength(1);
 
     deleteAllLocalAppData();
@@ -56,6 +57,7 @@ describe("device-local application data", () => {
     expect(window.localStorage.getItem("haven_a11y")).toBeNull();
     expect(window.localStorage.getItem("haven.a11y.v2")).toBeNull();
     expect(window.localStorage.getItem("unrelated.product")).toBe("keep");
+    expect(window.localStorage.getItem("mentication_nes_v2_app_state")).toBeNull();
     expect(window.__events).toContain("mentation:accessibility-changed");
   });
 });

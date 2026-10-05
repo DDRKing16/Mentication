@@ -18,7 +18,8 @@ import {
   Home
 } from "lucide-react";
 import { consumeNextStepHandoff } from "@/lib/tomorrowParking/storage";
-import { generateTaskSteps } from "@/lib/aiSteps";
+import { HELPFULNESS } from "@/lib/attemptFeedback";
+import { freshNextStep, restoreNextStep, advanceNextStep, undoNextStep, replaceNextStep } from "@/lib/nextStepState";
 import { findLibraryTask } from "@/lib/taskLibrary";
 
 // Category to Lucide icon mapping for Image 1 premium grid
@@ -556,7 +557,7 @@ const CATEGORY_THEMES = {
 const TASK_STEPS = {
   // cleaning
   "tidy-desk": [
-    { title: "Assess the clutter", micro: "Gently look at your desk surface and identify the main areas of clutter.", time: "<15 sec", easier: ["Glance at desk", "Think about desk"] },
+    { title: "Move one item into place", micro: "Pick one pen, paper, or other item on your desk and put it where it belongs. Just one is enough.", time: "<15 sec", easier: ["Touch one item", "Point to one item to move"] },
     { title: "Push your chair in", micro: "Align your chair to create a neat boundary and make space around your desk.", time: "<10 sec", easier: ["Touch chair", "Look at chair"] },
     { title: "Pick up loose paper trash", micro: "Gather any wrappers, receipts, or old envelopes that can be thrown away immediately.", time: "<20 sec", easier: ["Touch paper trash", "Point at trash"] },
     { title: "Discard the paper trash", micro: "Drop the gathered paper waste into your nearest bin.", time: "<10 sec", easier: ["Slide trash closer to bin", "Drop trash on floor near bin"] },
@@ -1115,13 +1116,13 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular", o
   let baseSteps = [];
   const capitalizedTaskName = taskKey.replace(/-/g, " ").replace(/(^|[\s-])\w/g, c => c.toUpperCase());
   
-  // AI-written steps win, then hand-crafted steps, then the generic fallback.
+  // Bundled library steps, hand-crafted steps, then a local fallback.
   if (overrideSteps) {
     baseSteps = overrideSteps;
   } else if (category === "custom" || !TASK_STEPS[taskKey]) {
     // Last-resort fallback: straight into the work, no ritual padding.
     baseSteps = [
-      { title: `Do the easiest visible piece of ${capitalizedTaskName}`, micro: "Name the smallest concrete action it needs and do it now — even badly.", time: "<60 sec", easier: ["Do 10 seconds only", "Do the first click or move"] },
+      { title: "Put one thing you need within reach", micro: `For ${capitalizedTaskName}, place one tool or item beside you, or open the relevant file. Stop there if that is enough.`, time: "<60 sec", easier: ["Do 10 seconds only", "Do the first click or move"] },
       { title: `Gather what ${capitalizedTaskName} needs`, micro: "Pull the tools, files or ingredients into arm's reach.", time: "<60 sec", easier: ["Grab just one tool", "Open the one app or page"] },
       { title: `Start the first real part of ${capitalizedTaskName}`, micro: "Begin the core work — rough is fine, momentum matters.", time: "<60 sec", easier: ["Do it badly on purpose", "Work for 30 seconds"] },
       { title: `Keep working on ${capitalizedTaskName} for two minutes`, micro: "Stay on this task only; park every stray idea on paper instead.", time: "<120 sec", easier: ["Work for 60 seconds", "Slow the pace, don't stop"] },
@@ -1137,58 +1138,9 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular", o
     baseSteps = TASK_STEPS[taskKey];
   }
 
-  // Calculate target total step count based on pathLength
-  const totalTargetCount = pathLength === "speedy" ? 5 : pathLength === "regular" ? 10 : 20;
-
-  let finalSteps = [];
-
-  if (totalTargetCount === 20) {
-    // If minimax (20 steps), use baseSteps directly!
-    finalSteps = [...baseSteps];
-  } else {
-    // Otherwise, chunk and merge them dynamically so they are beautifully condensed
-    const chunkSize = baseSteps.length / totalTargetCount; // 20 / 5 = 4, or 20 / 10 = 2
-    for (let i = 0; i < totalTargetCount; i++) {
-      const start = Math.floor(i * chunkSize);
-      const end = Math.floor((i + 1) * chunkSize);
-      const chunk = baseSteps.slice(start, end);
-      
-      if (chunk.length > 0) {
-        if (chunk.length === 1) {
-          finalSteps.push(chunk[0]);
-        } else {
-          // Merge chunk
-          const firstStep = chunk[0];
-          const lastStep = chunk[chunk.length - 1];
-          
-          // Encompassing title
-          let title = firstStep.title;
-          const lowerLast = lastStep.title.charAt(0).toLowerCase() + lastStep.title.slice(1);
-          title = `${title} and ${lowerLast}`;
-          
-          // Build comprehensive micro text that lists all intermediate sub-steps
-          const micro = chunk.map((step, idx) => `${idx + 1}. ${step.title}: ${step.micro}`).join("\n");
-          
-          // Sum up the time
-          let totalSec = 0;
-          chunk.forEach(step => {
-            const match = step.time.match(/<(\d+)\s*sec/);
-            if (match) {
-              totalSec += parseInt(match[1], 10);
-            } else {
-              totalSec += 30;
-            }
-          });
-          const time = totalSec < 60 ? `<${totalSec} sec` : `<${Math.ceil(totalSec / 60)} min`;
-          
-          // Take the easiest option of the first sub-step as the ice-breaker!
-          const easier = firstStep.easier;
-          
-          finalSteps.push({ title, micro, time, easier });
-        }
-      }
-    }
-  }
+  // A shorter route takes fewer atomic actions; it never merges several into one.
+  const totalTargetCount = pathLength === "speedy" ? 1 : pathLength === "regular" ? 3 : 5;
+  const finalSteps = baseSteps.slice(0, totalTargetCount);
 
   // Map step IDs dynamically
   return finalSteps.map((step, idx) => ({
@@ -1197,38 +1149,19 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular", o
   }));
 };
 
-export default function NextEasiestStepExperience() {
+export default function NextEasiestStepExperience({ intervention, onComplete, onAttemptEvent } = {}) {
   const { prefs } = useAccessibilityPrefs();
-  // 3. Persistent state initialization from localStorage using 'mentication_nes_v2_app_state'
-  const [gameState, setGameState] = useState(() => {
-    const saved = localStorage.getItem("mentication_nes_v2_app_state");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed) {
-          return {
-            pathLength: "regular",
-            ...parsed,
-            ladder: Array.isArray(parsed.ladder) ? parsed.ladder : [],
-          };
-        }
-      } catch (e) {
-        console.error("Failed to parse saved state", e);
-      }
-    }
-    return {
-      screen: "landing",
-      brainState: null,
-      category: null,
-      task: null,
-      currentStepIndex: 0,
-      dopamineLevel: 0,
-      brainWarmingStage: 1,
-      ladder: [],
-      winsToday: 0,
-      pathLength: "regular"
-    };
-  });
+  const [restored] = useState(() => restoreNextStep());
+  const [gameState, setGameState] = useState(restored.state);
+  const [storageStatus, setStorageStatus] = useState(null);
+  const [loadError, setLoadError] = useState(restored.error);
+  const [editStep, setEditStep] = useState(null);
+  const gettingStarted = gameState.gettingStarted ?? null;
+  const helpfulness = gameState.helpfulness ?? null;
+  const setGettingStarted = value => setGameState(prev => ({ ...prev, gettingStarted: value }));
+  const setHelpfulness = value => setGameState(prev => ({ ...prev, helpfulness: value }));
+  const completionSent = useRef(false);
+  const lastAction = useRef(0);
 
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
@@ -1236,7 +1169,7 @@ export default function NextEasiestStepExperience() {
   const [showPause, setShowPause] = useState(false);
   const [easierOptionsVisible, setEasierOptionsVisible] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
-  const [aiGenerating, setAiGenerating] = useState(false);
+  const aiGenerating = false;
 
   const canvasRef = useRef(null);
   const audioCtxRef = useRef(null);
@@ -1245,8 +1178,9 @@ export default function NextEasiestStepExperience() {
   useEffect(() => {
     try {
       localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(gameState));
+      setStorageStatus(null);
     } catch {
-      /* storage unavailable (private mode / quota) */
+      setStorageStatus("Could not save on this device. Keep this page open; refreshing may lose this task.");
     }
   }, [gameState]);
 
@@ -1435,31 +1369,18 @@ export default function NextEasiestStepExperience() {
     setGameState(prev => ({ ...prev, screen: screenName }));
   };
 
-  const handleSelectCategoryTask = async (catKey, taskObj) => {
+  const handleSelectCategoryTask = (catKey, taskObj) => {
+    completionSent.current = false;
     playClick();
-    // Tasks without hand-crafted steps get AI-written ones (falls back to the
-    // generic ladder if the AI relay is unavailable).
-    const needsAI = !TASK_STEPS[taskObj.id];
-    let aiSteps = null;
-    if (needsAI) {
-      // Library match first (instant, task-specific), AI only if it misses.
-      const libMatch = findLibraryTask(taskObj.name);
-      if (libMatch) {
-        aiSteps = libMatch.steps;
-      } else {
-        setAiGenerating(true);
-        aiSteps = await generateTaskSteps(taskObj.name, { pathLength: gameState.pathLength });
-        setAiGenerating(false);
-      }
-    }
+    // Task text stays on this device. Use the bundled library or a local fallback.
+    const aiSteps = TASK_STEPS[taskObj.id] ? null : findLibraryTask(taskObj.name)?.steps || null;
     const ladderSteps = generateLadder(catKey, taskObj.id, gameState.brainState, gameState.pathLength, aiSteps);
     setGameState(prev => ({
-      ...prev,
+      ...freshNextStep(),
+      pathLength: prev.pathLength,
       category: catKey,
       task: taskObj.name,
       currentStepIndex: 0,
-      dopamineLevel: 0,
-      brainWarmingStage: 1,
       ladder: ladderSteps,
       screen: "focus"
     }));
@@ -1467,29 +1388,21 @@ export default function NextEasiestStepExperience() {
     setSelectedSubcategory(null);
   };
 
-  const handleCustomTaskGo = async () => {
+  const handleCustomTaskGo = () => {
     if (!customTaskInput.trim() || aiGenerating) return;
+    completionSent.current = false;
     playClick();
     const cleanInput = customTaskInput.trim();
     const taskSlug = cleanInput.toLowerCase().replace(/\s+/g, "-");
-    // A typed task is always its own thing: the big library provides its own
-    // steps when it matches, AI writes them when it doesn't, and the generic
-    // ladder is only the last-resort fallback.
     const libMatch = findLibraryTask(cleanInput);
-    let aiSteps = null;
-    if (!libMatch) {
-      setAiGenerating(true);
-      aiSteps = await generateTaskSteps(cleanInput, { pathLength: gameState.pathLength });
-      setAiGenerating(false);
-    }
+    const aiSteps = null;
     const ladderSteps = generateLadder("work", taskSlug, gameState.brainState, gameState.pathLength, libMatch?.steps || aiSteps);
     setGameState(prev => ({
-      ...prev,
+      ...freshNextStep(),
+      pathLength: prev.pathLength,
       category: "custom",
       task: cleanInput,
       currentStepIndex: 0,
-      dopamineLevel: 0,
-      brainWarmingStage: 1,
       ladder: ladderSteps,
       screen: "focus"
     }));
@@ -1497,6 +1410,7 @@ export default function NextEasiestStepExperience() {
   };
 
   const handleSurpriseMe = () => {
+    completionSent.current = false;
     playClick();
     const keys = Object.keys(CATEGORY_THEMES);
     const randCatKey = keys[Math.floor(Math.random() * keys.length)];
@@ -1506,65 +1420,50 @@ export default function NextEasiestStepExperience() {
     const ladderSteps = generateLadder(randCatKey, randTask.id, gameState.brainState, gameState.pathLength);
     
     setGameState(prev => ({
-      ...prev,
+      ...freshNextStep(),
+      pathLength: prev.pathLength,
       category: randCatKey,
       task: randTask.name,
       currentStepIndex: 0,
-      dopamineLevel: 0,
-      brainWarmingStage: 1,
       ladder: ladderSteps,
       screen: "focus"
     }));
   };
 
-  // Mark step complete (dopamine burst + sounds + confetti + haptics)
-  const handleCompleteStep = () => {
-    playSuccessChime();
-    triggerHaptic();
-    triggerConfetti();
-
-    setGameState(prev => {
-      const nextIndex = prev.currentStepIndex + 1;
-      const nextDopamine = Math.min(100, prev.dopamineLevel + 2);
-      const nextWins = prev.winsToday + 1;
-      
-      // Brain warming stages: Stage 1 for 0-7, Stage 2 for 8-20, Stage 3 for 21+ completed steps
-      let nextStage = 1;
-      if (nextIndex >= 8 && nextIndex <= 20) {
-        nextStage = 2;
-      } else if (nextIndex > 20) {
-        nextStage = 3;
-      }
-
-      const isCompleted = nextIndex >= prev.ladder.length;
-
-      return {
-        ...prev,
-        currentStepIndex: isCompleted ? prev.currentStepIndex : nextIndex,
-        dopamineLevel: nextDopamine,
-        winsToday: nextWins,
-        brainWarmingStage: nextStage,
-        screen: isCompleted ? "dashboard" : "focus"
-      };
-    });
-
+  const advanceStep = (status) => {
+    if (Date.now() - lastAction.current < 400) return;
+    lastAction.current = Date.now();
+    setGameState(prev => advanceNextStep(prev, status));
+    if (status === "done") { playSuccessChime(); triggerHaptic(); triggerConfetti(); }
     setEasierOptionsVisible(false);
+  };
+  const handleCompleteStep = () => advanceStep("done");
+  const chooseEasier = (title) => {
+    setGameState(prev => replaceNextStep(prev, title));
+    setEasierOptionsVisible(false);
+  };
+  const finish = () => {
+    if (completionSent.current || !onComplete) return;
+    completionSent.current = true;
+    const done = gameState.ladder.filter(step => step.status === "done").length;
+    const skipped = gameState.ladder.filter(step => step.status === "skipped").length;
+    const submittedState = { ...gameState, submitted: true };
+    try { localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(submittedState)); } catch { /* Shared flow handles history save failure separately. */ }
+    setGameState(submittedState);
+    onAttemptEvent?.({ interventionId: "nextAction", mechanism: intervention?.mechanism,
+      action: "completed", exitReason: done + skipped < gameState.ladder.length ? "exited" : done ? "completed" : "skipped",
+      completedPercentage: done / Math.max(1, gameState.ladder.length),
+      startedAt: gameState.startedAt, timestamp: Date.now(), helpfulness });
+    onComplete({ requireGoalReassessment: true, helpfulness,
+      outcome: { type: "next-easiest-step", completedSteps: done, skippedSteps: skipped, gettingStarted } });
   };
 
   const handleResetDay = () => {
     playClick();
-    setGameState({
-      screen: "landing",
-      brainState: null,
-      category: null,
-      task: null,
-      currentStepIndex: 0,
-      dopamineLevel: 0,
-      brainWarmingStage: 1,
-      ladder: [],
-      winsToday: 0,
-      pathLength: "regular"
-    });
+    setGameState(freshNextStep());
+    setGettingStarted(null);
+    setHelpfulness(null);
+    completionSent.current = false;
     setExpandedCategory(null);
     setCustomTaskInput("");
     setEasierOptionsVisible(false);
@@ -1573,15 +1472,9 @@ export default function NextEasiestStepExperience() {
 
   const currentStep = gameState.ladder[gameState.currentStepIndex];
 
-  // Dynamically calculate brain warming progress
-  let warmingProgressPct = 0;
-  if (gameState.currentStepIndex < 8) {
-    warmingProgressPct = (gameState.currentStepIndex / 7) * 100;
-  } else if (gameState.currentStepIndex <= 20) {
-    warmingProgressPct = ((gameState.currentStepIndex - 8) / 12) * 100;
-  } else {
-    warmingProgressPct = Math.min(100, ((gameState.currentStepIndex - 21) / 20) * 100);
-  }
+  const doneCount = gameState.ladder.filter(step => step.status === "done").length;
+  const skippedCount = gameState.ladder.filter(step => step.status === "skipped").length;
+  const progressPct = gameState.ladder.length ? Math.round(doneCount / gameState.ladder.length * 100) : 0;
 
   return (
     <div 
@@ -1592,6 +1485,23 @@ export default function NextEasiestStepExperience() {
       }}
     >
       {/* Shared Home button on every screen, and Back on the opening screen (inner screens keep their own step-back arrows). */}
+      {loadError && <div className="nes-save-status" role="alert">{loadError}<button onClick={() => setLoadError(null)}>Dismiss</button></div>}
+      <div className="nes-save-status" role={storageStatus ? "alert" : "status"}>{storageStatus || "Task progress saved on this device."}{storageStatus && <button onClick={() => setGameState(prev => ({ ...prev }))}>Retry save</button>}</div>
+      <style>{`
+        .nes-v2-wrap .screen { max-width:600px; margin:0 auto; }
+        .nes-save-status { position:relative; z-index:6; padding:60px 20px 8px; color:#502f37; background:#e1e8c1; font-size:14px; }
+        .nes-quick { width:100%; background:#e1e8c1; color:#502f37; border-radius:18px; padding:16px; margin:12px 0; }
+        .nes-quick p,.nes-quick label,.nes-quick legend { font-size:16px; line-height:1.5; }
+        .nes-quick input { width:100%; min-height:48px; padding:10px; border:1px solid #502f37; border-radius:10px; font-size:16px; color:#502f37; background:#fff; }
+        .nes-quick button,.nes-actions button { min-height:48px; padding:10px 14px; margin:4px; border:1px solid currentColor; border-radius:14px; font-size:16px; }
+        .nes-actions { display:flex; flex-wrap:wrap; gap:4px; }
+        .nes-light { color:#e1e8c1; }
+        .nes-v2-wrap button:disabled { opacity:.5; cursor:default; }
+        .nes-v2-wrap button[aria-pressed=true] { background:#502f37; color:#fff; }
+        .nes-v2-wrap button:focus-visible,.nes-v2-wrap input:focus-visible { outline:3px solid #e75a6d; outline-offset:3px; }
+        .nes-v2-wrap .focus-hardware-card { height:auto !important; min-height:200px !important; max-height:none !important; overflow:visible !important; }
+        .nes-v2-wrap .focus-hardware-card p { font-size:17px !important; }
+      `}</style>
       <InterventionNav back={gameState.screen === "landing"} home tone="dark" />
       {/* While the AI writes task-specific steps, a small overlay keeps the
           tap responsive instead of leaving the screen unchanged. */}
@@ -2047,7 +1957,7 @@ export default function NextEasiestStepExperience() {
           z-index: 2;
         }
 
-        /* Float upward sparkle elements for Dopamine tank */
+        /* Float upward sparkle elements for progress capsule */
         @keyframes floatUpSparkle {
           0% {
             transform: translateY(0) scale(0) rotate(0deg);
@@ -2167,7 +2077,7 @@ export default function NextEasiestStepExperience() {
             
             {/* Horizontal progress bar at the very top */}
             <div style={{ width: "100%", height: "5px", backgroundColor: "rgba(28, 94, 82, 0.12)", borderRadius: "3px", overflow: "hidden", position: "relative", marginBottom: "16px" }}>
-              <div style={{ width: "35%", height: "100%", backgroundColor: "#1C5E52", borderRadius: "3px" }} />
+              <div style={{ width: `${progressPct}%`, height: "100%", backgroundColor: "#1C5E52", borderRadius: "3px" }} />
             </div>
 
             {/* Centered ADHD Focus • Calm Badge */}
@@ -2285,6 +2195,18 @@ export default function NextEasiestStepExperience() {
 
             </div>
 
+            <section className="nes-quick" aria-label="Quick task choices">
+              <p>Choose a familiar task, or name your own. Your text stays on this device.</p>
+              <div className="nes-actions">
+                <button onClick={() => handleSelectCategoryTask("cleaning", { id: "tidy-desk", name: "Tidy my desk" })}>Tidy my desk</button>
+                <button onClick={() => handleSelectCategoryTask("work", { id: "emails", name: "Reply to emails" })}>Reply to emails</button>
+                <button onClick={() => handleSelectCategoryTask("study", { id: "read-chapter", name: "Read a chapter" })}>Read a chapter</button>
+              </div>
+              <label htmlFor="nes-quick-task">What would you like to start?</label>
+              <input id="nes-quick-task" value={customTaskInput} maxLength={200} onChange={e => setCustomTaskInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleCustomTaskGo(); }} />
+              <button disabled={!customTaskInput.trim()} onClick={handleCustomTaskGo}>Show my small step</button>
+              {gameState.ladder.length > 0 && !gameState.submitted && <button onClick={() => navigateTo(gameState.ladder.every(step => step.status) ? "dashboard" : "focus")}>Resume saved task: {gameState.task}</button>}
+            </section>
             {/* Primary Action Button ("I can't focus →") */}
             <div style={{ width: "100%", margin: "0 0 18px" }}>
               <button 
@@ -2312,7 +2234,7 @@ export default function NextEasiestStepExperience() {
                 onMouseDown={(e) => e.currentTarget.style.transform = "scale(0.98)"}
                 onMouseUp={(e) => e.currentTarget.style.transform = "scale(1)"}
               >
-                I can't focus 
+                Browse all tasks
                 <span className="arrow" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="#DBE4AF" stroke="#DBE4AF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "-2px", filter: "drop-shadow(0 0 2px rgba(219, 228, 175, 0.95)) drop-shadow(0 0 6px rgba(219, 228, 175, 0.55))" }}>
                     <polygon points="5 3 19 12 5 21 5 3" />
@@ -2330,8 +2252,8 @@ export default function NextEasiestStepExperience() {
                 Ladder
               </div>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", textAlign: "right" }}>
-                <span style={{ fontSize: "9px", fontWeight: "800", color: "#1E4D41", opacity: 0.7, letterSpacing: "0.06em", lineHeight: "1.2" }}>3 STEPS TO THE SUMMIT</span>
-                <span style={{ fontSize: "12px", fontWeight: "600", color: "#1E4D41", opacity: 0.9, marginTop: "2px", lineHeight: "1.2" }}>1 of 3 completed</span>
+                <span style={{ fontSize: "9px", fontWeight: "800", color: "#1E4D41", opacity: 0.7, letterSpacing: "0.06em", lineHeight: "1.2" }}>HOW A SMALL START CAN LOOK</span>
+                <span style={{ fontSize: "12px", fontWeight: "600", color: "#1E4D41", opacity: 0.9, marginTop: "2px", lineHeight: "1.2" }}>Example only · no steps done</span>
               </div>
             </div>
 
@@ -2350,7 +2272,7 @@ export default function NextEasiestStepExperience() {
                 boxSizing: "border-box"
               }}
             >
-              {/* STEP 1: Foundation Completed */}
+              {/* STEP 1: Choose one task */}
               <div style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%" }}>
                 {/* Outer Golden/Cream Circle with checkmark */}
                 <div style={{
@@ -2384,13 +2306,13 @@ export default function NextEasiestStepExperience() {
                     letterSpacing: "0.06em",
                     textTransform: "uppercase"
                   }}>
-                    Completed
+                    Example
                   </div>
                   <span style={{ fontSize: "15px", fontWeight: "700", fontFamily: "var(--font-headline)", color: "#F7F2D8", letterSpacing: "-0.01em", marginTop: "2px" }}>
-                    Foundation Completed
+                    Choose one task
                   </span>
                   <span style={{ fontSize: "11.5px", fontWeight: "400", color: "rgba(247, 242, 216, 0.72)", letterSpacing: "-0.01em" }}>
-                    You started. That counts.
+                    Start with one small action.
                   </span>
                 </div>
               </div>
@@ -2569,12 +2491,12 @@ export default function NextEasiestStepExperience() {
                 transition: "all 0.2s"
               }}
             >
-              ⚡ Speedy (5)
+              One step
             </button>
             <button
               onClick={() => {
                 playClick();
-                setGameState(prev => ({ ...prev, pathLength: "regular" }));
+                setGameState(prev => ({ ...prev, pathLength: "speedy" }));
               }}
               style={{
                 flex: 1,
@@ -2590,7 +2512,7 @@ export default function NextEasiestStepExperience() {
                 transition: "all 0.2s"
               }}
             >
-              ✨ Regular (10)
+              Three steps
             </button>
             <button
               onClick={() => {
@@ -2611,7 +2533,7 @@ export default function NextEasiestStepExperience() {
                 transition: "all 0.2s"
               }}
             >
-              🎯 Mini (20 max)
+              Five steps
             </button>
           </div>
 
@@ -3039,7 +2961,7 @@ export default function NextEasiestStepExperience() {
                 alignItems: "center",
                 justifyContent: "center",
                 transition: "background 0.2s",
-                minHeight: "36px",
+                minHeight: "48px",
                 marginRight: "48px"
               }}
             >
@@ -3081,7 +3003,7 @@ export default function NextEasiestStepExperience() {
               zIndex: 2
             }}>
               {gameState.ladder.map((step, idx) => {
-                const isCompleted = idx < gameState.currentStepIndex;
+                const isCompleted = step.status === "done";
                 const isCurrent = idx === gameState.currentStepIndex;
                 const size = isCurrent ? 18 : 14; // bigger circles
                 return (
@@ -3176,9 +3098,97 @@ export default function NextEasiestStepExperience() {
             </p>
           </div>
 
+          {/* Action buttons with correct heights (Upgraded to Image 2 side-by-side pills) */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", zIndex: 5, paddingBottom: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "12px", width: "100%" }}>
+              <button
+                className="btn-primary btn-primary-inverse"
+                style={{
+                  height: "56px",
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  borderRadius: "28px",
+                  border: "none",
+                  background: "#D6DFAB",
+                  color: "var(--text-burgundy)",
+                  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)",
+                  cursor: "pointer"
+                }}
+                onClick={() => setShowPause(true)}
+              >
+                Pause
+              </button>
+
+              <button
+                className="btn-primary btn-primary-inverse"
+                style={{
+                  height: "56px",
+                  fontSize: "16px",
+                  fontWeight: "800",
+                  borderRadius: "28px",
+                  border: "none",
+                  background: "#D6DFAB",
+                  color: "var(--text-burgundy)",
+                  boxShadow: "0 10px 24px rgba(214, 223, 171, 0.25)",
+                  cursor: "pointer"
+                }}
+                onClick={handleCompleteStep}
+              >
+                Done ✓
+              </button>
+            </div>
+
+            <button
+              className="btn-secondary btn-secondary-ghost-light"
+              style={{ minHeight: "48px", borderRadius: "24px", border: "1.5px solid rgba(214,223,171,0.3)", color: "#D6DFAB" }}
+              onClick={() => {
+                playClick();
+                setEasierOptionsVisible(!easierOptionsVisible);
+              }}
+            >
+              Too hard? Make it easier
+            </button>
+
+            <div className="nes-actions nes-light">
+              <button onClick={() => setEditStep(currentStep?.title || "")}>Edit step</button>
+              <button onClick={() => advanceStep("skipped")}>Skip this step</button>
+              <button disabled={!gameState.currentStepIndex} onClick={() => setGameState(undoNextStep)}>Undo previous</button>
+              <button onClick={() => navigateTo("dashboard")}>Finish for now</button>
+            </div>
+            {editStep !== null && <form className="nes-quick" onSubmit={e => { e.preventDefault(); if (editStep.trim()) { chooseEasier(editStep.trim()); setEditStep(null); } }}>
+              <label htmlFor="nes-step-edit">Your small action</label><input id="nes-step-edit" value={editStep} maxLength={200} onChange={e => setEditStep(e.target.value)} />
+              <button disabled={!editStep.trim()}>Use this step</button><button type="button" onClick={() => setEditStep(null)}>Cancel edit</button>
+            </form>}
+            {easierOptionsVisible && currentStep && currentStep.easier && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "4px" }}>
+                {currentStep.easier.map((easyTitle, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => chooseEasier(easyTitle)}
+                    className="card"
+                    style={{
+                      textAlign: "left",
+                      width: "100%",
+                      padding: "14px 18px",
+                      cursor: "pointer",
+                      background: "#FFFFFF",
+                      borderRadius: "18px",
+                      border: "1.5px solid rgba(90, 36, 48, 0.08)",
+                      boxShadow: "0 4px 12px rgba(90, 36, 48, 0.03)"
+                    }}
+                  >
+                    <span className="micro" style={{ color: ACCENT_CORAL, fontSize: "9px", fontWeight: "800" }}>EASIER MICRO-OPTION</span>
+                    <div style={{ fontWeight: "800", fontSize: "14px", color: "var(--text-burgundy)", marginTop: "4px" }}>
+                      {easyTitle} • <span style={{ opacity: 0.6, fontWeight: "normal" }}>&lt;15 sec</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {/* Statistics row with enhanced size & prominence (Perfect Visual Balance) */}
           <div style={{ display: "flex", gap: "28px", marginBottom: "28px", marginTop: "28px", alignItems: "center", padding: "0 10px", zIndex: 5, flexShrink: 0 }}>
-            {/* Dopamine Tank (Skeuomorphic gold-liquid capsule matching Image 1) */}
+            {/* Progress capsule (Skeuomorphic gold-liquid capsule matching Image 1) */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
               <span style={{ 
                 color: "#FAF6E3", 
@@ -3189,7 +3199,7 @@ export default function NextEasiestStepExperience() {
                 fontFamily: "var(--font-body)",
                 textTransform: "capitalize"
               }}>
-                Dopamine Tank — {gameState.dopamineLevel}%
+                Steps done — {progressPct}%
               </span>
               
               <div style={{ 
@@ -3209,7 +3219,7 @@ export default function NextEasiestStepExperience() {
                   bottom: "3px", 
                   left: "3px", 
                   right: "3px", 
-                  height: `calc(${gameState.dopamineLevel}% - 6px)`, 
+                  height: `calc(${progressPct}% - 6px)`,
                   background: "linear-gradient(to top, #DE9E36 0%, #F3D277 60%, #FFEFA6 100%)", // Rich gold gradient from Image 1
                   borderRadius: "24px",
                   transition: "height 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -3262,17 +3272,17 @@ export default function NextEasiestStepExperience() {
               </div>
             </div>
             
-            {/* Brain Warming Stage */}
+            {/* Task progress */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
-              <p className="micro" style={{ margin: 0, color: "#D6DFAB", fontSize: "10px", fontWeight: "800", letterSpacing: "0.1em" }}>BRAIN WARMING STATUS</p>
+              <p className="micro" style={{ margin: 0, color: "#D6DFAB", fontSize: "10px", fontWeight: "800", letterSpacing: "0.1em" }}>THIS TASK</p>
               <p style={{ fontSize: "22px", fontWeight: "900", margin: 0, color: "#D6DFAB", fontFamily: "var(--font-headline)" }}>
-                Stage {gameState.brainWarmingStage} of 3
+                {doneCount} done · {skippedCount} skipped
               </p>
               <div className="progress-track progress-track-light" style={{ width: "100%", height: "10px", borderRadius: "5px" }}>
                 <div 
                   className="progress-fill" 
                   style={{ 
-                    width: `${warmingProgressPct}%`,
+                    width: `${progressPct}%`,
                     background: "var(--primary-light)",
                     borderRadius: "5px"
                   }}
@@ -3281,84 +3291,6 @@ export default function NextEasiestStepExperience() {
             </div>
           </div>
 
-          {/* Action buttons with correct heights (Upgraded to Image 2 side-by-side pills) */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", zIndex: 5, paddingBottom: "16px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "12px", width: "100%" }}>
-              <button 
-                className="btn-primary btn-primary-inverse"
-                style={{ 
-                  height: "56px", 
-                  fontSize: "16px", 
-                  fontWeight: "700", 
-                  borderRadius: "28px", 
-                  border: "none", 
-                  background: "#D6DFAB", 
-                  color: "var(--text-burgundy)",
-                  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)",
-                  cursor: "pointer"
-                }}
-                onClick={() => setShowPause(true)}
-              >
-                Pause
-              </button>
-              
-              <button 
-                className="btn-primary btn-primary-inverse"
-                style={{ 
-                  height: "56px", 
-                  fontSize: "16px", 
-                  fontWeight: "800", 
-                  borderRadius: "28px", 
-                  border: "none", 
-                  background: "#D6DFAB", 
-                  color: "var(--text-burgundy)",
-                  boxShadow: "0 10px 24px rgba(214, 223, 171, 0.25)",
-                  cursor: "pointer"
-                }}
-                onClick={handleCompleteStep}
-              >
-                Done ✓
-              </button>
-            </div>
-            
-            <button 
-              className="btn-secondary btn-secondary-ghost-light"
-              style={{ minHeight: "48px", borderRadius: "24px", border: "1.5px solid rgba(214,223,171,0.3)", color: "#D6DFAB" }}
-              onClick={() => {
-                playClick();
-                setEasierOptionsVisible(!easierOptionsVisible);
-              }}
-            >
-              Too hard? Make it easier
-            </button>
-
-            {easierOptionsVisible && currentStep && currentStep.easier && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "4px" }}>
-                {currentStep.easier.map((easyTitle, idx) => (
-                  <button
-                    key={idx}
-                    onClick={handleCompleteStep}
-                    className="card"
-                    style={{ 
-                      textAlign: "left", 
-                      width: "100%", 
-                      padding: "14px 18px", 
-                      cursor: "pointer",
-                      background: "#FFFFFF",
-                      borderRadius: "18px",
-                      border: "1.5px solid rgba(90, 36, 48, 0.08)",
-                      boxShadow: "0 4px 12px rgba(90, 36, 48, 0.03)"
-                    }}
-                  >
-                    <span className="micro" style={{ color: ACCENT_CORAL, fontSize: "9px", fontWeight: "800" }}>EASIER MICRO-OPTION</span>
-                    <div style={{ fontWeight: "800", fontSize: "14px", color: "var(--text-burgundy)", marginTop: "4px" }}>
-                      {easyTitle} • <span style={{ opacity: 0.6, fontWeight: "normal" }}>&lt;15 sec</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       )}
 
@@ -3394,16 +3326,24 @@ export default function NextEasiestStepExperience() {
             <span style={{ position: "absolute", bottom: "12%", right: "15%", color: "#FFD700", opacity: 0.3, fontSize: "14px", textShadow: "0 0 5px #FFD700" }}>✧</span>
           </div>
 
-          <p className="micro" style={{ zIndex: 5, color: "#ffffff", opacity: 0.85, fontWeight: "700" }}>YOUR PROGRESS • TODAY</p>
+          <p className="micro" style={{ zIndex: 5, color: "#ffffff", opacity: 0.85, fontWeight: "700" }}>YOUR PROGRESS • THIS TASK</p>
           
           <h1 className="h1" style={{ fontSize: "32px", marginTop: "8px", lineHeight: "1.15", zIndex: 5, color: "#FFD700", textShadow: "0 0 10px rgba(255, 215, 0, 0.25)" }}>
-            You did<br />{gameState.winsToday} easy wins.
+            {doneCount} {doneCount === 1 ? "step" : "steps"}<br />marked done.
           </h1>
           
           <p className="subtitle" style={{ color: "#a5f3fc", marginTop: "6px", fontSize: "14px", fontWeight: "600", letterSpacing: "-0.01em", lineHeight: "1.35", zIndex: 5, opacity: 0.95 }}>
-            That is {gameState.winsToday} more than frozen. Dopamine Tank is {gameState.dopamineLevel}% full — your brain is warming up.
+            Steps marked done: {doneCount}. Skipped: {skippedCount}.
           </p>
 
+          <section className="nes-quick" style={{ zIndex: 5 }}>
+            <fieldset><legend>Did getting started become easier? Optional.</legend>
+              {[["easier", "Easier"], ["same", "No change"], ["harder", "Harder"], ["unsure", "Not sure"]].map(([id, label]) => <button key={id} aria-pressed={gettingStarted === id} onClick={() => setGettingStarted(id)}>{label}</button>)}
+            </fieldset>
+            <fieldset><legend>Was this helpful? Optional.</legend>{HELPFULNESS.map(item => <button key={item.id} aria-pressed={helpfulness === item.id} onClick={() => setHelpfulness(item.id)}>{item.label}</button>)}</fieldset>
+            <button onClick={finish} disabled={gameState.submitted || !onComplete}>Continue to final rating</button>
+            <button disabled={!gameState.currentStepIndex} onClick={() => setGameState(undoNextStep)}>Undo previous</button>
+          </section>
           <div className="grid-2" style={{ marginTop: "16px", zIndex: 5, gap: "12px" }}>
             {/* Steps done card (Dark Red and Light Blue writing, 20% size reduction, gold outline) */}
             <div className="card" style={{ 
@@ -3451,7 +3391,7 @@ export default function NextEasiestStepExperience() {
               </div>
             </div>
 
-            {/* Dopamine card (Dark Red and Light Blue writing, 20% size reduction, gold outline, glowing percent) */}
+            {/* Progress card (Dark Red and Light Blue writing, 20% size reduction, gold outline, glowing percent) */}
             <div className="card" style={{ 
               background: "linear-gradient(135deg, rgba(128, 12, 20, 0.95) 0%, rgba(95, 8, 14, 0.85) 100%)", 
               color: "#a5f3fc", 
@@ -3467,7 +3407,7 @@ export default function NextEasiestStepExperience() {
               padding: "12px 14px",
               position: "relative"
             }}>
-              {/* Mini visual Dopamine Level indicator inside card (20% reduced height, slight gold glow) */}
+              {/* Mini visual Completion percentage indicator inside card (20% reduced height, slight gold glow) */}
               <div style={{ 
                 position: "absolute", 
                 right: "14px", 
@@ -3485,7 +3425,7 @@ export default function NextEasiestStepExperience() {
                   bottom: "2px", 
                   left: "2px", 
                   right: "2px", 
-                  height: `calc(${gameState.dopamineLevel}% - 4px)`, 
+                  height: `calc(${progressPct}% - 4px)`,
                   background: "linear-gradient(to top, #DE9E36 0%, #F3D277 60%, #FFEFA6 100%)", 
                   borderRadius: "8px",
                   transition: "height 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -3545,7 +3485,7 @@ export default function NextEasiestStepExperience() {
                   fontFamily: "var(--font-headline)",
                   textShadow: "0 0 10px rgba(165, 243, 252, 0.8), 0 0 20px rgba(165, 243, 252, 0.4)" // Text glow
                 }}>
-                  {gameState.dopamineLevel}%
+                  {progressPct}%
                 </div>
                 <div className="micro" style={{ 
                   color: "#a5f3fc", 
@@ -3553,7 +3493,7 @@ export default function NextEasiestStepExperience() {
                   fontWeight: "800", 
                   opacity: 0.9,
                   textShadow: "0 0 8px rgba(165, 243, 252, 0.5)" // Sub-text glow
-                }}>Dopamine</div>
+                }}>Steps done</div>
               </div>
             </div>
           </div>
@@ -3575,13 +3515,13 @@ export default function NextEasiestStepExperience() {
               <div className="micro" style={{ color: "#a5f3fc", fontWeight: "800", opacity: 0.9 }}>CURRENT LADDER STATUS</div>
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: "8px", alignItems: "center" }}>
                 <span style={{ fontWeight: "800", fontSize: "13px" }}>{gameState.task}</span>
-                <span className="micro" style={{ fontSize: "9px", fontWeight: "800", color: "#a5f3fc" }}>{gameState.currentStepIndex + 1} / {gameState.ladder.length || 10}</span>
+                <span className="micro" style={{ fontSize: "9px", fontWeight: "800", color: "#a5f3fc" }}>{doneCount} / {gameState.ladder.length} done</span>
               </div>
               <div style={{ height: "3px", background: "rgba(165, 243, 252, 0.15)", borderRadius: "1.5px", overflow: "hidden", width: "100%", marginTop: "8px" }}>
                 <div 
                   style={{ 
                     height: "100%", 
-                    width: `${((gameState.currentStepIndex) / (gameState.ladder.length || 10)) * 100}%`, 
+                    width: `${progressPct}%`,
                     background: "#a5f3fc",
                     boxShadow: "0 0 6px #a5f3fc",
                     borderRadius: "1.5px"
@@ -3620,7 +3560,7 @@ export default function NextEasiestStepExperience() {
               zIndex: 10,
               letterSpacing: "0.08em"
             }}>
-              ✦ GOLDEN TRUTH
+              ✦ A SMALL REMINDER
             </div>
 
             {/* Elegant Confetti Splash Background (Faded low-opacity behind the text) */}
@@ -3649,17 +3589,15 @@ export default function NextEasiestStepExperience() {
                 WebkitTextFillColor: "transparent",
                 animation: "torchSweep 4s linear infinite"
               }}>
-                "We often anticipate tasks to be harder than they actually are. If we break them down into small steps, they feel a lot easier to action. Any task, even those that seem beyond our means, become as simple as the ones you just did. You'll be surprised at how far we can travel once we get going."
+                "One small action can be enough for now. If starting still feels hard, you can make the step smaller, choose another task, or stop here."
               </p>
             </div>
           </div>
 
           {/* Action buttons with neon play pulse & glowing card-button (20% reduced size, pushed up) */}
           <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "10px", zIndex: 5 }}>
-            {/* The dashboard is only ever reached once the current ladder is
-                fully done (see handleCompleteStep), so the next action here
-                is always to start a fresh task, never to "continue" the one
-                that just finished. */}
+            {/* A different task starts a new local ladder. Shared history is
+                recorded only through Continue to final rating above. */}
             <div
               className="card play-pulse-glow"
               role="button"
@@ -3699,7 +3637,7 @@ export default function NextEasiestStepExperience() {
               </div>
             </div>
             
-            {/* Split Option: Reset Day on left (40% width) and Return Home on right (60% width) with light blue fill, dark blue text */}
+            {/* Split Option: Start over on left (40% width) and Return Home on right (60% width) with light blue fill, dark blue text */}
             <div style={{ display: "flex", gap: "10px", width: "100%" }}>
               <button 
                 className="btn-secondary" 
@@ -3717,7 +3655,7 @@ export default function NextEasiestStepExperience() {
                   transition: "all 0.2s ease"
                 }}
               >
-                Reset Day
+                Start over
               </button>
 
               <button 
@@ -3742,7 +3680,7 @@ export default function NextEasiestStepExperience() {
                 }}
               >
                 <Home size={14} />
-                Return Home
+                Back to tasks
               </button>
             </div>
           </div>
@@ -3774,11 +3712,11 @@ export default function NextEasiestStepExperience() {
             </p>
             
             <h2 className="h2" style={{ marginTop: "8px", color: "var(--text-burgundy)", fontSize: "24px", lineHeight: "1.1", letterSpacing: "-0.03em" }}>
-              It's okay to pause.<br />Progress is saved.
+              It's okay to pause.<br />{storageStatus ? 'Saving unavailable.' : 'Saved on this device.'}
             </h2>
             
             <p className="subtitle" style={{ color: "var(--text-muted)", fontSize: "13.5px", marginTop: "12px", letterSpacing: "-0.01em", lineHeight: "1.5" }}>
-              Your Dopamine Tank stays filled.<br />Your Ladder stays exactly where it is.<br />No timer, no guilt.
+              Your task stays here while you pause.<br />No timer, no guilt.
             </p>
 
             {/* Stats row inside card */}
@@ -3788,12 +3726,12 @@ export default function NextEasiestStepExperience() {
                 <div className="micro" style={{ fontSize: "9px" }}>Done</div>
               </div>
               <div style={{ flex: 1, textAlign: "center" }}>
-                <div style={{ fontWeight: "800", fontSize: "18px", color: "var(--text-burgundy)" }}>{gameState.dopamineLevel}%</div>
-                <div className="micro" style={{ fontSize: "9px" }}>Dopamine</div>
+                <div style={{ fontWeight: "800", fontSize: "18px", color: "var(--text-burgundy)" }}>{progressPct}%</div>
+                <div className="micro" style={{ fontSize: "9px" }}>Steps done</div>
               </div>
               <div style={{ flex: 1, textAlign: "center" }}>
-                <div style={{ fontWeight: "800", fontSize: "18px", color: "var(--text-burgundy)" }}>Stage {gameState.brainWarmingStage}</div>
-                <div className="micro" style={{ fontSize: "9px" }}>Warming</div>
+                <div style={{ fontWeight: "800", fontSize: "18px", color: "var(--text-burgundy)" }}>{skippedCount}</div>
+                <div className="micro" style={{ fontSize: "9px" }}>Skipped</div>
               </div>
             </div>
 
@@ -3824,7 +3762,7 @@ export default function NextEasiestStepExperience() {
               onClick={handleResetDay}
               style={{ background: "none", border: "none", marginTop: "16px", color: "var(--text-muted)", fontSize: "13px", textDecoration: "underline", cursor: "pointer", minHeight: "48px" }}
             >
-              Reset Day
+              Start over
             </button>
           </div>
         </div>

@@ -70,7 +70,7 @@ export function deleteAllLocalAppData() {
   if (!local) return;
   const keys = Array.from({ length: local.length }, (_, index) => local.key(index)).filter(Boolean);
   for (const key of keys) {
-    if (APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
+    if (key === "mentication_nes_v2_app_state" || APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
   }
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
   notifyAccessibilityPreferencesChanged();

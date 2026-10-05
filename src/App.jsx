@@ -20,7 +20,6 @@ import { useSystemDarkMode } from '@/hooks/useSystemDarkMode';
 import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
 import { hasCompletedOnboarding } from '@/lib/onboarding';
-import WithBrandThreshold from '@/components/brand/WithBrandThreshold';
 
 // Route page components are loaded on demand to keep the initial bundle small.
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
@@ -28,7 +27,6 @@ import WithBrandThreshold from '@/components/brand/WithBrandThreshold';
 const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
 const ChangeSceneFollowup = lazy(() => import('@/pages/ChangeSceneFollowup'));
 const LiftFollowup = lazy(() => import('@/pages/LiftFollowup'));
-const NextEasiestStepExperience = lazy(() => import('@/components/NextEasiestStepExperience'));
 const Crisis = lazy(() => import('@/pages/Crisis'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Welcome = lazy(() => import('@/pages/Welcome'));
@@ -105,8 +103,8 @@ const MenticationRoutes = () => {
                 <Route path="/reset" element={<ResetFlow />} />
                 <Route path="/scene-followup" element={<ChangeSceneFollowup />} />
                 <Route path="/lift-followup" element={<LiftFollowup />} />
-                <Route path="/next-easiest-step" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience /></WithBrandThreshold>} />
-                <Route path="/next-easiest-step-v2" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience /></WithBrandThreshold>} />
+                <Route path="/next-easiest-step" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["nextAction"], direction: "focus", intensity: null, audio: "no" }} />} />
+                <Route path="/next-easiest-step-v2" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["nextAction"], direction: "focus", intensity: null, audio: "no" }} />} />
                 <Route path="/journal" element={<Journal />} />
                 <Route path="/dear-2100" element={<Dear2100 />} />
                 <Route path="/night-channel" element={<NightChannel />} />
