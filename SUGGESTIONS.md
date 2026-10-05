@@ -91,6 +91,35 @@ Shown once, after someone's first finished reset:
   hardcoded label inside a minified, single-file build the brand doc marks as
   your finished design (not to be hand-edited without asking), so flagging
   the mismatch rather than guessing at fixing text inside that file myself.
+  Gave Vector Shift its own dedicated walkthrough this round (the last of the
+  three finished standalone builds without one) and found the same "VECTOR ·
+  4 STEP · FELT SAFE" line hardcoded a second time, in the separate, plainer
+  version of Vector Shift used when it's reached as one step inside a longer
+  built plan rather than opened on its own (`VectorShiftExperience` in
+  `src/components/NewFlagshipExperiences.jsx`, line 84). Same wording
+  question as above, just worth knowing it's in two places, not one. No
+  other problems found walking that version's own Terminal → Align → Serpent
+  → Code → Reframe sequence.
+
+- **Change the Scene collects a chip choice, a "cozy" toggle and a planned
+  thing, but nothing in the screen ever lets anyone set them.** `selectedChip`,
+  `isCozy` and `plannedThing` in `ChangeSceneExperience.jsx` are read (they're
+  saved into the session and handed to whatever reads the finished session
+  data) but their setters are never called from anywhere on screen, so they
+  stay at their empty starting value for every single person, forever. Looks
+  like the start of a feature (picking a chip, marking the space "cozy",
+  writing down a planned thing) that never got wired to a control. Left alone
+  rather than guessed at, since adding the missing control is a design
+  decision, not a copy fix.
+
+- **5-4-3-2-1 Grounding's player takes a "discreet" setting it never uses.**
+  `GroundingV2Stage.jsx` accepts a `discreet` prop (the wider app already has
+  a real "Just discreetly" choice, used elsewhere to pick quieter
+  interventions) but nothing inside this file reads it — so if the intent was
+  ever for Grounding's own screen to go quieter or less visible in discreet
+  mode, that part was never built. Left alone rather than guessed at, since
+  deciding what "discreet" should actually change about this screen is a
+  product call, not a copy fix.
 
 - **The new Home screen's Premium card carries its "PREMIUM CONTENT / Coming
   soon" wording baked into the photo itself**
