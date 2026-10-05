@@ -1,3 +1,4 @@
+import { learningResponse } from "./attemptFeedback.js";
 // Mentication Recommendation Engine V3
 // Two-stage model:
 //   1) hard eligibility (never relaxed)
@@ -538,7 +539,7 @@ export function computeEffectivenessV3(sessions = [], helpers = {}) {
     });
 
     const answeredIds = new Set((session.attempts || [])
-      .filter((attempt) => rewardForResponse(attempt?.response) != null)
+      .filter((attempt) => rewardForResponse(learningResponse(attempt)) != null)
       .map((attempt) => resolveId(attempt.intervention_id)).filter(Boolean));
     const completedIds = [...new Set([
       ...(session.completed_pathway || []),
@@ -557,7 +558,7 @@ export function computeEffectivenessV3(sessions = [], helpers = {}) {
     }
 
     (session.attempts || []).forEach((attempt) => {
-      const response = lower(attempt?.response);
+      const response = lower(learningResponse(attempt));
       if (!response || response === "not_answered") return; // unanswered is not neutral evidence
       const reward = rewardForResponse(response);
       if (reward == null) return;

@@ -1,3 +1,5 @@
+import { goalPointChange } from "./goalAssessment.js";
+import { withMeasuredResponse } from "./attemptFeedback.js";
 // These are optional, separately opened journeys, not additional short-reset
 // catalogue entries. Mood and distress use independent, explicitly answered scales.
 export const LIFT_JOURNEYS = Object.freeze([
@@ -33,6 +35,6 @@ export function withLiftCheckin(session, mood, distress, answeredAt = new Date()
     intensity_end: mood,
     post_happy_bump_checkin: { mood, distress, answered_at: answeredAt },
     attempts: (session.attempts || []).map((attempt) => attempt.intervention_id === 'happyBump' && attempt.exit_reason === 'completed'
-      ? { ...attempt, response: moodResponse(session.intensity_start, mood) } : attempt),
+      ? withMeasuredResponse(attempt, goalPointChange(session.goal_baseline, "lift", mood) == null ? "not_answered" : moodResponse(session.goal_baseline.value, mood)) : attempt),
   };
 }
