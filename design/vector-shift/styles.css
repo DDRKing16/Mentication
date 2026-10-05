@@ -1,0 +1,35 @@
+/* Preserve the approved colours/art; readable controls sit outside game effects. */
+html {scrollbar-gutter:stable}
+body {margin:0;background:#0f2f23;color:#fff8e7}
+button {min-height:44px;touch-action:manipulation}
+button:focus-visible {outline:3px solid #fff8e7;outline-offset:4px}
+button:disabled {opacity:.55}
+.vs-stage {font-size:24px;font-weight:700;padding:20px 20px 8px;text-align:center;position:relative;z-index:10}
+.vs-instructions {position:relative;z-index:21;width:min(100%,680px);padding:16px;margin:8px auto 20px;background:#153c2c;border:1px solid #658676;border-radius:16px;color:#fff8e7;font-size:16px;line-height:1.6;letter-spacing:normal}
+.vs-instructions p+p {margin-top:12px}
+.vs-instructions button,.vs-feedback button,.vs-dialog button,.vs-controls button {padding:10px 16px;border:1px solid #b5c8b8;border-radius:22px;background:#fff8e7;color:#0f2a1f;font-size:16px;line-height:1.4;font-weight:600;letter-spacing:normal;min-height:44px;margin:6px 4px 0 0}
+.vs-feedback button[aria-pressed=true],.vs-instructions button[aria-pressed=true] {background:#00ff88;border-color:#00ff88}
+.vs-feedback {font-size:16px;line-height:1.5}
+.vs-feedback p {margin:16px 0}
+.vs-controls {position:sticky;bottom:0;z-index:60;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:12px 12px max(12px,env(safe-area-inset-bottom));background:#0f2a1f;border-top:1px solid #658676}
+.vs-controls button {margin:0}
+.vs-overlay {position:fixed;inset:0;z-index:100;background:#071c16e8;display:grid;place-items:center;padding:20px;overflow:auto}
+.vs-dialog {background:#153c2c;border:1px solid #a5bcae;border-radius:24px;padding:24px;max-width:440px;font-size:17px;line-height:1.6}
+.vs-dialog h2 {font-size:26px;font-weight:700;margin-bottom:12px}
+.vs-paused * {animation-play-state:paused!important}
+.vs-reframe {width:100%;border-radius:24px}
+.vs-scan-list {display:flex;flex-wrap:wrap;gap:6px}
+/* Increase small instructional text without changing drawn art geometry. */
+[class*="text-[10px]"],[class*="text-[11px]"],[class*="text-[12px]"] {font-size:14px;letter-spacing:.03em}
+[class*="text-white/30"],[class*="text-white/35"],[class*="text-white/50"],[class*="text-white/60"] {color:#c5d6cc}
+@media(max-width:420px){
+  .grid-cols-7 {gap:3px}
+  .grid-cols-7 button {width:36px;min-width:0;height:44px}
+  .vs-instructions{padding:14px}
+  .vs-controls{gap:6px}
+  .vs-controls button{font-size:14px;padding:10px 12px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.vs-game-metrics {gap:12px;flex-wrap:wrap;line-height:1.6}
+.vs-ending p {color:#d4e2d9!important;letter-spacing:.02em;font-style:normal}

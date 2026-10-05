@@ -1,0 +1,10 @@
+{
+  "results": [
+    "Real direct entry → explicit baseline → Begin → browser Back → Begin resumes → refresh retains session, baseline and paused Serpent",
+    "Final-assessment refresh fallback preserves final screen; skipped end rating remains null and saves once (shared direct-resume patch pending)"
+  ],
+  "errors": [],
+  "knownIssues": [
+    "Shared ResetFlow browser Forward remains on overview; Begin is needed to resume. Owner notified."
+  ]
+}

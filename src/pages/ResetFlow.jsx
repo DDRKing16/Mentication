@@ -29,6 +29,7 @@ const ThoughtOrFactExperience = lazy(() => import("@/components/ThoughtOrFactExp
 const UrgeSurfExperience = lazy(() => import("@/components/UrgeSurfExperience"));
 const NextEasiestStepExperience = lazy(() => import("@/components/NextEasiestStepExperience"));
 const ChangeSceneExperience = lazy(() => import("@/components/ChangeSceneExperience"));
+const VectorShiftFrame = lazy(() => import("@/components/VectorShiftFrame"));
 const TomorrowParkingExperience = lazy(() => import("@/components/TomorrowParkingExperience"));
 import {
   buildPathway,
@@ -663,14 +664,16 @@ export default function ResetFlow() {
     // Signal Lock, Vector Shift and Night Channel are finished standalone builds;
     // never show the simplified in-code stand-ins.
     const standaloneRoute = activePathway.length === 1 ? standaloneRouteFor(activePathway[0]?.id) : null;
-    if (standaloneRoute) return <Navigate to={standaloneRoute} replace state={activePathway[0]?.id === "nightChannel" ? { goal_baseline: answers.goal_baseline, direction: answers.direction } : undefined} />;
+    if (standaloneRoute && activePathway[0]?.id !== "vectorShift") return <Navigate to={standaloneRoute} replace state={activePathway[0]?.id === "nightChannel" ? { goal_baseline: answers.goal_baseline, direction: answers.direction } : undefined} />;
     const interactive = activePathway.length === 1 && isInteractiveFlagship(activePathway[0]?.id);
     if (interactive) {
       const interventionId = activePathway[0]?.id;
       // Each branch is a separately lazy-loaded component with its own props
       // shape; the union those component types produce is narrower than any
       // one of them, so the props passed below are typed loosely here.
-      const Experience = /** @type {any} */ (interventionId === "factCheck"
+      const Experience = /** @type {any} */ (interventionId === "vectorShift"
+        ? VectorShiftFrame
+        : interventionId === "factCheck"
         ? ThoughtOrFactExperience
         : interventionId === "urgeSurf"
           ? UrgeSurfExperience
@@ -688,6 +691,7 @@ export default function ResetFlow() {
         <Suspense fallback={<BuildingResetScreen />}>
         <Experience
           intervention={activePathway[0]}
+          sessionId={sessionIdRef.current}
           initialThought={interventionId === "factCheck" ? tofEntryThought : undefined}
           initialCertainty={interventionId === "factCheck" ? answers.intensity : undefined}
           answers={{ ...answers, intensity: lastValue }}

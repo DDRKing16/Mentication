@@ -1,0 +1,17 @@
+{
+  "results": [
+    "Align keyboard, pause freezes clock, focus stays in dialog, refresh resumes paused",
+    "All easier activities, word refresh, back/skip cancels delayed transition, stop/resume and all reflections",
+    "Original alignment completion waits during pause and advances after resume",
+    "Original serpent target collision and 15-target completion",
+    "Original word guessing, all 10 solar differences and reflection skip",
+    "Host ground: baseline 6 → 6, feedback same, identical scale, one session/attempt",
+    "Host ground: baseline 6 → 8, feedback worse, identical scale, one session/attempt",
+    "Host ground: baseline 6 → unanswered, feedback unanswered, identical scale, one session/attempt",
+    "Host calm: baseline 6 → 6, feedback unsure, identical scale, one session/attempt",
+    "Host lift: baseline 6 → 8, feedback helpful, identical scale, one session/attempt",
+    "Direct route without an answered baseline stays in shared check-in",
+    "No browser runtime errors; phone/desktop screenshots have no horizontal overflow"
+  ],
+  "errors": []
+}

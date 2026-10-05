@@ -1,7 +1,7 @@
 import React from "react";
-import StandaloneFrame from "@/components/brand/StandaloneFrame";
+import { Navigate } from "react-router-dom";
 
-// Vector Shift is a finished, self-contained build (public/vector-shift).
+// Direct entry uses the same explicitly answered baseline and completion path.
 export default function VectorShift() {
-  return <StandaloneFrame id="vectorShift" name="Vector Shift" src="/vector-shift/index.html" background="#0B2A1F" />;
+  return <Navigate to="/reset" replace state={{ prebuilt:true, pathway:["vectorShift"], direction:"ground", directionLabel:"Ground", whereFelt:"both", timeMin:5 }} />;
 }
