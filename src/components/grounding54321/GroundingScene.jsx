@@ -142,7 +142,7 @@ function sceneStyleForSense(sense, progress) {
 /**
  * @param {{ sense?: string, progress?: number }} props
  */
-export default function GroundingScene({ sense, progress = 0 }) {
+export default function GroundingScene({ sense, progress = 0, running = true, reducedMotion = false, discreet = false }) {
   const baseSceneStyle = sceneStyleForSense(sense, progress);
   const [handoffTick, setHandoffTick] = useState(0);
   const prevSenseRef = useRef(/** @type {string | null} */ (null));
@@ -158,7 +158,7 @@ export default function GroundingScene({ sense, progress = 0 }) {
   }, [sense]);
 
   return (
-    <div className="relative flex" style={GROUNDING_V2_FIELD_SIZE}>
+    <div className="grounding-accessible-scene relative flex" data-paused={!running} data-reduced-motion={reducedMotion} style={GROUNDING_V2_FIELD_SIZE}>
       {/* Shared wrapper carries the scale/brightness breathe animation so the
           glisten mask and sense overlay (siblings of the image) scale in
           lockstep and never drift out of alignment with the PNG. */}
@@ -175,7 +175,7 @@ export default function GroundingScene({ sense, progress = 0 }) {
           <div className="grounding-glisten" aria-hidden="true" />
         </div>
         {sense && <div key={`${sense}-${handoffTick}`} className="grounding-stage-handoff" aria-hidden="true" />}
-        <SenseOverlay sense={sense} progress={progress} />
+        <SenseOverlay sense={sense} progress={progress} hapticsEnabled={running && !reducedMotion && !discreet} />
       </div>
     </div>
   );

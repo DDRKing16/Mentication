@@ -41,13 +41,16 @@ const ANCHOR_SUGGESTIONS = [
   "The choice I want",
 ];
 
+export const URGE_INTENSITY_QUESTION = "How strong is the urge?";
+const INTENSITY_ANCHORS = "1 · Very mild — 10 · Extremely strong";
+
 const PRACTICE_STAGES = [
-  { label: "Notice", title: "Meet the wave", copy: "Notice the first pull in your body. Name its shape without needing it to change.", spoken: URGE_SURF_NARRATION.stages[0] },
+  { label: "Notice", title: "Meet the wave", copy: "Notice the urge or its trigger without needing to locate it in your body or make it change.", spoken: URGE_SURF_NARRATION.stages[0] },
   { label: "Allow", title: "Make room", copy: "Let the feeling gather. Soften around it instead of pushing it away.", spoken: URGE_SURF_NARRATION.stages[1] },
   { label: "Rise", title: "Ride the lift", copy: "As it builds, breathe into the edges. You can feel this without following it.", spoken: URGE_SURF_NARRATION.stages[2] },
-  { label: "Crest", title: "Stay at the crest", copy: "This is the peak—not forever. Stay on top of one slow, steady breath.", spoken: URGE_SURF_NARRATION.stages[3] },
-  { label: "Soften", title: "Feel it break", copy: "Notice the force beginning to fold. Let your jaw, shoulders, and hands release.", spoken: URGE_SURF_NARRATION.stages[4] },
-  { label: "Pass", title: "Watch it pass", copy: "Follow the last movement as it washes through and moves beyond you.", spoken: URGE_SURF_NARRATION.stages[5] },
+  { label: "Observe", title: "Notice what changes", copy: "The urge may rise, stay steady, or ease. Notice what is true for you.", spoken: URGE_SURF_NARRATION.stages[3] },
+  { label: "Steady", title: "Find a little steadiness", copy: "If it helps, loosen your jaw, shoulders, or hands. The urge does not have to soften.", spoken: URGE_SURF_NARRATION.stages[4] },
+  { label: "Choose", title: "Consider your next step", copy: "Notice the urge as this practice ends. You can choose a next step even if it is still strong.", spoken: URGE_SURF_NARRATION.stages[5] },
 ];
 
 const STAGE_SHARES = [0.12, 0.14, 0.22, 0.18, 0.21, 0.13];
@@ -146,11 +149,11 @@ function NameStage({ session, dispatch, onExit, audioEnabled }) {
         <div className="urge-lovable__intro">
           <p className="urge-lovable__eyebrow">Urge surfing</p>
           <p className="urge-lovable__reframe">You don’t have to fight this feeling.</p>
-          <h1>How strong is the urge?</h1>
+          <h1>{URGE_INTENSITY_QUESTION}</h1>
           <p>No need to change it. Just notice what’s here.</p>
         </div>
         <div className="urge-lovable__orb-wrap"><WaveOrb intensity={intensity} /></div>
-        <label className="sr-only" htmlFor="urge-intensity">How strong is the urge?</label>
+        <label className="sr-only" htmlFor="urge-intensity">{URGE_INTENSITY_QUESTION}</label>
         <input
           id="urge-intensity"
           className="urge-lovable__slider"
@@ -160,8 +163,10 @@ function NameStage({ session, dispatch, onExit, audioEnabled }) {
           value={intensity}
           onChange={(event) => dispatch({ type: "INITIAL_INTENSITY_SET", value: Number(event.target.value) })}
         />
+        <p>{INTENSITY_ANCHORS}</p>
+        <button type="button" className="urge-lovable__text-button" onClick={() => dispatch({ type: "INITIAL_INTENSITY_SET", value: intensity })}>Confirm {intensity} out of 10</button>
         <PrimaryButton disabled={!ready} onClick={() => dispatch({ type: "NAVIGATE", route: "urge.body" })}>
-          {ready ? "Continue" : "Move the scale to continue"}
+          {ready ? "Continue" : "Choose or confirm a rating"}
         </PrimaryButton>
       </div>
     </Shell>
@@ -171,7 +176,7 @@ function NameStage({ session, dispatch, onExit, audioEnabled }) {
 function BodyStage({ session, dispatch, audioEnabled }) {
   const region = session.bodyRegionKey;
   const sensation = session.sensationKeys[0] || null;
-  const ready = Boolean(region && sensation);
+  const ready = Boolean(session.environmentCueKey || (region && sensation));
   useUrgeNarration(URGE_SURF_NARRATION.body, audioEnabled);
   return (
     <Shell step={2} onBack={() => dispatch({ type: "NAVIGATE_BACK" })} backLabel="Back to urge intensity">
@@ -188,7 +193,10 @@ function BodyStage({ session, dispatch, audioEnabled }) {
             </button>
           ))}
         </fieldset>
-        <div className="urge-lovable__subheading urge-lovable__body-section-title"><p className="urge-lovable__eyebrow">Give it texture</p><h2>What does it feel like?</h2></div>
+        <fieldset className="urge-lovable__choice-grid"><legend>Or choose another starting point</legend>
+          {[["external", "Something around me"], ["not_sure", "Not sure / no clear sensation"]].map(([key, label]) => <button type="button" key={key} aria-pressed={session.environmentCueKey === key} className={session.environmentCueKey === key ? "is-selected" : ""} onClick={() => dispatch({ type: "ENVIRONMENT_CUE_SET", key })}>{label}</button>)}
+        </fieldset>
+        {!session.environmentCueKey && <><div className="urge-lovable__subheading urge-lovable__body-section-title"><p className="urge-lovable__eyebrow">Give it texture</p><h2>What does it feel like?</h2></div>
         <fieldset className="urge-lovable__sensation-grid">
           <legend className="sr-only">Sensation</legend>
           {SENSATIONS.map(([key, label]) => (
@@ -197,6 +205,7 @@ function BodyStage({ session, dispatch, audioEnabled }) {
             </button>
           ))}
         </fieldset>
+        </>}
         <PrimaryButton disabled={!ready} onClick={() => dispatch({ type: "NAVIGATE", route: "urge.anchor" })}>Continue</PrimaryButton>
       </div>
     </Shell>
@@ -253,7 +262,7 @@ function AnchorStage({ session, dispatch, audioEnabled }) {
           <span className="urge-lovable__range-labels"><small>30 sec</small><small>60 sec</small></span>
         </label>
         <PrimaryButton onClick={() => dispatch({ type: "TIMER_STARTED" })}>Start surfing</PrimaryButton>
-        <p className="urge-lovable__reassurance">You can ride any wave. You don’t have to act on it.</p>
+        <p className="urge-lovable__reassurance">You can pause or stop at any time, including if the urge gets stronger.</p>
       </div>
     </Shell>
   );
@@ -282,7 +291,7 @@ function TimerStage({ session, dispatch, audioEnabled }) {
   const stage = PRACTICE_STAGES[stageIndex] ?? PRACTICE_STAGES[0];
   const breathLabel = elapsed % 10 < 5 ? "Inhale slowly" : "Exhale slowly";
   const { speak, stop: stopNarration, pause: pauseNarration, resume: resumeNarration, preload } = useGuideVoice();
-  useUrgeSurfSoundscape({ active: true, enabled: audioEnabled, narrationActive, stageIndex });
+  useUrgeSurfSoundscape({ active: true, enabled: audioEnabled && !paused, narrationActive, stageIndex });
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -290,6 +299,16 @@ function TimerStage({ session, dispatch, audioEnabled }) {
     }, 250);
     return () => window.clearInterval(interval);
   }, [paused]);
+
+  useEffect(() => {
+    const pauseWhenHidden = () => {
+      if (!document.hidden) return;
+      dispatch({ type: "TIMER_PAUSED", nowEpochMs: Date.now() });
+      pauseNarration();
+    };
+    document.addEventListener("visibilitychange", pauseWhenHidden);
+    return () => document.removeEventListener("visibilitychange", pauseWhenHidden);
+  }, [dispatch, pauseNarration]);
 
   useEffect(() => {
     if (secondsLeft === 0) dispatch({ type: "TIMER_ELAPSED", nowEpochMs: now });
@@ -311,7 +330,7 @@ function TimerStage({ session, dispatch, audioEnabled }) {
     <Shell step={4}>
       <div className="urge-lovable__screen urge-lovable__practice">
         <div className="urge-lovable__practice-title">
-          <p>{BODY_AREAS.find(([key]) => key === session.bodyRegionKey)?.[1]} · {SENSATIONS.find(([key]) => key === session.sensationKeys[0])?.[1]}</p>
+          <p>{session.environmentCueKey ? "Notice what is here, without needing to locate it" : `${BODY_AREAS.find(([key]) => key === session.bodyRegionKey)?.[1]} · ${SENSATIONS.find(([key]) => key === session.sensationKeys[0])?.[1]}`}</p>
           <h1>{stage.title}</h1>
         </div>
         <div className="urge-lovable__practice-ocean">
@@ -357,10 +376,9 @@ function TimerStage({ session, dispatch, audioEnabled }) {
 }
 
 function PostRatingStage({ session, dispatch, audioEnabled }) {
-  const [afterIntensity, setAfterIntensity] = useState(session.initialIntensity ?? 5);
-  const [intensityTouched, setIntensityTouched] = useState(false);
-  const [choiceOutcome, setChoiceOutcome] = useState(null);
-  const ready = intensityTouched && choiceOutcome !== null;
+  const afterIntensity = session.postIntensity ?? session.initialIntensity ?? 5;
+  const choiceOutcome = session.choiceOutcome;
+  const ready = session.postIntensity !== null && choiceOutcome !== null;
   useUrgeNarration(URGE_SURF_NARRATION.postRating, audioEnabled);
   const complete = () => {
     dispatch({ type: "POST_INTENSITY_SELECTED", value: afterIntensity });
@@ -370,45 +388,48 @@ function PostRatingStage({ session, dispatch, audioEnabled }) {
     <Shell step={5}>
       <div className="urge-lovable__screen">
         <div className="urge-lovable__heading">
-          <p className="urge-lovable__eyebrow">Notice the shift</p>
-          <h1>Where is the wave now?</h1>
+          <p className="urge-lovable__eyebrow">Check in again</p>
+          <h1>{URGE_INTENSITY_QUESTION}</h1>
           <p>It may be softer, stronger, or simply different. Every answer is okay.</p>
         </div>
         <div className="urge-lovable__orb-wrap"><WaveOrb intensity={afterIntensity} breathing /></div>
         <input
-          aria-label="Current urge intensity"
+          aria-label={URGE_INTENSITY_QUESTION}
           className="urge-lovable__slider"
           type="range"
           min="1"
           max="10"
           value={afterIntensity}
-          onChange={(event) => { setAfterIntensity(Number(event.target.value)); setIntensityTouched(true); }}
+          onChange={(event) => dispatch({ type: "POST_INTENSITY_SELECTED", value: Number(event.target.value) })}
         />
+        <p>{INTENSITY_ANCHORS}</p>
+        <button type="button" className="urge-lovable__text-button" onClick={() => dispatch({ type: "POST_INTENSITY_SELECTED", value: afterIntensity })}>Confirm {afterIntensity} out of 10{afterIntensity === session.initialIntensity ? " · unchanged" : ""}</button>
         <fieldset className="urge-lovable__outcomes">
           <legend>Did the pause give you more room to choose?</legend>
-          {[["a_little", "Yes, some room"], ["not_yet", "Not yet"]].map(([value, label]) => (
-            <button type="button" key={value} className={choiceOutcome === value ? "is-selected" : ""} aria-pressed={choiceOutcome === value} onClick={() => setChoiceOutcome(value)}>{label}</button>
+          {[["a_little", "More room to choose"], ["not_yet", "No change"], ["stronger", "Less room / more unsettled"]].map(([value, label]) => (
+            <button type="button" key={value} className={choiceOutcome === value ? "is-selected" : ""} aria-pressed={choiceOutcome === value} onClick={() => dispatch({ type: "CHOICE_OUTCOME_SELECTED", value })}>{label}</button>
           ))}
         </fieldset>
-        <PrimaryButton disabled={!ready} onClick={complete}>{ready ? "Complete practice" : "Move the scale and choose"}</PrimaryButton>
-        <button type="button" className="urge-lovable__text-button" onClick={() => dispatch({ type: "CHOICE_OUTCOME_SET", value: null })}>I’d rather not say</button>
+        <PrimaryButton disabled={!ready} onClick={complete}>{ready ? "Complete practice" : "Confirm a rating and choose"}</PrimaryButton>
+        <button type="button" className="urge-lovable__text-button" onClick={() => dispatch({ type: "POST_RATING_SKIPPED" })}>I’d rather not say</button>
       </div>
     </Shell>
   );
 }
 
 function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
-  const { goBack } = useFlowNav();
   const navigate = useNavigate();
-  const totalSeconds = Math.round((session.timer.totalElapsedMs || session.timer.segmentDurationMs) / 1000);
+  const [nextAction, setNextAction] = useState(null);
+  const totalSeconds = Math.round(session.timer.totalElapsedMs / 1000);
   useUrgeNarration(URGE_SURF_NARRATION.complete, audioEnabled);
   return (
-    <Shell onBack={goBack} backLabel="Back" trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
+    <Shell onBack={() => dispatch({ type: "NAVIGATE_BACK" })} backLabel="Back to ratings" trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
       <div className="urge-lovable__screen urge-lovable__complete">
         <div className="urge-lovable__complete-mark"><Check aria-hidden="true" /></div>
-        <p className="urge-lovable__eyebrow">Wave passed</p>
-        <h1>You made space between feeling and action.</h1>
-        <p>The urge moved from <strong>{session.initialIntensity}</strong> to <strong>{session.postIntensity ?? "—"}</strong>. Whatever the number, you stayed present.</p>
+        <p className="urge-lovable__eyebrow">Practice complete</p>
+        <h1>{session.choiceOutcome === "a_little" ? "You noticed more room to choose." : session.choiceOutcome === "stronger" ? "You noticed less room to choose." : session.choiceOutcome === "not_yet" ? "You noticed no change in choice." : "Take the next step that fits."}</h1>
+        <p>{session.postIntensity == null ? "No final intensity rating was recorded." : `Urge intensity: ${session.initialIntensity} → ${session.postIntensity}. ${Math.abs(session.postIntensity - session.initialIntensity)} points ${session.postIntensity < session.initialIntensity ? "lower" : session.postIntensity > session.initialIntensity ? "higher" : "change"}.`}</p>
+        <p>{session.choiceOutcome === "stronger" ? "You can stop focusing on the urge, move away from the trigger, or reach out for support." : "The urge may still be here. Choose what would help you through the next few minutes."}</p>
         <div className="urge-lovable__time-rule"><span />{formatDuration(totalSeconds)} with the wave<span /></div>
         <label className="urge-lovable__save">
           <input type="checkbox" checked={session.savePreference} onChange={(event) => dispatch({ type: "SAVE_PREFERENCE_SET", value: event.target.checked })} />
@@ -418,10 +439,11 @@ function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
           <PrimaryButton onClick={() => onFinish("wait")}>Return home</PrimaryButton>
           <button type="button" onClick={() => dispatch({ type: "REPEAT_WAVE" })}>Ride it again</button>
           <button type="button" onClick={() => dispatch({ type: "EXTEND_TIMER" })}>Wait 10 more minutes</button>
-          <button type="button" onClick={() => onFinish("leave")}>Leave the trigger</button>
-          <button type="button" onClick={() => onFinish("substitute")}>Choose a substitute</button>
+          <button type="button" onClick={() => setNextAction("leave")}>Leave the trigger</button>
+          <button type="button" onClick={() => setNextAction("substitute")}>Choose a substitute</button>
           <button type="button" onClick={() => { dispatch({ type: "COMPLETION_ROUTE_SELECTED", route: "support" }); navigate("/support"); }}>Reach out for support</button>
         </div>
+        {nextAction && <section aria-live="polite"><h2>{nextAction === "leave" ? "Create some distance" : "Choose one substitute"}</h2><p>{nextAction === "leave" ? "If safe, close the app or put the triggering item out of reach. Move to another room or a place where you feel supported. Pick where you will go before continuing." : "Pick one safe action for the next few minutes: sip water, walk to another room, hold a familiar object, or contact someone supportive. Decide which one you will do now."}</p><PrimaryButton onClick={() => onFinish(nextAction)}>I have a next step · finish</PrimaryButton><button type="button" className="urge-lovable__text-button" onClick={() => setNextAction(null)}>Back to choices</button></section>}
         <a className="urge-lovable__support-link" href="https://findahelpline.com" target="_blank" rel="noreferrer">Need immediate support? <ExternalLink aria-hidden="true" /></a>
       </div>
     </Shell>
@@ -429,12 +451,9 @@ function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
 }
 
 export default function UrgeSurfExperience({ answers, onExit, onComplete }) {
-  const initialSession = useMemo(() => {
-    const initial = createUrgeSession();
-    return Number.isInteger(answers?.intensity) && answers.intensity >= 1 && answers.intensity <= 10
-      ? reduceUrgeSession(initial, { type: "INITIAL_INTENSITY_SET", value: answers.intensity })
-      : initial;
-  }, [answers?.intensity]);
+  // The shared goal baseline measures a different construct. Urge intensity
+  // always starts with an explicit answer to this experience's own question.
+  const initialSession = useMemo(() => createUrgeSession(), []);
   const [state, send] = useReducer(reduceUrgeSession, initialSession);
   const audioEnabled = !answers?.noAudio && answers?.audio === "yes";
 
@@ -447,7 +466,7 @@ export default function UrgeSurfExperience({ answers, onExit, onComplete }) {
       action,
       choiceOutcome: state.choiceOutcome,
     }) : undefined;
-    onComplete?.({ skipReflection: true, outcome });
+    onComplete?.({ requireGoalReassessment: true, outcome });
   };
 
   if (state.currentRoute === "urge.body") return <BodyStage session={state} dispatch={send} audioEnabled={audioEnabled} />;

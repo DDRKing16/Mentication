@@ -7,6 +7,7 @@ import {
 import StageVisual, { stageModeFor } from "@/components/StageVisual";
 import BrandThreadProgress from "@/components/brand/BrandThreadProgress";
 import BoxBreathingV2Stage from "@/components/BoxBreathingV2Stage";
+import GroundingFeedback from "@/components/grounding54321/GroundingFeedback";
 import GroundingV2Stage from "@/components/grounding54321/GroundingV2Stage";
 import PMRV2Stage from "@/components/PMRV2Stage";
 import {
@@ -36,6 +37,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   const [stepIndex, setStepIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(true);
+  const [showGroundingFeedback, setShowGroundingFeedback] = useState(false);
   const [showTimer, setShowTimer] = useState(true);
   const a11y = useAccessibilityPrefs();
   const [captions, setCaptions] = useState(a11y.prefs.captions !== false);
@@ -84,7 +86,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   useBoxBreathingSoundscape({ active: isBoxV2, narrationActive });
   // 5-4-3-2-1 Grounding V2 plays its own uploaded MP3 soundscape (with the same
   // volume + narration ducking as Box Breathing) throughout the whole exercise.
-  useGroundingSoundscape({ active: isGroundingV2, narrationActive, sense: step?.sense });
+  useGroundingSoundscape({ active: isGroundingV2 && !noAudio && narrate && running && !showGroundingFeedback, narrationActive, sense: step?.sense });
   usePMRSoundscape({
     active: isPMRV2 && !noAudio && !discreet,
     running,
@@ -223,12 +225,22 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noAudio, discreet]);
 
+  // Grounding stops when hidden and resumes only on an explicit Play tap.
+  useEffect(() => {
+    if (!isGroundingV2) return;
+    const onVisibility = () => {
+      if (document.hidden) { setRunning(false); pauseVoice(); }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [isGroundingV2, pauseVoice]);
+
   // ---- step timer ----
   useEffect(() => {
-    if (!running || transition || !step) return;
+    if (!running || transition || !step || (isGroundingV2 && narrate && !narrationEnded)) return;
     const t = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(t);
-  }, [running, transition, ivIndex, stepIndex]);
+  }, [running, transition, ivIndex, stepIndex, isGroundingV2, narrate, narrationEnded]);
 
   const goNextStep = useCallback(() => {
     if (!step) return;
@@ -282,6 +294,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // A safety cap (holdSec + 45s) prevents a step hanging if audio fails to load.
   useEffect(() => {
     if (!running || transition || !step) return;
+    // Grounding uses suggested time only; the person chooses when to move on.
+    if (isGroundingV2) return;
     // Box Breathing V2's paced step is driven entirely by its own master clock;
     // only a generous safety cap prevents a hang if the pacer ever fails to fire.
     if (isBoxV2Paced) {
@@ -295,7 +309,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     const safetyCap = spoken ? step.holdSec + 45 : step.holdSec;
     if (elapsed >= safetyCap) { goNextStep(); return; }
     if (elapsed >= step.holdSec && !waitForVoice) goNextStep();
-  }, [elapsed, running, transition, step, goNextStep, narrate, narrationEnded, answers?.direction, isBoxV2Paced]);
+  }, [elapsed, running, transition, step, goNextStep, narrate, narrationEnded, answers?.direction, isBoxV2Paced, isGroundingV2]);
 
   // ---- controls ----
   const togglePause = () => {
@@ -483,6 +497,23 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     }
   };
 
+  const finishGrounding = () => {
+    setRunning(false);
+    stopVoice();
+    setShowGroundingFeedback(true);
+  };
+  const completeGrounding = (presence) => {
+    const outcome = { interventionId: iv.id, presence };
+    onAttemptEvent?.({ interventionId: iv.id, mechanism: iv.mechanism,
+      action: isLastStep ? "completed" : "skipped", timestamp: Date.now() });
+    setShowGroundingFeedback(false);
+    if (isLastIv) { onComplete({ requireGoalReassessment: true, outcome }); return; }
+    setIvIndex((index) => index + 1);
+    setStepIndex(0);
+    setElapsed(0);
+    setRunning(true);
+  };
+
   // ---- overall progress (subtle) ----
   const totalLeft = useMemo(() => {
     let n = (iv?.steps.length - stepIndex) || 0;
@@ -551,6 +582,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   return (
     <div
       className="intervention-theme fixed inset-0 z-50 flex flex-col overflow-hidden"
+      data-grounding-reduced={isGroundingV2 && a11y.prefs.reducedMotion}
       data-intervention-theme={interventionPalette.id}
       data-theme-mode={interventionPalette.mode}
       style={interventionThemeStyle(interventionPalette)}
@@ -606,9 +638,11 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       </div>
 
       {/* stage */}
-      <div className={`relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
+      <div className={`relative flex min-h-0 flex-1 flex-col items-center ${isGroundingV2 ? "justify-start" : "justify-center"} overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
         <AnimatePresence mode="wait">
-          {transition ? (
+          {isGroundingV2 && showGroundingFeedback ? (
+            <GroundingFeedback onComplete={completeGrounding} />
+          ) : transition ? (
             <motion.div
               key="transition"
               initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
@@ -643,10 +677,10 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                     ? `pmr-${ivIndex}`
                     : `${ivIndex}-${stepIndex}`
               }
-              initial={isPMRV2 ? false : { opacity: 0, y: 16, filter: "blur(8px)" }}
+              initial={isPMRV2 || (isGroundingV2 && a11y.prefs.reducedMotion) ? false : { opacity: 0, y: 16, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -16, filter: "blur(8px)" }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              exit={isGroundingV2 && a11y.prefs.reducedMotion ? { opacity: 0 } : { opacity: 0, y: -16, filter: "blur(8px)" }}
+              transition={{ duration: isGroundingV2 && a11y.prefs.reducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="flex w-full max-w-md flex-col items-center gap-4 pb-1 sm:gap-6 sm:pb-2"
             >
               {isBoxV2 ? (
@@ -727,8 +761,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
               key="resting"
               initial={{ opacity: 0, y: 16, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -16, filter: "blur(8px)" }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              exit={isGroundingV2 && a11y.prefs.reducedMotion ? { opacity: 0 } : { opacity: 0, y: -16, filter: "blur(8px)" }}
+              transition={{ duration: isGroundingV2 && a11y.prefs.reducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="flex max-w-md flex-col items-center text-center"
             >
               <span className="intervention-copy-muted text-[0.7rem] font-medium uppercase tracking-[0.24em]">A moment to rest</span>
@@ -745,27 +779,32 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         </AnimatePresence>
       </div>
 
+      {isGroundingV2 && !showGroundingFeedback && <button type="button" className="relative mx-auto rounded-full border px-5 py-2 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}>Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}</button>}
+      {isGroundingV2 && !showGroundingFeedback && <div className="relative flex justify-center gap-3 px-4 py-3">
+        {!isLastStep && <button type="button" className="rounded-full bg-white/80 px-5 py-3 font-medium" onClick={goNextStep}>{step?.sense === "taste" ? "Recenter when ready" : "Next sense"}</button>}
+        <button type="button" className="rounded-full border px-5 py-3" onClick={finishGrounding}>{isLastStep ? "Finish grounding" : "Finish grounding early"}</button>
+      </div>}
       {/* adaptive actions — calm, integrated chips */}
-      <div className={`flex items-center justify-center px-6 pb-1 pt-3 ${isPMRV2 ? "pmr-v2-actions-wrap" : ""}`}>
+      <div style={isGroundingV2 ? { display: "none" } : undefined} className={`flex items-center justify-center px-6 pb-1 pt-3 ${isPMRV2 ? "pmr-v2-actions-wrap" : ""}`}>
         <div className={"flex items-center gap-1 rounded-full p-1 backdrop-blur-md " + (isPMRV2 ? "pmr-v2-actions " : "") + (lightChrome ? "border border-[#1A2E26]/10 bg-white/40" : "border border-white/[0.08] bg-white/[0.03]")}>
           <button
-            onClick={() => setShowSwitch(true)}
+            onClick={() => isGroundingV2 ? finishGrounding() : setShowSwitch(true)}
             className={"no-tap flex h-12 items-center rounded-full px-5 text-sm font-medium transition-all " + (lightChrome ? "text-[#1A2E26]/65 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/65 hover:bg-white/10 hover:text-cream")}
           >
             This isn’t helping
           </button>
           <span className={"h-5 w-px " + (lightChrome ? "bg-[#1A2E26]/10" : "bg-white/10")} />
           <button
-            onClick={skipToNext}
+            onClick={isGroundingV2 ? finishGrounding : skipToNext}
             className={"no-tap flex h-12 items-center rounded-full px-5 text-sm font-medium transition-all " + (lightChrome ? "text-[#1A2E26]/65 hover:bg-[#1A2E26]/5 hover:text-[#1A2E26]" : "text-cream/65 hover:bg-white/10 hover:text-cream")}
           >
-            {isLastIv ? "Finish here" : "Next intervention"}
+            {isGroundingV2 ? "Finish grounding" : isLastIv ? "Finish here" : "Next intervention"}
           </button>
         </div>
       </div>
 
       {/* control dock */}
-      <div className={`safe-bottom relative flex items-center justify-center gap-2 px-6 pb-10 pt-3 ${isPMRV2 ? "pmr-v2-control-wrap" : ""}`}>
+      <div style={isGroundingV2 && showGroundingFeedback ? { display: "none" } : undefined} className={`safe-bottom relative flex items-center justify-center gap-2 px-6 pb-10 pt-3 ${isPMRV2 ? "pmr-v2-control-wrap" : ""}`}>
         <div
           data-tone={lightChrome ? "light" : "dark"}
           className={"brand-chrome-dock flex items-center gap-0.5 rounded-full p-1.5 " + (isPMRV2 ? "pmr-v2-control-dock" : "")}

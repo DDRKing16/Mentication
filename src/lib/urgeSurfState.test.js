@@ -33,7 +33,7 @@ describe("Urge Surfing state", () => {
     expect(buildUrgeSurfLearningRecord({ categoryKey: "message Sam", action: "anything", choiceOutcome: "better" })).toMatchObject({
       category: "unspecified",
       action: "wait",
-      choiceOutcome: "not_yet",
+      choiceOutcome: null,
     });
   });
 
@@ -41,5 +41,9 @@ describe("Urge Surfing state", () => {
     expect(buildUrgeSurfLearningRecord({
       categoryKey: "send", windowSeconds: 120, intensityBefore: 8, intensityNow: null, action: "leave", choiceOutcome: "a_little",
     })).toMatchObject({ intensityBefore: 8, intensityNow: null, action: "leave", choiceOutcome: "a_little" });
+  });
+  it("preserves missing ratings and outcomes as missing, including the invalid zero anchor", () => {
+    expect(buildUrgeSurfLearningRecord({ intensityBefore: 0, intensityNow: null, choiceOutcome: null }))
+      .toMatchObject({ intensityBefore: null, intensityNow: null, choiceOutcome: null });
   });
 });

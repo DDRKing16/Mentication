@@ -197,7 +197,7 @@ export function useGroundingSoundscape({ active, narrationActive, sense }) {
       if (audio.paused) audio.play().catch(() => { /* autoplay can be blocked before a gesture */ });
     } else {
       targetRef.current = 0;
-      fadeTo(0, FADE_OUT, () => { try { audio.pause(); } catch { /* */ } });
+      fadeTo(0, 0, () => { try { audio.pause(); } catch { /* */ } });
     }
   }, [active, narrationActive]);
 

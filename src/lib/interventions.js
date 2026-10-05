@@ -333,7 +333,7 @@ const GROUNDING = [
     { title: "3 you hear", body: "Three sounds, near or far.", holdSec: 15 },
     { title: "2 you smell · 1 you taste", body: "Two scents, one taste. You’re here, fully.", holdSec: 18 },
   ] }),
-  make({ id: "grounding54321V2", name: "5-4-3-2-1 Grounding V2", category: "grounding", mechanism: "sensory-54321", why: "A flagship sensory grounding practice — anchor through sight, touch, hearing, smell and taste to come fully into the present.", targets: ["thoughts", "both"], states: ["overthinking", "overstimulated", "panicky", "anxious", "worried", "dissociated"], durationMin: 5, eyes: "open", basePriority: 6, steps: [
+  make({ id: "grounding54321V2", name: "5-4-3-2-1 Grounding V2", category: "grounding", mechanism: "sensory-54321", why: "A flagship sensory grounding practice — explore sight, touch, hearing, smell and taste to support contact with the present, with alternatives for each sense.", targets: ["thoughts", "both"], states: ["overthinking", "overstimulated", "panicky", "anxious", "worried", "dissociated"], durationMin: 5, eyes: "open", basePriority: 6, steps: [
     { title: "Five things you can see", body: "Notice five things around you.", speak: "Notice five things around you. Ordinary is perfect.", holdSec: 12, grounding54321V2: true, sense: "sight" },
     { title: "Four things you can feel", body: "Notice four things you can feel.", holdSec: 11, grounding54321V2: true, sense: "touch" },
     { title: "Three things you can hear", body: "Listen for three sounds around you.", holdSec: 10, grounding54321V2: true, sense: "hearing" },
@@ -1344,12 +1344,12 @@ const EMOTION = [
     { title: "Let it point you", body: "Whatever you chose — that's the thread to follow next.", holdSec: 40 },
     { title: "No wrong answer", body: "Just information about what you need.", holdSec: 20 },
   ] }),
-  make({ id: "urgeSurf", name: "Urge Surfing", category: "emotion", mechanism: "distress-tolerance", why: "Riding an urge without acting lets it lose height on its own.", targets: ["body", "thoughts"], states: ["any"], directions: ["calm", "reset"], durationMin: 4, cognitiveLoad: 3, physicalDemand: 1, environment: "any", eyes: "closed", audio: "optional", movement: "none", discreet: true, energy: "calming", arousal: "lower", basePriority: 5, steps: [
+  make({ id: "urgeSurf", name: "Urge Surfing", category: "emotion", mechanism: "distress-tolerance", why: "A pause to notice an urge and choose a next step, whether it eases, stays steady, or grows.", targets: ["body", "thoughts"], states: ["any"], directions: ["calm", "reset"], durationMin: 4, cognitiveLoad: 3, physicalDemand: 1, environment: "any", eyes: "closed", audio: "optional", movement: "none", discreet: true, energy: "calming", arousal: "lower", basePriority: 5, steps: [
     { title: "Notice the urge", body: "Checking, reacting, messaging, avoiding, quitting, snapping. Name it quietly.", holdSec: 20 },
     { title: "Where in the body?", body: "Where do you feel it pulling?", holdSec: 25 },
     { title: "Rate it", body: "How strong, one to ten.", holdSec: 20 },
     { title: "Imagine a wave", body: "Rising, peaking, falling. Urges do that.", holdSec: 60 },
-    { title: "Don't act yet", body: "Just ride it. It will lose height.", holdSec: 60 },
+    { title: "Don't act yet", body: "Notice what happens without needing the urge to change. You can pause or stop whenever you need.", holdSec: 60 },
     { title: "Re-rate", body: "A little lower, maybe? Or the same — that's okay too.", holdSec: 25 },
     { title: "If it's still high", body: "Ride another wave. You don't have to act on it.", holdSec: 30 },
   ] }),

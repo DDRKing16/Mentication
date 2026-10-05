@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useWordReveal } from "@/hooks/useWordReveal";
 import GroundingScene from "@/components/grounding54321/GroundingScene";
 import StageMarkers from "@/components/grounding54321/StageMarkers";
 import { INK, STAGES } from "@/lib/grounding54321Layout";
+import { GROUNDING_ALTERNATIVES, groundingProgress } from "@/lib/groundingExperience";
+import "@/styles/grounding-accessibility.css";
 import { hapticPattern } from "@/lib/feedback";
 
 // 5-4-3-2-1 Grounding V2 — master premium sensory grounding stage.
@@ -10,16 +12,9 @@ import { hapticPattern } from "@/lib/feedback";
 // Renders the five stage markers, the uppercase sense label, the large serif
 // heading, the pearl-glass GroundingScene, and the supporting narration text.
 //
-// Narration is owned here via `useWordReveal` (the approved production
-// word-by-word pattern) — each word appears exactly when the narrator speaks
-// it; nothing is shown before narration begins. The shared ResetPlayer
-// narrator is skipped for Grounding V2.
-//
-// The stage timer (and the sensory illumination + progress arc) begins ONLY
-// after this stage's narration instruction finishes, then runs for the step's
-// holdSec. ResetPlayer advances at the same point (it resets its elapsed
-// counter on this stage's onNarrationEnd), so the arc and the advance stay in
-// sync.
+// The player supplies the single suggested-time clock; moving to another
+// sense is always an explicit choice. Muted/reduced-motion guidance stays
+// fully readable without waiting for word animation.
 export default function GroundingV2Stage({
   step,
   running,
@@ -35,16 +30,16 @@ export default function GroundingV2Stage({
   reducedMotion = false,
 }) {
   const [narrationDone, setNarrationDone] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const accumRef = useRef(0);
+  const [showAlternative, setShowAlternative] = useState(false);
 
   const holdSec = step?.holdSec ?? 10;
   const sense = step?.sense;
   const stage = STAGES.find((s) => s.sense === sense);
-  const isLast = sense === "taste";
-  const remainingSec = narrationDone ? Math.max(0, Math.ceil(stepRemaining ?? holdSec)) : holdSec;
+  const progress = groundingProgress(stepRemaining, holdSec);
+  const remainingSec = (narrationDone || !narrate) ? Math.max(0, Math.ceil(stepRemaining ?? holdSec)) : holdSec;
 
   useEffect(() => {
+    if (discreet || reducedMotion || !running) return;
     switch (sense) {
       case "sight":
         hapticPattern([7]);
@@ -67,7 +62,7 @@ export default function GroundingV2Stage({
       default:
         break;
     }
-  }, [sense]);
+  }, [sense, discreet, reducedMotion]);
 
   const { tokens, visibleCount, revealAll } = useWordReveal({
     body: step?.body,
@@ -82,38 +77,15 @@ export default function GroundingV2Stage({
     },
   });
 
-  // Reflection clock — accumulates only while running, from the moment
-  // narration ends, across holdSec. Pauses cleanly with `running`.
-  useEffect(() => {
-    if (!narrationDone) {
-      accumRef.current = 0;
-      setProgress(0);
-      return;
-    }
-    let raf;
-    let last = null;
-    const loop = (now) => {
-      if (last != null && running) {
-        accumRef.current = Math.min(holdSec, accumRef.current + (now - last) / 1000);
-      }
-      last = now;
-      setProgress(holdSec > 0 ? accumRef.current / holdSec : 1);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [narrationDone, holdSec, running]);
-
-  // Reset per stage.
+  // The player owns elapsed time. The visual never advances on a second RAF clock.
   useEffect(() => {
     setNarrationDone(false);
-    accumRef.current = 0;
-    setProgress(0);
+    setShowAlternative(false);
   }, [spoken, sense]);
 
   return (
     <div className="flex w-full flex-col items-center gap-5">
-      <StageMarkers activeSense={sense} reducedMotion={reducedMotion} />
+      <StageMarkers activeSense={sense} reducedMotion={reducedMotion || !running} />
 
       <p
         className="text-[0.65rem] font-medium uppercase tracking-[0.28em]"
@@ -132,15 +104,15 @@ export default function GroundingV2Stage({
         <p
           className="text-[0.7rem] font-medium uppercase tracking-[0.22em]"
           style={{ color: `${INK}99` }}
-          aria-live="polite"
+          aria-live="off"
         >
-          {remainingSec}s
+          {remainingSec > 0 ? `${remainingSec}s suggested time` : "Move on whenever you are ready"}
         </p>
       )}
 
-      <GroundingScene sense={sense} progress={progress} running={running} showArc={showTimer} isLast={isLast} />
+      <GroundingScene sense={sense} progress={progress} running={running} reducedMotion={reducedMotion} discreet={discreet} />
 
-      {showBody && (
+      {(showBody || !narrate || reducedMotion) && (
         <div className="grounding-instruction -mt-8 flex w-full max-w-md flex-col items-center gap-1.5 px-4 text-center sm:-mt-7">
           <p
             className="grounding-instruction-sentence text-[17px] leading-[1.7] text-balance sm:text-[19px]"
@@ -148,7 +120,7 @@ export default function GroundingV2Stage({
           >
             {tokens.map((t, i) => {
               if (t.space) return <span key={i}>{t.text}</span>;
-              const vis = revealAll || (t.wordIndex != null && t.wordIndex < visibleCount);
+              const vis = reducedMotion || !narrate || revealAll || (t.wordIndex != null && t.wordIndex < visibleCount);
               return (
                 <span key={i} style={{ opacity: vis ? 1 : 0 }}>
                   {t.text}
@@ -158,6 +130,13 @@ export default function GroundingV2Stage({
           </p>
         </div>
       )}
+      <div className="flex w-full max-w-md flex-col items-center gap-3 px-4 text-center" style={{ color: INK }}>
+        <p className="text-sm">Take as long as you need. You can move on without finding every item.</p>
+        {GROUNDING_ALTERNATIVES[sense] && <>
+          <button type="button" className="rounded-full border border-current px-5 py-3 text-sm" aria-expanded={showAlternative} onClick={() => setShowAlternative((value) => !value)}>Try another sense instead</button>
+          {showAlternative && <p className="text-base leading-relaxed" role="status">{GROUNDING_ALTERNATIVES[sense]}</p>}
+        </>}
+      </div>
     </div>
   );
 }
