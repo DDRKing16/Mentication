@@ -8,7 +8,7 @@ import StageVisual, { stageModeFor } from "@/components/StageVisual";
 import BrandThreadProgress from "@/components/brand/BrandThreadProgress";
 import BoxBreathingV2Stage from "@/components/BoxBreathingV2Stage";
 import GroundingV2Stage from "@/components/grounding54321/GroundingV2Stage";
-import PMRV2Stage from "@/components/PMRV2Stage";
+import PMRExperience from "@/components/pmr/PMRExperience";
 import {
   suggestSwitch, suggestAdaptiveAlternative, transitionSentence, SWITCH_MODES,
 } from "@/lib/interventions";
@@ -20,7 +20,6 @@ import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { useEscapeToClose } from "@/hooks/useEscapeToClose";
 import { useBoxBreathingSoundscape } from "@/hooks/useBoxBreathingSoundscape";
 import { useGroundingSoundscape } from "@/hooks/useGroundingSoundscape";
-import { usePMRSoundscape } from "@/hooks/usePMRSoundscape";
 import SoundscapeMixer from "@/components/SoundscapeMixer";
 import SleepTimerSheet from "@/components/SleepTimerSheet";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
@@ -85,13 +84,6 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // 5-4-3-2-1 Grounding V2 plays its own uploaded MP3 soundscape (with the same
   // volume + narration ducking as Box Breathing) throughout the whole exercise.
   useGroundingSoundscape({ active: isGroundingV2, narrationActive, sense: step?.sense });
-  usePMRSoundscape({
-    active: isPMRV2 && !noAudio && !discreet,
-    running,
-    narrationActive,
-    phase: step?.phase,
-    stepIndex,
-  });
   const isLastStep = step != null && stepIndex === iv.steps.length - 1;
   const isLastIv = ivIndex === remaining.length - 1;
 
@@ -225,10 +217,10 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
   // ---- step timer ----
   useEffect(() => {
-    if (!running || transition || !step) return;
+    if (!running || transition || !step || isPMRV2) return;
     const t = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(t);
-  }, [running, transition, ivIndex, stepIndex]);
+  }, [running, transition, ivIndex, stepIndex, isPMRV2]);
 
   const goNextStep = useCallback(() => {
     if (!step) return;
@@ -281,7 +273,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // the current line when narration is on, so the voice never gets cut off.
   // A safety cap (holdSec + 45s) prevents a step hanging if audio fails to load.
   useEffect(() => {
-    if (!running || transition || !step) return;
+    if (!running || transition || !step || isPMRV2) return;
     // Box Breathing V2's paced step is driven entirely by its own master clock;
     // only a generous safety cap prevents a hang if the pacer ever fails to fire.
     if (isBoxV2Paced) {
@@ -337,67 +329,6 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     mixer.stopAll();
     goBack();
   };
-
-  // ---- PMR V2: move directly to the next muscle group ----
-  // Individual muscle phases skip the matching release phase and land on the
-  // next region. Intro and whole-body closing phases advance one stage at a
-  // time so this control remains available throughout the full experience.
-  const nextPMRStageIndex = useMemo(() => {
-    if (!isPMRV2 || !step || !Array.isArray(iv?.steps)) return -1;
-
-    const currentRegion = step.region;
-
-    if (stepIndex >= iv.steps.length - 1) return iv.steps.length;
-
-    if (!currentRegion || currentRegion === "whole") {
-      return stepIndex + 1;
-    }
-
-    for (let i = stepIndex + 1; i < iv.steps.length; i += 1) {
-      const candidate = iv.steps[i];
-
-      if (candidate?.region && candidate.region !== currentRegion) {
-        return i;
-      }
-    }
-
-    return iv.steps.length;
-  }, [isPMRV2, step, stepIndex, iv?.steps]);
-
-  const nextPMRBodyPart = useCallback(() => {
-    if (nextPMRStageIndex < 0) return;
-
-    if (transitionTimer.current) {
-      clearTimeout(transitionTimer.current);
-    }
-
-    // Stop the current narration before changing stages so clips cannot overlap.
-    stopVoice();
-
-    setTransition(null);
-
-    if (nextPMRStageIndex >= iv.steps.length) {
-      setNarrationEnded(true);
-      goNextStep();
-      return;
-    }
-
-    // Count skipped PMR stages as completed for overall progress.
-    setStepsDone((done) =>
-      done + Math.max(1, nextPMRStageIndex - stepIndex)
-    );
-
-    setStepIndex(nextPMRStageIndex);
-    setElapsed(0);
-    setNarrationEnded(false);
-    setRunning(true);
-  }, [
-    nextPMRStageIndex,
-    stepIndex,
-    stopVoice,
-    iv?.steps?.length,
-    goNextStep,
-  ]);
 
   // ---- "this isn't helping" switch ----
   const doSwitch = (mode) => {
@@ -548,6 +479,13 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     }
   }, [isGroundingV2, groundingSense]);
 
+  if (isPMRV2) return <PMRExperience key={`${iv.id}-${ivIndex}`} intervention={iv} answers={answers}
+    onExit={onExit} onAttemptEvent={onAttemptEvent}
+    onComplete={() => {
+      if (isLastIv) onComplete();
+      else { setIvIndex(i => i + 1); setStepIndex(0); setElapsed(0); }
+    }} />;
+
   return (
     <div
       className="intervention-theme fixed inset-0 z-50 flex flex-col overflow-hidden"
@@ -678,28 +616,6 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
                   spoken={spokenFor(step, iv, answers?.direction)}
                   onNarrationEnd={() => { setElapsed(0); setNarrationEnded(true); }}
                   reducedMotion={a11y.prefs.reducedMotion}
-                />
-              ) : isPMRV2 ? (
-                <PMRV2Stage
-                  step={step}
-                  steps={iv.steps}
-                  stepIndex={stepIndex}
-                  elapsed={elapsed}
-                  running={running}
-                  showBody={captions}
-                  narrate={narrate}
-                  rate={vf.rate}
-                  leadMs={ivIndex === 0 && stepIndex === 0 ? vf.leadMs : 250}
-                  spoken={spokenFor(step, iv, answers?.direction)}
-                  onNarrationEnd={() => setNarrationEnded(true)}
-                  onNextBodyPart={nextPMRStageIndex >= 0 ? nextPMRBodyPart : undefined}
-                  nextBodyPartLabel={
-                    step?.phase === "intro"
-                      ? "Start with hands"
-                      : step?.phase === "return"
-                        ? "Finish"
-                        : "Next body part"
-                  }
                 />
               ) : (
                 <StageVisual
