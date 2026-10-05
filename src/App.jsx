@@ -26,6 +26,7 @@ import WithBrandThreshold from '@/components/brand/WithBrandThreshold';
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
 // inside AppShell so they can be kept mounted across tab switches.
 const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
+const ChangeSceneFollowup = lazy(() => import('@/pages/ChangeSceneFollowup'));
 const LiftFollowup = lazy(() => import('@/pages/LiftFollowup'));
 const NextEasiestStepExperience = lazy(() => import('@/components/NextEasiestStepExperience'));
 const Crisis = lazy(() => import('@/pages/Crisis'));
@@ -102,6 +103,7 @@ const MenticationRoutes = () => {
                 </Route>
                 <Route path="/welcome" element={<Welcome />} />
                 <Route path="/reset" element={<ResetFlow />} />
+                <Route path="/scene-followup" element={<ChangeSceneFollowup />} />
                 <Route path="/lift-followup" element={<LiftFollowup />} />
                 <Route path="/next-easiest-step" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience /></WithBrandThreshold>} />
                 <Route path="/next-easiest-step-v2" element={<WithBrandThreshold id="nextAction" name="Next Easiest Step"><NextEasiestStepExperience /></WithBrandThreshold>} />
