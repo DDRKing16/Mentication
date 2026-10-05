@@ -253,3 +253,8 @@ motion and OS override, Back/Exit/refresh, natural completion, all helpfulness
 options and duplicate-submit protection. Device-native iOS lifecycle and actual
 VoiceOver speech require device verification. A headless CDP freeze experiment is
 not treated as evidence of native app switching.
+
+The shared baseline-resume correction (06c2582) has been integrated. Phone and
+desktop browser tests confirm the original answered baseline/session survive
+refresh, while a new Library attempt requires a fresh explicit rating. Refresh
+restarts Box's exercise presentation; it does not resume a stale breathing phase.

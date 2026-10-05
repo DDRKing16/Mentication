@@ -583,3 +583,15 @@ lint and typecheck pass. Rendered cadence: 16 phases, 4,000 ms boundaries, 64,00
 active duration. Long-RAF-gap and pagehide pause checks pass. Native iOS/VoiceOver
 remain unverified. Publication stays coordinated with the parent, pending the
 shared baseline-refresh correction and final serial checks.
+
+#### Box publication gate — baseline refresh integration
+
+Merged approved shared fix 06c25829dc39f647d10bf6a0379e4d8280fd4dc8 into the
+existing Chat-GPT branch with no conflicts; compatible exitReason preservation
+is retained once. Final combined verification: 42 Vitest files / 273 tests pass,
+lint/typecheck/build/V3 verification and diff check pass. Phone390×844 and
+desktop1280×800 smoke tests confirm original explicit baseline, session id and
+start time survive guiding refresh; refresh during reassessment retains that
+baseline; repeat submit saves one truthful attempt/session; a new Library attempt
+requires a fresh answer. The parent granted the exclusive publication slot under
+the founder's explicit six-set testing-preview approval. No main or hosting edit.
