@@ -1,3 +1,4 @@
+import { GOAL_ASSESSMENTS } from "@/lib/goalAssessment";
 import React from "react";
 
 // Per-direction descriptor scales. Low end = the desired state / least
@@ -62,12 +63,12 @@ export default function IntensityDial({ value, onChange, mood = false, direction
           step={1}
           value={v}
           onChange={(e) => onChange(Number(e.target.value))}
-          aria-label={key === "lift" ? "How is your mood right now" : "How intense is it right now"}
+          aria-label={(GOAL_ASSESSMENTS[key]?.question || GOAL_ASSESSMENTS.calm.question).replace(/\?$/, "")}
           className={sliderClass}
         />
         <div className="mt-3 flex justify-between text-xs font-medium text-muted-foreground">
-          <span>{scale.left}</span>
-          <span>{scale.right}</span>
+          <span>{GOAL_ASSESSMENTS[key]?.left || scale.left}</span>
+          <span>{GOAL_ASSESSMENTS[key]?.right || scale.right}</span>
         </div>
       </div>
 

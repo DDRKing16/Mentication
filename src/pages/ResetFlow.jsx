@@ -1,3 +1,5 @@
+import { captureGoalBaseline, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
+import { withAttemptHelpfulness } from "@/lib/attemptFeedback";
 // @ts-check
 import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
@@ -60,8 +62,9 @@ export default function ResetFlow() {
   const { allowed, isPremium, loading: quotaLoading } = useFreeQuota();
 
   const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
-  const startsDirectFlagship = directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
-  const initialPhase = startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
+  const needsAnsweredBaseline = directEntryPathway.some((item) => MATCHED_ASSESSMENT_IDS.has(item.id)) && !hasGoalBaseline(entry);
+  const startsDirectFlagship = !needsAnsweredBaseline && directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
+  const initialPhase = needsAnsweredBaseline ? "questions" : startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
@@ -99,6 +102,8 @@ export default function ResetFlow() {
   const sessionHistoryRef = useRef([]);
   const attemptLogRef = useRef([]);
   const pendingCompletionRef = useRef(null);
+  const goalCompletionRef = useRef(null);
+  const [goalEndRating, setGoalEndRating] = useState(null);
   const sessionSavedRef = useRef(false);
   const [weekCount, setWeekCount] = useState(0);
   useEffect(() => {
@@ -258,16 +263,16 @@ export default function ResetFlow() {
     );
   }
 
-  const setAnswer = (key, value) => setAnswers((a) => ({ ...a, [key]: value }));
+  const setAnswer = (key, value) => setAnswers((a) => ({ ...a, [key]: value, ...(key === "intensity" ? { goal_baseline:captureGoalBaseline(a.direction, value) } : {}) }));
 
-  const advance = (snap) => {
+  const advance = (snap, nextEntry = entry) => {
     flowStack.current.push({
       phase: snap.phase,
       unsureStep: snap.unsureStep ?? unsureStep,
     });
     setPhase(snap.phase);
     if (snap.unsureStep != null) setUnsureStep(snap.unsureStep);
-    navigate(`/reset?step=${flowStack.current.length - 1}`, { state: entry });
+    navigate(`/reset?step=${flowStack.current.length - 1}`, { state: nextEntry });
   };
   const goBack = () => {
     if (flowStack.current.length > 1) navigate(-1);
@@ -357,7 +362,7 @@ export default function ResetFlow() {
       exitReason: "completed",
       coarseContextKey: coarseContextKey(currentAttemptContext(lastValue)),
     });
-    attemptLogRef.current = [...attemptLogRef.current, record];
+    attemptLogRef.current = [...attemptLogRef.current, withAttemptHelpfulness(record, event.helpfulness)];
     pendingCompletionRef.current = null;
     return rebuildEffectivenessWithLiveAttempts(attemptLogRef.current);
   };
@@ -367,6 +372,7 @@ export default function ResetFlow() {
     setSaving(false);
     const first = pathway[0];
     if (!first) return;
+    if (MATCHED_ASSESSMENT_IDS.has(first.id) && !hasGoalBaseline(answers)) { setPhase("questions"); return; }
     pauseHomeAmbient();
     attemptLogRef.current = [];
     pendingCompletionRef.current = null;
@@ -374,10 +380,22 @@ export default function ResetFlow() {
     setUsedIds([first.id]);
     setPlanRemaining(Math.max(0, (answers.timeMin || 5) - segmentMinutes([first])));
     setLastValue(answers.intensity ?? 5);
-    advance({ phase: "guiding" });
+    // Preserve the answered Lift context on refresh while the Happy Bump
+    // experience restores its own private, non-text progress.
+    advance({ phase: "guiding" }, first.id === "happyBump" ? { ...answers, prebuilt:true, pathway:[first.id] } : entry);
   };
 
-  const onSegmentComplete = () => {
+  const startGoalReassessment = (result) => {
+    const item = activePathway?.[0];
+    const event = pendingCompletionRef.current || (item ? { interventionId:item.id, mechanism:item.mechanism, action:"completed", completedPercentage:1, timestamp:Date.now() } : null);
+    if (event) pendingCompletionRef.current = { ...event, ...(result.helpfulness ? { helpfulness:result.helpfulness } : {}) };
+    goalCompletionRef.current = result;
+    setGoalEndRating(null);
+    advance({ phase:"goalReassessment" });
+  };
+
+  const onSegmentComplete = (result) => {
+    if (result?.requireGoalReassessment) { startGoalReassessment(result); return; }
     setCheckinValue(lastValue);
     setRemaining(null);
     advance({ phase: "checkpoint" });
@@ -495,6 +513,7 @@ export default function ResetFlow() {
       direction: answers.direction,
       direction_label: answers.directionLabel,
       intensity_start: answers.intensity,
+      goal_baseline: answers.goal_baseline || null,
       intensity_end: Object.prototype.hasOwnProperty.call(options, "endIntensityOverride") ? options.endIntensityOverride : endIntensity,
       where_felt: answers.whereFelt,
       time_min: answers.timeMin,
@@ -612,6 +631,25 @@ export default function ResetFlow() {
     );
   }
 
+  // Opt-in contract for experiences with additional mechanism-specific feedback.
+  // The matching goal rating is independent; skipping it never supplies a delta.
+  if (phase === "goalReassessment") {
+    const assessment = GOAL_ASSESSMENTS[answers.direction];
+    const finishGoal = (rating) => {
+      const result = goalCompletionRef.current || {};
+      commitPendingPulse(goalPointChange(answers.goal_baseline, answers.direction, rating) == null ? null : rating);
+      completeSession({ direct:true, silent:true, endIntensityOverride:rating, interventionOutcome:result.outcome, navigateTo:result.navigateTo });
+    };
+    return <main className="calmbg min-h-[100dvh] px-5 py-6"><div className="mx-auto flex max-w-lg flex-col gap-6">
+      <FlowHomeButton /><h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
+      <p className="text-muted-foreground">The same question as at the start. Confirm an honest rating, or skip. You do not need to feel better.</p>
+      <IntensityDial value={goalEndRating ?? 5} onChange={setGoalEndRating} direction={answers.direction} />
+      <p className="text-muted-foreground">{goalEndRating == null ? 'Not answered yet.' : goalPointChange(answers.goal_baseline, answers.direction, goalEndRating) == null ? 'No confirmed starting rating to compare.' : `${answers.goal_baseline.value} → ${goalEndRating} · ${goalPointChange(answers.goal_baseline, answers.direction, goalEndRating)} points`}</p>
+      <Button className="rounded-full" disabled={saving} onClick={() => finishGoal(goalEndRating ?? 5)}>Confirm rating: {goalEndRating ?? 5}</Button>
+      <Button className="rounded-full" variant="outline" disabled={saving} onClick={() => finishGoal(null)}>Skip and finish</Button>
+    </div></main>;
+  }
+
   // ---------- GUIDING ----------
   if (phase === "guiding" && activePathway) {
     // Signal Lock, Vector Shift and Night Channel are finished standalone builds;
@@ -647,6 +685,11 @@ export default function ResetFlow() {
           answers={{ ...answers, intensity: lastValue }}
           onAttemptEvent={handleAttemptEvent}
           onComplete={(result) => {
+            if (result?.helpfulness && pendingCompletionRef.current) pendingCompletionRef.current = { ...pendingCompletionRef.current, helpfulness:result.helpfulness };
+            if (result?.requireGoalReassessment) {
+              startGoalReassessment(result);
+              return;
+            }
             commitPendingPulse(null);
             setEndIntensity(null);
             if (result?.skipReflection) {
@@ -1143,7 +1186,7 @@ export default function ResetFlow() {
             className="flex flex-1 flex-col"
           >
             <h1 className="font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
-              {answers.direction === "lift" ? "How is your mood right now?" : INTENSITY_QUESTION.title}
+              {GOAL_ASSESSMENTS[answers.direction]?.question || INTENSITY_QUESTION.title}
             </h1>
             <p className="mt-3 text-lg text-muted-foreground text-balance">
               {answers.direction === "lift" ? "Low to high. An honest first read." : INTENSITY_QUESTION.description}
@@ -1173,7 +1216,7 @@ export default function ResetFlow() {
             <div className="mt-10 flex justify-center">
               <Button
                 size="lg"
-                disabled={answers.intensity === null || (answers.direction === "lift" && answers.distress === null)}
+                disabled={answers.intensity === null || !hasGoalBaseline(answers) || (answers.direction === "lift" && answers.distress === null)}
                 onClick={nextQuestion}
                 className="h-16 w-full max-w-sm rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95 disabled:opacity-40 disabled:shadow-none"
               >

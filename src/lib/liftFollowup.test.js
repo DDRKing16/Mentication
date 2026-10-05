@@ -1,3 +1,4 @@
+import { captureGoalBaseline } from "./goalAssessment";
 import { describe, expect, it } from 'vitest';
 import { LIFT_JOURNEYS, liftJourneyOptions, moodResponse } from './liftFollowup';
 import { buildPathway, buildSegment, INTERVENTIONS } from './interventions';
@@ -73,7 +74,7 @@ describe('separate Lift mood and eligibility distress', () => {
 describe('completion evidence', () => {
   it('keeps session identity and one attempt when confirming more than once', async () => {
     const { withLiftCheckin } = await import('./liftFollowup');
-    const completed = { id: 'completed-bump', created_date: '2026-10-05T00:00:00Z', direction: 'lift', intensity_start: 8, intensity_end: null, completed_pathway: ['happyBump'], attempts: [{ intervention_id: 'happyBump', exit_reason: 'completed', response: 'not_answered' }] };
+    const completed = { id: 'completed-bump', created_date: '2026-10-05T00:00:00Z', direction: 'lift', intensity_start: 8, goal_baseline:captureGoalBaseline('lift',8), intensity_end: null, completed_pathway: ['happyBump'], attempts: [{ intervention_id: 'happyBump', exit_reason: 'completed', response: 'not_answered' }] };
     expect(withLiftCheckin(completed, null, 5)).toBeNull();
     const once = withLiftCheckin(completed, 5, 5, '2026-10-05T00:01:00Z');
     const twice = withLiftCheckin(once, 5, 5, '2026-10-05T00:01:00Z');

@@ -168,11 +168,11 @@ export default function InterventionLibrary() {
     }
     navigate("/reset", {
       state: {
-        prebuilt: true,
+        prebuilt: iv.id !== "happyBump",
         pathway: [iv.id],
         direction: iv.primaryDirection || iv.directions?.[0] || "calm",
         directionLabel: iv.name,
-        intensity: 5,
+        intensity: iv.id === "happyBump" ? null : 5,
         whereFelt: iv.targets?.includes("body") ? "body" : "thoughts",
         timeMin: iv.durationMin,
         audio: "yes",
@@ -279,7 +279,7 @@ export default function InterventionLibrary() {
                 {g.items.map((iv) => {
                   const isKing = iv.isKing;
                   if (!isKing) {
-                    return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={`${iv.durationMin} min`} why={iv.why} iv={iv} onClick={() => launch(iv)} />;
+                    return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={`${iv.durationMin}${iv.durationMax ? `–${iv.durationMax}` : ""} min`} why={iv.why} iv={iv} onClick={() => launch(iv)} />;
                   }
                   return (
                     <button
@@ -300,7 +300,7 @@ export default function InterventionLibrary() {
                           }>
                             {iv.name}
                           </span>
-                          <span className="text-xs text-muted-foreground">· {iv.durationMin} min</span>
+                          <span className="text-xs text-muted-foreground">· {iv.durationMin}{iv.durationMax ? `–${iv.durationMax}` : ""} min</span>
                         </div>
                         <p className={
                           "mt-1 text-sm leading-snug line-clamp-2 " +
