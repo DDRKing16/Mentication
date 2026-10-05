@@ -91,9 +91,9 @@ export function createInitialResetAnswers(entry) {
     situation: entry?.situation ?? null,
     awake_reason: null,
     discreet: Boolean(entry?.discreet),
-    eyesOpen: false,
-    noBreathing: false,
-    noAudio: false,
+    eyesOpen: Boolean(entry?.eyesOpen),
+    noBreathing: Boolean(entry?.noBreathing),
+    noAudio: Boolean(entry?.noAudio),
     bedtime: Boolean(entry?.bedtime),
     subtype: entry?.subtype ?? null,
   };
