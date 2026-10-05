@@ -14,6 +14,7 @@ export function useBoxBreathingActivityPause(active, onPause) {
     const pause = () => pauseRef.current();
     const visibility = () => { if (document.hidden) pause(); };
     document.addEventListener("visibilitychange", visibility);
+    document.addEventListener("freeze", pause);
     window.addEventListener("pagehide", pause);
     visibility();
     if (Capacitor.isNativePlatform()) {
@@ -27,6 +28,7 @@ export function useBoxBreathingActivityPause(active, onPause) {
     return () => {
       disposed = true;
       document.removeEventListener("visibilitychange", visibility);
+      document.removeEventListener("freeze", pause);
       window.removeEventListener("pagehide", pause);
       nativeListener?.remove();
     };

@@ -237,9 +237,19 @@ above are historical; they do not authorize replacing the current artwork.
   the stage remains scrollable for enlarged text while the fixed controls stay
   reachable.
 
-The shared explicit-helpfulness and same-question before/after assessment are
-owned by the coordinated shared-feedback change, not this Box-only patch. A
-Library-supplied default intensity is not an answered baseline. Combined
-integration must verify positive/unchanged/worse/unanswered feedback and
-exactly-once consumption before treating all five requested improvements as
-complete.
+Shared feedback integration (c3c1500) is now consumed by Box's optional Helpful /
+No change / Felt worse / Not sure screen, with an explicit skip. Submission is
+guarded against repeat taps. The shared goal assessment then repeats the answered
+starting question, scale, anchors and direction; skipped ratings remain missing.
+A Library-supplied default does not qualify as an answered baseline. Raw starting
+and ending ratings stay separate from helpfulness, whose explicit answer supplies
+one recommendation-learning response. “Finish here” retains a skipped exit and
+partial completion; it is never relabelled as a completed practice.
+
+Verification: rendered 16-phase sequence measured 4,000 ms per phase and 64,000 ms
+of active breathing. Browser coverage includes phone/desktop, short viewport and
+enlarged text, pause/resume, pagehide and long RAF-gap interruption, full/reduced
+motion and OS override, Back/Exit/refresh, natural completion, all helpfulness
+options and duplicate-submit protection. Device-native iOS lifecycle and actual
+VoiceOver speech require device verification. A headless CDP freeze experiment is
+not treated as evidence of native app switching.

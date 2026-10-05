@@ -569,3 +569,17 @@ background lifecycle, completion, and no runtime errors. Further small-phone,
 enlarged-text, exit/back/refresh and integrated cadence results are recorded in
 the task-owned box-qa evidence folder and final handoff. Native iOS and actual
 VoiceOver speech are not verified by the desktop headless browser.
+
+#### Box shared-feedback integration checkpoint
+
+Merged c3c1500 locally after feaf6fc. Box now emits the agreed explicit helpfulness
+and requireGoalReassessment contract, with truthful skipped/completed metadata.
+The only shared ResetFlow adjustment preserves event.exitReason (identical to the
+coordinated PMR hunk). Browser cases verified Helpful, No change, Felt worse, Not
+sure and Skip; conflicting measured ratings remain independent; double submission
+saves one attempt/session. Learning regression tests compare each explicit answer
+to exactly one corresponding sample. Current suite: 41 files / 263 tests pass;
+lint and typecheck pass. Rendered cadence: 16 phases, 4,000 ms boundaries, 64,000 ms
+active duration. Long-RAF-gap and pagehide pause checks pass. Native iOS/VoiceOver
+remain unverified. Publication stays coordinated with the parent, pending the
+shared baseline-refresh correction and final serial checks.

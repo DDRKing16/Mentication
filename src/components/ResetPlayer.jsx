@@ -6,6 +6,7 @@ import {
   Activity, Brain, Feather, Zap, Shuffle, ChevronRight, ArrowLeft } from "lucide-react";
 import StageVisual, { stageModeFor } from "@/components/StageVisual";
 import BrandThreadProgress from "@/components/brand/BrandThreadProgress";
+import BoxBreathingV2Feedback from "@/components/BoxBreathingV2Feedback";
 import BoxBreathingV2Stage from "@/components/BoxBreathingV2Stage";
 import GroundingV2Stage from "@/components/grounding54321/GroundingV2Stage";
 import PMRV2Stage from "@/components/PMRV2Stage";
@@ -61,6 +62,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   useEscapeToClose(showAmbient, () => setShowAmbient(false));
   const [stepsDone, setStepsDone] = useState(0);
   const transitionTimer = useRef(null);
+  const [boxFeedback, setBoxFeedback] = useState(null);
+  const boxFeedbackSent = useRef(false);
 
   const iv = remaining[ivIndex];
   const step = iv?.steps[stepIndex];
@@ -238,8 +241,28 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
     return () => clearInterval(t);
   }, [running, transition, ivIndex, stepIndex]);
 
+  const finishBoxSequence = useCallback((exitReason = "completed") => {
+    if (boxFeedback) return;
+    const total = iv.steps.reduce((sum, item) => sum + item.holdSec, 0);
+    const completed = iv.steps.slice(0, stepIndex).reduce((sum, item) => sum + item.holdSec, 0)
+      + Math.min(elapsed, step?.holdSec || 0);
+    setBoxFeedback({ exitReason, completedPercentage: exitReason === "completed" ? 1 : Math.min(0.99, completed / total) });
+    setRunning(false);
+    stopVoice();
+  }, [boxFeedback, iv, stepIndex, elapsed, step, stopVoice]);
+
+  const submitBoxFeedback = (helpfulness) => {
+    if (!boxFeedback || boxFeedbackSent.current) return;
+    boxFeedbackSent.current = true;
+    onAttemptEvent?.({ interventionId: iv.id, mechanism: iv.mechanism,
+      action: "completed", ...boxFeedback, timestamp: Date.now() });
+    onComplete({ requireGoalReassessment: true, ...(helpfulness ? { helpfulness } : {}),
+      outcome: { kind: "box_breathing", completion: boxFeedback.exitReason } });
+  };
+
   const goNextStep = useCallback(() => {
     if (!step) return;
+    if (isBoxV2 && isLastStep && isLastIv) { finishBoxSequence(); return; }
     if (!discreet) haptic(10);
     if (!isLastStep) {
       setStepsDone((s) => s + 1);
@@ -283,7 +306,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       stopVoice();
       onComplete();
     }
-  }, [step, isLastStep, isLastIv, ivIndex, remaining, onComplete, iv, onAttemptEvent]);
+  }, [step, isLastStep, isLastIv, ivIndex, remaining, onComplete, iv, onAttemptEvent, isBoxV2, finishBoxSequence]);
 
   // auto-advance when step time elapses — but wait for the narrator to finish
   // the current line when narration is on, so the voice never gets cut off.
@@ -458,6 +481,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
   // ---- skip to the next activity ----
   const skipToNext = () => {
+    if (isBoxV2 && isLastIv) { finishBoxSequence("skipped"); return; }
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     setStepsDone((s) => s + 1);
     stopVoice();
@@ -618,7 +642,9 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       {/* stage */}
       <div className={`relative flex min-h-0 flex-1 flex-col items-center ${isBoxV2 ? "justify-start" : "justify-center"} overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
         <AnimatePresence mode="wait">
-          {transition ? (
+          {boxFeedback ? (
+            <BoxBreathingV2Feedback key="box-feedback" onContinue={submitBoxFeedback} />
+          ) : transition ? (
             <motion.div
               key="transition"
               initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
@@ -756,6 +782,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         </AnimatePresence>
       </div>
 
+      {!boxFeedback && <>
       {isBoxV2 && (
         <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
           <p className="text-xs leading-relaxed text-cream/75">
@@ -831,6 +858,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         </div>
       </div>
 
+      </>}
       <AnimatePresence>
         {showAmbient && (
           <div className="pointer-events-none absolute inset-x-0 bottom-32 z-50 flex justify-center px-4">

@@ -359,7 +359,7 @@ export default function ResetFlow() {
       endedAt: new Date(event.timestamp || Date.now()).toISOString(),
       completedPercentage: event.completedPercentage ?? 1,
       response,
-      exitReason: "completed",
+      exitReason: event.exitReason || "completed",
       coarseContextKey: coarseContextKey(currentAttemptContext(lastValue)),
     });
     attemptLogRef.current = [...attemptLogRef.current, withAttemptHelpfulness(record, event.helpfulness)];
