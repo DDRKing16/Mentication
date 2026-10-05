@@ -635,3 +635,31 @@ Left alone and flagged in SUGGESTIONS.md instead: a reset's "eyes open" answer i
 used anywhere -- deciding whether that should change something about the practice is a product call,
 not an agent's to guess at.
 Full test/typecheck/lint/build suite passes clean on every commit.
+
+## 5 Oct -- The last known Reduce motion gap closed, two small follow-ups
+Checked docs/BRAND_THREAD.md: all six phases still done, same owner-decision items already in
+SUGGESTIONS.md. The last run had left one gap on record for a future pass: Night Channel, Signal Lock
+and Vector Shift (the three finished standalone builds) never received Mentication's own in-app Reduce
+motion setting at all, because each one runs inside its own iframe document, separate from the host
+page the setting is actually applied to. Fixed it from the outside, without touching any of the three
+builds' own files: their shared wrapper (`StandaloneFrame`) now mirrors the setting into each iframe's
+own document at runtime as a small injected style tag, kept in sync on load and whenever the setting
+changes (87bf9ae). Verified in a real headless-browser run at 375x812 across all three -- the setting
+now reaches every one of them, with nothing visually different when it's off. Added a unit test for the
+injection logic itself rather than a source-text check, since this one has real on/off behaviour to get
+right.
+While following up on Vector Shift, a background audit of every icon-only button across the 12
+interventions and the shared chrome came back clean -- one real near-miss found: the native Vector
+Shift build's "serpent" stage has four direction buttons that show only an arrow glyph (↑ ← ↓ →) with
+nothing else, so a screen reader has nothing reliable to read out. Gave each its own aria-label ("Move
+up" etc.) with a regression test (7fec9fa).
+Then gave Signal Lock -- one of the three finished standalone builds, and the only one of the twelve
+interventions that hadn't had its own dedicated walkthrough yet -- the same full headless-browser pass
+Night Channel got last time: signal prompt, the pitch screen, the distraction-lock grid, the
+press-and-hold drawer gesture, the reward picker, through to the task picker. The flow itself held up
+cleanly, no broken buttons or console errors. One real, new gap found along the way: the pitch screen's
+four bullets type themselves out over about 8 seconds no matter what Reduce motion is set to -- the one
+place left in the app where that setting makes no difference. Logged in SUGGESTIONS.md rather than
+hand-edited, since fixing it means changing behaviour inside that finished, minified build, which needs
+the owner's say-so first.
+Full test/typecheck/lint/build suite passes clean on every commit.
