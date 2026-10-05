@@ -69,7 +69,7 @@ export default function Restructure() {
                   <img src={item.image} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover object-top opacity-80" />
                 )}
                 <div className="absolute inset-x-0 bottom-0 h-[80%]" style={{ background: `linear-gradient(180deg, transparent, ${item.tint} 82%)` }} />
-                {item.plus && !plus.active && (
+                {item.plus && !plus.hasAccess && (
                   <span className="absolute right-3 top-3 rounded-full bg-black/45 px-2 py-0.5 text-[0.6rem] font-bold tracking-[0.14em] text-white backdrop-blur-sm">PLUS</span>
                 )}
                 <div className="relative z-10 p-4">

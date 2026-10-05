@@ -70,6 +70,16 @@ export default function Plus() {
     }
   };
 
+  if (plus.founderPreview) return (
+    <div className="min-h-full bg-[#0A1F3D] px-5 py-12 text-[#F6EFE2]">
+      <main className="mx-auto max-w-xl">
+        <h1 className="text-2xl">Founder testing preview</h1>
+        <p className="mt-4">All experiences are open for testing on this preview. This is not a paid subscription; no purchase is needed.</p>
+        <button onClick={() => navigate(returnTo ? `/${returnTo}` : "/restructure")} className="mt-6 min-h-11 rounded-full border px-5">Continue exploring</button>
+      </main>
+    </div>
+  );
+
   return (
     <div className="min-h-full bg-[#0A1F3D] text-[#F6EFE2]">
       <main className="mx-auto max-w-xl px-5 pb-16 pt-[max(1.25rem,env(safe-area-inset-top))]">

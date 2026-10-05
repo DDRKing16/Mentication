@@ -33,6 +33,13 @@ const CACHE_KEY = "mentication.plus.v1";
 const isNative = () => Capacitor.isNativePlatform();
 const isDev = () => Boolean(import.meta.env?.DEV);
 
+// Explicit nonproduction build opt-in, restricted to the founder preview.
+// Never persists an entitlement or changes Apple subscription state.
+export const founderPreview = import.meta.env.VITE_FOUNDER_PREVIEW === "1"
+  && !isNative()
+  && typeof window !== "undefined"
+  && window.location.hostname === "mentication-chatgpt-preview.onrender.com";
+
 let listeners = new Set();
 let snapshot = readCache();
 
@@ -69,7 +76,8 @@ export function isPlusActive() {
 
 /** React hook: re-renders when Plus starts or ends. */
 export function usePlus() {
-  return useSyncExternalStore(subscribe, getPlus, getPlus);
+  const state = useSyncExternalStore(subscribe, getPlus, getPlus);
+  return { ...state, founderPreview, hasAccess: founderPreview || state.active };
 }
 
 async function plugin() {
