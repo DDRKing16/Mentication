@@ -546,3 +546,52 @@ standalone builds (Signal Lock, Vector Shift, Night Channel) keep their own chro
 their finished inner builds simply don't scale with this setting, which is expected since they're outside
 what this app's text-size control reaches. Full test/typecheck/lint/build suite passes clean on every
 commit.
+
+### 2026-10-05 — Box Breathing accessibility and active-time continuity
+
+Task-owned isolated clone on existing Chat-GPT, fresh baseline 440c477. Founder
+approved reduced motion, background continuity, readable phase/round status,
+comfort/alternative/stop, and shared explicit helpfulness. This local patch owns
+the first four and leaves coordinated shared assessment/learning integration to
+its existing owner. No push, main edit, hosting configuration or dependency change.
+
+Changes: Box-specific lifecycle pause and protected active-time clock; static
+reduced visuals/labels/instructions with existing saved preference and OS default;
+phase/round text and phase-edge live region; comfort copy; alternative-picker
+pause; immediate instruction/soundscape pause and lead-in cancellation; responsive
+space for controls. Narration content and 4×4×4 rounds remain unchanged.
+
+Initial validation passed: 37 Vitest files / 228 tests, lint, typecheck, build and
+V3 algorithm verification. Hosted preview was inspected in isolated muted Chrome
+before edits. Local browser checks cover 390×844 and 1440×1000, repeated pause,
+120-second paused interval, reduced/full/OS override, alternate cancellation,
+background lifecycle, completion, and no runtime errors. Further small-phone,
+enlarged-text, exit/back/refresh and integrated cadence results are recorded in
+the task-owned box-qa evidence folder and final handoff. Native iOS and actual
+VoiceOver speech are not verified by the desktop headless browser.
+
+#### Box shared-feedback integration checkpoint
+
+Merged c3c1500 locally after feaf6fc. Box now emits the agreed explicit helpfulness
+and requireGoalReassessment contract, with truthful skipped/completed metadata.
+The only shared ResetFlow adjustment preserves event.exitReason (identical to the
+coordinated PMR hunk). Browser cases verified Helpful, No change, Felt worse, Not
+sure and Skip; conflicting measured ratings remain independent; double submission
+saves one attempt/session. Learning regression tests compare each explicit answer
+to exactly one corresponding sample. Current suite: 41 files / 263 tests pass;
+lint and typecheck pass. Rendered cadence: 16 phases, 4,000 ms boundaries, 64,000 ms
+active duration. Long-RAF-gap and pagehide pause checks pass. Native iOS/VoiceOver
+remain unverified. Publication stays coordinated with the parent, pending the
+shared baseline-refresh correction and final serial checks.
+
+#### Box publication gate — baseline refresh integration
+
+Merged approved shared fix 06c25829dc39f647d10bf6a0379e4d8280fd4dc8 into the
+existing Chat-GPT branch with no conflicts; compatible exitReason preservation
+is retained once. Final combined verification: 42 Vitest files / 273 tests pass,
+lint/typecheck/build/V3 verification and diff check pass. Phone390×844 and
+desktop1280×800 smoke tests confirm original explicit baseline, session id and
+start time survive guiding refresh; refresh during reassessment retains that
+baseline; repeat submit saves one truthful attempt/session; a new Library attempt
+requires a fresh answer. The parent granted the exclusive publication slot under
+the founder's explicit six-set testing-preview approval. No main or hosting edit.
