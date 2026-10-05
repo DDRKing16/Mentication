@@ -47,12 +47,6 @@ const MODE_LABEL = {
 };
 
 const ACCENT_FOR = { breath: "teal", sense: "teal", body: "indigo", mind: "indigo", lift: "gold", focus: "teal", connect: "rose", ring: "teal" };
-const ACCENT = {
-  teal: { chip: "text-teal/80" },
-  gold: { chip: "text-[hsl(40_60%_70%)]" },
-  indigo: { chip: "text-[hsl(36_55%_72%)]" },
-  rose: { chip: "text-[hsl(350_60%_72%)]" },
-};
 const HALO = {
   teal: "bg-[radial-gradient(circle,hsl(178_55%_45%/0.14),transparent_60%)]",
   indigo: "bg-[radial-gradient(circle,hsl(36_50%_55%/0.14),transparent_60%)]",
@@ -121,39 +115,7 @@ function GentleBreath({ running, discreet, reducedMotion }) {
   );
 }
 
-function SenseRings({ running, discreet, reducedMotion }) {
-  return (
-    <div className="relative flex h-64 w-64 items-center justify-center">
-      <motion.span
-        className="absolute h-56 w-56 rounded-full border border-dashed border-teal/15"
-        animate={{ rotate: reducedMotion ? 0 : running ? 360 : 0 }}
-        transition={reducedMotion ? { duration: 0 } : { duration: 40, repeat: Infinity, ease: "linear" }}
-      />
-      {[0, 1, 2, 3, 4].map((i) => (
-        <motion.span
-          key={i}
-          className="absolute rounded-full border border-teal/30"
-          style={{ height: 56, width: 56 }}
-          animate={
-            reducedMotion
-              ? { scale: 1, opacity: discreet ? 0.2 : 0.35 }
-              : running
-                ? { scale: [1, 4], opacity: [0.55, 0] }
-                : { scale: 1, opacity: discreet ? 0.3 : 0.5 }
-          }
-          transition={reducedMotion ? { duration: 0 } : { duration: 4.5, repeat: Infinity, ease: "easeOut", delay: i * 0.9 }}
-        />
-      ))}
-      <motion.span
-        className="relative h-4 w-4 rounded-full bg-teal shadow-[0_0_22px_hsl(178_55%_45%/0.7)]"
-        animate={{ scale: reducedMotion ? 1 : running ? [1, 1.3, 1] : 1 }}
-        transition={reducedMotion ? { duration: 0 } : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-    </div>
-  );
-}
-
-function BodyScan({ running, discreet, reducedMotion }) {
+function BodyScan({ running, reducedMotion }) {
   return (
     <div className="relative flex h-64 w-40 items-center justify-center">
       <div className="absolute h-56 w-24 rounded-[6rem] border border-indigo/15 bg-[radial-gradient(circle,hsl(36_50%_50%/0.06),transparent_70%)]" />
@@ -273,7 +235,7 @@ export default function StageVisual({ mode, iv, step, stepIndex, running, showTi
           <GroundingStage step={step} stepRemaining={stepRemaining} running={running} discreet={discreet} reducedMotion={reducedMotion} />
         )}
 
-        {mode === "body" && <BodyScan running={running} discreet={discreet} reducedMotion={reducedMotion} />}
+        {mode === "body" && <BodyScan running={running} reducedMotion={reducedMotion} />}
 
         {mode === "mind" && <MindCard reducedMotion={reducedMotion} />}
 

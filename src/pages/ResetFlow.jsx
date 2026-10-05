@@ -79,7 +79,6 @@ export default function ResetFlow() {
   const [wouldUseAgain, setWouldUseAgain] = useState(null);
   const [unsureStep, setUnsureStep] = useState(0);
   const [unsureBranch, setUnsureBranch] = useState(null);
-  const [saving, setSaving] = useState(false);
   // The Closing brand moment plays once between a session ending and the
   // screen that follows (the shared "done" screen, or navigating away).
   // { id, onDone } while it plays; null the rest of the time.
@@ -846,7 +845,6 @@ export default function ResetFlow() {
             <Button
               size="lg"
               onClick={completeSession}
-              disabled={saving}
               data-sfx="none"
               className="h-16 w-full rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95"
             >
@@ -924,11 +922,10 @@ export default function ResetFlow() {
             <Button
               variant="outline"
               onClick={completeSession}
-              disabled={saving}
               data-sfx="none"
               className="h-12 rounded-full border-primary/30 px-8 text-base font-medium text-primary hover:bg-primary/10 active:scale-95"
             >
-              {saving ? "Saving…" : "Save reflection"}
+              Save reflection
             </Button>
           </div>
         </div>

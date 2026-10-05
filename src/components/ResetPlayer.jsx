@@ -28,8 +28,6 @@ import { suspendFeedback, resumeFeedback, haptic, setHapticsEnabled } from "@/li
 import { recordDislike } from "@/lib/preferences";
 import { interventionThemeStyle, paletteForIntervention } from "@/lib/mentationThemes";
 
-const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
-
 export default function ResetPlayer({ pathway, answers, effectiveness = {}, onComplete, onAttemptEvent, onExit }) {
   const [remaining, setRemaining] = useState(pathway);
   const [ivIndex, setIvIndex] = useState(0);

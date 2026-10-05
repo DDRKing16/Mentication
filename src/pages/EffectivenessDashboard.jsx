@@ -77,7 +77,7 @@ export default function EffectivenessDashboard() {
               <h2 className="font-heading text-lg font-medium text-primary">Most often useful</h2>
             </div>
             <div className="space-y-2">
-              {insights.topInterventions.map((iv, idx) => (
+              {insights.topInterventions.map((iv) => (
                 <div
                   key={iv.id}
                   className="flex items-center justify-between rounded-lg border border-border bg-card p-3"
