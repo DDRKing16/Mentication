@@ -1,0 +1,36 @@
+/* Keep the supplied violet artwork and orb, but let content breathe and scroll. */
+#root {color:#eee6ff;font-family:Quicksand,system-ui,sans-serif}
+#root > div {height:auto;min-height:100dvh;max-height:none;overflow:visible}
+#root > div > div.relative {height:auto;min-height:100dvh;max-height:none;padding:24px 16px;gap:24px;max-width:480px}
+#root .overflow-hidden:not(.fixed):not(.absolute):not(.pointer-events-none) {overflow:visible}
+#root .min-h-0 {min-height:auto}
+#root .justify-evenly {justify-content:flex-start;gap:24px}
+#root button,#root select,#root input[type=range],#root label[title] {min-height:44px}
+#root button:disabled {opacity:.5;cursor:not-allowed}
+#root button:focus-visible,#root input:focus-visible,#root select:focus-visible {outline:3px solid #eee6ff;outline-offset:3px}
+#root [class*="text-[9"],#root [class*="text-[10"],#root [class*="text-[11"],#root [class*="text-[12"] {font-size:14px;line-height:1.45}
+#root [class*="text-[#8E7EBE]"] {color:#c7b9e5}
+#root .whitespace-nowrap {white-space:normal}
+#root .line-clamp-2 {display:block;-webkit-line-clamp:unset}
+#root button.group {height:auto!important;min-height:220px!important}
+#root [style*="height: 33px"] {height:auto!important;min-height:44px!important}
+#root .fixed > div:last-child {overflow:auto}
+#root .fixed label[title],#root .fixed button[class*="w-9"],#root .fixed button[class*="w-8"] {min-width:44px}
+#root .fixed .group {flex-wrap:wrap;gap:16px}
+#root .fixed .group > button {min-width:200px}
+#root .fixed input[type=file] {display:block;width:44px;opacity:.01;position:absolute}
+.night-controls {font-size:14px;line-height:1.5;background:#291c45;border:1px solid #756393;border-radius:20px;padding:18px}
+.night-controls p {margin:8px 0 14px}
+.night-actions,.night-ratings {display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.night-controls button,.night-provider button {background:#ded0f8;color:#27173f;border:1px solid #b9a0df;border-radius:12px;padding:10px 14px;min-height:44px}
+.night-controls select,.night-controls input {display:block;width:100%;background:#3a2a58;color:#fff;border:1px solid #b9a0df;border-radius:8px;padding:10px;margin:8px 0;font-size:16px}
+.night-provider {border:1px solid #9881ba;border-radius:16px;padding:16px;margin:12px 0;line-height:1.5}
+.night-provider h2 {font-size:21px;margin-bottom:10px}
+.night-ratings button {min-width:44px}
+@media(prefers-reduced-motion:reduce) {#root *,#root *:before,#root *:after {animation:none!important;transition:none!important}}
+#root .shrink-0 {max-width:100%;min-width:0}
+#root .whitespace-nowrap {white-space:normal!important}
+#root .h-\[70px\] {height:auto;min-height:70px}
+#root h1 {font-size:clamp(42px,12vw,64px);white-space:nowrap}
+.night-stop {background:#eadcff;color:#27173f;border:2px solid #fff;border-radius:12px;padding:10px 16px;font-weight:700}
+#root label:focus-within {outline:3px solid #eee6ff;outline-offset:3px}

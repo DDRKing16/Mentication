@@ -1,0 +1,5 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="referrer" content="no-referrer"><title>Spotify authorization</title><p>You can return to Night Channel.</p><script>
+const params = new URLSearchParams(location.search);
+history.replaceState(null, '', location.pathname);
+if (window.opener) window.opener.postMessage({type:'night-spotify-callback', code:params.get('code'), error:params.get('error'), state:params.get('state')}, location.origin);
+</script></html>

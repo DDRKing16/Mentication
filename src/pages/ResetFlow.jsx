@@ -664,7 +664,7 @@ export default function ResetFlow() {
     // Signal Lock, Vector Shift and Night Channel are finished standalone builds;
     // never show the simplified in-code stand-ins.
     const standaloneRoute = activePathway.length === 1 ? standaloneRouteFor(activePathway[0]?.id) : null;
-    if (standaloneRoute) return <Navigate to={standaloneRoute} replace />;
+    if (standaloneRoute) return <Navigate to={standaloneRoute} replace state={activePathway[0]?.id === "nightChannel" ? { goal_baseline: answers.goal_baseline, direction: answers.direction } : undefined} />;
     const interactive = activePathway.length === 1 && isInteractiveFlagship(activePathway[0]?.id);
     if (interactive) {
       const interventionId = activePathway[0]?.id;
