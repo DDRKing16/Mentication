@@ -721,6 +721,14 @@
   border: 0;
 }
 
+html.reduce-motion .tpl *,
+html.reduce-motion .tpl *::before,
+html.reduce-motion .tpl *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tpl *,
   .tpl *::before,

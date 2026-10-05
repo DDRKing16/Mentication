@@ -2139,6 +2139,14 @@ export default function NextEasiestStepExperience() {
             background-position: 0% 50%;
           }
         }
+
+        html.reduce-motion .nes-v2-wrap *,
+        html.reduce-motion .nes-v2-wrap *::before,
+        html.reduce-motion .nes-v2-wrap *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
       ` }} />
 
       {/* ==================== 1. LANDING SCREEN ==================== */}

@@ -544,11 +544,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
         accentRgb: "162, 249, 184",
         buttonBg: "#ef4444", // Light red button shading
         buttonText: "#a2f9b8", // Lime green text on button
-        stickyBg: "#1c4434", // Dark green sticky note
-        stickyText: "#e87a74", // Soft red/pink text
         shadow: "0 28px 80px rgba(88, 24, 37, 0.4)",
-        badgeBg: "#b91c1c",
-        badgeText: "#a2f9b8",
         promptBg: "#1c4434",
         promptBorder: "rgba(162, 249, 184, 0.4)"
       };
@@ -561,11 +557,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
         accentRgb: "14, 165, 233",
         buttonBg: "#7c3aed", // Purple button
         buttonText: "#ffffff",
-        stickyBg: "#7c3aed", // Purple sticky note
-        stickyText: "#ffece8", // Peach/coral text
         shadow: "0 28px 80px rgba(124, 58, 237, 0.2)",
-        badgeBg: "#7c3aed",
-        badgeText: "#ffffff",
         promptBg: "#1c4434",
         promptBorder: "rgba(124, 58, 237, 0.4)"
       };
@@ -578,11 +570,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
         accentRgb: "232, 122, 116",
         buttonBg: "#e87a74", // Soft red/pink proceed button
         buttonText: "#122a2e", // Dark green text on button
-        stickyBg: "#1c4434", // Darker green sticky note
-        stickyText: "#e87a74", // Soft red/slightly pink writing on sticky note
         shadow: "0 28px 80px rgba(28, 68, 52, 0.15)",
-        badgeBg: "#1c4434",
-        badgeText: "#e87a74",
         promptBg: "#1c4434",
         promptBorder: "rgba(232, 122, 116, 0.4)"
       };
@@ -1302,65 +1290,6 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
               text-shadow: 0 0 12px rgba(255, 229, 138, 0.7);
               transform: scale(1.04);
               font-weight: 800;
-            }
-
-            .change-scene-v2 .badge {
-              position: absolute;
-              top: -12px;
-              left: 20px;
-              background: ${theme.badgeBg};
-              color: ${theme.badgeText};
-              padding: 4px 12px;
-              border-radius: 12px;
-              font-size: 9px;
-              font-weight: 900;
-              text-transform: uppercase;
-              letter-spacing: 0.1em;
-              box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-              border: 1px solid rgba(255,255,255,0.12);
-            }
-
-            .change-scene-v2 .sticky-note {
-              position: absolute;
-              bottom: -22px;
-              width: 155px;
-              padding: 6px 14px;
-              border-radius: 12px;
-              box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-              font-size: 10px;
-              line-height: 1.35;
-              font-weight: 750;
-              z-index: 25;
-              transition: all 0.3s ease;
-            }
-            .change-scene-v2 .sticky-note.left-side {
-              left: 12px;
-              transform: rotate(-3.5deg);
-            }
-            .change-scene-v2 .sticky-note.right-side {
-              right: 12px;
-              transform: rotate(2.8deg);
-            }
-            .change-scene-v2 .sticky-note.in-flow {
-              position: relative;
-              bottom: auto;
-              left: auto;
-              width: min(100%, 252px);
-              margin: 14px 0 0 12px;
-              transform: none;
-              opacity: 1;
-              z-index: 1;
-            }
-            .change-scene-v2 .sticky-note-pin {
-              position: absolute;
-              top: -6px;
-              left: 50%;
-              width: 10px;
-              height: 10px;
-              background: rgba(255,255,255,0.5);
-              border-radius: 50%;
-              transform: translateX(-50%);
-              box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             }
 
             .change-scene-v2 .glistening {
@@ -2124,6 +2053,14 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
             }
             html.large-text .change-scene-v2 .start-tap-progress {
               margin-bottom: 4px;
+            }
+
+            html.reduce-motion .change-scene-v2 *,
+            html.reduce-motion .change-scene-v2 *::before,
+            html.reduce-motion .change-scene-v2 *::after {
+              animation-duration: 0.001ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.001ms !important;
             }
           `
         }} />

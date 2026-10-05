@@ -9,16 +9,25 @@ const AI_URL = import.meta.env.VITE_AI_URL || "";
 
 export const aiStepsAvailable = () => Boolean(AI_URL);
 
+// A stalled connection (reachable but never responding) would otherwise hang
+// the fetch forever, leaving the caller's "writing your steps" overlay on
+// screen with no way out. Aborting after a bounded wait guarantees this
+// always settles, same as the "relay unreachable" path already does.
+const REQUEST_TIMEOUT_MS = 15000;
+
 // Returns a list of steps in the app's ladder shape — { title, micro, time,
 // easier: [two easier alternatives] } — or null when AI generation is not
 // possible right now.
 export async function generateTaskSteps(taskName, { pathLength = "regular" } = {}) {
   if (!AI_URL || !taskName?.trim()) return null;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     const res = await fetch(`${AI_URL}/steps`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ task: taskName.trim(), pathLength }),
+      signal: controller.signal,
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -38,5 +47,7 @@ export async function generateTaskSteps(taskName, { pathLength = "regular" } = {
     return cleaned.length >= 5 ? cleaned : null;
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
