@@ -693,7 +693,7 @@ export default function ResetFlow() {
           initialCertainty={interventionId === "factCheck" ? answers.intensity : undefined}
           answers={{ ...answers, intensity: lastValue }}
           onGoalBaseline={(baseline) => {
-            if (!baseline?.answered) return;
+            if (!hasGoalBaseline({ direction:answers.direction, goal_baseline:baseline })) return;
             const next = { ...answers, intensity: baseline.value, goal_baseline: baseline };
             setAnswers(next);
             setLastValue(baseline.value);

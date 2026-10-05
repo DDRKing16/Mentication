@@ -87,3 +87,8 @@ describe('approved Change Scene coarse handoff', () => {
     }
   });
 });
+
+it('retains Tomorrow Parking bedside identity and verified coarse save without note text', () => {
+  const snapshot = resetCompletionSnapshot({event:{...event,interventionId:'tomorrowParking'},result:{interventionId:'tomorrowParking',outcome:{parked:true,durationSec:60,note:'PRIVATE'},navigateTo:'/parking-lot'}},'tomorrowParking');
+  expect(snapshot.result).toEqual({requireGoalReassessment:true,interventionId:'tomorrowParking',outcome:{parked:true,durationSec:60},navigateTo:'/parking-lot'});
+});

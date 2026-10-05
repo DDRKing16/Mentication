@@ -70,11 +70,12 @@ export function resetCompletionSnapshot(snapshot, interventionId) {
   for (const key of ['startedAt', 'timestamp']) if (bounded(event[key], 0, 8640000000000000)) cleanEvent[key] = event[key];
   if (HELPFULNESS.includes(event.helpfulness)) cleanEvent.helpfulness = event.helpfulness;
   const result = { requireGoalReassessment:true };
+  if (snapshot.result?.interventionId === interventionId) result.interventionId = interventionId;
   if (HELPFULNESS.includes(snapshot.result?.helpfulness)) result.helpfulness = snapshot.result.helpfulness;
   const outcome = coarseCompletionOutcome(snapshot.result?.outcome, interventionId);
   if (outcome !== undefined) result.outcome = outcome;
   // No arbitrary query strings: these can contain private exercise text.
-  if (['/', '/library', '/lift-followup'].includes(snapshot.result?.navigateTo)) result.navigateTo = snapshot.result.navigateTo;
+  if (['/', '/library', '/lift-followup', '/parking-lot', '/night-channel'].includes(snapshot.result?.navigateTo)) result.navigateTo = snapshot.result.navigateTo;
   const destination = snapshot.result?.navigateTo;
   if (interventionId === 'changeScene' && typeof destination === 'string' && destination.startsWith('/scene-followup?') && destination.length < 200) {
     const url = new URL(destination, 'https://mentication.invalid');
