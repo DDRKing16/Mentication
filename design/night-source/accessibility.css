@@ -34,3 +34,10 @@
 #root h1 {font-size:clamp(42px,12vw,64px);white-space:nowrap}
 .night-stop {background:#eadcff;color:#27173f;border:2px solid #fff;border-radius:12px;padding:10px 16px;font-weight:700}
 #root label:focus-within {outline:3px solid #eee6ff;outline-offset:3px}
+
+/* Keep Change and STOP independently reachable on phone widths. */
+@media (max-width:420px) {
+  .night-player-status {flex-wrap:wrap;gap:10px}
+  .night-player-status > div {flex-basis:100%}
+  .night-player-status > button {flex:1;min-width:0}
+}

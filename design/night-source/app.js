@@ -442,7 +442,7 @@ function Bi() {
         children: S("div", {
           className: "flex-1 flex flex-col",
           children: [S("div", {
-            className: "flex items-center justify-between mt-1 mb-2",
+            className: "night-player-status flex items-center justify-between mt-1 mb-2",
             children: [S("div", {
               className: "flex items-center gap-3",
               children: [S("div", {
