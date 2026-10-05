@@ -651,7 +651,7 @@ export default function PMRV2Stage({
             </button>
           )}
         </div>
-        <h2 className="pmr-v2-instruction">{!running ? "Let your body rest" : phase === "tense" && movementPhase === "release" ? "Let go" : step?.title}</h2>
+        <h2 className="pmr-v2-instruction" aria-live="polite" aria-atomic="true">{!running ? "Let your body rest" : phase === "tense" && movementPhase === "release" ? "Let go" : step?.title}</h2>
         <p className="pmr-v2-region-label">{REGION_LABELS[region]}</p>
 
         {showBody && (

@@ -187,7 +187,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
   // ---- media session: lock screen & background controls ----
   useEffect(() => {
-    if (typeof navigator === "undefined" || !navigator.mediaSession) return;
+    if (isPMRV2 || typeof navigator === "undefined" || !navigator.mediaSession) return;
     try {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: iv?.name || "Reset",
@@ -481,8 +481,8 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
 
   if (isPMRV2) return <PMRExperience key={`${iv.id}-${ivIndex}`} intervention={iv} answers={answers}
     onExit={onExit} onAttemptEvent={onAttemptEvent}
-    onComplete={() => {
-      if (isLastIv) onComplete();
+    onComplete={(result) => {
+      if (isLastIv) onComplete(result);
       else { setIvIndex(i => i + 1); setStepIndex(0); setElapsed(0); }
     }} />;
 

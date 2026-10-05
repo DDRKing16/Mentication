@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createPMRSteps, nextPMRArea, pmrTiming, pmrCueState } from './pmrSession';
 import { pathwayByIds } from './interventions';
 const original = pathwayByIds(['progressive-muscle-relaxation-v2'])[0].steps;
@@ -33,5 +33,25 @@ describe('PMR routes and common cue timeline', () => {
     const after = pmrCueState(step, timing.duration);
     expect(before.visibleCount).toBeLessThan(after.visibleCount);
     expect(after.visibleCount).toBe(timing.alignment.length);
+  });
+});
+
+// Learning consumes only the explicit helpfulness answer; a tension report alone
+// must not become a second sample or overwrite the matching goal assessment.
+import { withAttemptHelpfulness, learningResponse } from './attemptFeedback';
+import { buildAttemptRecord, computeEffectiveness } from './interventions';
+describe('PMR shared feedback integration', () => {
+  beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-05T00:00:00Z')); });
+  afterEach(() => vi.useRealTimers());
+  it.each([['helpful', 'better'], ['same', 'same'], ['worse', 'worse'], ['unsure', 'not_answered'], [null, 'not_answered']])('handles %s independently from tension', (helpfulness, expected) => {
+    const attempt = withAttemptHelpfulness(buildAttemptRecord({ interventionId:'progressive-muscle-relaxation-v2', response:'not_answered' }), helpfulness);
+    expect(learningResponse(attempt)).toBe(expected);
+    const session = { created_date:new Date().toISOString(), attempts:[attempt], intervention_outcome:{type:'pmr',tensionResponse:'less_tension'} };
+    expect(computeEffectiveness([session])).toEqual(computeEffectiveness([{...session,intervention_outcome:{type:'pmr',tensionResponse:'more_uncomfortable'}}]));
+  });
+  it('keeps an early stop out of completed pathways', () => {
+    const attempt = buildAttemptRecord({ interventionId:'progressive-muscle-relaxation-v2', exitReason:'exited', completedPercentage:0 });
+    expect(attempt.exit_reason).toBe('exited');
+    expect(attempt.completed_percentage).toBe(0);
   });
 });

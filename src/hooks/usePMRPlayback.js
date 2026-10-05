@@ -3,7 +3,7 @@ import { App } from '@capacitor/app';
 import { pmrTiming, PMR_LEAD, PMR_RATE } from '@/lib/pmrSession';
 
 // PMR-owned clock: narration, mute, pose and step completion share one timeline.
-export function usePMRPlayback({ step, stepIndex, running, audioEnabled, onPause, onComplete }) {
+export function usePMRPlayback({ step, stepIndex, running, audioEnabled, onPause, onResume, onComplete }) {
   const [elapsed, setElapsed] = useState(0);
   const elapsedRef = useRef(0);
   const completeRef = useRef(onComplete);
@@ -33,6 +33,18 @@ export function usePMRPlayback({ step, stepIndex, running, audioEnabled, onPause
     listener.then(handle => { if (disposed) handle.remove(); });
     return () => { disposed = true; document.removeEventListener('visibilitychange', visibility); document.removeEventListener('freeze', pause); window.removeEventListener('blur', pause); listener.then(handle => handle.remove()); };
   }, [onPause]);
+
+  useEffect(() => {
+    if (!navigator.mediaSession) return;
+    try {
+      navigator.mediaSession.setActionHandler('pause', onPause);
+      navigator.mediaSession.setActionHandler('play', onResume);
+      return () => {
+        navigator.mediaSession.setActionHandler('pause', null);
+        navigator.mediaSession.setActionHandler('play', null);
+      };
+    } catch { /* Unsupported media controls do not change in-app controls. */ }
+  }, [onPause, onResume]);
 
   useEffect(() => {
     const audio = audioRef.current;

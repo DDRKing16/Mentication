@@ -37,3 +37,5 @@
  .pmr-session-controls{padding:6px 8px 10px;gap:4px}
  .pmr-session-controls button{padding:8px 12px;font-size:13px}
 }
+.pmr-session-panel .pmr-helpfulness{grid-template-columns:1fr 1fr}
+.pmr-session-panel .pmr-helpfulness button{text-align:center;padding-inline:10px}
