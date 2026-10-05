@@ -3,3 +3,8 @@
 
 /* Keep the glowing line from stretching the page wider than the screen. */
 .happy-bump-engine{overflow:hidden}
+/* Keep the longer ending and its controls in one scroll flow. */
+.happy-bump-stage-11 .happy-bump-content{padding-bottom:2rem}
+.happy-bump-stage-11 > .fixed.inset-x-0.bottom-0{position:relative;bottom:auto}
+.happy-bump-feedback{width:100%;max-width:32rem;margin:1rem auto 0}
+.happy-bump-feedback small{color:var(--bump-muted)}

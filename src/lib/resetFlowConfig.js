@@ -71,6 +71,7 @@ const WHERE_FELT_DEFAULT = Object.freeze({
 
 export function createInitialResetAnswers(entry) {
   return {
+    goal_baseline: entry?.goal_baseline || null,
     direction: entry?.direction ?? (entry?.immediate ? "calm" : null),
     directionLabel: entry?.directionLabel ?? (entry?.immediate ? "Calm down" : ""),
     immediate: Boolean(entry?.immediate),
