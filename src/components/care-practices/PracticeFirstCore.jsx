@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, Pencil, RefreshCw, Eye, Ear, Hand } from 'lucide-react';
 import { CARE_ACTIONS, EXTERNAL_ANCHORS, compassionateSuggestions, noticingPhrase, makeRoomPhrase } from '@/lib/carePracticeDesign';
+import CarePracticeGuide from './CarePracticeGuide';
 import './practice-first-core.css';
 
 function NextStep({ flow }) {
@@ -32,7 +33,7 @@ export function CompassionCore({ flow }) {
       <button type="button" className="pf-rewrite" onClick={()=>{setRewrite(true);setEditing(false);}}><RefreshCw size={14} aria-hidden="true"/>That does not feel believable</button>
     </>}
     {editing && <div className="pf-editor"><label htmlFor={`${flow.id}-response`}>A response I can believe</label><textarea id={`${flow.id}-response`} autoFocus rows={3} maxLength={300} value={s.perspective} onChange={event=>flow.patch({perspective:event.target.value,responseRead:false,practiceTaken:false})}/><button type="button" className="pf-inline" onClick={()=>setEditing(false)}>Use these words</button></div>}
-    <NextStep flow={flow}/>
+    <CarePracticeGuide id={flow.id}/><NextStep flow={flow}/>
     {s.perspective && !rewrite && <FinishPractice flow={flow} report="I tried saying these words">{s.action || 'Choose one act of care'}</FinishPractice>}
     <Stop flow={flow} stage="action">Choose care without the words</Stop>
   </section>;
@@ -44,7 +45,7 @@ export function UnhookCore({ flow }) {
     <p className="pf-instruction">{s.defusionStep?'Keep the thought. Choose what else gets your attention.':'First, notice the words as a thought.'}</p>
     <div className="pf-thought-room"><div className="pf-thought"><span>{s.defusionStep?'I am noticing the thought…':'My mind says…'}</span><h1 ref={flow.heading} tabIndex={-1}>{s.notice || 'The words I am holding in mind'}</h1></div>{beside && <div className="pf-attention" key={`anchor-${Math.floor(s.clicks/2)}`}><span>Also here, in the real world</span><h2>{s.anchorText || {object:'One object nearby',sound:'One sound in the room',support:'The surface supporting me'}[s.anchorType]}</h2><p>{EXTERNAL_ANCHORS[s.anchorType].instruction}</p><button type="button" className="pf-inline" onClick={()=>setNaming(!naming)}>{s.anchorText?'Change my anchor':'Name what I notice'}<Pencil size={13} aria-hidden="true"/></button></div>}</div>
     {!s.defusionStep ? <button type="button" className="pf-primary" onClick={()=>flow.patch({defusionStep:1,perspective:noticingPhrase(s.notice),practiceTaken:false})}><span>Notice this as a thought</span><ArrowRight size={20} aria-hidden="true"/></button> : <><AnchorChoice flow={flow} onChoose={()=>flow.patch({defusionStep:2,distance:'beside'})}/>{naming && s.anchorType && <AnchorName flow={flow}/>}<NextStep flow={flow}/><FinishPractice flow={flow} report="I tried noticing and returning attention"/></>}
-    <Stop flow={flow}>Return to the room</Stop>
+    <CarePracticeGuide id={flow.id}/><Stop flow={flow}>Return to the room</Stop>
   </section>;
 }
 export function MakeRoomCore({ flow }) {
@@ -53,8 +54,9 @@ export function MakeRoomCore({ flow }) {
     <div className="pf-room-anchor"><span>Stay connected to</span><strong>{s.anchorText || (s.anchorType?{object:'One object nearby',sound:'One sound in the room',support:'The surface supporting me'}[s.anchorType]:'Something outside the feeling')}</strong>{s.anchorType && <button type="button" className="pf-inline" onClick={()=>setNaming(!naming)}><Pencil size={13} aria-hidden="true"/>{s.anchorText?'Change':'Name it'}</button>}</div>
     <AnchorChoice flow={flow}/>{naming && s.anchorType && <AnchorName flow={flow}/>} 
     <div className={`pf-space ${s.allowance?'has-room':''} ${s.allowance==='more'?'has-more-room':''}`}><div className="pf-space-boundary" aria-hidden="true"/><div className="pf-feeling" data-long={s.notice.length > 40 || undefined}><span>Here is</span><h1 ref={flow.heading} tabIndex={-1}>{s.notice || 'This feeling'}</h1></div><p>It can stay the same.</p></div>
-    <div className="pf-space-control" role="group" aria-label="How much space to try">{[[null,'Room only'],['small','A little'],['more','More']].map(([value,label])=><button type="button" key={label} disabled={!s.anchorType && value!==null} aria-pressed={s.allowance===value} onClick={()=>flow.patch({allowance:value,perspective:makeRoomPhrase(s.notice),practiceTaken:false,attentionFocused:false})}>{label}</button>)}</div>
-    <p className="pf-room-guidance">{!s.anchorType?'Choose an anchor before turning toward the feeling.':!s.allowance?'Stay with your surroundings for now.':'Notice lightly, with your anchor still here.'}</p>
+    <div className="pf-space-control" role="group" aria-label="How much attention to give the feeling">{[[null,'Room only'],['small','A little'],['more','More']].map(([value,label])=><button type="button" key={label} disabled={!s.anchorType && value!==null} aria-pressed={s.allowance===value} onClick={()=>flow.patch({allowance:value,perspective:makeRoomPhrase(s.notice),practiceTaken:false,attentionFocused:false})}>{label}</button>)}</div>
+    <p className="pf-room-guidance">{!s.anchorType?'Choose an anchor before turning toward the feeling.':`${EXTERNAL_ANCHORS[s.anchorType].instruction} ${!s.allowance?'Stay with your surroundings for now.':'Notice the feeling lightly, with your anchor still here.'}`}</p>
+    <CarePracticeGuide id={flow.id}/>
     <NextStep flow={flow}/><FinishPractice flow={flow} tried={!!s.allowance} report={s.allowance?'I tried making room for the feeling':'I stayed with my surroundings'}/>
     <Stop flow={flow}>Too much? Return to the room</Stop>
   </section>;

@@ -3,6 +3,7 @@ import { savedWorkMatches, taraReportedResult, validSavedDate } from '@/lib/save
 import { getBrandAtmosphere, getBrandInk } from '@/lib/interventionBrand';
 import { loadTara, deleteTaraRecap } from '@/lib/taraTacticianStorage';
 import { CARE_PRACTICES } from '@/lib/carePractices';
+import { careSavedWorkRows } from '@/lib/careSavedWork';
 import { readCareCards, deleteCareSaved } from '@/lib/carePracticeStorage';
 import { INTERVENTIONS } from '@/lib/interventions';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -52,7 +53,7 @@ export default function ReturnPoints() {
   const visibleNotes=notes?.filter(note=>savedWorkMatches(query,[note.text,JOURNEY_EXPERIENCES[note.interventionId]?.name]));
   const visibleThoughts=thoughts?.filter(record=>savedWorkMatches(query,['Thought or Fact',record.thought,record.balancedConfirmed?record.ruling:'',record.returnPhrase]));
   const visibleTara=taraRecaps?.filter(record=>savedWorkMatches(query,['Tara Tactician',record.prediction,record.actual,record.learning,record.nextStep,taraReportedResult(record)?.text]));
-  const visibleCards=cards?.filter(({id,state})=>savedWorkMatches(query,[CARE_PRACTICES[id].title,state.perspective,state.action]));
+  const visibleCards=cards?.filter(({id,state})=>savedWorkMatches(query,[CARE_PRACTICES[id].title,...careSavedWorkRows(id,state).map(row=>row.value)]));
   const count=[visibleNotes,visibleThoughts,visibleTara,visibleCards].reduce((sum,list)=>sum+(list?.length||0),0);
   return <main className="mx-auto max-w-2xl px-5 pb-[max(3rem,env(safe-area-inset-bottom))] pt-10 safe-top-lg text-foreground">
     <Link className="inline-block min-h-11 underline" to="/">Home</Link>
@@ -94,8 +95,7 @@ export default function ReturnPoints() {
     </article>)}
     {visibleCards?.map(({ id, state }) => <article key={id} className="my-4 rounded-2xl border border-border bg-card p-5">
       <SavedHeading id={id}>{CARE_PRACTICES[id].title} · saved card</SavedHeading>
-      {state.perspective && <p className="my-3 whitespace-pre-wrap break-words">{state.perspective}</p>}
-      {state.action && <p className="my-3 whitespace-pre-wrap break-words">Your chosen action: {state.action}</p>}
+      {careSavedWorkRows(id,state).map(row=><div key={row.kind} className="my-4"><p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{row.label}</p><p className="mt-1 whitespace-pre-wrap break-words">{row.kind==='action'?'Your chosen action: ':''}{row.value}</p></div>)}
       <Link className="min-h-11 inline-block underline mr-4" to="/reset" state={{ prebuilt: true, pathway: [id], direction: INTERVENTIONS.find(iv => iv.id === id)?.primaryDirection, intensity: null, timeMin: 3, audio: "no" }}>Open practice and saved card</Link>
       <button className="min-h-11 underline" onClick={() => { if (deleteCareSaved(id)) { setCards(current => current.filter(card => card.id !== id)); setError(""); } else setError("Could not delete this saved card. Try again."); }}>Delete saved card</button>
     </article>)}

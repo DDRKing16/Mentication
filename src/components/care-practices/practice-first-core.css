@@ -41,3 +41,14 @@
 .pf-feeling[data-long]{background:#82947d}
 .pf-space:has(.pf-feeling[data-long]) .pf-space-boundary{width:76%;height:calc(100% - 80px)}
 .pf-space.has-room:has(.pf-feeling[data-long]) .pf-space-boundary{width:94%;height:calc(100% - 24px)}
+
+/* Optional teaching stays next to the real practice and uses its own palette. */
+.pf-practice-guide{margin:14px 0 4px;border-top:1px solid var(--care-line);border-bottom:1px solid var(--care-line);color:var(--care-muted)}
+.pf-practice-guide summary{cursor:pointer;min-height:44px;padding:12px 0;font-size:14px;line-height:1.5;color:var(--care-accent)}
+.pf-practice-guide>div{padding:4px 0 16px}
+.pf-practice-guide h2{font:400 25px/1.2 'EB Garamond',serif;color:var(--care-ink);margin:5px 0 12px}
+.pf-practice-guide p,.pf-practice-guide li{font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+.pf-practice-guide ol{padding-left:22px;margin:12px 0 0}
+.pf-practice-guide li{padding-left:4px;margin:10px 0}
+.pf-practice-guide summary:focus-visible{outline:3px solid var(--care-accent);outline-offset:3px}
+.large-text .pf-practice-guide :is(summary,p,li){font-size:18px}
