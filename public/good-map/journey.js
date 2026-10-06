@@ -10,6 +10,13 @@
     maps = [],
     undo = [],
     lastAction = null;
+  window.addEventListener('message', event => {
+    if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'mentication:pause-for-alternative' || typeof event.data.requestId !== 'string') return;
+    document.querySelectorAll('audio,video').forEach(media => media.pause());
+    window.speechSynthesis?.cancel();
+    // This is a self-paced map. Keeping it mounted retains its current inputs.
+    window.parent.postMessage({ type: 'mentication:alternative-ready', requestId: event.data.requestId }, location.origin);
+  });
   const clone = x => JSON.parse(JSON.stringify(x));
   const fresh = clone(JST);
   const uid = () => crypto.randomUUID();

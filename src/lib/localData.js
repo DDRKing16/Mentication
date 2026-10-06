@@ -81,5 +81,36 @@ export function exportLocalAppData() {
     schemaVersion: 1,
     exportedAt: new Date().toISOString(),
     sessions: readSessions(),
+    takeaways: readTakeaways(),
+    signalLock: JSON.parse(storage()?.getItem("mentation.signal-lock.grounding.v1") || "null"),
   };
 }
+
+// Explicitly saved personal notes are separate from session/effectiveness data.
+// Never infer a note from a rating, elapsed time or completion event.
+const TAKEAWAY_KEY = 'mentation.takeaways.v1';
+function readTakeaways() {
+  const raw = storage()?.getItem(TAKEAWAY_KEY);
+  if (!raw) return [];
+  const records = JSON.parse(raw);
+  if (!Array.isArray(records)) throw new Error('Saved notes could not be read.');
+  if (records.some(record => !record || typeof record.id !== 'string' || typeof record.text !== 'string' || typeof record.interventionId !== 'string')) throw new Error('Saved notes could not be read.');
+  return records;
+}
+function writeTakeaways(records) {
+  const local = storage();
+  if (!local) throw new Error('Device storage is unavailable.');
+  local.setItem(TAKEAWAY_KEY, JSON.stringify(records));
+}
+export const takeawayStore = Object.freeze({
+  list: readTakeaways,
+  save({ id, interventionId, text }) {
+    const content = typeof text === 'string' ? text.trim() : '';
+    if (!content || content.length > 1500 || typeof interventionId !== 'string' || !interventionId) throw new Error('Enter a note of up to 1500 characters.');
+    const record = { id: id || globalThis.crypto?.randomUUID?.() || `note-${Date.now()}`, interventionId, text: content, createdAt: new Date().toISOString() };
+    const records = readTakeaways();
+    writeTakeaways([record, ...records.filter(item => item.id !== record.id)]);
+    return record;
+  },
+  delete(id) { writeTakeaways(readTakeaways().filter(item => item.id !== id)); },
+});

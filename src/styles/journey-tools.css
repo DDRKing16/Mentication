@@ -1,0 +1,13 @@
+.journey-takeaway { margin: 1rem 0; padding: 1rem; border: 1px solid currentColor; border-radius: 1rem; text-align: left; font: 400 1rem/1.5 system-ui,sans-serif; overflow-wrap:anywhere; }
+.journey-takeaway summary { cursor:pointer; min-height:44px; }
+.journey-takeaway label,.journey-takeaway a { display:block; margin-top:.75rem; }
+.journey-takeaway textarea { box-sizing:border-box; width:100%; margin:.5rem 0; padding:.75rem; background:#fffdf7; color:#172d32; border:1px solid #617275; border-radius:.5rem; font:inherit; }
+.journey-takeaway p { font:inherit; margin:.5rem 0; }
+.journey-takeaway button,.journey-options-button { min-height:44px; padding:.5rem .75rem; border:1px solid currentColor; border-radius:.75rem; font:inherit; color:inherit; background:transparent; }
+.journey-takeaway button:disabled { opacity:.6; }
+.journey-takeaway a { text-decoration:underline; min-height:44px; }
+.journey-options-dialog { width:calc(100% - 2rem); max-width:30rem; max-height:85dvh; overflow:auto; padding:1.5rem; border:1px solid #718281; border-radius:1.5rem; color:#172d32; background:#fffdf7; font:400 1rem/1.6 system-ui,sans-serif; }
+.journey-options-dialog::backdrop { background:rgb(0 0 0 / .65); }
+.journey-options-dialog h2 { font-size:1.5rem; margin-bottom:.75rem; }
+.journey-options-dialog button { min-height:44px; padding:.65rem 1rem; margin-top:.75rem; border:1px solid currentColor; border-radius:1rem; }
+.journey-options-dialog :focus-visible,.journey-takeaway :focus-visible,.journey-options-button:focus-visible { outline:3px solid #b85030; outline-offset:3px; }

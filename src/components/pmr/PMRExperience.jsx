@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import PMRV2Stage from '@/components/PMRV2Stage';
 import { HELPFULNESS } from '@/lib/attemptFeedback';
@@ -64,6 +65,7 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
   return <div className="intervention-theme pmr-session" data-intervention-theme={palette.id} style={interventionThemeStyle(palette)}>
     <div className="pmr-v2-player-ambient" aria-hidden="true" />
     <header className="pmr-session-header"><button onClick={onExit} aria-label="Exit Progressive Muscle Relaxation">Exit</button><span>Progressive Muscle Relaxation</span></header>
+    <div className="relative z-10 mx-auto w-fit"><JourneyOptions id={intervention.id} onOpen={pause} /></div>
     {phase === 'setup' ? <main className="pmr-session-panel">
       <h1>Choose a comfortable way</h1>
       <p>Is any area painful, injured or unsafe to tense today? If yes or unsure, choose release only, skip that area, or stop.</p>

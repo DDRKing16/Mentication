@@ -11,7 +11,7 @@ const ambientResetRoutes = new Set(['lift', 'focus', 'calm', 'ground', 'sleep', 
 const routes = new Set([
   'lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'begin',
   'seven-calmer-days', 'restructure', 'foundations', 'journal', 'good-map', 'dear-2100', 'palace',
-  'library', 'my-plan', 'profile', 'insights', 'settings', 'recommended', 'parking-lot'
+  'library', 'my-plan', 'profile', 'insights', 'settings', 'recommended', 'parking-lot', 'return-points'
 ]);
 
 /**

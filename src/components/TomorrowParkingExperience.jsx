@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, X } from "lucide-react";
@@ -90,6 +91,7 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
         <button type="button" className="tpl-icon-btn" aria-label="Exit" disabled={saving} onClick={leave}><X size={18} aria-hidden="true" /></button>
       </header>
 
+      <JourneyOptions id={ID} />
       {step === "capture" && <div className="tpl-rise tpl-capture">
         <p className="tpl-kicker">A little less to carry tonight</p>
         {heading("Leave tomorrow here.")}

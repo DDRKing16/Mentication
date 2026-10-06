@@ -8,7 +8,7 @@
     restructure: 'Restructure', foundations: 'Foundations', journal: 'Check in with yourself',
     palace: 'Peace Palace',
     'good-map': 'See what makes life feel good', 'dear-2100': 'Go after what you’ve avoided',
-    library: 'Library', 'my-plan': 'My Plan', profile: 'Profile', insights: 'Insights', settings: 'Settings',
+    'return-points': 'Return points', library: 'Library', 'my-plan': 'My Plan', profile: 'Profile', insights: 'Insights', settings: 'Settings',
     recommended: 'Your reset for today', 'parking-lot': 'Your parking lot'
   });
   const preferenceKey = 'mentication.home.accessibility.v1';
@@ -16,6 +16,7 @@
   let navigateHandler = null;
   let storageAvailable = true;
   let bridgeConnected = false;
+  let pendingNavigation = null;
   let parentOrigin = null;
   let bridgeId = null;
   let activeOpener = null;
@@ -144,6 +145,11 @@
         },
       });
       if (!bgMusic.paused) bgMusic.pause();
+      return;
+    }
+    if (window.parent !== window) {
+      pendingNavigation = route;
+      status.textContent = 'Opening…';
       return;
     }
     showDestinationPreview(route, opener);
@@ -329,6 +335,7 @@
       bridgeConnected = true;
       root.dataset.embedded = 'true';
       sendBridge('ready'); reportHeight();
+      if (pendingNavigation) { const route = pendingNavigation; pendingNavigation = null; navigate(route); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'viewport' && Number.isFinite(data.top) && data.top >= 0 && Number.isFinite(data.height) && data.height >= 1 && data.height <= 20000) {
       root.style.setProperty('--dialog-top', `${data.top + data.height / 2}px`);
       root.style.setProperty('--dialog-max-height', `${Math.max(100, data.height - 32)}px`);

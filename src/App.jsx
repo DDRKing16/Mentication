@@ -24,6 +24,8 @@ import { hasCompletedOnboarding } from '@/lib/onboarding';
 // Route page components are loaded on demand to keep the initial bundle small.
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
 // inside AppShell so they can be kept mounted across tab switches.
+const NeedStart = lazy(() => import('@/pages/NeedStart'));
+const ReturnPoints = lazy(() => import('@/pages/ReturnPoints'));
 const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
 const ChangeSceneFollowup = lazy(() => import('@/pages/ChangeSceneFollowup'));
 const LiftFollowup = lazy(() => import('@/pages/LiftFollowup'));
@@ -100,6 +102,8 @@ const MenticationRoutes = () => {
                   <Route path="/settings" element={<></>} />
                 </Route>
                 <Route path="/welcome" element={<Welcome />} />
+                <Route path="/start" element={<NeedStart />} />
+                <Route path="/return-points" element={<ReturnPoints />} />
                 <Route path="/reset" element={<ResetFlow />} />
                 <Route path="/scene-followup" element={<ChangeSceneFollowup />} />
                 <Route path="/lift-followup" element={<LiftFollowup />} />

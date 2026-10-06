@@ -1,3 +1,5 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
+import { pauseJourneyFrame } from '@/lib/journeyBridge';
 import React, { useEffect, useRef } from 'react';
 
 /** Keep the approved self-contained artwork, with a narrowly scoped bridge. */
@@ -25,8 +27,9 @@ export default function VectorShiftFrame({ answers, sessionId, onComplete }) {
     window.addEventListener('message', receive);
     return () => window.removeEventListener('message', receive);
   }, [sessionId]);
-  return <main className="fixed inset-0" style={{ background:'#0f2f23' }} aria-label="Vector Shift">
-    <iframe ref={frame} title="Vector Shift activities" className="h-full w-full border-0"
+  return <main className="fixed inset-0 flex flex-col" style={{ background:'#0f2f23' }} aria-label="Vector Shift">
+    <div className="shrink-0 px-4 py-1 text-center text-white"><JourneyOptions id="vectorShift" onOpen={() => pauseJourneyFrame(frame.current)} /></div>
+    <iframe ref={frame} title="Vector Shift activities" className="min-h-0 flex-1 w-full border-0"
       src={`/vector-shift/index.html?session=${encodeURIComponent(sessionId)}&audio=${answers?.audio === 'no' || answers?.noAudio || answers?.discreet ? 'off' : 'on'}`} />
   </main>;
 }

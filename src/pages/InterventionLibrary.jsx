@@ -147,7 +147,7 @@ export default function InterventionLibrary() {
     const activeFilters = FILTERS.filter((f) => filters[f.key]);
     const allItems = [...INTERVENTIONS, DEAR_2100_INTERVENTION];
     let list = allItems.filter((iv) => {
-      if (cat && iv.primaryDirection !== cat) return false;
+      if (cat && iv.primaryDirection !== cat && !(iv.directions || []).includes(cat)) return false;
       if (activeFilters.length && !activeFilters.every((f) => f.test(iv))) return false;
       if (!term) return true;
       return iv.name.toLowerCase().includes(term) || (iv.why || "").toLowerCase().includes(term);
@@ -197,6 +197,11 @@ export default function InterventionLibrary() {
             <p className="text-sm text-muted-foreground">Pick any practice. {INTERVENTIONS.length + 1} in total.</p>
           </div>
         </header>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <button type="button" className="min-h-14 rounded-2xl border border-border bg-card p-4 text-left" onClick={() => navigate('/start')}>Not sure where to start? Choose what you need</button>
+          <button type="button" className="min-h-14 rounded-2xl border border-border bg-card p-4 text-left" onClick={() => navigate('/return-points')}>Return points · your saved work</button>
+        </div>
 
         <div className="relative mt-5">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

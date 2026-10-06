@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import InterventionNav from "@/components/brand/InterventionNav";
 import React, { useState, useRef, useEffect } from "react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
@@ -1487,6 +1488,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
       {/* Shared Home button on every screen, and Back on the opening screen (inner screens keep their own step-back arrows). */}
       {loadError && <div className="nes-save-status" role="alert">{loadError}<button onClick={() => setLoadError(null)}>Dismiss</button></div>}
       <div className="nes-save-status" role={storageStatus ? "alert" : "status"}>{storageStatus || "Task progress saved on this device."}{storageStatus && <button onClick={() => setGameState(prev => ({ ...prev }))}>Retry save</button>}</div>
+      <div style={{ position: "relative", zIndex: 6, textAlign: "center", color: "#502f37" }}><JourneyOptions id="nextAction" /></div>
       <style>{`
         .nes-v2-wrap .screen { max-width:600px; margin:0 auto; }
         .nes-save-status { position:relative; z-index:6; padding:60px 20px 8px; color:#502f37; background:#e1e8c1; font-size:14px; }

@@ -218,7 +218,8 @@ export default function Home() {
     if (route === "profile") { navigate("/profile"); return; }
     if (route === "insights") { navigate("/insights"); return; }
     if (route === "settings") { navigate("/settings"); return; }
-    if (route === "guide") { navigate("/reset", { state: { unsure: true } }); return; }
+    if (route === "guide") { navigate("/start"); return; }
+    if (route === "return-points") { navigate("/return-points"); return; }
     if (DIRECTION_LABELS[route]) {
       navigate("/reset", { state: { direction: route, directionLabel: DIRECTION_LABELS[route] } });
     }

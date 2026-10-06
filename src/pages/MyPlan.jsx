@@ -74,8 +74,14 @@ export default function MyPlan() {
         <header>
           <p className="text-[0.72rem] font-medium uppercase tracking-[0.26em] text-[#7A572E]">Your plan</p>
           <h1 className="mt-1.5 font-heading text-[1.9rem] font-medium leading-tight text-[#0E4536]">My Plan</h1>
-          <p className="mt-1 text-[0.92rem] text-[#5F726B]">A personalised regulation plan, built from your history.</p>
+          <p className="mt-1 text-[0.92rem] text-[#5F726B]">Starting ideas for today, with your saved local feedback where available.</p>
         </header>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <button type="button" onClick={() => navigate('/start')} className="min-h-12 rounded-2xl border border-[#0E4536]/20 p-3 text-left">Choose what you need now</button>
+          <button type="button" onClick={() => navigate('/return-points')} className="min-h-12 rounded-2xl border border-[#0E4536]/20 p-3 text-left">Return to saved work</button>
+        </div>
+        <p className="mt-4 text-sm leading-relaxed text-[#5F726B]">Today's suggestion uses the time of day and saved feedback where available. It does not know how you feel now; choose what you need or answer a fresh check-in.</p>
 
         <section className="mt-8">
           <p className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[#5F726B]">Today</p>

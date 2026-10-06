@@ -6,6 +6,7 @@ const HANDOFF_KEY = "mentation.flagship.handoffs.v1";
 const PARKING_KEY = "mentation.tomorrowParking.pending";
 const PARKING_RECORDS_KEY = "mentication.tomorrowParking.records.v1";
 const PARKING_CONSENTS_KEY = "mentication.tomorrowParking.consents.v1";
+const SHARED_RETURN_KEYS = ["mentation.takeaways.v1", "mentation.thought-or-fact.records.v1", "mentation.signal-lock.grounding.v1"];
 const NIGHT_FEEDBACK_KEY = "mentation.nightChannel.feedback.v1";
 const ACTIVE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -125,9 +126,9 @@ export function getFlagshipPatternSummary(interventionId) {
 export function deleteFlagshipMemory(scope = "all") {
   const keys = scope === "active" ? [ACTIVE_KEY]
     : scope === "preferences" ? [PREF_KEY, HANDOFF_KEY]
-      : scope === "saved" ? [PARKING_KEY, PARKING_RECORDS_KEY, NIGHT_FEEDBACK_KEY]
-        : [PREF_KEY, ACTIVE_KEY, HANDOFF_KEY, PARKING_KEY, PARKING_RECORDS_KEY, PARKING_CONSENTS_KEY, NIGHT_FEEDBACK_KEY];
-  keys.forEach((key) => { try { localStorage.removeItem(key); } catch { /* private mode */ } });
+      : scope === "saved" ? [PARKING_KEY, PARKING_RECORDS_KEY, NIGHT_FEEDBACK_KEY, ...SHARED_RETURN_KEYS]
+        : [PREF_KEY, ACTIVE_KEY, HANDOFF_KEY, PARKING_KEY, PARKING_RECORDS_KEY, PARKING_CONSENTS_KEY, NIGHT_FEEDBACK_KEY, ...SHARED_RETURN_KEYS];
+  keys.forEach((key) => localStorage.removeItem(key));
   // A Tomorrow Parking Lot draft (unsaved note text) and a staged Next Easiest
   // Step handoff excerpt live in sessionStorage, not the keys above - but this
   // button promises to clear "saved return points and handoff preferences",

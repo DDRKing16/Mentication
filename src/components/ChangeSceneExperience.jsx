@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useEffect, useRef, useState } from "react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { useGuideVoice } from "@/hooks/useGuideVoice";
@@ -257,6 +258,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       <button aria-label="Exit intervention" onClick={onExit}>×</button>
     </header>
     <main className="scene-card">
+      <JourneyOptions id={ID} onOpen={() => { stop(); setAudioOn(false); }} />
       <nav className="scene-progress" aria-label="Journey progress">
         {['Start','Move','Water','View','Connect','Rest','Plan','Review'].map((label,i)=><button key={label} aria-label={`${label}${i===step?', current step':''}`} aria-current={i===step?'step':undefined} disabled={i>step} onClick={()=>go(i)}><span aria-hidden="true">{i===0?'✦':session.actions[i]?.status==='done'?'✓':session.actions[i]?.status==='skipped'?'−':i}</span><small>{label}</small></button>)}
       </nav>

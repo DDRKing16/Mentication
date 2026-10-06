@@ -1,3 +1,5 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
+import { JOURNEY_EXPERIENCES } from '@/lib/journeyExperience';
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, CircleStop, MoreHorizontal, Pause, Play, SlidersHorizontal, Volume2, VolumeX, X } from "lucide-react";
@@ -62,6 +64,7 @@ export default function InterventionControlShell({
         {bottomActionLabel && onBottomAction
           ? <button onClick={onBottomAction} className="min-h-11 rounded-full px-5 text-sm font-medium text-white/68 underline-offset-4 hover:text-white hover:underline">{bottomActionLabel}</button>
           : <button onClick={openAdapt} className="min-h-11 rounded-full px-5 text-sm font-medium text-white/68 underline-offset-4 hover:text-white hover:underline">This is not helping</button>}
+        <JourneyOptions id={id} onOpen={() => { if (active && !paused) onPause?.(); if (audioOn) onAudio?.(); }} />
         {(active || onAudio) && <div className="brand-chrome-dock flex items-center gap-1 rounded-full p-1.5">
           {onPause && <button onClick={onPause} aria-label={paused ? "Resume" : "Pause"} className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10">{paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}</button>}
           {onAudio && <button onClick={onAudio} aria-label={audioOn ? "Mute audio" : "Enable audio"} aria-pressed={audioOn} className="grid min-h-11 min-w-11 place-items-center rounded-full hover:bg-white/10">{audioOn ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}</button>}
@@ -77,7 +80,7 @@ export default function InterventionControlShell({
             <h2 id={`${id}-adapt-title`} className="mt-2 font-heading text-2xl">What would fit better?</h2>
             <div className="mt-5 grid gap-2">
               {onSimplify && <button onClick={() => { onSimplify(); setShowAdapt(false); }} className="min-h-12 rounded-2xl border border-white/15 bg-white/[0.06] px-4 text-left">{simplifyLabel}</button>}
-              {onDifferent && <button onClick={() => { onDifferent(); setShowAdapt(false); }} className="min-h-12 rounded-2xl border border-white/15 bg-white/[0.06] px-4 text-left">Use a different mechanism</button>}
+              {onDifferent && !JOURNEY_EXPERIENCES[id] && <button onClick={() => { onDifferent(); setShowAdapt(false); }} className="min-h-12 rounded-2xl border border-white/15 bg-white/[0.06] px-4 text-left">Use a different mechanism</button>}
               <button onClick={() => { setShowAdapt(false); onExit?.(); }} className="min-h-12 rounded-2xl border border-white/15 px-4 text-left">Stop deliberately</button>
               <button onClick={() => setShowAdapt(false)} className="min-h-11 px-4 text-sm text-white/60">Continue here</button>
             </div>

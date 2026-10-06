@@ -33,6 +33,7 @@ export default function Settings() {
   const navigate = useNavigate();
   const plus = usePlus();
   const [reminder, setReminder] = useState(getReminderPrefs);
+  const [memoryError, setMemoryError] = useState("");
   const [reminderNote, setReminderNote] = useState("");
   const [backupNote, setBackupNote] = useState("");
   const [pendingRestore, setPendingRestore] = useState(null);
@@ -187,8 +188,7 @@ export default function Settings() {
             <Trash2 className="h-4 w-4" /> Your data
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            We store as little as possible and never keep raw free-text beyond what you choose to save. Delete your
-            session history any time from your Profile.
+            Your saved notes and practice records stay on this device. Some practices also keep a local draft so you can resume. You can manage saved notes in Return points and delete app data from your Profile.
           </p>
           <Button variant="outline" onClick={() => navigate("/profile")} className="mt-4 rounded-full">
             Manage & delete my data
@@ -197,13 +197,14 @@ export default function Settings() {
             variant="ghost"
             onClick={() => {
               if (!window.confirm("Delete local intervention memory, saved return points and handoff preferences from this device?")) return;
-              deleteFlagshipMemory("all");
-              setMemoryCleared(true);
+              try { deleteFlagshipMemory("all"); setMemoryCleared(true); setMemoryError(""); }
+              catch { setMemoryCleared(false); setMemoryError("Some local memory could not be deleted. Please try again."); }
             }}
             className="mt-2 rounded-full text-muted-foreground"
           >
             Delete local intervention memory
           </Button>
+          {memoryError && <p role="alert" className="mt-2 text-sm">{memoryError}</p>}
           {memoryCleared && <p role="status" className="mt-2 text-sm text-muted-foreground">Local intervention memory deleted.</p>}
         </div>
 

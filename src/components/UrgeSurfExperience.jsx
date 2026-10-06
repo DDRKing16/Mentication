@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import { useFlowNav } from "@/components/brand/InterventionNav";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Check, ChevronLeft, ExternalLink, Pause, Play, X } from "lucide-react";
@@ -72,6 +73,7 @@ function Shell({ children, step, onBack, backLabel = "Go back", trailing }) {
   return (
     <main className="urge-lovable">
       <section className="urge-lovable__shell">
+        <div style={{position:"relative",zIndex:5,textAlign:"center"}}><JourneyOptions id="urgeSurf" onOpen={() => window.dispatchEvent(new Event("mentation:urge-pause"))} /></div>
         <BackgroundWaves />
         <header className="urge-lovable__header">
           <div className="urge-lovable__header-side urge-lovable__header-side--start">
@@ -306,8 +308,10 @@ function TimerStage({ session, dispatch, audioEnabled }) {
       dispatch({ type: "TIMER_PAUSED", nowEpochMs: Date.now() });
       pauseNarration();
     };
+    const pauseForAlternative = () => { dispatch({ type: "TIMER_PAUSED", nowEpochMs: Date.now() }); pauseNarration(); };
+    window.addEventListener("mentation:urge-pause", pauseForAlternative);
     document.addEventListener("visibilitychange", pauseWhenHidden);
-    return () => document.removeEventListener("visibilitychange", pauseWhenHidden);
+    return () => { document.removeEventListener("visibilitychange", pauseWhenHidden); window.removeEventListener("mentation:urge-pause", pauseForAlternative); };
   }, [dispatch, pauseNarration]);
 
   useEffect(() => {

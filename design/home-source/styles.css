@@ -2135,3 +2135,6 @@ body:has(dialog[open]) {
 .parking-return button { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; width: 100%; text-align: left; padding: 16px 20px; border: 1px solid #baa59066; border-radius: 16px; background: #2f2736; color: #f2e8df; cursor: pointer; }
 .parking-return button span:first-child { font-size: 18px; }
 .parking-return button span:last-child { font-size: 13px; color: #d0bec5; align-self: center; }
+
+.return-points-nav { margin: 12px 0; text-align:center; }
+.return-points-nav button { min-height:44px; padding:8px 16px; border:1px solid currentColor; border-radius:24px; background:transparent; color:inherit; font:inherit; }

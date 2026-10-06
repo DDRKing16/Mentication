@@ -24,7 +24,7 @@ export function BuildingResetScreen() {
       >
         Building your reset…
       </motion.p>
-      <p className="text-muted-foreground">Tailoring a pathway just for you.</p>
+      <p className="text-muted-foreground">Finding a starting practice from your answers.</p>
     </div>
   );
 }
@@ -56,8 +56,10 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
           <p className="mt-2 max-w-lg text-[0.98rem] leading-relaxed text-muted-foreground text-balance">
             {isPrebuilt
               ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
-              : "Starting with the best-fit practice. The next step will adapt after your check-in."}
+              : "A starting practice based on your answers. The next step can change after your check-in."}
           </p>
+
+          {!isPrebuilt && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">You chose {answers.directionLabel || answers.direction}{Number.isFinite(answers.timeMin) ? ` and ${answers.timeMin} minutes` : ''}. Your current answers and any saved local feedback guide this starting suggestion. You can adapt it or stop.</p>}
 
           <motion.section
             initial={{ opacity: 0, y: 10 }}

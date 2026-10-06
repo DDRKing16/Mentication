@@ -3698,7 +3698,14 @@ function SN() {
       if (window.parent !== window) window.parent.postMessage({type:"dear2100-saved-exit"},location.origin);
       else location.href = "/#/";
     };
-    const message = event => { if(event.origin === location.origin && event.source === window.parent && event.data?.type === "dear2100-save-exit") void exit(); };
+    const message = event => {
+      if(event.origin !== location.origin || event.source !== window.parent) return;
+      if(event.data?.type === "dear2100-save-exit") void exit();
+      if(event.data?.type === "mentication:pause-for-alternative" && typeof event.data.requestId === "string") {
+        ge.pause(); ie(!1);
+        window.parent.postMessage({type:"mentication:alternative-ready",requestId:event.data.requestId},location.origin);
+      }
+    };
     const changed = event => { if(event.key === Sf) { C("error"); R("This book changed in another tab. Export your current copy, then reload the saved book. Nothing was overwritten."); } };
     window.addEventListener("message", message);
     window.addEventListener("storage",changed);

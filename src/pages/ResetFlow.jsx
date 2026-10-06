@@ -1,3 +1,4 @@
+import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
 import { attemptEventDisposition, resetCompletionSnapshot, finalAssessmentEvent } from '@/lib/resetCompletion';
 import { resetNavigationEntry, freshResetEntry, appendResetFlowSnapshot, resetFlowHistorySnapshot } from "@/lib/resetNavigation";
 import { captureGoalBaseline, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
@@ -654,6 +655,7 @@ export default function ResetFlow() {
       <p className="text-muted-foreground">The same question as at the start. Confirm an honest rating, or skip. You do not need to feel better.</p>
       <IntensityDial value={goalEndRating ?? 5} onChange={setGoalEndRating} direction={answers.direction} />
       <p className="text-muted-foreground">{goalEndRating == null ? 'Not answered yet.' : goalPointChange(answers.goal_baseline, answers.direction, goalEndRating) == null ? 'No confirmed starting rating to compare.' : `${answers.goal_baseline.value} → ${goalEndRating} · ${goalPointChange(answers.goal_baseline, answers.direction, goalEndRating)} points`}</p>
+      <JourneyTakeaway id={goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id} />
       <Button className="rounded-full" disabled={saving} onClick={() => finishGoal(goalEndRating ?? 5)}>Confirm rating: {goalEndRating ?? 5}</Button>
       <Button className="rounded-full" variant="outline" disabled={saving} onClick={() => finishGoal(null)}>Skip and finish</Button>
     </div></main>;
@@ -1055,7 +1057,7 @@ export default function ResetFlow() {
       ? (isLift ? `Up ${imp} — a real shift.` : `Down ${imp} — a real shift.`)
       : outcome === "worse"
       ? "Different things work at different times. Be gentle with yourself."
-      : "Holding steady. You showed up, and that matters.";
+      : outcome === "neutral" ? "No before-and-after comparison was recorded." : "Your rating stayed the same.";
     return (
       <div className="calmbg flex min-h-full flex-col items-center justify-center gap-6 px-6 text-center">
         <div className="relative flex h-24 w-24 items-center justify-center">
@@ -1106,6 +1108,7 @@ export default function ResetFlow() {
           )}
         </div>
 
+        <JourneyTakeaway id={usedIds[usedIds.length - 1] || pathway[0]?.id} />
         {weekCount > 0 && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground/80">
             <span className="h-1.5 w-1.5 rounded-full bg-teal/70" />

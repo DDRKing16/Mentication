@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import { useFlowNav } from "@/components/brand/InterventionNav";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
@@ -738,6 +739,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         {!isLastStep && <button type="button" className="rounded-full bg-white/80 px-5 py-3 font-medium" onClick={goNextStep}>{step?.sense === "taste" ? "Recenter when ready" : "Next sense"}</button>}
         <button type="button" className="rounded-full border px-5 py-3" onClick={finishGrounding}>{isLastStep ? "Finish grounding" : "Finish grounding early"}</button>
       </div>}
+      <div className="relative z-10 mx-auto my-2 w-fit"><JourneyOptions id={iv?.id} onOpen={() => { setRunning(false); pauseVoice(); }} /></div>
       {!boxFeedback && <>
       {isBoxV2 && (
         <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
