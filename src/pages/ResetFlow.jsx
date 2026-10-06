@@ -658,7 +658,7 @@ export default function ResetFlow() {
     return <main className={`${goalCompletionRef.current?.interventionId === "tomorrowParking" ? "tpl tpl--bedside tpl-goal" : "calmbg"} min-h-[100dvh] px-5 py-6`}><div className="mx-auto flex max-w-lg flex-col gap-6">
       <FlowHomeButton /><h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
       <p className="text-muted-foreground">{hasGoalBaseline(answers) ? "The same goal question as at the start." : "An optional goal check-in, separate from the practice question. There is no starting goal rating to compare."} Confirm an honest rating, or skip. You do not need to feel better.</p>
-      <IntensityDial value={goalEndRating ?? 5} onChange={setGoalEndRating} direction={answers.direction} />
+      <IntensityDial value={goalEndRating} onChange={setGoalEndRating} direction={answers.direction} />
       <p className="text-muted-foreground">{goalEndRating == null ? 'Not answered yet.' : goalPointChange(answers.goal_baseline, answers.direction, goalEndRating) == null ? 'No confirmed starting rating to compare.' : `${answers.goal_baseline.value} → ${goalEndRating} · ${goalPointChange(answers.goal_baseline, answers.direction, goalEndRating)} points`}</p>
       <JourneyTakeaway id={goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id} />
       <Button className="rounded-full" disabled={saving} onClick={() => finishGoal(goalEndRating ?? 5)}>Confirm rating: {goalEndRating ?? 5}</Button>
@@ -1225,7 +1225,7 @@ export default function ResetFlow() {
             </p>
 
             <div className="mt-10 flex flex-1 flex-col items-center">
-              <IntensityDial value={answers.intensity ?? 5} onChange={(value) => setAnswer("intensity", value)} direction={answers.direction} />
+              <IntensityDial value={answers.intensity} onChange={(value) => setAnswer("intensity", value)} direction={answers.direction} />
             </div>
 
             {answers.direction === "lift" && <div className="mt-8">

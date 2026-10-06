@@ -40,7 +40,8 @@ const SCALES = {
 };
 
 export default function IntensityDial({ value, onChange, mood = false, direction, compact = false }) {
-  const v = Number(value);
+  const answered = typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 10;
+  const v = answered ? value : 5;
   const key = direction || (mood ? "lift" : "calm");
   const scale = SCALES[key] || SCALES.calm;
   const sliderClass = `reset-slider h-3 w-full cursor-pointer rounded-full bg-gradient-to-r ${scale.gradient} outline-none`;
@@ -49,11 +50,11 @@ export default function IntensityDial({ value, onChange, mood = false, direction
     <div className={"flex flex-col items-center " + (compact ? "gap-3" : "gap-6")}>
       <div className="flex items-end gap-1.5">
         <span className={"font-heading font-medium leading-none tracking-tight text-primary tabular-nums " + (compact ? "text-6xl" : "text-7xl")}>
-          {v}
+          {answered ? v : "—"}
         </span>
         <span className="mb-2 text-lg font-medium text-muted-foreground">/10</span>
       </div>
-      <span className="font-heading text-xl text-indigo italic">{scale.words[v] ?? "—"}</span>
+      <span className="font-heading text-xl text-indigo italic">{answered ? scale.words[v] ?? "—" : "Choose a rating"}</span>
 
       <div className="mt-2 w-full max-w-md">
         <input
@@ -63,6 +64,7 @@ export default function IntensityDial({ value, onChange, mood = false, direction
           step={1}
           value={v}
           onChange={(e) => onChange(Number(e.target.value))}
+          aria-valuetext={answered ? `${v} of 10 · ${scale.words[v]}` : "Not answered yet. Move the slider or choose a number."}
           aria-label={(GOAL_ASSESSMENTS[key]?.question || GOAL_ASSESSMENTS.calm.question).replace(/\?$/, "")}
           className={sliderClass}
         />
@@ -80,10 +82,10 @@ export default function IntensityDial({ value, onChange, mood = false, direction
               type="button"
               onClick={() => onChange(i)}
               aria-label={String(i)}
-              aria-pressed={i === v}
+              aria-pressed={answered && i === v}
               className={
                 "flex h-9 items-center justify-center rounded-full text-sm font-medium transition-all " +
-                (i === v
+                (answered && i === v
                   ? "bg-primary text-primary-foreground soft-depth scale-110 shadow-[0_6px_18px_hsl(179_69%_17%/0.35)]"
                   : "bg-secondary text-muted-foreground hover:bg-secondary/70")
               }

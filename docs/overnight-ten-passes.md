@@ -14,6 +14,12 @@ Inspected Return points and native saved-card schemas. Reworked records into pra
 
 Validation: three source-fidelity/search/date tests passed; typecheck passed; real 320×640 route verified native Tara recap with blank optional fields, word search/recovery, actual saved date and 150% text with long-word wrapping/no overflow. No storage schema or artwork changed.
 
+## Pass 3 — clear selection feedback and honest unanswered ratings
+
+Inspected need selection and Reset assessment controls. Choosing a need now focuses and brings its tailored preview into view, confirms the exact user choice, and provides a clear way back to the chosen option before launching. Generic unanswered baseline/end ratings show an em dash and “Choose a rating”, with an honest slider announcement, rather than looking like a selected 5. Explicit number/slider interaction and the existing Confirm/Skip semantics remain.
+
+Validation: real 320px first-click preview/focus/change-without-launch flow passed; actual Library → Box Breathing baseline proved no selected number until explicit 5; seven existing baseline fidelity tests and typecheck passed. Inspection also found direct `/reset` without state leaves an empty setup; address it in pass 4.
+
 ## Remaining passes
 
-3–10 pending; preserve this log when continuing.
+4–10 pending; preserve this log when continuing.
