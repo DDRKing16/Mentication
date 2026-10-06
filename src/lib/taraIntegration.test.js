@@ -13,7 +13,7 @@ class Memory {
 }
 beforeEach(() => { const storage = new Memory(); vi.stubGlobal('localStorage', storage); vi.stubGlobal('sessionStorage', new Memory()); vi.stubGlobal('window', { localStorage: storage }); });
 afterEach(() => vi.unstubAllGlobals());
-const recap = (id) => confirmReflection({ ...newTaraState(), id, phase: 'reflect', eventStatus: 'unknown', actualActionConfirmed: true, comparison: 'unsure', learning: 'Private learning', nextStep: 'Private next action' });
+const recap = (id) => confirmReflection({ ...newTaraState(), id, experienceVersion: 1, phase: 'reflect', eventStatus: 'unknown', actualActionConfirmed: true, comparison: 'unsure', learning: 'Private learning', nextStep: 'Private next action' });
 describe('Tara host integration', () => {
  it('resolves the actual custom practice with Unrated evidence and time/goal constraints', () => {
   const [iv] = pathwayByIds(['taraTactician']); expect(iv).toBeTruthy(); expect(INTERVENTIONS).toHaveLength(18);
@@ -26,6 +26,11 @@ describe('Tara host integration', () => {
   const clean = coarseCompletionOutcome({ interventionId: 'taraTactician', completion: 'completed', saved: false, eventStatus: 'not-attempted', predictionComparison, rehearsed: false, prediction: 'Private prediction', learning: 'Private learning' }, 'taraTactician');
   expect(clean).toEqual({ interventionId: 'taraTactician', completion: 'completed', saved: false, eventStatus: 'not-attempted', predictionComparison, rehearsed: false });
   expect(coarseCompletionOutcome({ eventStatus: 'successful', predictionComparison: 'improved', rehearsed: 'yes' }, 'taraTactician')).toEqual({});
+ });
+ it.each(['happened', 'partly', 'did-not', 'not-tested', 'unsure'])('preserves factual result %s independently of historical difficulty', predictionResult => {
+  const clean = coarseCompletionOutcome({ predictionResult, predictionComparison: 'more', actual: 'Private observation' }, 'taraTactician');
+  expect(clean).toEqual({ predictionResult, predictionComparison: 'more' });
+  expect(coarseCompletionOutcome({ predictionResult: 'improved' }, 'taraTactician')).toEqual({});
  });
  it('exports validated authored records and deletes only the selected saved recap', () => {
   saveTaraRecap(recap('first')); saveTaraRecap(recap('second'));

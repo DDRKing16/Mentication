@@ -96,6 +96,7 @@ export function coarseCompletionOutcome(outcome, interventionId) {
   if (interventionId === "taraTactician") {
     if (["finished", "stepped-out", "not-attempted", "unknown"].includes(outcome.eventStatus)) clean.eventStatus = outcome.eventStatus;
     if (["less", "same", "more", "different", "not-tested", "unsure"].includes(outcome.predictionComparison)) clean.predictionComparison = outcome.predictionComparison;
+    if (["happened", "partly", "did-not", "not-tested", "unsure"].includes(outcome.predictionResult)) clean.predictionResult = outcome.predictionResult;
     if (typeof outcome.rehearsed === "boolean") clean.rehearsed = outcome.rehearsed;
   }
   if (interventionId === "eftTapping") {
