@@ -1,8 +1,9 @@
+import { careMilestone } from './carePracticeDesign.js';
 /** Original practice copy. Clinical rationale and host contract: docs/handoffs/care-practices.md. */
 export const CARE_PRACTICES = Object.freeze({
   selfCompassion: {
     title: 'Self-Compassion', goal: 'calm', accent: '#f5c2ad', motif: 'shelter',
-    intro: 'Meet a harsh inner voice with something fair, believable, and useful.',
+    intro: 'Turn a harsh line into a caring response you can believe, then one act of support.',
     question: 'How harsh is your self-talk right now?', left: 'Not harsh', right: 'Extremely harsh',
     noticeTitle: 'What is the critical line?', noticeBody: 'Choose a familiar line or write the words your mind is using. A few words are enough.',
     noticeLabel: 'The critical line', notices: ['I should have done better.', 'I always get it wrong.', 'I am falling behind.'],
@@ -15,7 +16,7 @@ export const CARE_PRACTICES = Object.freeze({
   },
   unhook: {
     title: 'Unhook from the Thought', goal: 'reset', accent: '#b9d5f5', motif: 'thread',
-    intro: 'Notice a sticky thought, loosen its hold, and return to something that matters.',
+    intro: 'Practise seeing a thought as a thought, then return your attention to something useful.',
     question: 'How caught up in this thought are you right now?', left: 'Not caught up', right: 'Completely caught up',
     noticeTitle: 'Which thought keeps pulling you in?', noticeBody: 'Use a few words. We will practise noticing the thought without deciding whether it is true.',
     noticeLabel: 'The sticky thought', notices: ['Something will go wrong.', 'I cannot do this.', 'They will judge me.'],
@@ -28,7 +29,7 @@ export const CARE_PRACTICES = Object.freeze({
   },
   makeRoom: {
     title: 'Make Room for the Feeling', goal: 'calm', accent: '#c5d6b7', motif: 'room',
-    intro: 'Let a manageable feeling be here while you choose a useful next step.',
+    intro: 'Give a manageable feeling some room while staying connected to your surroundings.',
     question: 'How much are you struggling with this feeling right now?', left: 'Not struggling', right: 'Struggling a lot',
     noticeTitle: 'What feeling is here?', noticeBody: 'Choose something manageable right now. No need to recall a difficult event or search your body.',
     noticeLabel: 'The feeling', notices: ['Sadness', 'Worry', 'Frustration', 'Hard to name'],
@@ -43,23 +44,30 @@ export const CARE_PRACTICES = Object.freeze({
 export const CARE_STAGES = ['arrival', 'baseline', 'notice', 'perspective', 'practice', 'action', 'rerate', 'complete'];
 export const validCareRating = value => Number.isInteger(value) && value >= 0 && value <= 10;
 export function freshCareState() {
-  return { version: 1, stage: 'arrival', before: null, after: null, notice: '', perspective: '', action: '', clicks: 0, milestone: '', practiceTaken: false, actionStatus: null };
+  return { version: 1, stage: 'arrival', before: null, after: null, notice: '', perspective: '', action: '', clicks: 0, milestone: '', practiceTaken: false, actionStatus: null, responseRead: false, responseTone: 'steady', defusionStep: 0, distance: 'near', anchorType: null, anchorText: '', anchorNoticed: false, allowance: null, attentionFocused: false };
 }
 export function restoreCareState(value) {
   const s = freshCareState();
   if (!value || value.version !== 1) return s;
-  for (const key of ['notice', 'perspective', 'action', 'milestone']) if (typeof value[key] === 'string') s[key] = value[key].slice(0, 300);
+  for (const key of ['notice', 'perspective', 'action', 'milestone', 'anchorText']) if (typeof value[key] === 'string') s[key] = value[key].slice(0, 300);
   if ([...CARE_STAGES, 'orient'].includes(value.stage)) s.stage = value.stage;
   for (const key of ['before', 'after']) s[key] = validCareRating(value[key]) ? value[key] : null;
   s.clicks = Number.isSafeInteger(value.clicks) && value.clicks >= 0 ? value.clicks : 0;
   s.practiceTaken = value.practiceTaken === true;
   s.actionStatus = ['done', 'planned', 'not-now'].includes(value.actionStatus) ? value.actionStatus : null;
+  s.responseRead = value.responseRead === true;
+  s.responseTone = ['steady', 'gentle'].includes(value.responseTone) ? value.responseTone : 'steady';
+  s.defusionStep = [0, 1, 2].includes(value.defusionStep) ? value.defusionStep : 0;
+  s.distance = value.distance === 'beside' ? 'beside' : 'near';
+  s.anchorType = ['object', 'sound', 'support'].includes(value.anchorType) ? value.anchorType : null;
+  s.anchorNoticed = value.anchorNoticed === true;
+  s.allowance = ['small', 'more'].includes(value.allowance) ? value.allowance : null;
+  s.attentionFocused = value.attentionFocused === true;
   return s;
 }
 export function careClick(state, id) {
   const clicks = state.clicks + 1;
-  const index = state.stage === 'notice' || state.stage === 'baseline' || state.stage === 'arrival' ? 0 : ['perspective', 'practice', 'orient'].includes(state.stage) ? 1 : 2;
-  return { ...state, clicks, milestone: clicks % 2 === 0 ? (['arrival', 'baseline'].includes(state.stage) ? CARE_PRACTICES[id].intro : CARE_PRACTICES[id].reveals[index]) : state.milestone };
+  return { ...state, clicks, milestone: clicks % 2 === 0 ? careMilestone(id, state) : state.milestone };
 }
 export function careOutcome(id, state) {
   const config = CARE_PRACTICES[id];

@@ -45,6 +45,6 @@ export function deleteCareSaved(id) {
     const records = readCareCards();
     if (records && typeof records === 'object') delete records[id];
     localStorage.setItem(CARE_SAVED_KEY, JSON.stringify(records || {}));
-    return readCareSaved(id) === null;
+    return !Object.hasOwn(readCareCards(), id);
   } catch { return false; }
 }
