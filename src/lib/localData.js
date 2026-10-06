@@ -6,7 +6,7 @@
 import { notifyAccessibilityPreferencesChanged } from "./accessibilityEvents";
 
 const SESSION_KEY = "mentation.sessions.v1";
-const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr"];
+const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr", "mentication.foundations."];
 const MAX_SESSIONS = 500;
 
 const storage = () => (typeof window === "undefined" ? null : window.localStorage);
@@ -77,9 +77,18 @@ export function deleteAllLocalAppData() {
 }
 
 export function exportLocalAppData() {
+  const local = storage();
+  const foundations = {};
+  if (local) {
+    for (let index = 0; index < local.length; index += 1) {
+      const key = local.key(index);
+      if (key?.startsWith("mentication.foundations.")) foundations[key] = local.getItem(key);
+    }
+  }
   return {
     schemaVersion: 1,
     exportedAt: new Date().toISOString(),
     sessions: readSessions(),
+    foundations,
   };
 }

@@ -14,6 +14,17 @@ function memoryStorage(initial = {}) {
 }
 
 describe("Backup", () => {
+  it("round-trips Foundations drafts, migrated plans, reviews and preferences", () => {
+    const data = {
+      "mentication.foundations.weekly-plan.v1": '{"version":1,"domain":"sleep","action":0,"size":"tiny"}',
+      "mentication.foundations.weekly-plan.v2": '{"version":2,"reviews":[{"id":"synthetic-review"}]}',
+      "mentication.foundations.draft.v2": '{"version":2,"state":{"responses":{"overall":4}}}',
+      "mentication.foundations.sound.v1": "off",
+    };
+    const restored = memoryStorage();
+    restoreBackup(parseBackup(JSON.stringify(createBackup(memoryStorage(data)))), restored);
+    expect(restored.dump()).toEqual(data);
+  });
   it("saves the app's data but never the Plus status, reminders or other sites' data", () => {
     const store = memoryStorage({
       "mentation.sessions.v1": "[]",
