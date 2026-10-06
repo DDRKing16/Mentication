@@ -1,0 +1,3 @@
+PASS selfCompassion: mobile, resume, matched/blank ratings, save failure/retry/delete, repeat, consent, keyboard, reduced motion
+PASS unhook: mobile, resume, matched/blank ratings, save failure/retry/delete, repeat, consent, keyboard, reduced motion
+PASS makeRoom: mobile, resume, matched/blank ratings, save failure/retry/delete, repeat, consent, keyboard, reduced motion
