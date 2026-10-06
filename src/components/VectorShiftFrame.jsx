@@ -28,8 +28,8 @@ export default function VectorShiftFrame({ answers, sessionId, onComplete }) {
     return () => window.removeEventListener('message', receive);
   }, [sessionId]);
   return <main className="fixed inset-0 flex flex-col" style={{ background:'#0f2f23' }} aria-label="Vector Shift">
-    <div className="shrink-0 px-4 py-1 text-center text-white"><JourneyOptions id="vectorShift" onOpen={() => pauseJourneyFrame(frame.current)} /></div>
     <iframe ref={frame} title="Vector Shift activities" className="min-h-0 flex-1 w-full border-0"
       src={`/vector-shift/index.html?session=${encodeURIComponent(sessionId)}&audio=${answers?.audio === 'no' || answers?.noAudio || answers?.discreet ? 'off' : 'on'}`} />
+    <div className="journey-frame-footer text-white"><JourneyOptions id="vectorShift" onOpen={() => pauseJourneyFrame(frame.current)} /></div>
   </main>;
 }

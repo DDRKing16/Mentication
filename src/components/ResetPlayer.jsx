@@ -758,7 +758,6 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         {!isLastStep && <button type="button" className="rounded-full bg-white/80 px-5 py-3 font-medium" onClick={goNextStep}>{step?.sense === "taste" ? "Recenter when ready" : "Next sense"}</button>}
         <button type="button" className="rounded-full border px-5 py-3" onClick={finishGrounding}>{isLastStep ? "Finish grounding" : "Finish grounding early"}</button>
       </div>}
-      <div className="relative z-10 mx-auto my-2 w-fit"><JourneyOptions id={iv?.id} onOpen={() => { setRunning(false); pauseVoice(); }} /></div>
       {!boxFeedback && <>
       {isBoxV2 && (
         <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
@@ -836,6 +835,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
       </div>
 
       </>}
+      <div className="relative z-10 px-6"><JourneyOptions id={iv?.id} onOpen={() => { setRunning(false); pauseVoice(); }} /></div>
       <AnimatePresence>
         {showAmbient && (
           <div className="pointer-events-none absolute inset-x-0 bottom-32 z-50 flex justify-center px-4">

@@ -117,7 +117,6 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
         <button type="button" className="tpl-icon-btn" aria-label="Exit" disabled={saving} onClick={leave}><X size={18} aria-hidden="true" /></button>
       </header>
 
-      <JourneyOptions id={ID} />
       {readNotice && <p role="status" className="tpl-xs tpl-muted">{readNotice}</p>}
       {restored.error && <p role="alert" className="tpl-alert">Your saved return could not be read. Existing notes have not been replaced. You can review them in Your parking lot.</p>}
       {step === "capture" && <div className="tpl-rise tpl-capture">
@@ -183,6 +182,7 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
         <p className="tpl-xs tpl-muted">Your screen may lock as usual. No audio is playing.<br />Kept until {saved ? formatDate(saved.expiresAt) : "you return"}. No reminder was created.</p>
       </div>}
 
+      <JourneyOptions id={ID} />
       {leaving && <LeaveDraftDialog draftAvailable={draftAvailable} onCancel={() => setLeaving(false)} onLeave={() => finish()} onDiscard={() => { clearDraft(); finish(); }} />}
 
     </div>

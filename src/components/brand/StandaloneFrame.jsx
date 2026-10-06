@@ -20,11 +20,11 @@ export default function StandaloneFrame({ id, name, src, background = "#02050B",
         {(nav.back !== false || nav.home !== false) && <div className="relative shrink-0" style={{ height: "calc(3.5rem + env(safe-area-inset-top))" }}>
           <InterventionNav position="absolute" tone={tone} back={nav.back !== false} home={nav.home !== false} />
         </div>}
-        <div className="relative shrink-0 px-4 py-1 text-center" style={{ color: tone === 'light' ? '#172d32' : '#fffdf7' }}>
+        <iframe ref={frame} title={name} src={src} className="min-h-0 w-full flex-1 border-0" allow={allow} style={{ width: "100%", maxWidth: "none" }} />
+        <footer className="journey-frame-footer" style={{ color: tone === 'light' ? '#172d32' : '#fffdf7' }}>
           {resetError && <p role="alert">{resetError}</p>}
           <JourneyOptions id={id} onOpen={() => pauseJourneyFrame(frame.current)} />
-        </div>
-        <iframe ref={frame} title={name} src={src} className="min-h-0 w-full flex-1 border-0" allow={allow} style={{ width: "100%", maxWidth: "none" }} />
+        </footer>
       </main>
     </WithBrandThreshold>
   );

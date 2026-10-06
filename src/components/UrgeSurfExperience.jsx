@@ -74,7 +74,6 @@ function Shell({ children, step, onBack, backLabel = "Go back", trailing }) {
   return (
     <main className="urge-lovable">
       <section className="urge-lovable__shell">
-        <div style={{position:"relative",zIndex:5,textAlign:"center"}}><JourneyOptions id="urgeSurf" onOpen={() => window.dispatchEvent(new Event("mentation:urge-pause"))} /></div>
         <BackgroundWaves />
         <header className="urge-lovable__header">
           <div className="urge-lovable__header-side urge-lovable__header-side--start">
@@ -95,6 +94,7 @@ function Shell({ children, step, onBack, backLabel = "Go back", trailing }) {
           </div>
         ) : null}
         <div className="urge-lovable__content">{children}</div>
+        <div style={{position:"relative",zIndex:5,padding:"0 1.25rem"}}><JourneyOptions id="urgeSurf" onOpen={() => window.dispatchEvent(new Event("mentation:urge-pause"))} /></div>
       </section>
     </main>
   );

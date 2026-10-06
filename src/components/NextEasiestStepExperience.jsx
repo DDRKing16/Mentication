@@ -1527,11 +1527,10 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
       {/* Shared Home button on every screen, and Back on the opening screen (inner screens keep their own step-back arrows). */}
       {loadError && <div className="nes-save-status" role="alert">{loadError}<button onClick={() => setLoadError(null)}>Dismiss</button></div>}
       <div className="nes-save-status" role={storageStatus ? "alert" : "status"}>{storageStatus || (gameState.task ? "Task progress saved on this device." : "Task choices stay on this device.")}{storageStatus && <button onClick={() => setGameState(prev => ({ ...prev }))}>Retry save</button>}</div>
-      <div className="nes-journey-tools"><JourneyOptions id="nextAction" /></div>
       <style>{`
         .nes-v2-wrap .screen { max-width:600px; margin:0 auto; }
         .nes-v2-wrap .screen :is(h1,h2)[tabindex="-1"] { outline:none; }
-        .nes-journey-tools { position:relative; z-index:6; text-align:center; color:#502f37; }
+        .nes-journey-tools { position:relative; z-index:6; text-align:left; padding:0 24px 16px; color:#502f37; }
         [data-nes-screen=focus] .nes-journey-tools { color:#e1e8c1; }
         .nes-task-return { position:relative; z-index:5; margin:14px 0; padding:20px; background:#e1e8c1; color:#502f37; border:1px solid #502f3730; border-radius:22px; overflow-wrap:anywhere; }
         .nes-task-return .nes-task-label { font-size:11px; text-transform:uppercase; letter-spacing:.12em; margin:12px 0 6px; }
@@ -3839,6 +3838,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
           </div>
         </dialog>
       )}
+      <div className="nes-journey-tools"><JourneyOptions id="nextAction" /></div>
     </div>
   );
 }

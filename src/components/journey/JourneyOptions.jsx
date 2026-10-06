@@ -8,19 +8,22 @@ import '@/styles/journey-tools.css';
 // Timed players supply onOpen to pause; closing never resumes without consent.
 export default function JourneyOptions({ id, onOpen, label = 'Another way' }) {
   const dialog = useRef(null);
+  const trigger = useRef(null);
   const [waiting, setWaiting] = useState(false);
   const [error, setError] = useState('');
   const meta = JOURNEY_EXPERIENCES[id];
   if (!meta) return null;
   return <>
-    <button type="button" className="journey-options-button" disabled={waiting} onClick={async () => {
+    <div className="journey-secondary">
+    <button ref={trigger} type="button" className="journey-options-button" disabled={waiting} onClick={async () => {
       setWaiting(true); setError('');
       try { await onOpen?.(); dialog.current?.showModal(); }
       catch (failure) { setError(failure?.message || 'Could not pause the practice. Please try again.'); }
       finally { setWaiting(false); }
     }}>{waiting ? 'Pausing…' : label}</button>
     {error && <p role="alert">{error}</p>}
-    {createPortal(<dialog ref={dialog} className="journey-options-dialog" aria-label={`Another way · ${meta.name}`}>
+    </div>
+    {createPortal(<dialog ref={dialog} onClose={() => trigger.current?.focus({ preventScroll: true })} className="journey-options-dialog" aria-label={`Another way · ${meta.name}`}>
       <h2>Try a different approach</h2>
       <p>{meta.alternative}</p>
       <p>Your practice stays open underneath. You can return to it or leave using its exit controls. This alternative does not mark any steps complete.</p>

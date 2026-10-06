@@ -173,7 +173,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   </details>;
   return <section className={`tapping-experience tap-stage-${stage} ${quiet ? 'tap-reduced' : ''}`} aria-label="Gentle Tapping">
     <div className="tap-wrap">
-      <header className="tap-header"><span className="tap-wordmark">mentication</span><div className="tap-header-tools"><JourneyOptions id="eftTapping" label="Another way" onOpen={pausePractice} /><button data-sfx="none" className="tap-exit" aria-label="Exit tapping" onClick={exit}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7L17 17M17 7L7 17"/></svg></button></div></header>
+      <header className="tap-header"><span className="tap-wordmark">mentication</span><div className="tap-header-tools"><button data-sfx="none" className="tap-exit" aria-label="Exit tapping" onClick={exit}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7L17 17M17 7L7 17"/></svg></button></div></header>
       {draftError && <p className="tap-error-note" role="status">{draftStatus}</p>}
       {stage === 'choose' && <main className="tap-entry">
         <div className="tap-eyebrow">GENTLE TAPPING <span> / </span> CALM + GROUND</div>
@@ -243,6 +243,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
       </main>}
       {stage === 'round' && (soundError || hapticError) && <p role="status" className="tap-error-note">{soundError || hapticError}</p>}
       {error && <p className="tap-error-note" role="alert">{error}</p>}
+      <JourneyOptions id="eftTapping" onOpen={pausePractice} />
     </div>
   </section>;
 }

@@ -258,7 +258,6 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       <button aria-label="Exit intervention" onClick={onExit}>×</button>
     </header>
     <main className="scene-card">
-      <JourneyOptions id={ID} onOpen={() => { stop(); setAudioOn(false); }} />
       <nav className="scene-progress" aria-label="Journey progress">
         {['Start','Move','Water','View','Connect','Rest','Plan','Review'].map((label,i)=><button key={label} aria-label={`${label}${i===step?', current step':''}`} aria-current={i===step?'step':undefined} disabled={i>step} onClick={()=>go(i)}><span aria-hidden="true">{i===0?'✦':session.actions[i]?.status==='done'?'✓':session.actions[i]?.status==='skipped'?'−':i}</span><small>{label}</small></button>)}
       </nav>
@@ -287,6 +286,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       </>}
     </main>
     <footer className="scene-controls"><button aria-label={audioOn?'Mute audio':'Enable audio'} aria-pressed={audioOn} onClick={()=>setAudioOn(!audioOn)}>{audioOn?'Audio on':'Audio off'}</button>{audioOn&&!narrationAvailable&&<span className="scene-caption">This instruction is text-only.</span>}<button onClick={()=>setShowAdapt(true)}>This is not helping</button></footer>
+    <div className="mx-auto w-full max-w-xl px-5"><JourneyOptions id={ID} onOpen={() => { stop(); setAudioOn(false); }} /></div>
     {showAdapt && <div className="scene-modal" onClick={e=>{if(e.target===e.currentTarget)setShowAdapt(false);}}><section ref={dialog} role="dialog" aria-modal="true" aria-labelledby="scene-adapt-heading"><h2 id="scene-adapt-heading">What would fit better?</h2>{step>0&&step<7&&<button onClick={()=>{record(choice==='primary'?'alternative':'primary');setShowAdapt(false);}}>Try the other action</button>}{<button onClick={changeMechanism}>Use a different mechanism</button>}<button onClick={()=>{clearActiveFlagship(ID);stop();onExit?.();}}>Stop deliberately</button><button onClick={()=>setShowAdapt(false)}>Continue here</button></section></div>}
     {showAccessibility&&<div ref={dialog} className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Accessibility options"><AccessibilityPanel onClose={()=>setShowAccessibility(false)} dark /></div>}
   </div>;

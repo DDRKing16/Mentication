@@ -65,7 +65,6 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
   return <div className="intervention-theme pmr-session" data-intervention-theme={palette.id} style={interventionThemeStyle(palette)}>
     <div className="pmr-v2-player-ambient" aria-hidden="true" />
     <header className="pmr-session-header"><button onClick={onExit} aria-label="Exit Progressive Muscle Relaxation">Exit</button><span>Progressive Muscle Relaxation</span></header>
-    <div className="relative z-10 mx-auto w-fit"><JourneyOptions id={intervention.id} onOpen={pause} /></div>
     {phase === 'setup' ? <main className="pmr-session-panel">
       <h1>Choose a comfortable way</h1>
       <p>Is any area painful, injured or unsafe to tense today? If yes or unsure, choose release only, skip that area, or stop.</p>
@@ -97,5 +96,6 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
       <button className="pmr-session-primary" onClick={() => complete()}>{outcome ? 'Continue to check-in' : 'Skip tension check'}</button>
       {outcome === 'more_uncomfortable' && <button onClick={() => complete('/library')}>Check in, then open Library</button>}
     </main>}
+    <div className="relative z-10 px-5"><JourneyOptions id={intervention.id} onOpen={pause} /></div>
   </div>;
 }

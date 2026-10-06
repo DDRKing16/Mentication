@@ -34,8 +34,8 @@ export default function Dear2100() {
             {saving ? "Saving… check any message below" : "Save & return Home"}
           </button>
         </div>
-        <div className="shrink-0 px-4 py-1 text-center text-[#112b50]"><JourneyOptions id="dear2100" onOpen={() => pauseJourneyFrame(frame.current)} /></div>
         <iframe ref={frame} title="Dear 2100" src="/dear2100-updated/index.html" className="min-h-0 flex-1 w-full border-0" allow="autoplay" />
+        <div className="journey-frame-footer text-[#112b50]"><JourneyOptions id="dear2100" onOpen={() => pauseJourneyFrame(frame.current)} /></div>
       </div>
     </PlusGate>
   );

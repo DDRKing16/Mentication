@@ -501,7 +501,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
     >
       <div className="tof-experience" data-tof-stage={stage}>
         <div className="tof-live-region sr-only" role="status" aria-live="polite">{stageAnnouncement}</div>
-        <div className="tof-practice-options"><details className="tof-details tof-privacy"><summary><LockKeyhole aria-hidden="true"/>About your private draft</summary><p>Your thought, progress and typed evidence stay in a device-local draft, resumable for 24 hours after your last change. Add or Continue includes typed details in the review. Finish clears the draft; optional Save keeps a separate reflection. This is not synced across devices.</p></details><JourneyOptions id="factCheck"/></div>
+        <div className="tof-practice-options"><details className="tof-details tof-privacy"><summary><LockKeyhole aria-hidden="true"/>About your private draft</summary><p>Your thought, progress and typed evidence stay in a device-local draft, resumable for 24 hours after your last change. Add or Continue includes typed details in the review. Finish clears the draft; optional Save keeps a separate reflection. This is not synced across devices.</p></details></div>
         {!draftOk && <p className="tof-sub" role="status">This draft could not be saved. Your words are still here, but leaving or refreshing may lose these changes.</p>}
         {stepFor(stage) > 0 && <Steps current={stepFor(stage)} />}
         <AnimatePresence initial={false} mode="wait">
@@ -517,6 +517,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
           {stage === "direction" && <DirectionStage key="direction" hasPrediction={hasPrediction} hasActionable={hasActionable} predictionText={predictionText} knownContext={knownContext} openContext={openContext} onFinish={() => go("complete")} onAction={() => launch("nextAction")} onTest={() => { recordHandoffDecision("factCheck", "testPrediction", "accepted"); clearActiveFlagship("factCheck"); navigate("/reset", { replace: true, state: { prebuilt: true, pathway: ["testPrediction"], direction: "lift", directionLabel: "Test the Prediction", intensity: answers?.intensity || 5, whereFelt: "thoughts", timeMin: 4, audio: answers?.audio || "yes" } }); }} onGround={() => launch("grounding54321V2")} />}
           {stage === "complete" && <CompletionStage key="complete" confirmed={data.balancedConfirmed === true} saveError={saveError} thought={data.thought} fairerView={data.fairerView} support={data.support} against={data.evidenceAgainst} returnPhrase={data.returnPhrase || ""} setReturnPhrase={(returnPhrase) => update({ returnPhrase, saved: false })} saved={saved} onSave={handleSave} onFinish={finish} />}
         </AnimatePresence>
+        <JourneyOptions id="factCheck"/>
       </div>
     </InterventionControlShell>
     </MotionConfig>
