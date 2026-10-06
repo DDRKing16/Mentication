@@ -18,9 +18,9 @@ class Storage {
 beforeEach(() => { const storage = new Storage(); vi.stubGlobal('localStorage', storage); vi.stubGlobal('sessionStorage', new Storage()); vi.stubGlobal('window', { localStorage: storage }); });
 const ids = ['eftTapping', 'selfCompassion', 'unhook', 'makeRoom'];
 const answers = { direction: 'calm', intensity: 4, distress: 4, whereFelt: 'both', timeMin: 5, location: 'home', movement: 'seated', audio: 'no' };
-describe('19 reachable experiences including 17 catalogue practices', () => {
+describe('20 reachable experiences including 18 catalogue practices', () => {
   it('registers all four exact builds with honest mechanisms and no generic fallback', () => {
-    expect(INTERVENTIONS).toHaveLength(17);
+    expect(INTERVENTIONS).toHaveLength(18);
     for (const iv of pathwayByIds(ids)) {
       expect(isInteractiveFlagship(iv.id)).toBe(true);
       expect(iv.evidenceGrade).toBe('Unrated');

@@ -1,5 +1,6 @@
 // Host-level choices only: these do not change clinical matching or goal scales.
 export const JOURNEY_EXPERIENCES = Object.freeze({
+  taraTactician: { name: "Tara Tactician", archive: "/tara-tactician", prompt: "Your explicitly saved reflection and next step are in Tara. Your unfinished plan is a separate device-local draft.", alternative: "Leave the situation or preparation aside for now if that is useful. Look at one steady detail, choose a smaller practical step, or ask for support. There is no pressure to attempt or finish the event; your plan stays available when you return." },
   selfCompassion: { name: 'Self-Compassion', archive: '/return-points', prompt: 'What kind phrase or manageable act of care do you want to remember?', alternative: 'Leave words aside if they do not feel useful. Choose one ordinary act of care that is possible now, or rest without asking yourself to feel differently.' },
   unhook: { name: 'Unhook from the Thought', archive: '/return-points', prompt: 'What wording or next action helps you carry this thought more lightly?', alternative: 'Stop working with the thought for now. Notice one neutral detail around you, or take one simple practical action. There is no need to change or prove the thought.' },
   makeRoom: { name: 'Make Room for the Feeling', archive: '/return-points', prompt: 'What boundary, support or next action would you like to keep?', alternative: 'You can stop turning toward the feeling. Look outward to an ordinary detail around you, or choose a source of support. You decide how much attention to give the feeling.' },
@@ -30,5 +31,6 @@ export const NEED_ENTRIES = Object.freeze([
   { id: 'bedtime', label: 'I keep planning at bedtime', practice: 'tomorrowParking', reason: 'Optionally put one unfinished thought aside for later.' },
   { id: 'harsh-self-talk', label: 'I am being hard on myself', practice: 'selfCompassion', reason: 'Try a fair, believable response to a harsh inner voice, then choose a manageable act of care.' },
   { id: 'sticky-thought', label: 'I want to step back from a sticky thought', practice: 'unhook', reason: 'Notice and name a thought, then return to a chosen action without having to prove or change the thought.' },
+  { id: 'prepare-situation', label: 'I want a plan for something difficult', practice: 'taraTactician', reason: 'Prepare one manageable next move, choose support for the situation, and return later to reflect on what actually happened.' },
   { id: 'feeling-struggle', label: 'I am struggling with a feeling', practice: 'makeRoom', reason: 'Try giving a manageable feeling a little room, or look around and choose a useful next step.' },
 ]);

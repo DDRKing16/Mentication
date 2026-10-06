@@ -1,7 +1,7 @@
 // Data-only routing contract so tests and the Reset flow can verify coverage
 // without importing browser-bound experience components.
 export const INTERACTIVE_FLAGSHIP_IDS = Object.freeze([
-  "eftTapping", "selfCompassion", "unhook", "makeRoom",
+  "taraTactician", "eftTapping", "selfCompassion", "unhook", "makeRoom",
   "factCheck", "urgeSurf", "activationMenu", "changeScene", "testPrediction", "thenWhat",
   "countermove", "openChannel", "pulseShift", "nextAction", "tomorrowParking",
   "vectorShift", "signalLock", "nightChannel", "happyBump",

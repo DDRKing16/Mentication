@@ -3,6 +3,7 @@
 //
 // V1 deliberately has no remote account or application backend. Session data
 // stays in this app's local storage and can be erased in-app at any time.
+import { loadTara } from "./taraTacticianStorage";
 import { notifyAccessibilityPreferencesChanged } from "./accessibilityEvents";
 
 const SESSION_KEY = "mentation.sessions.v1";
@@ -92,6 +93,7 @@ export function exportLocalAppData() {
     takeaways: readTakeaways(),
     signalLock: JSON.parse(storage()?.getItem("mentation.signal-lock.grounding.v1") || "null"),
     foundations,
+    tara: local ? loadTara(local) : { draft: null, recaps: [] },
     careCards: JSON.parse(storage()?.getItem("mentation.carePractices.saved.v1") || "{}"),
     tappingDraft: JSON.parse(storage()?.getItem("mentation.eftTapping.draft.v1") || "null"),
   };

@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Compass, X } from 'lucide-react';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
@@ -62,10 +63,13 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
   useEffect(() => { if (deleting) deleteRef.current?.focus(); }, [deleting]);
   useEffect(() => {
     const erased = () => {
-      try { if (loadTara().draft === null) { setState(newTaraState()); setRecaps([]); setSaveStatus('idle'); setReviewOnly(false); } } catch { /* No write on a storage read failure. */ }
+      try { if (loadTara().draft === null) { setState(newTaraState()); setRecaps([]); setSaveStatus('idle'); setReviewOnly(false); completedRef.current = false; snapshotsRef.current = []; setError(''); } } catch { /* No write on a storage read failure. */ }
     };
+    const changed = event => { if (event.storageArea === window.localStorage && event.newValue === null && (event.key === null || event.key === 'mentation.tara-tactician.v1')) erased(); };
     window.addEventListener('mentation:sessions-changed', erased);
-    return () => window.removeEventListener('mentation:sessions-changed', erased);
+    window.addEventListener('mentation:tara-cleared', erased);
+    window.addEventListener('storage', changed);
+    return () => { window.removeEventListener('mentation:sessions-changed', erased); window.removeEventListener('mentation:tara-cleared', erased); window.removeEventListener('storage', changed); };
   }, []);
 
   const edit = patch => setState(value => ({ ...value, ...patch, saved: false }));
@@ -107,6 +111,7 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
   const stage = stageFor(state.phase);
 
   return <div className={`tara ${live ? 'tara--live' : ''}`} data-reduced-motion={prefs.reducedMotion || undefined} data-intervention={TARA_ID}>
+    <div className="px-4 pt-2 text-center"><JourneyOptions id={TARA_ID} /></div>
     <header className="tara-header"><button className="tara-icon" onClick={back} aria-label="Go back"><ArrowLeft size={21} /></button><div><span>Mentication</span><p>Tara Tactician</p></div><button className="tara-icon" onClick={exit} aria-label="Exit Tara"><X size={21} /></button></header>
     <nav className="tara-stages" aria-label="Intervention progress">{STAGES.map((name, index) => <span key={name} aria-current={stage === index ? 'step' : undefined}>{name}</span>)}</nav>
     <main className="tara-main">

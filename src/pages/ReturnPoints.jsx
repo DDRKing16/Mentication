@@ -1,3 +1,4 @@
+import { loadTara, deleteTaraRecap } from '@/lib/taraTacticianStorage';
 import { CARE_PRACTICES } from '@/lib/carePractices';
 import { readCareCards, deleteCareSaved } from '@/lib/carePracticeStorage';
 import { INTERVENTIONS } from '@/lib/interventions';
@@ -14,12 +15,13 @@ function readThoughts() {
   return records;
 }
 export default function ReturnPoints() {
+  const [taraRecaps, setTaraRecaps] = useState(() => { try { return loadTara().recaps; } catch { return null; } });
   const [cards, setCards] = useState(() => { try { const saved = readCareCards(); return Object.keys(CARE_PRACTICES).map(id => ({ id, state: saved[id] })).filter(card => card.state); } catch { return null; } });
   const [error, setError] = useState('');
   const [notes, setNotes] = useState(() => { try { return takeawayStore.list(); } catch { return null; } });
   const [thoughts, setThoughts] = useState(() => { try { return readThoughts(); } catch { return null; } });
   const refresh = () => {
-    try { setNotes(takeawayStore.list()); setThoughts(readThoughts()); const saved = readCareCards(); setCards(Object.keys(CARE_PRACTICES).map(id => ({ id, state: saved[id] })).filter(card => card.state)); setError(''); }
+    try { setNotes(takeawayStore.list()); setTaraRecaps(loadTara().recaps); setThoughts(readThoughts()); const saved = readCareCards(); setCards(Object.keys(CARE_PRACTICES).map(id => ({ id, state: saved[id] })).filter(card => card.state)); setError(''); }
     catch { setError('Saved work could not be read. Nothing has been removed. Try again.'); }
   };
   const archives = Object.entries(JOURNEY_EXPERIENCES).filter(([, meta]) => meta.archive && meta.archive !== '/return-points');
@@ -27,7 +29,7 @@ export default function ReturnPoints() {
     <Link className="inline-block min-h-11 underline" to="/">Home</Link>
     <h1 className="font-heading text-3xl">Return points</h1>
     <p className="my-4">Notes you chose to keep, and the practices that hold your saved work. Stored in this browser or app on this device; not synced across devices.</p>
-    {(error || notes === null || thoughts === null || cards === null) && <div role="alert"><p>{error || 'Some saved work could not be read. Nothing has been removed.'}</p><button type="button" className="min-h-11 underline" onClick={refresh}>Try again</button></div>}
+    {(error || notes === null || thoughts === null || cards === null || taraRecaps === null) && <div role="alert"><p>{error || 'Some saved work could not be read. Nothing has been removed.'}</p><button type="button" className="min-h-11 underline" onClick={refresh}>Try again</button></div>}
     <h2 className="mt-6 font-heading text-2xl">Your notes</h2>
     {notes?.length === 0 && <p className="my-3">No saved notes yet. Saving a takeaway is always optional.</p>}
     {notes?.map(note => <article key={note.id} className="my-4 rounded-2xl border border-border bg-card p-5">
@@ -47,6 +49,13 @@ export default function ReturnPoints() {
         try { localStorage.setItem(THOUGHT_KEY, JSON.stringify(readThoughts().filter(item => item.id !== record.id))); setThoughts(readThoughts()); setError(''); }
         catch { setError('Could not delete this perspective. It is still saved. Try again.'); }
       }}>Delete this perspective</button>
+    </article>)}
+    {taraRecaps?.map(recap => <article key={recap.id} className="my-4 rounded-2xl border border-border bg-card p-5">
+      <h2>Tara Tactician · saved reflection</h2>
+      {recap.learning && <p className="my-3 whitespace-pre-wrap break-words">What you want to remember: {recap.learning}</p>}
+      {recap.nextStep && <p className="my-3 whitespace-pre-wrap break-words">Your next step: {recap.nextStep}</p>}
+      <Link className="min-h-11 inline-block underline mr-4" to="/tara-tactician">Open Tara and saved reflections</Link>
+      <button className="min-h-11 underline" onClick={() => { try { setTaraRecaps(deleteTaraRecap(recap.id).recaps); setError(''); } catch { setError('Could not delete this saved reflection. Try again.'); } }}>Delete Tara reflection</button>
     </article>)}
     {cards?.map(({ id, state }) => <article key={id} className="my-4 rounded-2xl border border-border bg-card p-5">
       <h2>{CARE_PRACTICES[id].title} · saved card</h2>

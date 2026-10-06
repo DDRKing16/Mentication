@@ -107,6 +107,7 @@ const MenticationRoutes = () => {
                 <Route path="/reset" element={<ResetFlow />} />
                 <Route path="/scene-followup" element={<ChangeSceneFollowup />} />
                 <Route path="/lift-followup" element={<LiftFollowup />} />
+                <Route path="/tara-tactician" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["taraTactician"], direction: "focus", intensity: null, timeMin: 5, audio: "no" }} />} />
                 <Route path="/next-easiest-step" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["nextAction"], direction: "focus", intensity: null, audio: "no" }} />} />
                 <Route path="/next-easiest-step-v2" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["nextAction"], direction: "focus", intensity: null, audio: "no" }} />} />
                 <Route path="/journal" element={<Journal />} />

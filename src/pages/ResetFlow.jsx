@@ -22,6 +22,7 @@ import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/compone
 // once the pathway is known, instead of every one of them riding along in
 // this shared flow's bundle for every reset. Each one's own stylesheet
 // (imported inside the component itself, not here) rides along with it.
+const TaraTacticianExperience = lazy(() => import("@/components/tara-tactician/TaraTacticianExperience"));
 const GentleTappingExperience = lazy(() => import("@/components/tapping/GentleTappingExperience"));
 const SelfCompassionExperience = lazy(() => import("@/components/SelfCompassionExperience"));
 const UnhookExperience = lazy(() => import("@/components/UnhookExperience"));
@@ -677,7 +678,8 @@ export default function ResetFlow() {
       // Each branch is a separately lazy-loaded component with its own props
       // shape; the union those component types produce is narrower than any
       // one of them, so the props passed below are typed loosely here.
-      const Experience = /** @type {any} */ (interventionId === "eftTapping" ? GentleTappingExperience
+      const Experience = /** @type {any} */ (interventionId === "taraTactician" ? TaraTacticianExperience
+        : interventionId === "eftTapping" ? GentleTappingExperience
         : interventionId === "selfCompassion" ? SelfCompassionExperience
         : interventionId === "unhook" ? UnhookExperience
         : interventionId === "makeRoom" ? MakeRoomExperience

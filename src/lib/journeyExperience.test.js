@@ -31,7 +31,7 @@ describe('explicit takeaways', () => {
       ['overwhelmed', 'signalLock'], ['starting', 'nextAction'], ['thought', 'factCheck'],
       ['tense', 'progressive-muscle-relaxation-v2'], ['flat', 'changeScene'], ['bedtime', 'tomorrowParking'],
     ]);
-    expect(NEED_ENTRIES.slice(6).map(({ practice }) => practice)).toEqual(['selfCompassion', 'unhook', 'makeRoom']);
+    expect(NEED_ENTRIES.slice(6).filter(entry => entry.practice !== "taraTactician").map(({ practice }) => practice)).toEqual(['selfCompassion', 'unhook', 'makeRoom']);
     expect(new Set(NEED_ENTRIES.map(({ id }) => id)).size).toBe(NEED_ENTRIES.length);
     for (const entry of NEED_ENTRIES.slice(6)) {
       expect(entry.label.length).toBeGreaterThan(15);

@@ -22,7 +22,7 @@ describe('current catalogue recommendation contracts', () => {
       'boxV2', 'progressive-muscle-relaxation-v2', 'factCheck', 'urgeSurf',
       'happyBump', 'changeScene', 'goodMap', 'grounding54321V2', 'vectorShift',
       'nextAction', 'signalLock', 'tomorrowParking', 'nightChannel',
-      'eftTapping', 'selfCompassion', 'unhook', 'makeRoom',
+      'eftTapping', 'selfCompassion', 'unhook', 'makeRoom', 'taraTactician',
     ]);
     expect(ACTIVE_INTERVENTION_IDS).toEqual(INTERVENTIONS.map((iv) => iv.id));
     expect(standaloneRouteFor('goodMap')).toBe('/good-map');

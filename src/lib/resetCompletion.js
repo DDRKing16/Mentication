@@ -93,6 +93,11 @@ export function coarseCompletionOutcome(outcome, interventionId) {
     if (typeof outcome.practiceTaken === "boolean") clean.practiceTaken = outcome.practiceTaken;
     if (["done", "planned", "not-now", null].includes(outcome.actionStatus)) clean.actionStatus = outcome.actionStatus;
   }
+  if (interventionId === "taraTactician") {
+    if (["finished", "stepped-out", "not-attempted", "unknown"].includes(outcome.eventStatus)) clean.eventStatus = outcome.eventStatus;
+    if (["less", "same", "more", "different", "not-tested", "unsure"].includes(outcome.predictionComparison)) clean.predictionComparison = outcome.predictionComparison;
+    if (typeof outcome.rehearsed === "boolean") clean.rehearsed = outcome.rehearsed;
+  }
   if (interventionId === "eftTapping") {
     if (["eft", "grounding"].includes(outcome.mode)) clean.mode = outcome.mode;
     if (outcome.ratingQuestion === "How intense is the discomfort right now?" && outcome.ratingMin === 0 && outcome.ratingMax === 10) {

@@ -23,8 +23,8 @@ beforeEach(() => { global.localStorage = new LocalStorageStub(); });
 
 describe("elite 18 contract", () => {
   it("includes every flagship exactly once with evidence", () => {
-    expect(FLAGSHIP_IDS).toHaveLength(22);
-    expect(new Set(FLAGSHIP_IDS).size).toBe(22);
+    expect(FLAGSHIP_IDS).toHaveLength(23);
+    expect(new Set(FLAGSHIP_IDS).size).toBe(23);
     expect(library.interventions).toHaveLength(18);
     expect(library.interventions.every(item => FLAGSHIP_IDS.includes(item.id))).toBe(true);
     FLAGSHIP_IDS.forEach((id) => {
@@ -32,7 +32,7 @@ describe("elite 18 contract", () => {
       if (!FLAGSHIP_EVIDENCE[id]) {
         // New original builds are explicitly Unrated; the historic evidence
         // library is not a claim that these screens are clinically validated.
-        expect(["eftTapping", "selfCompassion", "unhook", "makeRoom"]).toContain(id);
+        expect(["eftTapping", "selfCompassion", "unhook", "makeRoom", "taraTactician"]).toContain(id);
         return;
       }
       expect(FLAGSHIP_EVIDENCE[id].psychoeducation.length).toBeGreaterThan(40);

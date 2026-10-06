@@ -48,3 +48,10 @@ export function clearTara(provided) {
     if (target.getItem(TARA_STORAGE_KEY) !== null) throw new Error();
   } catch { throw new TaraStorageError('Tara data could not be deleted. Please try again.'); }
 }
+
+export function deleteTaraRecap(id, provided) {
+  const current = loadTara(provided);
+  const next = write({ draft: current.draft?.id === id && current.draft.phase === 'recap' ? null : current.draft, recaps: current.recaps.filter(recap => recap.id !== id) }, provided);
+  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') window.dispatchEvent(new CustomEvent('mentation:tara-cleared'));
+  return next;
+}

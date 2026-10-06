@@ -35,6 +35,7 @@ const DEFAULT_ATMOSPHERE = Object.freeze({
 // Colour worlds sampled from each intervention's own screens.
 // `tone: "light"` means the atmosphere is a light surface (ink text, deeper coral).
 export const INTERVENTION_ATMOSPHERE = Object.freeze({
+  taraTactician: { background: "#edf6f1", glow: "rgba(77, 161, 155, 0.12)", tone: "light" },
   boxV2: { background: "#010E24", glow: "rgba(138, 236, 199, 0.16)", tone: "dark" },
   "progressive-muscle-relaxation-v2": { background: "#271327", glow: "rgba(190, 150, 200, 0.18)", tone: "dark" },
   factCheck: { background: "#024B58", glow: "rgba(238, 229, 207, 0.14)", tone: "dark" },
