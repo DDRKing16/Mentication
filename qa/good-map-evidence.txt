@@ -1,0 +1,68 @@
+Good Map implementation and verification — 2026-10-06
+
+Branch: existing Chat-GPT. Base: 06b4b6d5c3ba5c9c8aa2225b928f04d2d57f406d.
+Local implementation only; publication and deployment held for parent review.
+
+Scope
+- Restore saved phase, answers, drafts and undo; expose Back/Menu/Save and exit.
+- Report storage failures and block exit; retain unreadable data until explicit deletion.
+- Explicit importance and satisfaction ratings or null; no imputed optional answers.
+- Editable map rings and interpretation; preserve illustrated cards and step library.
+- Real dated maps and check-ins; no fictional comparison partner or seasonal gains.
+- Identical satisfaction question/scale/anchors/direction at baseline and follow-up;
+  helpfulness and whether the step was tried remain separate fields.
+- Private calendar-file export with absolute UTC event time and VALARM.
+- Recipient-labelled exact-preview manual summary export with fresh consent.
+- Scrolling phone/desktop layouts, large text, keyboard/dialog controls, reduced-motion CSS.
+- Remove guaranteed-result wording in the active journey; offer adjustment/support.
+- Include Good Map storage in the app's delete-all-local-data path.
+
+Automated checks on final code
+- 389 tests passed, 50 files. /tmp/good-map-final-tests.log
+- Lint clean. /tmp/good-map-final-lint.log
+- Typecheck clean. /tmp/good-map-final-typecheck.log
+- Production build completed in 4.71 seconds; existing >500kB chunk warning.
+  /tmp/good-map-final-build.log
+- git diff --check clean.
+- Ten Good Map model tests cover null/zero, identical measurement definition,
+  separate helpfulness, duplicate attempt IDs, missing comparisons, failed writes,
+  ICS timestamps/alarm, invalid/past dates, midnight, three time zones and DST.
+
+Actual silent browser QA completed before host interruptions
+- Inspected current live baseline, then local implementation.
+- Full 16-card sort/rate/map/interpretation/plan/date/check-in flow.
+- Refresh through sort, rating, interpretation, satisfaction, planning choices,
+  custom-step draft, date/time, home and follow-up restored values.
+- Sort Undo, 100% after card 16, all Not really me, all ratings skipped.
+- Double-click on completion produced one saved check-in.
+- Missing baseline/endpoint produced no change score.
+- Save/exit/resume; dated history compared real values and retained missingness.
+- Synthetic storage denial prevented exit and showed failure; synthetic export
+  failure showed an error without success. Reproducible disposable fixture server:
+  node qa/good-map-server.mjs (127.0.0.1:5188, never part of production build).
+- Sharing defaults off; recipient and consent required; cancellation and completed
+  download clear both. No connected recipient, message or automatic transmission.
+- Actual downloaded good-map-reminder.ics read from Downloads: chosen Melbourne
+  2027-04-04 09:30 -> DTSTART:20270403T233000Z, ten-minute event, VALARM PT0M.
+  Generic title/description; no personal answers, notes or steps in calendar file.
+- Actual downloaded good-map-summary.txt matched preview, including chosen QA
+  recipient; custom notes/steps/interpretation excluded.
+- 320px phone and 1440px desktop geometry/screenshots inspected; large-text sharing
+  screen at 320px had no horizontal overflow. Artwork preserved.
+- Keyboard Enter navigation, Escape cancellation/focus return, explicit deletion
+  of disposable local data followed by refresh; no browser console errors observed.
+
+Limits and required release follow-up
+- Calendar export is a download request, NOT scheduling. User must import the file;
+  calendar application controls whether its alarm is delivered.
+- Summary export is manual sharing, NOT a sent message or live access. Copies already
+  given to someone cannot be revoked by this app. No external service/account added.
+- Legacy v3 drafts retain original records and written notes, but old ratings need
+  confirmation because v3 did not distinguish defaults from explicit answers.
+- Physical iOS/WKWebView export, notification delivery and system-level reduced-motion
+  testing are not verified. Browser viewport QA is not physical-device certification.
+- After connection recovery, final targeted browser recheck passed on committed code:
+  missing outcomes still produce no change score; custom step containing literal
+  <b>markup</b> and ampersand renders as text in step and scheduling subtitle.
+  No browser console errors. Final deletion/recovery guards also reviewed in source.
+- Parent owns serial integration, final route/native QA and publication. HOLD PUSH.

@@ -6,7 +6,7 @@
 import { notifyAccessibilityPreferencesChanged } from "./accessibilityEvents";
 
 const SESSION_KEY = "mentation.sessions.v1";
-const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_"];
+const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr"];
 const MAX_SESSIONS = 500;
 
 const storage = () => (typeof window === "undefined" ? null : window.localStorage);

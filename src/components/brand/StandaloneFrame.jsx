@@ -12,9 +12,9 @@ export default function StandaloneFrame({ id, name, src, background = "#02050B",
   return (
     <WithBrandThreshold id={id} name={name}>
       <main className="fixed inset-0 flex flex-col" style={{ background }} aria-label={name}>
-        <div className="relative shrink-0" style={{ height: "calc(3.5rem + env(safe-area-inset-top))" }}>
+        {(nav.back !== false || nav.home !== false) && <div className="relative shrink-0" style={{ height: "calc(3.5rem + env(safe-area-inset-top))" }}>
           <InterventionNav position="absolute" tone={tone} back={nav.back !== false} home={nav.home !== false} />
-        </div>
+        </div>}
         <iframe title={name} src={src} className="min-h-0 w-full flex-1 border-0" allow={allow} style={{ width: "100%", maxWidth: "none" }} />
       </main>
     </WithBrandThreshold>

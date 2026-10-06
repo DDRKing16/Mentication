@@ -763,7 +763,7 @@ body{padding:0!important;min-height:100dvh;overflow:hidden}
 .phone{zoom:1!important}
 .scr{border-radius:0!important;height:100%!important}
 </style>
-</head><body><div class="wrap">
+<link rel="stylesheet" href="journey.css"></head><body><div class="wrap">
   <div class="intro">
     <h1>The Good Map,<br><em>the whole journey</em></h1>
     <p class="sub">Sort what matters, see it on your map, then close the biggest gap one small step at a time.</p>
@@ -994,7 +994,7 @@ function card(idx,cls){while(ORDER.length<=idx)extend();const d=DECK[ORDER[idx]]
   <img class="face" alt="${d.w}" draggable="false" src="data:image/webp;base64,${CARDS[G][d.k]}">
   <div class="mf"><span class="n">${String(idx+1).padStart(2,"0")} / ${N}</span><span class="gut">GUT CHECK <i></i></span></div>`;return el}
 function layout(){stage.innerHTML="";
-  if(i>=N){stage.innerHTML=`<div style="text-align:center;padding:0 30px"><div class="kick">ALL SIXTEEN SORTED</div><div class="q" style="margin-top:12px">You need<br><em>${hist.filter(v=>v===3).length} things.</em></div><button class="rgo" id="torate">Rate how much they matter</button></div>`;document.getElementById("torate").onclick=startRating;return}
+  if(i>=N){paint();stage.innerHTML=`<div style="text-align:center;padding:0 30px"><div class="kick">ALL SIXTEEN SORTED</div><div class="q" style="margin-top:12px">You need<br><em>${hist.filter(v=>v===3).length} things.</em></div><button class="rgo" id="torate">Rate how much they matter</button></div>`;document.getElementById("torate").onclick=startRating;return}
   [2,1].forEach(o=>{if(i+o<N){const b=card(i+o,"back");b.style.transform=`translate(${o%2?14:-12}px,${o*8}px) rotate(${o%2?6:-5}deg)`;b.style.opacity=1;b.style.filter=`brightness(${o===2?.55:.72})`;stage.appendChild(b)}});
   const f=card(i,"front");f.style.setProperty('--tilt',(i%2?1.5:-1.5)+'deg');stage.appendChild(f);if(!reduce){f.animate([{transform:"translateY(14px) scale(.96)",opacity:.6},{transform:"none",opacity:1}],{duration:380,easing:"cubic-bezier(.2,.8,.2,1)"})}
   bind(f);gutT=performance.now();paint()}
@@ -1097,7 +1097,7 @@ function insight(items,t){const ess=items.filter((d,i)=>t[i]===0);if(!ess.length
   const tail=daily>=Math.ceil(ess.length/2)?"Small daily habits will matter most.":freq>=Math.ceil(ess.length/2)?"A little, often, will matter most.":"Protecting set times each week will matter most.";
   return `At your core: <b>${list}</b>. ${tail}`}
 function renderMap(){const scr=document.querySelector(".scr");scr.classList.add("light");
-  const items=RQ.filter(d=>RATE[d.k]>0).map(d=>({...d,s:score(d.k)})).sort((a,b)=>b.s-a.s);
+  const items=RQ.filter(d=>Number.isInteger(RATE[d.k])).map(d=>({...d,s:score(d.k)})).sort((a,b)=>b.s-a.s);
   const segs=document.getElementById("segs");[...segs.children].forEach(x=>x.className="d3");
   const R=document.getElementById("rate");const{t,pos,up}=gmLayout(items);const n0=t.filter(x=>x===0).length;
   const anim=FIRST&&!reduce;
@@ -1114,7 +1114,7 @@ function renderMap(){const scr=document.querySelector(".scr");scr.classList.add(
     return `<button class="gm-mk t${k}${up[i]?" up":""}${anim?" fly":""}" data-k="${d.k}" style="left:${x/GW*100}%;top:${y/GH*100}%;--c:${c};--s:${MS[k]}px;--fx:${dx/L*140}px;--fy:${dy/L*140}px;animation-delay:${dl}s" aria-label="${d.w}, ${TN[k]}">
       <span class="dot">${mkIcon(d,MS[k]*.5,k===0?"#FFF8EE":c)}${rank?`<b class="rk">${rank}</b>`:""}</span>
       <span class="lb"><span>${d.w}</span><i>${AREA[d.k]}</i></span></button>`}).join("");
-  const list=`<div class="rlist">${items.map((d,i)=>`<div class="rrow" data-k="${d.k}"><b>${i+1}</b><span class="rdot" style="--c:${ACOL[AREA[d.k]]}">${mkIcon(d,18,"#FFF8EE")}</span><div><span>${d.w}</span><small>${TN[t[i]].toUpperCase()} · ${RHYO[RHY[d.k]??2].toUpperCase()}</small></div><i style="--w:${Math.round(d.s*100)}%;--c:${ACOL[AREA[d.k]]}"></i></div>`).join("")}</div>`;
+  const list=`<div class="rlist">${items.map((d,i)=>`<div class="rrow" data-k="${d.k}"><b>${i+1}</b><span class="rdot" style="--c:${ACOL[AREA[d.k]]}">${mkIcon(d,18,"#FFF8EE")}</span><div><span>${d.w}</span><small>${TN[t[i]].toUpperCase()} · ${RHY[d.k]==null?"NOT ANSWERED":RHYO[RHY[d.k]].toUpperCase()}</small></div><i style="--w:${Math.round(d.s*100)}%;--c:${ACOL[AREA[d.k]]}"></i></div>`).join("")}</div>`;
   R.innerHTML=`<div class="map4 gm"><div class="gm-head"><div class="kick">YOUR GOOD MAP</div>
    <div class="gm-tools"><button class="gm-save" id="gmsave" aria-label="Save my map as an image"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></svg></button>
    <div class="vt"><button class="${VIEW==="sky"?"on":""}" data-view="sky">Map</button><button class="${VIEW==="list"?"on":""}" data-view="list">List</button></div></div></div>
@@ -1223,7 +1223,7 @@ partner:{w:["Evenings together","Inside jokes","Date nights, sometimes","Good ta
  st:[["Put phones away at dinner",1,"Actually talking","qefa"],["Text them one thing you love about them",2,"A smile across the day","qefsa"],["Plan a simple date night",5,"Something to look forward to","q"],["Ask one real question over dinner",10,"Feeling close again","qefa"],["Walk together for 10 minutes after dinner",10,"Time that's just yours","qefa"]]},
 hug:{w:["Hugs at home","Friends who hug","My pets","Family catch-ups","Kids' cuddles"],
  u:["More hugs day to day","Cuddles without rushing","Seeing my huggy people more","Feeling held"],
- st:[["Hug someone for a full 20 seconds",1,"Instant calm","qefa"],["Book a massage",5,"Your body says thank you","qs"],["Wrap yourself in a warm throw and breathe slowly",5,"Calm, head to toe","qefsa"],["Cuddle on the couch instead of scrolling",15,"A slow, warm evening","efa"],["See your huggiest friend this week",60,"Feeling held","f"]]},
+ st:[["Hug someone for a full 20 seconds",1,"A pause to try","qefa"],["Book a massage",5,"Your body says thank you","qs"],["Wrap yourself in a warm throw and breathe slowly",5,"Calm, head to toe","qefsa"],["Cuddle on the couch instead of scrolling",15,"A slow, warm evening","efa"],["See your huggiest friend this week",60,"Feeling held","f"]]},
 parent:{w:["Bedtime stories","School run chats","Weekend outings","Laughing together","Being their safe place"],
  u:["Ten minutes of full attention a day","More fun, less managing","One-on-one time","Calmer evenings"],
  st:[["Slip a note in their lunchbox",2,"A smile you'll hear about","qefa"],["Say one thing you're proud of at bedtime",2,"Ending the day close","qefa"],["Ask one fun question at dinner",5,"Stories you'd never hear","qefa"],["Plan a small one-on-one outing",5,"Something special together","q"],["Play their game for 10 minutes, phone away",10,"Their face lighting up","qefa"]]},
@@ -1238,7 +1238,7 @@ awe:{w:["Sunsets and night skies","The ocean","Big views on holidays","Music tha
  st:[["Step outside and look up at the sky",5,"Feeling small in a good way","qefsa"],["Notice one beautiful thing on your walk",5,"Seeing the everyday differently","qefsa"],["Plan one lookout or beach trip",10,"Something to look forward to","qf"],["Catch one sunrise or sunset",20,"A moment you'll remember","efs"],["Watch something that gives you goosebumps",30,"That wow feeling","efs"]]},
 home:{w:["A cosy corner","My bed","Plants and light","Clean sheets","Candles and music"],
  u:["One corner that feels calm","Less clutter","A home that looks like me","Coming home to tidy"],
- st:[["Light a candle when you get home",1,"Coming home feels like a treat","qefsa"],["Clear one surface completely",10,"Instant calm","qefs"],["Fix one thing that bugs you",10,"One less annoyance","qefs"],["Put fresh sheets on",10,"The best sleep of the week","qfsa"],["Buy one plant or print you love",20,"A home that looks like you","s"]]},
+ st:[["Light a candle when you get home",1,"Coming home feels like a treat","qefsa"],["Clear one surface completely",10,"A pause to try","qefs"],["Fix one thing that bugs you",10,"One less annoyance","qefs"],["Put fresh sheets on",10,"The best sleep of the week","qfsa"],["Buy one plant or print you love",20,"A home that looks like you","s"]]},
 ontop:{w:["To-do lists","Bills on autopay","A weekly reset","A good calendar","Planning on Sundays"],
  u:["A calm weekly reset","Knowing where my money goes","Fewer loose ends","Starting Mondays ready"],
  st:[["Write tomorrow's top three before bed",3,"Sleeping with a clear head","qefsa"],["Check your bank balance, just once",3,"Knowing where you stand","qefs"],["Knock off one tiny admin job",10,"The relief of done","qefs"],["Put one bill on autopay",10,"One less thing to remember","qfs"],["Do a 15-minute Sunday reset",15,"Starting Monday ready","efsa"]]},
@@ -1341,16 +1341,16 @@ const JMOM=[
  {k:"dinner",t:"After dinner",ic:"bowl",anc:"finish dinner",ph:"evening",at:"7:30pm"},
  {k:"bed",t:"Before bed",ic:"moon",anc:"get into bed",ph:"night",at:"9:30pm"}];
 /* one line of encouragement for the first thing they said gets in the way */
-const JCOPE={time:(m)=>`Short on time? It only takes ${m} min.`,tired:()=>"Too tired? Do the lazy version. It still counts.",forget:()=>"Worried you'll forget? Your reminder has it covered.",
+const JCOPE={time:(m)=>`Short on time? It only takes ${m} min.`,tired:()=>"Too tired? Do the lazy version. It still counts.",forget:()=>"Worried you'll forget? You can export a private calendar reminder.",
  money:(m,f)=>f?"Money tight? This one's free.":"Money tight? Try the free version.",people:()=>"No one around? You can do this one on your own.",
- selfish:()=>"Feels selfish? Topping up helps you show up for others.",mood:()=>"Not in the mood? Start anyway. Mood follows action.",start:()=>"Not sure how to start? Just do the first 30 seconds."};
+ selfish:()=>"Feels selfish? Topping up helps you show up for others.",mood:()=>"Not in the mood? Try a smaller version, or choose another time.",start:()=>"Not sure how to start? Just do the first 30 seconds."};
 const JST={base:{},log:[],week:0,notice:null,gentle:false,own:"",photo:{},sat:{},focus:null,works:[],bars:[],up:null,upText:"",plan:[],order:[],pstep:0,done:[],wk:{day:2,mom:null,at:null},chk:{did:null},newsat:null,stack:[],complete:null,startSat:null,celebrate:false};
 const JS={};
 const RT=()=>document.getElementById("rate"),SCR=()=>document.querySelector(".scr");
 const jCap=t=>t.charAt(0).toUpperCase()+t.slice(1);
 const jEsc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function jImg(k){return (CARDS[G]&&CARDS[G][k])||CARDS.f[k]||CARDS.m[k]||""}
-function jItems(){return RQ.filter(d=>RATE[d.k]>0).map(d=>({...d,s:score(d.k)})).sort((a,b)=>b.s-a.s)}
+function jItems(){return RQ.filter(d=>Number.isInteger(RATE[d.k])).map(d=>({...d,s:score(d.k)})).sort((a,b)=>b.s-a.s)}
 function jFocus(){return jItems().find(x=>x.k===JST.focus)||jItems()[0]}
 function jSat(k){return JST.sat[k]??5}
 function jGaps(items){return items.map(d=>({d,g:d.s*(10-jSat(d.k))/10})).sort((a,b)=>b.g-a.g||jSat(a.d.k)-jSat(b.d.k))}
@@ -1459,11 +1459,11 @@ JS.up=()=>{jMode(false);jStage(4,.7);const d=jFocus(),v=jSat(d.k),nx=Math.min(10
 
 /* ---------- 4 · one tiny step at a time ---------- */
 function jLadder(from,mark){const L=jSteps();return `<div class="jlad">${JST.plan.map((si,k)=>{if(k<from)return "";const dn=k<mark,nx=k===mark;
-  return `<div class="jlr${dn?" dn":""}${nx?" nx":""}"><span class="n">${dn?ji("check",12,2.8):k+1}</span><span class="t">${L[si][0]}</span>${nx&&mark>0?`<em>UP NEXT</em>`:""}</div>`}).join("")}</div>`}
+  return `<div class="jlr${dn?" dn":""}${nx?" nx":""}"><span class="n">${dn?ji("check",12,2.8):k+1}</span><span class="t">${jEsc(L[si][0])}</span>${nx&&mark>0?`<em>UP NEXT</em>`:""}</div>`}).join("")}</div>`}
 JS.step=()=>{jMode(true);const j=JST.pstep;j===0?jStage(4,.92):jStage(5,.15);const d=jFocus(),v=jSat(d.k),nx=Math.min(10,v+1),s=jStep(j),free=s[3].includes("f");
  RT().innerHTML=jPage({kick:(j===0?"YOUR FIRST STEP":`STEP ${j+1} OF 3`)+(JST.gentle?" · GENTLE MODE":""),q:j===0?`Start <em>tiny.</em>`:`Next, <em>step ${j+1}.</em>`,sub:`Aiming for a ${nx}: ${jGoal()}.`,
   body:`<div class="jc1" id="jc1"><div class="jc1-top">${jm(d,40)}<div><small>STEP ${j+1} OF 3</small><span class="jdots">${[0,1,2].map(k=>`<i class="${k<j?"dn":k===j?"cur":""}"></i>`).join("")}</span></div></div>
-   <b class="jc1-t">${s[0]}</b>
+   <b class="jc1-t">${jEsc(s[0])}</b>
    <div class="jmeta">${ji("clock",14)}${s[1]} min${free?`<span class="dotsep"></span>${ji("coin",14)}Free`:""}</div>
    <div class="jrew">${ji("spark",14)}${s[2]}</div>
    <div class="jc1-acts"><button class="jlink sm" id="janother">${ji("refresh",15,2)}Show me another</button><button class="jlink sm" id="jmine">${ji("spark",15,2)}Write my own</button></div></div>
@@ -1502,12 +1502,12 @@ JS.set=()=>{jMode(true);jStage(5,.6);const d=jFocus(),v=jSat(d.k),nx=Math.min(10
   body:`<div class="jcard"><div class="jcard-top"><div class="jpol"><img alt="" src="data:image/webp;base64,${jImg(d.k)}"></div>
     <div><small class="jey">FOCUS</small><h3>${d.w}</h3><span class="jup sm"><b>${v}</b>${JARROW}<b class="to">${nx}</b></span></div></div>
    <div class="jrows">
-    <div class="jrow"><span class="ic on">${ji("flag",14,2)}</span><div><small>STEP ${JST.pstep+1} OF 3</small><b>${s[0]}</b><p>${jWhen()||"Sunday evening"}, after I ${M.anc}</p><p class="jrmd">${ji("bell",13)}Reminder ${dn==="Today"?"today":dn==="Tomorrow"?"tomorrow":dn} at ${jFmt(jAt())}</p></div></div>
+    <div class="jrow"><span class="ic on">${ji("flag",14,2)}</span><div><small>STEP ${JST.pstep+1} OF 3</small><b>${jEsc(s[0])}</b><p>${jWhen()||"Sunday evening"}, after I ${M.anc}</p><p class="jrmd">${ji("bell",13)}Reminder ${dn==="Today"?"today":dn==="Tomorrow"?"tomorrow":dn} at ${jFmt(jAt())}</p></div></div>
     ${JST.works.length?`<div class="jrow"><span class="ic">${ji("check",14,2.2)}</span><div><small>ALREADY HELPING</small><p>${JST.works.map(i=>JLIB[d.k].w[i]).join(" · ")}</p></div></div>`:""}
     ${b?`<div class="jrow"><span class="ic">${ji(b.ic,14,2)}</span><div><small>IF IT GETS HARD</small><p class="jcp">${JCOPE[b.k](s[1],free)}</p></div></div>`:""}
    </div></div>
    <div class="jlbl">Your reminder will look like this</div>
-   <div class="jnotif"><span class="jnapp">M</span><div><div class="jnh"><b>Mentication</b><span>${dn==="Today"?"":dn.slice(0,3)+" "}${jFmt(jAt())}</span></div><b class="jnt">Time for ${d.w}</b><p>${s[0]}. It takes ${s[1]} min.</p><div class="jnact"><button data-q="yes">Did it</button><button data-q="no">Not yet</button></div></div></div>
+   <div class="jnotif"><span class="jnapp">M</span><div><div class="jnh"><b>Mentication</b><span>${dn==="Today"?"":dn.slice(0,3)+" "}${jFmt(jAt())}</span></div><b class="jnt">Time for ${d.w}</b><p>${jEsc(s[0])}. It takes ${s[1]} min.</p><div class="jnact"><button data-q="yes">Did it</button><button data-q="no">Not yet</button></div></div></div>
    <p class="jnote2">Answer straight from the notification. No need to open the app.</p>`,
   foot:`<div class="jbtns"><button class="jsec" id="jcal">${ji("cal",16)}Add to calendar</button><button class="rcta" id="jnext">Done <span class="ar"></span></button></div>`});
  RT().querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{JST.chk={did:b.dataset.q};JST.newsat=null;JST.celebrate=b.dataset.q==="yes";JST.stack=["home"];jgo(b.dataset.q==="yes"?"win":"adjust")});
@@ -1518,7 +1518,7 @@ JS.set=()=>{jMode(true);jStage(5,.6);const d=jFocus(),v=jSat(d.k),nx=Math.min(10
 JS.chk=()=>{jMode(false);jStage(5,.8);const d=jFocus(),s=jStep(JST.pstep),w=JST.wk,M=JMOM[w.mom]??JMOM[3],dn=JWD[jDate(w.day).getDay()];
  const opts=[["yes","Did it","check"],["part","Partly","half"],["no","Not yet","later"]];
  RT().innerHTML=jPage({pre:`<div class="jnote">${ji("bell",15)}<span><b>${dn}, ${jFmt(jAt())}</b> · Time to check in</span></div>`,kick:`CHECK-IN · STEP ${JST.pstep+1} OF 3`,q:`Did you<br><em>try it?</em>`,
-  body:`<div class="jchero"><div class="jcpol"><img alt="" src="data:image/webp;base64,${jImg(d.k)}"></div><small>${(jWhen()||"Sunday evening").toUpperCase()} · ${s[1]} MIN</small><b>${s[0]}</b></div>
+  body:`<div class="jchero"><div class="jcpol"><img alt="" src="data:image/webp;base64,${jImg(d.k)}"></div><small>${(jWhen()||"Sunday evening").toUpperCase()} · ${s[1]} MIN</small><b>${jEsc(s[0])}</b></div>
    <div class="jopts">${opts.map(([k,l,ic])=>`<button class="jopt" data-o="${k}"><span class="oi">${ji(ic,22,2)}</span>${l}</button>`).join("")}</div>`,
   foot:`<button class="jlink" id="jsnooze">${ji("later",15,2)}Remind me in an hour</button>`});
  document.getElementById("jsnooze").onclick=()=>jToast(`${ji("bell",14,2)} We'll remind you again at ${jFmt(jAt()+60)}`);
@@ -1557,26 +1557,8 @@ JS.adjust=()=>{jMode(true);jStage(5,1);const d=jFocus(),L=jSteps(),j=JST.pstep,c
   if(a==="time"){JST.wk.mom=null;jgo("when");return}
   jgo("step")})};
 
-/* ---------- side panel: jump to any screen ---------- */
-const JORDER=["sat","focus","help","way","up","step","when","set"];
 function jNavMark(id){document.querySelectorAll("[data-jump]").forEach(b=>b.classList.toggle("on",b.dataset.jump===id))}
-function jSeed(){const P={move:[10,3,0],rest:[9,3,0],partner:[9,2,1],learn:[7,2,1],make:[7,1,2],awe:[5,1,3],music:[5,0,2],hug:[4,1,3]};
- RQ=Object.keys(P).map(k=>DECK.find(d=>d.k===k));RATE={};LOSS={};RHY={};Object.entries(P).forEach(([k,v])=>{RATE[k]=v[0];LOSS[k]=v[1];RHY[k]=v[2]});TOV={};
- Object.assign(JST,{sat:{move:7,rest:3,partner:6,learn:5,make:4,awe:6,music:8,hug:7},focus:"rest",works:[0,1],bars:["time","forget"],up:1,upText:"",newsat:null,complete:null,celebrate:false,
-  wk:{day:2,mom:3,at:null},chk:{did:null},stack:[],gentle:false,own:"",notice:null,log:[],week:0,base:{move:7,rest:3,partner:6,learn:5,make:4,awe:6,music:8,hug:7}});jBuildPlan();SCR().classList.add("rating");RT().hidden=false}
-function jJump(id){closeSheet&&closeSheet();jSheetClose(true);
- if(id==="sort"){JST.stack=[];reset();jNavMark("sort");return}
- jSeed();
- if(id==="rate"){SCR().classList.remove("light");RI=0;renderRate();return}
- if(id==="map"){FIRST=true;renderMap();return}
- if(["home","chk","win","adjust","missed"].includes(id)){JST.stack=id==="home"?[]:["home"];
-  if(id==="home"||id==="missed"){JST.done=[JST.plan[0]];JST.pstep=1;JST.sat.rest=4;JST.week=1;JST.log=[{k:"rest",v:4,wk:1,step:jSteps()[JST.plan[0]][0],feel:"yes"}];JST.wk={day:3,mom:4,at:null}}}
- else if(id==="care"){JST.stack=["map","sat"];JST.sat={move:2,rest:1,partner:3,learn:2,make:1,awe:3,music:4,hug:2}}
- else{const upto=JORDER.indexOf(id);JST.stack=["map",...JORDER.slice(0,upto)]}
- if(id==="when")JST.wk={day:2,mom:null};
- if(id==="win"){JST.chk.did="yes";JST.celebrate=true}
- if(id==="adjust")JST.chk.did="no";
- jgo(id)}
+function jJump(){}
 function jStartFromMap(){Object.assign(JST,{sat:{},base:{},log:[],week:0,gentle:false,own:"",focus:null,works:[],bars:[],up:null,upText:"",plan:[],order:[],pstep:0,done:[],complete:null,wk:{day:2,mom:null,at:null},stack:["map"]});jgo("sat")}
 /* progress steps in the top bar */
 (()=>{const segs=document.getElementById("segs");if(!segs||document.querySelector(".jsteps"))return;const el=document.createElement("div");el.className="jsteps";el.setAttribute("aria-label","Progress");
@@ -1610,7 +1592,7 @@ JS.home=()=>{jMode(true);const items=jItems(),d=jFocus(),s=jStep(JST.pstep),w=JS
  const rows=items.map(x=>{const now=jSat(x.k),was=JST.base[x.k]??now,dl=now-was;return `<div class="jhm"><span class="jhm-n">${jm(x,28)}<span>${x.w}</span></span><span class="jhm-b"><i style="width:${now*10}%;--c:${ACOL[AREA[x.k]]}"></i></span><b>${now}</b><em class="${dl>0?"up":dl<0?"dn":""}">${dl>0?"+"+dl:dl<0?dl:""}</em></div>`}).join("");
  RT().innerHTML=jPage({kick:"YOUR GOOD MAP",q:`${hi}<br><em>Here's your week.</em>`,
   body:`<div class="jwk"><div class="jwk-top"><small>THIS WEEK · STEP ${JST.pstep+1} OF 3</small><span class="jdots">${[0,1,2].map(k=>`<i class="${k<JST.pstep?"dn":k===JST.pstep?"cur":""}"></i>`).join("")}</span></div>
-    <b>${s[0]}</b><p>${jWhen()||"Sunday evening"}, after I ${M.anc}</p><p class="jrmd">${ji("bell",13)}Reminder ${dn==="Today"?"today":dn==="Tomorrow"?"tomorrow":dn} at ${jFmt(jAt())}</p></div>
+    <b>${jEsc(s[0])}</b><p>${jWhen()||"Sunday evening"}, after I ${M.anc}</p><p class="jrmd">${ji("bell",13)}Reminder ${dn==="Today"?"today":dn==="Tomorrow"?"tomorrow":dn} at ${jFmt(jAt())}</p></div>
    <div class="jfp"><div class="jfp-l">${jm(d,40)}<div><small>FOCUS</small><b>${d.w}</b><span>${b0} → ${v}${v>b0?` <em>+${v-b0}</em>`:""}</span></div></div>${jTrail(d.k)}</div>
    <div class="jsum">${ji("sun",16)}<div><small>YOUR WEEK ON THE MAP</small><p>${JST.done.length} step${JST.done.length===1?"":"s"} done · ${d.w} ${v>b0?`up ${v-b0}`:`at ${v}`} · next: step ${JST.pstep+1}</p></div></div>
    <div class="jtiles"><button data-g="compare">${ji("person",18)}<span>Compare maps</span></button><button data-g="clinician">${ji("link",18)}<span>Share with my psychologist</span></button><button data-g="remap">${ji("refresh",18)}<span>Re-map in 84 days</span></button></div>
@@ -1634,7 +1616,7 @@ JS.care=()=>{jMode(true);jStage(3,.55);
 /* ---------- 8 · missed a check-in ---------- */
 JS.missed=()=>{jMode(true);jStage(5,.8);const d=jFocus(),s=jStep(JST.pstep);
  RT().innerHTML=jPage({kick:"WELCOME BACK",q:`Good to see you.<br><em>No catching up needed.</em>`,sub:"Life gets busy. Your map is right where you left it.",
-  body:`<div class="jrecap lt"><img alt="" src="data:image/webp;base64,${jImg(d.k)}"><div><small>WHERE YOU LEFT OFF · STEP ${JST.pstep+1}</small><b>${s[0]}</b></div></div>
+  body:`<div class="jrecap lt"><img alt="" src="data:image/webp;base64,${jImg(d.k)}"><div><small>WHERE YOU LEFT OFF · STEP ${JST.pstep+1}</small><b>${jEsc(s[0])}</b></div></div>
    <div class="jacts">${[["resume","Pick up where I left off","Check in on this step now"],["smaller","Start again, smaller","Swap in the smallest step"],["focus","Change what I'm working on","See your map and pick again"]].map(([k,t,x])=>`<button class="jact" data-a="${k}"><span><b>${t}</b><small>${x}</small></span>${ji("chev",16,2)}</button>`).join("")}</div>`,foot:""});
  RT().querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{const a=b.dataset.a,L=jSteps();
   if(a==="resume"){JST.chk={did:null};jgo("chk");return}
@@ -1730,44 +1712,6 @@ function jShareCard(remap){const items=jItems(),{main,second}=jType(items),core=
  img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(g)}
 saveMap=function(){jShareCard()};
 
-/* ---------- 3 · compare maps with someone close ---------- */
-const JSAM={partner:9,laugh:9,nature:8,talk:8,rest:7,food:7,move:5,music:6,home:8,crew:7,learn:4,make:3,awe:6,hug:8,work:5,free:6};
-JS.compare=()=>{jMode(true);jStage(2,1);const items=jItems(),mine=Object.fromEntries(items.map(d=>[d.k,Math.round(d.s*10)]));
- const keys=[...new Set([...Object.keys(mine),...Object.keys(JSAM)])].map(k=>DECK.find(d=>d.k===k)).filter(Boolean);
- const both=keys.filter(d=>(mine[d.k]||0)>=7&&(JSAM[d.k]||0)>=7);
- const diff=keys.filter(d=>!both.includes(d)).map(d=>({d,a:mine[d.k]||0,b:JSAM[d.k]||0})).sort((x,y)=>Math.abs(y.a-y.b)-Math.abs(x.a-x.b)).slice(0,4);
- const row=({d,a,b})=>`<div class="jcmp"><span class="jcmp-n">${jm(d,26)}<span>${d.w}</span></span><span class="jcmp-b"><i style="width:${a*10}%" class="me"></i><i style="width:${b*10}%" class="them"></i></span></div>`;
- RT().innerHTML=jPage({kick:"COMPARE MAPS · EXAMPLE",q:`You and <em>Sam.</em>`,sub:"See what you both need, and where you differ, so you can look after each other better.",
-  body:`<div class="jinv"><small>YOUR INVITE LINK</small><div><code id="jlink">mentication.app/m/7k42rt</code><button class="jsec sm" id="jcopy">${ji("link",14)}Copy</button></div><p>When they finish their sort, your maps line up here.</p></div>
-   <div class="jlbl">You both need</div><div class="jboth">${both.length?both.map(d=>`<span>${jm(d,26)}${d.w}</span>`).join(""):`<span class="none">Nothing shared yet</span>`}</div>
-   <div class="jlbl jleg">Where you differ <span><i class="me"></i>You <i class="them"></i>Sam</span></div><div class="jcmpl">${diff.map(row).join("")}</div>
-   <p class="jtip">${diff[0]?`Tip: ${diff[0].b>diff[0].a?`Sam needs ${diff[0].d.w} more than you do. Worth making room for together.`:`You need ${diff[0].d.w} more than Sam does. Worth saying out loud.`}`:""}</p>`,
-  foot:`<button class="rcta" id="jnext">Send my invite <span class="ar"></span></button>`});
- document.getElementById("jcopy").onclick=async()=>{const t=document.getElementById("jlink").textContent;try{await navigator.clipboard.writeText(t);jToast(`${ji("check",14,2.4)} Link copied`)}catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById("jlink"));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);jToast("Link selected. Copy it to share.")}};
- document.getElementById("jnext").onclick=()=>jToast(`${ji("check",14,2.4)} Invite ready to send`)};
-
-/* ---------- 6 · re-map every season, see the change ---------- */
-JS.remap=()=>{jMode(true);jStage(2,1);const items=jItems(),t=tiers(items);
- const moved=[{k:"rest",from:2,to:0,a:3,b:6},{k:"learn",from:2,to:1,a:5,b:6},{k:"move",from:0,to:0,a:7,b:8}].map(x=>({...x,d:DECK.find(d=>d.k===x.k)})).filter(x=>x.d);
- RT().innerHTML=jPage({kick:"90 DAYS ON",q:`Your map<br><em>has moved.</em>`,sub:"Every season, re-sort your cards and see what changed. This is what 3 months of small steps looks like.",
-  body:`<div class="jmv">${moved.map(x=>`<div class="jmvr">${jm(x.d,34)}<div><b>${x.d.w}</b><p>${x.from!==x.to?`${TN[x.from]} <span class="arr">→</span> <strong>${TN[x.to]}</strong>`:`Still ${TN[x.to]}`}</p></div><span class="jmvs"><em>${x.a}</em>→<b>${x.b}</b></span></div>`).join("")}</div>
-   <div class="jshare2"><button class="jsec" id="jsharer">${ji("spark",16)}Share my before and after</button></div>`,
-  foot:`<button class="rcta" id="jnext">Start my new season <span class="ar"></span></button>`});
- document.getElementById("jsharer").onclick=()=>jShareCard(true);
- document.getElementById("jnext").onclick=()=>{JST.stack=["map"];jgo("sat")}};
-
-/* ---------- 7 · share progress with your psychologist ---------- */
-JS.clinician=()=>{jMode(true);jStage(5,1);const d=jFocus(),v=jSat(d.k),b0=JST.base[d.k]??v,{main}=jType(),on=JST.shareOn!==false,feel=JST.log.filter(x=>x.feel==="yes").length;
- RT().innerHTML=jPage({kick:"SHARE WITH YOUR PSYCHOLOGIST",q:`Bring your map<br><em>to your sessions.</em>`,sub:"Your practitioner sees your progress between sessions, so you spend the hour on what matters.",
-  body:`<div class="jshr"><span>${ji("link",16)}<b>Sharing with your psychologist</b></span><button class="jtog2${on?" on":""}" id="jshare" aria-pressed="${on}" aria-label="Sharing"><i></i></button></div>
-   <div class="jlbl">What they'll see</div>
-   <div class="jcs2"><div><small>MAP TYPE</small><b>${main.n}</b></div><div><small>FOCUS</small><b>${d.w}</b><p>${b0} → ${v}</p></div><div><small>STEPS DONE</small><b>${JST.done.length} of 3</b></div><div><small>FELT THE PAYOFF</small><b>${feel} of ${JST.log.length||0} check-ins</b></div></div>
-   <p class="jtip">They never see your sort cards or anything you write yourself unless you choose to. Stop sharing anytime.</p>
-   <div class="jcode"><small>OR GIVE THEM THIS CODE</small><b>MAP-7K42</b></div>`,
-  foot:`<button class="rcta" id="jnext">Done <span class="ar"></span></button>`});
- document.getElementById("jshare").onclick=()=>{JST.shareOn=!on;jre("clinician")};
- document.getElementById("jnext").onclick=()=>jback()};
-
 /* ---------- 4 · an early glimpse after 8 cards ---------- */
 (()=>{const pt=paint;paint=function(){pt.apply(this,arguments);
  if(i===0)JST._peek=false;
@@ -1775,28 +1719,21 @@ JS.clinician=()=>{jMode(true);jStage(5,1);const d=jFocus(),v=jSat(d.k),b0=JST.ba
   const el=document.createElement("div");el.className="jpeek";el.innerHTML=`<small>HALFWAY THERE</small><b>Your map is taking shape.</b><p>${top?`${APHR[top[0]].charAt(0).toUpperCase()+APHR[top[0]].slice(1)} is leading so far.`:"Keep going to see what leads."}</p>`;
   SCR().appendChild(el);requestAnimationFrame(()=>el.classList.add("show"));setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),400)},3200)}}})();
 
-/* side panel seeds for the new screens */
-(()=>{const jj=jJump;jJump=function(id){if(["type","compare","remap","clinician"].includes(id)){closeSheet&&closeSheet();jSheetClose(true);jSeed();
-  if(id==="clinician"){JST.done=[JST.plan[0]];JST.pstep=1;JST.sat.rest=4;JST.week=1;JST.log=[{k:"rest",v:4,wk:1,step:jSteps()[JST.plan[0]][0],feel:"yes"}];JST.stack=["home"]}
-  else JST.stack=["map"];
-  jgo(id);return}return jj(id)};
- document.querySelectorAll("[data-jump]").forEach(b=>b.onclick=()=>jJump(b.dataset.jump))})();
-
-jSwapCheck();jRestore();
+jSwapCheck();
 
 </script>
-<script>document.addEventListener("DOMContentLoaded",function(){var m=document.querySelector('[data-g="x"]');if(m)m.click();});</script><style id="mentication-narration">
+<style id="mentication-narration">
 #gmSound{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:12px;z-index:50;width:36px;height:36px;border-radius:50%;border:1px solid rgba(244,241,234,.25);background:rgba(18,3,10,.55);color:#F4F1EA;font-size:15px;line-height:1;cursor:pointer}
 </style>
 <script id="mentication-narration-js">
 /* Mentication: a brief spoken line for each screen. Silent on the support and psychologist screens on purpose. */
 (function(){
-  var NO_LINE={care:1,clinician:1},cur=null,last=null,on=true,btn;
-  try{on=localStorage.getItem("gm_narr")!=="off"}catch(e){}
+  var NO_LINE={care:1,clinician:1},cur=null,last=null,on=false,btn;
+  try{on=localStorage.getItem("gm_narr")==="on"}catch(e){}
   function stop(){if(cur){try{cur.pause()}catch(e){}cur=null}}
   function say(id){
     if(id===last)return;last=id;stop();
-    if(!on||NO_LINE[id])return;
+    if(!on||NO_LINE[id]||!["sort","help","way"].includes(id))return;
     var a=new Audio("audio/"+id+".mp3");cur=a;
     a.play().catch(function(){/* the phone may block sound until the first tap; the next screen will play */});
   }
@@ -1807,8 +1744,8 @@ jSwapCheck();jRestore();
     btn=document.createElement("button");btn.id="gmSound";btn.type="button";label();
     btn.onclick=function(){on=!on;try{localStorage.setItem("gm_narr",on?"on":"off")}catch(e){}if(!on)stop();label()};
     document.body.appendChild(btn);
-    setTimeout(function(){say("sort")},700);
+    document.addEventListener("good-map:phase",function(event){say(event.detail)});
   });
 })();
 </script>
-</body></html>
+<script src="model.js"></script><script src="journey.js"></script></body></html>

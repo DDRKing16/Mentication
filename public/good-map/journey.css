@@ -1,0 +1,48 @@
+/* Keep the illustrated maroon/jade world; let content grow instead of shrinking text. */
+body { overflow:auto!important; }
+.phone { height:auto!important; min-height:100dvh; }
+.scr { min-height:100dvh; height:auto!important; overflow:visible; padding-bottom:env(safe-area-inset-bottom); }
+.top { display:none!important; }
+.gm-nav { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:10px 12px; padding-right:54px; position:relative; z-index:25; }
+.gm-nav button { background:transparent; color:inherit; border:1px solid currentColor; border-radius:18px; padding:9px 12px; min-height:44px; font:600 14px system-ui; cursor:pointer; }
+.gm-nav button:disabled { opacity:.45; cursor:default; }
+.gm-status { width:100%; font:400 13px/1.4 system-ui; }
+.gm-status.error { color:#ffdeb1; background:#621526; padding:8px; }
+.rate { flex:none!important; height:auto!important; min-height:0!important; overflow:visible!important; width:100%; max-width:680px; margin:0 auto; }
+.jw { height:auto!important; min-height:0!important; overflow:visible!important; }
+.jbody { overflow:visible!important; flex:none!important; padding:20px 22px; }
+.jfoot { position:static!important; padding:18px 22px 28px!important; }
+.jq { font-size:clamp(32px,6vw,46px)!important; }
+.jsub,.jtip,.jnote2 { font-size:16px!important; line-height:1.5!important; }
+button,input,select,textarea { font-size:16px; }
+button { min-height:44px; touch-action:manipulation; }
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible { outline:3px solid #00A676!important; outline-offset:3px; }
+.gm-field { display:grid; gap:8px; margin:18px 0; font:500 16px/1.5 system-ui; }
+.gm-field input,.gm-field textarea,.gm-field select { width:100%; padding:12px; border:1px solid #9b6d70; border-radius:12px; color:#2a0911; background:#fffaf1; min-height:48px; }
+.gm-field textarea { min-height:100px; }
+.gm-options { display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 22px; }
+.gm-options button { min-width:44px; padding:10px; border:1px solid currentColor; border-radius:10px; background:transparent; color:inherit; }
+.gm-options button[aria-pressed=true] { background:#007956; color:white; }
+.gm-preview { white-space:pre-wrap; overflow-wrap:anywhere; font:400 15px/1.5 system-ui; padding:16px; border:1px solid #a98989; border-radius:12px; }
+.gm-record { margin:16px 0; padding:16px; border:1px solid #b49b89; border-radius:14px; }
+.gm-record p { line-height:1.5; }
+.gm-check { display:flex; gap:10px; align-items:flex-start; margin:20px 0; line-height:1.5; }
+.gm-check input { width:24px; height:24px; flex:none; }
+.gm-photo { width:130px; border:6px solid #fff7e8; transform:rotate(-3deg); margin:10px auto 25px; display:block; }
+.stage { flex:none; height:380px; min-height:330px; }
+.trays { max-width:640px; width:100%; margin:0 auto; }
+.tray { font-size:15px!important; min-height:80px; }
+.hint { padding-bottom:22px; }
+.gm { overflow:visible!important; }
+.gm-stage { max-width:500px; margin:auto; }
+.jpanel,.gm-panel { max-height:85dvh; overflow:auto; }
+.jshs,.gm-facts span { font-size:15px!important; }
+.gm-nav + .hd { max-width:640px; width:100%; margin:0 auto; }
+@media(max-width:360px) { .jbody,.jfoot { padding-left:14px!important; padding-right:14px!important; } .gm-nav button { padding:8px; } .trays { gap:5px; padding:0 8px; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+
+.gm-large button,.gm-large input,.gm-large textarea,.gm-large select,.gm-large p,.gm-large .jsub,.gm-large .jtip,.gm-large .gm-preview { font-size:22px!important; line-height:1.55!important; }
+.gm-large .gm-status { font-size:18px; }
+.gm-large .gm-nav { padding-right:54px; }
+.gm-large .gm-options button { min-width:52px; }
+.gm-large .jbtns { flex-wrap:wrap; }
