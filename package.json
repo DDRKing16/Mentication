@@ -16,7 +16,7 @@
     "test": "vitest run",
     "narration:audit": "node scripts/final50-narration.mjs --audit",
     "narration:generate-final50": "node scripts/final50-narration.mjs --generate",
-    "prebuild": "node scripts/build-home-document.mjs"
+    "prebuild": "node scripts/build-home-document.mjs && node scripts/build-dear2100.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.1",

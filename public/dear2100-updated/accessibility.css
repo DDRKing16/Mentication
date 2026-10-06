@@ -1,0 +1,9 @@
+.meter select { width:100%; min-height:44px; padding:10px 12px; border:1px solid #657181; border-radius:10px; background:#fffaf1; color:#112b50; font:inherit; }
+button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible { outline:3px solid #b34836; outline-offset:3px; }
+.save-error { flex-wrap:wrap; position:relative; z-index:100; }
+.save-error button { min-height:44px; }
+.meter-heading { gap:12px; align-items:start; }
+.meter-heading b { white-space:nowrap; font-size:14px; }
+[data-motion="quiet"] *, [data-motion="quiet"] *::before, [data-motion="quiet"] *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after {animation:none!important;transition:none!important;scroll-behavior:auto!important;} }
+@media(max-width:480px) { .plan-schedule-row {flex-wrap:wrap;} .schedule-choice {min-width:90px;} .meter-heading {flex-wrap:wrap;} }
