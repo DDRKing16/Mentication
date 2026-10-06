@@ -65,3 +65,18 @@ describe("Backup", () => {
     expect(phone.getItem("mentication.plus.v1")).toBe('{"active":false}');
   });
 });
+
+describe('backup failures and Journal coverage',()=>{
+  it('includes device Journal entries',()=>{const store=memoryStorage({daybook:'[{"id":"note"}]'});const phone=memoryStorage();restoreBackup(createBackup(store),phone);expect(phone.getItem('daybook')).toBe(store.getItem('daybook'));});
+  it('rejects array containers, missing versions and unreadable values',()=>{
+    for(const data of [{format:'mentication-backup',version:1,data:[]},{format:'mentication-backup',data:{}},{format:'mentication-backup',version:1,data:{daybook:{}}}])expect(()=>parseBackup(JSON.stringify(data))).toThrow();
+  });
+  it('preserves unreadable current history before changing any key',()=>{
+    const phone=memoryStorage({'mentation.sessions.v1':'broken',daybook:'old'});
+    expect(()=>restoreBackup({format:'mentication-backup',version:1,data:{daybook:'new','mentation.sessions.v1':'[]'}},phone)).toThrow();expect(phone.getItem('daybook')).toBe('old');
+  });
+  it('rolls back earlier writes when a later key cannot be saved',()=>{
+    const phone=memoryStorage({daybook:'old'}),set=phone.setItem;phone.setItem=(key,value)=>{if(key==='dear2100-book-v1')throw new Error('quota');set(key,value);};
+    expect(()=>restoreBackup({format:'mentication-backup',version:1,data:{daybook:'new','dear2100-book-v1':'{}'}},phone)).toThrow('previous data');expect(phone.dump()).toEqual({daybook:'old'});
+  });
+});

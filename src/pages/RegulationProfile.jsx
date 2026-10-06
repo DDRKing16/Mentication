@@ -1,3 +1,4 @@
+import {disableDailyReminder} from '@/lib/reminders';
 import { useDeviceSessions } from '@/hooks/useDeviceSessions';
 import { repeatLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
@@ -6,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Castle, ChevronLeft, Sparkles, TrendingDown, Repeat, Layers, History } from "lucide-react";
-import { deleteAllLocalAppData, sessionStore } from "@/lib/localData";
+import { deleteAllLocalAppData } from "@/lib/localData";
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
 import { derivePeacePalace } from "@/lib/peacePalace";
 import { usePremium } from "@/hooks/usePremium";
@@ -36,20 +37,20 @@ export default function RegulationProfile() {
   const {sessions,ready,error,reload:loadSessions}=useDeviceSessions(100);
   const profile=useMemo(()=>buildProfile(sessions),[sessions]);
   const lastWorked=useMemo(()=>pickLastWorked(sessions),[sessions]);
-  const [confirming,setConfirming]=useState(false),[deleting,setDeleting]=useState(false);
+  const [confirming,setConfirming]=useState(false),[deleting,setDeleting]=useState(false),[deleteError,setDeleteError]=useState('');
   const weekCount=sessions.filter(s=>new Date(s.created_date).getTime()>=Date.now()-7*86400000).length;
   const { isPremium } = usePremium();
   const palace = useMemo(() => derivePeacePalace(sessions), [sessions]);
 
   const deleteAll = async () => {
-    setDeleting(true);
+    setDeleting(true);setDeleteError('');
     try {
-      await sessionStore.deleteMany();
+      await disableDailyReminder();
       deleteFlagshipMemory("all");
       deleteAllLocalAppData();
-    } catch { /* */ }
-    setDeleting(false);
-    navigate("/");
+      navigate("/");
+    } catch { setDeleteError("Deletion did not finish. Some data may remain on this device. Try again."); }
+    finally { setDeleting(false); }
   };
 
 
@@ -69,7 +70,7 @@ export default function RegulationProfile() {
     );
   }
 
-  if (!profile || profile.count === 0) {
+  if ((!profile || profile.count === 0) && !confirming) {
     return (
       <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
@@ -115,7 +116,7 @@ export default function RegulationProfile() {
         </motion.div>
 
         {/* typical change */}
-        <div className="mt-8 rounded-2xl border border-border bg-card p-6 soft-depth">
+        {profile.count > 0 && <div className="mt-8 rounded-2xl border border-border bg-card p-6 soft-depth">
           <div className="flex items-center gap-2 text-muted-foreground">
             <TrendingDown className="h-4 w-4" />
             <span className="text-sm font-medium uppercase tracking-[0.15em]">Typical change</span>
@@ -129,7 +130,7 @@ export default function RegulationProfile() {
             Across {profile.count} reset{profile.count === 1 ? "" : "s"}, you{" "}
             {profile.change > 0 ? `improved ${profile.change} on average` : "held steady on average"}.
           </p>
-        </div>
+        </div>}
 
         {/* do what worked last time */}
         {lastWorked && (
@@ -204,12 +205,13 @@ export default function RegulationProfile() {
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             Your session history stays on this device. Delete it and your intervention memory at any time.
           </p>
+          {deleteError && <p role="alert" className="mt-3">{deleteError}</p>}
           {confirming ? (
             <div className="mt-4 flex flex-wrap gap-2">
               <Button variant="destructive" onClick={deleteAll} disabled={deleting} className="rounded-full">
                 {deleting ? "Deleting…" : "Yes, delete everything"}
               </Button>
-              <Button variant="ghost" onClick={() => setConfirming(false)} className="rounded-full">Cancel</Button>
+              <Button variant="ghost" onClick={() => setConfirming(false)} disabled={deleting} className="rounded-full">Cancel</Button>
             </div>
           ) : (
             <Button variant="outline" onClick={() => setConfirming(true)} className="mt-4 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10">

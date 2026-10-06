@@ -1,3 +1,4 @@
+import {writeVerified} from '@/lib/verifiedStorage';
 import { savedWorkMatches, taraReportedResult, validSavedDate } from '@/lib/savedWorkPresentation';
 import { getBrandAtmosphere, getBrandInk } from '@/lib/interventionBrand';
 import { loadTara, deleteTaraRecap } from '@/lib/taraTacticianStorage';
@@ -28,8 +29,11 @@ export default function ReturnPoints() {
   const [notes, setNotes] = useState(() => { try { return takeawayStore.list(); } catch { return null; } });
   const [thoughts, setThoughts] = useState(() => { try { return readThoughts(); } catch { return null; } });
   const refresh = () => {
-    try { setNotes(takeawayStore.list()); setTaraRecaps(loadTara().recaps); setThoughts(readThoughts()); const saved = readCareCards(); setCards(Object.keys(CARE_PRACTICES).map(id => ({ id, state: saved[id] })).filter(card => card.state)); setError(''); }
-    catch { setError('Saved work could not be read. Nothing has been removed. Try again.'); }
+    let failed=false;
+    for(const read of [()=>setNotes(takeawayStore.list()),()=>setTaraRecaps(loadTara().recaps),()=>setThoughts(readThoughts()),()=>{const saved=readCareCards();setCards(Object.keys(CARE_PRACTICES).map(id=>({id,state:saved[id]})).filter(card=>card.state));}]) {
+      try { read(); } catch { failed=true; }
+    }
+    setError(failed?'Some saved work could not be read. Nothing has been removed. Try again.':'');
   };
   const archives = Object.entries(JOURNEY_EXPERIENCES).filter(([, meta]) => meta.archive && meta.archive !== '/return-points');
   const visibleNotes=notes?.filter(note=>savedWorkMatches(query,[note.text,JOURNEY_EXPERIENCES[note.interventionId]?.name]));
@@ -61,7 +65,7 @@ export default function ReturnPoints() {
       {record.balancedConfirmed === true && typeof record.ruling === 'string' && <p className="mt-3 whitespace-pre-wrap break-words">Your confirmed perspective: {record.ruling}</p>}
       {typeof record.returnPhrase === 'string' && record.returnPhrase.trim() && <p className="mt-3 whitespace-pre-wrap break-words">Your return phrase: {record.returnPhrase}</p>}
       <button type="button" className="mt-3 min-h-11 underline" onClick={() => {
-        try { localStorage.setItem(THOUGHT_KEY, JSON.stringify(readThoughts().filter(item => item.id !== record.id))); setThoughts(readThoughts()); setError(''); }
+        try { writeVerified(localStorage,THOUGHT_KEY, JSON.stringify(readThoughts().filter(item => item.id !== record.id))); setThoughts(readThoughts()); setError(''); }
         catch { setError('Could not delete this perspective. It is still saved. Try again.'); }
       }}>Delete this perspective</button>
     </article>)}

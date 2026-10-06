@@ -1,3 +1,4 @@
+import {readRecordList,writeVerified,removeVerified} from './verifiedStorage';
 // Backup and restore: everything Mentication keeps on the phone, saved as one
 // file the person keeps wherever they like (iCloud Drive, Files, AirDrop).
 // Nothing is sent anywhere by the app; the phone's own share sheet does it.
@@ -11,7 +12,7 @@ const EXCLUDED = new Set(["mentication.plus.v1", "mentation.reminders.v1"]);
 const SESSION_KEY = "mentation.sessions.v1";
 const FORMAT = "mentication-backup";
 
-const includeKey = (key) => !EXCLUDED.has(key) && PREFIXES.some((prefix) => key.startsWith(prefix));
+const includeKey = (key) => !EXCLUDED.has(key) && (key === "daybook" || PREFIXES.some((prefix) => key.startsWith(prefix)));
 
 function allKeys(storage) {
   return Array.from({ length: storage.length }, (_, index) => storage.key(index)).filter(Boolean);
@@ -45,15 +46,16 @@ export function backupSessionCount(backup) {
 export function parseBackup(text) {
   let backup;
   try { backup = JSON.parse(text); } catch { throw new Error("That file isn't a Mentication backup."); }
-  if (backup?.format !== FORMAT || typeof backup.data !== "object" || backup.data === null) {
+  if (backup?.format !== FORMAT || typeof backup.data !== "object" || backup.data === null || Array.isArray(backup.data)) {
     throw new Error("That file isn't a Mentication backup.");
   }
   if (backup.version > 1) throw new Error("That backup is from a newer version of Mentication. Update the app, then try again.");
+  if(backup.version !== 1 || Object.values(backup.data).some(value=>typeof value!=="string")) throw new Error("That file is not a readable version 1 Mentication backup.");
   return backup;
 }
 
 function mergeSessions(current, incoming) {
-  const parse = (raw) => { try { const v = JSON.parse(raw || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
+  const parse = raw => readRecordList({getItem:()=>raw}, SESSION_KEY);
   const byId = new Map();
   for (const session of [...parse(incoming), ...parse(current)]) {
     if (session?.id && !byId.has(session.id)) byId.set(session.id, session);
@@ -66,13 +68,21 @@ function mergeSessions(current, incoming) {
  * this phone is lost); everything else takes the backup's version.
  */
 export function restoreBackup(backup, storage = globalThis.localStorage) {
-  let restored = 0;
-  for (const [key, value] of Object.entries(backup.data)) {
-    if (!includeKey(key) || typeof value !== "string") continue;
-    storage.setItem(key, key === SESSION_KEY ? mergeSessions(storage.getItem(key), value) : value);
-    restored += 1;
+  // Prepare every value before mutating so an unreadable history cannot be lost.
+  const checked=parseBackup(JSON.stringify(backup));
+  const changes=Object.entries(checked.data).filter(([key])=>includeKey(key)).map(([key,value])=>({key,previous:storage.getItem(key),value:key===SESSION_KEY?mergeSessions(storage.getItem(key),value):value}));
+  const attempted=[];
+  try {
+    for(const change of changes){attempted.push(change);writeVerified(storage,change.key,change.value);}
+  } catch {
+    let recovered=true;
+    for(const change of attempted.reverse()) {
+      try { if(change.previous===null)removeVerified(storage,change.key);else writeVerified(storage,change.key,change.previous); }
+      catch { recovered=false; }
+    }
+    throw new Error(recovered?'Restore could not be saved. Your previous data has been kept. Try again.':'Restore did not finish and some data could not be recovered. Keep your backup and try again when device storage is available.');
   }
-  return restored;
+  return changes.length;
 }
 
 /**

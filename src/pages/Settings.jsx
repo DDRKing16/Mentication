@@ -59,9 +59,11 @@ export default function Settings() {
     }
   };
   const confirmRestore = () => {
-    restoreBackup(pendingRestore);
-    setPendingRestore(null);
-    window.location.assign("/");
+    try {
+      restoreBackup(pendingRestore);
+      setPendingRestore(null);
+      window.location.assign("/");
+    } catch(error) { setBackupNote(error.message); }
   };
   const setReminderOn = async (on, hour = reminder.hour, minute = reminder.minute) => {
     setReminderNote("");

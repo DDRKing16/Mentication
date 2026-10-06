@@ -1,4 +1,5 @@
-import { clearDraft, clearNextStepHandoff } from "@/lib/tomorrowParking/storage";
+import {removeVerified} from './verifiedStorage';
+import { clearDraft, clearNextStepHandoff, DRAFT_KEY, NEXT_STEP_HANDOFF_KEY } from "@/lib/tomorrowParking/storage";
 
 const PREF_KEY = "mentation.flagship.preferences.v1";
 const ACTIVE_KEY = "mentation.flagship.active.v1";
@@ -129,12 +130,15 @@ export function deleteFlagshipMemory(scope = "all") {
       : scope === "saved" ? [PARKING_KEY, PARKING_RECORDS_KEY, NIGHT_FEEDBACK_KEY, ...SHARED_RETURN_KEYS]
         : [PREF_KEY, ACTIVE_KEY, HANDOFF_KEY, PARKING_KEY, PARKING_RECORDS_KEY, PARKING_CONSENTS_KEY, NIGHT_FEEDBACK_KEY, ...SHARED_RETURN_KEYS];
   keys.forEach((key) => {
-    localStorage.removeItem(key);
+    removeVerified(localStorage,key);
     if (key === "mentation.tara-tactician.v1" && localStorage.getItem(key) === null && typeof window !== "undefined" && typeof window.dispatchEvent === "function") window.dispatchEvent(new CustomEvent("mentation:tara-cleared"));
   });
   // A Tomorrow Parking Lot draft (unsaved note text) and a staged Next Easiest
   // Step handoff excerpt live in sessionStorage, not the keys above - but this
   // button promises to clear "saved return points and handoff preferences",
   // so they need clearing here too, for "saved" and "all".
-  if (scope === "saved" || scope === "all") { clearDraft(); clearNextStepHandoff(); }
+  if (scope === "saved" || scope === "all") {
+    clearDraft(); clearNextStepHandoff();
+    if(typeof window!=="undefined" && window.sessionStorage) { removeVerified(window.sessionStorage,DRAFT_KEY);removeVerified(window.sessionStorage,NEXT_STEP_HANDOFF_KEY); }
+  }
 }

@@ -32,6 +32,12 @@ Inspected Home, My Plan, Profile and Insights history lifecycles. A shared local
 
 Validation: nine subscription, progress-story and recommendation tests, typecheck and lint passed. Mounted 320px My Plan updated after real session create/delete without navigating; mounted 390px Insights updated after another tab's create/delete. No matching algorithm or fabricated ratings added.
 
+## Pass 6 — verified local saves, backups and deletion
+
+Inspected shared history/notes, Journal, backup restore, reminder cancellation and full deletion. Shared writes/removals now verify storage; unreadable session history cannot silently become an empty overwrite. Journal saves/deletes update the view only after verification and preserve the active entry on error. Backup includes Journal, validates its container and version, prepares history merges before writing, and rolls back partial restore failures with truthful recovery messages. Full deletion includes Dear books/backups and Journal, verifies owned local/session keys, cancels native reminders first, and stays on Profile with a retry message if deletion fails. Scoped memory deletion verifies its promised draft/handoff removals. Return points retries independent stores so one unreadable store does not block others.
+
+Validation: 20 storage/backup/memory/reminder tests passed, including corrupt history, silent writes/removals, Journal round-trip and partial restore rollback. Typecheck and lint passed. Actual 320px Profile proved a silent deletion failure keeps the route, records and truthful retry visible. Native notification hardware is unavailable; cancellation uses the existing on-device plugin.
+
 ## Remaining passes
 
-6–10 pending; preserve this log when continuing.
+7–10 pending; preserve this log when continuing.

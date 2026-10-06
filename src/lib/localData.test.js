@@ -69,3 +69,27 @@ describe("device-local application data", () => {
     expect(window.__events).toContain("mentation:accessibility-changed");
   });
 });
+
+describe('storage failures remain truthful',()=>{
+  beforeEach(()=>{globalThis.window={localStorage:new MemoryStorage(),dispatchEvent:()=>{}};globalThis.CustomEvent=class {constructor(type){this.type=type;}};});
+  afterEach(()=>{delete globalThis.window;delete globalThis.CustomEvent;});
+  it('does not replace unreadable session history',async()=>{
+    window.localStorage.setItem('mentation.sessions.v1','{broken');
+    await expect(sessionStore.create({id:'new'})).rejects.toThrow();
+    expect(window.localStorage.getItem('mentation.sessions.v1')).toBe('{broken');
+    await expect(sessionStore.list()).rejects.toThrow();
+  });
+  it('does not report a silent write as a saved session',async()=>{
+    window.localStorage.setItem=()=>{};
+    await expect(sessionStore.create({id:'new'})).rejects.toThrow('confirm');
+  });
+  it('erases Dear and Journal but preserves unrelated storage',()=>{
+    for(const key of ['dear2100-book-v1','dear2100-book-v1.migration-backup','daybook'])window.localStorage.setItem(key,'private');
+    window.localStorage.setItem('mentication.unrelated','keep');deleteAllLocalAppData();
+    expect(window.localStorage.getItem('daybook')).toBeNull();expect(window.localStorage.getItem('dear2100-book-v1')).toBeNull();expect(window.localStorage.getItem('dear2100-book-v1.migration-backup')).toBeNull();expect(window.localStorage.getItem('mentication.unrelated')).toBe('keep');
+  });
+  it('does not report silent removal as a successful full deletion',()=>{
+    window.localStorage.setItem('daybook','private');window.localStorage.removeItem=()=>{};
+    expect(()=>deleteAllLocalAppData()).toThrow('deletion');
+  });
+});

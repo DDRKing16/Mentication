@@ -89,10 +89,11 @@ export async function enableDailyReminder(hour, minute) {
 
 export async function disableDailyReminder() {
   const prefs = { ...getReminderPrefs(), enabled: false };
+  if (remindersSupported()) {
+    const LocalNotifications = await plugin();
+    await LocalNotifications.cancel({ notifications: ALL_IDS.map((id) => ({ id })) });
+  }
   savePrefs(prefs);
-  if (!remindersSupported()) return;
-  const LocalNotifications = await plugin();
-  await LocalNotifications.cancel({ notifications: ALL_IDS.map((id) => ({ id })) });
 }
 
 export function formatReminderTime(hour, minute) {

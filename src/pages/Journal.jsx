@@ -1,3 +1,4 @@
+import {readRecordList,writeVerified} from '@/lib/verifiedStorage';
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -321,13 +322,9 @@ export default function Journal() {
   // Load daybook from localStorage
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("daybook");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) setDaybook(parsed);
-      }
+      setDaybook(readRecordList(localStorage,"daybook"));
     } catch {
-      console.error("Failed to parse daybook from storage");
+      setToast("Your archive could not be read. Existing entries have been kept.");
     }
   }, []);
 
@@ -370,7 +367,6 @@ export default function Journal() {
 
   // Save active entry
   const saveEntry = () => {
-    playSound('success');
     const moodInfo = getMoodSummary(mood.x, mood.y);
     const now = new Date();
     
@@ -407,9 +403,11 @@ export default function Journal() {
       customPlayNote: customPlayInput
     };
 
-    const updatedDaybook = [newEntry, ...daybook];
+    let updatedDaybook;
+    try { updatedDaybook=[newEntry,...readRecordList(localStorage,"daybook")];writeVerified(localStorage,"daybook",JSON.stringify(updatedDaybook)); }
+    catch { triggerToast("Your entry was not saved. Keep this screen open and try again.");return; }
     setDaybook(updatedDaybook);
-    try { localStorage.setItem("daybook", JSON.stringify(updatedDaybook)); } catch { /* storage unavailable */ }
+    playSound("success");
     triggerToast("Entry saved to Mentication Archive");
     setStep(0); // return to dashboard
   };
@@ -417,10 +415,11 @@ export default function Journal() {
   // Delete past entry
   const deleteEntry = (id, e) => {
     e.stopPropagation();
-    playSound('delete');
-    const updated = daybook.filter(item => item.id !== id);
+    let updated;
+    try { updated=readRecordList(localStorage,"daybook").filter(item=>item.id!==id);writeVerified(localStorage,"daybook",JSON.stringify(updated)); }
+    catch { triggerToast("Could not confirm deletion. Try again.");return; }
     setDaybook(updated);
-    try { localStorage.setItem("daybook", JSON.stringify(updated)); } catch { /* storage unavailable */ }
+    playSound("delete");
     triggerToast("Entry deleted");
     if (selectedPastEntry?.id === id) {
       setSelectedPastEntry(null);
@@ -2169,6 +2168,7 @@ export default function Journal() {
       <AnimatePresence>
         {toast && (
           <motion.div
+            role="status"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}

@@ -1,3 +1,4 @@
+import {readRecordList,writeVerified,removeVerified} from './verifiedStorage';
 import { resetOnboardingSession } from './onboarding';
 // @ts-check
 // Device-local persistence for Mentication.
@@ -8,24 +9,18 @@ import { loadTara } from "./taraTacticianStorage";
 import { notifyAccessibilityPreferencesChanged } from "./accessibilityEvents";
 
 const SESSION_KEY = "mentation.sessions.v1";
-const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr", "mentication.foundations."];
+const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr", "mentication.foundations.", "mentication.tomorrowParking.", "dear2100"];
 const MAX_SESSIONS = 500;
 
 const storage = () => (typeof window === "undefined" ? null : window.localStorage);
 
 function readSessions() {
-  try {
-    const raw = storage()?.getItem(SESSION_KEY);
-    const value = raw ? JSON.parse(raw) : [];
-    return Array.isArray(value) ? value : [];
-  } catch {
-    return [];
-  }
+  return readRecordList(storage(),SESSION_KEY);
 }
 
 function writeSessions(sessions) {
   const next = sessions.slice(0, MAX_SESSIONS);
-  storage()?.setItem(SESSION_KEY, JSON.stringify(next));
+  writeVerified(storage(),SESSION_KEY,JSON.stringify(next));
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: next.length } }));
   }
@@ -69,10 +64,15 @@ export const sessionStore = Object.freeze({
 
 export function deleteAllLocalAppData() {
   const local = storage();
-  if (!local) return;
+  if (!local) throw new Error("Device storage is unavailable.");
   const keys = Array.from({ length: local.length }, (_, index) => local.key(index)).filter(Boolean);
   for (const key of keys) {
-    if (key === "mentication_nes_v2_app_state" || APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
+    if (key === "mentication_nes_v2_app_state" || key === "daybook" || APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) removeVerified(local,key);
+  }
+  const temporary=window.sessionStorage;
+  if(temporary) {
+    const draftKeys=Array.from({length:temporary.length},(_,index)=>temporary.key(index)).filter(Boolean);
+    for(const key of draftKeys) if(key === "mentication_nes_v2_app_state" || APP_DATA_PREFIXES.some(prefix=>key.startsWith(prefix))) removeVerified(temporary,key);
   }
   resetOnboardingSession();
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
@@ -115,15 +115,16 @@ function readTakeaways() {
 function writeTakeaways(records) {
   const local = storage();
   if (!local) throw new Error('Device storage is unavailable.');
-  local.setItem(TAKEAWAY_KEY, JSON.stringify(records));
+  writeVerified(local,TAKEAWAY_KEY,JSON.stringify(records));
 }
 export const takeawayStore = Object.freeze({
   list: readTakeaways,
   save({ id, interventionId, text }) {
     const content = typeof text === 'string' ? text.trim() : '';
     if (!content || content.length > 1500 || typeof interventionId !== 'string' || !interventionId) throw new Error('Enter a note of up to 1500 characters.');
-    const record = { id: id || globalThis.crypto?.randomUUID?.() || `note-${Date.now()}`, interventionId, text: content, createdAt: new Date().toISOString() };
     const records = readTakeaways();
+    const previous = records.find(item=>item.id===id);
+    const record = { id: id || globalThis.crypto?.randomUUID?.() || `note-${Date.now()}`, interventionId, text: content, createdAt: previous?.createdAt || new Date().toISOString() };
     writeTakeaways([record, ...records.filter(item => item.id !== record.id)]);
     return record;
   },
