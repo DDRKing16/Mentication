@@ -1,0 +1,52 @@
+contact-final
+390px hand: placement, rhythm, crop, controls, pause/resume passed
+390px crown: placement, rhythm, crop, controls, pause/resume passed
+390px brow: placement, rhythm, crop, controls, pause/resume passed
+390px sideEye: placement, rhythm, crop, controls, pause/resume passed
+390px underEye: placement, rhythm, crop, controls, pause/resume passed
+390px nose: placement, rhythm, crop, controls, pause/resume passed
+390px chin: placement, rhythm, crop, controls, pause/resume passed
+390px collar: placement, rhythm, crop, controls, pause/resume passed
+390px arm: placement, rhythm, crop, controls, pause/resume passed
+320px hand: placement, rhythm, crop, controls, pause/resume passed
+320px crown: placement, rhythm, crop, controls, pause/resume passed
+320px brow: placement, rhythm, crop, controls, pause/resume passed
+320px sideEye: placement, rhythm, crop, controls, pause/resume passed
+320px underEye: placement, rhythm, crop, controls, pause/resume passed
+320px nose: placement, rhythm, crop, controls, pause/resume passed
+320px chin: placement, rhythm, crop, controls, pause/resume passed
+320px collar: placement, rhythm, crop, controls, pause/resume passed
+320px arm: placement, rhythm, crop, controls, pause/resume passed
+delay image: passed
+error image: passed
+
+cues-final
+PASS: explicit gesture activation, independent optional sound/touch, synchronized beat, quiet placement, distinct double point change, immediate cancellation on pause/stop/hidden/alternative/exit/unmount, no replay on resume/repeat, unsupported, silent reset and reduced-motion fallback. Native vibration shape tested with injected APIs in Vitest; physical device sensation not verified.
+
+integrated-final
+320px: integrated entry, two-activation reveal, all 9 automatic points, in-frame markers, matched question, full round, pause/resume, repeat, alternative return, browser restart paused, interrupted post-rating blank, host finish and goal skip; no horizontal overflow or browser errors.
+390px: integrated entry, two-activation reveal, all 9 automatic points, in-frame markers, matched question, full round, pause/resume, repeat, alternative return, browser restart paused, interrupted post-rating blank, host finish and goal skip; no horizontal overflow or browser errors.
+430px: integrated entry, two-activation reveal, all 9 automatic points, in-frame markers, matched question, full round, pause/resume, repeat, alternative return, browser restart paused, interrupted post-rating blank, host finish and goal skip; no horizontal overflow or browser errors.
+
+journey
+PASS: mobile timed journey; exact before/after; pause/resume; repeat; stop; skip blanks; grounding mode; change-course payload; keyboard; reduced motion; 320/390/430/768 overflow; no browser errors.
+
+pacing
+PASS: spacious pacing 16s, background pause freezes 60s, explicit resume continues from same point.
+
+resilience-final
+PASS: integrated save failure/retry/delete failure, retained text, no false save; draft-delete/completion failure retains zero; corrupt draft protected and explicitly recoverable; app reduced motion + large text + contrast at 320px; exit without session credit.
+
+edge
+PASS: 320px journey, audio unavailable fallback, completion rejection/retry, all-skipped rounds incomplete, zero preserved, higher rating removes repeat, exit without completion.
+
+Final repository tests
+ Test Files  62 passed (62)
+      Tests  476 passed (476)
+   Start at  13:19:21
+   Duration  22.28s (transform 3.37s, setup 0ms, import 12.79s, tests 4.70s, environment 21ms)
+
+
+Repository lint and typecheck: passed. Production build: passed; existing chunk-size advisory only.
+Protocol and cue-engine files: unchanged from approved pilot.
+Original owner checkout: e2369be, clean. Task branch only; no push, main merge or deployment.

@@ -3,6 +3,7 @@ import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
 import { readTappingDraft, writeTappingDraft, deleteTappingDraft } from './tappingDraft';
 import { useEffect, useRef, useState } from 'react';
 import TappingSilhouette from './TappingSilhouette';
+import { TAPPING_ARTWORK } from './tappingArtwork';
 import { CONCERNS, TAPPING_POINTS, RATING_QUESTION, makeTappingResult, outcomeText } from './tappingProtocol';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import { createTappingCues } from './tappingCues';
@@ -19,6 +20,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const [after, setAfter] = useState(restored?.after ?? null);
   const [index, setIndex] = useState(restored?.index || 0);
   const [second, setSecond] = useState(restored?.second || 0);
+  const [artworkStatus, setArtworkStatus] = useState({ id: '', status: 'loading' });
   const [paused, setPaused] = useState(restored?.stage === 'round');
   const [slow, setSlow] = useState(restored?.slow === true);
   const { prefs } = useAccessibilityPrefs();
@@ -46,10 +48,12 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const heading = useRef(null);
   const point = TAPPING_POINTS[index];
   const grounding = concern.id === 'grounding';
-  const contactGate = point.id === 'sideEye';
+  const placement = TAPPING_ARTWORK[point.id].placement;
+  const artworkReady = artworkStatus.id === point.id && artworkStatus.status !== 'loading';
+  const artworkError = artworkStatus.id === point.id && artworkStatus.status === 'error';
   const secondsPerPoint = index === 0 ? (grounding ? 12 : 30) : slow ? 16 : 12;
   const locating = second < (index === 0 ? 3 : slow ? 6 : 4);
-  const tapping = stage === 'round' && !paused && !locating;
+  const tapping = stage === 'round' && !paused && artworkReady && !locating;
   currentTick.current = `${roundSerial.current}:${index}:${second}`;
   const visualTapping = tapping && blockedVisualTick.current !== currentTick.current;
 
@@ -73,13 +77,13 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     return () => { document.removeEventListener('visibilitychange', hide); window.removeEventListener('storage', deleted); };
   }, [onExit]);
   useEffect(() => {
-    if (stage !== 'round' || paused) return;
+    if (stage !== 'round' || paused || !artworkReady) return;
     const timer = window.setInterval(() => {
       duration.current += 1;
       setSecond(s => s + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [stage, paused]);
+  }, [stage, paused, artworkReady]);
   useEffect(() => {
     if (stage !== 'round' || second < secondsPerPoint) return;
     setSecond(0);
@@ -87,7 +91,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     else setIndex(i => i + 1);
   }, [stage, second, secondsPerPoint, index]);
   useEffect(() => {
-    if (stage !== 'round' || paused || document.hidden) { cues.current?.cancel(); return; }
+    if (stage !== 'round' || paused || !artworkReady || document.hidden) { cues.current?.cancel(); return; }
     if (second >= secondsPerPoint) return;
     const tick = `${roundSerial.current}:${index}:${second}`;
     if (cueTick.current === tick) return;
@@ -95,7 +99,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     // Point-change cues happen during placement, rhythm cues after placement.
     if (second === 0) cues.current?.emit('point', { sound: sound && !silent, haptic: haptic && !systemReduced && !prefs.reducedMotion });
     else if (tapping) cues.current?.emit('beat', { sound: sound && !silent, haptic: haptic && !systemReduced && !prefs.reducedMotion });
-  }, [stage, paused, index, second, tapping, sound, haptic, systemReduced, prefs.reducedMotion, secondsPerPoint, silent]);
+  }, [stage, paused, index, second, tapping, sound, haptic, systemReduced, prefs.reducedMotion, secondsPerPoint, silent, artworkReady]);
   useEffect(() => {
     if (systemReduced || prefs.reducedMotion) { cues.current?.stopHaptics(); setHaptic(false); }
   }, [systemReduced, prefs.reducedMotion]);
@@ -212,13 +216,14 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
         {hapticError && <p role="status" className="tap-error-note">{hapticError}</p>}
         <button data-sfx="none" className="tap-primary" onClick={begin}>Begin my round <span aria-hidden="true">→</span></button>
       </main>}
-      {stage === 'round' && <main className={`tap-round ${contactGate ? 'tap-contact-round' : ''} ${paused ? 'is-paused' : ''}`}>
-        <div className="tap-round-meta"><span>{index === 0 ? 'THE SETUP' : `POINT ${String(index).padStart(2, '0')} / 08`}</span><span>{contactGate ? 'EITHER SIDE' : paused ? 'PAUSED' : locating ? 'FIND YOUR PLACE' : 'A GENTLE RHYTHM'}</span></div>
-        <div className="tap-round-title" aria-live="polite" aria-atomic="true"><h1 ref={heading} tabIndex={-1}>{point.name}</h1>{!contactGate && <p>{point.instruction}</p>}</div>
-        <div className={`tap-main-art tap-frame-${point.id}`} key={point.id}><TappingSilhouette point={point} paused={!visualTapping} quiet={quiet} beat={second}/>{!contactGate && <div className="tap-art-caption">MIRROR VIEW <span>·</span> EITHER SIDE</div>}
-          {contactGate ? <div className="tap-contact-action" aria-live="polite" aria-atomic="true"><h2>{paused ? 'Rest here.' : locating ? 'Place two fingertips here' : 'Tap gently'}</h2><div className="tap-contact-rhythm" aria-hidden="true"><span key={second} className={visualTapping ? 'tap-beating' : ''}/><span/><span/></div>{locating && !paused && <p>On the bone beside your eye.</p>}</div> : <div className="tap-rhythm" aria-hidden="true"><span key={second} className={visualTapping ? 'tap-beating' : ''}/><span>{paused ? 'Rest' : locating ? 'Place your fingertips' : 'Light touch · your rhythm'}</span></div>}
+      {stage === 'round' && <main className={`tap-round tap-contact-round ${paused ? 'is-paused' : ''}`}>
+        <div className="tap-round-meta"><span>{index === 0 ? 'THE SETUP' : `POINT ${String(index).padStart(2, '0')} / 08`}</span><span>EITHER SIDE</span></div>
+        <div className="tap-round-title" aria-live="polite" aria-atomic="true"><h1 ref={heading} tabIndex={-1}>{point.name}</h1></div>
+        <div className={`tap-main-art tap-frame-${point.id}`} key={point.id}><TappingSilhouette point={point} paused={!visualTapping} quiet={quiet} beat={second} onArtworkStatus={(id, status) => { setArtworkStatus({ id, status }); if (status === 'error') pausePractice(); }}/>
+          {artworkError && <p className="tap-image-error" role="status">The image couldn’t load. Resume with the placement below, or skip this point.</p>}
+          <div className="tap-contact-action" aria-live="polite" aria-atomic="true"><h2>{paused ? 'Rest here.' : !artworkReady ? 'Finding your place…' : locating ? 'Place two fingertips here' : 'Tap gently'}</h2><div className="tap-contact-rhythm" aria-hidden="true"><span key={second} className={visualTapping ? 'tap-beating' : ''}/><span/><span/></div>{(locating || paused || artworkError) && <p>{placement}</p>}</div>
         </div>
-        <div className="tap-cue">{contactGate ? (!locating && !paused && <><div className="tap-cue-label">YOUR REMINDER</div><p>{phrase}</p></>) : <><div className="tap-cue-label">{paused ? 'TAKE ALL THE TIME YOU NEED' : locating ? 'LET YOUR HAND SETTLE HERE' : grounding ? 'GENTLY NOTICE' : index === 0 ? `SAY GENTLY · ${Math.min(3, Math.floor(second / 10) + 1)} OF 3` : 'SAY OR THINK'}</div><p>{paused ? 'Pick up here when you’re ready.' : phrase}</p></>}</div>
+        <div className="tap-cue">{!locating && !paused && <><div className="tap-cue-label">{grounding ? 'GENTLY NOTICE' : index === 0 ? `SAY GENTLY · ${Math.min(3, Math.floor(second / 10) + 1)} OF 3` : 'YOUR REMINDER'}</div><p>{phrase}</p></>}</div>
         <div className="tap-round-bottom"><div className="tap-progress" role="progressbar" aria-label="Round progress" aria-valuemin={0} aria-valuemax={9} aria-valuenow={index}>{TAPPING_POINTS.map((p, i) => <span key={p.id} className={i < index ? 'done' : i === index ? 'current' : ''}/>)}</div>
           <div className="tap-controls"><button data-sfx="none" className={paused ? "tap-primary" : "tap-pause"} onClick={pauseRound}><span>{paused ? 'Resume my round' : 'Pause'}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={paused ? 'M9 6L18 12L9 18Z' : 'M9 6V18M15 6V18'}/></svg></button><button data-sfx="none" className="tap-stop" onClick={stop}>Stop round</button></div>
           <button data-sfx="none" className="tap-text-button tap-skip" onClick={skipPoint}>Skip this point</button>

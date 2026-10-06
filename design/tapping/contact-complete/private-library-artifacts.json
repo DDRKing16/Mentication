@@ -1,0 +1,64 @@
+[
+  {
+    "file": "/workspace/mentation-tapping-contact-complete/design/tapping/contact-complete/Gentle-Tapping-All-Nine-Contacts.png",
+    "receipt": {
+      "operation": "create_library_file",
+      "status": "succeeded",
+      "path": "/Gentle-Tapping-All-Nine-Contacts.png",
+      "file_id": "file_000000006db481f5adcb87dea330f0f4",
+      "library_file_id": "libfile_acb3ff43c0188191aed0c13ef21051d5",
+      "file_name": "Gentle-Tapping-All-Nine-Contacts.png",
+      "current_version_number": 0,
+      "restored_from_version_number": null,
+      "xattrs": [
+        {
+          "name": "user.library-file-version",
+          "value": "0"
+        }
+      ],
+      "directory_id": "libdir_e128460a140481918d3fc0da5491679d",
+      "mime_type": "image/png",
+      "library_artifact_type": "image",
+      "file_size_bytes": 1839853,
+      "external_connectors_accessed": false
+    },
+    "metadata": {
+      "chunk_id": "05f8de",
+      "wall_time_seconds": 0.109809054,
+      "exit_code": 0,
+      "original_token_count": 29,
+      "output": "/workspace/mentation-tapping-contact-complete/design/tapping/contact-complete/Gentle-Tapping-All-Nine-Contacts.png\n"
+    }
+  },
+  {
+    "file": "/workspace/mentation-tapping-contact-complete/design/tapping/contact-complete/Gentle-Tapping-Rhythm-320.png",
+    "receipt": {
+      "operation": "create_library_file",
+      "status": "succeeded",
+      "path": "/Gentle-Tapping-Rhythm-320.png",
+      "file_id": "file_00000000360081f8a088a7807fb47528",
+      "library_file_id": "libfile_949cbbd1712481918bafd65ba2ca6fb3",
+      "file_name": "Gentle-Tapping-Rhythm-320.png",
+      "current_version_number": 0,
+      "restored_from_version_number": null,
+      "xattrs": [
+        {
+          "name": "user.library-file-version",
+          "value": "0"
+        }
+      ],
+      "directory_id": "libdir_e128460a140481918d3fc0da5491679d",
+      "mime_type": "image/png",
+      "library_artifact_type": "image",
+      "file_size_bytes": 1005137,
+      "external_connectors_accessed": false
+    },
+    "metadata": {
+      "chunk_id": "e21824",
+      "wall_time_seconds": 0.10719529,
+      "exit_code": 0,
+      "original_token_count": 27,
+      "output": "/workspace/mentation-tapping-contact-complete/design/tapping/contact-complete/Gentle-Tapping-Rhythm-320.png\n"
+    }
+  }
+]
