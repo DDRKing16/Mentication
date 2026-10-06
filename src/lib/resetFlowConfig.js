@@ -98,3 +98,8 @@ export function createInitialResetAnswers(entry) {
     subtype: entry?.subtype ?? null,
   };
 }
+
+// A bare or invalid setup URL should show the existing guided choices.
+export function needsGuidedResetEntry(entry) {
+  return !entry?.prebuilt && !entry?.immediate && !['calm','lift','ground','reset','focus','sleep'].includes(entry?.direction);
+}

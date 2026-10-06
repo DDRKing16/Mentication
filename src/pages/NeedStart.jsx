@@ -1,3 +1,4 @@
+import { practiceLaunchEntry } from '@/lib/practiceLaunch';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -20,7 +21,7 @@ export default function NeedStart() {
     if (!iv) return;
     const route = standaloneRouteFor(iv.id);
     if (route) { navigate(route); return; }
-    navigate('/reset', { state: { prebuilt:true, pathway:[iv.id], direction:iv.primaryDirection, directionLabel:iv.name, intensity:null, whereFelt:'both', timeMin:iv.durationMin, audio:'no' } });
+    navigate('/reset', { state: practiceLaunchEntry(iv) });
   }
   return <main className="mx-auto max-w-xl px-5 py-10 safe-top-lg text-foreground">
     <Link className="inline-block min-h-11 underline" to="/">Home</Link>

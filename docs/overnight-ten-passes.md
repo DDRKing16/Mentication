@@ -20,6 +20,12 @@ Inspected need selection and Reset assessment controls. Choosing a need now focu
 
 Validation: real 320px first-click preview/focus/change-without-launch flow passed; actual Library → Box Breathing baseline proved no selected number until explicit 5; seven existing baseline fidelity tests and typecheck passed. Inspection also found direct `/reset` without state leaves an empty setup; address it in pass 4.
 
+## Pass 4 — reliable fresh and repeat entry
+
+Inspected onboarding, setup fallback, and launch payloads from Home/My Plan/Library/need entry. Explicit onboarding can now complete for the open run even when storage denies access, avoiding a welcome redirect loop; deleting app data resets that memory. Bare `/reset` uses the existing guided choices. Retired prebuilt pathways recover into guided setup and no longer retain an unusable fixed pathway. Shared launch helpers retain the chosen practice/context while clearing old goal/distress ratings; repeat/suggested launches cannot answer today’s assessment from history.
+
+Validation: 21 entry/recommendation/history tests passed; typecheck passed; actual browser verified bare setup, retired-pathway fallback and storage-denied onboarding reaching Home. Matching algorithms and existing immediate-reset behavior are unchanged.
+
 ## Remaining passes
 
-4–10 pending; preserve this log when continuing.
+5–10 pending; preserve this log when continuing.

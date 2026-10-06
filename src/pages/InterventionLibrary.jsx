@@ -1,3 +1,4 @@
+import { practiceLaunchEntry } from '@/lib/practiceLaunch';
 import { PRACTICE_CATEGORIES, practiceSearchMatches, practiceTimeLabel } from '@/lib/practiceDiscovery';
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
 import React, { useState, useMemo } from "react";
@@ -157,16 +158,7 @@ export default function InterventionLibrary() {
       return;
     }
     navigate("/reset", {
-      state: {
-        prebuilt: iv.id !== "happyBump",
-        pathway: [iv.id],
-        direction: iv.primaryDirection || iv.directions?.[0] || "calm",
-        directionLabel: iv.name,
-        intensity: null,
-        whereFelt: iv.targets?.includes("body") ? "body" : "thoughts",
-        timeMin: iv.durationMin,
-        audio: "yes",
-      },
+      state: practiceLaunchEntry(iv, {audio:"yes"}),
     });
   };
 

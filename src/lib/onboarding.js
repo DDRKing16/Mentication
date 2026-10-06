@@ -1,7 +1,12 @@
 // @ts-check
 export const ONBOARDING_KEY = "haven_onboarded";
 
+let completedThisRun = false;
+
+export function resetOnboardingSession() { completedThisRun = false; }
+
 export function hasCompletedOnboarding() {
+  if (completedThisRun) return true;
   try {
     return globalThis.localStorage?.getItem(ONBOARDING_KEY) === "1";
   } catch {
@@ -10,6 +15,7 @@ export function hasCompletedOnboarding() {
 }
 
 export function completeOnboarding() {
+  completedThisRun = true;
   try {
     globalThis.localStorage?.setItem(ONBOARDING_KEY, "1");
   } catch {

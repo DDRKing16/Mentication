@@ -57,6 +57,7 @@ import { pauseHomeAmbient, resumeHomeAmbient } from "@/lib/homeAmbient";
 import { maybeRequestReview } from "@/lib/reviewPrompt";
 import {
   createInitialResetAnswers,
+  needsGuidedResetEntry,
   INTENSITY_QUESTION,
   REMAINING_STATE_BY_ID,
   REMAINING_STATE_OPTIONS,
@@ -67,14 +68,18 @@ import {
 export default function ResetFlow() {
   const navigate = useNavigate();
   const location = useLocation();
-  const entry = location.state;
+  const entry = useMemo(() => {
+    const incoming=location.state;
+    return incoming?.prebuilt && !pathwayByIds(incoming.pathway).length ? {...incoming,prebuilt:false,pathway:[],unsure:true,reset_phase:undefined} : incoming;
+  },[location.state]);
   const { allowed, isPremium, loading: quotaLoading } = useFreeQuota();
 
   const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
+  const usablePrebuiltEntry = Boolean(entry?.prebuilt && directEntryPathway.length);
   const needsAnsweredBaseline = directEntryPathway.some((item) => MATCHED_ASSESSMENT_IDS.has(item.id)) && !hasGoalBaseline(entry);
   const startsDirectFlagship = !needsAnsweredBaseline && directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
   const restoredCompletion = entry?.reset_phase === "goalReassessment" ? resetCompletionSnapshot(entry.reset_completion, directEntryPathway[0]?.id) : null;
-  const initialPhase = restoredCompletion ? "goalReassessment" : needsAnsweredBaseline ? "questions" : ["questions", "pathway", "guiding"].includes(entry?.reset_phase) ? entry.reset_phase : startsDirectFlagship ? "guiding" : (entry?.prebuilt ? "pathway" : (entry?.unsure ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
+  const initialPhase = restoredCompletion ? "goalReassessment" : needsAnsweredBaseline ? "questions" : ["questions", "pathway", "guiding"].includes(entry?.reset_phase) ? entry.reset_phase : startsDirectFlagship ? "guiding" : (usablePrebuiltEntry ? "pathway" : (entry?.unsure || needsGuidedResetEntry({ ...entry, prebuilt: usablePrebuiltEntry }) ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
@@ -265,14 +270,6 @@ export default function ResetFlow() {
     }
   }, [pathway, answers.direction]);
 
-  if (!entry) {
-    return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="text-lg text-muted-foreground">Let’s start from the beginning.</p>
-        <Button onClick={() => navigate("/")} className="rounded-full">Back to home</Button>
-      </div>
-    );
-  }
 
   const setAnswer = (key, value) => setAnswers((a) => ({ ...a, [key]: value, ...(key === "intensity" ? { goal_baseline:captureGoalBaseline(a.direction, value) } : {}) }));
 

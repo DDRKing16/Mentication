@@ -1,3 +1,4 @@
+import { repeatLaunchEntry, suggestionLaunchEntry } from '@/lib/practiceLaunch';
 // My Plan — a focused view of the user's personalised regulation plan.
 // Reuses the existing recommendation engine and history (no new data): the
 // time-of-day reset plus their best-performing practice. Both start buttons
@@ -31,11 +32,7 @@ export default function MyPlan() {
   const doRecommend = () => {
     if (!recommendation || (!recommendation.requiresCheckIn && !recommendation.pathway?.length)) return;
     navigate("/reset", {
-      state: {
-        prebuilt: !recommendation.requiresCheckIn, pathway: recommendation.pathway, direction: recommendation.direction,
-        directionLabel: recommendation.title, intensity: recommendation.requiresCheckIn ? null : 5, whereFelt: "both",
-        timeMin: recommendation.min, audio: "yes", movement: "seated",
-      },
+      state: suggestionLaunchEntry(recommendation),
     });
   };
 
@@ -44,7 +41,7 @@ export default function MyPlan() {
       navigate("/reset", {
         state: {
           prebuilt: true, pathway: personalBest.pathway, direction: personalBest.direction,
-          directionLabel: "What works for you", intensity: 5, whereFelt: "both",
+          directionLabel: "What works for you", intensity: null, distress: null, goal_baseline: null, whereFelt: "both",
           timeMin: 6, audio: "yes", movement: "seated",
         },
       });
@@ -53,11 +50,7 @@ export default function MyPlan() {
     const s = lastWorked;
     if (!s) return;
     navigate("/reset", {
-      state: {
-        prebuilt: true, pathway: s.pathway, direction: s.direction || s.state,
-        directionLabel: s.direction_label || s.state_label, intensity: s.intensity_start,
-        whereFelt: s.where_felt, timeMin: s.time_min, audio: s.audio, movement: s.movement,
-      },
+      state: repeatLaunchEntry(s),
     });
   };
 

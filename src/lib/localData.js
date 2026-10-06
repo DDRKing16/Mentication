@@ -1,3 +1,4 @@
+import { resetOnboardingSession } from './onboarding';
 // @ts-check
 // Device-local persistence for Mentication.
 //
@@ -73,6 +74,7 @@ export function deleteAllLocalAppData() {
   for (const key of keys) {
     if (key === "mentication_nes_v2_app_state" || APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) local.removeItem(key);
   }
+  resetOnboardingSession();
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
   notifyAccessibilityPreferencesChanged();
 }

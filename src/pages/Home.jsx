@@ -1,3 +1,4 @@
+import { suggestionLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
 // Home — the approved MentiCation home screen, delivered as the isolated
 // HomeFrame document (original artwork, weekly panel, goal cards, discovery
@@ -199,11 +200,7 @@ export default function Home() {
     if (route === "begin") { void beginWeek(); return; }
     if (route === "recommended" && (today?.requiresCheckIn || today?.pathway?.length)) {
       navigate("/reset", {
-        state: {
-          prebuilt: !today.requiresCheckIn, pathway: today.pathway, direction: today.direction,
-          directionLabel: today.title, intensity: today.requiresCheckIn ? null : 5, whereFelt: "both",
-          timeMin: today.min, audio: "yes", movement: "seated",
-        },
+        state: suggestionLaunchEntry(today),
       });
       return;
     }
