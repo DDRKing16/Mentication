@@ -3,3 +3,41 @@
 @media(max-width:350px){.care-practice[data-core] .care-main{padding:17px 17px 20px}.pf-response h1{font-size:32px}.pf-critical p{font-size:21px}.pf-thought h1{font-size:32px}.pf-unhook.is-beside .pf-thought h1{font-size:23px}.pf-attention h2{font-size:28px}.pf-tone button{padding:9px 13px}.pf-tone>span{font-size:10px}.pf-space{min-height:238px}.pf-anchor-tabs button{font-size:12px;gap:5px}}
 .large-text .pf-core :is(p,button),.large-text .pf-next summary strong{font-size:17px}.large-text .pf-primary strong{font-size:17px}.large-text .pf-response h1{font-size:38px}.high-contrast .pf-core{--care-muted:#f3eee4;--care-line:#d5decb80}
 @media(prefers-reduced-motion:reduce){.pf-core *{animation:none!important;transition:none!important}}
+/* Preparation and finish keep the same quiet, readable density as the cores. */
+.pf-tone-label{display:block;font-size:12px;color:var(--care-muted);margin:0 0 7px}
+.pf-primary .pf-primary-report{font-size:15px;font-weight:600;line-height:1.4}
+.pf-primary .pf-primary-action{display:block;font-size:14px;font-weight:400;line-height:1.4;margin-top:5px;overflow-wrap:anywhere}
+.care-practice[data-core] .care-scene{padding-top:14px}
+.care-practice[data-core] .care-scene h1{font-size:36px;line-height:1.13;margin-bottom:16px;overflow-wrap:anywhere}
+.care-practice[data-core] .care-body{font-size:14px;margin-bottom:25px}
+.care-practice[data-core] .care-choices button{min-height:58px;font-size:16px;background:transparent;border-radius:12px;padding:14px}
+.care-practice[data-core] .care-primary{border-radius:18px;justify-content:space-between;min-height:58px;text-align:left}
+.care-practice[data-core] .care-rating{padding-top:8px;padding-bottom:10px}
+.care-practice[data-core] .care-rating legend{font-size:27px;margin-bottom:14px}
+.care-practice[data-core] .care-action-choices{margin:18px 0}
+.care-practice[data-core] .care-action-choices button{min-height:64px;font-size:16px;padding:14px;border-radius:12px;background:transparent}
+.care-practice[data-core] .care-action-choices small{font-size:12px}
+.care-practice[data-core] .care-tools{margin-top:18px;padding-top:3px;border:0}
+.care-practice[data-core] .care-tools .care-text{font-size:12px!important}
+.care-practice[data-core] .care-takeaway{padding:0;border:0;background:transparent;margin:25px 0 18px;border-radius:0}
+.care-practice[data-core] .care-takeaway-row{padding:13px 0;border-top:1px solid var(--care-line)}
+.care-practice[data-core] .care-takeaway-row span{font-size:10px;line-height:1.5;letter-spacing:.08em;color:var(--care-muted)}
+.care-practice[data-core] .care-takeaway-row p{font:400 23px/1.22 'EB Garamond',serif;margin:8px 0 0;overflow-wrap:anywhere}
+.care-practice[data-core] .care-takeaway-response p{font-size:30px;color:var(--care-accent)}
+.care-practice[data-core] .care-tried-status{font-size:12px;color:var(--care-muted);margin:0 0 8px}
+.care-practice[data-core] .care-comparison{padding:0;border:0;font-size:13px;margin:0 0 15px;line-height:1.5}
+.care-practice[data-core] .care-resume-card{margin:20px 0;padding:16px;border-radius:12px}
+@media(max-width:350px){.care-practice[data-core] .care-scene h1{font-size:31px}.care-practice[data-core] .care-takeaway-response p{font-size:27px}.care-practice[data-core] .care-header p{font-size:17px}}
+.large-text .pf-core .pf-primary-report,.large-text .pf-core .pf-primary-action{font-size:18px}
+.large-text .pf-core :is(.pf-critical p,.pf-thought h1,.pf-attention h2,.pf-feeling h1){font-size:32px}
+.large-text .pf-core .pf-tone-label,.large-text .pf-core .pf-room-guidance{font-size:17px}
+.large-text .care-practice[data-core] .care-choices button,.large-text .care-practice[data-core] .care-body{font-size:18px}
+.large-text .care-practice[data-core] .care-takeaway-row p{font-size:28px}
+.pf-feeling[data-long]{width:min(76%,240px);border-radius:24px;padding:20px;min-height:113px;margin:24px 0 32px}
+.pf-feeling[data-long] h1{font-size:26px;line-height:1.25}
+.large-text .pf-core .pf-feeling[data-long] h1{font-size:30px}
+/* Decorative dots must not become part of the alternative button's name. */
+.pf-header-actions .journey-options-button::after{content:'';background:radial-gradient(circle,currentColor 1px,transparent 1.5px) calc(50% - 8px) center/3px 3px no-repeat,radial-gradient(circle,currentColor 1px,transparent 1.5px) center/3px 3px no-repeat,radial-gradient(circle,currentColor 1px,transparent 1.5px) calc(50% + 8px) center/3px 3px no-repeat}
+.pf-feeling[data-long]{background:#82947d}
+.pf-space:has(.pf-feeling[data-long]) .pf-space-boundary{width:76%;height:calc(100% - 80px)}
+.pf-space.has-room:has(.pf-feeling[data-long]) .pf-space-boundary{width:94%;height:calc(100% - 24px)}

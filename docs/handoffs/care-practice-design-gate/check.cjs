@@ -20,8 +20,31 @@ for(const id of Object.keys(fixtures)){
  await p.evaluate(()=>{window.gateOriginalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='mentation.carePractices.saved.v1')throw new Error('gate quota simulation');return window.gateOriginalSet.call(this,key,value);};});
  await p.getByRole('button',{name:'Save this card on my device',exact:true}).click();await p.getByText('Saving did not work. Your card has not been saved. Try again.',{exact:true}).waitFor();await p.evaluate(()=>{Storage.prototype.setItem=window.gateOriginalSet;});
  await p.getByRole('button',{name:'Save this card on my device',exact:true}).click();await p.getByText('Saved on this device. You can find it in Return points.',{exact:true}).waitFor();await p.getByRole('button',{name:'Delete saved card',exact:true}).click();await p.getByText('Saved card deleted from this device.',{exact:true}).waitFor();
- await p.evaluate(({id,state})=>localStorage.setItem('mentation.flagship.active.v1',JSON.stringify({interventionId:id,experience:state,expiresAt:Date.now()+86400000})),{id,state:{...base,...fixtures[id],notice:id==='makeRoom'?'Frustration about a difficult conversation that is still unresolved':'I keep thinking about what happened in that difficult conversation, and I worry that I will be judged for every word I say next. '.repeat(2).slice(0,300),perspective:id==='selfCompassion'?'I can look honestly at this difficult conversation and choose one small thing to repair. I can take responsibility while treating myself with care.':''}});
- await p.setViewportSize({width:320,height:844});await p.reload();await p.getByRole('button',{name:'Resume practice',exact:true}).click();await p.screenshot({path:`${out}/${id}-long-320.png`,fullPage:true});const longOverflow=await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth);if(longOverflow)throw Error(id+' long overflow');
- checks.push({id,viewport:'390x844',...layout,noChangeReported:true,savedDeleted:true,saveErrorHonest:true,resumeAfterChoices:true,primaryKeyboardEnter:true,long320NoHorizontalOverflow:!longOverflow,errors});await c.close();
+ await c.close();
+ const longText='I keep thinking about what happened in that difficult conversation, and I worry that I will be judged for every word I say next. '.repeat(3).slice(0,300);
+ const longState={...base,...fixtures[id],notice:id==='makeRoom'?'Frustration about a difficult conversation that is still unresolved, with uncertainty about what comes next.':longText,perspective:id==='selfCompassion'?'I can look honestly at this difficult conversation and choose one small thing to repair. I can take responsibility while treating myself with care. '.repeat(3).slice(0,300):'',anchorType:id==='selfCompassion'?null:'object',anchorText:id==='selfCompassion'?'':'The blue mug by the window, beside the notebook I can open for the next small part of my work.',defusionStep:id==='unhook'?2:0,allowance:id==='makeRoom'?'small':null,action:'Open the document and write one clear sentence about what happened, then decide on one small repair I can make without judging everything about myself.'};
+ const longResults=[];
+ for(const enlarged of [false,true]){
+  const lc=await b.newContext({viewport:{width:320,height:844},reducedMotion:'reduce'});const lp=await lc.newPage();lp.on('pageerror',e=>errors.push(e.message));
+  await lp.addInitScript(({id,state,enlarged})=>{if(window.top!==window)return;localStorage.setItem('haven_onboarded','1');localStorage.setItem('haven.a11y.v2',JSON.stringify({largeText:enlarged,highContrast:enlarged,reducedMotion:true}));localStorage.setItem('mentation.flagship.active.v1',JSON.stringify({interventionId:id,experience:state,expiresAt:Date.now()+86400000}));history.replaceState({usr:{prebuilt:true,pathway:[id],direction:id==='unhook'?'reset':'calm',intensity:null,timeMin:3,audio:'no'},key:'long-gate',idx:0},'',location.href);},{id,state:longState,enlarged});
+  await lp.goto((process.env.CARE_GATE_ORIGIN || 'http://localhost:5175')+'/reset');await lp.getByRole('button',{name:'Resume practice',exact:true}).click();
+  await lp.locator(`[data-care="${id}"][data-care-stage="practice"] .pf-core`).waitFor();
+  const name=await lp.locator(id==='selfCompassion'?'.pf-critical p':id==='unhook'?'.pf-thought h1':'.pf-feeling h1').innerText();
+  if(!name.includes(longState.notice))throw Error(id+' wrong fixture/core');
+  const longOverflow=await lp.evaluate(()=>document.documentElement.scrollWidth>innerWidth);if(longOverflow)throw Error(id+' long overflow');
+  const persisted=await lp.evaluate(()=>JSON.parse(localStorage.getItem('mentation.flagship.active.v1')).experience);
+  if(persisted.stage!=='practice'||persisted.notice!==longState.notice||persisted.action!==longState.action)throw Error(id+' incorrect long stage');
+  await lp.screenshot({path:`${out}/${id}-long${enlarged?'-enlarged':''}-320.png`,fullPage:true});
+  const primary=lp.locator('.pf-primary');await primary.focus();
+  const reachable=await primary.evaluate(e=>({focused:document.activeElement===e,top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom}));
+  if(!reachable.focused||reachable.top<0||reachable.bottom>844)throw Error(id+' action not reachable '+JSON.stringify(reachable));
+  await lp.keyboard.press('Tab');if(!(await lp.locator('.pf-stop').evaluate(e=>document.activeElement===e)))throw Error(id+' keyboard safety control unreachable');await lp.keyboard.press('Shift+Tab');
+  await lp.screenshot({path:`${out}/${id}-long${enlarged?'-enlarged':''}-action-320.png`});
+  await lp.keyboard.press('Enter');await lp.locator('[data-care-stage="rerate"]').waitFor();
+  if(!(await lp.evaluate(()=>JSON.parse(localStorage.getItem('mentation.flagship.active.v1')).experience.practiceTaken)))throw Error(id+' keyboard self-report missing');
+  longResults.push({safetyKeyboardReachable:true,enlarged,stage:'practice',noticeLength:longState.notice.length,responseLength:longState.perspective.length,actionLength:longState.action.length,noHorizontalOverflow:true,keyboardActionReachable:true});await lc.close();
+ }
+ if(errors.length)throw Error(id+' runtime '+errors.join('; '));
+ checks.push({id,viewport:'390x844',...layout,noChangeReported:true,savedDeleted:true,saveErrorHonest:true,resumeAfterChoices:true,primaryKeyboardEnter:true,longCoreChecks:longResults,errors});
 }
 fs.writeFileSync(out+'/checks.json',JSON.stringify(checks,null,2));console.log(JSON.stringify(checks));await b.close();})().catch(e=>{console.error(e);process.exit(1)});

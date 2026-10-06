@@ -62,7 +62,7 @@ export default function useCarePractice(id, props) {
   const stages = ['arrival', 'baseline', 'notice', 'perspective', 'practice', 'action', 'rerate', 'complete'];
   const back = () => {
     if (returning || viewingSaved || state.stage === 'arrival') return exit();
-    go(state.stage === 'orient' ? 'action' : stages[Math.max(0, stages.indexOf(state.stage) - 1)]);
+    go(['perspective', 'practice'].includes(state.stage) ? 'notice' : state.stage === 'orient' ? 'practice' : state.stage === 'action' ? 'practice' : stages[Math.max(0, stages.indexOf(state.stage) - 1)]);
   };
   return { id, s: state, patch, go, returning, resume: () => setReturning(false), saved, viewingSaved, draftOk, error, message, heading, countClick, exit, discard, finish, save, deleteSaved, restart, openSaved, back };
 }
