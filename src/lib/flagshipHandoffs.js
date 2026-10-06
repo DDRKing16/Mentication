@@ -18,8 +18,6 @@ const RULES = Object.freeze([
   { from: "tomorrowParking", to: "nextAction", when: (c) => c.reopenedNextDay, reason: "This item is back in daytime space; one easy step can help you begin it." },
   { from: "grounding54321V2", to: "vectorShift", when: (c) => c.orientationImproved && c.needsDestination, reason: "You are more oriented; a short precision-grounding protocol can help consolidate that return." },
   { from: "countermove", to: "vectorShift", when: (c) => c.directActionTooDemanding, reason: "Direct action is too demanding right now; Vector Shift can provide a contained grounding reset before another move." },
-  { from: "nextAction", to: "signalLock", when: (c) => c.actionClear && c.wantsTimedSprint, reason: "The next action is clear and startable, so a bounded focus sprint can carry it forward." },
-  { from: "signalLock", to: "nextAction", when: (c) => c.targetUnstartable, reason: "Brief scaffolding did not reveal a startable target; Next Easiest Step can identify the deeper barrier." },
   { from: "tomorrowParking", to: "nightChannel", when: (c) => c.parkedNow && c.audioAllowed, reason: "The unfinished thought is stored; Night Channel can now give remaining attention somewhere low-pressure to settle." },
 ]);
 
