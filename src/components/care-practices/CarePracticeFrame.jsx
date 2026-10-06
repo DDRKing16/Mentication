@@ -13,19 +13,19 @@ export function WordChoices({ label, value, choices, onChange, placeholder = 'A 
   const [editing, setEditing] = useState(() => !!value && !choices.includes(value));
   return <div className="care-word-choices"><div className="care-choices" role="group" aria-label={label}>{choices.map(text => <button type="button" key={text} aria-pressed={value === text} onClick={() => { onChange(text); setEditing(false); }}><span>{text}</span>{value === text && <Check size={17} aria-hidden="true" />}</button>)}</div><button type="button" className="care-edit" aria-expanded={editing} onClick={() => setEditing(!editing)}><Pencil size={14} aria-hidden="true" />{editing ? 'Close editor' : 'Use my own words'}</button>{editing && <label className="care-input-label">{label}<textarea maxLength={300} rows={2} value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} autoFocus /></label>}</div>;
 }
-export function CareFrame({ flow, children }) {
+export function CareFrame({ flow, children, compact = false }) {
   const { prefs } = useAccessibilityPrefs();
   const config = CARE_PRACTICES[flow.id];
   const index = ['arrival','baseline','notice','perspective','practice','action','rerate','complete'].indexOf(flow.s.stage);
-  return <div className="care-practice" data-care={flow.id} data-care-stage={flow.s.stage} data-reduced-motion={prefs.reducedMotion || undefined} style={{ '--care-accent': config.accent }} onClick={flow.countClick}>
+  return <div className="care-practice" data-core={compact || undefined} data-care={flow.id} data-care-stage={flow.s.stage} data-reduced-motion={prefs.reducedMotion || undefined} style={{ '--care-accent': config.accent }} onClick={flow.countClick}>
     <div className="care-atmosphere" aria-hidden="true" />
-    <header className="care-header"><button type="button" aria-label="Go back" onClick={flow.back}><ArrowLeft size={19} /></button><div><span>MENTICATION</span><p>{config.title}</p></div><button type="button" aria-label="Exit and keep draft" onClick={flow.exit}><X size={19} /></button></header>
+    <header className="care-header"><button type="button" aria-label="Go back" onClick={flow.back}><ArrowLeft size={19} /></button><div><span>MENTICATION</span><p>{compact ? {selfCompassion:'Self-Compassion',unhook:'Unhook',makeRoom:'Make Room'}[flow.id] : config.title}</p></div>{compact && <div className="pf-header-actions" data-care-tools><JourneyOptions id={flow.id}/><button type="button" aria-label="Exit and keep draft" onClick={flow.exit}><X size={19}/></button></div>}{!compact && <button type="button" aria-label="Exit and keep draft" onClick={flow.exit}><X size={19} /></button>}</header>
     <div className="care-progress" role="progressbar" aria-label="Practice progress" aria-valuemin={0} aria-valuemax={7} aria-valuenow={Math.max(0,index)}><i style={{ width: `${Math.max(0,index) / 7 * 100}%` }} /></div>
     <main className="care-main">{flow.returning ? <Scene flow={flow} eyebrow="Your unfinished practice" title="You can begin again, right here." body="Your words and choices are still on this device."><div className="care-resume-card"><span>Where you left off</span><p>{{arrival:'Your beginning',baseline:'Before you begin',notice:'Naming what is here',perspective:'Choosing how to respond',practice:'A moment of practice',orient:'Back with the room',action:'Choosing a next step',rerate:'Checking in again',complete:'Your takeaway'}[flow.s.stage]}</p>{flow.s.perspective && <blockquote>{flow.s.perspective}</blockquote>}</div><Primary onClick={flow.resume}>Resume practice</Primary><Quiet onClick={flow.restart}>Start fresh</Quiet><Quiet onClick={flow.discard}>Delete draft and leave</Quiet></Scene> : children}
       {flow.error && <p role="alert" className="care-error">{flow.error}</p>}{flow.message && <p role="status" className="care-notice">{flow.message}</p>}
-      {!flow.returning && flow.s.milestone && <div className="care-milestone" role="status" aria-live="polite" aria-atomic="true" key={`pair-${Math.floor(flow.s.clicks / 2)}`}><i aria-hidden="true" /><p>{flow.s.milestone}</p></div>}
+      {!compact && !flow.returning && flow.s.milestone && <div className="care-milestone" role="status" aria-live="polite" aria-atomic="true" key={`pair-${Math.floor(flow.s.clicks / 2)}`}><i aria-hidden="true" /><p>{flow.s.milestone}</p></div>}
       {!flow.draftOk && <p role="alert" className="care-error">This device could not save your draft. You can continue here, but progress may be lost when you leave.</p>}
-      <footer className="care-tools" data-care-tools><JourneyOptions id={flow.id} />{!flow.viewingSaved && !flow.returning && <Quiet onClick={flow.discard}>Delete draft and leave</Quiet>}</footer>
+      {!compact && <footer className="care-tools" data-care-tools><JourneyOptions id={flow.id} />{!flow.viewingSaved && !flow.returning && <Quiet onClick={flow.discard}>Delete draft and leave</Quiet>}</footer>}
     </main>
   </div>;
 }

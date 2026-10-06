@@ -1,0 +1,53 @@
+[
+  {
+    "id": "selfCompassion",
+    "viewport": "390x844",
+    "overflow": false,
+    "primaryBottom": 724.953125,
+    "stopBottom": 777.953125,
+    "practiceTaken": false,
+    "clicks": 4,
+    "animations": 0,
+    "noChangeReported": true,
+    "savedDeleted": true,
+    "saveErrorHonest": true,
+    "resumeAfterChoices": true,
+    "primaryKeyboardEnter": true,
+    "long320NoHorizontalOverflow": true,
+    "errors": []
+  },
+  {
+    "id": "unhook",
+    "viewport": "390x844",
+    "overflow": false,
+    "primaryBottom": 681.96875,
+    "stopBottom": 734.96875,
+    "practiceTaken": false,
+    "clicks": 4,
+    "animations": 0,
+    "noChangeReported": true,
+    "savedDeleted": true,
+    "saveErrorHonest": true,
+    "resumeAfterChoices": true,
+    "primaryKeyboardEnter": true,
+    "long320NoHorizontalOverflow": true,
+    "errors": []
+  },
+  {
+    "id": "makeRoom",
+    "viewport": "390x844",
+    "overflow": false,
+    "primaryBottom": 735.75,
+    "stopBottom": 788.75,
+    "practiceTaken": false,
+    "clicks": 4,
+    "animations": 0,
+    "noChangeReported": true,
+    "savedDeleted": true,
+    "saveErrorHonest": true,
+    "resumeAfterChoices": true,
+    "primaryKeyboardEnter": true,
+    "long320NoHorizontalOverflow": true,
+    "errors": []
+  }
+]
