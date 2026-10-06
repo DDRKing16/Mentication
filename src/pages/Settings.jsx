@@ -84,7 +84,7 @@ export default function Settings() {
   const [memoryCleared, setMemoryCleared] = useState(false);
 
   return (
-    <div className="calmbg min-h-full">
+    <div className="settings-page calmbg min-h-full">
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-28">
         <button
           onClick={goBack}

@@ -595,3 +595,17 @@ start time survive guiding refresh; refresh during reassessment retains that
 baseline; repeat submit saves one truthful attempt/session; a new Library attempt
 requires a fresh answer. The parent granted the exclusive publication slot under
 the founder's explicit six-set testing-preview approval. No main or hosting edit.
+
+#### Ten cumulative overnight passes — isolated implementation
+
+Completed the owner's ten sequential improvement passes on
+`codex/overnight-ten-passes`, based on main e292234 plus the required Dear
+understanding check 681952b. Details and per-pass checks are recorded in
+`docs/overnight-ten-passes.md`; no claimed quality multipliers. Reused authored
+journeys, approved artwork, matching logic and local schemas. Final cumulative
+validation: 72 files / 569 tests; typecheck/lint/build/V3/diff passed. Production
+mobile regressions passed shared entry/save/delete/error/return, all three Dear
+barriers and four legacy entries, five Tara outcomes, standalone pause/deletion,
+empty-history data controls, backup rollback, enlarged-text Settings and actual
+Journal retry/refresh. Added `qa/overnight-ten-passes-browser.py`. Native iOS and
+spoken VoiceOver remain unverified. No push, merge or deploy.

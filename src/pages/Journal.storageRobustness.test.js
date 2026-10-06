@@ -1,28 +1,15 @@
-import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
-
-// The Journal saves and deletes daybook entries by writing the whole
-// daybook to localStorage. That write had no try/catch anywhere -- private
-// browsing or a full storage quota throws synchronously, which would have
-// crashed saving or deleting an entry mid-write. The restore on open also
-// trusted a stored value to already be an array, so a corrupted or
-// hand-edited "daybook" entry could crash the Journal the moment it opened.
-describe("Journal's saved daybook fails safely", () => {
-  const src = readFileSync("src/pages/Journal.jsx", "utf8");
-
-  it("wraps the save-entry write in try/catch", () => {
-    expect(src).toMatch(
-      /setDaybook\(updatedDaybook\);\s*try \{ localStorage\.setItem\("daybook", JSON\.stringify\(updatedDaybook\)\); \} catch/
-    );
-  });
-
-  it("wraps the delete-entry write in try/catch", () => {
-    expect(src).toMatch(
-      /setDaybook\(updated\);\s*try \{ localStorage\.setItem\("daybook", JSON\.stringify\(updated\)\); \} catch/
-    );
-  });
-
-  it("only restores the saved daybook when it parses to an array", () => {
-    expect(src).toMatch(/if \(Array\.isArray\(parsed\)\) setDaybook\(parsed\);/);
-  });
+import {describe,it,expect} from 'vitest';
+import {readRecordList,writeVerified} from '../lib/verifiedStorage';
+function archive(initial){let value=initial;return {getItem:()=>value,setItem:(_,next)=>{value=next;}};}
+describe("Journal's saved daybook fails safely",()=>{
+ it('refuses unreadable containers and retains the exact stored content',()=>{
+  for(const raw of ['broken','{}','[null]','[{"note":"missing id"}]']){const store=archive(raw);expect(()=>readRecordList(store,'daybook')).toThrow();expect(store.getItem('daybook')).toBe(raw);}
+ });
+ it('round-trips genuine supplied entries including long private wording',()=>{
+  const store=archive(null),entries=[{id:'synthetic',anchor:'Synthetic reflection '.repeat(100)}];writeVerified(store,'daybook',JSON.stringify(entries));expect(readRecordList(store,'daybook')).toEqual(entries);
+ });
+ it('rejects silent save and delete-list writes without replacing the old archive',()=>{
+  const original='[{"id":"existing","anchor":"Synthetic existing entry"}]',store=archive(original);store.setItem=()=>{};
+  expect(()=>writeVerified(store,'daybook','[]')).toThrow('confirm');expect(()=>writeVerified(store,'daybook','[{"id":"new"}]')).toThrow('confirm');expect(store.getItem('daybook')).toBe(original);
+ });
 });

@@ -322,3 +322,6 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Settings actions remain readable at enlarged text on narrow devices. */
+.settings-page button { max-width:100%;white-space:normal;min-height:44px;height:auto;overflow-wrap:anywhere; }

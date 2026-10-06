@@ -62,6 +62,28 @@ export default function RegulationProfile() {
     });
   };
 
+  const dataControls=(
+        <div className="mt-10 rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
+          <p className="font-heading text-lg font-medium tracking-tight text-foreground">Your data, your control</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            Your session history stays on this device. Delete it and your intervention memory at any time.
+          </p>
+          {deleteError && <p role="alert" className="mt-3">{deleteError}</p>}
+          {confirming ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button variant="destructive" onClick={deleteAll} disabled={deleting} className="rounded-full">
+                {deleting ? "Deleting…" : "Yes, delete everything"}
+              </Button>
+              <Button variant="ghost" onClick={() => setConfirming(false)} disabled={deleting} className="rounded-full">Cancel</Button>
+            </div>
+          ) : (
+            <Button variant="outline" onClick={() => setConfirming(true)} className="mt-4 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10">
+              Delete all my data
+            </Button>
+          )}
+        </div>
+  );
+
   if (!ready) {
     return (
       <div role="status" aria-label="Loading local history" className="flex min-h-full items-center justify-center">
@@ -89,6 +111,7 @@ export default function RegulationProfile() {
             </p>
             <Button onClick={() => navigate("/")} className="mt-8 rounded-full">Back to start</Button>
           </div>
+          {dataControls}
         </div>
       </div>
     );
@@ -200,25 +223,7 @@ export default function RegulationProfile() {
           </Section>
         )}
 
-        <div className="mt-10 rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
-          <p className="font-heading text-lg font-medium tracking-tight text-foreground">Your data, your control</p>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Your session history stays on this device. Delete it and your intervention memory at any time.
-          </p>
-          {deleteError && <p role="alert" className="mt-3">{deleteError}</p>}
-          {confirming ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button variant="destructive" onClick={deleteAll} disabled={deleting} className="rounded-full">
-                {deleting ? "Deleting…" : "Yes, delete everything"}
-              </Button>
-              <Button variant="ghost" onClick={() => setConfirming(false)} disabled={deleting} className="rounded-full">Cancel</Button>
-            </div>
-          ) : (
-            <Button variant="outline" onClick={() => setConfirming(true)} className="mt-4 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10">
-              Delete all my data
-            </Button>
-          )}
-        </div>
+        {dataControls}
 
           <SafetyFooter />
         </div>

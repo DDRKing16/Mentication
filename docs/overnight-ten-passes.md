@@ -56,6 +56,21 @@ Inspected Home ambient handoff and procedural practice audio. Fixed denied-autop
 
 Validation: four audio lifecycle tests passed, including denied gesture retries, late promise rejection, background interruption and source/position/volume fidelity. Typecheck and lint passed. Actual Library → Dear navigation with synthetic autoplay denial verified subsequent gestures cannot restart Home music. No approved audio/art asset replaced.
 
-## Remaining passes
+## Pass 10 — cumulative integration and error recovery
 
-10 pending; preserve this log when continuing.
+Audited the cumulative version rather than starting another design. Corrected follow-up mood controls that still visually answered an unanswered 5; a failed Lift history write now reports that the valid answers were not saved while still allowing the chosen next step or finish. Change the Scene history read errors offer retry instead of hanging. Profile's existing data controls are available with no rated history, so books/Journal/notes can still be deleted. Production enlarged-text testing exposed Settings buttons overflowing at 320px; long actions now wrap inside the screen. Replaced Journal tests that required the old optimistic write order with actual corrupt-container, exact-entry round-trip and silent-write failure contracts. Added executable cumulative production mobile regression checks.
+
+Validation on the cumulative version:
+
+- **72 Vitest files / 569 tests passed**. Typecheck, lint, production build, V3 verification and whitespace check passed. The build retains its existing large-chunk warning; no build errors.
+- `qa/overnight-ten-passes-browser.py`: 320/390px actual routes, empty-history deletion, silent failure/retry, owned local/session removal with unrelated data preserved, plain-language discovery, unanswered ratings, all eleven 44×44px targets, keyboard, cross-tab contrast, direct/internal Back plus refresh, 150% text, failed restore rollback, Lift save error with available finish, actual Journal save failure/retry/refresh, and scene-history read recovery passed without page errors.
+- `qa/journey-experience-browser.py`: authored entry and baseline, alternatives/pause/return/focus, optional notes, quota failures, host refresh, return/read/delete, existing-record reuse and Back passed in production.
+- `qa/dear-threat-required-browser.py`: all three fresh barriers plus four legacy entry views passed 75% gate/failure/retry/keyboard/back/refresh/home-exit/resume, new-chapter reset and no-bypass checks in production.
+- `qa/tara-integrated-browser.py`: all five actual reported prediction outcomes, resume, privacy, no duplicate completion and mounted cross-tab deletion passed in production.
+- `qa/journey-standalone-browser.py`: Night Channel, Good Map and Dear preserve iframe progress across alternatives; Vector Shift pauses; Foundations/Signal Lock acknowledge pause; mounted cross-tab deletion cannot resurrect old content. No page errors.
+
+Evidence logs: `/tmp/overnight-all-tests.log`, `/tmp/overnight-pass10-types.log`, `/tmp/overnight-pass10-lint.log`, `/tmp/overnight-build.log`, `/tmp/overnight-v3.log`, `/tmp/overnight-mobile-browser.log`, `/tmp/overnight-shared-browser.log`, `/tmp/overnight-dear-browser.log`, `/tmp/overnight-tara-browser.log`, `/tmp/overnight-standalone-browser.log`.
+
+## Completion and limits
+
+All ten sequential passes are complete on the cumulative branch. None of the requested quality multipliers is a measured result. Approved standalone builds, artwork, names, clinical matching, questions/scale meanings and the existing local saved-state systems are retained; no remote service, account, new plugin or app-wide reward matrix was added. The mandatory Dear check remains the preceding separate `681952b` commit. Native iOS notification hardware and spoken VoiceOver testing are unavailable here. No push, merge or deployment. The previously identified hosting deep-link rewrite remains a separate deployment setting, not changed by this branch.
