@@ -2148,6 +2148,9 @@ body:has(dialog[open]) {
 .return-points-nav { margin: 12px 0; text-align:center; }
 .return-points-nav button { min-height:44px; padding:8px 16px; border:1px solid currentColor; border-radius:24px; background:transparent; color:inherit; font:inherit; }
 
+/* Host-provided visibility must win over the authored card display rules. */
+[hidden] { display:none !important; }
+
 </style>
 </head>
 <body>

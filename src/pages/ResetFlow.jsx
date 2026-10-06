@@ -1,3 +1,4 @@
+import SelectedPracticeContext from '@/components/reset-flow/SelectedPracticeContext';
 import {appBackTarget} from '@/lib/appBack';
 import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
 import { attemptEventDisposition, resetCompletionSnapshot, finalAssessmentEvent } from '@/lib/resetCompletion';
@@ -290,6 +291,7 @@ export default function ResetFlow() {
 
   const nextQuestion = () => {
     if (!isPremium && !quotaLoading && allowed <= 0) return;
+    if(entry?.prebuilt && pathway.length === 1 && pathway[0].id !== "factCheck") { beginGuided();return; }
     setBuilding(true);
     buildingTimer.current = setTimeout(() => { setBuilding(false); advance({ phase: "pathway" }); }, 650);
   };
@@ -1215,6 +1217,7 @@ export default function ResetFlow() {
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-1 flex-col"
           >
+            {usablePrebuiltEntry && pathway.length === 1 && <SelectedPracticeContext practice={pathway[0]} />}
             <h1 className="font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
               {GOAL_ASSESSMENTS[answers.direction]?.question || INTENSITY_QUESTION.title}
             </h1>
@@ -1237,12 +1240,13 @@ export default function ResetFlow() {
               <p className="mt-2 text-sm text-muted-foreground">This is separate from your mood and helps us choose a suitable reset.</p>
             </div>}
 
-            <label className="mt-6 flex flex-col gap-3 text-primary">
+            {!(usablePrebuiltEntry && pathway.length===1) && <label className="mt-6 flex flex-col gap-3 text-primary">
               Time available
               <select aria-label="Time available" className="min-h-12 rounded-xl border border-border bg-card px-3" value={answers.timeMin} onChange={(event) => setAnswer("timeMin", Number(event.target.value))}>
                 {[...new Set([3, 5, 10, 15, answers.timeMin])].sort((a, b) => a - b).map((minutes) => <option key={minutes} value={minutes}>{minutes} minutes</option>)}
               </select>
-            </label>
+            </label>}
+            {usablePrebuiltEntry && pathway.length===1 && <p className="mt-6 text-sm leading-relaxed text-muted-foreground">An honest starting check-in. The practice opens when you choose Start; you can pause, adapt or stop there.</p>}
             <div className="mt-10 flex justify-center">
               <Button
                 size="lg"
@@ -1250,7 +1254,7 @@ export default function ResetFlow() {
                 onClick={nextQuestion}
                 className="h-16 w-full max-w-sm rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95 disabled:opacity-40 disabled:shadow-none"
               >
-                Build my reset
+                {usablePrebuiltEntry && pathway.length===1 ? pathway[0].id==="factCheck" ? "Continue to your thought" : `Start ${pathway[0].name}` : "Build my reset"}
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </div>

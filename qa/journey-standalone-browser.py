@@ -12,6 +12,8 @@ with sync_playwright() as p:
         page.goto(origin+route)
         frame=page.frame_locator('iframe[title="'+title+'"]')
         expect(frame.locator('body')).not_to_be_empty(timeout=15000)
+        if route == '/good-map':
+            expect(frame.locator('#gmStart')).to_be_visible(timeout=15000)
         # Marker proves opening/closing the alternative does not remount the iframe.
         page.locator('iframe').evaluate("f => f.contentWindow.syntheticProgress = 'preserve'")
         page.get_by_role('button',name='Another way',exact=True).click(timeout=15000)
@@ -23,8 +25,7 @@ with sync_playwright() as p:
     # Vector Shift goes through its existing baseline, then its original build.
     page.goto(origin+'/vector-shift')
     page.get_by_role('slider').fill('4')
-    page.get_by_role('button',name='Build my reset',exact=True).click()
-    page.get_by_role('button',name='Begin',exact=True).click()
+    page.get_by_role('button',name='Start Vector Shift',exact=True).click()
     expect(page.frame_locator('iframe').locator('body')).not_to_be_empty(timeout=15000)
     page.get_by_role('button',name='Another way',exact=True).click()
     expect(page.get_by_role('dialog',name='Another way · Vector Shift')).to_be_visible()
