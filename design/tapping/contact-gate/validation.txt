@@ -1,0 +1,38 @@
+Tapping contact design gate — 2026-10-06
+Base: 0793acca8448693dc5e9bc528b566eccbca85d14
+Candidate: design/tapping-contact-gate-v3
+PASS npm test -- --run --maxWorkers=2: 62 files / 476 tests.
+PASS npm run lint.
+PASS npm run typecheck.
+PASS npm run build: 18.25s; existing chunk-size advisory.
+PASS git diff --check.
+
+Actual-pixel gate:
+before 390px entry: passed
+before 390px place: passed
+before 390px tap: passed
+before 390px lower: passed
+before 390px nochange: passed
+after 390px entry: passed
+after 390px place: passed
+after 390px tap: passed
+after 390px lower: passed
+after 390px nochange: passed
+before 320px entry: passed
+before 320px place: passed
+before 320px tap: passed
+before 320px lower: passed
+before 320px nochange: passed
+after 320px entry: passed
+after 320px place: passed
+after 320px tap: passed
+after 320px lower: passed
+after 320px nochange: passed
+
+Cue safety regression:
+PASS: explicit gesture activation, independent optional sound/touch, synchronized beat, quiet placement, distinct double point change, immediate cancellation on pause/stop/hidden/alternative/exit/unmount, no replay on resume/repeat, unsupported, silent reset and reduced-motion fallback. Native vibration shape tested with injected APIs in Vitest; physical device sensation not verified.
+
+An earlier screenshot rerun hit a test-clock race (pauseAt 100ms was already in the past during concurrent checks). The gate harness now pauses at a fixed future clock epoch before loading the app; all 20 before/after states subsequently passed. No production clock was changed.
+
+Library create succeeded: /Gentle-Tapping-Contact-Design-Gate.png; local version identity applied successfully. File identity in private-library-artifact.json.
+No branch push, main change or deployment. Gate pilots entry and side-of-eye only; other point artwork is held for design review.

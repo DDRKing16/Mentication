@@ -176,3 +176,43 @@
 .tap-main-art > svg { position: absolute; left: 0; top: 0; width: 100%; height: calc(100% - 32px); }
 .tap-frame-crown > svg, .tap-frame-brow > svg, .tap-frame-sideEye > svg,
 .tap-frame-underEye > svg, .tap-frame-nose > svg, .tap-frame-chin > svg { left: 20px; width: calc(100% - 40px); }
+
+/* V3 contact design gate: photographic anatomy with one action per phase. */
+.tap-photo-overview { mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 68%, transparent); }
+.tap-intro-art:has(.tap-photo-overview) { margin-top: 5px; margin-bottom: -5px; height: clamp(220px, 29dvh, 255px); }
+.tap-contact-round .tap-round-meta { letter-spacing: 1.3px; font-size: 10px; }
+.tap-contact-round .tap-round-title h1 { font: 400 29px/1.1 'EB Garamond', serif; margin-top: 11px; }
+.tap-contact-round .tap-main-art { min-height: 400px; padding-bottom: 115px; margin-top: 0; }
+.tap-contact-round .tap-main-art>svg { left: 0; width: 100%; height: calc(100% - 75px); mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 70%, transparent); }
+.tap-contact-action { position: absolute; bottom: 0; left: 15px; right: 15px; text-align: left; min-height: 116px; }
+.tap-contact-action h2 { font: 400 35px/1.02 'EB Garamond', serif; letter-spacing: -.3px; margin: 0; max-width: 285px; }
+.tap-contact-action p { color: #c4ccbd; font-size: 13px; margin: 10px 0 0; }
+.tap-contact-rhythm { display: flex; align-items: center; gap: 8px; height: 15px; margin-top: 13px; }
+.tap-contact-rhythm span { width: 7px; height: 7px; border-radius: 50%; background: #e8c796; opacity: .3; }
+.tap-contact-rhythm span:first-child { opacity: 1; box-shadow: 0 0 0 5px #e8c79612; }
+.tap-contact-round .tap-cue { text-align: left; min-height: 60px; margin-top: 3px; }
+.tap-contact-round .tap-cue p { margin-left: 0; font-size: 26px; }
+.tap-contact-round .tap-cue-label { font-size: 9px; }
+.tap-controls .tap-pause { border: 0!important; border-radius: 0; min-height: 44px!important; padding-left: 0; flex: 0 0 auto; gap: 12px; font-size: 13px; color: #c9d2c4!important; }
+.tap-controls .tap-pause svg { width: 16px; height: 16px; stroke-width: 1.4; }
+.tap-controls { justify-content: space-between; }
+.tap-stop { font-size: 13px!important; }
+@media (max-height: 740px) {
+  .tap-contact-round .tap-main-art { min-height: 330px; }
+  .tap-contact-action { min-height: 104px; }
+  .tap-contact-action h2 { font-size: 31px; }
+  .tap-contact-round .tap-cue { min-height: 51px; }
+}
+@media (max-width: 350px) {
+  .tap-contact-round .tap-main-art { min-height: 310px; }
+  .tap-contact-action h2 { font-size: 30px; max-width: 240px; }
+  .tap-contact-action p { font-size: 12px; }
+  .tap-contact-round .tap-cue p { font-size: 24px; }
+}
+.tap-intro-art:has(.tap-photo-overview), .tap-reveal-art:has(.tap-photo-overview) { display: flex; justify-content: center; }
+.tap-photo-overview { width: auto; max-width: 100%; aspect-ratio: 1024 / 1160; }
+.tap-photo-overview, .tap-contact-round .tap-main-art>svg {
+  mask-image: linear-gradient(to right, transparent, #000 13%, #000 87%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 73%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}

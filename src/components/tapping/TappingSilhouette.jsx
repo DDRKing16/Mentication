@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import TappingContactVisual from './TappingContactVisual';
 
 const FACE_POINTS = new Set(['crown', 'brow', 'sideEye', 'underEye', 'nose', 'chin']);
 const BODY = 'M38 548C38 481 39 397 69 365C90 342 124 345 154 314L160 265C136 249 125 222 127 191C111 180 114 154 128 158C120 102 145 60 200 60C255 60 280 102 272 158C286 154 289 180 273 191C275 222 264 249 240 265L246 314C276 345 310 342 331 365C361 397 362 481 362 548Z';
@@ -6,6 +7,7 @@ const BODY = 'M38 548C38 481 39 397 69 365C90 342 124 345 154 314L160 265C136 24
 /** Original sculpted vector. Markers are anatomically placed in the same viewBox as the artwork. */
 export default function TappingSilhouette({ point, paused = false, quiet = false, overview = false, beat = 0 }) {
   const id = `tapping-${useId().replace(/:/g, '')}`;
+  if (overview || point?.id === 'sideEye') return <TappingContactVisual overview={overview} paused={paused} quiet={quiet} beat={beat}/>;
   const hand = point?.id === 'hand' && !overview;
   const face = FACE_POINTS.has(point?.id) && !overview;
   const underArm = point?.id === 'arm' && !overview;
