@@ -1,3 +1,4 @@
+import {pauseHomeAmbient} from '@/lib/homeAmbient';
 import { founderPreview } from "@/lib/subscription";
 // @ts-check
 import { Toaster } from "@/components/ui/toaster"
@@ -72,6 +73,7 @@ const pageVariants = {
 const MenticationRoutes = () => {
   const location = useLocation();
   const direction = useNavigationDirection(location.pathname);
+  useEffect(()=>{if(!TAB_PATHS.includes(location.pathname) && location.pathname!=="/reset")pauseHomeAmbient();},[location.pathname]);
   // Group the tab routes under one key so the AppShell (and its tab bar) stays
   // mounted while switching tabs; only leaving/entering the tab surface animates
   // the top-level group.

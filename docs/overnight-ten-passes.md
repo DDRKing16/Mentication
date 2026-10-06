@@ -50,6 +50,12 @@ Inspected shared assessment dimensions and accessibility propagation. The rating
 
 Validation: 16 scale/preference/subscription tests passed; typecheck and lint passed. Actual 320px reduced-motion browser verified every rating target is at least 44×44px, keyboard selection, no overflow, OS fallback and mounted cross-tab contrast refresh. Browser inspection caught and fixed the previously shrinking rating container before completing this pass.
 
+## Pass 9 — audio retry and interruption lifecycle
+
+Inspected Home ambient handoff and procedural practice audio. Fixed denied-autoplay retries that could survive pause/mute and restart on an unrelated later gesture. A generation guard rejects late failures; pending gesture listeners are removed on pause, stop and mute. Background/page interruption suspends Home audio and resumes only while still requested. Standalone journey routes pause Home audio; the approved continuous setup/rating/pathway handoff remains. Approved music source, looping, handoff position and volume are retained. The tab loading surface also announces its status.
+
+Validation: four audio lifecycle tests passed, including denied gesture retries, late promise rejection, background interruption and source/position/volume fidelity. Typecheck and lint passed. Actual Library → Dear navigation with synthetic autoplay denial verified subsequent gestures cannot restart Home music. No approved audio/art asset replaced.
+
 ## Remaining passes
 
-9–10 pending; preserve this log when continuing.
+10 pending; preserve this log when continuing.

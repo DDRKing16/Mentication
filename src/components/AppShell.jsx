@@ -12,7 +12,7 @@ const EffectivenessDashboard = lazy(() => import("@/pages/EffectivenessDashboard
 const Settings = lazy(() => import("@/pages/Settings"));
 
 const PageSpinner = () => (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/90 backdrop-blur-sm">
+  <div role="status" aria-label="Loading Mentication" className="fixed inset-0 z-[70] flex items-center justify-center bg-background/90 backdrop-blur-sm">
     <div className="h-3 w-3 rounded-full bg-primary/70 animate-breathe" />
   </div>
 );
