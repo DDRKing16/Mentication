@@ -19,6 +19,7 @@ export function practiceTimeLabel(practice) {
   if (practice.id === 'nextAction') return 'Self-paced steps';
   if (practice.id === 'goodMap') return 'Self-paced map';
   if (practice.id === 'nightChannel') return '15+ min · stop anytime';
+  if (practice.id === 'urgeSurf') return '30–60 sec practice · optional setup';
   if (practice.id === 'progressive-muscle-relaxation-v2') return 'About 2–5 min';
   return `About ${practice.durationMin}${practice.durationMax ? `–${practice.durationMax}` : ''} min`;
 }

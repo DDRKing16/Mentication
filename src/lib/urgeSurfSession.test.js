@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createUrgeSession, reduceUrgeSession, remainingSeconds, URGE_SURF_DEFAULTS } from "./urgeSurfSession.js";
+import { createUrgeSession, reduceUrgeSession, remainingSeconds, URGE_SURF_DEFAULTS, urgePracticeCompletion, captureUrgeRuntime, restoreUrgeRuntime } from "./urgeSurfSession.js";
+import {finalAssessmentEvent} from './resetCompletion';
 
 function readySession() {
   return [
@@ -195,4 +196,62 @@ describe("Urge Surfing session", () => {
       .toMatchObject({ currentRoute: "urge.timer", postIntensity: null, choiceOutcome: null });
   });
 
+});
+
+describe("Urge Surfing direct practice and truthful return", () => {
+  const quick = () => reduceUrgeSession(createUrgeSession(1000), {type:"QUICK_PRACTICE_STARTED",nowEpochMs:1000});
+  it("uses an explicitly chosen external cue without inferring an urge score or body sensation", () => {
+    const active=quick();
+    expect(active).toMatchObject({status:"timer_active",currentRoute:"urge.timer",entryMode:"external",initialIntensity:null,environmentCueKey:"external",bodyRegionKey:null,sensationKeys:[],timer:{totalPlannedMs:60000}});
+    expect(reduceUrgeSession(active,{type:"QUICK_PRACTICE_STARTED",nowEpochMs:2000})).toEqual(active);
+    expect(reduceUrgeSession(active,{type:"TIMER_STARTED",nowEpochMs:2000})).toEqual(active);
+    expect(reduceUrgeSession(active,{type:"DURATION_CHANGED",durationMs:30000})).toEqual(active);
+  });
+  it("lets a direct continuous practice finish without compulsory new ratings", () => {
+    const ended=reduceUrgeSession(quick(),{type:"TIMER_ELAPSED",nowEpochMs:61000});
+    expect(ended).toMatchObject({currentRoute:"urge.complete",initialIntensity:null,postIntensity:null,choiceOutcome:null});
+    expect(urgePracticeCompletion(ended)).toEqual({exitReason:"completed",completedPercentage:1});
+  });
+  it("passes an early stop's measured fraction through the shared completion boundary", () => {
+    const paused=reduceUrgeSession(quick(),{type:"TIMER_PAUSED",nowEpochMs:16000});
+    const stopped=reduceUrgeSession(paused,{type:"TIMER_STOPPED",nowEpochMs:100000});
+    expect(stopped.timer.totalElapsedMs).toBe(15000);
+    expect(finalAssessmentEvent(null,{id:"urgeSurf"},urgePracticeCompletion(stopped))).toMatchObject({exitReason:"exited",completedPercentage:.25});
+  });
+  it("does not use an earlier whole wave as credit for a stopped repeat", () => {
+    const ended=reduceUrgeSession(quick(),{type:"TIMER_ELAPSED",nowEpochMs:61000});
+    const repeated=reduceUrgeSession(ended,{type:"REPEAT_WAVE",nowEpochMs:62000});
+    const stopped=reduceUrgeSession(repeated,{type:"TIMER_STOPPED",nowEpochMs:92000});
+    expect(stopped.timer).toMatchObject({totalElapsedMs:90000,totalPlannedMs:120000});
+    expect(urgePracticeCompletion(stopped)).toEqual({exitReason:"stopped",completedPercentage:.75});
+  });
+  it("preserves paused position across refresh without counting the interruption as practice", () => {
+    const snapshot=captureUrgeRuntime(quick(),"same",21000);
+    const restored=restoreUrgeRuntime(JSON.parse(JSON.stringify(snapshot)),"same",100000);
+    expect(restored).toMatchObject({status:"timer_paused",initialIntensity:null,timer:{pausedRemainingMs:40000,totalElapsedMs:0}});
+    const resumed=reduceUrgeSession(restored,{type:"TIMER_RESUMED",nowEpochMs:100000});
+    const stopped=reduceUrgeSession(resumed,{type:"TIMER_STOPPED",nowEpochMs:110000});
+    expect(stopped.timer.totalElapsedMs).toBe(30000);
+  });
+  it("keeps confirmed check-ins but excludes private preparation content from history", () => {
+    let active=reduceUrgeSession(readySession(),{type:"TIMER_STARTED",nowEpochMs:1000});
+    const snapshot=captureUrgeRuntime({...active,anchorText:"PRIVATE",transcript:"PRIVATE"},"same",21000);
+    expect(JSON.stringify(snapshot)).not.toMatch(/PRIVATE|chest|tight|bodyRegion|sensation|anchorText/);
+    const restored=restoreUrgeRuntime({...snapshot,anchorText:"PRIVATE",bodyRegionKey:"PRIVATE"},"same",22000);
+    expect(restored).toMatchObject({initialIntensity:8,anchorText:"",bodyRegionKey:null,sensationKeys:[]});
+    active=reduceUrgeSession(active,{type:"TIMER_ELAPSED",nowEpochMs:61000});
+    active=reduceUrgeSession(active,{type:"POST_INTENSITY_SELECTED",value:8});
+    active=reduceUrgeSession(active,{type:"CHOICE_OUTCOME_SET",value:"stronger"});
+    active=reduceUrgeSession(active,{type:"SAVE_PREFERENCE_SET",value:true});
+    expect(restoreUrgeRuntime(captureUrgeRuntime(active,"same",62000),"same",63000)).toMatchObject({currentRoute:"urge.complete",postIntensity:8,choiceOutcome:"stronger",savePreference:true});
+  });
+  it("rejects another attempt, expired, impossible or malformed runtime snapshots", () => {
+    const snapshot=captureUrgeRuntime(quick(),"same",21000);
+    expect(restoreUrgeRuntime(snapshot,"fresh",22000)).toBeNull();
+    expect(restoreUrgeRuntime(snapshot,"same",21001+86400000)).toBeNull();
+    for(const patch of [{version:2},{capturedAt:"21000"},{capturedAt:23000},{status:"timer_active"},{timer:null},{timer:{...snapshot.timer,pausedRemainingMs:60001}},{timer:{...snapshot.timer,totalElapsedMs:1}}]) {
+      expect(restoreUrgeRuntime({...snapshot,...patch},"same",22000)).toBeNull();
+    }
+    expect(captureUrgeRuntime(createUrgeSession(),"same",21000)).toBeNull();
+  });
 });

@@ -23,5 +23,6 @@ describe('authored practice discovery',()=>{
   expect(practiceTimeLabel({id:'nextAction',durationMin:3})).toBe('Self-paced steps');
   expect(practiceTimeLabel({id:'dear2100',durationMin:15})).toBe('Self-paced reflection');
   expect(practiceTimeLabel({id:'boxV2',durationMin:2})).toBe('About 2 min');
+  expect(practiceTimeLabel({id:'urgeSurf',durationMin:4})).toBe('30–60 sec practice · optional setup');
  });
 });

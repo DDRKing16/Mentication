@@ -188,6 +188,18 @@
   display: none;
 }
 
+.urge-lovable__start-wave { position: relative; min-height: 160px; flex: 0 0 160px; margin-top: 1rem; }
+.urge-lovable__start-duration { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1rem 0; }
+.urge-lovable__start-duration legend { margin-bottom: .6rem; font-size: .85rem; }
+.urge-lovable__start-duration button { flex: 1; min-height: 48px; border: 1px solid var(--us-border); border-radius: 1rem; }
+.urge-lovable__start-duration button[aria-pressed="true"] { color: var(--us-primary-foreground); background: var(--us-primary); border-color: var(--us-primary); }
+.urge-lovable__optional-setup { margin: 1.2rem 0; padding: .9rem; border: 1px solid var(--us-border); border-radius: 1rem; }
+.urge-lovable__optional-setup summary { min-height: 44px; cursor: pointer; align-content: center; line-height: 1.4; }
+.urge-lovable__optional-setup[open] summary { margin-bottom: 1rem; }
+.urge-lovable__optional-setup .urge-lovable__orb-wrap { min-height: 210px; }
+.urge-lovable__optional-setup h2 { font-family: var(--font-clean); }
+.urge-lovable__complete .journey-takeaway { margin-bottom: 1rem; }
+
 .urge-lovable__screen h1,
 .urge-lovable__screen h2 {
   margin: 0;
@@ -516,7 +528,11 @@
 
 .urge-lovable__primary {
   width: 100%;
+  height: auto;
   min-height: 3.5rem;
+  padding: .9rem 1rem;
+  white-space: normal;
+  line-height: 1.35;
   flex: none;
   overflow: hidden;
   border: 1px solid rgb(255 211 221 / 55%);
@@ -938,8 +954,15 @@
 }
 
 .urge-lovable__overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  color: var(--us-foreground);
   z-index: 10;
   display: grid;
   place-items: center;
@@ -948,8 +971,11 @@
   backdrop-filter: blur(8px);
 }
 
+.urge-lovable__overlay:not([open]) { display: none; }
+
 .urge-lovable__overlay section {
   width: 100%;
+  max-width: 26rem;
   border: 1px solid var(--us-border);
   border-radius: 1.2rem;
   background: linear-gradient(155deg, rgb(12 91 96 / 98%), rgb(4 61 69 / 98%));

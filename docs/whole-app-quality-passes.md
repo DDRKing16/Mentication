@@ -14,6 +14,18 @@ Validation: 569 tests in 72 files, typecheck, lint and production build passed. 
 
 Evidence: `/workspace/whole-app-review/pass-01-final/`, `/workspace/whole-app-review/box-chosen-baseline-320.png`, `/workspace/whole-app-review/home-earned-cards-390.png`; logs `/tmp/whole-pass01-{tests,types,lint,build,breadth,deep,standalone}.log`.
 
+Pass 1 commit: `203b24a`.
+
+## Pass 2 — practice before preparation, truthful Urge Surfing completion
+
+Reviewed the cumulative eight host surfaces/all 20 entries again, with deeper inspection of original Urge setup, practice and completion. Preserved its original artwork, wave and six stages. An explicit external-cue start now opens the timed practice without mandatory preparation forms; guided rating/body-anchor preparation remains available. Quick completion places next-step controls before optional check-ins, notes and feedback, preserves unanswered scores, and reuses the existing optional takeaway store. End-early confirmation uses a native modal dialog. Library timing and short-start filter reflect the actual 30–60 second practice window without changing recommendation durations.
+
+Early stops now carry actual completion fractions through shared history; repeat windows use cumulative planned/active time. Coarse position in the existing browser entry restores paused after refresh/Back without keeping anchor words, body locations or sensations. Confirmed check-ins retain their own question/scale; shared distress cannot answer urge intensity, and a missing starting urge rating cannot produce a delta. Optional saving remains separate, device-local, and deletable through the existing Return points system. The original guided route and unchanged/worse feedback remain available.
+
+Validation: 576 tests in 72 files, typecheck, lint, production build and V3 verification passed. Production breadth scan passed eight host surfaces/all 20 entries. Deep production suite passed direct entry, exact paused refresh/Back/forward, alternative return, modal focus/Escape, independent rating, worse feedback, failed-save recovery, true partial history, saved note return/delete, a real 30-second elapsed wave with no new ratings or notes, and the full guided route with unchanged feedback/private-text exclusion/repeat reset. Rendered 150% text inspection found a clipped primary label; wrapping was corrected, rebuilt and verified on actual 320px start, native stop dialog and completion controls.
+
+Evidence: `/tmp/whole-pass02-*.log`, `/workspace/whole-app-review/pass-02-before/`, `/workspace/whole-app-review/pass-02-final/`, and `qa/urge-practice-browser.py`. Entry scans do not imply every entire journey was independently replayed in this pass. PMR/Box/iframe depth is from pass 1; Urge Surfing depth is from pass 2.
+
 ## Remaining work
 
-Passes 2–10 are pending. Native iOS and spoken VoiceOver verification are unavailable here; the separate hosting deep-link rewrite remains outside this patch.
+Passes 1–2 are complete. Passes 3–10 have not started. No blocker. Native iOS and spoken VoiceOver verification are unavailable here; the separate hosting deep-link rewrite remains outside this patch. No push, merge or deployment.

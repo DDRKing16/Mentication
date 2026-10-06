@@ -1,4 +1,5 @@
 import JourneyOptions from '@/components/journey/JourneyOptions';
+import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
 import { useFlowNav } from "@/components/brand/InterventionNav";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { Check, ChevronLeft, ExternalLink, Pause, Play, X } from "lucide-react";
@@ -9,7 +10,7 @@ import { useGuideVoice } from "@/hooks/useGuideVoice";
 import { useUrgeSurfSoundscape } from "@/hooks/useUrgeSurfSoundscape";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { URGE_SURF_NARRATION } from "@/lib/urgeSurfNarration";
-import { createUrgeSession, reduceUrgeSession, URGE_SURF_DEFAULTS } from "@/lib/urgeSurfSession";
+import { createUrgeSession, reduceUrgeSession, URGE_SURF_DEFAULTS, urgePracticeCompletion, captureUrgeRuntime, restoreUrgeRuntime } from "@/lib/urgeSurfSession";
 import { buildUrgeSurfLearningRecord } from "@/lib/urgeSurfState";
 import { getBrandCoral } from "@/lib/interventionBrand";
 import "@/styles/urge-surfing.css";
@@ -99,7 +100,7 @@ function Shell({ children, step, onBack, backLabel = "Go back", trailing }) {
   );
 }
 
-function WaveOrb({ intensity, breathing = false }) {
+function WaveOrb({ intensity, breathing = false, rated = true }) {
   const fill = 35 + intensity * 4.5;
   return (
     <div className={`urge-lovable__orb ${breathing ? "is-breathing" : ""}`}>
@@ -118,7 +119,7 @@ function WaveOrb({ intensity, breathing = false }) {
           </div>
         </div>
       </div>
-      <div className="urge-lovable__orb-value"><strong>{intensity}</strong><span>intensity</span></div>
+      <div className="urge-lovable__orb-value"><strong>{rated ? intensity : "—"}</strong><span>{rated ? "intensity" : "not rated"}</span></div>
     </div>
   );
 }
@@ -142,34 +143,41 @@ function useUrgeNarration(text, enabled) {
 
 function NameStage({ session, dispatch, onExit, audioEnabled }) {
   const { goBack } = useFlowNav();
+  const { prefs } = useAccessibilityPrefs();
+  const [setupOpen, setSetupOpen] = useState(false);
   const intensity = session.initialIntensity ?? 7;
   const ready = Number.isInteger(session.initialIntensity);
-  useUrgeNarration(URGE_SURF_NARRATION.name, audioEnabled);
+  const duration = session.timer.segmentDurationMs / 1000;
+  useUrgeNarration(setupOpen ? URGE_SURF_NARRATION.name : PRACTICE_STAGES[0].spoken, audioEnabled);
   return (
     <Shell onBack={goBack} backLabel="Back" trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
-      <div className="urge-lovable__screen">
+      <div className="urge-lovable__screen urge-lovable__start">
         <div className="urge-lovable__intro">
           <p className="urge-lovable__eyebrow">Urge surfing</p>
-          <p className="urge-lovable__reframe">You don’t have to fight this feeling.</p>
-          <h1>{URGE_INTENSITY_QUESTION}</h1>
-          <p>No need to change it. Just notice what’s here.</p>
+          <h1>Make a little space before acting.</h1>
+          <p>Notice a neutral detail around you while you wait. You do not have to focus on your body or make the urge change.</p>
         </div>
-        <div className="urge-lovable__orb-wrap"><WaveOrb intensity={intensity} /></div>
-        <label className="sr-only" htmlFor="urge-intensity">{URGE_INTENSITY_QUESTION}</label>
-        <input
-          id="urge-intensity"
-          className="urge-lovable__slider"
-          type="range"
-          min="1"
-          max="10"
-          value={intensity}
-          onChange={(event) => dispatch({ type: "INITIAL_INTENSITY_SET", value: Number(event.target.value) })}
-        />
-        <p>{INTENSITY_ANCHORS}</p>
-        <button type="button" className="urge-lovable__text-button" onClick={() => dispatch({ type: "INITIAL_INTENSITY_SET", value: intensity })}>Confirm {intensity} out of 10</button>
-        <PrimaryButton disabled={!ready} onClick={() => dispatch({ type: "NAVIGATE", route: "urge.body" })}>
-          {ready ? "Continue" : "Choose or confirm a rating"}
-        </PrimaryButton>
+        <div className="urge-lovable__start-wave" aria-hidden="true"><UrgeWave stage={0} paused reducedMotion={prefs.reducedMotion} /></div>
+        <p className="urge-lovable__reassurance">The wave guides the practice; it does not measure your urge.</p>
+        <fieldset className="urge-lovable__start-duration"><legend>Time with the wave</legend>
+          {[30,60].map(seconds => <button type="button" key={seconds} aria-pressed={duration===seconds} onClick={()=>dispatch({type:"DURATION_CHANGED",durationMs:seconds*1000})}>{seconds} seconds</button>)}
+        </fieldset>
+        <PrimaryButton onClick={()=>dispatch({type:"QUICK_PRACTICE_STARTED"})}>Start with a detail around me</PrimaryButton>
+        <p className="urge-lovable__reassurance">Pause or stop at any time. If observing the urge is uncomfortable, choose Another way.</p>
+        <p className="urge-lovable__reassurance">Refresh keeps your timer paused and your confirmed check-ins in this tab. Unsaved anchor words and body details are not kept.</p>
+        <details className="urge-lovable__optional-setup" onToggle={event=>setSetupOpen(event.currentTarget.open)}>
+          <summary>Add an urge rating or body anchor · optional</summary>
+          <h2>{URGE_INTENSITY_QUESTION}</h2>
+          <p>No need to change it. Just notice what’s here.</p>
+          <div className="urge-lovable__orb-wrap"><WaveOrb intensity={intensity} rated={ready} /></div>
+          <label className="sr-only" htmlFor="urge-intensity">{URGE_INTENSITY_QUESTION}</label>
+          <input id="urge-intensity" className="urge-lovable__slider" type="range" min="1" max="10" value={intensity}
+            aria-valuetext={ready ? `${intensity} out of 10` : "No rating chosen. Choose a rating from 1 to 10."}
+            onChange={event=>dispatch({type:"INITIAL_INTENSITY_SET",value:Number(event.target.value)})} />
+          <p>{INTENSITY_ANCHORS}</p>
+          <button type="button" className="urge-lovable__text-button" onClick={()=>dispatch({type:"INITIAL_INTENSITY_SET",value:intensity})}>Confirm {intensity} out of 10</button>
+          <PrimaryButton disabled={!ready} onClick={()=>dispatch({type:"NAVIGATE",route:"urge.body"})}>{ready ? "Choose my anchor" : "Choose or confirm a rating"}</PrimaryButton>
+        </details>
       </div>
     </Shell>
   );
@@ -274,9 +282,10 @@ function formatDuration(totalSeconds) {
   return `${String(Math.floor(totalSeconds / 60)).padStart(2, "0")}:${String(totalSeconds % 60).padStart(2, "0")}`;
 }
 
-function TimerStage({ session, dispatch, audioEnabled }) {
+function TimerStage({ session, dispatch, audioEnabled, runtimeAvailable }) {
   const [now, setNow] = useState(Date.now());
   const [confirmExit, setConfirmExit] = useState(false);
+  const endDialog = useRef(null);
   const [narrationActive, setNarrationActive] = useState(false);
   const { prefs } = useAccessibilityPrefs();
   const paused = session.status === "timer_paused";
@@ -294,6 +303,8 @@ function TimerStage({ session, dispatch, audioEnabled }) {
   const breathLabel = elapsed % 10 < 5 ? "Inhale slowly" : "Exhale slowly";
   const { speak, stop: stopNarration, pause: pauseNarration, resume: resumeNarration, preload } = useGuideVoice();
   useUrgeSurfSoundscape({ active: true, enabled: audioEnabled && !paused, narrationActive, stageIndex });
+
+  useEffect(() => { if (confirmExit) endDialog.current?.showModal(); }, [confirmExit]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -334,7 +345,7 @@ function TimerStage({ session, dispatch, audioEnabled }) {
     <Shell step={4}>
       <div className="urge-lovable__screen urge-lovable__practice">
         <div className="urge-lovable__practice-title">
-          <p>{session.environmentCueKey ? "Notice what is here, without needing to locate it" : `${BODY_AREAS.find(([key]) => key === session.bodyRegionKey)?.[1]} · ${SENSATIONS.find(([key]) => key === session.sensationKeys[0])?.[1]}`}</p>
+          <p>{(session.environmentCueKey || !session.bodyRegionKey) ? "Notice what is here, without needing to locate it" : `${BODY_AREAS.find(([key]) => key === session.bodyRegionKey)?.[1]} · ${SENSATIONS.find(([key]) => key === session.sensationKeys[0])?.[1]}`}</p>
           <h1>{stage.title}</h1>
         </div>
         <div className="urge-lovable__practice-ocean">
@@ -345,6 +356,7 @@ function TimerStage({ session, dispatch, audioEnabled }) {
           {PRACTICE_STAGES.map((item, index) => <span className={index === stageIndex ? "is-active" : index < stageIndex ? "is-complete" : ""} key={item.label}><i />{item.label}</span>)}
         </div>
         <p className="urge-lovable__guidance" aria-live="polite">{stage.copy}</p>
+        {runtimeAvailable === false && <p role="status" className="urge-lovable__reassurance">Timer position could not be kept for refresh. Keep this page open; you can still pause or stop.</p>}
         <div className="urge-lovable__practice-controls">
           <button
             type="button"
@@ -365,14 +377,14 @@ function TimerStage({ session, dispatch, audioEnabled }) {
           <button type="button" onClick={() => { dispatch({ type: "TIMER_PAUSED", nowEpochMs: Date.now() }); pauseNarration(); setConfirmExit(true); }}><X aria-hidden="true" /> End early</button>
         </div>
         {confirmExit && (
-          <div className="urge-lovable__overlay" role="dialog" aria-modal="true" aria-labelledby="urge-end-title">
+          <dialog ref={endDialog} className="urge-lovable__overlay" aria-labelledby="urge-end-title" onCancel={()=>setConfirmExit(false)}>
             <section>
               <h2 id="urge-end-title">Leave the wave?</h2>
               <p>You can stop whenever you need to. The time you have already made still counts.</p>
-              <PrimaryButton onClick={() => { setConfirmExit(false); setNow(Date.now()); dispatch({ type: "TIMER_RESUMED", nowEpochMs: Date.now() }); resumeNarration(); }}>Keep surfing</PrimaryButton>
+              <PrimaryButton autoFocus onClick={() => { setConfirmExit(false); setNow(Date.now()); dispatch({ type: "TIMER_RESUMED", nowEpochMs: Date.now() }); resumeNarration(); }}>Keep surfing</PrimaryButton>
               <button type="button" className="urge-lovable__text-button" onClick={() => dispatch({ type: "TIMER_STOPPED", nowEpochMs: Date.now() })}>End gently</button>
             </section>
-          </div>
+          </dialog>
         )}
       </div>
     </Shell>
@@ -396,9 +408,10 @@ function PostRatingStage({ session, dispatch, audioEnabled }) {
           <h1>{URGE_INTENSITY_QUESTION}</h1>
           <p>It may be softer, stronger, or simply different. Every answer is okay.</p>
         </div>
-        <div className="urge-lovable__orb-wrap"><WaveOrb intensity={afterIntensity} breathing /></div>
+        <div className="urge-lovable__orb-wrap"><WaveOrb intensity={afterIntensity} breathing rated={session.postIntensity !== null} /></div>
         <input
           aria-label={URGE_INTENSITY_QUESTION}
+          aria-valuetext={session.postIntensity === null ? "No rating chosen. Choose a rating from 1 to 10." : `${afterIntensity} out of 10`}
           className="urge-lovable__slider"
           type="range"
           min="1"
@@ -433,23 +446,16 @@ function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
   const totalSeconds = Math.round(session.timer.totalElapsedMs / 1000);
   useUrgeNarration(URGE_SURF_NARRATION.complete, audioEnabled);
   return (
-    <Shell onBack={() => dispatch({ type: "NAVIGATE_BACK" })} backLabel="Back to ratings" trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
+    <Shell onBack={session.entryMode === "external" ? undefined : () => dispatch({ type: "NAVIGATE_BACK" })} backLabel="Back to ratings" trailing={<button type="button" className="urge-lovable__exit" onClick={onExit}>Exit</button>}>
       <div className="urge-lovable__screen urge-lovable__complete">
         <div className="urge-lovable__complete-mark"><Check aria-hidden="true" /></div>
-        <p className="urge-lovable__eyebrow">Practice complete</p>
+        <p className="urge-lovable__eyebrow">{session.timer.completionReason === "stopped" ? "Practice ended early" : "Practice complete"}</p>
         <h1>{session.choiceOutcome === "a_little" ? "You noticed more room to choose." : session.choiceOutcome === "stronger" ? "You noticed less room to choose." : session.choiceOutcome === "not_yet" ? "You noticed no change in choice." : "Take the next step that fits."}</h1>
-        <p>{session.postIntensity == null ? "No final intensity rating was recorded." : `Urge intensity: ${session.initialIntensity} → ${session.postIntensity}. ${Math.abs(session.postIntensity - session.initialIntensity)} points ${session.postIntensity < session.initialIntensity ? "lower" : session.postIntensity > session.initialIntensity ? "higher" : "change"}.`}</p>
+        <p>{session.postIntensity == null ? "No final intensity rating was recorded." : session.initialIntensity == null ? `Your confirmed urge rating: ${session.postIntensity} out of 10. No starting urge rating was recorded.` : `Urge intensity: ${session.initialIntensity} → ${session.postIntensity}. ${Math.abs(session.postIntensity - session.initialIntensity)} points ${session.postIntensity < session.initialIntensity ? "lower" : session.postIntensity > session.initialIntensity ? "higher" : "change"}.`}</p>
         <p>{session.choiceOutcome === "stronger" ? "You can stop focusing on the urge, move away from the trigger, or reach out for support." : "The urge may still be here. Choose what would help you through the next few minutes."}</p>
-        <div className="urge-lovable__time-rule"><span />{formatDuration(totalSeconds)} with the wave<span /></div>
-        <fieldset className="urge-lovable__outcomes"><legend>Was this practice helpful? Optional — helps future suggestions on this device.</legend>
-          {[["helpful", "Helpful"], ["same", "No difference"], ["worse", "Made things worse"], ["unsure", "Not sure"]].map(([value, label]) => <button key={value} type="button" className={session.helpfulness === value ? "is-selected" : ""} aria-pressed={session.helpfulness === value} onClick={() => dispatch({ type: "HELPFULNESS_SELECTED", value })}>{label}</button>)}
-        </fieldset>
-        <label className="urge-lovable__save">
-          <input type="checkbox" checked={session.savePreference} onChange={(event) => dispatch({ type: "SAVE_PREFERENCE_SET", value: event.target.checked })} />
-          <span><strong>Include urge ratings and choice feedback in my local record</strong><small>No anchor words, body locations, or voice content are included.</small></span>
-        </label>
+        <div className="urge-lovable__time-rule"><span />{formatDuration(totalSeconds)} active time with the wave<span /></div>
         <div className="urge-lovable__finish-actions">
-          <PrimaryButton onClick={() => onFinish("wait")}>Continue to final rating</PrimaryButton>
+          <PrimaryButton onClick={() => onFinish("wait")}>Continue to final check-in</PrimaryButton>
           <button type="button" onClick={() => dispatch({ type: "REPEAT_WAVE" })}>Ride it again</button>
           <button type="button" onClick={() => dispatch({ type: "EXTEND_TIMER" })}>Wait 10 more minutes</button>
           <button type="button" onClick={() => setNextAction("leave")}>Leave the trigger</button>
@@ -457,18 +463,60 @@ function CompleteStage({ session, dispatch, onExit, onFinish, audioEnabled }) {
           <button type="button" onClick={() => { dispatch({ type: "COMPLETION_ROUTE_SELECTED", route: "support" }); navigate("/support"); }}>Reach out for support</button>
         </div>
         {nextAction && <section ref={nextActionRef} tabIndex={-1} aria-live="polite" aria-labelledby="urge-next-action-title"><h2 id="urge-next-action-title">{nextAction === "leave" ? "Create some distance" : "Choose one substitute"}</h2><p>{nextAction === "leave" ? "If safe, close the app or put the triggering item out of reach. Move to another room or a place where you feel supported. Pick where you will go before continuing." : "Pick one safe action for the next few minutes: sip water, walk to another room, hold a familiar object, or contact someone supportive. Decide which one you will do now."}</p><PrimaryButton onClick={() => onFinish(nextAction)}>I have a next step · finish</PrimaryButton><button type="button" className="urge-lovable__text-button" onClick={() => setNextAction(null)}>Back to choices</button></section>}
+        {session.entryMode === "external" && <details className="urge-lovable__optional-setup"><summary>Urge check-in · optional</summary>
+          <h2>{URGE_INTENSITY_QUESTION}</h2><p>{INTENSITY_ANCHORS}</p>
+          <output>{session.postIntensity === null ? "No rating chosen" : `${session.postIntensity} out of 10`}</output>
+          <input aria-label={URGE_INTENSITY_QUESTION} aria-valuetext={session.postIntensity === null ? "No rating chosen. Choose a rating from 1 to 10." : `${session.postIntensity} out of 10`} className="urge-lovable__slider" type="range" min="1" max="10" value={session.postIntensity ?? 5} onChange={event=>dispatch({type:"POST_INTENSITY_SELECTED",value:Number(event.target.value)})} />
+          <button type="button" className="urge-lovable__text-button" onClick={()=>dispatch({type:"POST_INTENSITY_SELECTED",value:session.postIntensity ?? 5})}>Confirm {session.postIntensity ?? 5} out of 10</button>
+          <fieldset className="urge-lovable__outcomes"><legend>Did the pause give you more room to choose?</legend>
+            {[["a_little","More room to choose"],["not_yet","No change"],["stronger","Less room / more unsettled"]].map(([value,label])=><button type="button" key={value} aria-pressed={session.choiceOutcome===value} className={session.choiceOutcome===value ? "is-selected" : ""} onClick={()=>dispatch({type:"CHOICE_OUTCOME_SELECTED",value})}>{label}</button>)}
+          </fieldset>
+          <button type="button" className="urge-lovable__text-button" onClick={()=>dispatch({type:"POST_RATING_SKIPPED"})}>Clear this optional check-in</button>
+        </details>}
+        <JourneyTakeaway id="urgeSurf" />
+        <details className="urge-lovable__optional-setup"><summary>Practice feedback and local record · optional</summary>
+        <fieldset className="urge-lovable__outcomes"><legend>Was this practice helpful? Optional — helps future suggestions on this device.</legend>
+          {[["helpful", "Helpful"], ["same", "No difference"], ["worse", "Made things worse"], ["unsure", "Not sure"]].map(([value, label]) => <button key={value} type="button" className={session.helpfulness === value ? "is-selected" : ""} aria-pressed={session.helpfulness === value} onClick={() => dispatch({ type: "HELPFULNESS_SELECTED", value })}>{label}</button>)}
+        </fieldset>
+        <label className="urge-lovable__save">
+          <input type="checkbox" checked={session.savePreference} onChange={(event) => dispatch({ type: "SAVE_PREFERENCE_SET", value: event.target.checked })} />
+          <span><strong>Include urge ratings and choice feedback in my local record</strong><small>No anchor words, body locations, or voice content are included.</small></span>
+        </label>
+        </details>
         <a className="urge-lovable__support-link" href="https://findahelpline.com" target="_blank" rel="noreferrer">Need immediate support? <ExternalLink aria-hidden="true" /></a>
       </div>
     </Shell>
   );
 }
 
-export default function UrgeSurfExperience({ answers, onExit, onComplete }) {
-  // The shared goal baseline measures a different construct. Urge intensity
-  // always starts with an explicit answer to this experience's own question.
-  const initialSession = useMemo(() => createUrgeSession(), []);
+export default function UrgeSurfExperience({ answers, sessionId, onExit, onComplete }) {
+  // A shared distress baseline must never answer the different urge question.
+  const initialSession = useMemo(() => restoreUrgeRuntime(window.history.state?.urgeSurfRuntime, sessionId) || createUrgeSession(), [sessionId]);
   const [state, send] = useReducer(reduceUrgeSession, initialSession);
   const audioEnabled = !answers?.noAudio && answers?.audio === "yes";
+  const current = useRef(state);
+  current.current = state;
+  const [runtimeAvailable, setRuntimeAvailable] = useState(null);
+  const clearRuntime = () => {
+    if (window.history.state?.urgeSurfRuntime?.sessionId !== sessionId) return;
+    const next = {...window.history.state}; delete next.urgeSurfRuntime;
+    try { window.history.replaceState(next, ""); } catch { /* the current practice remains usable */ }
+  };
+  useEffect(() => {
+    const keepPosition = () => {
+      // Never write an old practice into a different router entry on exit/Back.
+      if (window.history.state?.usr?.reset_session_id !== sessionId || window.history.state?.usr?.reset_phase !== "guiding") return;
+      const snapshot = captureUrgeRuntime(current.current, sessionId);
+      if (!snapshot) return;
+      try { window.history.replaceState({...window.history.state,urgeSurfRuntime:snapshot}, ""); setRuntimeAvailable(true); }
+      catch { setRuntimeAvailable(false); }
+    };
+    keepPosition();
+    const interval = state.status === "timer_active" ? window.setInterval(keepPosition,1000) : null;
+    window.addEventListener("pagehide", keepPosition);
+    return () => { if (interval !== null) window.clearInterval(interval); window.removeEventListener("pagehide", keepPosition); };
+  }, [sessionId, state]);
+  const exit = () => { clearRuntime(); onExit?.(); };
 
   const finish = (action) => {
     const outcome = state.savePreference ? buildUrgeSurfLearningRecord({
@@ -479,13 +527,14 @@ export default function UrgeSurfExperience({ answers, onExit, onComplete }) {
       action,
       choiceOutcome: state.choiceOutcome,
     }) : undefined;
-    onComplete?.({ requireGoalReassessment: true, helpfulness: state.helpfulness, outcome });
+    clearRuntime();
+    onComplete?.({ requireGoalReassessment: true, ...urgePracticeCompletion(state), helpfulness: state.helpfulness, outcome });
   };
 
   if (state.currentRoute === "urge.body") return <BodyStage session={state} dispatch={send} audioEnabled={audioEnabled} />;
   if (state.currentRoute === "urge.anchor") return <AnchorStage session={state} dispatch={send} audioEnabled={audioEnabled} />;
-  if (state.currentRoute === "urge.timer") return <TimerStage session={state} dispatch={send} audioEnabled={audioEnabled} />;
+  if (state.currentRoute === "urge.timer") return <TimerStage session={state} dispatch={send} audioEnabled={audioEnabled} runtimeAvailable={runtimeAvailable} />;
   if (state.currentRoute === "urge.postRating") return <PostRatingStage session={state} dispatch={send} audioEnabled={audioEnabled} />;
-  if (state.currentRoute === "urge.complete") return <CompleteStage session={state} dispatch={send} onExit={onExit} onFinish={finish} audioEnabled={audioEnabled} />;
-  return <NameStage session={state} dispatch={send} onExit={onExit} audioEnabled={audioEnabled} />;
+  if (state.currentRoute === "urge.complete") return <CompleteStage session={state} dispatch={send} onExit={exit} onFinish={finish} audioEnabled={audioEnabled} />;
+  return <NameStage session={state} dispatch={send} onExit={exit} audioEnabled={audioEnabled} />;
 }

@@ -15,7 +15,7 @@ const CATEGORY_SHORT = CATEGORY_LABELS;
 
 // User-friendly filters mapped to existing intervention metadata.
 const FILTERS = [
-  { key: "quick", label: "Short start (≤3 min)", test: (iv) => iv.durationMin <= 3 },
+  { key: "quick", label: "Short start (≤3 min)", test: (iv) => iv.id === "urgeSurf" || iv.durationMin <= 3 },
   { key: "discreet", label: "Discreet", test: (iv) => iv.discreet },
   { key: "eyesOpen", label: "Eyes open", test: (iv) => iv.eyes === "open" },
   { key: "sleep", label: "Sleep-friendly", test: (iv) => iv.bedtime },
