@@ -1,5 +1,5 @@
 {
-  "status": "Component implemented; catalogue and router integration owned by parent task",
+  "status": "Practice-first visual gate implemented; full redesign regression testing and parent pixel review pending",
   "interventionId": "taraTactician",
   "displayName": "Tara Tactician",
   "component": "src/components/tara-tactician/TaraTacticianExperience.jsx",
@@ -28,11 +28,12 @@
         "completion": "completed",
         "saved": false,
         "eventStatus": "unknown",
-        "predictionComparison": "unsure",
-        "rehearsed": false
+        "predictionComparison": null,
+        "rehearsed": false,
+        "predictionResult": "unsure"
       }
     },
-    "outcomeNote": "Sample values only. Actual enum/boolean values come exclusively from the user's state; completion means the app flow was finished, not that a real event succeeded.",
+    "outcomeNote": "Sample values only. New predictionResult describes whether the specific prediction happened, separately from the historical predictionComparison difficulty field. Neither field is derived from the other. Actual enums/booleans come exclusively from user state; completion means the app flow finished, not that a real event succeeded.",
     "eventStatus": [
       "finished",
       "stepped-out",
@@ -59,7 +60,14 @@
       "viewing a previously completed recap"
     ],
     "exit": "onAttemptEvent action=exited then onExit; no forced reflection",
-    "privacy": "No situation, prediction, plan, rehearsal, observation, learning or next-step wording in host outcome or history.state"
+    "privacy": "No situation, prediction, plan, rehearsal, observation, learning or next-step wording in host outcome or history.state",
+    "predictionResult": [
+      "happened",
+      "partly",
+      "did-not",
+      "not-tested",
+      "unsure"
+    ]
   },
   "hostRegistration": {
     "componentImport": "const TaraTacticianExperience = lazy(() => import('@/components/tara-tactician/TaraTacticianExperience'));",
@@ -67,7 +75,7 @@
     "standaloneOption": "Register /tara-tactician with a thin host-owned page, normal exit/completion callbacks, and standaloneRouteFor mapping; no iframe is required.",
     "catalogueOwner": "Parent handles catalogue/router/library entry/takeaway/alternatives and associated invariants together.",
     "existingInvariant": "Current main has 22 FLAGSHIP_IDS, 19 INTERACTIVE_FLAGSHIP_IDS, 17 active catalogue practices and 19 JOURNEY_EXPERIENCES. The historical evidence library remains 18 items. The old 18-flagship membership warning is superseded.",
-    "coarseOutcome": "Current coarseCompletionOutcome preserves completion, saved and matching interventionId but drops new eventStatus/predictionComparison/rehearsed. Explicitly allowlist those enums/boolean if host history needs them; never spread a full local record.",
+    "coarseOutcome": "Callbacks unchanged. Explicitly allowlist eventStatus and predictionResult enums, legacy predictionComparison enum, and rehearsed boolean if host history needs them; never spread a local record or infer one comparison from the other.",
     "brandThreshold": "Optional host atmosphere: light pale-aqua surface, teal ink and pink accent; current unknown-ID threshold uses its default atmosphere. Parent owns any brand registration.",
     "typecheck": "Existing jsconfig includes ResetFlow and transitively imported components; parent import provides integration typechecking. The isolated component was also production-bundled separately.",
     "verifiedMain": "6ce94730424ba67bb27281fc846ce2bec2606949",
@@ -85,7 +93,8 @@
     "integrity": "Unreadable/future-schema data is preserved until the user chooses deletion",
     "completedRecap": "A persisted completionReported flag prevents a normal recap refresh from emitting another completion; saved-recap browsing is review-only. Host session persistence is authoritative if local writes fail.",
     "exportIntegration": "Current main exportLocalAppData omits the Tara key. Include validated Tara draft/recaps in explicit data export if the host promises export of saved practices.",
-    "savedMemoryIntegration": "Current deleteFlagshipMemory(saved/all) uses explicit SHARED_RETURN_KEYS; include mentation.tara-tactician.v1 there, and notify/unmount the active Tara view when deletion is invoked. Full deleteAllLocalAppData already covers the key and emits the observed sessions-changed signal."
+    "savedMemoryIntegration": "Current deleteFlagshipMemory(saved/all) uses explicit SHARED_RETURN_KEYS; include mentation.tara-tactician.v1 there, and notify/unmount the active Tara view when deletion is invoked. Full deleteAllLocalAppData already covers the key and emits the observed sessions-changed signal.",
+    "experienceVersion": "Additive experienceVersion=2 within unchanged schemaVersion=1 container. Missing experienceVersion loads as legacy 1; preserve original difficulty comparisons. New flow uses separate predictionResult. Unsupported experience versions are rejected without overwriting stored data."
   },
   "visualReference": {
     "branch": "design/tara-reference-20261006-1041",
@@ -94,7 +103,7 @@
     "bytes": 1889393,
     "blob": "3678b9c08c4097ae80d6395626e61311970b6945",
     "pixelsInspectedLocally": true,
-    "chosenTreatment": "Editorial Garamond headings, Hanken interface text, soft ivory/pale aqua surfaces, deep teal/aqua/pink accents, detailed existing Tara artwork occupying approximately a quarter of the mobile heading area. Dark teal is reserved for Tackle/live support.",
+    "chosenTreatment": "Warm ivory/pale aqua and teal editorial design, substantial existing Tara artwork at welcome and preparation/practice transitions. Live mode places the actionable move first and collapses prediction/backup details. One-field editors replace the open worksheet.",
     "omittedReferenceElements": [
       "handwriting",
       "decorative completed steps",
@@ -103,19 +112,26 @@
       "giant mobile Tara",
       "extra onboarding screens"
     ],
-    "asset": "public/media/brand/tara-tactician.webp already exists in base repository; no image edit or new dependency"
+    "asset": "public/media/brand/tara-tactician.webp already exists in base repository; no image edit or new dependency",
+    "checkpoint": "design/tara-tactician/screenshots/practice-first-gate/: 14 screen states, full and viewport PNGs, 390px plus 320px with root text enlarged from 16px to 24px; authored synthetic review fixtures only."
   },
   "validation": {
-    "unit": "17 Tara state/storage tests",
-    "browser": "9 scenarios: 320px/390px, two selection reveals, optional rehearsal, saved draft refresh, Back after refresh, live support return, six honest comparisons, intentional stepping out, unattempted/unknown action, optional recap save, quota failure, deletion, app-wide deletion, enlarged text, reduced motion, dialog keyboard/focus, no duplicate completed-recap learning",
-    "fullProject": [
-      "npm test -- --run",
+    "checkpointPassed": [
       "npm run lint",
       "npm run typecheck",
-      "npm run build"
+      "14 rendered browser states with no page errors or horizontal overflow"
     ],
-    "integrationLimit": "Host catalogue and final combined app navigation are not registered on this isolated branch and require parent validation.",
-    "nativeLimit": "No iOS simulator/device run was performed in this Linux executor."
+    "historicalBaseline": "Previous implementation passed 17 Tara unit tests, 9 browser scenarios, and all 419 project tests; those results do not validate the new redesign.",
+    "remaining": [
+      "Update old browser harness button contracts",
+      "Add new tactics/predictionResult tests and legacy migration cases",
+      "Full mobile branches, errors, save/refresh/back/revisit/delete/focus/reduced-motion regression",
+      "npm test -- --run",
+      "npm run lint and npm run typecheck again after final edits",
+      "npm run build and isolated production bundle"
+    ],
+    "integrationLimit": "Parent owns catalogue/router and combined app navigation validation.",
+    "nativeLimit": "No iOS simulator/device run performed in this Linux executor."
   },
-  "release": "Own task branch only; no push, merge or deployment"
+  "release": "Owner-authorized visual checkpoint on codex/tara-tactician only; no main merge or deployment"
 }

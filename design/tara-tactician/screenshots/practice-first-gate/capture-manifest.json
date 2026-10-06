@@ -1,0 +1,382 @@
+{
+  "checkpoint": "Practice-first visual gate; full regression suite pending",
+  "baseline": "864ae77b2996b1431fefa68a541316909feb94e0",
+  "branch": "codex/tara-tactician",
+  "preview": "/design/tara-tactician/preview.html",
+  "fixtures": "Synthetic authored review data only. No user data, claimed real outcome or inferred participation.",
+  "motion": "prefers-reduced-motion reduce",
+  "pageErrors": [],
+  "captures": [
+    {
+      "name": "01-entry-390",
+      "heading": "One small step into something difficult.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "move": null,
+      "files": [
+        {
+          "file": "01-entry-390-full.png",
+          "bytes": 207057,
+          "sha256": "96327fabd4b9ebbda498bec14b1da0a6d0d654632047b578bbf4e48b969e1311"
+        },
+        {
+          "file": "01-entry-390-viewport.png",
+          "bytes": 207057,
+          "sha256": "96327fabd4b9ebbda498bec14b1da0a6d0d654632047b578bbf4e48b969e1311"
+        }
+      ]
+    },
+    {
+      "name": "02-challenge-390",
+      "heading": "What are you facing?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "move": null,
+      "files": [
+        {
+          "file": "02-challenge-390-full.png",
+          "bytes": 128785,
+          "sha256": "20025a269798c136907ce2fff2b8c5452f3228d4f13b30659a79eb4b9e35add5"
+        },
+        {
+          "file": "02-challenge-390-viewport.png",
+          "bytes": 128785,
+          "sha256": "20025a269798c136907ce2fff2b8c5452f3228d4f13b30659a79eb4b9e35add5"
+        }
+      ]
+    },
+    {
+      "name": "03-move-390",
+      "heading": "One move is enough.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "move": {
+        "x": 22,
+        "y": 365.046875,
+        "width": 346,
+        "height": 140.3125
+      },
+      "files": [
+        {
+          "file": "03-move-390-full.png",
+          "bytes": 180516,
+          "sha256": "178e3fa3328111ed9d5bff4a59154b834a3a7a784718044c312acc5653215245"
+        },
+        {
+          "file": "03-move-390-viewport.png",
+          "bytes": 180516,
+          "sha256": "178e3fa3328111ed9d5bff4a59154b834a3a7a784718044c312acc5653215245"
+        }
+      ]
+    },
+    {
+      "name": "04-one-field-editor-390",
+      "heading": "One move is enough.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "move": {
+        "x": 22,
+        "y": 365.046875,
+        "width": 346,
+        "height": 140.3125
+      },
+      "files": [
+        {
+          "file": "04-one-field-editor-390-full.png",
+          "bytes": 71122,
+          "sha256": "34043cbe454a095ad43a2629d1bfd8b57b35bf01ef9d2f0744c3c4793e921121"
+        },
+        {
+          "file": "04-one-field-editor-390-viewport.png",
+          "bytes": 71122,
+          "sha256": "34043cbe454a095ad43a2629d1bfd8b57b35bf01ef9d2f0744c3c4793e921121"
+        }
+      ]
+    },
+    {
+      "name": "05-rehearsal-choice-390",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "move": null,
+      "files": [
+        {
+          "file": "05-rehearsal-choice-390-full.png",
+          "bytes": 138710,
+          "sha256": "99b4a353894a5875816dbd32e544114a666a0d24d2d1d11825955213ba47ce45"
+        },
+        {
+          "file": "05-rehearsal-choice-390-viewport.png",
+          "bytes": 138710,
+          "sha256": "99b4a353894a5875816dbd32e544114a666a0d24d2d1d11825955213ba47ce45"
+        }
+      ]
+    },
+    {
+      "name": "06-rehearsal-response-390",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 1014,
+        "rootFontSize": "16px"
+      },
+      "move": {
+        "x": 22,
+        "y": 352.046875,
+        "width": 346,
+        "height": 166.5625
+      },
+      "files": [
+        {
+          "file": "06-rehearsal-response-390-full.png",
+          "bytes": 196340,
+          "sha256": "7c07699100e207f4e07dc7a474547a906becc1f130160bcda740cbafff596e1a"
+        },
+        {
+          "file": "06-rehearsal-response-390-viewport.png",
+          "bytes": 168477,
+          "sha256": "feb05bc07d844854e7c24f13458afd555918787f3e1ea6f0c0cf608aaea6cee8"
+        }
+      ]
+    },
+    {
+      "name": "07-live-move-390",
+      "heading": "Your next move.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "move": {
+        "x": 22,
+        "y": 194.046875,
+        "width": 346,
+        "height": 210.5625
+      },
+      "files": [
+        {
+          "file": "07-live-move-390-full.png",
+          "bytes": 147423,
+          "sha256": "423a9f94a1e70c2f9940e2d8c5e29c4282eaf61457f37d6c7e00637be953eede"
+        },
+        {
+          "file": "07-live-move-390-viewport.png",
+          "bytes": 147423,
+          "sha256": "423a9f94a1e70c2f9940e2d8c5e29c4282eaf61457f37d6c7e00637be953eede"
+        }
+      ]
+    },
+    {
+      "name": "08-support-390",
+      "heading": "A cue for right now.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "move": {
+        "x": 22,
+        "y": 194.046875,
+        "width": 346,
+        "height": 131.4375
+      },
+      "files": [
+        {
+          "file": "08-support-390-full.png",
+          "bytes": 147229,
+          "sha256": "3df250399c116e54da4afe5d6da6fc8c9243f1f606f635e1963aa500ba2688f4"
+        },
+        {
+          "file": "08-support-390-viewport.png",
+          "bytes": 147229,
+          "sha256": "3df250399c116e54da4afe5d6da6fc8c9243f1f606f635e1963aa500ba2688f4"
+        }
+      ]
+    },
+    {
+      "name": "09-reflection-390",
+      "heading": "What happened?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 853,
+        "rootFontSize": "16px"
+      },
+      "move": null,
+      "files": [
+        {
+          "file": "09-reflection-390-full.png",
+          "bytes": 166365,
+          "sha256": "e3a9d7aa2aed7e060c22a8a6bf3de9c293ed2a1ebd7c60edbf5b90c71a5edc31"
+        },
+        {
+          "file": "09-reflection-390-viewport.png",
+          "bytes": 165766,
+          "sha256": "36131b208498ae506e9df2e3f071dcc3800a6de6a22accc75c4b2b26dcefa7f3"
+        }
+      ]
+    },
+    {
+      "name": "10-recap-390",
+      "heading": "What you learned.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 880,
+        "rootFontSize": "16px"
+      },
+      "move": null,
+      "files": [
+        {
+          "file": "10-recap-390-full.png",
+          "bytes": 136433,
+          "sha256": "e2d2ed3323e697bd14dcd59abcc521341f4b69c9e3361d0d56f905f54243d94d"
+        },
+        {
+          "file": "10-recap-390-viewport.png",
+          "bytes": 133809,
+          "sha256": "0dc206fa684579820e29f2252bbea2f07c20c0a17c77f51852ab08578c4d4a89"
+        }
+      ]
+    },
+    {
+      "name": "11-live-move-320-large",
+      "heading": "Your next move.",
+      "dimensions": {
+        "width": 320,
+        "height": 740,
+        "scrollWidth": 320,
+        "scrollHeight": 1178,
+        "rootFontSize": "24px"
+      },
+      "move": {
+        "x": 16,
+        "y": 317.53125,
+        "width": 288,
+        "height": 380.921875
+      },
+      "files": [
+        {
+          "file": "11-live-move-320-large-full.png",
+          "bytes": 212568,
+          "sha256": "41b9375855d8fbc901004282fab044d4839b4f03b6aca4418ac62542037e4bd7"
+        },
+        {
+          "file": "11-live-move-320-large-viewport.png",
+          "bytes": 169222,
+          "sha256": "6ba05518d311ba8dd10c4babacb805f23d5e52dac4e55040b80e6fbc558d506e"
+        }
+      ]
+    },
+    {
+      "name": "12-support-320-large",
+      "heading": "A cue for right now.",
+      "dimensions": {
+        "width": 320,
+        "height": 740,
+        "scrollWidth": 320,
+        "scrollHeight": 955,
+        "rootFontSize": "24px"
+      },
+      "move": {
+        "x": 16,
+        "y": 317.53125,
+        "width": 288,
+        "height": 281.609375
+      },
+      "files": [
+        {
+          "file": "12-support-320-large-full.png",
+          "bytes": 173161,
+          "sha256": "949bf3924c07645838b3d54dd6742d4f696856b8627cf2dfffca32ede928c28a"
+        },
+        {
+          "file": "12-support-320-large-viewport.png",
+          "bytes": 153568,
+          "sha256": "5734af4775b59d5994000573a1613ccc7b9914123d85569a597102f2606f0e25"
+        }
+      ]
+    },
+    {
+      "name": "13-reflection-320-large",
+      "heading": "What happened?",
+      "dimensions": {
+        "width": 320,
+        "height": 740,
+        "scrollWidth": 320,
+        "scrollHeight": 1482,
+        "rootFontSize": "24px"
+      },
+      "move": null,
+      "files": [
+        {
+          "file": "13-reflection-320-large-full.png",
+          "bytes": 197139,
+          "sha256": "dc8facaaa69b530494572f92655daf325c69c9d1d43c4b34787a51416cf7d0e9"
+        },
+        {
+          "file": "13-reflection-320-large-viewport.png",
+          "bytes": 109505,
+          "sha256": "2b0e10992aa262e2d8fadbce21d5d6195d4a635960bc8e41451779a88521cffd"
+        }
+      ]
+    },
+    {
+      "name": "14-rehearsal-320-large",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 320,
+        "height": 740,
+        "scrollWidth": 320,
+        "scrollHeight": 1184,
+        "rootFontSize": "24px"
+      },
+      "move": null,
+      "files": [
+        {
+          "file": "14-rehearsal-320-large-full.png",
+          "bytes": 162475,
+          "sha256": "b04113ff86e97acd2be9d77520d6afd28c61cc0c1ec2940577e4bf65f8879d09"
+        },
+        {
+          "file": "14-rehearsal-320-large-viewport.png",
+          "bytes": 122033,
+          "sha256": "a6349dd93a5bc1b562a7514068d36beda7436c62f2e0da003a73054270d04901"
+        }
+      ]
+    }
+  ]
+}

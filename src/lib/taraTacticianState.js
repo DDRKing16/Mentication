@@ -6,6 +6,7 @@ export const COMPARISONS = [
   ['more', 'More difficult than I expected'], ['different', 'Something different happened'],
   ['not-tested', 'I did not test it'], ['unsure', 'I’m not sure yet'],
 ];
+export const PREDICTION_RESULTS = [['happened', 'It happened'], ['partly', 'Part of it happened'], ['did-not', 'It did not happen'], ['not-tested', 'I did not test it'], ['unsure', 'I’m not sure yet']];
 export const EVENTS = [
   { id: 'conversation', label: 'A conversation', challenges: ['Finding the words', 'Holding a boundary', 'Feeling judged'] },
   { id: 'task', label: 'Something I need to do', challenges: ['Getting started', 'Making a mistake', 'Feeling overwhelmed'] },
@@ -22,18 +23,18 @@ const GUIDANCE = {
   'Not knowing what happens': ['I might not know what to do next.', 'I can ask, observe, or choose one small next step.', 'Trying to solve everything in advance.', 'Find out the next thing I need to know.', 'Ask for clarification or give myself a pause.'],
 };
 export function newTaraState() {
-  return { schemaVersion: 1, id: globalThis.crypto?.randomUUID?.() || `tara-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  return { schemaVersion: 1, experienceVersion: 2, selectedMoveId: '', rehearsalChoice: '', rehearsalResponse: '', predictionResult: '', id: globalThis.crypto?.randomUUID?.() || `tara-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     phase: 'entry', entryMode: null, event: '', situation: '', challenge: '', prediction: '', predictionEdited: false,
     likelihood: '', plan: { mind: '', notice: '', do: '', spikes: '' }, rehearsal: '', rehearsed: false,
     support: '', eventStatus: 'not-started', actualActionConfirmed: false, completionReported: false, actual: '', comparison: '', learning: '', nextStep: '', saved: false };
 }
 export function chooseEvent(state, event) {
   if (!EVENTS.some(item => item.id === event)) return state;
-  return { ...state, event, challenge: '', prediction: state.predictionEdited ? state.prediction : '', saved: false };
+  return { ...state, event, selectedMoveId: '', rehearsalChoice: '', rehearsalResponse: '', challenge: '', prediction: state.predictionEdited ? state.prediction : '', saved: false };
 }
 export function chooseChallenge(state, challenge) {
   if (!EVENTS.find(item => item.id === state.event)?.challenges.includes(challenge)) return state;
-  return { ...state, challenge, prediction: state.predictionEdited ? state.prediction : GUIDANCE[challenge][0], saved: false };
+  return { ...state, challenge, selectedMoveId: '', rehearsalChoice: '', rehearsalResponse: '', prediction: state.predictionEdited ? state.prediction : GUIDANCE[challenge][0], saved: false };
 }
 export function preparePlan(state) {
   const guide = GUIDANCE[state.challenge] || GUIDANCE['Feeling overwhelmed'];
@@ -43,16 +44,21 @@ export function preparePlan(state) {
 export function beginTackle(state) { return { ...state, phase: 'tackle', eventStatus: state.eventStatus === 'not-started' ? 'in-progress' : state.eventStatus }; }
 export function returnToEvent(state) { return { ...state, phase: 'tackle', support: '' }; }
 export function confirmReflection(state) {
-  if (!state.actualActionConfirmed || !['finished', 'stepped-out', 'not-attempted', 'unknown'].includes(state.eventStatus) || !COMPARISONS.some(([value]) => value === state.comparison)) return state;
+  if (!state.actualActionConfirmed || !['finished', 'stepped-out', 'not-attempted', 'unknown'].includes(state.eventStatus) || !(state.experienceVersion === 2 ? PREDICTION_RESULTS.some(([value]) => value === state.predictionResult) : COMPARISONS.some(([value]) => value === state.comparison))) return state;
   return { ...state, phase: 'recap', saved: false };
 }
 const text = value => typeof value === 'string' ? value.slice(0, 3000) : '';
 export function validateTaraState(raw) {
   if (!raw || raw.schemaVersion !== 1 || typeof raw.id !== 'string' || !raw.id || !PHASES.includes(raw.phase)) return null;
+  if (raw.experienceVersion !== undefined && ![1, 2].includes(raw.experienceVersion)) return null;
   if (!['not-started', 'in-progress', 'finished', 'stepped-out', 'not-attempted', 'unknown'].includes(raw.eventStatus)) return null;
   const state = newTaraState();
-  for (const key of ['situation', 'prediction', 'rehearsal', 'actual', 'learning', 'nextStep']) state[key] = text(raw[key]);
+  for (const key of ['situation', 'prediction', 'rehearsal', 'rehearsalResponse', 'actual', 'learning', 'nextStep']) state[key] = text(raw[key]);
   for (const key of ['predictionEdited', 'rehearsed', 'saved', 'actualActionConfirmed', 'completionReported']) state[key] = raw[key] === true;
+  state.experienceVersion = raw.experienceVersion === 2 ? 2 : 1;
+  state.selectedMoveId = typeof raw.selectedMoveId === 'string' ? raw.selectedMoveId.slice(0, 30) : '';
+  state.rehearsalChoice = ['my-move', 'pause'].includes(raw.rehearsalChoice) ? raw.rehearsalChoice : '';
+  state.predictionResult = PREDICTION_RESULTS.some(([value]) => value === raw.predictionResult) ? raw.predictionResult : '';
   state.id = raw.id; state.phase = raw.phase; state.eventStatus = raw.eventStatus;
   state.entryMode = ['prepare', 'live'].includes(raw.entryMode) ? raw.entryMode : null;
   state.event = EVENTS.some(item => item.id === raw.event) ? raw.event : '';
@@ -61,11 +67,11 @@ export function validateTaraState(raw) {
   state.comparison = COMPARISONS.some(([value]) => value === raw.comparison) ? raw.comparison : '';
   state.support = ['racing', 'overwhelmed', 'step-out'].includes(raw.support) ? raw.support : '';
   state.plan = Object.fromEntries(['mind', 'notice', 'do', 'spikes'].map(key => [key, text(raw.plan?.[key])]));
-  if (state.phase === 'recap' && (!state.comparison || !state.actualActionConfirmed || !['finished', 'stepped-out', 'not-attempted', 'unknown'].includes(state.eventStatus))) return null;
+  if (state.phase === 'recap' && (!(state.experienceVersion === 2 ? state.predictionResult : state.comparison) || !state.actualActionConfirmed || !['finished', 'stepped-out', 'not-attempted', 'unknown'].includes(state.eventStatus))) return null;
   return state;
 }
 export function taraCompletion(state) {
   // Deliberate coarse fields only. Host integration must allowlist any new enums.
   return { interventionId: TARA_ID, completion: 'completed', saved: state.saved,
-    eventStatus: state.eventStatus, predictionComparison: state.comparison || null, rehearsed: state.rehearsed };
+    eventStatus: state.eventStatus, predictionComparison: state.comparison || null, predictionResult: state.predictionResult || null, rehearsed: state.rehearsed };
 }
