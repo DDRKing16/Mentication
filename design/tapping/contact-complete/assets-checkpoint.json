@@ -1,0 +1,61 @@
+{
+  "scope": "Eight additional contact assets. UI wiring and per-point marker registration are pending. Existing approved side-eye pilot is preserved.",
+  "assets": [
+    {
+      "point_asset": "hand",
+      "file": "public/media/tapping/hand-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "d9706c4636617612e615bd10bc831257a1b23a912d2f83f20ed14a57bb8e36fe"
+    },
+    {
+      "point_asset": "crown",
+      "file": "public/media/tapping/crown-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "f8b0fe4838f5f5a564312e761fb6166796f4c4832e6c7823bc0cc056900efd1f"
+    },
+    {
+      "point_asset": "brow",
+      "file": "public/media/tapping/brow-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "14a775c3d1eee0ef94c0b8b336c9a11f65fd384d1da3df30abcfb262353c10af"
+    },
+    {
+      "point_asset": "under-eye",
+      "file": "public/media/tapping/under-eye-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "4e8a421f9eb6d2316275068a16bde3b56ac83e9db974440f07b201e49c48ab75"
+    },
+    {
+      "point_asset": "nose",
+      "file": "public/media/tapping/nose-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "533b45de49b0828ad027cac7a2204724649217ba25e55b2ff9423fab2f4df3ae"
+    },
+    {
+      "point_asset": "chin",
+      "file": "public/media/tapping/chin-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "db1be0d3bc866b055c5a113c13da505c4e1e2b571a85b91c43836178b9c147db"
+    },
+    {
+      "point_asset": "collar",
+      "file": "public/media/tapping/collar-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "1264c47e4d59c8507c5b0969e122b994341a3a3a2f0c2a412e6ebde21ce765a0"
+    },
+    {
+      "point_asset": "arm",
+      "file": "public/media/tapping/arm-contact.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "39f5d84da7bc319832ceaa852b5d63806e0fcf9aa6fa2dd1b561215c474db369"
+    }
+  ]
+}
