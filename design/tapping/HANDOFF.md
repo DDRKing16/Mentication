@@ -1,3 +1,5 @@
+> Updated design, integrated-route evidence and cue lifecycle results: [Redesign review](redesign/REVIEW.md). The sections below describe the original delivery.
+
 # Gentle Tapping
 
 Local implementation on `design/eft-tapping-review`, based on verified main `e2369be`. No shared host files changed, no push, merge or deployment. The finished component is for the existing Mentication application. `design/tapping/index.html` is only a review harness, not a new app.
