@@ -65,7 +65,7 @@ export function ProgrammeList() {
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2 font-semibold text-primary">
                     {programme.title}
-                    {programme.plus && <span className="rounded-full bg-[#E0715C]/15 px-2 py-0.5 text-[0.62rem] font-bold tracking-[0.16em] text-[#B94E3B]">PLUS</span>}
+                    {locked && <span className="rounded-full bg-[#E0715C]/15 px-2 py-0.5 text-[0.62rem] font-bold tracking-[0.16em] text-[#B94E3B]">PLUS</span>}
                   </span>
                   <span className="mt-1 block text-sm text-muted-foreground">{programme.days.length} days · {programme.promise}</span>
                   {progress && (
@@ -115,7 +115,7 @@ export function ProgrammeDetail() {
 
   return (
     <Shell onBack={() => navigate("/programmes")}>
-      <p className="mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{programme.days.length}-day programme{programme.plus ? " · Plus" : ""}</p>
+      <p className="mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{programme.days.length}-day programme{locked ? " · Plus" : ""}</p>
       <h1 className="mt-2 font-heading text-3xl font-medium tracking-tight text-primary">{programme.title}</h1>
       <p className="mt-2 text-muted-foreground">{programme.promise}</p>
 

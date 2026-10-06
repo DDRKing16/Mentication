@@ -19,9 +19,11 @@ const past = new Date(Date.now() - 864e5).toISOString();
 beforeEach(() => { global.localStorage = new LocalStorageStub(); });
 
 describe("Mentication Plus", () => {
-  it("starts locked for someone who has never subscribed", async () => {
+  it("records no subscription for someone who has never subscribed", async () => {
     const plus = await freshModule();
     expect(plus.isPlusActive()).toBe(false);
+    const { hasJourneyAccess } = await import("./accessPolicy");
+    expect(hasJourneyAccess(plus.getPlus())).toBe(true);
   });
 
   it("remembers an active subscription offline", async () => {
@@ -34,12 +36,16 @@ describe("Mentication Plus", () => {
     localStorage.setItem("mentication.plus.v1", JSON.stringify({ active: true, productId: "com.mentation.app.plus.monthly", expiresAt: past }));
     const plus = await freshModule();
     expect(plus.isPlusActive()).toBe(false);
+    const { hasJourneyAccess } = await import("./accessPolicy");
+    expect(hasJourneyAccess(plus.getPlus())).toBe(true);
   });
 
-  it("survives a corrupted saved value by treating it as locked", async () => {
+  it("survives a corrupted saved value without inventing a subscription", async () => {
     localStorage.setItem("mentication.plus.v1", "{not json");
     const plus = await freshModule();
     expect(plus.isPlusActive()).toBe(false);
+    const { hasJourneyAccess } = await import("./accessPolicy");
+    expect(hasJourneyAccess(plus.getPlus())).toBe(true);
   });
 
   it("only counts current, un-refunded Plus purchases", async () => {
@@ -60,6 +66,8 @@ describe("Mentication Plus", () => {
     expect(result).toMatchObject({ active: true, test: true });
     plus.clearTestPlus();
     expect(plus.isPlusActive()).toBe(false);
+    const { hasJourneyAccess } = await import("./accessPolicy");
+    expect(hasJourneyAccess(plus.getPlus())).toBe(true);
   });
 
   it("in the browser, shows the placeholder prices (there is no App Store here)", async () => {

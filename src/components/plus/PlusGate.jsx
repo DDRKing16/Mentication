@@ -1,5 +1,5 @@
-// Wraps a Plus-only journey. Plus members go straight in; everyone else sees
-// a short, honest preview of what it is, and a way to start the free trial.
+// Journey access follows the app policy exposed by usePlus, independently
+// of the recorded subscription.
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Home, Lock } from "lucide-react";

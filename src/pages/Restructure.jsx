@@ -11,8 +11,7 @@ import { MORE_WAYS_IN_ITEMS } from "@/components/home/MoreWaysIn";
 
 const byId = (id) => MORE_WAYS_IN_ITEMS.find((item) => item.id === id);
 
-// Foundations is free; Dear 2100 and The Good Map are part of Plus, the same
-// as on Home's "More ways in" row.
+// Legacy Plus metadata does not determine the current free-access policy.
 export const RESTRUCTURE_ITEMS = [
   {
     id: "foundations",

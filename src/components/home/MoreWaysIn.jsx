@@ -5,6 +5,7 @@
 // day summary) so the card is a genuine glimpse, not a coloured slab.
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { hasJourneyAccess } from "@/lib/accessPolicy";
 import { Mic } from "lucide-react";
 import { hapticPattern } from "@/lib/feedback";
 
@@ -92,7 +93,7 @@ export default function MoreWaysIn({ plusActive, onOpen }) {
         <div ref={rowRef} className="home-more-row flex snap-x snap-mandatory gap-3 overflow-x-auto scrollbar-none px-5 pb-1" role="list" style={{ maskImage: "linear-gradient(90deg, black 88%, transparent 100%)", WebkitMaskImage: "linear-gradient(90deg, black 88%, transparent 100%)" }}>
           {ITEMS.map((item) => {
             const Icon = item.icon;
-            const locked = item.id !== "journal" && !plusActive;
+            const locked = item.id !== "journal" && !hasJourneyAccess({ active: plusActive });
             return (
               <button
                 key={item.id}

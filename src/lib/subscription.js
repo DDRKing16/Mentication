@@ -8,6 +8,7 @@
 // In the browser (development and the preview), there is no App Store, so a
 // clearly-labelled test purchase is available in development builds only.
 import { useSyncExternalStore } from "react";
+import { hasJourneyAccess } from "./accessPolicy";
 import { Capacitor } from "@capacitor/core";
 
 // Must match the product ID created in App Store Connect exactly. There is
@@ -77,7 +78,7 @@ export function isPlusActive() {
 /** React hook: re-renders when Plus starts or ends. */
 export function usePlus() {
   const state = useSyncExternalStore(subscribe, getPlus, getPlus);
-  return { ...state, founderPreview, hasAccess: founderPreview || state.active };
+  return { ...state, founderPreview, hasAccess: hasJourneyAccess({ active: state.active, founderPreview }) };
 }
 
 async function plugin() {

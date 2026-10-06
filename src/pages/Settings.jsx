@@ -239,10 +239,10 @@ export default function Settings() {
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Mentication Plus</p>
-          <p className="mt-2 text-sm text-muted-foreground">{plus.founderPreview ? "Founder testing preview — all experiences open. No paid subscription." : plus.active ? "Plus is active on this Apple ID." : "Dear 2100, The Good Map and new journeys. The everyday tools stay free."}</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Journey access</p>
+          <p className="mt-2 text-sm text-muted-foreground">All journeys are free. {plus.test ? "A development test purchase is recorded; this is not a paid subscription." : plus.active ? "An existing Plus subscription is recorded on this device." : "No active paid subscription is recorded on this device."}</p>
           <Button variant="outline" onClick={() => navigate("/plus")} className="mt-4 rounded-full">
-            {plus.founderPreview ? "Preview access" : plus.active ? "Manage Plus" : "See Plus"}
+            Access and subscription details
           </Button>
         </div>
 
