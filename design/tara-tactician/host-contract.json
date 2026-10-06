@@ -4,15 +4,60 @@
   "displayName": "Tara Tactician",
   "component": "src/components/tara-tactician/TaraTacticianExperience.jsx",
   "preview": "/design/tara-tactician/preview.html",
-  "compatibleProps": ["intervention", "sessionId", "answers", "onAttemptEvent", "onComplete", "onExit"],
+  "compatibleProps": [
+    "intervention",
+    "sessionId",
+    "answers",
+    "onAttemptEvent",
+    "onComplete",
+    "onExit"
+  ],
   "completion": {
     "trigger": "Explicit Finish after confirmed reflection",
-    "onAttemptEvent": { "interventionId": "taraTactician", "action": "completed", "exitReason": "completed", "completedPercentage": 1 },
-    "onComplete": { "interventionId": "taraTactician", "skipReflection": true, "outcome": { "interventionId": "taraTactician", "completion": "completed", "saved": false, "eventStatus": "unknown", "predictionComparison": "unsure", "rehearsed": false } },
+    "onAttemptEvent": {
+      "interventionId": "taraTactician",
+      "action": "completed",
+      "exitReason": "completed",
+      "completedPercentage": 1
+    },
+    "onComplete": {
+      "interventionId": "taraTactician",
+      "skipReflection": true,
+      "outcome": {
+        "interventionId": "taraTactician",
+        "completion": "completed",
+        "saved": false,
+        "eventStatus": "unknown",
+        "predictionComparison": "unsure",
+        "rehearsed": false
+      }
+    },
     "outcomeNote": "Sample values only. Actual enum/boolean values come exclusively from the user's state; completion means the app flow was finished, not that a real event succeeded.",
-    "eventStatus": ["finished", "stepped-out", "not-attempted", "unknown"],
-    "predictionComparison": ["less", "same", "more", "different", "not-tested", "unsure"],
-    "noCompletionTriggers": ["mount", "draft save", "plan ready", "rehearsal", "support return", "Event finished alone", "recap save", "exit", "viewing a previously completed recap"],
+    "eventStatus": [
+      "finished",
+      "stepped-out",
+      "not-attempted",
+      "unknown"
+    ],
+    "predictionComparison": [
+      "less",
+      "same",
+      "more",
+      "different",
+      "not-tested",
+      "unsure"
+    ],
+    "noCompletionTriggers": [
+      "mount",
+      "draft save",
+      "plan ready",
+      "rehearsal",
+      "support return",
+      "Event finished alone",
+      "recap save",
+      "exit",
+      "viewing a previously completed recap"
+    ],
     "exit": "onAttemptEvent action=exited then onExit; no forced reflection",
     "privacy": "No situation, prediction, plan, rehearsal, observation, learning or next-step wording in host outcome or history.state"
   },
@@ -21,10 +66,14 @@
     "resetOption": "Add a taraTactician Experience branch and catalogue resolution, forwarding existing ResetFlow callbacks.",
     "standaloneOption": "Register /tara-tactician with a thin host-owned page, normal exit/completion callbacks, and standaloneRouteFor mapping; no iframe is required.",
     "catalogueOwner": "Parent handles catalogue/router/library entry/takeaway/alternatives and associated invariants together.",
-    "existingInvariant": "eliteInterventionSystem.test.js expects exactly the existing 18 flagship IDs and checks INTERACTIVE_FLAGSHIP_IDS against them. Mechanically appending Tara only to that list fails the invariant; reconcile through the parent's chosen registration strategy.",
+    "existingInvariant": "Current main has 22 FLAGSHIP_IDS, 19 INTERACTIVE_FLAGSHIP_IDS, 17 active catalogue practices and 19 JOURNEY_EXPERIENCES. The historical evidence library remains 18 items. The old 18-flagship membership warning is superseded.",
     "coarseOutcome": "Current coarseCompletionOutcome preserves completion, saved and matching interventionId but drops new eventStatus/predictionComparison/rehearsed. Explicitly allowlist those enums/boolean if host history needs them; never spread a full local record.",
     "brandThreshold": "Optional host atmosphere: light pale-aqua surface, teal ink and pink accent; current unknown-ID threshold uses its default atmosphere. Parent owns any brand registration.",
-    "typecheck": "Existing jsconfig includes ResetFlow and transitively imported components; parent import provides integration typechecking. The isolated component was also production-bundled separately."
+    "typecheck": "Existing jsconfig includes ResetFlow and transitively imported components; parent import provides integration typechecking. The isolated component was also production-bundled separately.",
+    "verifiedMain": "6ce94730424ba67bb27281fc846ce2bec2606949",
+    "taraFlagshipInvariantUpdate": "If registered as an additional active flagship and journey: registry 22 -> 23, interactive 19 -> 20, active catalogue 17 -> 18, journey coverage 19 -> 20. Keep historical evidence library at 18; include taraTactician in the original-build Unrated evidence exception. Update hardcoded counts in eliteInterventionSystem.test.js and integratedExperiences.test.js and derive coverage from registries where practical.",
+    "preferredResetRegistration": "Register taraTactician in flagshipRegistry and final50Catalog definitions/specs, add it to INTERACTIVE_FLAGSHIP_IDS, lazy-import its component in ResetFlow and add the Experience selector branch before the generic fallback. Existing onAttemptEvent/onComplete/onExit callbacks are compatible.",
+    "journeyRegistration": "Add JOURNEY_EXPERIENCES.taraTactician with a return-to-Tara archive destination and a deliberate leave/return alternative. Tara already has its own confirmed recap, so skipReflection=true should avoid adding a second forced reflection or recap."
   },
   "storage": {
     "key": "mentation.tara-tactician.v1",
@@ -34,7 +83,9 @@
     "resume": "Refresh reopens the saved phase and authored content",
     "delete": "Clear Tara data deletes draft and all recaps; existing app-wide deletion covers mentation. and clears mounted Tara state via its event",
     "integrity": "Unreadable/future-schema data is preserved until the user chooses deletion",
-    "completedRecap": "A persisted completionReported flag prevents a normal recap refresh from emitting another completion; saved-recap browsing is review-only. Host session persistence is authoritative if local writes fail."
+    "completedRecap": "A persisted completionReported flag prevents a normal recap refresh from emitting another completion; saved-recap browsing is review-only. Host session persistence is authoritative if local writes fail.",
+    "exportIntegration": "Current main exportLocalAppData omits the Tara key. Include validated Tara draft/recaps in explicit data export if the host promises export of saved practices.",
+    "savedMemoryIntegration": "Current deleteFlagshipMemory(saved/all) uses explicit SHARED_RETURN_KEYS; include mentation.tara-tactician.v1 there, and notify/unmount the active Tara view when deletion is invoked. Full deleteAllLocalAppData already covers the key and emits the observed sessions-changed signal."
   },
   "visualReference": {
     "branch": "design/tara-reference-20261006-1041",
@@ -44,13 +95,25 @@
     "blob": "3678b9c08c4097ae80d6395626e61311970b6945",
     "pixelsInspectedLocally": true,
     "chosenTreatment": "Editorial Garamond headings, Hanken interface text, soft ivory/pale aqua surfaces, deep teal/aqua/pink accents, detailed existing Tara artwork occupying approximately a quarter of the mobile heading area. Dark teal is reserved for Tackle/live support.",
-    "omittedReferenceElements": ["handwriting", "decorative completed steps", "fake metrics", "gold decoration", "giant mobile Tara", "extra onboarding screens"],
+    "omittedReferenceElements": [
+      "handwriting",
+      "decorative completed steps",
+      "fake metrics",
+      "gold decoration",
+      "giant mobile Tara",
+      "extra onboarding screens"
+    ],
     "asset": "public/media/brand/tara-tactician.webp already exists in base repository; no image edit or new dependency"
   },
   "validation": {
     "unit": "17 Tara state/storage tests",
     "browser": "9 scenarios: 320px/390px, two selection reveals, optional rehearsal, saved draft refresh, Back after refresh, live support return, six honest comparisons, intentional stepping out, unattempted/unknown action, optional recap save, quota failure, deletion, app-wide deletion, enlarged text, reduced motion, dialog keyboard/focus, no duplicate completed-recap learning",
-    "fullProject": ["npm test -- --run", "npm run lint", "npm run typecheck", "npm run build"],
+    "fullProject": [
+      "npm test -- --run",
+      "npm run lint",
+      "npm run typecheck",
+      "npm run build"
+    ],
     "integrationLimit": "Host catalogue and final combined app navigation are not registered on this isolated branch and require parent validation.",
     "nativeLimit": "No iOS simulator/device run was performed in this Linux executor."
   },
