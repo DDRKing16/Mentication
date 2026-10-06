@@ -1,11 +1,12 @@
-"""Host/iframe pause handshake checks. Foundations/SignalLock require their worker receivers."""
+"""Integrated host/iframe pause and deletion checks."""
+import os
 from playwright.sync_api import sync_playwright, expect
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,executable_path='/usr/bin/chromium')
     context=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,reduced_motion='reduce')
     page=context.new_page(); errors=[]
     page.on('pageerror', lambda error: errors.append(str(error)))
-    origin='http://127.0.0.1:5177'
+    origin=os.environ.get('JOURNEY_URL', 'http://127.0.0.1:5177')
     page.goto(origin+'/start');page.evaluate("localStorage.setItem('haven_onboarded','1')")
     for route,name,title in [('/night-channel','Night Channel','Night Channel'),('/good-map','The Good Map','The Good Map'),('/dear-2100','Dear 2100','Dear 2100')]:
         page.goto(origin+route)
@@ -29,12 +30,15 @@ with sync_playwright() as p:
     expect(page.get_by_role('dialog',name='Another way · Vector Shift')).to_be_visible()
     page.get_by_role('button',name='Return to Vector Shift',exact=True).click()
     assert page.locator('iframe').evaluate("f => f.contentDocument.documentElement.classList.contains('vs-paused')")
-    # Missing adapters fail visibly, without covering a still-running exercise.
-    for route in ['/signal-lock','/foundations']:
+    # Integrated adapters acknowledge pause without remounting valid progress.
+    for route,name in [('/signal-lock','Signal Lock'),('/foundations','Foundations')]:
         page.goto(origin+route)
+        expect(page.frame_locator('iframe').locator('body')).not_to_be_empty(timeout=15000)
+        page.locator('iframe').evaluate("f => f.contentWindow.syntheticProgress = 'preserve'")
         page.get_by_role('button',name='Another way',exact=True).click(timeout=15000)
-        expect(page.get_by_role('alert')).to_contain_text('could not confirm it is paused')
-        expect(page.locator('dialog[open]')).to_have_count(0)
+        expect(page.get_by_role('dialog',name='Another way · '+name)).to_be_visible()
+        page.get_by_role('button',name='Return to '+name,exact=True).click()
+        assert page.locator('iframe').evaluate("f => f.contentWindow.syntheticProgress") == 'preserve'
     # Cross-tab deletion disposes old state before its pagehide save can resurrect it.
     page.goto(origin+'/signal-lock')
     signal=page.locator('iframe')
@@ -47,5 +51,5 @@ with sync_playwright() as p:
     assert page.evaluate("localStorage.getItem('mentation.signal-lock.grounding.v1')") is None
     other.close()
     assert not errors,errors
-    print('PASS: Night Channel/Good Map/Dear 2100 preserve iframe state; Vector Shift pauses; missing Foundations/SignalLock receivers fail truthfully; cross-tab deletion does not resurrect old state; no page errors.')
+    print('PASS: Night Channel/Good Map/Dear 2100 preserve iframe state; Vector Shift pauses; Foundations/SignalLock acknowledge secure pause; cross-tab deletion does not resurrect old state; no page errors.')
     browser.close()

@@ -1,9 +1,9 @@
 // Host-level choices only: these do not change clinical matching or goal scales.
 export const JOURNEY_EXPERIENCES = Object.freeze({
-  selfCompassion: { name: 'Self Compassion', prompt: 'What kind phrase or manageable act of care do you want to remember?', alternative: 'Leave words aside if they do not feel useful. Choose one ordinary act of care that is possible now, or rest without asking yourself to feel differently.' },
-  unhook: { name: 'Unhook from Thought', prompt: 'What wording or next action helps you carry this thought more lightly?', alternative: 'Stop working with the thought for now. Notice one neutral detail around you, or take one simple practical action. There is no need to change or prove the thought.' },
-  makeRoom: { name: 'Make Room for Feeling', prompt: 'What boundary, support or next action would you like to keep?', alternative: 'You can stop turning toward the feeling. Look outward to an ordinary detail around you, or choose a source of support. You decide how much attention to give the feeling.' },
-  eftTapping: { name: 'EFT Tapping', prompt: 'Which tapping adjustment or grounding cue would you choose again?', alternative: 'Stop tapping and let your hands rest. If comfortable, notice one neutral object or familiar sound around you. You do not need to repeat a phrase or continue touching your body.' },
+  selfCompassion: { name: 'Self-Compassion', archive: '/return-points', prompt: 'What kind phrase or manageable act of care do you want to remember?', alternative: 'Leave words aside if they do not feel useful. Choose one ordinary act of care that is possible now, or rest without asking yourself to feel differently.' },
+  unhook: { name: 'Unhook from the Thought', archive: '/return-points', prompt: 'What wording or next action helps you carry this thought more lightly?', alternative: 'Stop working with the thought for now. Notice one neutral detail around you, or take one simple practical action. There is no need to change or prove the thought.' },
+  makeRoom: { name: 'Make Room for the Feeling', archive: '/return-points', prompt: 'What boundary, support or next action would you like to keep?', alternative: 'You can stop turning toward the feeling. Look outward to an ordinary detail around you, or choose a source of support. You decide how much attention to give the feeling.' },
+  eftTapping: { name: 'Gentle Tapping', prompt: 'Which tapping adjustment or grounding cue would you choose again?', alternative: 'Stop tapping and let your hands rest. If comfortable, notice one neutral object or familiar sound around you. You do not need to repeat a phrase or continue touching your body.' },
   boxV2: { name: 'Box Breathing', prompt: 'What breathing pace or adjustment would you choose next time?', alternative: 'Let your breath find its own rhythm. If comfortable, rest your attention on one still object instead of counting or holding your breath.' },
   'progressive-muscle-relaxation-v2': { name: 'Progressive Muscle Relaxation', prompt: 'Which area or release-only adjustment would you like to remember?', alternative: 'Leave your muscles as they are. Notice a neutral object near you instead. No tensing, stretching or body scanning is needed.' },
   factCheck: { name: 'Thought or Fact', prompt: 'Your confirmed perspective and return phrase can be saved in the practice.', archive: '/return-points', alternative: 'Set the thought aside for now. Notice one ordinary detail around you, such as a colour or shape. You do not have to resolve the thought.' },
@@ -22,7 +22,7 @@ export const JOURNEY_EXPERIENCES = Object.freeze({
 });
 
 export const NEED_ENTRIES = Object.freeze([
-  { id: 'overwhelmed', label: 'I feel overwhelmed', practice: 'grounding54321V2', reason: 'A guided way to notice your surroundings, with choices for each sense.' },
+  { id: 'overwhelmed', label: 'I feel overwhelmed', practice: 'signalLock', reason: 'Follow a gentle visual signal at your own pace. No setup questions; pause or stop whenever you want.' },
   { id: 'starting', label: 'I cannot get started', practice: 'nextAction', reason: 'Break one task into a first doable step.' },
   { id: 'thought', label: 'I am stuck in a thought', practice: 'factCheck', reason: 'Separate what you know from interpretations and predictions.' },
   { id: 'tense', label: 'My body feels tense', practice: 'progressive-muscle-relaxation-v2', reason: 'Try release only, or gentle tensing where comfortable.' },

@@ -1,28 +1,35 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
+import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
+import { readTappingDraft, writeTappingDraft, deleteTappingDraft } from './tappingDraft';
 import { useEffect, useRef, useState } from 'react';
 import TappingSilhouette from './TappingSilhouette';
 import { CONCERNS, TAPPING_POINTS, RATING_QUESTION, makeTappingResult, outcomeText } from './tappingProtocol';
 import './tapping.css';
 
 export default function TappingExperience({ onComplete, onExit, onChangeCourse, initialConcern }) {
-  const [stage, setStage] = useState('choose');
-  const [concern, setConcern] = useState(CONCERNS.find(c => c.id === initialConcern) || CONCERNS[0]);
-  const [before, setBefore] = useState(null);
-  const [after, setAfter] = useState(null);
-  const [index, setIndex] = useState(0);
-  const [second, setSecond] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [slow, setSlow] = useState(false);
+  const [draft] = useState(() => { try { return { saved: readTappingDraft(), error: '' }; } catch { return { saved: null, error: 'Your saved tapping draft could not be read. It has not been changed.' }; } });
+  const restored = draft.saved;
+  const [draftStatus, setDraftStatus] = useState(draft.error);
+  const [stage, setStage] = useState(restored?.stage || 'choose');
+  const [concern, setConcern] = useState(CONCERNS.find(c => c.id === (restored?.concern || initialConcern)) || CONCERNS[0]);
+  const [before, setBefore] = useState(restored?.before ?? null);
+  const [after, setAfter] = useState(restored?.after ?? null);
+  const [index, setIndex] = useState(restored?.index || 0);
+  const [second, setSecond] = useState(restored?.second || 0);
+  const [paused, setPaused] = useState(restored?.stage === 'round');
+  const [slow, setSlow] = useState(restored?.slow === true);
   const [quiet, setQuiet] = useState(false);
   const [sound, setSound] = useState(false);
   const [soundError, setSoundError] = useState('');
-  const [rounds, setRounds] = useState(0);
-  const [stopped, setStopped] = useState(false);
-  const [skipped, setSkipped] = useState(0);
+  const [rounds, setRounds] = useState(restored?.rounds || 0);
+  const [stopped, setStopped] = useState(restored?.stopped === true);
+  const [skipped, setSkipped] = useState(restored?.skipped || 0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const audio = useRef(null);
-  const duration = useRef(0);
-  const roundSkipped = useRef(false);
+  const duration = useRef(restored?.duration || 0);
+  const finished = useRef(false);
+  const roundSkipped = useRef(restored?.roundSkipped === true);
   const heading = useRef(null);
   const point = TAPPING_POINTS[index];
   const grounding = concern.id === 'grounding';
@@ -30,6 +37,11 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const locating = index !== 0 && second < (slow ? 6 : 4);
   const tapping = stage === 'round' && !paused && !locating;
 
+  useEffect(() => {
+    if (draft.error || finished.current) return;
+    try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current }); setDraftStatus('Draft saved on this device. If interrupted, the round returns paused.'); }
+    catch { setDraftStatus('Your draft could not be saved. It is available for this visit only.'); }
+  }, [stage, concern, before, after, index, second, slow, rounds, stopped, skipped, draft.error]);
   useEffect(() => { heading.current?.focus(); }, [stage]);
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -39,9 +51,11 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   }, []);
   useEffect(() => {
     const hide = () => { if (document.hidden) setPaused(true); };
+    const deleted = event => { if (event.storageArea === localStorage && event.newValue === null && (event.key === null || event.key === 'mentation.eftTapping.draft.v1')) { finished.current = true; setPaused(true); onExit?.(); } };
+    window.addEventListener('storage', deleted);
     document.addEventListener('visibilitychange', hide);
-    return () => document.removeEventListener('visibilitychange', hide);
-  }, []);
+    return () => { document.removeEventListener('visibilitychange', hide); window.removeEventListener('storage', deleted); };
+  }, [onExit]);
   useEffect(() => {
     if (stage !== 'round' || paused) return;
     const timer = window.setInterval(() => {
@@ -93,8 +107,9 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     if (!callback) { if (onExit) onExit(); return; }
     setBusy(true); setError('');
     try {
+      deleteTappingDraft(); finished.current = true;
       await callback(makeTappingResult({ concern: concern.id, before, after, roundsCompleted: rounds, stopped, skippedPoints: skipped, durationSeconds: duration.current }));
-    } catch { setError('That didn’t finish. Your check-in is still here. Please try again.'); setBusy(false); }
+    } catch { finished.current = false; setError('That didn’t finish. Your check-in is still here. Please try again.'); setBusy(false); }
   }
   function rate(value) {
     if (stage === 'before') { setBefore(value); setStage('ready'); }
@@ -104,7 +119,11 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   return <section className={`tapping-experience ${quiet ? 'tap-reduced' : ''}`} aria-label="Gentle Tapping">
     <div className="tap-wrap">
       <header className="tap-header"><span className="tap-wordmark">mentication</span><button className="tap-exit" aria-label="Exit tapping" onClick={onExit}>×</button></header>
+      <JourneyOptions id="eftTapping" onOpen={() => { setPaused(true); setSound(false); }} />
+      <p className="tap-small" role="status">{draftStatus}</p>
+      {(restored || draft.error) && <button className="tap-secondary" onClick={() => { try { deleteTappingDraft(); window.location.reload(); } catch { setError('The draft could not be deleted. Try again.'); } }}>Delete draft and start fresh</button>}
       <div className="tap-eyebrow">CALM <span>·</span> GROUNDING</div>
+      {stage === 'result' && <JourneyTakeaway id="eftTapping" />}
       {stage === 'choose' && <>
         <h1 ref={heading} tabIndex={-1}>A softer place<br/>to land.</h1>
         <p className="tap-lead">Gentle tapping, one point at a time.</p>

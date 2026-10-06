@@ -22,6 +22,10 @@ import { BuildingResetScreen, NoSafeMatchScreen, ResetOverview } from "@/compone
 // once the pathway is known, instead of every one of them riding along in
 // this shared flow's bundle for every reset. Each one's own stylesheet
 // (imported inside the component itself, not here) rides along with it.
+const GentleTappingExperience = lazy(() => import("@/components/tapping/GentleTappingExperience"));
+const SelfCompassionExperience = lazy(() => import("@/components/SelfCompassionExperience"));
+const UnhookExperience = lazy(() => import("@/components/UnhookExperience"));
+const MakeRoomExperience = lazy(() => import("@/components/MakeRoomExperience"));
 const ResetPlayer = lazy(() => import("@/components/ResetPlayer"));
 const FlagshipExperience = lazy(() => import("@/components/FlagshipExperience"));
 const NewFlagshipExperience = lazy(() => import("@/components/NewFlagshipExperiences"));
@@ -652,7 +656,7 @@ export default function ResetFlow() {
     };
     return <main className={`${goalCompletionRef.current?.interventionId === "tomorrowParking" ? "tpl tpl--bedside tpl-goal" : "calmbg"} min-h-[100dvh] px-5 py-6`}><div className="mx-auto flex max-w-lg flex-col gap-6">
       <FlowHomeButton /><h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
-      <p className="text-muted-foreground">The same question as at the start. Confirm an honest rating, or skip. You do not need to feel better.</p>
+      <p className="text-muted-foreground">{hasGoalBaseline(answers) ? "The same goal question as at the start." : "An optional goal check-in, separate from the practice question. There is no starting goal rating to compare."} Confirm an honest rating, or skip. You do not need to feel better.</p>
       <IntensityDial value={goalEndRating ?? 5} onChange={setGoalEndRating} direction={answers.direction} />
       <p className="text-muted-foreground">{goalEndRating == null ? 'Not answered yet.' : goalPointChange(answers.goal_baseline, answers.direction, goalEndRating) == null ? 'No confirmed starting rating to compare.' : `${answers.goal_baseline.value} → ${goalEndRating} · ${goalPointChange(answers.goal_baseline, answers.direction, goalEndRating)} points`}</p>
       <JourneyTakeaway id={goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id} />
@@ -673,7 +677,11 @@ export default function ResetFlow() {
       // Each branch is a separately lazy-loaded component with its own props
       // shape; the union those component types produce is narrower than any
       // one of them, so the props passed below are typed loosely here.
-      const Experience = /** @type {any} */ (interventionId === "vectorShift"
+      const Experience = /** @type {any} */ (interventionId === "eftTapping" ? GentleTappingExperience
+        : interventionId === "selfCompassion" ? SelfCompassionExperience
+        : interventionId === "unhook" ? UnhookExperience
+        : interventionId === "makeRoom" ? MakeRoomExperience
+        : interventionId === "vectorShift"
         ? VectorShiftFrame
         : interventionId === "factCheck"
         ? ThoughtOrFactExperience

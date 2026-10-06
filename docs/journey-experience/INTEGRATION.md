@@ -1,91 +1,21 @@
-# Shared journey integration
+# Combined journey contracts
 
-Base: `e2369be`. Host branch: `codex/need-takeaway-alternatives`.
+The release contains 17 catalogue practices plus Dear 2100 and Foundations. Original names/artwork remain in their approved components; Tara is excluded pending its assets. Four original worker builds use actual IDs `eftTapping`, `selfCompassion`, `unhook`, `makeRoom`; display names are Gentle Tapping, Self-Compassion, Unhook from the Thought, and Make Room for the Feeling.
 
-The shared patch owns `App.jsx`, `ResetFlow.jsx`, shared player/control wrappers,
-Home/Library/My Plan entry, localData/flagshipMemory and the new journey components.
-It does not include the Foundations or SignalLock internal redesigns, the new
-intervention components, or their clinical matching decisions.
+## Shared React controls
 
-## React contracts
+`JourneyOptions({ id, onOpen, label? })` opens a native dialog with a tailored in-place alternative, retains the mounted practice, and awaits timer/audio pause. Rejected pauses show an error. Closing never resumes or grants completion. Native dialog supplies focus containment and Escape.
 
-- `JourneyOptions({ id, onOpen, label? })`: opens a native modal with a tailored
-  in-place alternative. Keep the practice mounted. `onOpen` may be async and must
-  pause active timer/audio; throw/reject on failure. Closing never auto-resumes or
-  marks progress complete. Escape and keyboard focus are handled by the native dialog.
-- `JourneyTakeaway({ id })`: optional explicitly entered note, stored through the
-  existing localData module. Blank or inferred content is never saved. Notes are
-  separate from session statistics and available at `/return-points`, with deletion.
-  Established saved work is linked back to its original store rather than copied.
-- New experiences default-export a component with `{ intervention, answers,
-  sessionId, onComplete, onAttemptEvent, onExit }` as needed. Terminal completion
-  can use `onComplete({ interventionId, requireGoalReassessment:true, helpfulness,
-  outcome, exitReason, completedPercentage })`. No private text in outcome/history.
-  Only emitted terminal attempts are used for feedback; mount/progress is not completion.
-- The shared completion serializer uses an allowlist. Provide the exact coarse
-  outcome fields before adding a new allowlist entry; do not pass whole drafts.
+`JourneyTakeaway({ id })` saves only explicitly entered text through `takeawayStore`, separate from history/statistics. Established care cards, Thought or Fact records and other archives reuse their own storage. Return points reads actual records and supports deletion; saving is optional and device-local, with visible failures.
 
-Confirmed three-new worker IDs/exports:
+ResetFlow lazily dispatches the four new components. Gentle Tapping's adapter preserves its own question and stopped/incomplete status; a stopped round receives no full credit. Care outcomes contain only their exact numeric assessment and coarse practice/action choices. Private notice, perspective and action text never enter session history or completion snapshots. The host goal question remains a separate optional check-in; missing baselines never produce a comparison.
 
-| ID | Default component |
-| --- | --- |
-| `selfCompassion` | `SelfCompassionExperience.jsx` |
-| `unhook` | `UnhookExperience.jsx` |
-| `makeRoom` | `MakeRoomExperience.jsx` |
+The new techniques have Unrated evidence metadata, declared goal/mechanism/duration/preferences and ordinary V3 history learning. No scoring weights or new clinical matching claims were introduced. Tapping retains its supplied `automaticEligible:false` restriction for automatic-only plans; it is explicitly selectable. Existing access policy is reused via PlusGate and remains unchanged.
 
-Tapping provisional ID/export: `eftTapping` / `EFTTappingExperience.jsx`; final
-worker contract still needed. Calm primary, Ground secondary/discoverability.
+## Secure native pause bridge
 
-The four new component files are not present in this environment. No unavailable
-route or invented registration is added. Integration requires transferring their
-bundles and confirming names, durations, mechanisms, eligibility and outcome fields.
+Host sends `{ type:'mentication:pause-for-alternative', requestId }` to the exact same-origin iframe. The document validates origin and parent source, pauses, then acknowledges `{ type:'mentication:alternative-ready', requestId }`. The host validates source/origin/request and rejects after 1.5 seconds if acknowledgement is missing. Native receivers exist for Foundations, Signal Lock, Vector Shift, Night Channel, Good Map and Dear 2100.
 
-## Standalone pause bridge
+Deletion reset disposes mounted Signal Lock, Good Map and Foundations documents before a second clear, preventing pagehide autosave from resurrecting removed data. Tapping stops its writer and exits on cross-tab deletion. Saved notes, care cards, tapping drafts, Signal Lock and Foundations keys participate in shared deletion/backup/export paths.
 
-Host sends `{ type:"mentication:pause-for-alternative", requestId }` to the iframe's
-same origin. Receiver must check origin, `event.source === window.parent` and string
-requestId, then pause existing timer/audio without clearing valid progress. Reply
-`{ type:"mentication:alternative-ready", requestId }` only after pausing succeeds.
-The host accepts only matching source/origin/request. A timeout reports a visible
-error and leaves the running practice uncovered.
-
-Receivers implemented in this patch: Vector Shift, Night Channel, The Good Map,
-and Dear 2100. Foundations and SignalLock receivers must be supplied by their
-internal workers. The original builds correctly time out until those are combined.
-
-For SignalLock preserve the worker's grounding semantics, `external-visual-anchoring`
-mechanism, Ground primary/Calm secondary and removed timed-sprint handoffs. Its key
-`mentation.signal-lock.grounding.v1` is included in shared saved-memory clearing and
-shared export. Host storage deletion handling disposes the old iframe before a
-second clear/reload to avoid a pagehide autosave resurrecting deleted work.
-Foundations must supply its canonical key to extend this handling.
-
-## Catalogue / selector integration
-
-Shared owner should integrate each supplied definition in `final50Catalog.js`,
-`final50AlgorithmMeta.js`, `flagshipRegistry.js`, `flagshipExperienceRouting.js`,
-`goalAssessment.js`, branded metadata/threshold assets and ResetFlow's lazy dispatch.
-Workers should not make competing edits there.
-
-Required supplied fields: ID/name, actual duration range, primary/secondary goals,
-mechanism and mechanism family, cognitive load, arousal, audio/movement/eyes/private
-setting requirements, contraindication/substate tags, pathway roles and appropriate
-intensity limits. Evidence should remain explicitly unrated unless supported.
-
-Verify each new ID through `hardEligibleV3`, `scoreInterventionV3`, `buildPathway`,
-`buildSegment`, direct Library routes and preference/time filters. Verify confirmed
-helpfulness and matching before/after samples use that ID/mechanism and skipped,
-partial or unmeasured work supplies no fabricated improvement. Do not change the
-scoring formula to force a new experience to win.
-
-The Library now filters declared secondary directions as well as primary. Grouping
-remains in the practice's primary stream, so Tapping can appear when Ground is
-selected while retaining a Calm home in the catalogue.
-
-## Transfer without a remote push
-
-Create a Git bundle containing the local review branch relative to the common base.
-Save that local deliverable as a private Library file. The parent can resolve that
-file and download/materialize it in its own workspace, verify the bundle, fetch a
-local review ref, then combine the patches in an isolated integration checkout.
-A local path or commit hash alone cannot transfer bytes across execution machines.
+Home's source lives in `design/home-source`; its validated opaque-origin bridge and token remain intact. Initial recommendation data and document layout are ready before its route controls become available. Regenerate `public/home.html` with the existing build script. Dear 2100 edits remain in `design/dear2100/app.js` and are regenerated with its existing script.

@@ -59,7 +59,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
           !data || data.namespace !== 'mentication-home' || data.version !== 1 ||
           data.bridgeId !== bridgeId.current) return;
       if (data.type === 'ready') {
-        setReady(true);
+        // Show controls after the document reports its hydrated layout.
         send('parking', { parking: callbacks.current.parking });
         send('week', { week: callbacks.current.week });
         if (callbacks.current.today) send('today', { today: callbacks.current.today });
@@ -69,6 +69,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         reportViewport();
       } else if (data.type === 'height' && Number.isFinite(data.height) && data.height > 0 && data.height < 20000) {
         setHeight(Math.ceil(data.height));
+        setReady(true);
       } else if (data.type === 'home') {
         frame.current?.scrollIntoView({ block: 'start', behavior: data.reduceMotion ? 'instant' : 'smooth' });
       } else if (data.type === 'ambient-start') {
@@ -124,16 +125,19 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
     throw new TypeError('HomeFrame requires the host onNavigate(routeId) function.');
   }
   return (
-    <section aria-label="MentiCation home" style={{ background: '#49392f', minHeight: '100svh' }}>
+    <section aria-busy={!ready} aria-label="MentiCation home" style={{ background: '#49392f', minHeight: '100svh' }}>
+      {!ready && <p role="status" style={{ color: '#fff4e9', padding: '12px 20px' }}>Loading home…</p>}
       {error && <p role="alert" style={{ color: '#fff4e9', padding: '12px 20px', margin: 0 }}>{error}</p>}
       <iframe
         ref={frame}
         title="MentiCation home"
+        aria-hidden={!ready}
+        {...(!ready ? { inert: "" } : {})}
         src={homeSrc}
         allow="autoplay"
         sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
         onLoad={() => { setReady(false); send('connect'); }}
-        style={{ display: 'block', width: '100%', height, border: 0, maxWidth: 949, margin: '0 auto' }}
+        style={{ opacity: ready ? 1 : 0, pointerEvents: ready ? 'auto' : 'none', display: 'block', width: '100%', height, border: 0, maxWidth: 949, margin: '0 auto' }}
       />
     </section>
   );

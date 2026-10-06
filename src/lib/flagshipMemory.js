@@ -6,7 +6,7 @@ const HANDOFF_KEY = "mentation.flagship.handoffs.v1";
 const PARKING_KEY = "mentation.tomorrowParking.pending";
 const PARKING_RECORDS_KEY = "mentication.tomorrowParking.records.v1";
 const PARKING_CONSENTS_KEY = "mentication.tomorrowParking.consents.v1";
-const SHARED_RETURN_KEYS = ["mentation.takeaways.v1", "mentation.thought-or-fact.records.v1", "mentation.signal-lock.grounding.v1"];
+const SHARED_RETURN_KEYS = ["mentation.carePractices.saved.v1", "mentation.eftTapping.draft.v1", "mentication.foundations.draft.v2", "mentication.foundations.weekly-plan.v2", "mentication.foundations.weekly-plan.v1", "mentation.takeaways.v1", "mentation.thought-or-fact.records.v1", "mentation.signal-lock.grounding.v1"];
 const NIGHT_FEEDBACK_KEY = "mentation.nightChannel.feedback.v1";
 const ACTIVE_TTL_MS = 24 * 60 * 60 * 1000;
 

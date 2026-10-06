@@ -3,6 +3,12 @@
 // Hard eligible intensity and preferred intensity are intentionally separate.
 
 export const FINAL_50_ALGORITHM_META = Object.freeze({
+  ...Object.fromEntries([
+    ["eftTapping", ["ground", "calm"], "eft-style-tapping", ["tense", "overloaded"]],
+    ["selfCompassion", ["calm"], "self-compassion", ["self_criticism"]],
+    ["unhook", ["reset"], "cognitive-defusion", ["racing_thoughts"]],
+    ["makeRoom", ["calm"], "emotional-acceptance", ["overloaded"]],
+  ].map(([id, algorithmDirections, mechanismFamily, supportedSubstates]) => [id, { evidenceGrade: "Unrated", algorithmDirections, mechanismFamily, supportedSubstates, unsuitableSubstates: ["acute", "disconnected"], pathwayRoles: ["core"], intensityMin: 0, intensityMax: 10 }])),
   "happyBump": {"evidenceGrade": "B+", "preferredIntensityMin": 1, "preferredIntensityMax": 5, "intensityMin": 0, "intensityMax": 7, "bestWhen": "Low energy, low mood or inertia where a gentle sequence can build momentum", "algorithmTarget": "Body + environment + connection + behaviour", "algorithmDirections": ["lift", "calm"], "pathwayRoles": ["opener", "core"], "algorithmContext": "Safe movement route available", "mechanismFamily": "stacked-behavioural-activation", "supportedSubstates": ["low_energy", "low_mood", "tired"], "unsuitableSubstates": ["acute", "physical_instability"]},
   "thenWhat": {"evidenceGrade": "B−", "preferredIntensityMin": 3, "preferredIntensityMax": 6, "intensityMin": 2, "intensityMax": 7, "bestWhen": "A feared future can be explored without acute panic, danger, trauma re-experiencing or reassurance looping", "algorithmTarget": "Thoughts + coping", "algorithmDirections": ["calm", "focus"], "pathwayRoles": ["core"], "algorithmContext": "Reflective capacity available", "mechanismFamily": "decatastrophising", "supportedSubstates": ["racing_thoughts", "avoiding"], "unsuitableSubstates": ["acute", "disconnected"]},
   "countermove": {"evidenceGrade": "B−", "preferredIntensityMin": 2, "preferredIntensityMax": 6, "intensityMin": 1, "intensityMax": 7, "bestWhen": "Withdrawal or avoidance is maintaining low mood and the pull is not protective or genuinely restorative", "algorithmTarget": "Behaviour + function", "algorithmDirections": ["lift", "focus"], "pathwayRoles": ["core"], "algorithmContext": "A capacity-matched opposite move is safe", "mechanismFamily": "graded-opposite-action", "supportedSubstates": ["avoiding", "low_mood"]},

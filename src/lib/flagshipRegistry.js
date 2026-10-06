@@ -21,6 +21,12 @@ const meta = (definition) => Object.freeze({
 });
 
 export const FLAGSHIP_REGISTRY = Object.freeze({
+  ...Object.fromEntries([
+    ["eftTapping", "Gentle Tapping", "ground", ["calm"], "eft-style-tapping"],
+    ["selfCompassion", "Self-Compassion", "calm", [], "self-compassion"],
+    ["unhook", "Unhook from the Thought", "reset", [], "cognitive-defusion"],
+    ["makeRoom", "Make Room for the Feeling", "calm", [], "emotional-acceptance"],
+  ].map(([id, displayName, primaryGoal, secondaryGoals, primaryMechanism]) => [id, meta({ id, displayName, primaryGoal, secondaryGoals, primaryMechanism, cognitiveLoad: id === "eftTapping" ? 1 : 2, completionModel: "explicit practice check-in and optional saved return point" })])),
   boxV2: meta({
     id: "boxV2", displayName: "Box Breathing", primaryGoal: "calm", secondaryGoals: ["focus"],
     primaryMechanism: "physiological pacing and attentional control", targetState: "elevated physiological activation with scattered attention",

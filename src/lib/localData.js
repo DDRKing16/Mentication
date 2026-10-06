@@ -92,6 +92,8 @@ export function exportLocalAppData() {
     takeaways: readTakeaways(),
     signalLock: JSON.parse(storage()?.getItem("mentation.signal-lock.grounding.v1") || "null"),
     foundations,
+    careCards: JSON.parse(storage()?.getItem("mentation.carePractices.saved.v1") || "{}"),
+    tappingDraft: JSON.parse(storage()?.getItem("mentation.eftTapping.draft.v1") || "null"),
   };
 }
 

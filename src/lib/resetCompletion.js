@@ -81,6 +81,27 @@ export function coarseCompletionOutcome(outcome, interventionId) {
       }
     }
   }
+  if (["selfCompassion", "unhook", "makeRoom"].includes(interventionId)) {
+    const questions = { selfCompassion: ["How harsh is your self-talk right now?", "Not harsh", "Extremely harsh"], unhook: ["How caught up in this thought are you right now?", "Not caught up", "Completely caught up"], makeRoom: ["How much are you struggling with this feeling right now?", "Not struggling", "Struggling a lot"] };
+    const [question, left, right] = questions[interventionId];
+    const assessment = outcome.assessment;
+    if (assessment?.question === question && assessment.min === 0 && assessment.max === 10 && assessment.left === left && assessment.right === right) {
+      clean.practice = interventionId;
+      clean.assessment = { question, left, right, min: 0, max: 10, before: bounded(assessment.before, 0, 10) ? assessment.before : null, after: bounded(assessment.after, 0, 10) ? assessment.after : null };
+      clean.change = clean.assessment.before !== null && clean.assessment.after !== null ? clean.assessment.after - clean.assessment.before : null;
+    }
+    if (typeof outcome.practiceTaken === "boolean") clean.practiceTaken = outcome.practiceTaken;
+    if (["done", "planned", "not-now", null].includes(outcome.actionStatus)) clean.actionStatus = outcome.actionStatus;
+  }
+  if (interventionId === "eftTapping") {
+    if (["eft", "grounding"].includes(outcome.mode)) clean.mode = outcome.mode;
+    if (outcome.ratingQuestion === "How intense is the discomfort right now?" && outcome.ratingMin === 0 && outcome.ratingMax === 10) {
+      clean.ratingQuestion = outcome.ratingQuestion; clean.ratingMin = 0; clean.ratingMax = 10;
+      for (const key of ["before", "after"]) clean[key] = bounded(outcome[key], 0, 10) ? outcome[key] : null;
+    }
+    for (const key of ["roundsCompleted", "skippedPoints", "durationSeconds"]) if (Number.isInteger(outcome[key]) && bounded(outcome[key], 0, 86400)) clean[key] = outcome[key];
+    if (typeof outcome.completed === "boolean") clean.completed = outcome.completed;
+  }
   return clean;
 }
 

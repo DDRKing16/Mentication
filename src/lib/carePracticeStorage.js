@@ -21,16 +21,20 @@ export function deleteCareDraft(id) {
     return active?.interventionId !== id;
   } catch { return false; }
 }
+export function readCareCards() {
+  const records = JSON.parse(localStorage.getItem(CARE_SAVED_KEY) || '{}');
+  if (!records || typeof records !== 'object' || Array.isArray(records) || Object.values(records).some(value => !value || value.version !== 1)) throw new Error('Unreadable saved cards');
+  return Object.fromEntries(Object.entries(records).map(([id, value]) => [id, restoreCareState(value)]));
+}
 export function readCareSaved(id) {
   try {
-    const records = JSON.parse(localStorage.getItem(CARE_SAVED_KEY) || '{}');
+    const records = readCareCards();
     return records?.[id]?.version === 1 ? restoreCareState(records[id]) : null;
   } catch { return null; }
 }
 export function writeCareSaved(id, state) {
   try {
-    const raw = JSON.parse(localStorage.getItem(CARE_SAVED_KEY) || '{}');
-    const records = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    const records = readCareCards();
     records[id] = restoreCareState(state);
     localStorage.setItem(CARE_SAVED_KEY, JSON.stringify(records));
     return JSON.stringify(readCareSaved(id)) === JSON.stringify(records[id]);
@@ -38,7 +42,7 @@ export function writeCareSaved(id, state) {
 }
 export function deleteCareSaved(id) {
   try {
-    const records = JSON.parse(localStorage.getItem(CARE_SAVED_KEY) || '{}');
+    const records = readCareCards();
     if (records && typeof records === 'object') delete records[id];
     localStorage.setItem(CARE_SAVED_KEY, JSON.stringify(records || {}));
     return readCareSaved(id) === null;

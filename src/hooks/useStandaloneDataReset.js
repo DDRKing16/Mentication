@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const SAVED_KEYS = {
+  foundations: ['mentication.foundations.draft.v2', 'mentication.foundations.weekly-plan.v2', 'mentication.foundations.weekly-plan.v1'],
   signalLock: ['mentation.signal-lock.grounding.v1'],
   goodMap: ['goodmap-journey-v4'],
 };

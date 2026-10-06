@@ -6,7 +6,7 @@ import { standaloneRouteFor } from "@/lib/standaloneInterventions";
 import { getBrandAtmosphere, getBrandInk, getBrandLogoParts } from "@/lib/interventionBrand";
 import { INTERVENTIONS } from "@/lib/interventions";
 
-const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "sleep"];
+const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "reset", "sleep"];
 const CATEGORY_LABELS = {
   calm: "Calm",
   lift: "Lift",
@@ -173,7 +173,7 @@ export default function InterventionLibrary() {
         pathway: [iv.id],
         direction: iv.primaryDirection || iv.directions?.[0] || "calm",
         directionLabel: iv.name,
-        intensity: iv.id === "happyBump" ? null : 5,
+        intensity: null,
         whereFelt: iv.targets?.includes("body") ? "body" : "thoughts",
         timeMin: iv.durationMin,
         audio: "yes",

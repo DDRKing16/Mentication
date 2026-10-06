@@ -1,3 +1,5 @@
+import { tappingRegistration } from "../components/tapping/tappingRegistration.js";
+import { CARE_PRACTICES } from "./carePractices.js";
 import { algorithmMetaFor } from "./final50AlgorithmMeta.js";
 import { flagshipMetadataFor, FLAGSHIP_CATALOGUE_VERSION } from "./flagshipRegistry.js";
 
@@ -374,6 +376,8 @@ const CONTENT_OVERRIDES = {
 };
 
 const NEW_INTERVENTIONS = {
+  eftTapping: { ...DEFAULTS, ...tappingRegistration },
+  ...Object.fromEntries(Object.entries(CARE_PRACTICES).map(([id, config]) => [id, { ...DEFAULTS, id, name: config.title, category: "cognitive", type: "cognitive", mechanism: { selfCompassion: "self-compassion", unhook: "cognitive-defusion", makeRoom: "emotional-acceptance" }[id], directions: [config.goal], targets: ["thoughts", "both"], states: ["any"], durationMin: 3, cognitiveLoad: 2, physicalDemand: 0, eyes: "open", audio: "no", energy: "steady", why: config.intro, experienceTier: "flagship", steps: [] }])),
   thenWhat: newIntervention({
     id: "thenWhat", name: "Then What?", category: "cognitive", mechanism: "coping-appraisal",
     why: "Extending the story beyond a feared frame reveals possible responses, support and life beyond the event.",
@@ -761,6 +765,10 @@ const CORE_25_SPECS = [
   // Sleep (2)
   ["tomorrowParking", "sleep"],
   ["nightChannel", "sleep"],
+  ["eftTapping", "ground"],
+  ["selfCompassion", "calm"],
+  ["unhook", "reset"],
+  ["makeRoom", "calm"],
 ];
 
 export const CORE_25_IDS = Object.freeze(CORE_25_SPECS.map(([id]) => id));

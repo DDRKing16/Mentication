@@ -1,3 +1,4 @@
+import JourneyOptions from '@/components/journey/JourneyOptions';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
@@ -80,6 +81,7 @@ export default function CarePracticeExperience({ id, intervention, onComplete, o
     <header className="care-header"><button aria-label="Go back" onClick={back}><ArrowLeft size={20} /></button><div><span>MENTICATION</span><p>{config.title}</p></div><button aria-label="Exit and keep draft" onClick={() => onExit?.()}><X size={20} /></button></header>
     <div className="care-progress" role="progressbar" aria-label="Practice progress" aria-valuemin={0} aria-valuemax={7} aria-valuenow={currentStage}><i style={{ width: `${currentStage / 7 * 100}%` }} /></div>
     <main className="care-main">
+      <JourneyOptions id={id} />
       <Artwork motif={config.motif} level={Math.floor(s.clicks / 2)} practice={s.stage === 'practice'} />
       <section className="care-card">
         <p className="care-eyebrow">{returning ? 'Welcome back' : viewingSaved ? 'Your saved card' : s.stage === 'practice' ? 'Take your time' : `${config.goal === 'reset' ? 'Thoughts' : 'Care'} · ${currentStage + 1} / 8`}</p>

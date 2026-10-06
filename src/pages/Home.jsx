@@ -71,6 +71,7 @@ export default function Home() {
   // "Your reset for today" appears only for returning users: onboarding done
   // and at least one session in history. Payload matches My Plan's card.
   const [today, setToday] = useState(null);
+  const [todayLoaded, setTodayLoaded] = useState(false);
   // The user's current Peace Palace level, shown on the More for you card
   // and the Your week badge.
   const [palace, setPalace] = useState(null);
@@ -168,7 +169,8 @@ export default function Home() {
       };
     })()
       .then((payload) => { if (live) setToday(payload); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => { if (live) setTodayLoaded(true); });
     return () => { live = false; };
   }, []);
 
@@ -241,7 +243,7 @@ export default function Home() {
       >
         {musicMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </button>
-      <HomeFrame parking={parking} onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />
+      {!todayLoaded ? <p role="status" className="p-5">Loading home…</p> : <HomeFrame parking={parking} onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />}
     </div>
   );
 }

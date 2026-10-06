@@ -423,4 +423,11 @@ setFoundationOrbitFocus(foundationBlocks[0],false);show(start,false);ready=true;
 $('#draftStatus').textContent=loadedDraft.error?'The previous draft could not be read. It has been kept untouched; use Settings to back it up.':planReadError?'The saved plan could not be read. It has been kept untouched.':loadedDraft.value?'Draft restored on this device.':savedPlan?'Saved plan opened on this device.':'Your answers stay on this device.';
 if(staleReview){$('#planError').hidden=false;$('#planError').textContent='The saved plan changed after this review began. Your draft answers are still here. Open the latest saved plan before reviewing again.';$('#reloadSavedPlan').hidden=false}
 if(window.parent!==window)window.parent.postMessage({type:'foundations:ready'},window.location.origin);
+window.addEventListener('message', async event => {
+ if(event.origin!==window.location.origin||event.source!==window.parent||event.data?.type!=='mentication:pause-for-alternative')return;
+ pauseFoundationIdle();persistDraft();
+ if(audioContext?.state==='running')await audioContext.suspend();
+ window.parent.postMessage({type:'mentication:alternative-ready',requestId:event.data.requestId},window.location.origin);
+});
+
 })();

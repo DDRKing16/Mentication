@@ -188,3 +188,9 @@ window.addEventListener('storage', preferences);
 motionQuery.addEventListener('change', preferences);
 preferences(); persist(); render();
 setInterval(tick, 500);
+
+window.addEventListener('message', event => {
+  if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'mentication:pause-for-alternative') return;
+  interrupt();
+  window.parent.postMessage({ type: 'mentication:alternative-ready', requestId: event.data.requestId }, window.location.origin);
+});

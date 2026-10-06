@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, '..');
 const harness = path.join(root, '.care-practices-check.html');
 fs.writeFileSync(harness, `<!doctype html><html lang="en"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Care practice check</title><link rel="icon" href="data:,"><div id="root"></div><script type="module">
 import React from 'react';
+import {BrowserRouter} from 'react-router-dom';
 import {createRoot} from 'react-dom/client';
 import Care from '/src/components/care-practices/CarePracticeExperience.jsx';
 import '/src/index.css';
@@ -14,7 +15,7 @@ import '/node_modules/@fontsource/eb-garamond/latin-400.css';
 import '/node_modules/@fontsource/hanken-grotesk/latin-400.css';
 const id = new URLSearchParams(location.search).get('id');
 window.results=[];window.exits=0;
-createRoot(document.getElementById('root')).render(React.createElement(Care,{id,onComplete:r=>window.results.push(r),onExit:()=>window.exits++}));
+createRoot(document.getElementById('root')).render(React.createElement(BrowserRouter,null,React.createElement(Care,{id,onComplete:r=>window.results.push(r),onExit:()=>window.exits++})));
 </script></html>`);
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
@@ -26,7 +27,7 @@ createRoot(document.getElementById('root')).render(React.createElement(Care,{id,
       page.on('pageerror', e => { errors.push(e.message); console.error('PAGE ERROR',e.message); });
       page.on('console', m => { if(m.type()==='error') console.error(m.text()); });
       const click = name => page.getByRole('button', { name, exact: true }).click();
-      const visit = () => page.goto(`http://localhost:5173/.care-practices-check.html?id=${id}`);
+      const visit = () => page.goto(`${process.env.CARE_PREVIEW_URL || 'http://127.0.0.1:5181'}/.care-practices-check.html?id=${id}`);
       await visit(); await click('Begin');
       assert.equal(await page.locator('.care-rating [aria-pressed=true]').count(), 0);
       const question = await page.locator('.care-rating legend').textContent();

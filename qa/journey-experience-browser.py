@@ -84,10 +84,12 @@ with sync_playwright() as p:
     page.screenshot(path=str(out/'return-points-mobile.png'),full_page=True)
     # Both links are carried through the isolated Home document's validated bridge.
     page.goto(args.url+'/')
+    expect(page.locator('iframe')).to_have_css('opacity', '1')
     home=page.frame_locator('iframe').first
     home.get_by_role('button',name='Return points · your saved work',exact=True).click()
     expect(page.get_by_role('heading',name='Return points',exact=True)).to_be_visible()
     page.goto(args.url+'/')
+    expect(page.locator('iframe')).to_have_css('opacity', '1')
     page.frame_locator('iframe').first.get_by_role('button',name='Guide me',exact=True).click()
     expect(page.get_by_role('heading',name='What would help you begin?')).to_be_visible()
     # Browser Back returns from saved-work hub to the route that opened it.
