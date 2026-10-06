@@ -1,5 +1,5 @@
 export const NEXT_STEP_KEY = 'mentication_nes_v2_app_state';
-export const freshNextStep = () => ({ screen: 'landing', task: null, category: null, brainState: null, ladder: [], currentStepIndex: 0, winsToday: 0, pathLength: 'speedy', startedAt: Date.now(), submitted: false, gettingStarted: null, helpfulness: null });
+export const freshNextStep = () => ({ screen: 'landing', task: null, category: null, brainState: null, ladder: [], currentStepIndex: 0, attemptStartIndex: 0, winsToday: 0, pathLength: 'speedy', startedAt: Date.now(), submitted: false, gettingStarted: null, helpfulness: null });
 export function restoreNextStep() {
   try {
     const raw = localStorage.getItem(NEXT_STEP_KEY);
@@ -9,22 +9,34 @@ export function restoreNextStep() {
     // Legacy counters claimed progress without explicit step states. Do not reuse them.
     const ladder = parsed.ladder.map(step => ({ ...step, status: ['done', 'skipped'].includes(step.status) ? step.status : null }));
     const firstPending = ladder.findIndex(step => !step.status);
-    return { state: { ...freshNextStep(), task: typeof parsed.task === 'string' ? parsed.task : '', ladder, pathLength: ['speedy', 'regular', 'mini'].includes(parsed.pathLength) ? parsed.pathLength : 'speedy', currentStepIndex: firstPending < 0 ? ladder.length : firstPending, winsToday: ladder.filter(step => step.status === 'done').length, submitted: parsed.submitted === true, gettingStarted: ['easier', 'same', 'harder', 'unsure'].includes(parsed.gettingStarted) ? parsed.gettingStarted : null, helpfulness: ['helpful', 'same', 'worse', 'unsure'].includes(parsed.helpfulness) ? parsed.helpfulness : null, startedAt: Number.isFinite(parsed.startedAt) ? parsed.startedAt : Date.now() }, error: null };
+    const currentStepIndex = firstPending < 0 ? ladder.length : firstPending;
+    const attemptStartIndex = Number.isInteger(parsed.attemptStartIndex) && parsed.attemptStartIndex >= 0 && parsed.attemptStartIndex <= currentStepIndex ? parsed.attemptStartIndex : 0;
+    return { state: { ...freshNextStep(), task: typeof parsed.task === 'string' ? parsed.task : '', ladder, pathLength: ['speedy', 'regular', 'mini'].includes(parsed.pathLength) ? parsed.pathLength : 'speedy', currentStepIndex, attemptStartIndex, winsToday: ladder.filter(step => step.status === 'done').length, submitted: parsed.submitted === true, gettingStarted: ['easier', 'same', 'harder', 'unsure'].includes(parsed.gettingStarted) ? parsed.gettingStarted : null, helpfulness: ['helpful', 'same', 'worse', 'unsure'].includes(parsed.helpfulness) ? parsed.helpfulness : null, startedAt: Number.isFinite(parsed.startedAt) ? parsed.startedAt : Date.now() }, error: null };
   } catch {
     return { state: freshNextStep(), error: 'Saved task could not be read. You can start a new task; previous progress is unavailable.' };
   }
 }
 export function advanceNextStep(state, status) {
-  if (!['done', 'skipped'].includes(status) || state.screen !== 'focus' || !state.ladder[state.currentStepIndex] || state.ladder[state.currentStepIndex].status) return state;
+  if (!['done', 'skipped'].includes(status) || state.submitted || state.screen !== 'focus' || !state.ladder[state.currentStepIndex] || state.ladder[state.currentStepIndex].status) return state;
   const ladder = state.ladder.map((step, index) => index === state.currentStepIndex ? { ...step, status } : step);
   const next = state.currentStepIndex + 1;
   return { ...state, ladder, currentStepIndex: next, winsToday: ladder.filter(step => step.status === 'done').length, screen: next >= ladder.length ? 'dashboard' : 'focus' };
 }
 export function undoNextStep(state) {
-  if (!state.currentStepIndex || state.submitted) return state;
+  if (!state.currentStepIndex || state.currentStepIndex <= (state.attemptStartIndex || 0) || state.submitted) return state;
   const index = state.currentStepIndex - 1;
   const ladder = state.ladder.map((step, i) => i === index ? { ...step, status: null } : step);
   return { ...state, ladder, currentStepIndex: index, winsToday: ladder.filter(step => step.status === 'done').length, screen: 'focus' };
+}
+export function nextStepAttempt(state) {
+  const start = Number.isInteger(state.attemptStartIndex) && state.attemptStartIndex >= 0 && state.attemptStartIndex <= state.ladder.length ? state.attemptStartIndex : 0;
+  const steps = state.ladder.slice(start);
+  return { done: steps.filter(step => step.status === 'done').length, skipped: steps.filter(step => step.status === 'skipped').length, total: steps.length };
+}
+export function resumeNextStep(state, now = Date.now()) {
+  const currentStepIndex = state.ladder.findIndex(step => !step.status);
+  if (currentStepIndex < 0) return state;
+  return { ...state, screen:'focus', currentStepIndex, ...(state.submitted ? {submitted:false, attemptStartIndex:currentStepIndex, startedAt:now, gettingStarted:null, helpfulness:null} : {}) };
 }
 export function replaceNextStep(state, title) {
   if (!title.trim() || !state.ladder[state.currentStepIndex] || state.submitted) return state;

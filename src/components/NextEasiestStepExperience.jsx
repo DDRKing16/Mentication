@@ -1,4 +1,6 @@
 import JourneyOptions from '@/components/journey/JourneyOptions';
+import NextStepReturn from '@/components/next-step/NextStepReturn';
+import { writeVerified } from '@/lib/verifiedStorage';
 import InterventionNav from "@/components/brand/InterventionNav";
 import React, { useState, useRef, useEffect } from "react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
@@ -20,7 +22,7 @@ import {
 } from "lucide-react";
 import { consumeNextStepHandoff } from "@/lib/tomorrowParking/storage";
 import { HELPFULNESS } from "@/lib/attemptFeedback";
-import { freshNextStep, restoreNextStep, advanceNextStep, undoNextStep, replaceNextStep } from "@/lib/nextStepState";
+import { freshNextStep, restoreNextStep, advanceNextStep, undoNextStep, replaceNextStep, resumeNextStep, nextStepAttempt } from "@/lib/nextStepState";
 import { findLibraryTask } from "@/lib/taskLibrary";
 
 // Category to Lucide icon mapping for Image 1 premium grid
@@ -1150,12 +1152,20 @@ const generateLadder = (category, taskKey, brainState, pathLength = "regular", o
   }));
 };
 
-export default function NextEasiestStepExperience({ intervention, onComplete, onAttemptEvent } = {}) {
+export default function NextEasiestStepExperience({ intervention, onComplete, onAttemptEvent, answers = {} } = {}) {
   const { prefs } = useAccessibilityPrefs();
   const [restored] = useState(() => restoreNextStep());
   const [gameState, setGameState] = useState(restored.state);
+  const experienceRoot = useRef(null);
+  useEffect(() => {
+    const title = experienceRoot.current?.querySelector('.screen h1, .screen h2');
+    title?.setAttribute('tabindex', '-1');
+    title?.focus({ preventScroll:true });
+    window.scrollTo({top:0,behavior:'instant'});
+  }, [gameState.screen, gameState.currentStepIndex]);
   const [storageStatus, setStorageStatus] = useState(null);
   const [loadError, setLoadError] = useState(restored.error);
+  const [canPersist, setCanPersist] = useState(!restored.error);
   const [editStep, setEditStep] = useState(null);
   const gettingStarted = gameState.gettingStarted ?? null;
   const helpfulness = gameState.helpfulness ?? null;
@@ -1168,6 +1178,15 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [customTaskInput, setCustomTaskInput] = useState(() => consumeNextStepHandoff() ?? "");
   const [showPause, setShowPause] = useState(false);
+  const pauseDialog = useRef(null);
+  useEffect(() => {
+    if (!showPause) return;
+    const previous = document.activeElement;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    pauseDialog.current?.showModal();
+    return () => { document.body.style.overflow = overflow; if (previous?.isConnected) previous.focus(); };
+  }, [showPause]);
   const [easierOptionsVisible, setEasierOptionsVisible] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const aiGenerating = false;
@@ -1177,13 +1196,17 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
 
   // Synchronize state with localStorage
   useEffect(() => {
+    if (!canPersist) {
+      setStorageStatus('The previous task could not be read. It has not been overwritten. Choose a new task if you want to replace it.');
+      return;
+    }
     try {
-      localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(gameState));
+      writeVerified(localStorage,"mentication_nes_v2_app_state",JSON.stringify(gameState));
       setStorageStatus(null);
     } catch {
       setStorageStatus("Could not save on this device. Keep this page open; refreshing may lose this task.");
     }
-  }, [gameState]);
+  }, [gameState, canPersist]);
 
   // Auto-unlock audio context on first click/touchstart to guarantee sound is ready
   useEffect(() => {
@@ -1205,6 +1228,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
 
   // Audio Context lazy-loader helper
   const getAudioContext = () => {
+    if (answers.audio === 'no' || answers.noAudio || answers.discreet) return null;
     try {
       if (!audioCtxRef.current) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1281,6 +1305,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
 
   // Haptic Vibration helper
   const triggerHaptic = () => {
+    if (prefs.reducedMotion) return;
     if (navigator.vibrate) {
       try {
         navigator.vibrate(10);
@@ -1371,6 +1396,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
   };
 
   const handleSelectCategoryTask = (catKey, taskObj) => {
+    setCanPersist(true); setLoadError(null);
     completionSent.current = false;
     playClick();
     // Task text stays on this device. Use the bundled library or a local fallback.
@@ -1391,6 +1417,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
 
   const handleCustomTaskGo = () => {
     if (!customTaskInput.trim() || aiGenerating) return;
+    setCanPersist(true); setLoadError(null);
     completionSent.current = false;
     playClick();
     const cleanInput = customTaskInput.trim();
@@ -1411,6 +1438,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
   };
 
   const handleSurpriseMe = () => {
+    setCanPersist(true); setLoadError(null);
     completionSent.current = false;
     playClick();
     const keys = Object.keys(CATEGORY_THEMES);
@@ -1435,6 +1463,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
     if (Date.now() - lastAction.current < 400) return;
     lastAction.current = Date.now();
     setGameState(prev => advanceNextStep(prev, status));
+    setEditStep(null);
     if (status === "done") { playSuccessChime(); triggerHaptic(); triggerConfetti(); }
     setEasierOptionsVisible(false);
   };
@@ -1443,23 +1472,31 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
     setGameState(prev => replaceNextStep(prev, title));
     setEasierOptionsVisible(false);
   };
+  const resumeTask = () => {
+    completionSent.current = false;
+    setGameState(prev => resumeNextStep(prev));
+    setShowPause(false);
+    setEasierOptionsVisible(false);
+    setEditStep(null);
+  };
   const finish = () => {
     if (completionSent.current || !onComplete) return;
     completionSent.current = true;
-    const done = gameState.ladder.filter(step => step.status === "done").length;
-    const skipped = gameState.ladder.filter(step => step.status === "skipped").length;
+    const { done, skipped, total } = nextStepAttempt(gameState);
     const submittedState = { ...gameState, submitted: true };
-    try { localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify(submittedState)); } catch { /* Shared flow handles history save failure separately. */ }
+    try { writeVerified(localStorage,"mentication_nes_v2_app_state",JSON.stringify(submittedState)); }
+    catch { completionSent.current = false; setStorageStatus('Could not save your task ending. Your step is still here. Try again before leaving.'); return; }
     setGameState(submittedState);
     onAttemptEvent?.({ interventionId: "nextAction", mechanism: intervention?.mechanism,
-      action: "completed", exitReason: done + skipped < gameState.ladder.length ? "exited" : done ? "completed" : "skipped",
-      completedPercentage: done / Math.max(1, gameState.ladder.length),
+      action: "completed", exitReason: done + skipped < total ? "exited" : done ? "completed" : "skipped",
+      completedPercentage: done / Math.max(1, total),
       startedAt: gameState.startedAt, timestamp: Date.now(), helpfulness });
     onComplete({ requireGoalReassessment: true, helpfulness,
       outcome: { type: "next-easiest-step", completedSteps: done, skippedSteps: skipped, gettingStarted } });
   };
 
   const handleResetDay = () => {
+    setCanPersist(true); setLoadError(null);
     playClick();
     setGameState(freshNextStep());
     setGettingStarted(null);
@@ -1480,6 +1517,8 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
   return (
     <div 
       className="nes-v2-wrap"
+      ref={experienceRoot}
+      data-nes-screen={gameState.screen}
       style={{
         background: gameState.screen === "focus" ? "var(--alternate-base)" : "var(--primary-base)",
         transition: "background 300ms cubic-bezier(0.4, 0, 0.2, 1)"
@@ -1487,10 +1526,30 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
     >
       {/* Shared Home button on every screen, and Back on the opening screen (inner screens keep their own step-back arrows). */}
       {loadError && <div className="nes-save-status" role="alert">{loadError}<button onClick={() => setLoadError(null)}>Dismiss</button></div>}
-      <div className="nes-save-status" role={storageStatus ? "alert" : "status"}>{storageStatus || "Task progress saved on this device."}{storageStatus && <button onClick={() => setGameState(prev => ({ ...prev }))}>Retry save</button>}</div>
-      <div style={{ position: "relative", zIndex: 6, textAlign: "center", color: "#502f37" }}><JourneyOptions id="nextAction" /></div>
+      <div className="nes-save-status" role={storageStatus ? "alert" : "status"}>{storageStatus || (gameState.task ? "Task progress saved on this device." : "Task choices stay on this device.")}{storageStatus && <button onClick={() => setGameState(prev => ({ ...prev }))}>Retry save</button>}</div>
+      <div className="nes-journey-tools"><JourneyOptions id="nextAction" /></div>
       <style>{`
         .nes-v2-wrap .screen { max-width:600px; margin:0 auto; }
+        .nes-v2-wrap .screen :is(h1,h2)[tabindex="-1"] { outline:none; }
+        .nes-journey-tools { position:relative; z-index:6; text-align:center; color:#502f37; }
+        [data-nes-screen=focus] .nes-journey-tools { color:#e1e8c1; }
+        .nes-task-return { position:relative; z-index:5; margin:14px 0; padding:20px; background:#e1e8c1; color:#502f37; border:1px solid #502f3730; border-radius:22px; overflow-wrap:anywhere; }
+        .nes-task-return .nes-task-label { font-size:11px; text-transform:uppercase; letter-spacing:.12em; margin:12px 0 6px; }
+        .nes-task-return h2 { font:600 26px/1.2 var(--font-headline); margin:0 0 18px; }
+        .nes-task-return h3 { font:600 22px/1.25 var(--font-headline); margin:0 0 10px; }
+        .nes-task-return p { font-size:16px; line-height:1.5; }
+        .nes-task-return button { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-height:48px; padding:12px 16px; margin:16px 0; border:0; border-radius:14px; background:#502f37; color:#e1e8c1; font-size:16px; }
+        .nes-task-return button svg { flex-shrink:0; }
+        .nes-task-return summary { cursor:pointer; min-height:44px; padding:10px 0; }
+        .nes-task-return li { margin:12px 0; }
+        .nes-task-return li span { display:block; font-size:12px; font-weight:600; }
+        .nes-task-return .nes-task-storage { margin-bottom:0; font-size:13px; }
+        .nes-v2-wrap .nes-optional-check { cursor:pointer; min-height:44px; padding:10px 0; font-size:16px; }
+        .nes-v2-wrap button[aria-pressed] { min-height:44px; }
+        .nes-v2-wrap dialog.pause-overlay { border:0; margin:0; width:100%; max-width:none; height:100dvh; max-height:none; color:var(--text-burgundy); overflow:auto; }
+        .nes-v2-wrap .pause-card { max-height:calc(100dvh - 48px); overflow:auto; }
+        .large-text .nes-v2-wrap :is(.nes-task-return p,.nes-task-return button,.nes-task-return summary,.nes-quick button,.nes-quick legend,.nes-actions button) { font-size:18px; }
+        .large-text .nes-v2-wrap .pause-card :is(.subtitle,button) { font-size:18px!important; }
         .nes-save-status { position:relative; z-index:6; padding:60px 20px 8px; color:#502f37; background:#e1e8c1; font-size:14px; }
         .nes-quick { width:100%; background:#e1e8c1; color:#502f37; border-radius:18px; padding:16px; margin:12px 0; }
         .nes-quick p,.nes-quick label,.nes-quick legend { font-size:16px; line-height:1.5; }
@@ -2197,6 +2256,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
 
             </div>
 
+            {!!gameState.ladder.length && <NextStepReturn state={gameState} onResume={resumeTask} saved={!storageStatus && canPersist} />}
             <section className="nes-quick" aria-label="Quick task choices">
               <p>Choose a familiar task, or name your own. Your text stays on this device.</p>
               <div className="nes-actions">
@@ -2207,7 +2267,6 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
               <label htmlFor="nes-quick-task">What would you like to start?</label>
               <input id="nes-quick-task" value={customTaskInput} maxLength={200} onChange={e => setCustomTaskInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleCustomTaskGo(); }} />
               <button disabled={!customTaskInput.trim()} onClick={handleCustomTaskGo}>Show my small step</button>
-              {gameState.ladder.length > 0 && !gameState.submitted && <button onClick={() => navigateTo(gameState.ladder.every(step => step.status) ? "dashboard" : "focus")}>Resume saved task: {gameState.task}</button>}
             </section>
             {/* Primary Action Button ("I can't focus →") */}
             <div style={{ width: "100%", margin: "0 0 18px" }}>
@@ -2475,6 +2534,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
             zIndex: 5
           }}>
             <button
+              aria-pressed={gameState.pathLength === 'speedy'}
               onClick={() => {
                 playClick();
                 setGameState(prev => ({ ...prev, pathLength: "speedy" }));
@@ -2496,9 +2556,10 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
               One step
             </button>
             <button
+              aria-pressed={gameState.pathLength === 'regular'}
               onClick={() => {
                 playClick();
-                setGameState(prev => ({ ...prev, pathLength: "speedy" }));
+                setGameState(prev => ({ ...prev, pathLength: "regular" }));
               }}
               style={{
                 flex: 1,
@@ -2517,6 +2578,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
               Three steps
             </button>
             <button
+              aria-pressed={gameState.pathLength === 'mini'}
               onClick={() => {
                 playClick();
                 setGameState(prev => ({ ...prev, pathLength: "mini" }));
@@ -2954,8 +3016,8 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
               style={{
                 background: "rgba(214,223,171,0.2)",
                 border: "none",
-                width: "36px",
-                height: "36px",
+                width: "48px",
+                height: "48px",
                 borderRadius: "50%",
                 color: "#D6DFAB",
                 cursor: "pointer",
@@ -3154,11 +3216,11 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
             <div className="nes-actions nes-light">
               <button onClick={() => setEditStep(currentStep?.title || "")}>Edit step</button>
               <button onClick={() => advanceStep("skipped")}>Skip this step</button>
-              <button disabled={!gameState.currentStepIndex} onClick={() => setGameState(undoNextStep)}>Undo previous</button>
+              <button disabled={gameState.submitted || gameState.currentStepIndex <= gameState.attemptStartIndex} onClick={() => setGameState(undoNextStep)}>Undo previous</button>
               <button onClick={() => navigateTo("dashboard")}>Finish for now</button>
             </div>
             {editStep !== null && <form className="nes-quick" onSubmit={e => { e.preventDefault(); if (editStep.trim()) { chooseEasier(editStep.trim()); setEditStep(null); } }}>
-              <label htmlFor="nes-step-edit">Your small action</label><input id="nes-step-edit" value={editStep} maxLength={200} onChange={e => setEditStep(e.target.value)} />
+              <label htmlFor="nes-step-edit">Your small action</label><input id="nes-step-edit" autoFocus value={editStep} maxLength={200} onChange={e => setEditStep(e.target.value)} />
               <button disabled={!editStep.trim()}>Use this step</button><button type="button" onClick={() => setEditStep(null)}>Cancel edit</button>
             </form>}
             {easierOptionsVisible && currentStep && currentStep.easier && (
@@ -3338,13 +3400,16 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
             Steps marked done: {doneCount}. Skipped: {skippedCount}.
           </p>
 
+          <NextStepReturn state={gameState} onResume={resumeTask} saved={!storageStatus && canPersist} />
           <section className="nes-quick" style={{ zIndex: 5 }}>
+            <button onClick={finish} disabled={gameState.submitted || !onComplete}>Continue to final rating</button>
+            <details><summary className="nes-optional-check">Optional check-in</summary>
             <fieldset><legend>Did getting started become easier? Optional.</legend>
               {[["easier", "Easier"], ["same", "No change"], ["harder", "Harder"], ["unsure", "Not sure"]].map(([id, label]) => <button key={id} aria-pressed={gettingStarted === id} onClick={() => setGettingStarted(id)}>{label}</button>)}
             </fieldset>
             <fieldset><legend>Was this helpful? Optional.</legend>{HELPFULNESS.map(item => <button key={item.id} aria-pressed={helpfulness === item.id} onClick={() => setHelpfulness(item.id)}>{item.label}</button>)}</fieldset>
-            <button onClick={finish} disabled={gameState.submitted || !onComplete}>Continue to final rating</button>
-            <button disabled={!gameState.currentStepIndex} onClick={() => setGameState(undoNextStep)}>Undo previous</button>
+            </details>
+            <button disabled={gameState.submitted || gameState.currentStepIndex <= gameState.attemptStartIndex} onClick={() => setGameState(undoNextStep)}>Undo previous</button>
           </section>
           <div className="grid-2" style={{ marginTop: "16px", zIndex: 5, gap: "12px" }}>
             {/* Steps done card (Dark Red and Light Blue writing, 20% size reduction, gold outline) */}
@@ -3695,7 +3760,12 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
 
       {/* ==================== 7. PAUSE OVERLAY ==================== */}
       {showPause && (
-        <div className="pause-overlay" onClick={() => setShowPause(false)}>
+        <dialog ref={pauseDialog} className="pause-overlay" aria-labelledby="nes-pause-title" onClose={() => setShowPause(false)} onCancel={() => setShowPause(false)} onClick={event => { if (event.target === event.currentTarget) setShowPause(false); }} onKeyDown={event => {
+          if (event.key !== 'Tab') return;
+          const buttons = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled)'));
+          if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons.at(-1)?.focus(); }
+          else if (!event.shiftKey && document.activeElement === buttons.at(-1)) { event.preventDefault(); buttons[0]?.focus(); }
+        }}>
           <div className="pause-card" onClick={(e) => e.stopPropagation()} style={{ borderRadius: "32px" }}>
             <div className="emoji-badge" style={{
               background: "rgba(214, 223, 171, 0.5)",
@@ -3713,7 +3783,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
               PAUSED • SAFE PLACE
             </p>
             
-            <h2 className="h2" style={{ marginTop: "8px", color: "var(--text-burgundy)", fontSize: "24px", lineHeight: "1.1", letterSpacing: "-0.03em" }}>
+            <h2 id="nes-pause-title" className="h2" style={{ marginTop: "8px", color: "var(--text-burgundy)", fontSize: "24px", lineHeight: "1.1", letterSpacing: "-0.03em" }}>
               It's okay to pause.<br />{storageStatus ? 'Saving unavailable.' : 'Saved on this device.'}
             </h2>
             
@@ -3757,7 +3827,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
                 navigateTo("landing");
               }}
             >
-              Back to Ladder
+              Back to tasks
             </button>
 
             <button 
@@ -3767,7 +3837,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
               Start over
             </button>
           </div>
-        </div>
+        </dialog>
       )}
     </div>
   );
