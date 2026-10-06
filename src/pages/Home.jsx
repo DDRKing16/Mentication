@@ -1,3 +1,4 @@
+import { useDeviceSessions } from '@/hooks/useDeviceSessions';
 import { suggestionLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
 // Home — the approved MentiCation home screen, delivered as the isolated
@@ -61,6 +62,7 @@ async function readWeekState() {
 
 export default function Home() {
   const navigate = useNavigate();
+  const {sessions:deviceSessions}=useDeviceSessions(500);
   const [parking, setParking] = useState(() => hasParkedNotes());
   useEffect(() => {
     const refresh = () => setParking(hasParkedNotes());
@@ -106,10 +108,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    let live = true;
-    sessionStore.list("-created_date", 500)
-      .then((sessions) => {
-        if (!live) return;
+    const sessions=deviceSessions;
         const p = derivePeacePalace(sessions);
         setPalace({
           level: p.level,
@@ -140,10 +139,7 @@ export default function Home() {
           palace: { show: !practicedToday },
           premium: { show: premiumImminent, title: PREMIUM_PIECE.title },
         });
-      })
-      .catch(() => {});
-    return () => { live = false; };
-  }, []);
+  }, [deviceSessions]);
 
   useEffect(() => {
     let live = true;
@@ -151,13 +147,13 @@ export default function Home() {
       .then((state) => { if (live) setWeek(state); })
       .catch(() => {});
     return () => { live = false; };
-  }, []);
+  }, [deviceSessions]);
 
   useEffect(() => {
     let live = true;
     (async () => {
       if (!hasCompletedOnboarding()) return null;
-      const sessions = await sessionStore.list("-created_date", 30);
+      const sessions = deviceSessions.slice(0,30);
       if (!sessions.length) return null;
       const recommendation = buildRecommendation(sessions);
       return {
@@ -173,7 +169,7 @@ export default function Home() {
       .catch(() => {})
       .finally(() => { if (live) setTodayLoaded(true); });
     return () => { live = false; };
-  }, []);
+  }, [deviceSessions]);
 
   // Begin starts (or continues) the seven calmer days and opens today's
   // practice the same way the Programmes page does. If the week is finished

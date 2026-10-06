@@ -1,8 +1,8 @@
 // @ts-check
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, MapPin, Loader } from "lucide-react";
-import { sessionStore } from "@/lib/localData";
+import { useDeviceSessions } from "@/hooks/useDeviceSessions";
 import { computeEffectivenessInsights } from "@/lib/insights";
 import { getBumpFunnel } from "@/lib/happyBumpFunnel";
 import FlowHomeButton from "@/components/FlowHomeButton";
@@ -10,29 +10,14 @@ import ProgressStory from "@/components/insights/ProgressStory";
 import { summariseProgress } from "@/lib/progressStory";
 
 export default function EffectivenessDashboard() {
-  const [insights, setInsights] = useState(null);
-  const [story, setStory] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {sessions,ready,error,reload}=useDeviceSessions(100);
+  const insights=useMemo(()=>computeEffectivenessInsights(sessions),[sessions]);
+  const story=useMemo(()=>summariseProgress(sessions),[sessions]);
   const bumpRuns = getBumpFunnel().runs || [];
   const completedBumps = bumpRuns.filter((run) => run.scenes?.includes("complete")).length;
 
-  useEffect(() => {
-    const loadInsights = async () => {
-      try {
-        const sessions = await sessionStore.list("-created_date", 100);
-        const computed = computeEffectivenessInsights(sessions);
-        setInsights(computed);
-        setStory(summariseProgress(sessions));
-      } catch (e) {
-        console.error("Failed to load insights:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadInsights();
-  }, []);
 
-  if (loading || !insights) {
+  if (!ready || !insights) {
     return (
       <div className="calmbg flex min-h-full items-center justify-center">
         <Loader className="h-8 w-8 animate-spin text-primary" />
@@ -52,13 +37,14 @@ export default function EffectivenessDashboard() {
           <h1 className="mt-2 font-heading text-3xl font-medium text-primary">What's helping you</h1>
         </motion.div>
 
+        {error && <div role="alert" className="mb-6 rounded-2xl border border-border p-4"><p>{error}</p><button className="min-h-11 underline" onClick={reload}>Try history again</button></div>}
         {story && <div className="mb-10"><ProgressStory story={story} /></div>}
 
         {insights.totalSessions > 0 && (
           <div className="mb-6 border-t border-border pt-6">
             <h2 className="font-heading text-xl font-medium text-primary">The detail</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Based on what you chose and rated in {insights.totalSessions} sessions
+              Based on what you chose and rated in {insights.totalSessions} {insights.totalSessions === 1 ? 'session' : 'sessions'}
               {insights.currentStreak > 0 && ` • ${insights.currentStreak}-day streak`}
             </p>
           </div>

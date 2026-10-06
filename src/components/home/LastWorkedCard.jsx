@@ -5,7 +5,7 @@ import { Play } from "lucide-react";
 // "Worked for you last time" — wider/taller ivory bar with a deeper overlap
 // into the emerald hero. Gold circular play button launches the user's most
 // effective recent reset (wired by the parent).
-export default function LastWorkedCard({ subtitle = "Repeat your most effective reset", onClick, overlap = true }) {
+export default function LastWorkedCard({ subtitle = "Repeat a practice from your check-ins", title = "Worked for you last time", onClick, overlap = true }) {
   return (
     <motion.button
       type="button"
@@ -26,7 +26,7 @@ export default function LastWorkedCard({ subtitle = "Repeat your most effective 
         </svg>
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-body text-[0.86rem] font-semibold leading-tight text-[var(--home-ink)]">Worked for you last time</span>
+        <span className="block font-body text-[0.86rem] font-semibold leading-tight text-[var(--home-ink)]">{title}</span>
         <span className="mt-1 block truncate text-[0.71rem] text-[var(--home-muted)]">{subtitle}</span>
       </span>
       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--home-accent)] shadow-[0_12px_26px_-10px_var(--home-accent)] transition-transform active:scale-90">

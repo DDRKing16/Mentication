@@ -3,9 +3,9 @@ import { repeatLaunchEntry, suggestionLaunchEntry } from '@/lib/practiceLaunch';
 // Reuses the existing recommendation engine and history (no new data): the
 // time-of-day reset plus their best-performing practice. Both start buttons
 // launch the existing /reset flow with a prebuilt pathway.
-import React, { useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { sessionStore } from "@/lib/localData";
+import { useDeviceSessions } from "@/hooks/useDeviceSessions";
 import { pickLastWorked, improvementOf, buildPersonalBest } from "@/lib/interventions";
 import { buildRecommendation } from "@/lib/recommend";
 import RecommendedCard from "@/components/home/RecommendedCard";
@@ -13,21 +13,10 @@ import LastWorkedCard from "@/components/home/LastWorkedCard";
 
 export default function MyPlan() {
   const navigate = useNavigate();
-  const [lastWorked, setLastWorked] = useState(null);
-  const [personalBest, setPersonalBest] = useState(null);
-  const [recommendation, setRecommendation] = useState(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      const sessions = await sessionStore.list("-created_date", 30);
-      setLastWorked(pickLastWorked(sessions));
-      setPersonalBest(buildPersonalBest(sessions));
-      setRecommendation(buildRecommendation(sessions));
-    })()
-      .catch(() => {})
-      .finally(() => setReady(true));
-  }, []);
+  const {sessions,ready,error,reload}=useDeviceSessions(30);
+  const lastWorked=useMemo(()=>pickLastWorked(sessions),[sessions]);
+  const personalBest=useMemo(()=>buildPersonalBest(sessions),[sessions]);
+  const recommendation=useMemo(()=>ready?buildRecommendation(sessions):null,[sessions,ready]);
 
   const doRecommend = () => {
     if (!recommendation || (!recommendation.requiresCheckIn && !recommendation.pathway?.length)) return;
@@ -55,7 +44,7 @@ export default function MyPlan() {
   };
 
   const lastSub = personalBest
-    ? "Built from your best-performing practices"
+    ? "Based on your reported practice ratings"
     : (() => {
         const imp = improvementOf(lastWorked);
         return imp > 0 ? `Last shifted you ${imp.toFixed(1)} pts` : "Repeat your most effective reset";
@@ -75,6 +64,7 @@ export default function MyPlan() {
           <button type="button" onClick={() => navigate('/return-points')} className="min-h-12 rounded-2xl border border-[#0E4536]/20 p-3 text-left">Return to saved work</button>
         </div>
         <p className="mt-4 text-sm leading-relaxed text-[#5F726B]">Today's suggestion uses the time of day and saved feedback where available. It does not know how you feel now; choose what you need or answer a fresh check-in.</p>
+        {error && <div role="alert" className="mt-5 rounded-2xl border border-border p-4"><p>{error}</p><button className="min-h-11 underline" onClick={reload}>Try history again</button></div>}
 
         <section className="mt-8">
           <p className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[#5F726B]">Today</p>
@@ -94,14 +84,14 @@ export default function MyPlan() {
 
         <section className="mt-8">
           <p className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[#5F726B]">Built from your history</p>
-          <h2 className="mt-1.5 font-heading text-[1.15rem] font-medium text-[#0E4536]">What works for you</h2>
+          <h2 className="mt-1.5 font-heading text-[1.15rem] font-medium text-[#0E4536]">From your reported check-ins</h2>
           {ready && (lastWorked || personalBest) ? (
             <div className="mt-3">
-              <LastWorkedCard subtitle={lastSub} onClick={doLastWorked} overlap={false} />
+              <LastWorkedCard title="From your reported check-ins" subtitle={lastSub} onClick={doLastWorked} overlap={false} />
             </div>
           ) : ready ? (
             <p className="mt-3 text-[0.92rem] leading-relaxed text-[#5F726B]">
-              Complete a session and your most effective reset will appear here.
+              When you have comparable check-ins, a practice you reported useful can appear here. You can always choose any practice.
             </p>
           ) : (
             <div className="mt-3 h-[76px] animate-pulse rounded-[1.5rem] bg-[#1E3C42]/10" />

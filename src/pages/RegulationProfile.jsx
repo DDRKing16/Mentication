@@ -1,5 +1,7 @@
+import { useDeviceSessions } from '@/hooks/useDeviceSessions';
+import { repeatLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
-import React, { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import React, { useMemo, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -31,13 +33,11 @@ function ResetHistoryFallback() {
 
 export default function RegulationProfile() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(null);
-  const [lastWorked, setLastWorked] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [confirming, setConfirming] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [weekCount, setWeekCount] = useState(0);
-  const [sessions, setSessions] = useState([]);
+  const {sessions,ready,error,reload:loadSessions}=useDeviceSessions(100);
+  const profile=useMemo(()=>buildProfile(sessions),[sessions]);
+  const lastWorked=useMemo(()=>pickLastWorked(sessions),[sessions]);
+  const [confirming,setConfirming]=useState(false),[deleting,setDeleting]=useState(false);
+  const weekCount=sessions.filter(s=>new Date(s.created_date).getTime()>=Date.now()-7*86400000).length;
   const { isPremium } = usePremium();
   const palace = useMemo(() => derivePeacePalace(sessions), [sessions]);
 
@@ -52,36 +52,16 @@ export default function RegulationProfile() {
     navigate("/");
   };
 
-  const loadSessions = async () => {
-    const sessions = await sessionStore.list("-created_date", 100);
-    setProfile(buildProfile(sessions));
-    setLastWorked(pickLastWorked(sessions));
-    const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    setSessions(sessions);
-    setWeekCount(sessions.filter((s) => new Date(s.created_date).getTime() >= since).length);
-    setLoading(false);
-  };
-  useEffect(() => { loadSessions().catch(() => setLoading(false)); }, []);
 
   const doLastWorked = () => {
     const s = lastWorked;
     if (!s) return;
     navigate("/reset", {
-      state: {
-        prebuilt: true,
-        pathway: s.pathway,
-        direction: s.direction || s.state,
-        directionLabel: s.direction_label || s.state_label,
-        intensity: s.intensity_start,
-        whereFelt: s.where_felt,
-        timeMin: s.time_min,
-        audio: s.audio,
-        movement: s.movement,
-      },
+      state: repeatLaunchEntry(s),
     });
   };
 
-  if (loading) {
+  if (!ready) {
     return (
       <div className="flex min-h-full items-center justify-center">
         <div className="h-8 w-8 rounded-full border-4 border-secondary border-t-primary animate-spin" />
@@ -93,6 +73,7 @@ export default function RegulationProfile() {
     return (
       <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
+          {error && <div role="alert" className="rounded-2xl border border-border p-4"><p>{error}</p><button className="min-h-11 underline" onClick={loadSessions}>Try history again</button></div>}
           <button onClick={() => navigate("/")} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
             <ChevronLeft className="h-4 w-4" /> Back
           </button>
@@ -114,6 +95,7 @@ export default function RegulationProfile() {
 
   return (
     <PullToRefresh onRefresh={loadSessions}>
+      {error && <div role="alert" className="mx-5 mt-5 rounded-2xl border border-border p-4"><p>{error}</p><button className="min-h-11 underline" onClick={loadSessions}>Try history again</button></div>}
       <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
           <button onClick={() => navigate("/")} className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">

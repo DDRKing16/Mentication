@@ -26,6 +26,12 @@ Inspected onboarding, setup fallback, and launch payloads from Home/My Plan/Libr
 
 Validation: 21 entry/recommendation/history tests passed; typecheck passed; actual browser verified bare setup, retired-pathway fallback and storage-denied onboarding reaching Home. Matching algorithms and existing immediate-reset behavior are unchanged.
 
+## Pass 5 — personalization from current local history
+
+Inspected Home, My Plan, Profile and Insights history lifecycles. A shared local-only subscription refreshes their derived views on actual session save/delete, another tab's session changes, focus and visible resume; stale requests cannot win after cleanup. Repeat actions also use fresh assessment payloads. My Plan describes reported check-ins rather than implying that an aggregate best practice was the last practice. Read errors keep prior data and offer retry.
+
+Validation: nine subscription, progress-story and recommendation tests, typecheck and lint passed. Mounted 320px My Plan updated after real session create/delete without navigating; mounted 390px Insights updated after another tab's create/delete. No matching algorithm or fabricated ratings added.
+
 ## Remaining passes
 
-5–10 pending; preserve this log when continuing.
+6–10 pending; preserve this log when continuing.
