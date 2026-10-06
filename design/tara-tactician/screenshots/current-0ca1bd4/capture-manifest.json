@@ -1,0 +1,324 @@
+{
+  "sourceCommit": "0ca1bd4ff1f52d7f6e73d5e2ddefff1c0a818cca",
+  "codeCommit": "0b320f6bb27270f419078408565860711ee537bb",
+  "branch": "codex/tara-tactician",
+  "preview": "/design/tara-tactician/preview.html",
+  "stylesheet": "Includes host index.css, app-surfaces.css and intervention-experiences.css from Tara task base",
+  "mobileViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "desktopViewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "captures": [
+    {
+      "name": "01-entry",
+      "heading": "One small step into something difficult.",
+      "full": "01-entry-full.png",
+      "viewport": "01-entry-viewport.png",
+      "scrollHeight": 844
+    },
+    {
+      "name": "02-event",
+      "heading": "What are you facing?",
+      "full": "02-event-full.png",
+      "viewport": "02-event-viewport.png",
+      "scrollHeight": 844
+    },
+    {
+      "name": "03-challenge",
+      "heading": "What are you facing?",
+      "full": "03-challenge-full.png",
+      "viewport": "03-challenge-viewport.png",
+      "scrollHeight": 1002
+    },
+    {
+      "name": "04-prediction",
+      "heading": "What are you facing?",
+      "full": "04-prediction-full.png",
+      "viewport": "04-prediction-viewport.png",
+      "scrollHeight": 1588
+    },
+    {
+      "name": "05-plan",
+      "heading": "A plan you can actually use.",
+      "full": "05-plan-full.png",
+      "viewport": "05-plan-viewport.png",
+      "scrollHeight": 1289
+    },
+    {
+      "name": "06-rehearsal",
+      "heading": "Try your first move.",
+      "full": "06-rehearsal-full.png",
+      "viewport": "06-rehearsal-viewport.png",
+      "scrollHeight": 1033
+    },
+    {
+      "name": "07-tackle",
+      "heading": "Just the next step.",
+      "full": "07-tackle-full.png",
+      "viewport": "07-tackle-viewport.png",
+      "scrollHeight": 1358
+    },
+    {
+      "name": "08-live-support",
+      "heading": "A little support, right here.",
+      "full": "08-live-support-full.png",
+      "viewport": "08-live-support-viewport.png",
+      "scrollHeight": 1042
+    },
+    {
+      "name": "09-step-out",
+      "heading": "A little support, right here.",
+      "full": "09-step-out-full.png",
+      "viewport": "09-step-out-viewport.png",
+      "scrollHeight": 1082
+    },
+    {
+      "name": "10-reflection-unanswered",
+      "heading": "What actually happened?",
+      "full": "10-reflection-unanswered-full.png",
+      "viewport": "10-reflection-unanswered-viewport.png",
+      "scrollHeight": 1706
+    },
+    {
+      "name": "11-honest-recap",
+      "heading": "What you want to take with you.",
+      "full": "11-honest-recap-full.png",
+      "viewport": "11-honest-recap-viewport.png",
+      "scrollHeight": 1063
+    },
+    {
+      "name": "12-reflection-desktop",
+      "heading": "What actually happened?",
+      "full": "12-reflection-desktop-full.png",
+      "viewport": "12-reflection-desktop-viewport.png",
+      "scrollHeight": 1778
+    },
+    {
+      "name": "13-plan-320-long-text",
+      "full": "13-plan-320-long-text-full.png",
+      "viewport": "13-plan-320-long-text-viewport.png",
+      "viewportSize": {
+        "width": 320,
+        "height": 844
+      },
+      "textScale": "24px root stress fixture",
+      "scrollHeight": 1792,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "14-rehearsal-320-long-text",
+      "full": "14-rehearsal-320-long-text-full.png",
+      "viewport": "14-rehearsal-320-long-text-viewport.png",
+      "viewportSize": {
+        "width": 320,
+        "height": 844
+      },
+      "textScale": "24px root stress fixture",
+      "scrollHeight": 1935,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "15-tackle-320-long-text",
+      "full": "15-tackle-320-long-text-full.png",
+      "viewport": "15-tackle-320-long-text-viewport.png",
+      "viewportSize": {
+        "width": 320,
+        "height": 844
+      },
+      "textScale": "24px root stress fixture",
+      "scrollHeight": 2220,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "16-reflection-320-long-text",
+      "full": "16-reflection-320-long-text-full.png",
+      "viewport": "16-reflection-320-long-text-viewport.png",
+      "viewportSize": {
+        "width": 320,
+        "height": 844
+      },
+      "textScale": "24px root stress fixture",
+      "scrollHeight": 2758,
+      "horizontalOverflow": false
+    }
+  ],
+  "sampleData": "Synthetic review fixture only; no user data or claimed outcome",
+  "pageErrors": [],
+  "viewportNote": "Viewport screenshots preserve browser scroll position after the actual interaction. Full screenshots contain the whole screen.",
+  "supplemental": {
+    "file": "17-storage-error-390-full.png",
+    "source": "Existing browser evidence captured from identical application code; copied without editing",
+    "scenario": "Quota failure; synthetic fixture"
+  },
+  "fileIntegrity": [
+    {
+      "file": "01-entry-full.png",
+      "bytes": 181022,
+      "sha256": "72c2e6c5a8d7d186c6d49947b394b07859ba45d4f1c02255c3493a14f3dbe99f"
+    },
+    {
+      "file": "01-entry-viewport.png",
+      "bytes": 181022,
+      "sha256": "72c2e6c5a8d7d186c6d49947b394b07859ba45d4f1c02255c3493a14f3dbe99f"
+    },
+    {
+      "file": "02-event-full.png",
+      "bytes": 157162,
+      "sha256": "f6d199925e9e0b3683fc2e66273b792b45d767b4fd7eceeebcefc45fb5032ffe"
+    },
+    {
+      "file": "02-event-viewport.png",
+      "bytes": 157162,
+      "sha256": "f6d199925e9e0b3683fc2e66273b792b45d767b4fd7eceeebcefc45fb5032ffe"
+    },
+    {
+      "file": "03-challenge-full.png",
+      "bytes": 174190,
+      "sha256": "b180adb705e93edcf04932c1b2b35395360bd526846e94d62f750d71f59b5a91"
+    },
+    {
+      "file": "03-challenge-viewport.png",
+      "bytes": 156227,
+      "sha256": "6fc5667ca8e07091ada0a55d31aeb8f6fdb0f3496b8b4e0020020d59ad8b34bf"
+    },
+    {
+      "file": "04-prediction-full.png",
+      "bytes": 246473,
+      "sha256": "0f160bd3b99a1c58dab4541422be2b987691765669067c563bf8353b6d064acf"
+    },
+    {
+      "file": "04-prediction-viewport.png",
+      "bytes": 99189,
+      "sha256": "79b04bbc07ca7c7211c6d7294c55fbc276400d9ded8a2f677a18f2dd045bf448"
+    },
+    {
+      "file": "05-plan-full.png",
+      "bytes": 238852,
+      "sha256": "5a4dfd7559da9e28d18eff0700bddd4437a89787744f43eed2f2d9b85a5d223f"
+    },
+    {
+      "file": "05-plan-viewport.png",
+      "bytes": 189854,
+      "sha256": "4d6125ab9b6dad691a4dc7e7a87b430791c9638666a25b78087b190dc38e3a69"
+    },
+    {
+      "file": "06-rehearsal-full.png",
+      "bytes": 223033,
+      "sha256": "58466d6047f76139f1793c904ba2cde432f5bee6cae5d8fc8e7306036c76dc41"
+    },
+    {
+      "file": "06-rehearsal-viewport.png",
+      "bytes": 203019,
+      "sha256": "73c9d615b51ee74d12b78bca13f232aecf6d9b487931b5315823a61731b20592"
+    },
+    {
+      "file": "07-tackle-full.png",
+      "bytes": 216993,
+      "sha256": "a862effed4fe1471d7a4905dc6fb1f2b1410af6b2fc1a2c2c14e39113340257b"
+    },
+    {
+      "file": "07-tackle-viewport.png",
+      "bytes": 166243,
+      "sha256": "b428724a98f65a93c03f281d9a1c913bb537bfdede41e9664695473ad6a32f37"
+    },
+    {
+      "file": "08-live-support-full.png",
+      "bytes": 189807,
+      "sha256": "b81c1ec6e034e75bf1b18dda748762b90eed843dc563e5a331cfbd18d1bdf852"
+    },
+    {
+      "file": "08-live-support-viewport.png",
+      "bytes": 166399,
+      "sha256": "096ed67e51c6fc2ff0f50964261fd359abedc7a504a2dec86401ab68fa1206cc"
+    },
+    {
+      "file": "09-step-out-full.png",
+      "bytes": 195142,
+      "sha256": "59e2ccbf9b4866b037000d44af66333149e8996fe9a2c104ef39940354bcba44"
+    },
+    {
+      "file": "09-step-out-viewport.png",
+      "bytes": 167729,
+      "sha256": "95bc90ccf0968ebbdaed5daa44a2a52de584bddc1d671a4f5cb358957b6f2413"
+    },
+    {
+      "file": "10-reflection-unanswered-full.png",
+      "bytes": 245950,
+      "sha256": "dc623bf13627544ceddfedd554c63171b4d73b7e348bdd43621b1a829288dcff"
+    },
+    {
+      "file": "10-reflection-unanswered-viewport.png",
+      "bytes": 168337,
+      "sha256": "5cbea34cec88be326a285b57499f50139bcce0daaf3c048d482679ace1a20133"
+    },
+    {
+      "file": "11-honest-recap-full.png",
+      "bytes": 234558,
+      "sha256": "ab23150b124c50e49ea525913c9681439f4f56f1f74f3aa09fbaa3345a2c6a4d"
+    },
+    {
+      "file": "11-honest-recap-viewport.png",
+      "bytes": 212701,
+      "sha256": "8a84c00a01bfade9244011f0967b53a97c29b25776996a84d7fd873e803009c8"
+    },
+    {
+      "file": "12-reflection-desktop-full.png",
+      "bytes": 593463,
+      "sha256": "47e2fda756d6e0a1e144f35a5a30f16fb3182f52a5081aea21693f2954c58c39"
+    },
+    {
+      "file": "12-reflection-desktop-viewport.png",
+      "bytes": 416019,
+      "sha256": "a4a808536d5c7bd9edb16832ccc38fbc99683eb67cf4b181802be8e0d2081c12"
+    },
+    {
+      "file": "13-plan-320-long-text-full.png",
+      "bytes": 254888,
+      "sha256": "884ce3e923ec122a490f594d6753466af201aa2d17c0dec49316d38eaab93ab9"
+    },
+    {
+      "file": "13-plan-320-long-text-viewport.png",
+      "bytes": 163091,
+      "sha256": "9051ea1545704d66a7115bfe2c87ba2f35c577df0af81bbdfb8986d8b3d445d3"
+    },
+    {
+      "file": "14-rehearsal-320-long-text-full.png",
+      "bytes": 295625,
+      "sha256": "413bcd0ee4fcd38689f2b6fb1f335138c2a5badf2d0266c162c53b9593f50459"
+    },
+    {
+      "file": "14-rehearsal-320-long-text-viewport.png",
+      "bytes": 172208,
+      "sha256": "78a19ee90249170027fa70eccc0ba944cef37e54b47a7ac40fb052acf6ff92e5"
+    },
+    {
+      "file": "15-tackle-320-long-text-full.png",
+      "bytes": 320686,
+      "sha256": "548897ebf65d739332ad3ff0354e3c9ea5c2af73e883921ca34d72d71131d20b"
+    },
+    {
+      "file": "15-tackle-320-long-text-viewport.png",
+      "bytes": 183084,
+      "sha256": "07c81a9c83869f41e8672829fa12dfca9d437389c8e124db07bd33b3e55fc3da"
+    },
+    {
+      "file": "16-reflection-320-long-text-full.png",
+      "bytes": 417247,
+      "sha256": "c410b2fde7f7e40f250e1f72beb6a263c5b1ed7d33e1a16213667b7cca56089a"
+    },
+    {
+      "file": "16-reflection-320-long-text-viewport.png",
+      "bytes": 216138,
+      "sha256": "5a3c2f02687856f74d151d4ef8c390badebae5577c0e4309a85b140f98dcb85c"
+    },
+    {
+      "file": "17-storage-error-390-full.png",
+      "bytes": 240309,
+      "sha256": "95ddc95287f9e93c3cfcfaa1be2111de9c15f87c859f896e6be164a780253da6"
+    }
+  ]
+}
