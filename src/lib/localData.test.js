@@ -48,6 +48,7 @@ describe("device-local application data", () => {
     window.localStorage.setItem("haven.a11y.v2", JSON.stringify({ largeText: true }));
     window.localStorage.setItem("unrelated.product", "keep");
     window.localStorage.setItem("mentication_nes_v2_app_state", JSON.stringify({ task: "Synthetic private task" }));
+    for (const key of ["goodmap-journey-v4", "goodmap-journey-v3", "gm_narr"]) window.localStorage.setItem(key, "synthetic");
     expect(exportLocalAppData().sessions).toHaveLength(1);
 
     deleteAllLocalAppData();
@@ -58,6 +59,7 @@ describe("device-local application data", () => {
     expect(window.localStorage.getItem("haven.a11y.v2")).toBeNull();
     expect(window.localStorage.getItem("unrelated.product")).toBe("keep");
     expect(window.localStorage.getItem("mentication_nes_v2_app_state")).toBeNull();
+    for (const key of ["goodmap-journey-v4", "goodmap-journey-v3", "gm_narr"]) expect(window.localStorage.getItem(key)).toBeNull();
     expect(window.__events).toContain("mentation:accessibility-changed");
   });
 });

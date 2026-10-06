@@ -574,7 +574,7 @@
       });
       download(content, 'text/calendar;charset=utf-8', 'good-map-reminder.ics');
       JST.wk.exportedAt = new Date().toISOString();
-      save();
+      if (!save()) return;
       status('Calendar file download requested. Open it and confirm import in your calendar; no reminder has been added by this app.');
     } catch (e) {
       status(e.message, true);
@@ -776,7 +776,7 @@
         } else {
           localStorage.removeItem(KEY);
           localStorage.removeItem(JKEY);
-          if (localStorage.getItem(KEY) !== null) throw Error();
+          if (localStorage.getItem(KEY) !== null || localStorage.getItem(JKEY) !== null) throw Error();
           recoveryBlocked = false;
           loading = true;
           maps = [];

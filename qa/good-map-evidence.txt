@@ -66,3 +66,23 @@ Limits and required release follow-up
   <b>markup</b> and ampersand renders as text in step and scheduling subtitle.
   No browser console errors. Final deletion/recovery guards also reviewed in source.
 - Parent owns serial integration, final route/native QA and publication. HOLD PUSH.
+
+Serial integration review — release checkout
+- Fast-forwarded existing Chat-GPT from 06b4b6d to 46eea32 locally; no push.
+- Reviewed shared StandaloneFrame defaults and origin/source-checked exit bridge;
+  other standalone navigation and Night Channel iframe permissions remain unchanged.
+- Fixed calendar export overwriting a failed-save status; verified both current and
+  legacy storage keys are absent before completing Good Map deletion.
+- Extended app-wide deletion regression for v4, v3 and narration preferences.
+- Combined validation: 389 tests / 50 files pass; typecheck, lint, production build,
+  and diff whitespace checks pass. Existing bundle-size warning remains.
+- Muted Chrome against integrated dist at 320px: refresh restores menu; manual
+  export requires recipient and consent, cancel clears; calendar save failure stays
+  visible; simulated legacy deletion failure reports failure; retry deletion and
+  refresh remove legacy data. No runtime errors or horizontal overflow.
+- Inspected /tmp/good-map-integrated-mobile.png. Browser script:
+  /tmp/good-map-integration.cjs. First incomplete synthetic plan fixture timed out;
+  rerun with complete synthetic focus/plan passed. No production defect inferred.
+- Native export/alarm delivery and entitled Good Map host-route browser verification
+  remain unverified here. Existing worker end-to-end evidence reviewed above.
+- Publication and deployment remain on hold for new user approval.
