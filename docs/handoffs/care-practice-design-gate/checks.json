@@ -3,8 +3,8 @@
     "id": "selfCompassion",
     "viewport": "390x844",
     "overflow": false,
-    "primaryBottom": 724.953125,
-    "stopBottom": 777.953125,
+    "primaryBottom": 737.546875,
+    "stopBottom": 790.546875,
     "practiceTaken": false,
     "clicks": 4,
     "animations": 0,
@@ -13,15 +13,36 @@
     "saveErrorHonest": true,
     "resumeAfterChoices": true,
     "primaryKeyboardEnter": true,
-    "long320NoHorizontalOverflow": true,
+    "longCoreChecks": [
+      {
+        "safetyKeyboardReachable": true,
+        "enlarged": false,
+        "stage": "practice",
+        "noticeLength": 300,
+        "responseLength": 300,
+        "actionLength": 151,
+        "noHorizontalOverflow": true,
+        "keyboardActionReachable": true
+      },
+      {
+        "safetyKeyboardReachable": true,
+        "enlarged": true,
+        "stage": "practice",
+        "noticeLength": 300,
+        "responseLength": 300,
+        "actionLength": 151,
+        "noHorizontalOverflow": true,
+        "keyboardActionReachable": true
+      }
+    ],
     "errors": []
   },
   {
     "id": "unhook",
     "viewport": "390x844",
     "overflow": false,
-    "primaryBottom": 681.96875,
-    "stopBottom": 734.96875,
+    "primaryBottom": 689.8125,
+    "stopBottom": 742.8125,
     "practiceTaken": false,
     "clicks": 4,
     "animations": 0,
@@ -30,15 +51,36 @@
     "saveErrorHonest": true,
     "resumeAfterChoices": true,
     "primaryKeyboardEnter": true,
-    "long320NoHorizontalOverflow": true,
+    "longCoreChecks": [
+      {
+        "safetyKeyboardReachable": true,
+        "enlarged": false,
+        "stage": "practice",
+        "noticeLength": 300,
+        "responseLength": 0,
+        "actionLength": 151,
+        "noHorizontalOverflow": true,
+        "keyboardActionReachable": true
+      },
+      {
+        "safetyKeyboardReachable": true,
+        "enlarged": true,
+        "stage": "practice",
+        "noticeLength": 300,
+        "responseLength": 0,
+        "actionLength": 151,
+        "noHorizontalOverflow": true,
+        "keyboardActionReachable": true
+      }
+    ],
     "errors": []
   },
   {
     "id": "makeRoom",
     "viewport": "390x844",
     "overflow": false,
-    "primaryBottom": 735.75,
-    "stopBottom": 788.75,
+    "primaryBottom": 743.59375,
+    "stopBottom": 796.59375,
     "practiceTaken": false,
     "clicks": 4,
     "animations": 0,
@@ -47,7 +89,28 @@
     "saveErrorHonest": true,
     "resumeAfterChoices": true,
     "primaryKeyboardEnter": true,
-    "long320NoHorizontalOverflow": true,
+    "longCoreChecks": [
+      {
+        "safetyKeyboardReachable": true,
+        "enlarged": false,
+        "stage": "practice",
+        "noticeLength": 108,
+        "responseLength": 0,
+        "actionLength": 151,
+        "noHorizontalOverflow": true,
+        "keyboardActionReachable": true
+      },
+      {
+        "safetyKeyboardReachable": true,
+        "enlarged": true,
+        "stage": "practice",
+        "noticeLength": 108,
+        "responseLength": 0,
+        "actionLength": 151,
+        "noHorizontalOverflow": true,
+        "keyboardActionReachable": true
+      }
+    ],
     "errors": []
   }
 ]

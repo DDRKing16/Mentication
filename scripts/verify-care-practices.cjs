@@ -34,45 +34,46 @@ async function customNotice(p,id){
   const labels={selfCompassion:'The critical line',unhook:'The sticky thought',makeRoom:'The feeling'};
   const words={selfCompassion:'I ruined the meeting.',unhook:'They will judge my presentation.',makeRoom:'Worry'};
   await p.getByRole('textbox',{name:labels[id],exact:true}).fill(words[id]);
-  await click(p,{selfCompassion:'Find a kinder response',unhook:'Work with this thought',makeRoom:'Find a steady point nearby'}[id]);
+  await click(p,{selfCompassion:'Try a voice on my side',unhook:'Work with this thought',makeRoom:'Find a steady point nearby'}[id]);
   return words[id];
 }
 async function practice(p,id){
+  await p.locator('.pf-core').waitFor();
   if(id==='selfCompassion'){
-    await click(p,'Use my own words');await p.getByRole('textbox',{name:'A compassionate response',exact:true}).fill('One hard meeting is not the whole of me. I can repair one thing.');
-    await click(p,'Let this be my response');await click(p,'A gentle voice');await click(p,'I have tried saying these words');
-    assert.match(await p.locator('.compassion-lantern').innerText(),/repair one thing/);
+    await click(p,'Write a response I can believe');
+    await p.getByRole('textbox',{name:'A response I can believe',exact:true}).fill('One hard meeting is not the whole of me. I can repair one thing.');
+    await click(p,'Use these words');await click(p,'Gentle');
+    assert.match(await p.locator('.pf-response h1').innerText(),/repair one thing/);
+    assert.equal(await p.getByText('Try a tone',{exact:true}).count(),1);
   }else if(id==='unhook'){
-    const near=await p.locator('.unhook-thought').innerText();
-    await click(p,'Add “I am noticing the thought…”');
-    assert.match(await p.locator('.unhook-thought').innerText(),/I am noticing the thought/);
-    assert.match(near,/They will judge my presentation/);
-    await click(p,'Let it sit beside my attention');
-    assert.equal(await p.locator('.unhook-field.is-beside').count(),1);
+    const exact=await p.locator('.pf-thought h1').innerText();
+    await click(p,'Notice this as a thought');
+    assert.equal(await p.locator('.pf-thought h1').innerText(),exact);
+    assert.equal(await p.locator('h1').evaluate(e=>document.activeElement===e),true);
     await click(p,'Something I can see');await click(p,'Name what I notice');
     await p.getByLabel('An object or colour nearby',{exact:true}).fill('The blue mug');
-    await click(p,'I have noticed this in the room');
-    assert.match(await p.locator('.unhook-attention').innerText(),/The blue mug/);
-    assert.equal(await p.getByLabel('An object or colour nearby',{exact:true}).count(),0);
+    assert.match(await p.locator('.pf-attention').innerText(),/The blue mug/);
+    assert.equal(await p.locator('.pf-thought h1').innerText(),exact);
   }else{
-    await click(p,'Something I can see');
+    assert.equal(await p.getByRole('button',{name:'A little',exact:true}).isDisabled(),true);
+    await click(p,'Something I can see');await click(p,'Name it');
     await p.getByLabel('An object or colour nearby',{exact:true}).fill('The blue mug');
-    await click(p,'Try a little room with this anchor');
-    const feeling=await p.locator('.room-feeling').innerText();
-    const before=await p.locator('.room-rings i').first().boundingBox();
-    await click(p,'Just a little room');
-    const after=await p.locator('.room-rings i').first().boundingBox();
-    assert.ok(after.width>before.width);
-    assert.equal(await p.locator('.room-feeling').innerText(),feeling);
-    await click(p,'Return attention to The blue mug');
-    assert.equal(await p.locator('.room-field.is-anchored').count(),1);
+    const feeling=await p.locator('.pf-feeling h1').innerText();
+    const before=await p.locator('.pf-feeling').boundingBox();
+    const boundary=await p.locator('.pf-space-boundary').boundingBox();
+    await click(p,'A little');
+    const after=await p.locator('.pf-feeling').boundingBox();
+    assert.equal(after.width,before.width);assert.equal(after.height,before.height);
+    assert.ok((await p.locator('.pf-space-boundary').boundingBox()).width>boundary.width);
+    assert.equal(await p.locator('.pf-feeling h1').innerText(),feeling);
   }
+  assert.equal(await p.evaluate(key=>JSON.parse(localStorage.getItem(key)).experience.practiceTaken,store),false);
 }
-async function continueAction(p,id){
-  await click(p,{selfCompassion:'Choose one act of care',unhook:'Choose where I go next',makeRoom:'Choose a step with the feeling here'}[id]);
-  await p.locator('.care-action-choices button').first().click();
-  await p.getByLabel('My next step',{exact:true}).fill('Open the blue document');
-  await click(p,'Keep this as my next step');
+async function continueAction(p){
+  await p.locator('.pf-next summary').click();
+  await p.getByLabel('Or my own step',{exact:true}).fill('Open the blue document');
+  await p.locator('.pf-next summary').click();
+  await p.locator('.pf-primary').focus();await p.keyboard.press('Enter');
 }
 async function patchStorage(p,mode){
   await p.evaluate(({mode,savedStore})=>{
@@ -109,7 +110,7 @@ async function integratedCompletion(p,id){
    assert.equal(await p.locator('h1').evaluate(e=>document.activeElement===e),true);
    const draft=await p.evaluate(key=>JSON.parse(localStorage.getItem(key)).experience,store);
    assert.equal(draft.notice,words);assert.equal(draft.actionStatus,null);
-   assert.equal(id==='selfCompassion'?draft.responseRead:id==='unhook'?draft.anchorNoticed:draft.attentionFocused,true);
+   assert.equal(draft.practiceTaken,false);assert.equal(draft.responseRead,false);
    await click(p,'Another way');await p.getByRole('dialog').waitFor();
    await p.keyboard.press('Escape');await p.getByRole('dialog').waitFor({state:'hidden'});
    await continueAction(p,id);assert.equal(await p.locator('.care-rating legend').innerText(),question);
@@ -121,17 +122,18 @@ async function integratedCompletion(p,id){
    await p.screenshot({path:path.join(evidence,`${id}-after-takeaway-${width}.png`),fullPage:true});
    if(width===390){await patchStorage(p,'save');await click(p,'Save this card on my device');await p.getByRole('alert').filter({hasText:'has not been saved'}).waitFor();await patchStorage(p,'normal');}
    await click(p,'Save this card on my device');await p.getByText('Saved on this device. You can find it in Return points.',{exact:true}).waitFor();
+   if(width===390){await patchStorage(p,'deleteDraft');await click(p,'Finish');await p.getByRole('alert').filter({hasText:'draft could not be cleared'}).waitFor();assert.equal(await p.locator('[data-care-stage="complete"]').count(),1);assert.notEqual(await p.evaluate(key=>localStorage.getItem(key),store),null);await patchStorage(p,'normal');}
    await integratedCompletion(p,id);
    await p.goto(`${base}/return-points`);assert.match(await p.locator('main').innerText(),/Open the blue document/);
    await p.getByRole('link',{name:'Open practice and saved card',exact:true}).click();await p.locator('[data-care]').waitFor();await click(p,'Open my saved card');
    assert.match(await p.locator('.care-takeaway').innerText(),/Open the blue document/);
-   if(width===390){await patchStorage(p,'deleteSaved');await click(p,'Delete saved card');await p.getByRole('alert').filter({hasText:'could not be deleted'}).waitFor();await patchStorage(p,'normal');}
+   if(width===390){const count=await p.evaluate(()=>JSON.parse(localStorage.getItem('mentation.sessions.v1')||'[]').length);await click(p,'Close card');await p.locator('[data-care]').waitFor({state:'detached'});assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('mentation.sessions.v1')||'[]').length),count);await p.goto(`${base}/return-points`);await p.getByRole('link',{name:'Open practice and saved card',exact:true}).click();await click(p,'Open my saved card');await patchStorage(p,'deleteSaved');await click(p,'Delete saved card');await p.getByRole('alert').filter({hasText:'could not be deleted'}).waitFor();await patchStorage(p,'normal');}
    await click(p,'Delete saved card');assert.equal(await p.evaluate(({key,id})=>JSON.parse(localStorage.getItem(key))[id],{key:savedStore,id}),undefined);
    // Repeat, with both ratings blank and explicit decline. Native keyboard activation remains usable.
    await p.getByRole('button',{name:'Begin',exact:true}).focus();await p.keyboard.press('Enter');await click(p,'Skip rating');
    await click(p,{selfCompassion:'Keep the line in my mind',unhook:'Keep the words in my mind',makeRoom:'Leave the feeling unnamed'}[id]);
-   await click(p,{selfCompassion:'Choose an act of care instead',unhook:'Go straight to a useful action',makeRoom:'Not now — stay with the room'}[id]);
-   if(id==='makeRoom')await click(p,'Choose a next step');
+   await click(p,{selfCompassion:'Choose care without the words',unhook:'Return to the room',makeRoom:'Too much? Return to the room'}[id]);
+   if(id!=='selfCompassion')await click(p,'Choose a next step');
    await click(p,'No next step for now');await click(p,'Skip rating');
    const repeat=await p.evaluate(key=>JSON.parse(localStorage.getItem(key)).experience,store);
    assert.equal(repeat.before,null);assert.equal(repeat.after,null);assert.equal(repeat.practiceTaken,false);assert.equal(repeat.actionStatus,'not-now');
@@ -141,7 +143,19 @@ async function integratedCompletion(p,id){
     await patchStorage(p,'deleteDraft');await p.getByRole('button',{name:'Delete draft and leave',exact:true}).last().click();await p.getByRole('alert').filter({hasText:'draft could not be deleted'}).waitFor();await patchStorage(p,'normal');
     await patchStorage(p,'draft');await click(p,'Continue');await p.getByRole('alert').filter({hasText:'could not save your draft'}).waitFor();await patchStorage(p,'normal');
    }
-   await c.close();note(`PASS ${id} ${width}px: library entry, personal interaction, matched/blank ratings, resume, alternatives, save/return/delete, repeat, consent, keyboard, reduced motion, large text, high contrast${width===390?', storage failures/retries':''}`);
+   if(width!==390)await click(p,'Continue');
+   await click(p,{selfCompassion:'Keep the line in my mind',unhook:'Keep the words in my mind',makeRoom:'Leave the feeling unnamed'}[id]);
+   await click(p,{selfCompassion:'Choose care without the words',unhook:'Return to the room',makeRoom:'Too much? Return to the room'}[id]);
+   if(id!=='selfCompassion')await click(p,'Choose a next step');
+   await p.locator('.care-action-choices button').first().click();await click(p,'I have done this step');await click(p,'Skip rating');
+   const done=await p.evaluate(key=>JSON.parse(localStorage.getItem(key)).experience,store);assert.equal(done.actionStatus,'done');assert.equal(done.practiceTaken,false);
+   if(width===390&&id==='makeRoom'){
+    await click(p,'Practise again');await click(p,'Begin');await click(p,'Skip rating');await click(p,'Leave the feeling unnamed');
+    await p.locator('.pf-next summary').click();await p.getByLabel('Or my own step',{exact:true}).fill('Get water while staying connected to the room');await p.locator('.pf-next summary').click();await p.locator('.pf-primary').click();await click(p,'Skip rating');
+    const roomOnly=await p.evaluate(key=>JSON.parse(localStorage.getItem(key)).experience,store);assert.equal(roomOnly.practiceTaken,false);assert.equal(roomOnly.actionStatus,'planned');assert.equal(roomOnly.allowance,null);
+   }
+   await click(p,'Delete draft and leave');await p.locator('[data-care]').waitFor({state:'detached'});assert.equal(await p.evaluate(key=>localStorage.getItem(key),store),null);
+   await c.close();note(`PASS ${id} ${width}px: library entry, personal interaction, matched/blank ratings, resume, alternatives, save/return/delete, repeat, stopped/done/planned truthfulness, keyboard, reduced motion, large text, high contrast${width===390?', storage failures/retries':''}`);
   }
   assert.deepEqual(errors,[]);
  }finally{await b.close();fs.writeFileSync(path.join(evidence,'browser-checks.txt'),logs.join('\n')+'\n');}
