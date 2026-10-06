@@ -1,3 +1,4 @@
+import { PRACTICE_CATEGORIES, practiceSearchMatches, practiceTimeLabel } from '@/lib/practiceDiscovery';
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,25 +7,13 @@ import { standaloneRouteFor } from "@/lib/standaloneInterventions";
 import { getBrandAtmosphere, getBrandInk, getBrandLogoParts } from "@/lib/interventionBrand";
 import { INTERVENTIONS } from "@/lib/interventions";
 
-const CATEGORY_ORDER = ["calm", "lift", "ground", "focus", "reset", "sleep"];
-const CATEGORY_LABELS = {
-  calm: "Calm",
-  lift: "Lift",
-  ground: "Ground",
-  focus: "Focus",
-  sleep: "Sleep",
-};
-const CATEGORY_SHORT = {
-  calm: "Calm",
-  lift: "Lift",
-  ground: "Ground",
-  focus: "Focus",
-  sleep: "Sleep",
-};
+const CATEGORY_ORDER = PRACTICE_CATEGORIES.map(([id]) => id);
+const CATEGORY_LABELS = Object.fromEntries(PRACTICE_CATEGORIES);
+const CATEGORY_SHORT = CATEGORY_LABELS;
 
 // User-friendly filters mapped to existing intervention metadata.
 const FILTERS = [
-  { key: "quick", label: "Quick (≤3 min)", test: (iv) => iv.durationMin <= 3 },
+  { key: "quick", label: "Short start (≤3 min)", test: (iv) => iv.durationMin <= 3 },
   { key: "discreet", label: "Discreet", test: (iv) => iv.discreet },
   { key: "eyesOpen", label: "Eyes open", test: (iv) => iv.eyes === "open" },
   { key: "sleep", label: "Sleep-friendly", test: (iv) => iv.bedtime },
@@ -37,7 +26,7 @@ const DEAR_2100_INTERVENTION = {
   primaryDirection: "lift",
   directions: ["lift"],
   durationMin: 15,
-  why: "A premium 15-minute reflective journey that guides you from avoidance to a real, committed smallest action.",
+  why: "Reflect on what you want, explore what gets in the way, and choose a practical next step at your own pace.",
   discreet: true,
   eyes: "open",
   bedtime: false,
@@ -150,7 +139,7 @@ export default function InterventionLibrary() {
       if (cat && iv.primaryDirection !== cat && !(iv.directions || []).includes(cat)) return false;
       if (activeFilters.length && !activeFilters.every((f) => f.test(iv))) return false;
       if (!term) return true;
-      return iv.name.toLowerCase().includes(term) || (iv.why || "").toLowerCase().includes(term);
+      return practiceSearchMatches(iv, term);
     });
     const map = {};
     list.forEach((iv) => { (map[iv.primaryDirection] = map[iv.primaryDirection] || []).push(iv); });
@@ -277,7 +266,8 @@ export default function InterventionLibrary() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-10">
+        <p className="mt-5 text-sm text-muted-foreground" role="status" aria-live="polite">{grouped.reduce((count, group) => count + group.items.length, 0)} practices shown</p>
+        <div className="mt-5 flex flex-col gap-10">
           {grouped.map((g) => (
             <section key={g.category}>
               <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -287,7 +277,7 @@ export default function InterventionLibrary() {
                 {g.items.map((iv) => {
                   const isKing = iv.isKing;
                   if (!isKing) {
-                    return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={iv.id === "progressive-muscle-relaxation-v2" ? "2–5 min" : `${iv.durationMin}${iv.durationMax ? `–${iv.durationMax}` : ""} min`} why={iv.why} iv={iv} onClick={() => launch(iv)} />;
+                    return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={practiceTimeLabel(iv)} why={iv.why} iv={iv} onClick={() => launch(iv)} />;
                   }
                   return (
                     <button
@@ -308,7 +298,7 @@ export default function InterventionLibrary() {
                           }>
                             {iv.name}
                           </span>
-                          <span className="text-xs text-muted-foreground">· {iv.id === "progressive-muscle-relaxation-v2" ? "2–5" : `${iv.durationMin}${iv.durationMax ? `–${iv.durationMax}` : ""}`} min</span>
+                          <span className="text-xs text-muted-foreground">· {practiceTimeLabel(iv)}</span>
                         </div>
                         <p className={
                           "mt-1 text-sm leading-snug line-clamp-2 " +
@@ -322,7 +312,7 @@ export default function InterventionLibrary() {
                           <div className="mt-3.5 border-t border-[#CE9131]/20 dark:border-[#C99646]/20 pt-2.5">
                             <p className="text-xs italic text-[#7A572E] dark:text-[#C99646] font-medium leading-relaxed flex items-center gap-1.5">
                               <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CE9131] dark:bg-[#C99646] shrink-0" />
-                              Intended for longer durations (15+ minutes) and repeated use.
+                              Take your time. You can leave and return to your local draft.
                             </p>
                           </div>
                         )}
@@ -338,7 +328,7 @@ export default function InterventionLibrary() {
             </section>
           ))}
           {!grouped.length && (
-            <p className="py-12 text-center text-sm text-muted-foreground">No practices match. Try clearing a filter.</p>
+            <div className="py-8 text-center"><p className="text-sm text-muted-foreground">No practices match these choices.</p><button type="button" className="mt-3 min-h-11 underline" onClick={() => { setQ(""); setCat(null); setFilters({}); }}>Clear search and filters</button></div>
           )}
         </div>
       </div>
