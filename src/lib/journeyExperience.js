@@ -28,4 +28,7 @@ export const NEED_ENTRIES = Object.freeze([
   { id: 'tense', label: 'My body feels tense', practice: 'progressive-muscle-relaxation-v2', reason: 'Try release only, or gentle tensing where comfortable.' },
   { id: 'flat', label: 'I want a gentle change', practice: 'changeScene', reason: 'Explore a small change in your surroundings or position.' },
   { id: 'bedtime', label: 'I keep planning at bedtime', practice: 'tomorrowParking', reason: 'Optionally put one unfinished thought aside for later.' },
+  { id: 'harsh-self-talk', label: 'I am being hard on myself', practice: 'selfCompassion', reason: 'Try a fair, believable response to a harsh inner voice, then choose a manageable act of care.' },
+  { id: 'sticky-thought', label: 'I want to step back from a sticky thought', practice: 'unhook', reason: 'Notice and name a thought, then return to a chosen action without having to prove or change the thought.' },
+  { id: 'feeling-struggle', label: 'I am struggling with a feeling', practice: 'makeRoom', reason: 'Try giving a manageable feeling a little room, or look around and choose a useful next step.' },
 ]);

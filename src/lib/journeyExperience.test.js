@@ -26,6 +26,19 @@ describe('explicit takeaways', () => {
     }
     for (const need of NEED_ENTRIES) expect(ACTIVE_INTERVENTION_IDS).toContain(need.practice);
   });
+  it('offers distinct care entry choices while preserving the existing suggestions', () => {
+    expect(NEED_ENTRIES.slice(0, 6).map(({ id, practice }) => [id, practice])).toEqual([
+      ['overwhelmed', 'signalLock'], ['starting', 'nextAction'], ['thought', 'factCheck'],
+      ['tense', 'progressive-muscle-relaxation-v2'], ['flat', 'changeScene'], ['bedtime', 'tomorrowParking'],
+    ]);
+    expect(NEED_ENTRIES.slice(6).map(({ practice }) => practice)).toEqual(['selfCompassion', 'unhook', 'makeRoom']);
+    expect(new Set(NEED_ENTRIES.map(({ id }) => id)).size).toBe(NEED_ENTRIES.length);
+    for (const entry of NEED_ENTRIES.slice(6)) {
+      expect(entry.label.length).toBeGreaterThan(15);
+      expect(entry.reason).not.toMatch(/diagnos|best.fit|optimal|guarantee|will feel/i);
+      expect(JOURNEY_EXPERIENCES[entry.practice].alternative).toBeTruthy();
+    }
+  });
   it('only saves entered content, updates without duplicates, and is excluded from session statistics', async () => {
     expect(() => takeawayStore.save({ interventionId:'boxV2', text:'  ' })).toThrow();
     const record = takeawayStore.save({ interventionId:'boxV2', text:'  I prefer an unforced pace.  ' });
