@@ -1,3 +1,4 @@
+import { THREAT_QUESTIONS, scoreThreatCheck, threatCheckPassed, requiredThreatStep, requiredThreatView, emptyThreatCheck } from "./threat-check.js";
 import { createBookStore } from "./storage.js";
 import { en, hi, As, ia, ht, Sl, A2, O2, nb, Dd, Y1, q1, lv, J1, h, i, La, za, Nn, tt, Rn, Gr, li, X1, Qe, pu, Mx, LE, tb, Dx, Lx, zx, Rt, Zn, W1, Q1, Ke, hu, F1, fu, ta, Z1, QE, ZE, qE, XE, rb, G1, e2, n2, t2, r2, o2, bs, av, Uh, K1, $1, ob, H1, Bh, Vh, _p, eb, B1, $E, BE, HE, GE, UE, KE, YE, ov } from "./vendor.js";
 const _e = en().max(2e3),
@@ -65,6 +66,7 @@ const _e = en().max(2e3),
   }).strict(),
   os = hi({
     format: Sl(7),
+    threatCheck: hi({answers: As(ht().int().min(0).max(3).nullable()).length(4), submitted: A2()}).nullable().default(null),
     resume: hi({ view: en(), section: en(), planTab: en(), threat: ht().int().min(0).max(3), road: en(), checkpoint: ht().int().min(0).max(2) }).default({view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0}),
     reflectionDraft: hi({ chapterId: en().uuid(), action: _e, result: ia(["less","same","more","unclear"]), observed: _e, learned: _e, next: _e, actualDiscomfort: ht().min(0).max(10).nullable(), afterLikelihood: ht().min(0).max(100).nullable(), goalStateAfter: ht().min(0).max(10).nullable() }).nullable().default(null),
     step: ht().int().min(0).max(9),
@@ -167,6 +169,7 @@ const z2 = {
   },
   Co = () => ({
     format: 7,
+    threatCheck: null,
     resume: {view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0},
     reflectionDraft: null,
     step: 0,
@@ -205,7 +208,7 @@ const z2 = {
   }, {
     phase: "Pattern",
     title: "Threat detection",
-    cue: "Explore the four phases. No answer needed."
+    cue: "Explore the four phases, then answer four questions."
   }, {
     phase: "Pattern",
     title: "My response to fear",
@@ -232,10 +235,10 @@ const z2 = {
     cue: "Review, then save your chapter."
   }];
 function Bp(e) {
-  return Hx.map((t, n) => e.barrierFocus === "practical" && (n === 2 || n === 3) ? {
+  return Hx.map((t, n) => e.barrierFocus === "practical" && n === 3 ? {
     phase: "Pattern",
-    title: n === 2 ? "Work with the real barrier" : "What would help?",
-    cue: n === 2 ? "Make room for your actual circumstances." : "Name a useful resource or adjustment."
+    title: "What would help?",
+    cue: "Name a useful resource or adjustment."
   } : e.barrierFocus === "practical" && n === 6 ? {...t,title:"Make room for support",cue:"Check the practical support your step needs."} : t);
 }
 function jr(e) {
@@ -278,6 +281,7 @@ function $u(e) {
   return !!(t && JSON.stringify(t.answers) === JSON.stringify(e.answers) && t.scheduledLabel === e.scheduledLabel);
 }
 function Y2(e, t, n) {
+  if (!threatCheckPassed(e)) throw new Error("Complete the four-question threat-system check with at least 3 of 4 correct first.");
   if (!_t(1, e.answers) || !_t(6, e.answers) || !_t(9, e.answers)) throw new Error("Complete your direction, values and plan first.");
   if ($u(e)) return e.committed && e.step === 9 && e.furthestStep === 9 ? e : {
     ...e,
@@ -1479,10 +1483,27 @@ class nN {
   }
 }
 const ge = new nN();
+function ThreatCheck({check, onCheck}) {
+  const root = h.useRef(null);
+  const value = check || emptyThreatCheck(), score = scoreThreatCheck(value);
+  const complete = score !== null, passed = value.submitted && complete && score >= 3;
+  return i.jsxs("section", {ref:root, className:"threat-understanding-check", "aria-label":"Threat-system understanding check", children:[
+    i.jsx("h2",{children:"Check what you took away"}),
+    i.jsx("p",{children:"Answer all four questions. Get at least 3 of 4 correct (75%) to continue. This checks understanding of this screen, not your mental health."}),
+    ...THREAT_QUESTIONS.map((question,index)=>i.jsxs("fieldset",{children:[
+      i.jsx("legend",{children:`${index+1}. ${question.question}`}),
+      ...question.options.map((option,answer)=>i.jsxs("label",{children:[i.jsx("input",{type:"radio",name:`threat-check-${question.id}`,value:answer,checked:value.answers[index]===answer,onChange:()=>onCheck({answers:value.answers.map((old,key)=>key===index?answer:old),submitted:false})}),i.jsx("span",{children:option})]},answer)),
+      value.submitted && i.jsxs("p",{className:"threat-check-feedback",children:[i.jsx("strong",{children:value.answers[index]===question.correct?"Matched the screen. ":"Review this takeaway. "}),question.explanation]})
+    ]},question.id)),
+    value.submitted && i.jsx("p",{role:"status",children:`${score} of 4 correct (${score*25}%). ${passed?"You can continue.":"Review the explanations and try again."}`}),
+    i.jsx("button",{type:"button",className:"secondary-button",disabled:!complete || value.submitted,onClick:()=>onCheck({...value,submitted:true}),children:"Check my answers"}),
+    value.submitted && !passed && i.jsx("button",{type:"button",className:"secondary-button",onClick:()=>{onCheck(emptyThreatCheck());requestAnimationFrame(()=>root.current?.querySelector("input")?.focus());},children:"Try the four questions again"})
+  ]});
+}
 function rN({
   phases: e,
   onLearn: t,
-  phase = 0, onPhase = () => {}
+  phase = 0, onPhase = () => {}, check, onCheck
 }) {
   const n = phase, r = onPhase,
     o = h.useRef(null),
@@ -1675,7 +1696,7 @@ function rN({
           size: 14
         })]
       })]
-    }, `detail-${n}`)]
+    }, `detail-${n}`), i.jsx(ThreatCheck, {check, onCheck})]
   });
 }
 function oN({
@@ -2732,7 +2753,7 @@ function kN({
   onLearn: r,
   futureWalk: o,
   onFutureWalkChange: s,
-  focusRequest: a, onResumeChange
+  focusRequest: a, onResumeChange, onThreatCheck
 }) {
   const l = t.answers,
     c = yN(l),
@@ -3109,62 +3130,11 @@ function kN({
           })
         })]
       })]
-    }), e === 3 && l.barrierFocus === "practical" && i.jsxs(i.Fragment, {
-      children: [i.jsxs("h1", {
-        id: "screen-title",
-        children: ["Work with the ", i.jsx("em", {
-          children: "real barrier."
-        })]
-      }), i.jsx("p", {
-        className: "lede",
-        children: "What would make this possible within your actual life?"
-      }), i.jsxs("div", {
-        className: "practical-bridge",
-        "aria-label": "From my ambition to what would help",
-        children: [i.jsxs("div", {
-          children: [i.jsx("small", {
-            children: "WHAT I WANT"
-          }), i.jsx("p", {
-            children: l.want
-          })]
-        }), i.jsx("span", {
-          className: "practical-bridge-link",
-          "aria-hidden": "true",
-          children: i.jsx(Qe, {
-            size: 17
-          })
-        }), i.jsxs("div", {
-          children: [i.jsx("small", {
-            children: "WHAT NEEDS ROOM"
-          }), i.jsx("p", {
-            children: l.practicalNote || "Time, resources, energy or support."
-          })]
-        })]
-      }), i.jsx("p", {
-        className: "practical-intro-copy",
-        children: "A real constraint is not a failure of courage. Support, a smaller version, or choosing a deliberate pause can all be useful. Next, choose what would help."
-      }), i.jsxs("button", {
-        type: "button",
-        className: "practical-fear-link",
-        onClick: () => {
-          n("barrierFocus", "both"), ge.cue(), window.scrollTo({
-            top: 0,
-            behavior: "instant"
-          }), requestAnimationFrame(() => {
-            var m;
-            return (m = document.getElementById("screen-title")) == null ? void 0 : m.focus({
-              preventScroll: !0
-            });
-          });
-        },
-        children: ["Fear is part of this too ", i.jsx(tt, {
-          size: 15
-        })]
-      })]
-    }), e === 3 && l.barrierFocus !== "practical" && i.jsx(i.Fragment, {
+    }), e === 3 && i.jsx(i.Fragment, {
       children: i.jsx(rN, {
         phases: gN,
         phase:t.resume.threat, onPhase:threat=>onResumeChange({threat}),
+        check:t.threatCheck, onCheck:onThreatCheck,
         onLearn: r
       })
     }), e === 4 && l.barrierFocus === "practical" && i.jsxs(i.Fragment, {
@@ -3577,6 +3547,11 @@ function SN() {
     an = Bp(D),
     Gt = jr(D),
     pi = e.chapters.find(E => E.id === (f || e.activeChapterId));
+  h.useEffect(() => {
+    if (I && (requiredThreatView(e,n) !== n || n === "journey" && e.step > 3 && !threatCheckPassed(e))) {
+      t(book=>({...book,step:3})); r("journey");
+    }
+  }, [I,e,n]);
   const Ne = update => {
     const next = typeof update === "function" ? update(re) : update;
     setReflection(next);
@@ -3620,7 +3595,8 @@ function SN() {
           sessionStorage.removeItem(fo);
         } catch {}
       }
-      t(A), r(A.resume.view), s(A.resume.section), J({road:A.resume.road,checkpoint:A.resume.checkpoint}), A.reflectionDraft && setReflection(A.reflectionDraft), $.current = A, P.current = E.version, me.current = JSON.stringify(A), C("saved"), R(""), B(!0), sn.current = !0;
+      if (requiredThreatView(A,A.resume.view) !== A.resume.view || A.resume.view === "journey") A.step = requiredThreatStep(A,A.step);
+      t(A), r(requiredThreatView(A,A.resume.view)), s(A.resume.section), J({road:A.resume.road,checkpoint:A.resume.checkpoint}), A.reflectionDraft && setReflection(A.reflectionDraft), $.current = A, P.current = E.version, me.current = JSON.stringify(A), C("saved"), R(""), B(!0), sn.current = !0;
     } catch (E) {
       C("error"), R(E instanceof Error ? E.message : "Your book could not be opened.");
     }
@@ -3732,7 +3708,7 @@ function SN() {
         }), ge.cue();
         return;
       }
-      const A = Math.max(0, Math.min(9, E));
+      const A = requiredThreatStep($.current, Math.max(0, Math.min(9, E)));
       t(X => ({
         ...X,
         step: A,
@@ -3748,6 +3724,7 @@ function SN() {
       });
     },
     oo = E => {
+      if (requiredThreatView($.current,E) !== E) { Ct(3); return; }
       ie(!1), u(!1), w(!1), E === "home" && s("start"), r(E), ge.cue(), window.scrollTo({
         top: 0,
         behavior: "instant"
@@ -3757,6 +3734,7 @@ function SN() {
       Y(await ge.enable(E));
     },
     qx = () => {
+      if (ue === 3 && !threatCheckPassed(e)) return;
       if (!_t(ue, D)) {
         m(A => A + 1);
         const E = document.querySelector(".needs-answer textarea, .flow-value-grid button:not([aria-pressed='true'])");
@@ -3782,6 +3760,7 @@ function SN() {
     },
     Qx = async () => {
       if (!d) {
+        if (!threatCheckPassed(e)) { Ct(3); return; }
         if (!_t(1, D)) {
           bn(1);
           return;
@@ -3811,6 +3790,7 @@ function SN() {
     },
     Cl = async () => {
       if (d) return;
+      if (!threatCheckPassed(e)) { Ct(3); return; }
       p(true);
       try {
         const book = Y2($.current,gc(),new Date().toISOString());
@@ -3928,10 +3908,10 @@ function SN() {
         Ef(A);
       }
     },
-    ss = n === "journey" && ue === 3 && D.barrierFocus !== "practical",
+    ss = n === "journey" && ue === 3,
     nw = F2.findIndex(E => ue >= E.range[0] && ue <= E.range[1]),
     rw = {
-      2: D.barrierFocus === "practical" ? "Next: What would help?" : "Next: Understand the alarm",
+      2: "Next: Understand the alarm",
       3: D.barrierFocus === "practical" ? "Next: choose what would help" : "Next: my response to fear",
       4: "Explore my two futures",
       5: "Choose what matters to me",
@@ -3986,7 +3966,8 @@ function SN() {
         execute: async Lt => {
           const Ir = Lt == null ? void 0 : Lt.view;
           if (Ir !== "cover" && Ir !== "home" && Ir !== "journey" && Ir !== "plan" && Ir !== "book") throw new Error("Choose cover, home, journey, plan, or book.");
-          const Rf = Ir === "journey" && $.current.step >= 9 ? "plan" : Ir;
+          const Rf = requiredThreatView($.current, Ir === "journey" && $.current.step >= 9 ? "plan" : Ir);
+          if (Rf === "journey") t(book=>({...book,step:requiredThreatStep(book,book.step)}));
           return r(Rf), await new Promise(sw => requestAnimationFrame(() => requestAnimationFrame(() => sw()))), {
             view: Rf
           };
@@ -4225,20 +4206,21 @@ function SN() {
           futureWalk: ee,
           onFutureWalkChange: J,
           onResumeChange: patch => t(book=>({...book,resume:{...book.resume,...patch}})),
+          onThreatCheck: threatCheck => t(book=>({...book,threatCheck})),
           focusRequest: k
         }, ue), ue < 9 && i.jsxs("footer", {
           className: "flow-actions",
           children: [i.jsx("span", {
             className: "save-status",
             id: "continue-guidance",
-            children: ue === 3 ? "Explore at your pace · no written answer on this screen" : i.jsxs(i.Fragment, {
+            children: ue === 3 ? (threatCheckPassed(e) ? "Understanding check passed · 75% or more" : "Answer all four questions · 3 of 4 correct to continue") : i.jsxs(i.Fragment, {
               children: [i.jsx(pu, {
                 size: 12
               }), _t(ue, D) ? j === "saved" ? "Saved privately" : j === "saving" ? "Saving…" : j === "loading" ? "Opening…" : "Not saved yet" : G2(ue, D)]
             })
           }), i.jsxs("button", {
             className: "primary-button " + (ss ? "cream-button" : "") + (_t(ue, D) ? "" : " needs-input"),
-            disabled: Kn,
+            disabled: Kn || ue === 3 && !threatCheckPassed(e),
             "aria-describedby": "continue-guidance",
             onClick: qx,
             children: [_t(ue, D) ? x ? "Return to my plan" : rw[ue] : ue === 8 && D.action.trim() ? "Next: my response to fear" : ue === 6 ? "Choose my values above" : "Answer above to continue", i.jsx(Qe, {
