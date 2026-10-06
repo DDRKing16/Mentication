@@ -1,5 +1,178 @@
 @import '@fontsource/eb-garamond/400.css';
 @import '@fontsource/hanken-grotesk/400.css';
 @import '@fontsource/hanken-grotesk/500.css';
-.tapping-experience{--tap-ink:#ece2d2;--tap-gold:#d9b577;--tap-bg:#1e3c42;box-sizing:border-box;min-height:100dvh;color:var(--tap-ink);background:radial-gradient(ellipse at 50% 42%,#2d5050 0%,#1e3c42 55%,#142e36 100%);font:400 16px/1.45 'Hanken Grotesk',sans-serif;padding:env(safe-area-inset-top) 22px env(safe-area-inset-bottom);isolation:isolate}
-.tapping-experience *{box-sizing:border-box}.tap-wrap{max-width:460px;margin:auto;padding-bottom:24px}.tap-header{display:flex;align-items:center;justify-content:space-between;height:76px}.tap-wordmark{font:400 27px 'EB Garamond',serif;letter-spacing:-1.2px}.tap-wordmark>span{font:10px sans-serif;vertical-align:top;letter-spacing:0;margin-left:3px}.tapping-experience button{font:inherit;cursor:pointer;touch-action:manipulation;color:inherit;border:1px solid transparent;min-height:44px;background:none}.tapping-experience button:focus-visible{outline:2px solid #ffda96;outline-offset:4px}.tapping-experience h1:focus{outline:none}.tapping-experience button:disabled{opacity:.5;cursor:wait}.tap-exit{font-size:28px!important;width:44px;color:#d6cdbb!important}.tap-eyebrow{font-size:10px;letter-spacing:2.7px;color:var(--tap-gold);display:flex;gap:12px;align-items:center}.tapping-experience h1{font:400 clamp(36px,9.5vw,46px)/1.06 'EB Garamond',serif;letter-spacing:-.7px;margin:19px 0 10px}.tapping-experience h2{font:400 25px 'EB Garamond',serif;margin:0 0 6px}.tapping-experience p{margin:0 0 16px;color:#e1d9ca}.tap-lead{font-size:15px}.tap-small{font-size:12px!important;line-height:1.5;color:#c6ccbe!important}.tap-kicker{font-size:10px;letter-spacing:2px;color:var(--tap-gold)!important}.tap-silhouette{display:block;width:100%;height:100%;overflow:visible}.tap-intro-art{height:245px;margin:-6px 0 -20px}.tap-intro-art svg{max-width:290px;margin:auto}.tap-choice-area{position:relative}.tap-choice-area>p{font-size:13px;max-width:310px}.tap-choices{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:13px 0}.tap-choices button{padding:15px 12px;border:1px solid #80928360;background:#59726812;border-radius:12px;display:flex;align-items:center;justify-content:space-between;text-align:left;font-size:13px;gap:10px}.tap-choices button span{color:var(--tap-gold)}.tap-choices button:hover,.tap-secondary:hover,.tap-settings button:hover{background:#d7c59812}.tap-primary{width:100%;border-radius:30px;background:#e9d2a7!important;color:#19383c!important;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;font-weight:500!important;min-height:56px!important}.tap-primary:hover{background:#f6dfb2!important}.tap-secondary{border:1px solid #aebaa45c!important;border-radius:28px;padding:11px 20px;min-height:46px!important}.tap-checkin{padding-top:66px}.tap-checkin h1{font-size:43px;margin:20px 0}.tap-checkin>p{font-size:15px}.tap-rating{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:36px}.tap-rating button{border:1px solid #b6b99b80;border-radius:50%;aspect-ratio:1;font-size:21px}.tap-rating button:hover{background:#e9d2a7;color:#19383c}.tap-scale{display:flex;justify-content:space-between;gap:20px;font-size:11px;color:#d6d0bf;margin:16px 0 38px}.tap-checkin>.tap-secondary{width:100%}.tap-reveal{animation:tap-arrive .65s ease-out}.tap-reveal>.tap-kicker{margin:25px 0 0}.tap-reveal h1{font-size:37px;margin-top:12px}.tap-ready-art{height:285px;margin:-10px -10px -12px}.tap-ready-copy>p{font-size:14px}.tap-settings{display:flex;flex-wrap:wrap;gap:4px;margin:14px 0}.tap-settings button{font-size:11px;border:1px solid #9ca99060;border-radius:20px;padding:7px 10px}.tap-round-meta{display:flex;justify-content:space-between;margin-top:26px;color:var(--tap-gold);font-size:10px;letter-spacing:1.6px}.tap-round-title{min-height:96px}.tap-round-title h1{font-size:36px;margin:14px 0 8px}.tap-round-title p{font-size:14px;max-width:325px;min-height:40px}.tap-main-art{height:clamp(265px,43dvh,420px);position:relative;margin:-5px -12px -3px}.tap-main-art svg{max-width:360px;margin:auto}.tap-art-caption{position:absolute;bottom:4px;width:100%;text-align:center;font-size:8px;letter-spacing:2px;color:#aebdae}.tap-art-caption span{margin:0 8px}.tap-cue{text-align:center;min-height:94px;padding:16px 6px 4px}.tap-cue-label{font-size:9px;letter-spacing:1.8px;color:var(--tap-gold)}.tap-cue p{font:400 23px/1.17 'EB Garamond',serif;margin:9px auto 10px;max-width:340px;color:#f0e7d8}.tap-progress{height:2px;background:#9eac9040;margin:10px 0 18px}.tap-progress span{display:block;height:100%;background:var(--tap-gold);transition:width .7s linear}.tap-controls{display:flex;gap:10px}.tap-controls button{flex:1}.tap-skip{display:block;margin:4px auto 0;font-size:12px!important;color:#c1caba!important}.tap-ripple{animation:tap-pulse 1s ease-out infinite;transform-box:fill-box;transform-origin:center}.tap-still .tap-ripple{animation:none;opacity:.6}.tap-result{text-align:center;padding-top:25px}.tap-result-orbit{width:123px;height:123px;border:1px solid #cdb48255;border-radius:50%;margin:5px auto 25px;display:grid;place-items:center;background:radial-gradient(circle,#d9b57720,transparent 70%);outline:1px solid #cdb48220;outline-offset:12px}.tap-result-orbit span{font:50px 'EB Garamond',serif;color:#e6c68f}.tap-result h1{margin:15px 0}.tap-comparison{display:flex;justify-content:center;align-items:center;gap:34px;margin:24px 0}.tap-comparison div{display:flex;flex-direction:column;gap:5px}.tap-comparison div>span{font-size:11px;letter-spacing:1px}.tap-comparison strong{font:44px 'EB Garamond',serif;color:#ecd4aa}.tap-result>p:not(.tap-kicker){max-width:315px;margin:0 auto 16px;font-size:14px}.tap-result>.tap-secondary{width:100%;margin-top:10px}.tap-result .tap-primary{margin-top:28px}.tap-reduced *{animation:none!important;transition:none!important}@keyframes tap-pulse{0%{transform:scale(.7);opacity:.7}100%{transform:scale(1.55);opacity:0}}@keyframes tap-arrive{from{opacity:.2;transform:translateY(9px)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){.tapping-experience *{animation:none!important;transition:none!important}}@media(max-width:350px){.tapping-experience{padding-left:16px;padding-right:16px}.tap-choices{grid-template-columns:1fr}.tap-rating{grid-template-columns:repeat(5,1fr)}.tap-header{height:64px}}@media(min-width:700px){.tapping-experience{padding-top:20px}.tap-wrap{max-width:420px}}@media(max-height:720px){.tap-header{height:62px}.tap-round-meta{margin-top:14px}.tap-main-art{height:265px}.tap-round-title{min-height:89px}.tap-cue{min-height:80px;padding-top:12px}.tap-intro-art{height:195px}}
+
+.tapping-experience {
+  --tap-ink: #ece2d2;
+  --tap-gold: #e2c08b;
+  --tap-line: #c7c5a62a;
+  --tap-muted: #bac6b8;
+  min-height: 100dvh;
+  color: var(--tap-ink);
+  background: radial-gradient(ellipse at 50% 38%, #2b4845 0, #1e3c42 45%, #112b32 100%);
+  font: 400 15px/1.45 'Hanken Grotesk', sans-serif;
+  padding: env(safe-area-inset-top) 24px env(safe-area-inset-bottom);
+  isolation: isolate;
+}
+.tapping-experience *, .tapping-experience { box-sizing: border-box; }
+.tap-wrap { max-width: 430px; margin: auto; padding-bottom: 24px; }
+.tap-header { height: 70px; display: flex; align-items: center; justify-content: space-between; }
+.tap-wordmark { font: 400 25px/1 'EB Garamond', serif; letter-spacing: -1px; }
+.tap-header-tools { display: flex; align-items: center; gap: 10px; }
+.tapping-experience button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; min-height: 44px; border: 0; background: none; }
+.tapping-experience button:focus-visible, .tapping-experience summary:focus-visible { outline: 2px solid #ffe1a5; outline-offset: 4px; }
+.tapping-experience h1:focus { outline: none; }
+.tapping-experience button:disabled { opacity: .45; cursor: default; }
+.tap-header .journey-options-button { border: 0; padding: 0 4px; font: 400 11px 'Hanken Grotesk', sans-serif; color: #d7d7c7; border-radius: 0; }
+.tap-exit { width: 44px; display: grid; place-items: center; margin-right: -10px; }
+.tap-exit svg { width: 21px; height: 21px; stroke: #cbd1c0; stroke-width: 1.4; fill: none; }
+.tap-eyebrow { color: var(--tap-gold); font-size: 9px; letter-spacing: 1.8px; line-height: 1.5; }
+.tap-eyebrow span { color: #8fa492; margin: 0 5px; }
+.tapping-experience h1 { font: 400 clamp(39px, 10.9vw, 48px)/.98 'EB Garamond', serif; letter-spacing: -.7px; margin: 16px 0 12px; }
+.tapping-experience p { margin: 0; }
+.tap-lead { color: #d5dccc; font-size: 14px; line-height: 1.5; }
+.tap-small { font-size: 11px; line-height: 1.5; color: var(--tap-muted); }
+.tap-primary { width: 100%; min-height: 54px!important; padding: 14px 23px; border-radius: 30px; background: #e8d2a8!important; color: #18363a!important; display: flex; align-items: center; justify-content: space-between; font-weight: 500!important; box-shadow: 0 6px 28px #071e2430; }
+.tap-primary:hover { background: #f1dfbc!important; }
+.tap-primary svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.tap-text-button { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 9px 0; font-size: 12px!important; }
+.tap-text-button:hover { color: var(--tap-gold); }
+.tap-text-button>span { color: var(--tap-gold); }
+.tap-entry h1 { font-size: clamp(45px, 12.3vw, 55px); margin-bottom: 11px; }
+.tap-entry .tap-eyebrow { margin-top: 12px; }
+.tap-intro-art { height: clamp(190px, 31dvh, 280px); margin: 0 -15px -20px; position: relative; }
+.tap-silhouette { width: 100%; height: 100%; display: block; overflow: hidden; pointer-events: none; }
+.tap-choice-area { position: relative; }
+.tap-choice-label { font-size: 9px; letter-spacing: 1.5px; color: var(--tap-gold); margin-bottom: 5px!important; }
+.tap-choices { display: flex; flex-direction: column; margin-bottom: 10px; }
+.tap-choices button { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; min-height: 49px; text-align: left; border-bottom: 1px solid var(--tap-line); font-size: 16px; }
+.tap-choices button:hover { color: var(--tap-gold); }
+.tap-choices svg { width: 20px; height: 20px; stroke: var(--tap-gold); fill: none; stroke-width: 1.2; }
+.tap-entry-footer { display: flex; justify-content: space-between; margin: 22px 0 4px; color: #c9cdb8; font-size: 10px; }
+.tap-checkin { padding: clamp(28px, 6dvh, 62px) 0 24px; }
+.tap-checkin h1 { font-size: clamp(38px, 10.7vw, 47px); line-height: 1.02; max-width: 365px; margin: 20px 0 16px; }
+.tap-rating-visual { height: clamp(72px, 14dvh, 120px); display: flex; align-items: center; justify-content: center; gap: 8px; margin: 15px 0 10px; }
+.tap-rating-visual span { width: 9px; height: 9px; background: #e2c08b; border-radius: 50%; opacity: .45; }
+.tap-rating-visual span:nth-child(2) { width: 30px; height: 30px; background: #e2c08b14; border: 1px solid #e2c08b80; opacity: 1; position: relative; }
+.tap-rating-visual span:nth-child(2)::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tap-gold); position: absolute; inset: 0; margin: auto; }
+.tap-rating { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.tap-rating button { border: 1px solid #cad0b755; border-radius: 12px; min-height: 48px; font: 400 23px 'EB Garamond', serif; }
+.tap-rating button:hover { color: #19383c; background: #e8d2a8; }
+.tap-scale { display: flex; justify-content: space-between; font-size: 10px; color: #c9cdb8; margin: 16px 0 28px; }
+.tap-checkin>.tap-text-button { margin-top: 14px; width: 100%; border-bottom: 1px solid var(--tap-line); }
+.tap-ready { padding-top: 15px; animation: tap-enter .55s ease-out both; }
+.tap-ready h1 { font-size: clamp(36px, 9.7vw, 44px); }
+.tap-reveal-art { height: clamp(205px, 31dvh, 290px); position: relative; margin: -5px -20px -20px; }
+.tap-reveal-light { width: 34px; height: 34px; border: 1px solid #e9cd9640; border-radius: 50%; position: absolute; top: 20%; left: calc(50% - 17px); box-shadow: 0 0 44px #e9cd9615; animation: tap-reveal 1.2s ease-out both; }
+.tap-ready-instruction { display: flex; align-items: center; gap: 18px; margin: 15px 0 12px; }
+.tap-instruction-number { font: 400 29px 'EB Garamond', serif; color: var(--tap-gold); border-right: 1px solid var(--tap-line); padding-right: 16px; }
+.tap-ready-instruction p { font-size: 15px; line-height: 1.5; }
+.tap-ready-instruction strong { font-weight: 400; color: #d0d6c5; }
+.tap-ready-note { max-width: 345px; margin-bottom: 15px!important; }
+.tap-settings-summary { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--tap-line); margin: 15px 0 10px; gap: 15px; }
+.tap-settings-summary>span { font-size: 10px; color: var(--tap-muted); }
+.tap-settings-summary button { gap: 12px; }
+.tap-settings { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 14px; }
+.tap-settings button { border: 1px solid #d4cda442; border-radius: 22px; padding: 9px 12px; font-size: 11px; }
+.tap-settings p { width: 100%; margin-top: 3px; }
+.tap-stage-round .tap-wrap { padding-bottom: 12px; }
+.tap-round { display: flex; flex-direction: column; min-height: calc(100dvh - 82px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+.tap-round-meta { display: flex; align-items: center; justify-content: space-between; color: var(--tap-gold); font-size: 9px; letter-spacing: 1.5px; margin-top: 11px; }
+.tap-round-title h1 { font-size: clamp(32px, 9vw, 40px); line-height: 1; margin: 12px 0 7px; }
+.tap-round-title p { color: #d7dccb; font-size: 13px; line-height: 1.45; max-width: 350px; min-height: 38px; }
+.tap-main-art { flex: 1; min-height: 250px; height: clamp(245px, 39dvh, 430px); margin: 12px -15px 0; position: relative; padding-bottom: 32px; animation: tap-enter .45s ease-out; }
+.tap-frame-crown, .tap-frame-brow, .tap-frame-sideEye, .tap-frame-underEye, .tap-frame-nose, .tap-frame-chin { padding-left: 20px; padding-right: 20px; }
+.tap-main-art svg { mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 90%, transparent); }
+.tap-art-caption { position: absolute; right: 10px; top: 7px; font-size: 7px; letter-spacing: 1.6px; color: #c5cebb; writing-mode: vertical-rl; }
+.tap-art-caption span { margin: 7px 0; }
+.tap-rhythm { position: absolute; left: 0; right: 0; bottom: 2px; display: flex; justify-content: center; gap: 10px; align-items: center; color: #d5d8c4; font-size: 10px; }
+.tap-rhythm>span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--tap-gold); box-shadow: 0 0 0 5px #e2c08b12; }
+.tap-beating { animation: tap-beat .86s ease-out; }
+.tap-cue { text-align: center; margin: 13px 0 12px; min-height: 75px; }
+.tap-cue-label { color: var(--tap-gold); font-size: 8px; letter-spacing: 1.6px; margin-bottom: 7px; }
+.tap-cue p { font: 400 24px/1.12 'EB Garamond', serif; max-width: 365px; margin: auto; }
+.tap-progress { display: flex; gap: 5px; margin: 0 0 15px; }
+.tap-progress span { flex: 1; height: 2px; background: #cfcca638; border-radius: 2px; }
+.tap-progress span.done { background: #e2c08b9e; }
+.tap-progress span.current { background: #f0ddb4; box-shadow: 0 0 9px #e2c08b20; }
+.tap-controls { display: flex; gap: 12px; align-items: center; }
+.tap-controls>.tap-primary, .tap-controls>.tap-pause { flex: 1; min-height: 47px!important; padding: 10px 22px; }
+.tap-pause { display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2c08b60!important; border-radius: 30px; color: #e8d2a8!important; }
+.tap-pause svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.tap-stop { padding: 8px 6px; min-width: 90px; font-size: 12px!important; color: #d8dccb!important; }
+.tap-skip { margin: 3px auto -5px; font-size: 10px!important; color: var(--tap-muted)!important; }
+.tap-point-core { transform-box: fill-box; transform-origin: center; }
+.tap-alive .tap-point-core { animation: tap-beat .86s ease-out; }
+.tap-ripple { transform-box: fill-box; transform-origin: center; }
+.tap-alive .tap-ripple { animation: tap-ripple .86s ease-out; }
+.tap-still .tap-ripple { opacity: .4; }
+.tap-result { padding: 38px 0 0; }
+.tap-result h1 { font-size: clamp(45px, 12vw, 54px); margin: 20px 0 34px; }
+.tap-comparison { display: flex; align-items: center; gap: 27px; margin: 0 0 34px; padding: 21px 0 27px; border-top: 1px solid var(--tap-line); border-bottom: 1px solid var(--tap-line); }
+.tap-comparison>div { display: flex; flex-direction: column; gap: 10px; }
+.tap-comparison>div>span { font-size: 10px; color: var(--tap-muted); }
+.tap-comparison strong { font: 400 62px/1 'EB Garamond', serif; color: var(--tap-gold); }
+.tap-comparison svg { width: 60px; stroke: #b7bba2; stroke-width: .8; fill: none; }
+.tap-result>p:not(.tap-eyebrow):not(.tap-small) { font-size: 15px; line-height: 1.55; max-width: 330px; margin-bottom: 12px; }
+.tap-result-actions { margin-top: 30px; }
+.tap-result-actions>.tap-text-button { width: 100%; border-bottom: 1px solid var(--tap-line); padding: 14px 0; }
+.tapping-experience .journey-takeaway { border: 0; border-radius: 0; padding: 0; margin: 20px 0 0; font: 400 12px/1.5 'Hanken Grotesk', sans-serif; }
+.tapping-experience .journey-takeaway summary { min-height: 44px; color: #d5d9c8; font-size: 12px; padding-top: 11px; }
+.tapping-experience .journey-takeaway p { font: inherit; color: var(--tap-muted); margin: 10px 0; }
+.tapping-experience .journey-takeaway button { border: 1px solid #b5bba15c; border-radius: 24px; padding: 10px 15px; font: inherit; }
+.tapping-experience .journey-takeaway textarea { border-color: #c9cda655; background: #f4efdf; font: 400 14px/1.5 'Hanken Grotesk', sans-serif; }
+.tap-storage { border-top: 1px solid var(--tap-line); margin-top: 16px; color: var(--tap-muted); font-size: 10px; }
+.tap-storage summary { padding: 13px 0; min-height: 44px; cursor: pointer; }
+.tap-storage p { margin: 0 0 8px; }
+.tap-storage button { text-decoration: underline; padding: 8px 0; font-size: 11px; }
+.tap-error-note { font-size: 12px; line-height: 1.5; color: #ffe0b3; margin: 10px 0!important; padding: 10px 0; }
+@keyframes tap-enter { from { opacity: .2; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes tap-reveal { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes tap-beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.35); } 55% { transform: scale(1); } }
+@keyframes tap-ripple { from { opacity: .65; transform: scale(.7); } to { opacity: 0; transform: scale(1.8); } }
+.tap-reduced *, .reduce-motion .tapping-experience * { animation: none!important; transition: none!important; }
+@media (prefers-reduced-motion: reduce) { .tapping-experience * { animation: none!important; transition: none!important; } }
+@media (max-height: 740px) {
+  .tap-header { height: 58px; }
+  .tap-entry .tap-eyebrow { margin-top: 5px; }
+  .tap-intro-art { height: 185px; }
+  .tap-entry h1 { font-size: 44px; }
+  .tap-entry-footer { margin-top: 14px; }
+  .tap-main-art { min-height: 200px; height: 245px; margin-top: 4px; }
+  .tap-cue { min-height: 68px; margin-top: 8px; }
+  .tap-cue p { font-size: 22px; }
+  .tap-round { min-height: calc(100dvh - 70px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+  .tap-reveal-art { height: 210px; }
+}
+@media (max-width: 350px) {
+  .tapping-experience { padding-left: 20px; padding-right: 20px; }
+  .tap-eyebrow { font-size: 8px; letter-spacing: 1.3px; }
+  .tap-header-tools { gap: 5px; }
+  .tap-rating { gap: 6px; }
+  .tap-rating button { min-height: 44px; font-size: 21px; }
+  .tap-main-art { min-height: 185px; }
+  .tap-round-title p { font-size: 12px; }
+  .tap-cue p { font-size: 21px; }
+  .tap-checkin h1 { font-size: 36px; }
+}
+.large-text .tapping-experience { font-size: 18px; }
+.large-text .tap-lead, .large-text .tap-ready-instruction p,
+.large-text .tap-round-title p, .large-text .tap-result>p:not(.tap-eyebrow) { font-size: 16px; }
+.large-text .tap-cue p { font-size: 26px; }
+.large-text .tap-small { font-size: 14px!important; }
+.large-text .tap-main-art { min-height: 260px; }
+.high-contrast .tapping-experience { --tap-muted: #eee9d9; --tap-line: #eee9d980; }
+@media (min-width: 700px) { .tap-wrap { max-width: 420px; } }
+
+@media (max-height: 680px) {
+  .tap-main-art { height: 190px; min-height: 170px; }
+  .tap-round-meta { margin-top: 5px; }
+  .tap-round-title h1 { margin-top: 9px; font-size: 30px; }
+  .tap-round-title p { min-height: 32px; }
+  .tap-cue { min-height: 62px; }
+}
+/* Position the vector within the allocated practice frame. Its intrinsic
+   viewBox must not increase the flex row and push stop controls off-screen. */
+.tap-main-art > svg { position: absolute; left: 0; top: 0; width: 100%; height: calc(100% - 32px); }
+.tap-frame-crown > svg, .tap-frame-brow > svg, .tap-frame-sideEye > svg,
+.tap-frame-underEye > svg, .tap-frame-nose > svg, .tap-frame-chin > svg { left: 20px; width: calc(100% - 40px); }

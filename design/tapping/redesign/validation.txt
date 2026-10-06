@@ -1,0 +1,47 @@
+Gentle Tapping v2 validation — 2026-10-06
+Base: 6ce94730424ba67bb27281fc846ce2bec2606949
+Branch: design/tapping-sculpted-v2
+
+Repository checks:
+PASS npm test -- --run --maxWorkers=2: 62 files / 476 tests.
+PASS npm run lint.
+PASS npm run typecheck.
+PASS npm run build: 18.47s. Existing >500kB chunk advisory remains.
+PASS git diff --check.
+
+An initial unrestricted suite run, concurrent with the build and browser checks, timed out one unchanged journeyAccess test at 5s. The full suite subsequently passed with two workers; no test timeout or test implementation was changed.
+
+Browser evidence (execution environment Playwright and /usr/bin/chromium; Vite at http://localhost:5174):
+
+integrated:
+320px: integrated entry, two-activation reveal, all 9 automatic points, in-frame markers, matched question, full round, pause/resume, repeat, alternative return, browser restart paused, interrupted post-rating blank, host finish and goal skip; no horizontal overflow or browser errors.
+390px: integrated entry, two-activation reveal, all 9 automatic points, in-frame markers, matched question, full round, pause/resume, repeat, alternative return, browser restart paused, interrupted post-rating blank, host finish and goal skip; no horizontal overflow or browser errors.
+430px: integrated entry, two-activation reveal, all 9 automatic points, in-frame markers, matched question, full round, pause/resume, repeat, alternative return, browser restart paused, interrupted post-rating blank, host finish and goal skip; no horizontal overflow or browser errors.
+
+harness:
+PASS: mobile timed journey; exact before/after; pause/resume; repeat; stop; skip blanks; grounding mode; change-course payload; keyboard; reduced motion; 320/390/430/768 overflow; no browser errors.
+
+edge:
+PASS: 320px journey, audio unavailable fallback, completion rejection/retry, all-skipped rounds incomplete, zero preserved, higher rating removes repeat, exit without completion.
+
+pacing:
+PASS: spacious pacing 16s, background pause freezes 60s, explicit resume continues from same point.
+
+resilience:
+PASS: integrated save failure/retry/delete failure, retained text, no false save; draft-delete/completion failure retains zero; corrupt draft protected and explicitly recoverable; app reduced motion + large text + contrast at 320px; exit without session credit.
+
+cue-browser:
+PASS: explicit gesture activation, independent optional sound/touch, synchronized beat, quiet placement, distinct double point change, immediate cancellation on pause/stop/hidden/alternative/exit/unmount, no replay on resume/repeat, unsupported, silent reset and reduced-motion fallback. Native vibration shape tested with injected APIs in Vitest; physical device sensation not verified.
+
+Actual Web Audio smoke: Chromium gesture activation, actual oscillator generation during the round, pause and exit passed without browser errors. Headless playback does not verify audibility.
+
+Reproduction:
+TAPPING_APP_URL=http://localhost:5174 node design/tapping/redesign/integrated-check.cjs
+TAPPING_APP_URL=http://localhost:5174 node design/tapping/redesign/resilience-check.cjs
+TAPPING_APP_URL=http://localhost:5174 node design/tapping/redesign/cue-check.cjs
+TAPPING_PREVIEW_URL=http://localhost:5174/design/tapping/index.html node design/tapping/browser-check.cjs
+TAPPING_PREVIEW_URL=http://localhost:5174/design/tapping/index.html node design/tapping/edge-check.cjs
+TAPPING_PREVIEW_URL=http://localhost:5174/design/tapping/index.html node design/tapping/pacing-check.cjs
+
+Native light-impact and cancellation paths are exercised with injected APIs in Vitest. Physical iOS haptics, VoiceOver and device audio remain unverified. No claim of detected body taps, clinical dose validation or guaranteed benefit.
+No push, merge or deployment. Shared host files, catalogue and other interventions are unchanged.
