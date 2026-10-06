@@ -1,0 +1,59 @@
+{
+  "passed": [
+    "390px production assets/fonts/art, prepare/rehearse/explicit practice/live support/return/reflection/save/refresh/finish/revisit; prediction result independent of difficulty; no duplicate completion",
+    "320px production assets/fonts/art, prepare/rehearse/explicit practice/live support/return/reflection/save/refresh/finish/revisit; prediction result independent of difficulty; no duplicate completion"
+  ],
+  "pageErrors": [],
+  "failedRequests": [],
+  "captures": [
+    {
+      "file": "live-production-390.png",
+      "bytes": 138282,
+      "sha256": "c1df756acfb45073bab49233f6ae080d7e209a16d001c262235afc4e6b0ae15d",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      }
+    },
+    {
+      "file": "reflection-production-390.png",
+      "bytes": 165911,
+      "sha256": "5e4f6d39936a6e115f89214c3811a841e24efd71aeb183bb6b722b99bbc6951b",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 853,
+        "rootFontSize": "16px"
+      }
+    },
+    {
+      "file": "live-production-320-large.png",
+      "bytes": 163581,
+      "sha256": "742c87119efe82e1e6b5766da32a353dc20fdb803086ef5130e18e42ec4438eb",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1020,
+        "rootFontSize": "24px"
+      }
+    },
+    {
+      "file": "reflection-production-320-large.png",
+      "bytes": 187360,
+      "sha256": "bf531311e95b4c5b79e9208cd9af6f44cb3982ae2a024ca9a1cd35e5cc28b906",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1376,
+        "rootFontSize": "24px"
+      }
+    }
+  ],
+  "fixtureProvenance": "Synthetic browser interaction with authored suggested moves. No user data or real-world outcome claim."
+}

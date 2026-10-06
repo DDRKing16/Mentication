@@ -1,5 +1,5 @@
 {
-  "status": "Practice-first visual gate implemented; full redesign regression testing and parent pixel review pending",
+  "status": "Practice-first implementation complete; visual review approved and regression checks passed. Parent owns host integration and release.",
   "interventionId": "taraTactician",
   "displayName": "Tara Tactician",
   "component": "src/components/tara-tactician/TaraTacticianExperience.jsx",
@@ -74,7 +74,7 @@
     "resetOption": "Add a taraTactician Experience branch and catalogue resolution, forwarding existing ResetFlow callbacks.",
     "standaloneOption": "Register /tara-tactician with a thin host-owned page, normal exit/completion callbacks, and standaloneRouteFor mapping; no iframe is required.",
     "catalogueOwner": "Parent handles catalogue/router/library entry/takeaway/alternatives and associated invariants together.",
-    "existingInvariant": "Current main has 22 FLAGSHIP_IDS, 19 INTERACTIVE_FLAGSHIP_IDS, 17 active catalogue practices and 19 JOURNEY_EXPERIENCES. The historical evidence library remains 18 items. The old 18-flagship membership warning is superseded.",
+    "existingInvariant": "Verified main snapshot 6ce9473 has 22 FLAGSHIP_IDS, 19 INTERACTIVE_FLAGSHIP_IDS, 17 active catalogue practices and 19 JOURNEY_EXPERIENCES. The historical evidence library remains 18 items. The old 18-flagship membership warning is superseded.",
     "coarseOutcome": "Callbacks unchanged. Explicitly allowlist eventStatus and predictionResult enums, legacy predictionComparison enum, and rehearsed boolean if host history needs them; never spread a local record or infer one comparison from the other.",
     "brandThreshold": "Optional host atmosphere: light pale-aqua surface, teal ink and pink accent; current unknown-ID threshold uses its default atmosphere. Parent owns any brand registration.",
     "typecheck": "Existing jsconfig includes ResetFlow and transitively imported components; parent import provides integration typechecking. The isolated component was also production-bundled separately.",
@@ -113,25 +113,28 @@
       "extra onboarding screens"
     ],
     "asset": "public/media/brand/tara-tactician.webp already exists in base repository; no image edit or new dependency",
-    "checkpoint": "design/tara-tactician/screenshots/practice-first-gate/: 14 screen states, full and viewport PNGs, 390px plus 320px with root text enlarged from 16px to 24px; authored synthetic review fixtures only."
+    "checkpoint": "design/tara-tactician/screenshots/practice-first-gate/: 14 screen states, full and viewport PNGs, 390px plus 320px with root text enlarged from 16px to 24px; authored synthetic review fixtures only.",
+    "review": "Independent actual-pixel review approved practice-first gate. Applied sole requested polish: native reflection placeholder is now Choose an answer; unknown action remains available.",
+    "finalProductionCaptures": "design/tara-tactician/verification/: 390px and 320px/150% text live and reflection PNGs, including approved select-placeholder polish."
   },
   "validation": {
-    "checkpointPassed": [
-      "npm run lint",
-      "npm run typecheck",
-      "14 rendered browser states with no page errors or horizontal overflow"
-    ],
-    "historicalBaseline": "Previous implementation passed 17 Tara unit tests, 9 browser scenarios, and all 419 project tests; those results do not validate the new redesign.",
-    "remaining": [
-      "Update old browser harness button contracts",
-      "Add new tactics/predictionResult tests and legacy migration cases",
-      "Full mobile branches, errors, save/refresh/back/revisit/delete/focus/reduced-motion regression",
-      "npm test -- --run",
-      "npm run lint and npm run typecheck again after final edits",
-      "npm run build and isolated production bundle"
-    ],
-    "integrationLimit": "Parent owns catalogue/router and combined app navigation validation.",
+    "unit": "33 Tara state/storage/tactics/prediction-result/legacy-compatibility tests passed",
+    "browser": "20 isolated browser scenarios passed, with no page errors: two meaningful reveals, explicit rehearsal vs selection, all five prediction-result branches, actual action, legacy draft phases and recap revisit, refresh/native Back, quota error/retry, local and app-wide deletion, failed deletion, large text, reduced motion, keyboard/focus, long wording, and duplicate-completion prevention.",
+    "productionBrowser": "2 production mobile flows passed at 390px and 320px/150% text, with no page errors or failed requests. Assets, fonts, art, practise/return/reflection/save/refresh/finish/revisit tested.",
+    "fullProject": {
+      "command": "npm test -- --run",
+      "files": 54,
+      "passed": 435,
+      "failed": 0
+    },
+    "lint": "npm run lint passed",
+    "typecheck": "npm run typecheck passed",
+    "build": "npm run build passed; existing large-chunk warning remains",
+    "isolatedProductionBuild": "Vite build using design/tara-tactician/preview.html input passed, includes Tara and host styles",
+    "diffCheck": "git diff --check passed",
+    "evidence": "design/tara-tactician/verification/",
+    "integrationLimit": "This branch does not register Tara in catalogue/router. Parent must validate final combined navigation, memory/export deletion integration and coarse outcome allowlist.",
     "nativeLimit": "No iOS simulator/device run performed in this Linux executor."
   },
-  "release": "Owner-authorized visual checkpoint on codex/tara-tactician only; no main merge or deployment"
+  "release": "Owner-authorized commits and push to codex/tara-tactician only; no main merge or deployment"
 }
