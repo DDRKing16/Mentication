@@ -50,3 +50,8 @@ describe("read", () => {
     expect(read().reducedMotion).toBe(true);
   });
 });
+
+describe('preference fidelity',()=>{
+ it('retains OS default when only another preference was previously saved',()=>{window.matchMedia=()=>({matches:true});localStorage.setItem('haven.a11y.v2','{"largeText":true}');expect(read().reducedMotion).toBe(true);});
+ it('keeps OS default on unreadable storage and rejects malformed boolean values',()=>{window.matchMedia=()=>({matches:true});localStorage.setItem('haven.a11y.v2','broken');expect(read().reducedMotion).toBe(true);localStorage.setItem('haven.a11y.v2','{"reducedMotion":"false","highContrast":123,"ambientType":"whitenoise"}');expect(read()).toMatchObject({reducedMotion:true,highContrast:false,ambientType:'whitenoise'});});
+});

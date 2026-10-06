@@ -1,6 +1,7 @@
+import {subscribeAccessibilityPreferences} from '@/lib/accessibilitySubscription';
 // @ts-check
 import { useState, useEffect, useCallback } from "react";
-import { ACCESSIBILITY_CHANGED_EVENT, notifyAccessibilityPreferencesChanged } from "@/lib/accessibilityEvents";
+import { notifyAccessibilityPreferencesChanged } from "@/lib/accessibilityEvents";
 
 // Accessibility preferences, persisted locally and applied to <html> as classes.
 const KEY = "haven.a11y.v2";
@@ -29,9 +30,15 @@ export function read() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { ...ACCESSIBILITY_DEFAULTS, reducedMotion: prefersReducedMotionByDefault() };
-    return { ...ACCESSIBILITY_DEFAULTS, ...JSON.parse(raw) };
+    const saved=JSON.parse(raw);
+    const next={...ACCESSIBILITY_DEFAULTS,reducedMotion:prefersReducedMotionByDefault()};
+    if(saved && typeof saved==='object' && !Array.isArray(saved)) {
+      for(const key of Object.keys(next)) if(typeof next[key]==='boolean' && typeof saved[key]==='boolean')next[key]=saved[key];
+      if(['off','wind','rain','ocean','hum','whitenoise'].includes(saved.ambientType))next.ambientType=saved.ambientType;
+    }
+    return next;
   } catch {
-    return { ...ACCESSIBILITY_DEFAULTS };
+    return { ...ACCESSIBILITY_DEFAULTS, reducedMotion:prefersReducedMotionByDefault() };
   }
 }
 
@@ -53,8 +60,7 @@ export function useAccessibilityPrefs() {
 
   useEffect(() => {
     const refresh = () => setPrefs(read());
-    window.addEventListener(ACCESSIBILITY_CHANGED_EVENT, refresh);
-    return () => window.removeEventListener(ACCESSIBILITY_CHANGED_EVENT, refresh);
+    return subscribeAccessibilityPreferences(refresh);
   }, []);
 
   const setPref = useCallback((key, value) => {

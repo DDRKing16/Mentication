@@ -44,6 +44,12 @@ Inspected direct-link and shared intervention Back controls. They now check the 
 
 Validation: 16 app-back/history tests passed; typecheck and lint passed. Actual 320px browser proved direct Settings Back stays in Mentication despite longer outside history, internal Library → Settings Back survives refresh, and Settings at 150% text has no horizontal overflow.
 
+## Pass 8 — accessible ratings and live preferences
+
+Inspected shared assessment dimensions and accessibility propagation. The rating component now occupies available width, uses five mobile columns with 44px minimum height, and keeps all eleven authored numbers/meanings and honest unanswered state. Selected sound/text controls announce their state. Loading overlays have status announcements. Accessibility reads validate saved booleans, honor OS reduced motion when no explicit choice exists even if another preference was saved, and retain the OS fallback for unreadable storage. Owned cross-tab changes, visible resume/focus and OS motion changes refresh preferences with listener cleanup; explicit saved choices remain authoritative.
+
+Validation: 16 scale/preference/subscription tests passed; typecheck and lint passed. Actual 320px reduced-motion browser verified every rating target is at least 44×44px, keyboard selection, no overflow, OS fallback and mounted cross-tab contrast refresh. Browser inspection caught and fixed the previously shrinking rating container before completing this pass.
+
 ## Remaining passes
 
-8–10 pending; preserve this log when continuing.
+9–10 pending; preserve this log when continuing.

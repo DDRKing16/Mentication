@@ -49,8 +49,8 @@ const ProgrammeDetail = lazy(() => import('@/pages/Programmes').then((m) => ({ d
 const TAB_PATHS = ["/", "/library", "/plan", "/profile", "/insights", "/settings"];
 
 const PageSpinner = () => (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/90 backdrop-blur-sm">
-    <div className="h-8 w-8 rounded-full border-4 border-secondary border-t-primary animate-spin" />
+  <div role="status" aria-label="Loading Mentication" className="fixed inset-0 z-[70] flex items-center justify-center bg-background/90 backdrop-blur-sm">
+    <div aria-hidden="true" className="h-8 w-8 rounded-full border-4 border-secondary border-t-primary animate-spin" />
   </div>
 );
 

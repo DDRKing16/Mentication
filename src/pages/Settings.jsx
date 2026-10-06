@@ -137,6 +137,7 @@ export default function Settings() {
                 <button
                   key={o.v}
                   type="button"
+                  aria-pressed={amb.prefs.ambientType === o.v}
                   onClick={() => amb.setPref("ambientType", o.v)}
                   className={
                     "no-tap rounded-2xl border py-3 text-sm font-medium transition-all active:scale-95 " +
@@ -163,6 +164,7 @@ export default function Settings() {
               <button
                 key={o.v}
                 type="button"
+                aria-pressed={a11y.textScale === o.v}
                 onClick={() => { update({ textScale: o.v }); amb.setPref("largeText", o.v > 1); }}
                 className={
                   "no-tap rounded-2xl border py-3 text-sm font-medium transition-all active:scale-95 " +

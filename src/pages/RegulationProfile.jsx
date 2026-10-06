@@ -64,7 +64,7 @@ export default function RegulationProfile() {
 
   if (!ready) {
     return (
-      <div className="flex min-h-full items-center justify-center">
+      <div role="status" aria-label="Loading local history" className="flex min-h-full items-center justify-center">
         <div className="h-8 w-8 rounded-full border-4 border-secondary border-t-primary animate-spin" />
       </div>
     );
