@@ -135,5 +135,8 @@ export function resetCompletionSnapshot(snapshot, interventionId) {
       result.navigateTo = `/scene-followup?practice=${practice}&session=${token}`;
     }
   }
-  return { event:cleanEvent, result };
+  return { event:cleanEvent, result,
+    ...(snapshot.goalRating === null || bounded(snapshot.goalRating,0,10) ? {goalRating:snapshot.goalRating} : {}),
+    ...(bounded(snapshot.completedAt,0,8640000000000000) ? {completedAt:snapshot.completedAt} : {}),
+  };
 }

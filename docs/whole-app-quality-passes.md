@@ -26,6 +26,16 @@ Validation: 576 tests in 72 files, typecheck, lint, production build and V3 veri
 
 Evidence: `/tmp/whole-pass02-*.log`, `/workspace/whole-app-review/pass-02-before/`, `/workspace/whole-app-review/pass-02-final/`, and `qa/urge-practice-browser.py`. Entry scans do not imply every entire journey was independently replayed in this pass. PMR/Box/iframe depth is from pass 1; Urge Surfing depth is from pass 2.
 
+## Pass 3 — a verified completion handoff with recovery
+
+Reviewed the cumulative eight host surfaces and all 20 entry points, plus original Change the Scene practice/review, Gentle Tapping pause/alternative/stop/result, and Self-Compassion practice/care-without-words/native card. Production reproduction showed a genuine shared problem: a quota failure still closed the journey and returned Home with no notice and no saved history record.
+
+The shared flow now waits for the verified existing session store before its original brand closing/next destination. A failed or unverified write retains the finished record and shows a practice-specific recovery surface: Retry saving history or Return Home without retrying. It never requires replaying the exercise. Retries consolidate concurrent taps and preserve the same ID, timestamps, real answers and measured partial attempt; retry delay does not become extra duration. A confirmed final goal answer, explicit skip and original finish timestamp survive refresh in the existing coarse navigation snapshot. Browser Back leaves the recovery state normally; forward/refresh retains the confirmed answer. Independently saved notes/cards remain in their own existing stores. Unreadable history is never replaced with an empty overwrite. No outcome, scale, question, matching or reward algorithm was changed.
+
+Validation: 581 tests in 73 files passed; 45 affected transaction/navigation/completion tests were rerun after the final Back/Forward cleanup. Typecheck, lint, production build and V3 verification passed. Production breadth scan passed eight host surfaces/all 20 entries. Deep production suite passed thrown and silent write failure, repeat retry with identical ID/time/answers, exactly one saved record, explicit final rating and skip, error-state Back/Forward/refresh, corrupt-history preservation, 320px/150% text recovery and deliberate Home return. Original tapping retained its paused round, independent unchanged 0–10 answer and truthful stopped exit. Native Self-Compassion saved its actual selected line/action; the saved card survived a separate history failure and remained deletable. Notes likewise survived and remained readable/deletable.
+
+Evidence: `qa/completion-save-browser.py`, `/tmp/whole-pass03-*.log`, `/workspace/whole-app-review/pass-03-before/` and `/workspace/whole-app-review/pass-03-final/`. The original screenshots and reproduction retain evidence of the silent failure; recovery screenshots show the actual implemented state. Deeper original-journey coverage rotates rather than asserting that every full journey was played this pass.
+
 ## Remaining work
 
-Passes 1–2 are complete. Passes 3–10 have not started. No blocker. Native iOS and spoken VoiceOver verification are unavailable here; the separate hosting deep-link rewrite remains outside this patch. No push, merge or deployment.
+Passes 1–3 are complete. Passes 4–10 have not started. No blocker. Native iOS and spoken VoiceOver verification are unavailable here; the separate hosting deep-link rewrite remains outside this patch. No push, merge or deployment.

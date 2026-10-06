@@ -9,6 +9,19 @@ const result = { requireGoalReassessment:true, helpfulness:'same', outcome:{ cla
 const entry = { prebuilt:true, pathway:['factCheck'], reset_completion:{ event, result } };
 
 describe('final assessment refresh boundary', () => {
+  it('retains a confirmed final goal answer or explicit skip for this same completion', () => {
+    for(const goalRating of [0,5,10,null]) {
+      const saved=resetNavigationEntry({...entry,reset_completion:{...entry.reset_completion,goalRating,completedAt:3000}},answers,'goalReassessment',{id:'same-session'});
+      expect(saved.reset_completion.goalRating).toBe(goalRating);
+      expect(saved.reset_completion.completedAt).toBe(3000);
+    }
+    for(const goalRating of ['PRIVATE',-1,11,NaN,undefined]) {
+      expect(resetCompletionSnapshot({...entry.reset_completion,goalRating},'factCheck')).not.toHaveProperty('goalRating');
+    }
+    for(const completedAt of ['PRIVATE',-1,Infinity,NaN,undefined]) {
+      expect(resetCompletionSnapshot({...entry.reset_completion,completedAt},'factCheck')).not.toHaveProperty('completedAt');
+    }
+  });
   it('round-trips the final phase, original baseline, same session and coarse completion after the private draft is gone', () => {
     const saved = resetNavigationEntry(entry, answers, 'goalReassessment', { id:'same-session', startedAt:1000 });
     const refreshed = JSON.parse(JSON.stringify(saved));

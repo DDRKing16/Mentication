@@ -1,3 +1,5 @@
+import {createSessionCompletion} from '@/lib/sessionCompletion';
+import SessionSaveRecovery from '@/components/reset-flow/SessionSaveRecovery';
 import SelectedPracticeContext from '@/components/reset-flow/SelectedPracticeContext';
 import {appBackTarget} from '@/lib/appBack';
 import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
@@ -102,6 +104,18 @@ export default function ResetFlow() {
   const [unsureStep, setUnsureStep] = useState(0);
   const [unsureBranch, setUnsureBranch] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [completionSaveFailed, setCompletionSaveFailed] = useState(false);
+  const completionTransactionRef = useRef(null);
+  const savingHistoryRef = useRef(false);
+  const completionMountedRef = useRef(true);
+  useEffect(() => { completionMountedRef.current = true; return () => { completionMountedRef.current = false; }; }, []);
+  useEffect(() => {
+    if (completionTransactionRef.current && completionTransactionRef.current.phase !== phase) {
+      completionTransactionRef.current = null;
+      setCompletionSaveFailed(false);
+      setSaving(false);
+    }
+  }, [phase]);
   // The Closing brand moment plays once between a session ending and the
   // screen that follows (the shared "done" screen, or navigating away).
   // { id, onDone } while it plays; null the rest of the time.
@@ -122,7 +136,7 @@ export default function ResetFlow() {
   const attemptLogRef = useRef([]);
   const pendingCompletionRef = useRef(restoredCompletion ? { ...restoredCompletion.event, mechanism:directEntryPathway[0]?.mechanism } : null);
   const goalCompletionRef = useRef(restoredCompletion?.result || null);
-  const [goalEndRating, setGoalEndRating] = useState(null);
+  const [goalEndRating, setGoalEndRating] = useState(restoredCompletion?.goalRating ?? null);
   const sessionSavedRef = useRef(false);
   const [weekCount, setWeekCount] = useState(0);
   useEffect(() => {
@@ -380,6 +394,8 @@ export default function ResetFlow() {
   };
 
   const beginGuided = () => {
+    completionTransactionRef.current = null;
+    setCompletionSaveFailed(false);
     sessionSavedRef.current = false;
     setSaving(false);
     const first = pathway[0];
@@ -511,14 +527,33 @@ export default function ResetFlow() {
     advance({ phase: "reflect" });
   };
 
-  const completeSession = (options = {}) => {
-    if (sessionSavedRef.current) return;
-    sessionSavedRef.current = true;
+  const savePendingCompletion = async () => {
+    const pending = completionTransactionRef.current;
+    if (!pending || sessionSavedRef.current || savingHistoryRef.current) return;
+    savingHistoryRef.current = true;
     setSaving(true);
-    if (!options.silent && !answers.discreet && !answers.noAudio) playComplete();
+    try {
+      await pending.transaction.save();
+      if (!completionMountedRef.current || pending !== completionTransactionRef.current) return;
+      sessionSavedRef.current = true;
+      setCompletionSaveFailed(false);
+      if (!pending.silent && !answers.discreet && !answers.noAudio) playComplete();
+      setClosing({id:pending.brandId,onDone:pending.finish});
+    } catch {
+      if (completionMountedRef.current && pending === completionTransactionRef.current) setCompletionSaveFailed(true);
+    } finally {
+      savingHistoryRef.current = false;
+      if (completionMountedRef.current) setSaving(false);
+    }
+  };
+
+  const completeSession = (options = {}) => {
+    if (sessionSavedRef.current || savingHistoryRef.current) return;
+    if (completionTransactionRef.current) { savePendingCompletion(); return; }
+    const completedAt = options.completedAt ?? Date.now();
     const payload = {
       id: sessionIdRef.current,
-      created_date: new Date().toISOString(),
+      created_date: new Date(completedAt).toISOString(),
       state: answers.direction,
       state_label: answers.directionLabel,
       direction: answers.direction,
@@ -542,7 +577,7 @@ export default function ResetFlow() {
       recommendation_engine_version: RECOMMENDATION_ENGINE_VERSION,
       what_helped: whatHelped.trim() || undefined,
       would_use_again: wouldUseAgain || undefined,
-      duration_sec: Math.round((Date.now() - startTimeRef.current) / 1000),
+      duration_sec: Math.max(0,Math.round((completedAt - startTimeRef.current) / 1000)),
       situation: answers.situation || undefined,
       awake_reason: answers.awake_reason || undefined,
       discreet: !!answers.discreet,
@@ -552,9 +587,6 @@ export default function ResetFlow() {
       bedtime: !!answers.bedtime,
       intervention_outcome: options.interventionOutcome || undefined,
     };
-    sessionStore.create(payload).catch(() => {
-      // non-blocking — the experience continues regardless
-    });
     // Dedicated premium experiences may own their complete state and return
     // directly home; legacy pathways retain the shared completion screen.
     // Either way, the Closing brand moment plays first so every session
@@ -564,7 +596,14 @@ export default function ResetFlow() {
       if (options.direct) navigate(options.navigateTo || "/", { replace: true, state: options.liftFollowup ? { completedSession: payload } : undefined });
       else advance({ phase: "done" });
     };
-    setClosing({ id: usedIds[usedIds.length - 1] || pathway[0]?.id, onDone: finish });
+    completionTransactionRef.current = {
+      transaction:createSessionCompletion(payload, value=>sessionStore.create(value)),
+      silent:options.silent,
+      brandId:usedIds[usedIds.length - 1] || pathway[0]?.id,
+      phase,
+      finish,
+    };
+    savePendingCompletion();
   };
 
   const finishClosing = () => {
@@ -572,6 +611,16 @@ export default function ResetFlow() {
     setClosing(null);
     finish?.();
   };
+
+  if (completionSaveFailed) {
+    const brandId = completionTransactionRef.current?.brandId;
+    const practice = pathwayByIds([brandId])[0];
+    return <SessionSaveRecovery practice={practice} saving={saving} onRetry={savePendingCompletion} onLeave={() => {
+      completionTransactionRef.current = null;
+      sessionSavedRef.current = true;
+      navigate("/", {replace:true});
+    }} />;
+  }
 
   // A session that just ended shows only the Closing brand moment -- never
   // stacked on top of whatever screen was showing -- so nothing of the old
@@ -583,6 +632,8 @@ export default function ResetFlow() {
 
   // quietly re-run the just-completed pathway from the overview
   const restartSame = () => {
+    completionTransactionRef.current = null;
+    setCompletionSaveFailed(false);
     const fresh = freshResetEntry(entry, answers);
     setAnswers(createInitialResetAnswers(fresh));
     sessionIdRef.current = globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`;
@@ -652,8 +703,15 @@ export default function ResetFlow() {
     const assessment = GOAL_ASSESSMENTS[answers.direction];
     const finishGoal = (rating) => {
       const result = goalCompletionRef.current || {};
+      const event = pendingCompletionRef.current;
+      const completedAt = restoredCompletion?.completedAt ?? Date.now();
+      if (event) {
+        const confirmedEntry = resetNavigationEntry({...entry,reset_completion:{event,result,goalRating:rating,completedAt}},answers,"goalReassessment",{id:sessionIdRef.current,startedAt:startTimeRef.current});
+        navigate(`${location.pathname}${location.search}`,{replace:true,state:confirmedEntry});
+      }
+      setGoalEndRating(rating);
       commitPendingPulse(goalPointChange(answers.goal_baseline, answers.direction, rating) == null ? null : rating);
-      completeSession({ direct:true, silent:true, endIntensityOverride:rating, interventionOutcome:result.outcome, navigateTo:result.navigateTo });
+      completeSession({ direct:true, silent:true, completedAt, endIntensityOverride:rating, interventionOutcome:result.outcome, navigateTo:result.navigateTo });
     };
     return <main className={`${goalCompletionRef.current?.interventionId === "tomorrowParking" ? "tpl tpl--bedside tpl-goal" : "calmbg"} min-h-[100dvh] px-5 py-6`}><div className="mx-auto flex max-w-lg flex-col gap-6">
       <FlowHomeButton /><h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
