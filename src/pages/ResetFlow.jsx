@@ -808,6 +808,7 @@ export default function ResetFlow() {
       <WithBrandThreshold key={single?.id || "pathway"} id={single?.id} name={single?.name}>
         <Suspense fallback={<BuildingResetScreen />}>
         <ResetPlayer
+          sessionId={sessionIdRef.current}
           pathway={activePathway}
           answers={{ ...answers, intensity: lastValue }}
           effectiveness={effectiveness}

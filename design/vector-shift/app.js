@@ -470,6 +470,7 @@ function qv({
 }
 function Aa() {
   const [saved] = w.useState(readVectorProgress);
+  const [progressSaved,setProgressSaved] = w.useState(true);
   const [paused,setPaused] = w.useState(Boolean(saved && saved.e > 1));
   const [stopped,setStopped] = w.useState(false);
   const [easy,setEasy] = w.useState(saved?.easy || false);
@@ -709,10 +710,11 @@ function Aa() {
   document.documentElement.classList.toggle("vs-paused", paused || stopped);
   const progress = {e,easy,helpfulness,skipped,exitReason,np,jt,score:$e,be,en:[...en],Hn:[...Hn],nn,cp,xu,eo,direction:Sn.current,align:M,hold:ee};
   const progressRef = w.useRef(progress); progressRef.current=progress;
-  w.useEffect(()=>{const save=()=>{try{sessionStorage.setItem(vectorStorageKey,JSON.stringify(progressRef.current))}catch{}};
+  w.useEffect(()=>{const save=()=>{setProgressSaved(saveVectorProgress(progressRef.current))};
     save();const timer=window.setInterval(save,500);window.addEventListener("pagehide",save);
     return()=>{save();window.clearInterval(timer);window.removeEventListener("pagehide",save)};
   },[]);
+  const retryProgress=()=>setProgressSaved(saveVectorProgress(progressRef.current));
   w.useEffect(()=>{document.querySelector(".vs-stage")?.focus();window.scrollTo(0,0)},[e]);
 
   w.useEffect(() => {
@@ -1255,6 +1257,7 @@ function Aa() {
       },
       children: [
         s("section",{className:"vs-instructions",children:[
+          !progressSaved && s("p",{role:"alert",children:["This tab could not save your place. Your activity is still here; refresh may lose progress. ",s("button",{onClick:retryProgress,children:"Retry saving place"})]}),
           s("p",{children:vectorInstructions[e]}),
           e===1 && s("p",{children:"Putting attention on colours, movement and simple choices may help you reconnect with what is around you. It may not change how you feel. These games do not measure your mood or nervous system."}),
           e>=2 && e<=5 && s("button",{"aria-pressed":easy,onClick:()=>setEasy(v=>!v),children:easy?"Use original activity":"Try an easier option"}),
@@ -2358,7 +2361,7 @@ function Aa() {
       e<7 && s("button",{onClick:()=>setStopped(true),children:"Stop"})
     ]}),
     (paused||stopped) && s("div",{className:"vs-overlay",role:"dialog","aria-modal":true,"aria-label":stopped?"Stop or resume":"Paused",onKeyDown:event=>{if(event.key==="Escape"){setPaused(false);setStopped(false)}if(event.key==="Tab"){const buttons=event.currentTarget.querySelectorAll("button");if(event.shiftKey&&document.activeElement===buttons[0]){event.preventDefault();buttons[buttons.length-1].focus()}else if(!event.shiftKey&&document.activeElement===buttons[buttons.length-1]){event.preventDefault();buttons[0].focus()}}},children:s("div",{className:"vs-dialog",children:[
-      s("h2",{children:stopped?"Stop here?":"Paused"}),s("p",{children:"Your place is saved in this tab. Resume when you want, or finish with an optional check-in."}),
+      s("h2",{children:stopped?"Stop here?":"Paused"}),s("p",{role:"status",children:progressSaved?"Your place is saved in this tab. Resume when you want, or finish with an optional check-in.":"Your place could not be saved in this tab. Your current activity is still here; refresh may lose progress."}),!progressSaved && s("button",{onClick:retryProgress,children:"Retry saving place"}),
       s("button",{autoFocus:true,onClick:()=>{setPaused(false);setStopped(false)},children:"Resume"}),
       s("button",{onClick:()=>{setExitReason("stopped");setPaused(false);setStopped(false);n(7)},children:"Finish here"})
     ]})})

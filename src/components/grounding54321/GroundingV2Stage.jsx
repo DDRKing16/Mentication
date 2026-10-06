@@ -136,6 +136,7 @@ export default function GroundingV2Stage({
       )}
       <div className="flex w-full max-w-md flex-col items-center gap-3 px-4 text-center" style={{ color: INK }}>
         <p className="text-sm">Take as long as you need. You can move on without finding every item.</p>
+        <details className="w-full text-left text-base leading-relaxed"><summary className="cursor-pointer text-center underline">How to practise · optional</summary><p className="mt-3">Notice a detail that is already here: a colour, the contact of clothes, or a sound. If attention wanders, come back to one comfortable detail. You do not need to find the full number or feel a particular change.</p><p className="mt-2">Choose Next sense when you want, use the alternative below, or finish early. The time is a suggestion.</p></details>
         {GROUNDING_ALTERNATIVES[sense] && <>
           <button type="button" className="rounded-full border border-current px-5 py-3 text-sm" aria-expanded={showAlternative} onClick={() => setShowAlternative((value) => !value)}>Try another sense instead</button>
           {showAlternative && <p ref={alternativeRef} className="text-base leading-relaxed" role="status">{GROUNDING_ALTERNATIVES[sense]}</p>}

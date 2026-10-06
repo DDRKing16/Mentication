@@ -1,3 +1,4 @@
+import { groundingPosition } from "./groundingPosition.js";
 import { resetCompletionSnapshot } from './resetCompletion.js';
 import { captureGoalBaseline, hasGoalBaseline } from './goalAssessment.js';
 
@@ -21,6 +22,7 @@ export function resetNavigationEntry(entry, answers, phase, session = {}) {
     ...(completion ? { reset_completion:completion } : {}),
     reset_session_id: session.id || entry?.reset_session_id,
     reset_started_at: session.startedAt || entry?.reset_started_at,
+    ...(phase==='guiding' && entry?.pathway?.length===1 && entry.pathway[0]==='grounding54321V2' && groundingPosition(entry?.reset_grounding,session.id || entry?.reset_session_id) ? {reset_grounding:groundingPosition(entry.reset_grounding,session.id || entry.reset_session_id)} : {}),
   };
 }
 export function freshResetEntry(entry, answers) {

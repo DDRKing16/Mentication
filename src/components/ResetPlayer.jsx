@@ -31,15 +31,22 @@ import { suspendFeedback, resumeFeedback, haptic, setHapticsEnabled } from "@/li
 import { recordDislike } from "@/lib/preferences";
 import { interventionThemeStyle, paletteForIntervention } from "@/lib/mentationThemes";
 
+import { groundingPosition, writeGroundingPosition } from "@/lib/groundingPosition";
+
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
 
-export default function ResetPlayer({ pathway, answers, effectiveness = {}, onComplete, onAttemptEvent, onExit }) {
+export default function ResetPlayer({ pathway, answers, sessionId, effectiveness = {}, onComplete, onAttemptEvent, onExit }) {
+  const [groundingResume] = useState(() => pathway.length===1 && pathway[0]?.id==="grounding54321V2" ? groundingPosition(globalThis.history?.state?.usr?.reset_grounding,sessionId) : null);
+  const [groundingSaved,setGroundingSaved] = useState(true);
+  const [groundingPresence,setGroundingPresence] = useState(groundingResume?.presence || null);
+  const [groundingHelpfulness,setGroundingHelpfulness] = useState(groundingResume?.helpfulness || null);
+  const groundingContent = useRef(null);
   const [remaining, setRemaining] = useState(pathway);
   const [ivIndex, setIvIndex] = useState(0);
-  const [stepIndex, setStepIndex] = useState(0);
-  const [elapsed, setElapsed] = useState(0);
-  const [running, setRunning] = useState(true);
-  const [showGroundingFeedback, setShowGroundingFeedback] = useState(false);
+  const [stepIndex, setStepIndex] = useState(groundingResume?.step || 0);
+  const [elapsed, setElapsed] = useState(groundingResume?.elapsed || 0);
+  const [running, setRunning] = useState(!groundingResume);
+  const [showGroundingFeedback, setShowGroundingFeedback] = useState(groundingResume?.feedback || false);
   const [showTimer, setShowTimer] = useState(true);
   const a11y = useAccessibilityPrefs();
   const [captions, setCaptions] = useState(a11y.prefs.captions !== false);
@@ -62,7 +69,7 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   const [showSleepTimer, setShowSleepTimer] = useState(false);
   useEscapeToClose(showSwitch, () => setShowSwitch(false));
   useEscapeToClose(showAmbient, () => setShowAmbient(false));
-  const [stepsDone, setStepsDone] = useState(0);
+  const [stepsDone, setStepsDone] = useState(groundingResume?.step || 0);
   const transitionTimer = useRef(null);
   const [boxFeedback, setBoxFeedback] = useState(null);
   const boxFeedbackSent = useRef(false);
@@ -95,6 +102,16 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   useGroundingSoundscape({ active: isGroundingV2 && !noAudio && narrate && running && !showGroundingFeedback, narrationActive, sense: step?.sense });
   const isLastStep = step != null && stepIndex === iv.steps.length - 1;
   const isLastIv = ivIndex === remaining.length - 1;
+
+  useEffect(() => {
+    if (!isGroundingV2 || pathway.length!==1 || !sessionId) return;
+    setGroundingSaved(writeGroundingPosition(globalThis.history,{sessionId,step:stepIndex,elapsed,feedback:showGroundingFeedback,presence:groundingPresence,helpfulness:groundingHelpfulness},sessionId));
+  },[isGroundingV2,pathway.length,sessionId,stepIndex,elapsed,showGroundingFeedback,groundingPresence,groundingHelpfulness]);
+  useEffect(() => {
+    if (!isGroundingV2) return;
+    const frame=requestAnimationFrame(()=>{const content=groundingContent.current;if(content){content.scrollTop=0;const heading=content.querySelector('h2');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}}});
+    return ()=>cancelAnimationFrame(frame);
+  },[isGroundingV2,stepIndex,showGroundingFeedback]);
 
   // ---- narration (natural guide voice) ----
   const { speak, stop: stopVoice, pause: pauseVoice, resume: resumeVoice, preload } = useGuideVoice();
@@ -168,11 +185,11 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
   // A one-time tap anywhere in the player resumes the narrator if it was muted
   // by an autoplay block, so sound is never permanently lost.
   useEffect(() => {
-    const unlock = () => { if (narrate && (!isBoxV2 || running)) resumeVoice(); };
+    const unlock = () => { if (narrate && (!(isBoxV2 || isGroundingV2) || running)) resumeVoice(); };
     window.addEventListener("pointerdown", unlock, { once: true });
     return () => window.removeEventListener("pointerdown", unlock);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBoxV2, running, narrate]);
+  }, [isBoxV2, isGroundingV2, running, narrate]);
 
   // Auto-start the ambient soundscape under the narration when enabled
   // (default on). Skipped for discreet / no-audio sessions and for sleep
@@ -612,12 +629,12 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
       </div>
 
       {/* stage */}
-      <div className={`relative flex min-h-0 flex-1 flex-col items-center ${isBoxV2 || isGroundingV2 ? "justify-start" : "justify-center"} overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
+      <div ref={groundingContent} className={`relative flex min-h-0 flex-1 flex-col items-center ${isBoxV2 || isGroundingV2 ? "justify-start" : "justify-center"} overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
         <AnimatePresence mode="wait">
           {boxFeedback ? (
             <BoxBreathingV2Feedback key="box-feedback" onContinue={submitBoxFeedback} />
           ) : isGroundingV2 && showGroundingFeedback ? (
-            <GroundingFeedback key="grounding-feedback" onComplete={completeGrounding} />
+            <GroundingFeedback key="grounding-feedback" feedback={groundingPresence} helpfulness={groundingHelpfulness} onFeedback={setGroundingPresence} onHelpfulness={setGroundingHelpfulness} onComplete={completeGrounding} />
           ) : transition ? (
             <motion.div
               key="transition"
@@ -734,8 +751,10 @@ export default function ResetPlayer({ pathway, answers, effectiveness = {}, onCo
         </AnimatePresence>
       </div>
 
+      {isGroundingV2 && !groundingSaved && <p role="status" className="relative px-5 text-center text-sm">This tab could not remember your grounding place. Your current practice is still here; refresh may lose it.</p>}
+      {isGroundingV2 && groundingResume && !showGroundingFeedback && !running && <p role="status" className="relative px-5 text-center text-sm">Your chosen sense is back, paused. Choose Play when ready.</p>}
       {isGroundingV2 && !showGroundingFeedback && <button type="button" className="relative mx-auto rounded-full border px-5 py-2 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}>Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}</button>}
-      {isGroundingV2 && !showGroundingFeedback && <div className="relative flex justify-center gap-3 px-4 py-3">
+      {isGroundingV2 && !showGroundingFeedback && <div className="relative flex flex-wrap justify-center gap-3 px-4 py-3">
         {!isLastStep && <button type="button" className="rounded-full bg-white/80 px-5 py-3 font-medium" onClick={goNextStep}>{step?.sense === "taste" ? "Recenter when ready" : "Next sense"}</button>}
         <button type="button" className="rounded-full border px-5 py-3" onClick={finishGrounding}>{isLastStep ? "Finish grounding" : "Finish grounding early"}</button>
       </div>}

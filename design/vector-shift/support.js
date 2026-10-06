@@ -10,6 +10,9 @@ function readVectorProgress() {
     return value && Number.isInteger(value.e) && value.e >= 1 && value.e <= 7 ? value : null;
   } catch { return null; }
 }
+function saveVectorProgress(value) {
+  try {const text=JSON.stringify(value);sessionStorage.setItem(vectorStorageKey,text);return sessionStorage.getItem(vectorStorageKey)===text;}catch{return false;}
+}
 const vectorStages = ['', 'Vector Shift', 'Align', 'Serpent', 'Word match', 'Solar scan', 'Reflect', 'Check in'];
 const vectorInstructions = [
   '',
