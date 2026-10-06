@@ -34,7 +34,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .tray { font-size:15px!important; min-height:80px; }
 .hint { padding-bottom:22px; }
 .gm { overflow:visible!important; }
-.gm-stage { max-width:500px; margin:auto; }
+/* Auto margins disable flex stretching; absolute planets cannot size this canvas. */
+.gm-stage { width:calc(100% + 48px); max-width:500px; margin:4px -24px 0; align-self:center; }
 .jpanel,.gm-panel { max-height:85dvh; overflow:auto; }
 .jshs,.gm-facts span { font-size:15px!important; }
 .gm-nav + .hd { max-width:640px; width:100%; margin:0 auto; }
