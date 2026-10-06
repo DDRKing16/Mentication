@@ -56,7 +56,7 @@ export function careMilestone(id, s) {
   }
   if (id === 'unhook') {
     if (s.anchorNoticed) return `Your attention anchor: ${short(s.anchorText || EXTERNAL_ANCHORS[s.anchorType]?.short || 'something in the room')}.`;
-    if (s.distance === 'beside') return 'The thought is still here. You have practised putting it beside your attention.';
+    if (s.distance === 'beside') return 'The thought is still here. You chose an anchor for your attention.';
     if (s.defusionStep) return `Notice the thought: “${short(s.notice || 'the words in your mind')}”`;
     return s.notice ? `Your practice uses your thought: “${short(s.notice)}”` : 'You can practise a different relationship with a thought.';
   }
