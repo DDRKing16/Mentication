@@ -216,3 +216,6 @@
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
+
+/* A failed photograph leaves room for its accessible placement fallback. */
+.tap-main-art .tap-image-error { position: absolute; top: 27%; left: 15px; right: 15px; max-width: 275px; margin: 0; color: #e5d2ac; font-size: 13px; line-height: 1.5; }
