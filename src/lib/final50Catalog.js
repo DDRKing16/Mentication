@@ -451,14 +451,15 @@ const NEW_INTERVENTIONS = {
     ],
   }),
   signalLock: newIntervention({
-    id: "signalLock", name: "Signal Lock", category: "focus", mechanism: "scaffold-lock-sprint",
-    why: "Turning a vague task into a startable target and containing distractions makes a bounded focus sprint easier to begin.",
-    targets: ["thoughts", "behaviour"], states: ["distracted", "avoiding", "overloaded"], directions: ["focus", "lift"],
-    durationMin: 8, cognitiveLoad: 3, energy: "energising", arousal: "raise", intensityMin: 0, intensityMax: 7,
+    id: "signalLock", name: "Signal Lock", category: "grounding", mechanism: "external-visual-anchoring",
+    why: "Follow a gentle visual signal and reveal a softly lit room, one small connection at a time.",
+    targets: ["thoughts", "body"], states: ["anxious", "overwhelmed", "distressed"], directions: ["ground", "calm"],
+    durationMin: 3, cognitiveLoad: 1, energy: "steady", arousal: "steady", intensityMin: 0, intensityMax: 7,
+    eyes: "open", requiredResources: ["screen interaction"], unsuitableSubstates: ["immediate-danger"],
     steps: [
-      { title: "Scaffold", body: "Compress the intended task into one observable target that can begin within twenty seconds.", holdSec: 30 },
-      { title: "Lock", body: "Choose a finish line, sprint length and only the perimeter changes that matter.", holdSec: 30 },
-      { title: "Sprint", body: "Start the visible countdown; distractions can be captured without leaving the target.", holdSec: 180 },
+      { title: "Find a signal", body: "Tap the first visible signal. There is no rush.", holdSec: 0 },
+      { title: "Make a connection", body: "Tap the second signal to reveal another part of the room.", holdSec: 0 },
+      { title: "Continue or stop", body: "Follow another signal, or stop whenever you want. A check-in is optional.", holdSec: 0 },
     ],
   }),
   goodMap: newIntervention({
@@ -753,9 +754,9 @@ const CORE_25_SPECS = [
   ["grounding54321V2", "ground"],
   ["vectorShift", "ground"],
 
-  // Focus (2)
+  // Preserve ID ordering for saved catalogue references.
   ["nextAction", "focus"],
-  ["signalLock", "focus"],
+  ["signalLock", "ground"],
 
   // Sleep (2)
   ["tomorrowParking", "sleep"],
@@ -785,7 +786,7 @@ const DIRECTION_OVERRIDES = {
   bodyRadar: ["ground", "calm"],
   rideWave: ["ground", "calm", "reset"],
   nextAction: ["focus", "lift"],
-  signalLock: ["focus", "lift"],
+  signalLock: ["ground", "calm"],
   twoMinStart: ["focus", "lift"],
   taskBreakdown: ["focus", "lift"],
   pomodoro: ["focus"],
