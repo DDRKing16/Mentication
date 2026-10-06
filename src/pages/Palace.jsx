@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 // The Peace Palace page: a place that grows as you use interventions and
 // grows again each time you finish one all the way through. Growth is
 // derived live from session history (src/lib/peacePalace.js).
@@ -11,6 +12,7 @@ import PeacePalace from "@/components/palace/PeacePalace";
 
 export default function Palace() {
   const navigate = useNavigate();
+  const goBack=useAppBack();
   const [palace, setPalace] = useState(null);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function Palace() {
   return (
     <div className="calmbg min-h-full">
       <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
-        <button onClick={() => navigate(-1)} className="no-tap flex min-h-11 items-center gap-1 self-start rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
+        <button onClick={goBack} className="no-tap flex min-h-11 items-center gap-1 self-start rounded-full text-sm font-medium text-muted-foreground hover:text-foreground">
           <ChevronLeft className="h-4 w-4" /> Back
         </button>
 

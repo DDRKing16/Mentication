@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 // Journey access follows the app policy exposed by usePlus, independently
 // of the recorded subscription.
 import React from "react";
@@ -8,6 +9,7 @@ import { usePlus } from "@/lib/subscription";
 export default function PlusGate({ route, name, promise, detail, background = "#0A1F3D", previewImage, children }) {
   const plus = usePlus();
   const navigate = useNavigate();
+  const goBack=useAppBack();
   if (plus.hasAccess) return children;
   return (
     <div className="fixed inset-0 overflow-y-auto text-[#F6EFE2]" style={{ background }}>
@@ -21,7 +23,7 @@ export default function PlusGate({ route, name, promise, detail, background = "#
         </div>
       )}
       <div className="relative flex items-center justify-between px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <button onClick={() => navigate(-1)} aria-label="Back" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/30 backdrop-blur-sm"><ArrowLeft className="h-5 w-5" /></button>
+        <button onClick={goBack} aria-label="Back" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/30 backdrop-blur-sm"><ArrowLeft className="h-5 w-5" /></button>
         <button onClick={() => navigate("/")} aria-label="Home" className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-black/30 backdrop-blur-sm"><Home className="h-5 w-5" /></button>
       </div>
       <main className="relative mx-auto flex min-h-[80%] max-w-md flex-col justify-end px-6 pb-16 pt-[40vh] text-center">

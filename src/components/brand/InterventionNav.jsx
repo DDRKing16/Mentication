@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 import React from "react";
 import { ArrowLeft, Home } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -20,10 +21,7 @@ const base =
 
 export function useFlowNav() {
   const navigate = useNavigate();
-  const goBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) navigate(-1);
-    else navigate("/library");
-  };
+  const goBack=useAppBack("/library");
   const goHome = () => navigate("/");
   return { goBack, goHome };
 }

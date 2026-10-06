@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 // Programmes: the list, and one programme's day-by-day page.
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -40,11 +41,12 @@ function Shell({ children, onBack }) {
 
 export function ProgrammeList() {
   const navigate = useNavigate();
+  const goBack=useAppBack();
   const plus = usePlus();
   const sessions = useSessions();
   const active = activeProgrammeId();
   return (
-    <Shell onBack={() => navigate(-1)}>
+    <Shell onBack={goBack}>
       <p className="mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Programmes</p>
       <h1 className="mt-2 font-heading text-3xl font-medium tracking-tight text-primary">A little each day.</h1>
       <p className="mt-2 text-muted-foreground">Short journeys made of the practices you already know. One opens each day.</p>

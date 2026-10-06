@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CloudUpload, LifeBuoy, Trash2, ShieldCheck } from "lucide-react";
@@ -31,6 +32,7 @@ function Toggle({ label, desc, on, onToggle }) {
 
 export default function Settings() {
   const navigate = useNavigate();
+  const goBack=useAppBack();
   const plus = usePlus();
   const [reminder, setReminder] = useState(getReminderPrefs);
   const [memoryError, setMemoryError] = useState("");
@@ -85,7 +87,7 @@ export default function Settings() {
     <div className="calmbg min-h-full">
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-28">
         <button
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" /> Back

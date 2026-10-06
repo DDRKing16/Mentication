@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -13,11 +14,12 @@ const NUMBERS = [
 
 export default function Crisis() {
   const navigate = useNavigate();
+  const goBack=useAppBack();
   return (
     <div className="min-h-full bg-gradient-to-b from-[hsl(178_40%_9%)] via-[hsl(178_36%_13%)] to-[hsl(178_42%_7%)] text-cream">
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-16">
         <button
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-cream/70 transition-colors hover:text-cream"
         >
           <ArrowLeft className="h-4 w-4" /> Back

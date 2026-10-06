@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 import { practiceLaunchEntry } from '@/lib/practiceLaunch';
 import { PRACTICE_CATEGORIES, practiceSearchMatches, practiceTimeLabel } from '@/lib/practiceDiscovery';
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
@@ -126,6 +127,7 @@ function WorldCard({ id, name, meta, why, iv, onClick, className = "" }) {
 
 export default function InterventionLibrary() {
   const navigate = useNavigate();
+  const goBack=useAppBack();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState(null);
   const [filters, setFilters] = useState({});
@@ -167,7 +169,7 @@ export default function InterventionLibrary() {
       <div className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:px-8 safe-top-lg">
         <header className="flex items-center gap-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             aria-label="Back"
             className="no-tap flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary active:scale-95"
           >

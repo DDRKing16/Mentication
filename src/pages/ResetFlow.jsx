@@ -1,3 +1,4 @@
+import {appBackTarget} from '@/lib/appBack';
 import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
 import { attemptEventDisposition, resetCompletionSnapshot, finalAssessmentEvent } from '@/lib/resetCompletion';
 import { resetNavigationEntry, freshResetEntry, appendResetFlowSnapshot, resetFlowHistorySnapshot } from "@/lib/resetNavigation";
@@ -283,7 +284,7 @@ export default function ResetFlow() {
     navigate(`/reset?step=${flowStack.current.length - 1}`, { state: resetNavigationEntry(nextEntry, nextAnswers, snap.phase, { id:sessionIdRef.current, startedAt:startTimeRef.current }) });
   };
   const goBack = () => {
-    if (stepParam > 0) navigate(-1);
+    if (stepParam > 0) navigate(appBackTarget(window.history.state,"/"));
     else navigate("/");
   };
 

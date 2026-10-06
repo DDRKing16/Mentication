@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 // Keep existing /plus links useful without selling access to free journeys.
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -13,6 +14,7 @@ const INCLUDED = [
 
 export default function Plus() {
   const navigate = useNavigate();
+  const goBack=useAppBack();
   const location = useLocation();
   const plus = usePlus();
   const [message, setMessage] = useState("");
@@ -29,7 +31,7 @@ export default function Plus() {
   return (
     <div className="min-h-full bg-[#0A1F3D] text-[#F6EFE2]">
       <main className="mx-auto max-w-xl px-5 pb-16 pt-[max(1.25rem,env(safe-area-inset-top))]">
-        <button onClick={() => navigate(-1)} className="flex min-h-11 items-center gap-1 text-sm"><ArrowLeft className="h-4 w-4" /> Back</button>
+        <button onClick={goBack} className="flex min-h-11 items-center gap-1 text-sm"><ArrowLeft className="h-4 w-4" /> Back</button>
         <h1 className="mt-6 font-serif text-3xl">All journeys are free</h1>
         <p className="mt-3">Dear 2100, The Good Map, Foundations and programmes are open to everyone. No purchase or trial is needed.</p>
         <button onClick={() => navigate(returnTo, { replace: true })} className="mt-6 min-h-11 rounded-full border px-5">Continue exploring</button>

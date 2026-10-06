@@ -1,3 +1,4 @@
+import {useAppBack} from '@/hooks/useAppBack';
 import React from "react";
 import { ArrowLeft, LockKeyhole, Mic, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -5,6 +6,7 @@ import "@/styles/thought-or-fact.css";
 
 function EntryHeader({ backLabel = "Go back", onBack }) {
   const navigate = useNavigate();
+
 
   return (
     <header className="tof-entry__header">
@@ -55,6 +57,7 @@ function VoiceScreen({ voiceState, voiceSeconds, onStopVoice, onReturnToWriting 
 }
 
 function ThoughtEntryScreen({ answers, thought, onThoughtChange, onStartVoice, onBegin }) {
+  const goBack=useAppBack();
   const navigate = useNavigate();
   const launch = (pathway, direction, timeMin) => navigate("/reset", {
     state: { prebuilt: true, pathway: [pathway], direction, intensity: answers.intensity ?? 5, timeMin, audio: answers.audio },
@@ -62,7 +65,7 @@ function ThoughtEntryScreen({ answers, thought, onThoughtChange, onStartVoice, o
 
   return (
     <div className="tof-entry-root">
-      <EntryHeader onBack={() => navigate(-1)} />
+      <EntryHeader onBack={goBack} />
       <main className="tof-experience">
         <div className="tof-stage">
           <div className="tof-heading">

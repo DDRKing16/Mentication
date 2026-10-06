@@ -38,6 +38,12 @@ Inspected shared history/notes, Journal, backup restore, reminder cancellation a
 
 Validation: 20 storage/backup/memory/reminder tests passed, including corrupt history, silent writes/removals, Journal round-trip and partial restore rollback. Typecheck and lint passed. Actual 320px Profile proved a silent deletion failure keeps the route, records and truthful retry visible. Native notification hardware is unavailable; cancellation uses the existing on-device plugin.
 
+## Pass 7 — reliable mobile return navigation
+
+Inspected direct-link and shared intervention Back controls. They now check the router's app-created history index rather than counting unrelated browser entries. Settings, Library, Crisis, Privacy, Plus, Palace, Programmes and Thought or Fact entry fall back to Home; shared intervention chrome retains its Library fallback. Reset setup also protects restored step links with missing internal history. Authored in-journey steps remain intact.
+
+Validation: 16 app-back/history tests passed; typecheck and lint passed. Actual 320px browser proved direct Settings Back stays in Mentication despite longer outside history, internal Library → Settings Back survives refresh, and Settings at 150% text has no horizontal overflow.
+
 ## Remaining passes
 
-7–10 pending; preserve this log when continuing.
+8–10 pending; preserve this log when continuing.
