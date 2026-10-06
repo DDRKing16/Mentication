@@ -51,10 +51,11 @@ with sync_playwright() as p:
     page.reload()
     expect(page.get_by_text('Not answered yet.',exact=True)).to_be_visible()
     page.locator('summary').click()
+    expect(page.get_by_role('textbox')).to_have_value('Synthetic note: release only for my shoulders.')
     page.get_by_role('textbox').fill('Synthetic unsaved text')
     # Block writes and prove neither save nor deletion success is fabricated.
     page.evaluate("() => { window.originalSetItem=Storage.prototype.setItem; Storage.prototype.setItem=function(){throw new Error('Test quota')}; }")
-    page.get_by_role('button',name='Save on this device',exact=True).click()
+    page.get_by_role('button',name='Save changes on this device',exact=True).click()
     expect(page.get_by_role('alert')).to_contain_text('Could not save')
     expect(page.get_by_role('textbox')).to_have_value('Synthetic unsaved text')
     page.evaluate('() => { Storage.prototype.setItem=window.originalSetItem; }')

@@ -1,4 +1,5 @@
 import {createSessionCompletion} from '@/lib/sessionCompletion';
+import {confirmedJourneyTakeaway} from '@/lib/confirmedJourneyTakeaway';
 import SessionSaveRecovery from '@/components/reset-flow/SessionSaveRecovery';
 import SelectedPracticeContext from '@/components/reset-flow/SelectedPracticeContext';
 import {appBackTarget} from '@/lib/appBack';
@@ -714,11 +715,13 @@ export default function ResetFlow() {
       completeSession({ direct:true, silent:true, completedAt, endIntensityOverride:rating, interventionOutcome:result.outcome, navigateTo:result.navigateTo });
     };
     return <main className={`${goalCompletionRef.current?.interventionId === "tomorrowParking" ? "tpl tpl--bedside tpl-goal" : "calmbg"} min-h-[100dvh] px-5 py-6`}><div className="mx-auto flex max-w-lg flex-col gap-6">
-      <FlowHomeButton /><h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
+      <FlowHomeButton />
+      <SelectedPracticeContext practice={pathwayByIds([goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id])[0]} label="After your practice" showTime={false} />
+      <h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
       <p className="text-muted-foreground">{hasGoalBaseline(answers) ? "The same goal question as at the start." : "An optional goal check-in, separate from the practice question. There is no starting goal rating to compare."} Confirm an honest rating, or skip. You do not need to feel better.</p>
       <IntensityDial value={goalEndRating} onChange={setGoalEndRating} direction={answers.direction} />
       <p className="text-muted-foreground">{goalEndRating == null ? 'Not answered yet.' : goalPointChange(answers.goal_baseline, answers.direction, goalEndRating) == null ? 'No confirmed starting rating to compare.' : `${answers.goal_baseline.value} → ${goalEndRating} · ${goalPointChange(answers.goal_baseline, answers.direction, goalEndRating)} points`}</p>
-      <JourneyTakeaway id={goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id} />
+      <JourneyTakeaway id={goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id} initialText={confirmedJourneyTakeaway(goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id,goalCompletionRef.current?.outcome)} />
       <Button className="rounded-full" disabled={saving} onClick={() => finishGoal(goalEndRating ?? 5)}>Confirm rating: {goalEndRating ?? 5}</Button>
       <Button className="rounded-full" variant="outline" disabled={saving} onClick={() => finishGoal(null)}>Skip and finish</Button>
     </div></main>;
@@ -1171,7 +1174,7 @@ export default function ResetFlow() {
               className="mx-auto mt-5 flex items-center gap-2 rounded-full border border-teal/30 bg-teal/5 px-4 py-2 text-sm font-medium text-primary transition-colors hover:border-teal/50"
             >
               <Castle className="h-4 w-4 text-teal" strokeWidth={1.8} />
-              Your Peace Palace grew — visit it
+              Visit your Peace Palace
             </motion.button>
           )}
         </div>

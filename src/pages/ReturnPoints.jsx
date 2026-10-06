@@ -5,7 +5,7 @@ import { loadTara, deleteTaraRecap } from '@/lib/taraTacticianStorage';
 import { CARE_PRACTICES } from '@/lib/carePractices';
 import { readCareCards, deleteCareSaved } from '@/lib/carePracticeStorage';
 import { INTERVENTIONS } from '@/lib/interventions';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { takeawayStore } from '@/lib/localData';
 import { JOURNEY_EXPERIENCES } from '@/lib/journeyExperience';
@@ -28,13 +28,26 @@ export default function ReturnPoints() {
   const [error, setError] = useState('');
   const [notes, setNotes] = useState(() => { try { return takeawayStore.list(); } catch { return null; } });
   const [thoughts, setThoughts] = useState(() => { try { return readThoughts(); } catch { return null; } });
-  const refresh = () => {
+  const refresh = useCallback(() => {
     let failed=false;
     for(const read of [()=>setNotes(takeawayStore.list()),()=>setTaraRecaps(loadTara().recaps),()=>setThoughts(readThoughts()),()=>{const saved=readCareCards();setCards(Object.keys(CARE_PRACTICES).map(id=>({id,state:saved[id]})).filter(card=>card.state));}]) {
       try { read(); } catch { failed=true; }
     }
     setError(failed?'Some saved work could not be read. Nothing has been removed. Try again.':'');
-  };
+  }, []);
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
+    window.addEventListener('mentation:takeaways-changed', refresh);
+    window.addEventListener('storage', refresh);
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('mentation:takeaways-changed', refresh);
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [refresh]);
   const archives = Object.entries(JOURNEY_EXPERIENCES).filter(([, meta]) => meta.archive && meta.archive !== '/return-points');
   const visibleNotes=notes?.filter(note=>savedWorkMatches(query,[note.text,JOURNEY_EXPERIENCES[note.interventionId]?.name]));
   const visibleThoughts=thoughts?.filter(record=>savedWorkMatches(query,['Thought or Fact',record.thought,record.balancedConfirmed?record.ruling:'',record.returnPhrase]));

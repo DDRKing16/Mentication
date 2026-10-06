@@ -55,7 +55,7 @@ with sync_playwright() as p:
     def records(page):return page.evaluate("JSON.parse(localStorage.getItem('mentation.sessions.v1')||'[]')")
 
     context,page=create(390);scene_review(page)
-    page.locator('main').get_by_text('Keep something for later · optional',exact=True).click()
+    page.locator('main').get_by_text('Keep these practice choices · optional',exact=True).click()
     page.get_by_role('textbox').fill('Synthetic Scene note: an indoor position change.')
     page.get_by_role('button',name='Save on this device',exact=True).click()
     expect(page.get_by_role('status')).to_have_text('Saved on this device.')

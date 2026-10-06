@@ -76,6 +76,7 @@ export function deleteAllLocalAppData() {
   }
   resetOnboardingSession();
   window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
+  window.dispatchEvent(new CustomEvent('mentation:takeaways-changed'));
   notifyAccessibilityPreferencesChanged();
 }
 
@@ -102,7 +103,8 @@ export function exportLocalAppData() {
 }
 
 // Explicitly saved personal notes are separate from session/effectiveness data.
-// Never infer a note from a rating, elapsed time or completion event.
+// Candidate text can use confirmed choices. A rating/timer/completion event
+// alone must never write a note; writing still requires the user's Save action.
 const TAKEAWAY_KEY = 'mentation.takeaways.v1';
 function readTakeaways() {
   const raw = storage()?.getItem(TAKEAWAY_KEY);
@@ -116,6 +118,7 @@ function writeTakeaways(records) {
   const local = storage();
   if (!local) throw new Error('Device storage is unavailable.');
   writeVerified(local,TAKEAWAY_KEY,JSON.stringify(records));
+  window.dispatchEvent?.(new CustomEvent('mentation:takeaways-changed'));
 }
 export const takeawayStore = Object.freeze({
   list: readTakeaways,
