@@ -8,6 +8,12 @@ Inspected all current Library entries, need entry language, categories, duration
 
 Validation: four data-contract tests passed; typecheck passed; actual 390px Library verified Reset, plain-language search, Tara time, no-results recovery and no overflow. No artwork, intervention naming or matching logic changed.
 
+## Pass 2 — readable, findable saved work on mobile
+
+Inspected Return points and native saved-card schemas. Reworked records into practice-colored cards using existing brand atmospheres, with real dates only when available. Added local search across actually displayed saved wording. Tara now shows its confirmed prediction, observation and reported result even when optional learning/action fields are blank; factual prediction results remain distinct from historical difficulty comparisons. Archive destinations are a separate disclosure and do not imply saved data.
+
+Validation: three source-fidelity/search/date tests passed; typecheck passed; real 320×640 route verified native Tara recap with blank optional fields, word search/recovery, actual saved date and 150% text with long-word wrapping/no overflow. No storage schema or artwork changed.
+
 ## Remaining passes
 
-2–10 pending; preserve this log when continuing.
+3–10 pending; preserve this log when continuing.
