@@ -1,8 +1,10 @@
 # Ten cumulative overnight implementation passes
 
-Branch: `codex/overnight-ten-passes`, starting from main `e292234` plus the completed required Dear 2100 check `681952b`. No push, merge or deploy. Requested multipliers are aspirations, not measured quality or clinical claims. Each pass inspects the cumulative version, implements focused behavior, and validates it before continuing.
+Branch: `codex/overnight-ten-passes`, starting from main `e292234` plus the completed required Dear 2100 check `681952b`. No push, merge or deploy. Requested multipliers are aspirations, not measured quality or clinical claims. Each pass inspects the cumulative version in its stated area, implements focused behavior, and validates it before continuing. These are ten targeted sequential implementation passes, not ten exhaustive whole-app audits or ten complete premium visual redesigns. Most passes concentrated on shared surfaces; the evidence does not establish that every journey was independently revisited during every pass.
 
 ## Pass 1 — authored practice discovery
+
+Commit: `02b1cac`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
 
 Inspected all current Library entries, need entry language, categories, durations and the active standalone Signal Lock/Dear journeys. Fixed the unlabeled Reset category. Search now finds existing need phrases, supported directions and authored acronyms, including “cannot get started”, without changing clinical matching. Self-paced maps/steps/reflection and Tara preparation are labeled honestly; Dear no longer promises a fixed duration or guaranteed committed action. Results have an announced count and an explicit clear-search/filter recovery action.
 
@@ -10,11 +12,15 @@ Validation: four data-contract tests passed; typecheck passed; actual 390px Libr
 
 ## Pass 2 — readable, findable saved work on mobile
 
+Commit: `d8fc2bd`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
+
 Inspected Return points and native saved-card schemas. Reworked records into practice-colored cards using existing brand atmospheres, with real dates only when available. Added local search across actually displayed saved wording. Tara now shows its confirmed prediction, observation and reported result even when optional learning/action fields are blank; factual prediction results remain distinct from historical difficulty comparisons. Archive destinations are a separate disclosure and do not imply saved data.
 
 Validation: three source-fidelity/search/date tests passed; typecheck passed; real 320×640 route verified native Tara recap with blank optional fields, word search/recovery, actual saved date and 150% text with long-word wrapping/no overflow. No storage schema or artwork changed.
 
 ## Pass 3 — clear selection feedback and honest unanswered ratings
+
+Commit: `5994882`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
 
 Inspected need selection and Reset assessment controls. Choosing a need now focuses and brings its tailored preview into view, confirms the exact user choice, and provides a clear way back to the chosen option before launching. Generic unanswered baseline/end ratings show an em dash and “Choose a rating”, with an honest slider announcement, rather than looking like a selected 5. Explicit number/slider interaction and the existing Confirm/Skip semantics remain.
 
@@ -22,11 +28,15 @@ Validation: real 320px first-click preview/focus/change-without-launch flow pass
 
 ## Pass 4 — reliable fresh and repeat entry
 
+Commit: `441a0e0`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
+
 Inspected onboarding, setup fallback, and launch payloads from Home/My Plan/Library/need entry. Explicit onboarding can now complete for the open run even when storage denies access, avoiding a welcome redirect loop; deleting app data resets that memory. Bare `/reset` uses the existing guided choices. Retired prebuilt pathways recover into guided setup and no longer retain an unusable fixed pathway. Shared launch helpers retain the chosen practice/context while clearing old goal/distress ratings; repeat/suggested launches cannot answer today’s assessment from history.
 
 Validation: 21 entry/recommendation/history tests passed; typecheck passed; actual browser verified bare setup, retired-pathway fallback and storage-denied onboarding reaching Home. Matching algorithms and existing immediate-reset behavior are unchanged.
 
 ## Pass 5 — personalization from current local history
+
+Commit: `7c58855`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
 
 Inspected Home, My Plan, Profile and Insights history lifecycles. A shared local-only subscription refreshes their derived views on actual session save/delete, another tab's session changes, focus and visible resume; stale requests cannot win after cleanup. Repeat actions also use fresh assessment payloads. My Plan describes reported check-ins rather than implying that an aggregate best practice was the last practice. Read errors keep prior data and offer retry.
 
@@ -34,11 +44,15 @@ Validation: nine subscription, progress-story and recommendation tests, typechec
 
 ## Pass 6 — verified local saves, backups and deletion
 
+Commit: `abaeef8`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
+
 Inspected shared history/notes, Journal, backup restore, reminder cancellation and full deletion. Shared writes/removals now verify storage; unreadable session history cannot silently become an empty overwrite. Journal saves/deletes update the view only after verification and preserve the active entry on error. Backup includes Journal, validates its container and version, prepares history merges before writing, and rolls back partial restore failures with truthful recovery messages. Full deletion includes Dear books/backups and Journal, verifies owned local/session keys, cancels native reminders first, and stays on Profile with a retry message if deletion fails. Scoped memory deletion verifies its promised draft/handoff removals. Return points retries independent stores so one unreadable store does not block others.
 
 Validation: 20 storage/backup/memory/reminder tests passed, including corrupt history, silent writes/removals, Journal round-trip and partial restore rollback. Typecheck and lint passed. Actual 320px Profile proved a silent deletion failure keeps the route, records and truthful retry visible. Native notification hardware is unavailable; cancellation uses the existing on-device plugin.
 
 ## Pass 7 — reliable mobile return navigation
+
+Commit: `47218c0`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
 
 Inspected direct-link and shared intervention Back controls. They now check the router's app-created history index rather than counting unrelated browser entries. Settings, Library, Crisis, Privacy, Plus, Palace, Programmes and Thought or Fact entry fall back to Home; shared intervention chrome retains its Library fallback. Reset setup also protects restored step links with missing internal history. Authored in-journey steps remain intact.
 
@@ -46,17 +60,23 @@ Validation: 16 app-back/history tests passed; typecheck and lint passed. Actual 
 
 ## Pass 8 — accessible ratings and live preferences
 
+Commit: `3986e1e`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
+
 Inspected shared assessment dimensions and accessibility propagation. The rating component now occupies available width, uses five mobile columns with 44px minimum height, and keeps all eleven authored numbers/meanings and honest unanswered state. Selected sound/text controls announce their state. Loading overlays have status announcements. Accessibility reads validate saved booleans, honor OS reduced motion when no explicit choice exists even if another preference was saved, and retain the OS fallback for unreadable storage. Owned cross-tab changes, visible resume/focus and OS motion changes refresh preferences with listener cleanup; explicit saved choices remain authoritative.
 
 Validation: 16 scale/preference/subscription tests passed; typecheck and lint passed. Actual 320px reduced-motion browser verified every rating target is at least 44×44px, keyboard selection, no overflow, OS fallback and mounted cross-tab contrast refresh. Browser inspection caught and fixed the previously shrinking rating container before completing this pass.
 
 ## Pass 9 — audio retry and interruption lifecycle
 
+Commit: `687cd66`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
+
 Inspected Home ambient handoff and procedural practice audio. Fixed denied-autoplay retries that could survive pause/mute and restart on an unrelated later gesture. A generation guard rejects late failures; pending gesture listeners are removed on pause, stop and mute. Background/page interruption suspends Home audio and resumes only while still requested. Standalone journey routes pause Home audio; the approved continuous setup/rating/pathway handoff remains. Approved music source, looping, handoff position and volume are retained. The tab loading surface also announces its status.
 
 Validation: four audio lifecycle tests passed, including denied gesture retries, late promise rejection, background interruption and source/position/volume fidelity. Typecheck and lint passed. Actual Library → Dear navigation with synthetic autoplay denial verified subsequent gestures cannot restart Home music. No approved audio/art asset replaced.
 
 ## Pass 10 — cumulative integration and error recovery
+
+Commit: `30fa2af`. Cumulative inspection: yes, within this pass’s stated scope; not a complete app-wide audit.
 
 Audited the cumulative version rather than starting another design. Corrected follow-up mood controls that still visually answered an unanswered 5; a failed Lift history write now reports that the valid answers were not saved while still allowing the chosen next step or finish. Change the Scene history read errors offer retry instead of hanging. Profile's existing data controls are available with no rated history, so books/Journal/notes can still be deleted. Production enlarged-text testing exposed Settings buttons overflowing at 320px; long actions now wrap inside the screen. Replaced Journal tests that required the old optimistic write order with actual corrupt-container, exact-entry round-trip and silent-write failure contracts. Added executable cumulative production mobile regression checks.
 
@@ -74,3 +94,24 @@ Evidence logs: `/tmp/overnight-all-tests.log`, `/tmp/overnight-pass10-types.log`
 ## Completion and limits
 
 All ten sequential passes are complete on the cumulative branch. None of the requested quality multipliers is a measured result. Approved standalone builds, artwork, names, clinical matching, questions/scale meanings and the existing local saved-state systems are retained; no remote service, account, new plugin or app-wide reward matrix was added. The mandatory Dear check remains the preceding separate `681952b` commit. Native iOS notification hardware and spoken VoiceOver testing are unavailable here. No push, merge or deployment. The previously identified hosting deep-link rewrite remains a separate deployment setting, not changed by this branch.
+
+
+## Rendered final review requested by the parent
+
+Inspected production screenshots of need-selection preview, Library need search, empty My Plan/Profile, unanswered baseline, Return points (empty and a genuine UI-entered synthetic saved note), enlarged Settings and Dear’s required check. The warm palette/type and authored practice identity remain. New shared screens are functional, readable and consistent, but this branch is not evidence of a newly elevated premium visual treatment in every practice. Most practice internals remain intentionally unchanged; the prior practice-first release is retained.
+
+This review found cramped six-column host navigation labels at large text. Within pass 10, host navigation now has three columns/two rows when the person selects large text, retaining all six readable labels and at least 44px targets. The default layout and approved Home document are retained. Typecheck/lint/build and the cumulative production mobile regression were rerun successfully, including actual Extra large selection, all six targets, navigation to Library/practice, no overflow and the earlier data/error cases.
+
+Screenshots in `/workspace/overnight-review/`:
+
+- `need-preview-390.png`, `library-search-390.png`, `my-plan-empty-390.png`, `profile-empty-390.png` — current production screenshots with empty device storage.
+- `baseline-unanswered-320.png` — actual Library → Box entry, unselected baseline.
+- `settings-actions-320-150.png` — before this review’s navigation fix, retained as evidence of the cramped labels.
+- `settings-large-navigation-320-150.png` — actual Extra large setting plus 150% text, corrected full labels.
+- `return-points-empty-320.png` — empty collection.
+- `return-points-saved-note-390.png` — note genuinely typed and explicitly saved via the PMR alternative dialog in production; synthetic content clearly labeled.
+- `dear-threat-320.png` — required-check screenshot from the preceding Dear verification; original approved scene preserved.
+
+Review logs: `/tmp/overnight-review-types.log`, `/tmp/overnight-review-lint.log`, `/tmp/overnight-review-build.log`, `/tmp/overnight-review-mobile.log`.
+
+Do not characterize this as ten proven whole-app transformations or a measured quality multiplier. Literal exhaustive whole-app coverage on every pass was not performed. No remaining failing checks or known regressions were found in this reviewed scope. Native hardware, spoken screen readers and the separate hosting rewrite remain unverified/outside this patch.

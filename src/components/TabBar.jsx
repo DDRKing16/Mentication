@@ -32,7 +32,7 @@ export default function TabBar() {
               silver-sheen treatment used elsewhere on Home, so the tab bar
               doesn't feel like a flat, unrelated strip. */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-          <div className="grid grid-cols-6 items-stretch">
+          <div className="app-tab-grid grid grid-cols-6 items-stretch">
             {TABS.map((t) => {
               const active = pathname === t.to;
               const Icon = t.icon;

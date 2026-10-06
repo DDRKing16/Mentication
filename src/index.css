@@ -325,3 +325,8 @@
 
 /* Settings actions remain readable at enlarged text on narrow devices. */
 .settings-page button { max-width:100%;white-space:normal;min-height:44px;height:auto;overflow-wrap:anywhere; }
+
+/* Keep the six destinations legible when the person increases text size. */
+html.large-text .app-tab-grid { grid-template-columns:repeat(3,minmax(0,1fr));gap:4px; }
+html.large-text .app-tab-grid button { padding:6px 4px;min-height:44px; }
+html.large-text .app-tab-grid button > span:not(:empty) { white-space:normal;line-height:1.2;overflow:visible;text-overflow:clip; }
