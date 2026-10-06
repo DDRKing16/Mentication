@@ -1,0 +1,25 @@
+{
+  "passed": [
+    "390px two selection reveals, one-field edits, refresh, selected response unpractised, support refresh/native Back/revisit, opaque history, explicit reflection/save/completion, no duplicate completion",
+    "Explicit actual rehearsal confirmation carries chosen authored response; selection/edit/refresh alone do not mark practice or complete",
+    "320px live entry, stay/step out, happened/finished, optional save, local deletion and Back/refresh without resurrection",
+    "320px live entry, stay/step out, partly/stepped-out, optional save, local deletion and Back/refresh without resurrection",
+    "320px live entry, stay/step out, did-not/finished, optional save, local deletion and Back/refresh without resurrection",
+    "320px live entry, stay/step out, not-tested/not-attempted, optional save, local deletion and Back/refresh without resurrection",
+    "320px live entry, stay/step out, unsure/unknown, optional save, local deletion and Back/refresh without resurrection",
+    "Legacy unversioned prepare draft resumes authored wording and original difficulty comparison without prediction reinterpretation",
+    "Legacy unversioned plan draft resumes authored wording and original difficulty comparison without prediction reinterpretation",
+    "Legacy unversioned rehearse draft resumes authored wording and original difficulty comparison without prediction reinterpretation",
+    "Legacy unversioned tackle draft resumes authored wording and original difficulty comparison without prediction reinterpretation",
+    "Legacy unversioned support draft resumes authored wording and original difficulty comparison without prediction reinterpretation",
+    "Legacy unversioned reflect draft resumes authored wording and original difficulty comparison without prediction reinterpretation",
+    "Legacy unversioned recap draft resumes authored wording and original difficulty comparison without prediction reinterpretation",
+    "Saved legacy recap revisit is read-only, preserves original comparison and emits no completion",
+    "Quota failure preserves editable in-memory flow and honest unsaved recap; explicit retry recovers and survives refresh",
+    "320px 150% text, early move, reduced motion, editor focus/Escape cancel/restoration, dialog keyboard trap, exit and resume",
+    "App-wide deletion clears mounted draft and persistent data; Back/refresh does not resurrect it",
+    "Silent deletion failure keeps data and confirmation dialog with truthful error",
+    "Long authored move stays intact through disclosure, enlarged mobile text, native Back and refresh"
+  ],
+  "pageErrors": []
+}

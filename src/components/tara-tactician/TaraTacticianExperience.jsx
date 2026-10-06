@@ -126,12 +126,12 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
   };
   const reveal = () => requestAnimationFrame(() => revealRef.current?.focus({ preventScroll: false }));
   const openEditor = (key, label) => {
-    const value = key.startsWith('plan.') ? prepared.plan[key.slice(5)] : state[key];
+    const value = key.startsWith('plan.') ? editablePlan[key.slice(5)] || (key === 'plan.do' && live ? '“Let me take a moment.”' : '') : state[key];
     setEditor({ key, label, value });
   };
   const keepEdit = value => {
     const key = editor.key;
-    if (key.startsWith('plan.')) editState({ plan: { ...prepared.plan, [key.slice(5)]: value }, ...(key === 'plan.do' ? { selectedMoveId: 'custom', rehearsalChoice: '', rehearsalResponse: '' } : {}) });
+    if (key.startsWith('plan.')) editState({ plan: { ...editablePlan, [key.slice(5)]: value }, ...(key === 'plan.do' ? { selectedMoveId: 'custom', rehearsalChoice: '', rehearsalResponse: '' } : {}) });
     else editState({ [key]: value, ...(key === 'prediction' ? { predictionEdited: true } : {}), ...(key === 'rehearsal' ? { rehearsalResponse: value } : {}) });
     setEditor(null);
   };
@@ -163,6 +163,7 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
   const event = EVENTS.find(item => item.id === state.event); const tactic = tacticFor(state);
   const prepared = preparePlan(state);
   if (!state.plan.do) prepared.plan.do = tactic.moves[0][2];
+  const editablePlan = ['prepare', 'plan'].includes(state.phase) ? prepared.plan : state.plan;
   const hasPreparation = state.phase === 'plan' || Boolean(state.event && state.challenge);
   const recapResult = state.predictionResult ? PREDICTION_RESULTS.find(([value]) => value === state.predictionResult)?.[1] : null;
 
@@ -211,7 +212,7 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
         </section>}
         {state.phase === 'reflect' && <section className="tara-reflection">
           <div className="tara-evidence"><div><span className="tara-small-label">I predicted</span><Wording value={state.prediction} fallback="No prediction recorded." /></div><div><span className="tara-small-label">I observed</span><Wording value={state.actual} fallback="What did you notice in the real situation?" /><EditButton label={state.actual ? 'Edit what happened' : 'Add what happened (optional)'} onClick={() => openEditor('actual', 'What actually happened?')} /></div></div>
-          <div className="tara-action-status"><label htmlFor="tara-event-status">What did I do?</label><select id="tara-event-status" value={state.actualActionConfirmed ? state.eventStatus : ''} onChange={event => editState({ eventStatus: event.target.value, actualActionConfirmed: true })}><option value="" disabled>Choose, or say you’re unsure</option>{Object.entries(ACTION_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
+          <div className="tara-action-status"><label htmlFor="tara-event-status">What did I do?</label><select id="tara-event-status" value={state.actualActionConfirmed ? state.eventStatus : ''} onChange={event => editState({ eventStatus: event.target.value, actualActionConfirmed: true })}><option value="" disabled>Choose an answer</option>{Object.entries(ACTION_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
           <ResultChoices value={state.predictionResult} onChange={predictionResult => editState({ experienceVersion: 2, predictionResult })} />
           <Action disabled={!state.predictionResult || !state.actualActionConfirmed} onClick={() => go(confirmReflection({ ...state, experienceVersion: 2 }))}>Keep this reflection</Action>
           <p className="tara-note">Whether the prediction happened is separate from how difficult the moment felt.</p>
