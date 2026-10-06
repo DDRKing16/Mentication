@@ -2,16 +2,22 @@
 (()=>{
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const app=$('#app'), screens=$$('.screen'), back=$('#back'), step=$('#step'), progress=$('#progress'), flowNav=$('#flowNav');
-const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+const motionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');
+const reducedMotion={matches:motionQuery.matches};
+let sharedPreferences={},localSound=true;
+try{sharedPreferences=JSON.parse(localStorage.getItem('haven.a11y.v2')||'{}')||{};localSound=localStorage.getItem('mentication.foundations.sound.v1')!=='off'}catch(e){}
+reducedMotion.matches=typeof sharedPreferences.reducedMotion==='boolean'?sharedPreferences.reducedMotion:motionQuery.matches;
 function reveal(element,frames,options){if(!reducedMotion.matches&&element.animate)element.animate(frames,options)}
-const order=['intro','scan','snapshot','choices','dose','plan','saved','reviewIntro','review','learned','finish'];
-const flowLabels={intro:'Start',scan:'Questions',snapshot:'Foundation',choices:'Pick one',dose:'Make it fit',plan:'Plan',saved:'Saved',reviewIntro:'Review',review:'Reflect',learned:'Learning',finish:'Finish'};
-flowNav.innerHTML=order.map(name=>`<button class="flow-stop" type="button" data-screen-target="${name}" data-label="${flowLabels[name]}" aria-label="Go to ${flowLabels[name]} screen"></button>`).join('');
+const order=['intro','scan','snapshot','choices','dose','plan','saved','review','learned','finish'];
+const flowLabels={intro:'Foundations',scan:'Check-in',snapshot:'Your picture',choices:'Choose an action',dose:'Choose a size',plan:'Your plan',saved:'Plan saved',review:'Review',learned:'Next choice',finish:'For now'};
+const stageLabels={scan:'Check-in',snapshot:'Picture',plan:'Plan',review:'Review'};
+flowNav.innerHTML=Object.entries(stageLabels).map(([name,label])=>`<button class="flow-stop" type="button" data-screen-target="${name}"><span aria-hidden="true" class="stage-dot"></span>${label}<span class="stage-state"></span></button>`).join('');
 const flowStops=$$('.flow-stop',flowNav);
 let audioContext;
 function tactileFeedback(weight='soft'){
   const isFoundation=weight==='foundation',isFirm=weight==='firm';
-  try{if(navigator.vibrate)navigator.vibrate(isFoundation?[9,14,12]:isFirm?14:8)}catch(e){}
+  try{if(!reducedMotion.matches&&navigator.vibrate)navigator.vibrate(isFoundation?[9,14,12]:isFirm?14:8)}catch(e){}
+  if(!localSound||sharedPreferences.ambientSoundscape===false)return;
   try{
     audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume();
     const now=audioContext.currentTime, master=audioContext.createGain(), filter=audioContext.createBiquadFilter();
@@ -23,7 +29,7 @@ function tactileFeedback(weight='soft'){
     if(isFoundation){const settle=audioContext.createOscillator(),settleGain=audioContext.createGain();settle.type='sine';settle.frequency.setValueAtTime(132,now+.072);settle.frequency.exponentialRampToValueAtTime(78,now+.145);settleGain.gain.setValueAtTime(.0001,now);settleGain.gain.exponentialRampToValueAtTime(.026,now+.078);settleGain.gain.exponentialRampToValueAtTime(.0001,now+.15);settle.connect(settleGain);settleGain.connect(filter);settle.start(now+.07);settle.stop(now+.155)}
   }catch(e){}
 }
-document.addEventListener('click',e=>{const button=e.target.closest('button');if(button&&!button.disabled)tactileFeedback(button.classList.contains('block')?'foundation':button.classList.contains('primary')||button.classList.contains('scale-point')?'firm':'soft')},true);
+document.addEventListener('click',e=>{const button=e.target.closest('button');if(button&&!button.disabled&&button.id!=='soundToggle')tactileFeedback(button.classList.contains('block')?'foundation':button.classList.contains('primary')||button.classList.contains('scale-point')?'firm':'soft')},true);
 const domains=[
  {id:'sleep',name:'Sleep and rhythm',questions:[['How steady has your sleep routine been?','Sleep and wake timing'],['How rested have you felt after sleeping?','Restfulness and recovery']],logic:['Irregular rhythm','Lower energy','Less emotional bandwidth','Harder follow-through'],why:'Sleep rhythm appears to be placing pressure on energy and follow-through. A small, consistent anchor may improve more than one part of the base.',actions:[['Anchor the morning','Keep wake time within the same 45-minute window.','A reliable morning anchor can steady circadian timing without redesigning the whole night.'],['Find ten minutes of daylight','Get outside within the first hour after waking.','Morning light is a low-friction signal that supports the sleep–wake system.'],['Create a two-step shutdown','Use the same two brief cues before bed.','A consistent sequence can reduce the decision load around winding down.'],['Protect one sleep opportunity','Choose one night and preserve a realistic sleep window.','One protected opportunity is more achievable than demanding immediate perfection.']]},
  {id:'nutrition',name:'Nutrition and hydration',questions:[['How regularly have you been eating?','Regularity and adequacy'],['How steady have food and water kept your energy?','Energy and hydration']],logic:['Basics become irregular','Energy fluctuates','Capacity drops','Other tasks feel harder'],why:'Basic intake appears inconsistent enough to affect energy and coping capacity. The goal is reliability, not restrictive eating rules.',actions:[['Protect one reliable meal','Choose one meal that can happen consistently.','One dependable meal reduces volatility without requiring a complete diet overhaul.'],['Make water visible','Place water where it will be seen during the busiest part of the day.','Changing the environment reduces reliance on remembering.'],['Add one steadying option','Prepare one easy food option for low-capacity moments.','A ready option protects adequacy when effort is limited.'],['Link intake to an existing cue','Pair food or water with something that already happens daily.','An existing cue makes repetition easier than creating a new routine from nothing.']]},
@@ -39,13 +45,54 @@ const scanItems=[
  {id:'overall',domain:'The whole picture',q:'How much have the basics supported you lately?',context:'Sleep · energy · routine · recovery · support'},
  ...domains.flatMap(d=>d.questions.map((q,index)=>({id:d.id+'-'+index,domain:d.name,domainId:d.id,q:q[0],context:q[1]})))
 ];
-let state={q:0,responses:{},answers:{},selected:null,dose:null,review:{},history:[]};
+function freshState(){return {q:0,responses:{},answers:{},priority:null,selected:null,dose:null,pendingResponse:null,cue:'',time:'',review:{},reviewId:'',planId:'',planRevision:0,history:[]}}
+let state=freshState(),ready=false,savedPlan=null,draftSaveFailed=false,planReadError=null;
+let deviceStorage;
+try{deviceStorage=window.localStorage}catch(e){deviceStorage={getItem(){throw new Error('Storage unavailable')}}}
+const store=globalThis.FoundationsStorage.create(deviceStorage,domains,scanItems);
+function answeredCount(){return scanItems.filter(item=>Number.isInteger(state.responses[item.id])&&state.responses[item.id]>=1&&state.responses[item.id]<=5).length}
+function persistDraft(){
+ if(!ready)return;
+ draftSaveFailed=!store.writeDraft({version:2,screen:currentName(),state,checkpointId,checkpointRevised});
+ $('#draftStatus').textContent=draftSaveFailed?'Changes are for this visit only. Device saving is unavailable.':'Draft saved on this device.';
+}
+function canEnter(name){
+ if(name==='snapshot')return answeredCount()>0;
+ if(name==='choices')return !!state.priority;
+ if(name==='dose')return state.selected!==null&&!!state.priority;
+ if(name==='plan')return canEnter('dose')&&!!state.dose;
+ if(name==='saved')return samePlan(savedPlan);
+ if(name==='review'||name==='finish')return !!savedPlan;
+ if(name==='learned')return !!savedPlan&&state.planId===savedPlan.id&&state.planRevision===savedPlan.revision&&store.completeReview(state.review);
+ return name==='intro'||name==='scan';
+}
+function safeScreen(name){
+ const fallback={snapshot:'scan',choices:'snapshot',dose:'choices',plan:'dose',saved:'plan',review:'plan',learned:'review',finish:'plan'};
+ for(let i=0;i<order.length&&!canEnter(name);i++)name=fallback[name]||'intro';
+ return name;
+}
+let checkpointId=null,checkpointRevised=false;
+const checkpoint=$('#scanCheckpoint');
+$('#checkpointPieces').innerHTML=scanItems.map(()=>'<i class="checkpoint-piece"></i>').join('');
+function renderCheckpoint(celebrate=false){
+ const reflection=globalThis.FoundationsCheckpoints.describe({items:scanItems,responses:state.responses,lastId:checkpointId,revised:checkpointRevised});
+ $('#checkpointTitle').textContent=reflection.title;
+ $('#checkpointCount').textContent=reflection.count+' of '+reflection.total+' answers';
+ $('#checkpointCopy').textContent=reflection.copy;
+ $('#checkpointNext').textContent=reflection.next;
+ $$('.checkpoint-piece',checkpoint).forEach((piece,index)=>{piece.classList.toggle('lit',reflection.answered[index]);piece.classList.toggle('latest',index===reflection.current)});
+ checkpoint.classList.remove('checkpoint-earned');
+ if(celebrate&&!reducedMotion.matches){void checkpoint.offsetWidth;checkpoint.classList.add('checkpoint-earned')}
+}
 function currentName(){return screens.find(s=>s.classList.contains('active')).dataset.screen}
-function updateFlowNav(name){const active=order.indexOf(name);flowStops.forEach((stop,index)=>{stop.classList.toggle('current',index===active);stop.classList.toggle('passed',index<active);if(index===active)stop.setAttribute('aria-current','step');else stop.removeAttribute('aria-current')})}
+function updateFlowNav(name){
+ const stage=['choices','dose','plan','saved','finish'].includes(name)?'plan':name==='learned'?'review':name;
+ const completed={scan:answeredCount()===scanItems.length,snapshot:!!state.priority,plan:samePlan(savedPlan),review:!!savedPlan?.reviews.some(review=>review.plan.domain===savedPlan.domain&&review.plan.action===savedPlan.action&&review.plan.size===savedPlan.size&&review.plan.cue===savedPlan.cue&&review.plan.time===savedPlan.time)};
+ flowStops.forEach(stop=>{const target=stop.dataset.screenTarget;stop.disabled=!canEnter(target);stop.classList.toggle('current',target===stage);stop.classList.toggle('passed',completed[target]);$('.stage-state',stop).textContent=completed[target]?' ✓':'';stop.setAttribute('aria-label',stageLabels[target]+(completed[target]?', completed':'')+(stop.disabled?', not available yet':''));if(target===stage)stop.setAttribute('aria-current','step');else stop.removeAttribute('aria-current')});
+}
 function show(name,push=true){
  if(!order.includes(name))return;
- if(['dose','plan','saved'].includes(name)&&state.selected===null)name='choices';
- if(['plan','saved'].includes(name)&&!state.dose)name='dose';
+ name=safeScreen(name);
  const from=currentName();
  if(name==='scan'&&from!=='scan'){state.q=Math.max(0,Math.min(state.q,scanItems.length-1));renderQuestion()}
  if(priorityExplanation.classList.contains('open'))closePriorityExplanation(false);
@@ -54,33 +101,33 @@ function show(name,push=true){
  app.classList.toggle('scan-active',name==='scan');
  if(name==='scan'&&from!=='scan'&&!scanScreen.classList.contains('question-enter'))animateQuestionEntry(false);
  if(push&&from&&from!==name)state.history.push(from);
- back.hidden=name==='intro'||name==='finish';
- const idx=order.indexOf(name),scanProgress=(state.q+1)/scanItems.length;
- step.textContent=name==='scan'?'Quick scan · '+String(state.q+1).padStart(2,'0')+'/'+scanItems.length:flowLabels[name]+' · '+String(idx+1).padStart(2,'0')+'/'+order.length;
- progress.style.width=(name==='scan'?((idx+scanProgress)/(order.length-1))*100:(idx/(order.length-1))*100)+'%';
+ back.hidden=name==='intro';
+ step.textContent=name==='scan'?`Question ${state.q+1} of ${scanItems.length}`:flowLabels[name];
+ progress.style.width=answeredCount()/scanItems.length*100+'%';
+ progress.parentElement.setAttribute('aria-valuenow',String(answeredCount()));$('#progressLabel').textContent=`Check-in: ${answeredCount()} of ${scanItems.length} answers confirmed`;
+ progress.parentElement.setAttribute('aria-valuetext',`${answeredCount()} of ${scanItems.length} answers confirmed. This tracks the check-in, not wellbeing.`);
+ if(name==='snapshot')renderSnapshot();if(name==='choices')renderChoices();if(name==='dose')renderDoses();if(name==='plan')renderPlan();if(name==='saved')renderSaved();if(name==='review')renderReview();if(name==='learned')renderLearning();
  updateFlowNav(name);
- if(name==='snapshot')renderSnapshot();if(name==='choices')renderChoices();if(name==='dose')renderDoses();if(name==='plan')renderPlan();if(name==='saved')renderSaved();if(name==='review')renderReview();
  if(name==='intro')scheduleFoundationIdle(1800);else{pauseFoundationIdle();clearFoundationImpact();resetFoundationParallax()}
- const heading=$('h1,h2',$('.screen.active'));if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
- window.scrollTo(0,0);
+ const active=$('.screen.active');active.scrollTop=0;
+ const heading=$('h1,h2',active);if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
+ window.scrollTo(0,0);persistDraft();
 }
-function navigateFlow(target){
- if(target===currentName())return;
- if(target==='scan'){state.q=Math.max(0,Math.min(state.q,scanItems.length-1));renderQuestion()}
- else if(order.indexOf(target)>=order.indexOf('snapshot'))calculateDomainScores();
- show(target);
-}
+function navigateFlow(target){if(target===currentName())return;if(target==='review'){openReview();return}if(target==='scan')state.q=Math.max(0,Math.min(state.q,scanItems.length-1));calculateDomainScores();show(target)}
 flowStops.forEach(stop=>stop.onclick=()=>navigateFlow(stop.dataset.screenTarget));
-back.onclick=()=>{if(currentName()==='scan'&&state.q>0){state.q--;renderQuestion();show('scan',false);return}const prev=state.history.pop();if(prev){if(prev==='scan'){state.q=Math.min(state.q,scanItems.length-1);renderQuestion()}show(prev,false)}};
-$$('[data-next]').forEach(b=>b.onclick=()=>b.closest('.screen[data-screen="intro"]')?beginFoundationEntry():show(b.dataset.next));
-const foundation=$('#foundation'), foundationZone=$('.foundation-zone'), foundationLabel=$('#foundationLabel'), foundationCaption=$('.foundation-caption'), foundationBlocks=$$('.block'), introContinue=$('.screen[data-screen="intro"] .primary[data-next="scan"]'), foundationIdleAllowed=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+back.onclick=()=>{if(currentName()==='scan'&&state.q>0){state.q--;state.pendingResponse=null;renderQuestion();show('scan',false);return}const prev=state.history.pop()||'intro';show(prev,false)};
+$$('[data-next]').forEach(b=>b.onclick=()=>{if(b.dataset.next==='review'){openReview();return}if(b.closest('.screen[data-screen="intro"]'))beginFoundationEntry();else show(b.dataset.next)});
+function exitFoundations(){persistDraft();if(window.parent!==window)window.parent.postMessage({type:'foundations:exit'},window.location.origin);else window.location.assign('/restructure')}
+$('#exit').onclick=exitFoundations;$('#finishExit').onclick=exitFoundations;
+const foundation=$('#foundation'), foundationZone=$('.foundation-zone'), foundationLabel=$('#foundationLabel'), foundationCaption=$('.foundation-caption'), foundationBlocks=$$('.block'), introContinue=$('.screen[data-screen="intro"] .primary[data-next="scan"]');
+let foundationIdleAllowed=!reducedMotion.matches;
 let foundationIdleStart=0,foundationIdleEnd=0,foundationCaptionTimer=0,foundationIdleIndex=1,foundationIdleEpoch=0,foundationImpactTimer=0,foundationTransitioning=false,energyTransferTimer=0,orbitPulseTimer=0,parallaxTargetX=0,parallaxTargetY=0,parallaxCurrentX=0,parallaxCurrentY=0,parallaxFrame=0;
 function swapFoundationCaption(label,epoch=foundationIdleEpoch){window.clearTimeout(foundationCaptionTimer);foundationCaption.classList.add('idle-caption-swap');foundationCaptionTimer=window.setTimeout(()=>{if(epoch!==foundationIdleEpoch)return;foundationLabel.textContent=label;foundationCaption.classList.remove('idle-caption-swap')},210)}
 function pauseFoundationIdle(){foundationIdleEpoch++;window.clearTimeout(foundationIdleStart);window.clearTimeout(foundationIdleEnd);window.clearTimeout(foundationCaptionTimer);const remembered=foundation.querySelector('.idle-memory');foundation.querySelectorAll('.idle-preview').forEach(x=>x.classList.remove('idle-preview'));foundation.classList.remove('idle-playing');foundationCaption.classList.remove('idle-caption-swap');if(remembered){remembered.classList.remove('idle-memory');remembered.classList.add('active')}const selected=foundation.querySelector('.block.active');if(selected){foundationLabel.textContent=selected.dataset.label;setFoundationOrbitFocus(selected,false)}}
 function scheduleFoundationIdle(delay=4000){window.clearTimeout(foundationIdleStart);if(!foundationIdleAllowed||document.hidden)return;const epoch=foundationIdleEpoch;foundationIdleStart=window.setTimeout(()=>{if(epoch===foundationIdleEpoch)playFoundationIdle()},delay)}
 function playFoundationIdle(){if(currentName()!=='intro'||!$('.screen[data-screen="intro"]').classList.contains('intro-settled')){scheduleFoundationIdle(900);return}pauseFoundationIdle();const epoch=foundationIdleEpoch,selected=foundation.querySelector('.block.active')||foundationBlocks[0];let target=foundationBlocks[foundationIdleIndex%foundationBlocks.length];if(target===selected){foundationIdleIndex=(foundationIdleIndex+1)%foundationBlocks.length;target=foundationBlocks[foundationIdleIndex]}selected.classList.remove('active');selected.classList.add('idle-memory');target.classList.add('idle-preview');foundation.classList.add('idle-playing');setFoundationOrbitFocus(target,false);swapFoundationCaption(target.dataset.label,epoch);foundationIdleEnd=window.setTimeout(()=>{if(epoch!==foundationIdleEpoch)return;target.classList.remove('idle-preview');foundation.classList.remove('idle-playing');selected.classList.remove('idle-memory');selected.classList.add('active');setFoundationOrbitFocus(selected,false);swapFoundationCaption(selected.dataset.label,epoch);foundationIdleIndex=(foundationIdleIndex+1)%foundationBlocks.length;scheduleFoundationIdle(1250)},1900)}
 function clearFoundationImpact(){window.clearTimeout(foundationImpactTimer);foundation.classList.remove('impacting');['--impact-rx','--impact-rz','--impact-x','--impact-y','--impact-return-x','--impact-return-y','--impact-rebound-x','--impact-rebound-y'].forEach(p=>foundation.style.removeProperty(p));foundationBlocks.forEach(x=>{x.classList.remove('impact-selected','impact-neighbour');['--neighbour-x','--neighbour-y','--neighbour-return-x','--neighbour-return-y','--neighbour-rebound-x','--neighbour-rebound-y'].forEach(p=>x.style.removeProperty(p))})}
-function playFoundationImpact(target){clearFoundationImpact();const width=foundation.offsetWidth,height=foundation.offsetHeight,cx=target.offsetLeft+target.offsetWidth/2,cy=target.offsetTop+target.offsetHeight/2,xNorm=Math.max(-1,Math.min(1,(cx-width/2)/(width/2))),yNorm=Math.max(-1,Math.min(1,(cy-height/2)/(height/2))),impactX=xNorm*5,impactY=yNorm*3.5;foundation.style.setProperty('--impact-rx',(55-yNorm*1.4)+'deg');foundation.style.setProperty('--impact-rz',(-45+xNorm*2.4)+'deg');foundation.style.setProperty('--impact-x',impactX+'px');foundation.style.setProperty('--impact-y',impactY+'px');foundation.style.setProperty('--impact-return-x',impactX*-.28+'px');foundation.style.setProperty('--impact-return-y',impactY*-.28+'px');foundation.style.setProperty('--impact-rebound-x',impactX*.12+'px');foundation.style.setProperty('--impact-rebound-y',impactY*.12+'px');target.classList.add('impact-selected');foundationBlocks.forEach(piece=>{if(piece===target)return;const px=piece.offsetLeft+piece.offsetWidth/2,py=piece.offsetTop+piece.offsetHeight/2,dx=px-cx,dy=py-cy,distance=Math.hypot(dx,dy);if(distance>105)return;const strength=Math.max(.25,1-distance/135),pushX=(dx/(distance||1))*5*strength,pushY=(dy/(distance||1))*5*strength;piece.style.setProperty('--neighbour-x',pushX+'px');piece.style.setProperty('--neighbour-y',pushY+'px');piece.style.setProperty('--neighbour-return-x',pushX*-.38+'px');piece.style.setProperty('--neighbour-return-y',pushY*-.38+'px');piece.style.setProperty('--neighbour-rebound-x',pushX*.14+'px');piece.style.setProperty('--neighbour-rebound-y',pushY*.14+'px');piece.classList.add('impact-neighbour')});void foundation.offsetWidth;foundation.classList.add('impacting');foundationImpactTimer=window.setTimeout(clearFoundationImpact,940)}
+function playFoundationImpact(target){clearFoundationImpact();if(reducedMotion.matches)return;const width=foundation.offsetWidth,height=foundation.offsetHeight,cx=target.offsetLeft+target.offsetWidth/2,cy=target.offsetTop+target.offsetHeight/2,xNorm=Math.max(-1,Math.min(1,(cx-width/2)/(width/2))),yNorm=Math.max(-1,Math.min(1,(cy-height/2)/(height/2))),impactX=xNorm*5,impactY=yNorm*3.5;foundation.style.setProperty('--impact-rx',(55-yNorm*1.4)+'deg');foundation.style.setProperty('--impact-rz',(-45+xNorm*2.4)+'deg');foundation.style.setProperty('--impact-x',impactX+'px');foundation.style.setProperty('--impact-y',impactY+'px');foundation.style.setProperty('--impact-return-x',impactX*-.28+'px');foundation.style.setProperty('--impact-return-y',impactY*-.28+'px');foundation.style.setProperty('--impact-rebound-x',impactX*.12+'px');foundation.style.setProperty('--impact-rebound-y',impactY*.12+'px');target.classList.add('impact-selected');foundationBlocks.forEach(piece=>{if(piece===target)return;const px=piece.offsetLeft+piece.offsetWidth/2,py=piece.offsetTop+piece.offsetHeight/2,dx=px-cx,dy=py-cy,distance=Math.hypot(dx,dy);if(distance>105)return;const strength=Math.max(.25,1-distance/135),pushX=(dx/(distance||1))*5*strength,pushY=(dy/(distance||1))*5*strength;piece.style.setProperty('--neighbour-x',pushX+'px');piece.style.setProperty('--neighbour-y',pushY+'px');piece.style.setProperty('--neighbour-return-x',pushX*-.38+'px');piece.style.setProperty('--neighbour-return-y',pushY*-.38+'px');piece.style.setProperty('--neighbour-rebound-x',pushX*.14+'px');piece.style.setProperty('--neighbour-rebound-y',pushY*.14+'px');piece.classList.add('impact-neighbour')});void foundation.offsetWidth;foundation.classList.add('impacting');foundationImpactTimer=window.setTimeout(clearFoundationImpact,940)}
 function playHomeEnergyTransfer(){if(!foundationIdleAllowed||currentName()!=='intro')return;window.clearTimeout(energyTransferTimer);introScreen.classList.remove('energy-transfer');void introScreen.offsetWidth;introScreen.classList.add('energy-transfer');energyTransferTimer=window.setTimeout(()=>introScreen.classList.remove('energy-transfer'),1850)}
 function setFoundationOrbitFocus(target,pulse=true){const index=Math.max(0,foundationBlocks.indexOf(target)),angle=-132+index*45;foundationZone.style.setProperty('--orbit-focus-angle',angle+'deg');if(!pulse||!foundationIdleAllowed)return;window.clearTimeout(orbitPulseTimer);foundationZone.classList.remove('orbit-reacting');void foundationZone.offsetWidth;foundationZone.classList.add('orbit-reacting');orbitPulseTimer=window.setTimeout(()=>foundationZone.classList.remove('orbit-reacting'),920)}
 function resetCtaMagnet(){introContinue.style.setProperty('--cta-magnet-x','0px');introContinue.style.setProperty('--cta-magnet-y','0px');introContinue.style.setProperty('--cta-arrow-x','0px')}
@@ -108,68 +155,57 @@ function renderQuestion(){
   selectedResponse=null;range.value=2;qContinue.disabled=true;answer.textContent='Choose a response below';answer.dataset.selected='false';responseScale.style.setProperty('--scale-fill','0%');responseScale.style.setProperty('--response-position','50%');responseScale.querySelector('.scale-dots').classList.remove('is-confirming');
   dots.forEach((x,index)=>{x.disabled=false;x.classList.remove('active','confirming');x.setAttribute('aria-pressed','false');x.setAttribute('aria-label',scaleAria[index])});
   const plinth=balance.querySelector('.plinth'),orb=balance.querySelector('.orb');plinth.style.setProperty('--tilt','-1deg');orb.style.setProperty('--orb-left','45%');balance.classList.remove('settling','responding');scanScreen.classList.remove('response-set','question-enter','domain-shift');
-  window.clearTimeout(balanceResponseTimer);animateQuestionEntry(domainChanged);if(Number.isFinite(state.responses[item.id]))updateRange(state.responses[item.id]-1)
+  window.clearTimeout(balanceResponseTimer);animateQuestionEntry(domainChanged);if(state.pendingResponse!==null)updateRange(state.pendingResponse,false);else if(Number.isFinite(state.responses[item.id]))updateRange(state.responses[item.id]-1,false)
 }
-function updateRange(value){
+function updateRange(value,save=true){
   const v=value===undefined?+range.value:+value,positions=[10,30,50,70,90],fill=[0,25,50,75,100],tilts=['-6deg','-3deg','-1deg','2deg','5deg'],orbPositions=['18%','31%','45%','59%','72%'],reaction=(v-2)/2;
   range.value=v;answer.textContent=labels[v];answer.dataset.selected='true';dots.forEach((x,i)=>{const selected=i===v;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected));x.setAttribute('aria-label',scaleAria[i])});responseScale.style.setProperty('--scale-fill',fill[v]+'%');responseScale.style.setProperty('--response-position',positions[v]+'%');
   const plinth=balance.querySelector('.plinth'),orb=balance.querySelector('.orb');plinth.style.setProperty('--tilt',tilts[v]);orb.style.setProperty('--orb-left',orbPositions[v]);balance.style.setProperty('--reaction-angle',(reaction*1.6)+'deg');balance.style.setProperty('--reaction-return-angle',(reaction*-.55)+'deg');balance.style.setProperty('--reaction-rebound-angle',(reaction*.24)+'deg');balance.style.setProperty('--reaction-x',(reaction*3.5)+'px');balance.style.setProperty('--reaction-return-x',(reaction*-.9)+'px');balance.style.setProperty('--orb-kick-x',(reaction*5)+'px');balance.style.setProperty('--orb-return-x',(reaction*-1.5)+'px');balance.style.setProperty('--orb-rebound-x',(reaction*.6)+'px');
   window.clearTimeout(balanceResponseTimer);balance.classList.remove('settling','responding');scanScreen.classList.remove('response-set');void balance.offsetWidth;balance.classList.add('settling','responding');scanScreen.classList.add('response-set');balanceResponseTimer=window.setTimeout(()=>balance.classList.remove('settling','responding'),820);qContinue.disabled=false;
-  selectedResponse=v;responseScale.querySelector('.scale-dots').classList.add('is-confirming');dots.forEach((point,index)=>point.classList.toggle('confirming',index===v));dots[v].setAttribute('aria-label',scaleAria[v]+'. Selected. Activate again to continue')
+  selectedResponse=v;responseScale.querySelector('.scale-dots').classList.add('is-confirming');dots.forEach((point,index)=>point.classList.toggle('confirming',index===v));dots[v].setAttribute('aria-label',scaleAria[v]+'. Selected. Activate again to continue');state.pendingResponse=v;if(save)persistDraft()
 }
 range.oninput=()=>updateRange();dots.forEach(point=>point.onclick=()=>{const value=+point.dataset.value;if(selectedResponse===value){advanceQuestion();return}updateRange(value)});
-function calculateDomainScores(){domains.forEach(d=>{const values=d.questions.map((_,i)=>state.responses[d.id+'-'+i]).filter(Number.isFinite);state.answers[d.id]=values.length?values.reduce((a,b)=>a+b,0)/values.length:3})}
-function advanceQuestion(){if(selectedResponse===null)return;const item=scanItems[state.q];if(!item)return;const value=+range.value+1;if(state.responses[item.id]!==value){state.priority=null;state.selected=null;state.selectionDomain=null;state.dose=null;state.review={}}state.responses[item.id]=value;if(item.id==='overall')state.overall=value;state.q++;if(state.q<scanItems.length){renderQuestion();show('scan',false)}else{calculateDomainScores();show('snapshot')}}
+function calculateDomainScores(){domains.forEach(d=>{const values=d.questions.map((_,i)=>state.responses[d.id+'-'+i]).filter(Number.isFinite);state.answers[d.id]=values.length?values.reduce((a,b)=>a+b,0)/values.length:null})}
+function advanceQuestion(){if(selectedResponse===null)return;const item=scanItems[state.q];if(!item)return;const value=+range.value+1,previous=state.responses[item.id];if(previous!==value){state.priority=null;state.selected=null;state.selectionDomain=null;state.dose=null}state.responses[item.id]=value;state.pendingResponse=null;checkpointId=item.id;checkpointRevised=Number.isFinite(previous);renderCheckpoint(previous!==value);state.q++;if(state.q<scanItems.length){renderQuestion();show('scan',false)}else{calculateDomainScores();show('snapshot')}}
 qContinue.onclick=advanceQuestion;
-function status(v){return v<2.5?'Under pressure':v<3.5?'Mixed':v<4.5?'Reasonably supported':'Strong and steady'}
-function lowDomain(){return domains.reduce((a,d)=>((state.answers[d.id]??3)<(state.answers[a.id]??3)?d:a),domains[0])}
+function status(v){return Number.isFinite(v)?v+' / 5':'Not answered'}
+function lowestDomains(){const rated=domains.filter(d=>d.questions.every((_,i)=>Number.isFinite(state.responses[d.id+'-'+i])));const lowest=Math.min(...rated.map(d=>state.answers[d.id]));return rated.filter(d=>state.answers[d.id]===lowest)}
 function setPriority(id){
-  if(state.priority!==id){state.selected=null;state.selectionDomain=null;state.dose=null;state.review={}}
+  if(state.priority!==id){state.selected=null;state.selectionDomain=null;state.dose=null}
   state.priority=id;
 }
 function renderSnapshot(){
-  const vals=domains.map(d=>state.answers[d.id]??3),avg=vals.reduce((a,b)=>a+b,0)/vals.length,model=$('#foundationModel'),screen=$('.screen[data-screen="snapshot"]');
-  if(!state.priority)setPriority(lowDomain().id);
-  model.classList.remove('has-focus');model.style.removeProperty('--focus-colour');
-  $('#snapshotTitle').textContent=avg<2.5?'A base under pressure':avg<3.7?'A mixed base':'A well-supported base';
-  const left=[0,2,4,6].reduce((n,i)=>n+vals[i],0)/4,right=[1,3,5,7].reduce((n,i)=>n+vals[i],0)/4;
-  $('.load-beam',model).style.setProperty('--beam-tilt',Math.max(-2.4,Math.min(2.4,(right-left)*.9))+'deg');
-  $('#supportFrame').innerHTML=domains.map((d,i)=>{
-    const v=vals[i],low=v<2.5;
-    return `<div class="support-piece ${low?'low':v>=4?'supported':''}" data-id="${d.id}" style="--piece-delay:${.58+i*.07}s;--score:${v};--piece-height:${Math.round(30+v*14)}px;--piece-sink:${Math.round((5-v)*5.5)}px;--piece-accent:${low?'#F08A78':'#9FC5EF'}" aria-label="${d.name}: ${status(v)}"></div>`;
-  }).join('');
-  $('#modelOrbit').innerHTML=domains.map((d,i)=>{
-    const v=vals[i],low=v<2.5;
-    return `<button class="model-node ${low?'low':''}" type="button" data-id="${d.id}" style="--node-delay:${.82+i*.055}s;--node-color:${low?'#F08A78':'#9FC5EF'}" aria-pressed="false"><b>${d.name}</b><span>${status(v)}</span></button>`;
-  }).join('');
-  const select=d=>{
-    setPriority(d.id);
-    const score=state.answers[d.id]??3,low=score<2.5,isMinimum=score===Math.min(...vals),hasTies=vals.filter(v=>v===score).length>1;
-    $$('.model-node',model).forEach(node=>{
-      const active=node.dataset.id===d.id,other=domains.find(x=>x.id===node.dataset.id),v=state.answers[other.id]??3;
-      node.classList.toggle('priority',active);node.setAttribute('aria-pressed',String(active));
-      node.setAttribute('aria-label',other.name+': '+status(v)+(active?', selected focus':''));
-      $('span',node).textContent=active?(v<3.5?'Start here':'Protect this'):status(v);
-    });
-    $$('.support-piece',model).forEach(piece=>piece.classList.toggle('priority',piece.dataset.id===d.id));
-    const title=score>=3.5?'A strength to protect':isMinimum&&!hasTies?'Your first place to start':'Your chosen focus';
-    const copy=score>=3.5?'This is supporting you. A small, repeatable action can help you maintain it.':score>=2.5?'There is room for a little more consistency here. Choose one manageable step.':d.why.split(/(?<=[.!?])\s/)[0];
-    $('#modelDetail').innerHTML=`<span class="detail-kicker">${title}</span><strong>${d.name}</strong><span>${copy}</span>`;
-    model.classList.toggle('priority-low',low);
-    $('#snapshotContinue').disabled=false;
-    $('#openPriorityWhy').textContent='Why '+d.name.toLowerCase()+'?';
-    renderRationale();
-  };
-  $$('.model-node',model).forEach(node=>node.onclick=()=>select(domains.find(d=>d.id===node.dataset.id)));
-  select(priority());
-  window.clearTimeout(snapshotBuildTimer);screen.classList.remove('snapshot-building');
-  if(!reducedMotion.matches){void screen.offsetWidth;screen.classList.add('snapshot-building');snapshotBuildTimer=window.setTimeout(()=>screen.classList.remove('snapshot-building'),1900)}
+ calculateDomainScores();
+ const model=$('#foundationModel'),screen=$('.screen[data-screen="snapshot"]'),lowest=lowestDomains();
+ $('#snapshotTitle').textContent=answeredCount()+' answers';
+ const overall=state.responses.overall;
+ $('#snapshotContext').textContent=`${answeredCount()} of 17 answers across eight areas. `+(overall?`Overall, you chose “${labels[overall-1].toLowerCase()}”. `:'')+'Area numbers are averages of your answers, not clinical scores.';
+ $('.load-beam',model).style.setProperty('--beam-tilt','0deg');
+ $('#supportFrame').innerHTML=domains.map((d,i)=>{const v=state.answers[d.id],known=Number.isFinite(v);return `<div class="support-piece${known?'':' unanswered'}" data-id="${d.id}" style="--piece-delay:${.15+i*.05}s;--score:${known?v:0};--piece-height:${known?Math.round(30+v*14):14}px;--piece-sink:0px;--piece-accent:#9FC5EF" aria-label="${d.name}: ${status(v)}"></div>`}).join('');
+ $('#modelOrbit').innerHTML=domains.map((d,i)=>{const count=d.questions.filter((_,n)=>Number.isFinite(state.responses[d.id+'-'+n])).length;return `<button class="model-node" type="button" data-id="${d.id}" style="--node-delay:${.2+i*.04}s;--node-color:#9FC5EF" aria-pressed="false"><b>${d.name}</b><span>${status(state.answers[d.id])}${count===1?' · 1 answer':''}</span></button>`}).join('');
+ const select=d=>{
+   setPriority(d.id);
+   $$('.model-node',model).forEach(node=>{const active=node.dataset.id===d.id;node.classList.toggle('priority',active);node.setAttribute('aria-pressed',String(active))});
+   $$('.support-piece',model).forEach(piece=>piece.classList.toggle('priority',piece.dataset.id===d.id));
+   const detail=$('#modelDetail');$('.detail-kicker',detail).textContent='Your chosen focus';$('strong',detail).textContent=d.name;
+   $('span:last-child',detail).textContent=Number.isFinite(state.answers[d.id])?'You chose this area. Try a small action and see whether it fits.':'You have not rated this area. You can still choose it as your focus.';
+   $('#snapshotContinue').disabled=false;$('#openPriorityWhy').disabled=false;$('#openPriorityWhy').textContent='How this becomes a plan';renderRationale();updateFlowNav('snapshot');persistDraft();
+ };
+ $$('.model-node',model).forEach(node=>node.onclick=()=>select(domains.find(d=>d.id===node.dataset.id)));
+ if(state.priority)select(priority());else{
+   $('#snapshotContinue').disabled=true;$('#openPriorityWhy').disabled=true;
+   const detail=$('#modelDetail');$('.detail-kicker',detail).textContent='You choose the focus';$('strong',detail).textContent=lowest.length>1?'Some areas are tied':lowest.length===1?lowest[0].name+' has your lowest average':'Choose an area to explore';
+   $('span:last-child',detail).textContent=lowest.length>1?(lowest.length===domains.length?'All eight areas have the same average. Choose the one that feels most useful.':'Among completed areas, '+lowest.map(d=>d.name.toLowerCase()).join(', ')+' share your lowest average. You choose the focus.'):'Tap an area above. Your preference matters more than a ranking.';
+ }
+ window.clearTimeout(snapshotBuildTimer);screen.classList.remove('snapshot-building');
+ if(!reducedMotion.matches){void screen.offsetWidth;screen.classList.add('snapshot-building');snapshotBuildTimer=window.setTimeout(()=>screen.classList.remove('snapshot-building'),1400)}
 }
 function renderRationale(){
   const d=priority(),path=$('#logicPath'),story=$('#pathwayStory'),insight=$('.pathway-insight',story),copy=$('#rationaleCopy'),copyLabel=$('#pathwayInsightLabel'),copyTitle=$('#pathwayInsightTitle'),play=$('#playPathway');$('#priorityName').textContent=d.name;window.clearTimeout(pathwayPlayTimer);
-  const supported=(state.answers[d.id]??3)>=3.5,logic=supported?['A steady support','One small action','Notice what helps','Keep what fits']:d.logic;
-  $('#priorityExplanationContext').textContent=supported?' is a support worth protecting.':' may be affecting more than one part of the base.';
-  const stepCopy=supported?['Your answers suggest this area is supporting you.','A small action can be a way to maintain this support.','After trying it, notice whether it felt useful and manageable.','Repeat what fits your life. Adjust what asks too much.']:logic.map((item,index)=>index===0?`${item} is one possible starting pressure in this pathway.`:index===logic.length-1?d.why:`${logic[index-1]} can contribute to ${item.toLowerCase()}.`);
+  const logic=['Your answers','Your chosen focus','One small experiment','Notice what fits'];
+  $('#priorityExplanationContext').textContent=' is the area you chose to explore.';
+  const reflection=globalThis.FoundationsCheckpoints.describe({items:scanItems,responses:state.responses,lastId:d.id+'-1'});
+  const stepCopy=[Number.isFinite(state.responses[d.id+'-1'])?reflection.copy:'You can choose this area without having rated it. Missing answers are not scored.', 'This is your preference, not a diagnosis or a claim about what caused how you feel.', 'Choose one action and a size that fits your circumstances. You can change either before saving.', 'After trying it, review effort and usefulness. Keep, resize or change the plan based on what actually happened.'];
   path.innerHTML=logic.map((x,i)=>`<button class="path-node${i===0?' active':''}" type="button" data-i="${i}" aria-pressed="${i===0?'true':'false'}"><span class="path-index">0${i+1}</span><span class="path-label">${x}</span></button>`).join('');
   const nodes=$$('.path-node',path),segments=$$('.pathway-segment-current',story),updateInsight=index=>{copyLabel.textContent=`Pathway insight · 0${index+1}/04`;copyTitle.textContent=logic[index];copy.textContent=stepCopy[index];reveal(insight,[{opacity:.76,transform:'translateY(7px) scale(.985)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:440,easing:'cubic-bezier(.16,.86,.24,1)'})},activate=(index,syncSegments=true)=>{nodes.forEach((node,i)=>{node.classList.remove('receiving');node.classList.toggle('active',i===index);node.classList.toggle('passed',i<index);node.setAttribute('aria-pressed',String(i===index));if(i===index)node.setAttribute('aria-current','step');else node.removeAttribute('aria-current')});if(syncSegments)segments.forEach((segment,i)=>segment.classList.toggle('lit',i<index));updateInsight(index)};
   const stopPlayback=()=>{window.clearTimeout(pathwayPlayTimer);nodes.forEach(node=>node.classList.remove('receiving'));play.classList.remove('playing');play.disabled=false;play.innerHTML=play.dataset.played?'<span aria-hidden="true">↻</span> Replay pathway':'<span aria-hidden="true">▶</span> Play pathway'};
@@ -181,12 +217,12 @@ const priorityExplanation=$('#priorityExplanation');
 function closePriorityExplanation(restore=true){
  window.clearTimeout(pathwayPlayTimer);priorityExplanation.classList.remove('open');priorityExplanation.setAttribute('aria-hidden','true');priorityExplanation.inert=true;
  [...priorityExplanation.parentElement.children].filter(e=>e!==priorityExplanation).forEach(e=>e.inert=false);
- $('.topbar').inert=false;flowNav.inert=false;if(restore)$('#openPriorityWhy').focus({preventScroll:true});
+ $('.topbar').inert=false;flowNav.inert=false;$('.journey-meta').inert=false;if(restore)$('#openPriorityWhy').focus({preventScroll:true});
 }
 $('#openPriorityWhy').onclick=()=>{
  renderRationale();priorityExplanation.inert=false;priorityExplanation.classList.add('open');priorityExplanation.setAttribute('aria-hidden','false');
  [...priorityExplanation.parentElement.children].filter(e=>e!==priorityExplanation).forEach(e=>e.inert=true);
- $('.topbar').inert=true;flowNav.inert=true;
+ $('.topbar').inert=true;flowNav.inert=true;$('.journey-meta').inert=true;
  requestAnimationFrame(()=>{if(priorityExplanation.classList.contains('open'))$('#closePriorityWhy').focus({preventScroll:true})});
 };
 $('#closePriorityWhy').onclick=()=>closePriorityExplanation();
@@ -198,7 +234,7 @@ document.addEventListener('keydown',e=>{
  if(e.key==='Escape'){e.preventDefault();closePriorityExplanation()}
  if(e.key==='Tab'){const buttons=$$('button:not(:disabled)',priorityExplanation),first=buttons[0],last=buttons[buttons.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}
 });
-function priority(){return domains.find(d=>d.id===state.priority)||lowDomain()}
+function priority(){return domains.find(d=>d.id===state.priority)}
 const tinyInstructions={
  sleep:['Choose a realistic wake time for tomorrow and set an alarm.','Step outside for two minutes within an hour of waking.','Use two brief wind-down cues tonight, such as dimming lights and closing a screen.','Choose one realistic bedtime for a night this week and protect it.'],
  nutrition:['Choose one easy meal for tomorrow and make sure it is available.','Place a glass or bottle of water where you will see it.','Set aside one easy food option for your next low-energy moment.','Pair a drink of water with one thing you already do each day.'],
@@ -211,16 +247,16 @@ const tinyInstructions={
 };
 function renderChoices(){
  const d=priority(),wrap=$('#actionChoices');
- if(state.selectionDomain!==d.id){state.selectionDomain=d.id;state.selected=null;state.dose=null;state.review={}}
+ if(state.selectionDomain!==d.id){state.selectionDomain=d.id;state.selected=null;state.dose=null}
  $('#choiceDomain').textContent=d.name.toLowerCase()+'.';$('#choiceSheetDomain').textContent=d.name;
  wrap.innerHTML=d.actions.map((a,i)=>`<button class="minimal-choice" type="button" data-i="${i}" aria-pressed="false"><span class="choice-number">0${i+1}</span><span class="choice-copy"><b>${a[0]}</b><small>${a[1]}</small></span><span class="choice-check" aria-hidden="true">✓</span></button>`).join('');
  const update=()=>{
    $$('.minimal-choice',wrap).forEach(btn=>{const selected=+btn.dataset.i===state.selected;btn.classList.toggle('selected',selected);btn.setAttribute('aria-pressed',String(selected))});
-   wrap.classList.toggle('has-selection',state.selected!==null);$('#choiceContinue').disabled=state.selected===null;
+   wrap.classList.toggle('has-selection',state.selected!==null);
  };
- $$('.minimal-choice',wrap).forEach(btn=>btn.onclick=()=>{const index=+btn.dataset.i;if(state.selected!==index){state.dose=null;state.review={}}state.selected=index;update()});update();
+ $$('.minimal-choice',wrap).forEach(btn=>btn.onclick=()=>{const index=+btn.dataset.i;if(state.selected!==index){state.dose=null}state.selected=index;update();show('dose')});update();
 }
-$('#choiceContinue').onclick=()=>{if(state.selected!==null)show('dose')};
+
 function chosen(){return priority().actions[state.selected??0]}
 function doseOptions(){
  const d=priority(),a=chosen();
@@ -228,11 +264,11 @@ function doseOptions(){
  {id:'regular',name:'Regular version',copy:a[1]},
  {id:'repeat',name:'Repeat version',copy:a[1]+' Try this twice this week.'}];
 }
-function actionTitle(){
- const title=chosen()[0];
- if(state.dose?.id!=='tiny')return title;
+function actionTitle(plan={domain:state.priority,action:state.selected??0,size:state.dose?.id}){
+ const title=domains.find(d=>d.id===plan.domain).actions[plan.action][0];
+ if(plan.size!=='tiny')return title;
  const titles={sleep:{1:'Find a moment of daylight'},movement:{0:'Take a short outside walk',1:'Use a short movement break'},recovery:{0:'Protect a brief landing'},activation:{1:'Approach for two minutes'}};
- return titles[priority().id]?.[state.selected]||title;
+ return titles[plan.domain]?.[plan.action]||title;
 }
 function renderDoses(){
  const doses=doseOptions(),wrap=$('#doseList'),path=$('#dosePath'),preview=$('#dosePreview'),positions=[{progress:0,x:0,y:0},{progress:53,x:120,y:-59},{progress:100,x:265,y:-154}];
@@ -245,86 +281,146 @@ function renderDoses(){
    path.classList.toggle('has-selection',index!==-1);path.style.setProperty('--dose-progress',position.progress);
    path.style.setProperty('--dose-x',position.x+'px');path.style.setProperty('--dose-y',position.y+'px');
    preview.innerHTML=choice?`<span>Your version</span><strong>${choice.name}</strong><p>${choice.copy}</p>`:'<span>Make it doable</span><strong>Small is a good start.</strong><p>Choose the version that fits your energy this week.</p>';
-   $('#doseContinue').disabled=index===-1;
+
    if(animate)reveal(preview,[{opacity:.7,transform:'translateY(5px)'},{opacity:1,transform:'none'}],{duration:320,easing:'ease-out'});
  };
- $$('.dose',wrap).forEach(btn=>btn.onclick=()=>{const next=doses[+btn.dataset.i];if(state.dose?.id!==next.id)state.review={};state.dose=next;update(true)});update();
+ $$('.dose',wrap).forEach(btn=>btn.onclick=()=>{const next=doses[+btn.dataset.i];state.dose=next;update(true);show('plan')});update();
 }
-$('#doseContinue').onclick=()=>{if(state.dose)show('plan')};
+
+const fitNotes={
+ sleep:'The timing suggestions are examples, not requirements. Adapt them for shift work, caring duties, daylight access or health needs; another action may fit better.',
+ nutrition:'Keep the focus on enough food and water, not restriction. Adapt this around your access, preferences and any care plan you already follow.',
+ movement:'Choose movement that is comfortable and safe for you. Seated or indoor movement can be an alternative; stop or choose another area if this does not fit.',
+ recovery:'Rest does not have to be earned. You can remove a demand or choose a pause that is actually available to you.',
+ structure:'An anchor is an option, not a rigid schedule. Adapt it to the responsibilities and unpredictability in your day.',
+ activation:'A small start is an experiment, not a test of willpower. Rest or practical support may be more useful when capacity is limited.',
+ support:'Choose safe contact only. If no trusted person comes to mind, a suitable group or support service may be an alternative; you can also choose another focus.',
+ stability:'This is a general planning exercise, not a treatment plan. Choose a small, safe change; do not use it to change medication or manage withdrawal.'
+};
+function samePlan(plan){return !!plan&&plan.domain===state.priority&&plan.action===state.selected&&plan.size===state.dose?.id&&(plan.cue||'')===(state.cue||'')&&(plan.time||'')===(state.time||'')}
 function renderPlan(){
  const d=priority(),a=chosen(),card=$('#weeklyPlanCard'),toggle=$('#planWhyToggle');
+ const savedDate=samePlan(savedPlan)?new Date(savedPlan.updatedAt||savedPlan.savedAt):null;$('#planSavedWhen').textContent=savedDate&&!Number.isNaN(savedDate.getTime())?'Saved '+savedDate.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'This week';
  $('#planDomain').textContent=d.name;$('#planTitle').textContent=actionTitle();$('#planInstruction').textContent=state.dose?.copy||a[1];
- $('#planDose').textContent=state.dose?.name||'Regular version';$('#planWhy').textContent=a[2];
+ $('#planDose').textContent=state.dose?.name||'Regular version';$('#planWhy').textContent=a[2];$('#planFitNote').textContent=fitNotes[d.id];
  $('#planWhyDisclosure').hidden=true;toggle.setAttribute('aria-expanded','false');toggle.querySelector('span').textContent='＋';
- reveal(card,[{opacity:.55,transform:'translateY(12px) scale(.98)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,.86,.24,1)'});
+ const cue=$('#planCue');if(state.cue&&![...cue.options].some(option=>option.value===state.cue)){const option=document.createElement('option');option.value=state.cue;option.textContent=state.cue;cue.append(option)}cue.value=state.cue||'';$('#planTime').value=state.time||'';
+ $('#reviewPlan').hidden=!samePlan(savedPlan);$('#planError').hidden=true;$('#reloadSavedPlan').hidden=true;
+ $('#savePlan span:first-child').textContent=savedPlan&&!samePlan(savedPlan)?'Save this version of my weekly plan':'Save my weekly plan';
+ $('#planReveal').textContent=samePlan(savedPlan)?'Your saved plan. Ready when it fits.':'Two choices. One doable next step.';
+ updateCueSummary();reveal(card,[{opacity:.55,transform:'translateY(12px) scale(.98)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,.86,.24,1)'});
 }
-$('#planWhyToggle').onclick=()=>{
- const disclosure=$('#planWhyDisclosure'),toggle=$('#planWhyToggle'),expanded=toggle.getAttribute('aria-expanded')==='true';
- disclosure.hidden=expanded;toggle.setAttribute('aria-expanded',String(!expanded));toggle.querySelector('span').textContent=expanded?'＋':'−';
- if(!expanded)reveal(disclosure,[{opacity:0,transform:'translateY(-5px)'},{opacity:1,transform:'none'}],{duration:250,easing:'ease-out'});
-};
+function updateCueSummary(){
+ $('#reviewPlan').hidden=!samePlan(savedPlan);updateFlowNav(currentName());
+ const parts=[state.cue,state.time].filter(Boolean);$('#planCueSummary').textContent=parts.length?parts.join(' · '):'No cue or time chosen.';
+ $('#cueFeedback').textContent=parts.length?'Your cue is on the card above. Save the plan to keep it. No notification is scheduled.':'These are cues on your plan, not scheduled notifications.';
+}
+$('#planCue').onchange=()=>{state.cue=$('#planCue').value;updateCueSummary();persistDraft();reveal($('#planCueSummary'),[{opacity:.4},{opacity:1}],{duration:350})};
+$('#planTime').oninput=()=>{state.time=$('#planTime').value;updateCueSummary();persistDraft()};
+$('#planWhyToggle').onclick=()=>{const disclosure=$('#planWhyDisclosure'),toggle=$('#planWhyToggle'),expanded=toggle.getAttribute('aria-expanded')==='true';disclosure.hidden=expanded;toggle.setAttribute('aria-expanded',String(!expanded));toggle.querySelector('span').textContent=expanded?'＋':'−'};
 $('#changePlan').onclick=()=>show('choices');
-const planStorageKey='mentication.foundations.weekly-plan.v1';
-let savedPlan=null;
-let planSaveFailed=false;
-function readSavedPlan(){
- try{
-   const p=JSON.parse(localStorage.getItem(planStorageKey)),d=domains.find(d=>d.id===p?.domain);
-   if(p?.version===1&&d&&Number.isInteger(p.action)&&d.actions[p.action]&&['tiny','regular','repeat'].includes(p.size))return p;
- }catch(e){}
- return null;
+function refreshSavedPlan(){const result=store.readPlan();savedPlan=result.value;planReadError=result.error;$('#resumePlan').hidden=!savedPlan;$('#resumeReview').hidden=!savedPlan}
+function hydratePlan(plan){
+ const different=state.planId!==plan.id||state.planRevision!==plan.revision;
+ state.priority=plan.domain;state.selectionDomain=plan.domain;state.selected=plan.action;state.dose=doseOptions().find(d=>d.id===plan.size);state.cue=plan.cue;state.time=plan.time;state.planId=plan.id;state.planRevision=plan.revision;
+ if(different){state.review={};state.reviewId=''}
 }
-function refreshSavedPlan(){savedPlan=readSavedPlan();$('#resumePlan').hidden=!savedPlan}
+function openSavedPlan(){
+ const result=store.readPlan();if(!result.value){$('#draftStatus').textContent='The saved plan could not be opened. Your current draft is unchanged.';return false}
+ if(canEnter('plan')&&!samePlan(result.value)&&!window.confirm('Open the saved plan instead of your unsaved plan edits? Your check-in answers will stay.'))return false;
+ savedPlan=result.value;planReadError=null;hydratePlan(savedPlan);show('plan');return true;
+}
+$('#resumePlan').onclick=openSavedPlan;$('#viewSavedPlan').onclick=()=>show('plan');$('#finishPlan').onclick=openSavedPlan;$('#reloadSavedPlan').onclick=openSavedPlan;
+let saveNotice='';
 function renderSaved(){
- refreshSavedPlan();
- const stored=savedPlan?.domain===priority().id&&savedPlan?.action===state.selected&&savedPlan?.size===state.dose?.id;
- $('#savedTitle').textContent=stored?'Plan saved.':'Plan ready.';
- $('#savedStatus').textContent=stored?'On this device':'For this visit';
- $('#savedCopy').textContent=stored?'Your one small action is saved on this device. Come back after trying it to notice what helped.':planSaveFailed?'Your plan is ready for this visit. This browser could not save it for next time.':'This version is not saved yet. View your plan and save it when it feels right.';
+ const stored=samePlan(savedPlan);
+ $('#savedTitle').textContent=stored?'Plan saved.':'Plan ready.';$('#savedStatus').textContent=stored?'On this device':'For this visit';
+ $('#savedCopy').textContent=saveNotice||(stored?'Your plan is saved on this device. Trying it is a separate step. Come back to review what actually happened.':'Save the plan when you are ready to keep it.');
 }
+function commitPlan(plan){
+ const current=store.readPlan();
+ if(current.error||(savedPlan&&(!current.value||current.value.id!==savedPlan.id||current.value.revision!==savedPlan.revision))||(!savedPlan&&current.value))return false;
+ if(!store.writePlan(plan))return false;
+ savedPlan=store.plan(plan);planReadError=null;state.planId=savedPlan.id;state.planRevision=savedPlan.revision;return true;
+}
+function uniqueId(){return globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)}
 $('#savePlan').onclick=()=>{
- const plan={version:1,domain:priority().id,action:state.selected,size:state.dose?.id||'regular',savedAt:new Date().toISOString()};
- let stored=false;
- try{localStorage.setItem(planStorageKey,JSON.stringify(plan));stored=true}catch(e){}
- planSaveFailed=!stored;
- refreshSavedPlan();show('saved');
+ if(!canEnter('plan'))return;
+ const unchanged=samePlan(savedPlan);if(!unchanged&&Object.keys(state.review).length&&!window.confirm('Save a different plan and replace the unfinished review? Previously saved reviews and check-in answers will stay.'))return;
+ if(!$('#planTime').checkValidity()){$('#planTime').reportValidity();return}
+ const now=new Date().toISOString(),plan={version:2,id:savedPlan?.id||uniqueId(),domain:state.priority,action:state.selected,size:state.dose.id,cue:state.cue||'',time:state.time||'',savedAt:savedPlan?.savedAt||now,updatedAt:now,revision:(savedPlan?.revision||0)+1,reviews:savedPlan?.reviews||[]};
+ if(planReadError||!commitPlan(plan)){$('#planError').hidden=false;$('#planError').textContent='This plan has not been saved. Storage may be unavailable, or another tab changed the saved plan. Your draft is still here.';$('#reloadSavedPlan').hidden=!store.readPlan().value;return}
+ if(!unchanged){state.review={};state.reviewId=''}saveNotice='Your plan is saved on this device. '+(state.cue||state.time?'Your cue is included; no notification is scheduled.':'Try it when it fits, then review what happened.');refreshSavedPlan();show('saved');
 };
-$('#viewSavedPlan').onclick=()=>show('plan');
-$('#resumePlan').onclick=()=>{
- refreshSavedPlan();if(!savedPlan)return;
- if(priority().id!==savedPlan.domain||state.selected!==savedPlan.action||state.dose?.id!==savedPlan.size)state.review={};
- setPriority(savedPlan.domain);state.selectionDomain=savedPlan.domain;state.selected=savedPlan.action;
- state.dose=doseOptions().find(d=>d.id===savedPlan.size);show('plan');
-};
-const reviewLabels={
- tried:['Not yet','A little','Partly','Mostly','As planned'],
- effort:['Too much','Difficult','Manageable','Comfortable','Easy to repeat'],
- help:['Not helpful','A little','Somewhat','Helpful','Very helpful']
-};
-function renderReview(){
- $$('.review-scale').forEach(w=>{
-   const key=w.dataset.review;
-   w.innerHTML=reviewLabels[key].map((label,i)=>`<button type="button" data-n="${i+1}" aria-label="${i+1}: ${label}" aria-pressed="${state.review[key]===i+1}" class="${state.review[key]===i+1?'selected':''}">${i+1}</button>`).join('');
-   $$('button',w).forEach(b=>b.onclick=()=>{state.review[key]=+b.dataset.n;if(key==='tried'&&state.review.tried===1){delete state.review.effort;delete state.review.help}renderReview();$(`button[data-n="${b.dataset.n}"]`,w).focus({preventScroll:true})});
- });
- const notYet=state.review.tried===1;
- $$('[data-review-followup]').forEach(e=>e.hidden=notYet);$('#reviewNotYet').hidden=!notYet;
- $('#reviewContinue').disabled=!(notYet||(state.review.tried&&state.review.effort&&state.review.help));
+function openReview(){
+ const current=store.readPlan();if(!current.value){$('#draftStatus').textContent='Save a plan before reviewing it.';return}
+ if(canEnter('plan')&&!samePlan(current.value)&&!window.confirm('Review the saved plan instead of your unsaved plan edits? Your check-in answers will stay.'))return;
+ savedPlan=current.value;hydratePlan(savedPlan);if(!state.reviewId)state.reviewId=uniqueId();show('review');
 }
-$('#reviewContinue').onclick=()=>{
- const r=state.review;if($('#reviewContinue').disabled)return;
- if(r.tried<=2){$('#learnedTitle').textContent='Make the first step easier.';$('#learnedCopy').textContent='If the action did not happen, start smaller or place it beside something you already do. This is information, not failure.'}
- else if(r.help<=2){$('#learnedTitle').textContent='A different route may fit better.';$('#learnedCopy').textContent='You gave it a try. If it did not feel useful, choose another small action that fits you better.'}
- else if(r.effort<=2){$('#learnedTitle').textContent='Keep what helped. Make it smaller.';$('#learnedCopy').textContent='Something felt useful, but it asked too much of you. Try the tiny version next.'}
- else{$('#learnedTitle').textContent='Keep the small thing that worked.';$('#learnedCopy').textContent='This felt useful and manageable. Give it another week before adding anything else.'}
- show('learned');
-};
-$('#restart').onclick=()=>{state={q:0,responses:{},answers:{},selected:null,dose:null,review:{},history:[]};renderReview();renderQuestion();refreshSavedPlan();show('intro',false)};
-renderReview();refreshSavedPlan();
+$('#reviewPlan').onclick=openReview;$('#resumeReview').onclick=openReview;
+const reviewLabels={tried:['Not yet','A little','Partly','Mostly','As planned'],effort:['Too much','Difficult','Manageable','Comfortable','Easy to repeat'],help:['Not helpful','A little','Somewhat','Helpful','Very helpful']};
+function renderReview(){
+ if(savedPlan)$('#reviewPlanSummary').textContent=actionTitle(savedPlan)+' · '+savedPlan.size+' version';
+ $$('.review-scale').forEach(w=>{const key=w.dataset.review;w.innerHTML=reviewLabels[key].map((label,i)=>`<button type="button" data-n="${i+1}" aria-label="${i+1}: ${label}" aria-pressed="${state.review[key]===i+1}" class="${state.review[key]===i+1?'selected':''}">${i+1}<span>${label}</span></button>`).join('');$$('button',w).forEach(b=>b.onclick=()=>{state.review[key]=+b.dataset.n;if(key==='tried'&&state.review.tried===1){delete state.review.effort;delete state.review.help}renderReview();persistDraft();$(`button[data-n="${b.dataset.n}"]`,w).focus({preventScroll:true});if(state.review.tried&&state.review.effort){reveal($('#reviewCheckpoint'),[{opacity:.5,transform:'scale(.98)'},{opacity:1,transform:'none'}],{duration:350});if(key==='effort')$('#reviewCheckpoint').scrollIntoView({block:'nearest',behavior:'instant'})}})});
+ const r=state.review,notYet=r.tried===1;$$('[data-review-followup]').forEach(e=>e.hidden=notYet);$('#reviewNotYet').hidden=!notYet;$('#reviewContinue').disabled=!store.completeReview(r);
+ $('#reviewCheckpoint').textContent=notYet?'':r.tried&&r.effort?`Two pieces connected: you tried it “${reviewLabels.tried[r.tried-1].toLowerCase()}” and found it “${reviewLabels.effort[r.effort-1].toLowerCase()}”. `+(r.help?'Next: choose what to keep or change.':'Next: was it useful?'):'';
+}
+function renderLearning(){
+ const r=state.review,tiny=savedPlan?.size==='tiny';
+ let title,copy;
+ if(r.tried===1){title='A plan you can return to.';copy=tiny?'You have not tried it yet, and it is already the tiny version. Keep it, change its cue on the plan, or choose another action.':'You have not tried it yet. Keep the plan, try its tiny version, or choose another action.'}
+ else if(r.help<=2){title='A different action may fit.';copy='You reported little benefit. That is useful feedback, not a failure. Keep the plan if you want another try, or choose another action.'}
+ else if(r.effort<=2){title='Keep the useful part. Reduce the demand.';copy=tiny?'You found some benefit but it asked too much, even in its tiny version. You can change its cue on the plan or choose another action.':'You found some benefit but it asked too much. The tiny version is one option to try.'}
+ else if(r.tried<=2){title='A start you can build around.';copy='You made a small start. Keep the plan if it fits, or make another choice. Your answers do not mean you need to do more.'}
+ else{title='You found something that may fit.';copy='You reported some usefulness and manageable effort. Keep it for another try, or choose a different action.'}
+ $('#learnedTitle').textContent=title;$('#learnedCopy').textContent=copy+' Choose below to save this review.';
+ $('#applyTiny').hidden=tiny;$('#reviewSaveError').hidden=true;
+}
+$('#reviewContinue').onclick=()=>{if(store.completeReview(state.review))show('learned')};
+function saveReview(decision){
+ if(currentName()!=='learned'||!savedPlan||state.planId!==savedPlan.id||state.planRevision!==savedPlan.revision||!store.completeReview(state.review))return;
+ if(!state.reviewId)state.reviewId=uniqueId();
+ if(savedPlan.reviews.some(review=>review.id===state.reviewId)){show('saved');return}
+ const now=new Date().toISOString(),entry={id:state.reviewId,reviewedAt:now,ratings:{...state.review},plan:{domain:savedPlan.domain,action:savedPlan.action,size:savedPlan.size,cue:savedPlan.cue,time:savedPlan.time},decision};
+ const next={...savedPlan,revision:savedPlan.revision+1,updatedAt:now,size:decision==='tiny'?'tiny':savedPlan.size,reviews:[...savedPlan.reviews,entry]};
+ if(!commitPlan(next)){$('#reviewSaveError').hidden=false;$('#reviewSaveError').textContent='Your review has not been saved. Check device storage or reopen the latest saved plan, then try again.';return}
+ hydratePlan(savedPlan);state.review={};state.reviewId='';saveNotice=decision==='tiny'?'Review saved. Your plan now uses the tiny version.':'Review saved with the plan you actually reviewed.';
+ if(decision==='change'){state.selected=null;state.dose=null;show('choices')}else show('saved');
+}
+$('#applyTiny').onclick=()=>saveReview('tiny');$('#keepReviewedPlan').onclick=()=>saveReview('keep');$('#changeReviewedPlan').onclick=()=>saveReview('change');
+function restartCheckIn(){
+ if((answeredCount()||canEnter('plan'))&&!window.confirm('Start a new check-in? This replaces the current draft answers and any unfinished review. Your saved weekly plan and reviews will stay.'))return;
+ state=freshState();checkpointId=null;checkpointRevised=false;saveNotice='';renderCheckpoint();renderReview();renderQuestion();refreshSavedPlan();show('intro',false);
+}
+$('#restart').onclick=restartCheckIn;$('#newCheckIn').onclick=restartCheckIn;
 const introScreen=$('.screen[data-screen="intro"]');
-if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)introScreen.classList.add('intro-settled');
+function applyPreferences(prefs=sharedPreferences){
+ sharedPreferences=prefs&&typeof prefs==='object'?prefs:{};
+ reducedMotion.matches=typeof sharedPreferences.reducedMotion==='boolean'?sharedPreferences.reducedMotion:motionQuery.matches;
+ foundationIdleAllowed=!reducedMotion.matches;
+ document.documentElement.classList.toggle('reduce-motion',reducedMotion.matches);document.documentElement.classList.toggle('large-text',sharedPreferences.largeText===true);document.documentElement.classList.toggle('high-contrast',sharedPreferences.highContrast===true);
+ const soundOn=localSound&&sharedPreferences.ambientSoundscape!==false;$('#soundToggle').textContent=soundOn?'Sound on':'Sound off';$('#soundToggle').setAttribute('aria-pressed',String(soundOn));$('#soundToggle').disabled=sharedPreferences.ambientSoundscape===false;$('#soundToggle').title=sharedPreferences.ambientSoundscape===false?'Sound is off in app preferences.':'';
+ if(reducedMotion.matches){pauseFoundationIdle();clearFoundationImpact();cancelAnimationFrame(parallaxFrame);parallaxFrame=0;writeFoundationParallax(0,0);introScreen.classList.add('intro-settled');checkpoint.classList.remove('checkpoint-earned')}
+ if(!soundOn&&audioContext?.state==='running')audioContext.suspend().catch(()=>{});
+}
+$('#soundToggle').onclick=()=>{localSound=!localSound;try{localStorage.setItem('mentication.foundations.sound.v1',localSound?'on':'off')}catch(e){}applyPreferences()};
+window.addEventListener('message',e=>{if(e.origin===window.location.origin&&e.source===window.parent&&e.data?.type==='foundations:preferences')applyPreferences(e.data.prefs)});
+window.addEventListener('storage',e=>{
+ if(e.key==='haven.a11y.v2'||e.key==='mentication.foundations.sound.v1'){try{sharedPreferences=JSON.parse(localStorage.getItem('haven.a11y.v2')||'{}');localSound=localStorage.getItem('mentication.foundations.sound.v1')!=='off'}catch(error){}applyPreferences()}
+ if(e.key===null||((e.key===store.keys.plan||e.key===store.keys.draft||e.key===store.keys.legacy)&&e.newValue===null)){ready=false;state=freshState();checkpointId=null;checkpointRevised=false;refreshSavedPlan();renderCheckpoint();renderQuestion();show('intro',false);$('#draftStatus').textContent='Device data changed in another window. Start here or reopen your saved plan.';ready=true}
+});
+motionQuery.addEventListener('change',()=>applyPreferences());
+window.addEventListener('pagehide',persistDraft);
+const loadedDraft=store.readDraft();refreshSavedPlan();
+let start='intro';
+if(loadedDraft.value){state=loadedDraft.value.state;checkpointId=loadedDraft.value.checkpointId;checkpointRevised=loadedDraft.value.checkpointRevised;calculateDomainScores();if(state.priority&&state.selected!==null&&state.dose)state.dose=doseOptions().find(d=>d.id===state.dose.id);start=loadedDraft.value.screen}
+else if(savedPlan){hydratePlan(savedPlan);start='plan'}
+const staleReview=['review','learned'].includes(start)&&savedPlan&&(state.planId!==savedPlan.id||state.planRevision!==savedPlan.revision);if(staleReview)start='plan';
+applyPreferences();renderReview();renderQuestion();renderCheckpoint();
+if(reducedMotion.matches)introScreen.classList.add('intro-settled');
 else window.setTimeout(()=>{introScreen.classList.add('intro-settled');if(currentName()==='intro'){playHomeEnergyTransfer();scheduleFoundationIdle(2600)}},2700);
-setFoundationOrbitFocus(foundationBlocks[0],false);
-renderQuestion();
-show('intro',false);
+setFoundationOrbitFocus(foundationBlocks[0],false);show(start,false);ready=true;
+$('#draftStatus').textContent=loadedDraft.error?'The previous draft could not be read. It has been kept untouched; use Settings to back it up.':planReadError?'The saved plan could not be read. It has been kept untouched.':loadedDraft.value?'Draft restored on this device.':savedPlan?'Saved plan opened on this device.':'Your answers stay on this device.';
+if(staleReview){$('#planError').hidden=false;$('#planError').textContent='The saved plan changed after this review began. Your draft answers are still here. Open the latest saved plan before reviewing again.';$('#reloadSavedPlan').hidden=false}
+if(window.parent!==window)window.parent.postMessage({type:'foundations:ready'},window.location.origin);
 })();
