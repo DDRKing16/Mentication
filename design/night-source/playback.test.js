@@ -41,6 +41,12 @@ describe('real provider transports', () => {
     await expect(apple.authorize()).rejects.toThrow('developer-token');
     expect(report).not.toHaveBeenCalled();
   });
+  it('keeps missing configuration truthful when returning from a local source',async()=>{
+    for(const Adapter of [SpotifyAdapter,AppleAdapter]) {
+      const report=vi.fn(),adapter=new Adapter({},report);await adapter.disconnect();expect(report).toHaveBeenLastCalledWith('config_missing');
+      const configured=new Adapter({clientId:'public',redirectUri:'http://127.0.0.1/night-channel/spotify-callback.html',tokenEndpoint:'/token'},report);await configured.disconnect();expect(report).toHaveBeenLastCalledWith('unauthorized');
+    }
+  });
   it('validates Spotify track links and rejects fake titles or other hosts', () => {
     expect(spotifyUri('https://open.spotify.com/track/1234567890123456789012?si=x')).toBe('spotify:track:1234567890123456789012');
     expect(() => spotifyUri('Sleepy Songs')).toThrow();

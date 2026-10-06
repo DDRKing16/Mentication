@@ -7,6 +7,7 @@
 // - Record text is never written to logs, analytics, URLs or any remote service.
 // - Every write is read back and verified before success is reported. A silent
 //   catch is not a saved note.
+import { writeVerified, removeVerified } from '../verifiedStorage.js';
 
 export const SCHEMA_VERSION = 1;
 export const RECORDS_KEY = "mentication.tomorrowParking.records.v1";
@@ -258,24 +259,38 @@ export function readDraft(now = new Date()) {
       s.removeItem(DRAFT_KEY);
       return null;
     }
-    return { text: parsed.text, updatedAt: parsed.updatedAt, ...(typeof parsed.recordId === "string" ? { recordId: parsed.recordId } : {}) };
+    return { text: parsed.text, updatedAt: parsed.updatedAt, ...(typeof parsed.recordId === "string" ? { recordId: parsed.recordId } : {}), ...(parsed.step==='seal'?{step:'seal'}:{}), ...(parsed.canWait===true?{canWait:true}:{}) };
   } catch {
     return null;
   }
 }
 
-export function writeDraft(text, recordId, now = new Date()) {
+export function writeDraft(text, recordId, now = new Date(), position = {}) {
   const s = sessionStore();
   if (!s) return false;
   if (text.trim().length === 0) {
-    try { s.removeItem(DRAFT_KEY); return true; } catch { return false; }
+    try { removeVerified(s,DRAFT_KEY); return true; } catch { return false; }
   }
   try {
-    s.setItem(DRAFT_KEY, JSON.stringify({ text, updatedAt: now.toISOString(), ...(recordId ? { recordId } : {}) }));
+    writeVerified(s,DRAFT_KEY, JSON.stringify({ text, updatedAt: now.toISOString(), ...(recordId ? { recordId } : {}), ...(position.step==='seal'?{step:'seal'}:{}), ...(position.canWait===true?{canWait:true}:{}) }));
   } catch {
     return false;
   }
   return true;
+}
+
+/** The same session slot can hold a coarse return to a verified saved note. No words are duplicated. */
+export function writeParkingReturn(recordId, step, now = new Date()) {
+  const s=sessionStore();
+  if(!s || typeof recordId!=='string' || !['parked','quiet'].includes(step)) return false;
+  try {writeVerified(s,DRAFT_KEY,JSON.stringify({kind:'parked-return',recordId,step,updatedAt:now.toISOString()}));return true;}catch{return false;}
+}
+export function readParkingReturn(now = new Date()) {
+  const s=sessionStore();if(!s)return null;
+  let value;try{value=JSON.parse(s.getItem(DRAFT_KEY)||'null');}catch{return null;}
+  if(!value || value.kind!=='parked-return' || !['parked','quiet'].includes(value.step) || typeof value.recordId!=='string' || !isIso(value.updatedAt) || now.getTime()-Date.parse(value.updatedAt)>DRAFT_TTL_HOURS*3_600_000)return null;
+  const record=getRecord(value.recordId,now);
+  return record?{step:value.step,record}:null;
 }
 
 export function clearDraft() {

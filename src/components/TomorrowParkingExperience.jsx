@@ -9,7 +9,7 @@ import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { clearActiveFlagship, rememberFlagshipEvent } from "@/lib/flagshipMemory";
 import { GOAL_ASSESSMENTS, captureGoalBaseline, hasGoalBaseline } from "@/lib/goalAssessment";
 import { formatDate } from "@/lib/tomorrowParking/dates";
-import { RETENTION_DAYS, clearDraft, newId, parkNote, readDraft, writeDraft } from "@/lib/tomorrowParking/storage";
+import { RETENTION_DAYS, RECORDS_KEY, clearDraft, newId, parkNote, readDraft, writeDraft, readParkingReturn, writeParkingReturn, getRecord } from "@/lib/tomorrowParking/storage";
 import "@/styles/tomorrow-parking.css";
 
 const ID = "tomorrowParking";
@@ -17,11 +17,14 @@ const ID = "tomorrowParking";
 export default function TomorrowParkingExperience({ intervention, answers, onGoalBaseline, onAttemptEvent, onComplete, onExit }) {
   const navigate = useNavigate();
   const { prefs } = useAccessibilityPrefs();
-  const [step, setStep] = useState("capture");
-  const [draft] = useState(() => readDraft());
-  const [text, setText] = useState(draft?.text || "");
-  const [suitability, setSuitability] = useState(null);
-  const [saved, setSaved] = useState(null);
+  const [restored] = useState(()=>{try{return {draft:readDraft(),parked:readParkingReturn(),error:false};}catch{return {draft:readDraft(),parked:null,error:true};}});
+  const [step, setStep] = useState(restored.parked?.step || restored.draft?.step || "capture");
+  const [draft] = useState(restored.draft);
+  const [text, setText] = useState(restored.parked?.record.text || draft?.text || "");
+  const [suitability, setSuitability] = useState(restored.parked || draft?.canWait ? 'wait' : null);
+  const [saved, setSaved] = useState(restored.parked?.record || null);
+  const [returnOk,setReturnOk] = useState(true);
+  const [readNotice,setReadNotice] = useState('');
   const [saveError, setSaveError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [draftAvailable, setDraftAvailable] = useState(true);
@@ -30,18 +33,40 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
   const [checkIn, setCheckIn] = useState(false);
   const [baseline, setBaseline] = useState(() => hasGoalBaseline(answers) ? answers.goal_baseline : null);
   const [rating, setRating] = useState(5);
-  const identity = useRef(draft?.recordId || newId());
+  const identity = useRef(restored.parked?.record.id || draft?.recordId || newId());
   const inFlight = useRef(false);
-  const completionReported = useRef(false);
+  const completionReported = useRef(!!restored.parked);
   const startedAt = useRef(Date.now());
   const title = useRef(null);
   const assessment = GOAL_ASSESSMENTS[answers?.direction || "sleep"];
   const reducedMotion = !!prefs.reducedMotion;
 
   useEffect(() => {
-    if (step === "capture" || step === "seal") setDraftAvailable(writeDraft(text, identity.current));
-  }, [text, step]);
+    if(step==='seal' && saved?.text===text.trimEnd()) setReturnOk(writeParkingReturn(saved.id,'parked'));
+    else if (step === "capture" || step === "seal") setDraftAvailable(writeDraft(text, identity.current,undefined,{step,canWait:suitability==='wait'}));
+    else if(saved) setReturnOk(writeParkingReturn(saved.id,step));
+  }, [text, step, suitability, saved]);
   useEffect(() => { title.current?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [step]);
+  useEffect(()=>{
+    if(!saved)return;
+    const check=event=>{
+      if(event.type==='storage' && event.key!==null && event.key!==RECORDS_KEY)return;
+      try {
+        const latest=getRecord(saved.id);
+        if(!latest) {
+          const dirty=['capture','seal'].includes(step) && text.trimEnd()!==saved.text;
+          const allRemoved=event.type==='storage' && event.newValue===null;
+          setSaved(null);
+          if(!dirty || allRemoved){setText('');clearDraft();setStep('capture');setSuitability(null);}
+          setReadNotice(dirty && !allRemoved?'The saved version was removed elsewhere. Your current edits are still an unsaved draft.':'This saved note was removed elsewhere. Nothing has been saved again.');
+        } else if(JSON.stringify(latest)!==JSON.stringify(saved)) {
+          setSaved(latest);if(['parked','quiet'].includes(step))setText(latest.text);setReadNotice('');
+        }
+      } catch {setReadNotice('Your saved note could not be read. Nothing has been replaced. Review Your parking lot before leaving.');}
+    };
+    window.addEventListener('storage',check);window.addEventListener('focus',check);
+    return ()=>{window.removeEventListener('storage',check);window.removeEventListener('focus',check);};
+  },[saved,step,text]);
 
   const attemptSave = useCallback(() => {
     if (inFlight.current) return false;
@@ -52,6 +77,7 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
       const record = parkNote({ id: identity.current, text });
       setSaved(record);
       clearDraft();
+      setReturnOk(writeParkingReturn(record.id,'parked'));
       rememberFlagshipEvent({ interventionId: ID, completed: true, options: { parkingItem: "captured" } });
       clearActiveFlagship(ID);
       if (!completionReported.current) onAttemptEvent?.({ interventionId: ID, mechanism: intervention?.mechanism, action: "completed", completedPercentage: 1, timestamp: Date.now() });
@@ -92,6 +118,8 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
       </header>
 
       <JourneyOptions id={ID} />
+      {readNotice && <p role="status" className="tpl-xs tpl-muted">{readNotice}</p>}
+      {restored.error && <p role="alert" className="tpl-alert">Your saved return could not be read. Existing notes have not been replaced. You can review them in Your parking lot.</p>}
       {step === "capture" && <div className="tpl-rise tpl-capture">
         <p className="tpl-kicker">A little less to carry tonight</p>
         {heading("Leave tomorrow here.")}
@@ -135,6 +163,9 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
         {heading("It’s parked.")}
         <p className="tpl-lede" role="status">Your words are here. You can stop holding them.</p>
         <ParkedObject />
+        <details className="tpl-details tpl-parked-preview"><summary>My parked note</summary><p>{saved.text}</p></details>
+        <details className="tpl-details tpl-practice-guide"><summary>If the thought returns tonight</summary><p>You have put these words somewhere you can find them. You do not need to solve them again here. Notice one ordinary detail in the room, or let the app go quiet and rest.</p><p>When you want to deal with it, reopen your own note or review it in daylight. Parking it does not create a reminder or say how you will sleep.</p></details>
+        {!returnOk && <p role="status" className="tpl-xs tpl-muted">Your note is saved, but this tab could not remember this screen. Find the note in Your parking lot if you leave.</p>}
         <button className="tpl-btn tpl-btn--primary tpl-btn--block tpl-btn--lg" onClick={() => setStep("quiet")}>Let the app go quiet</button>
         <p className="tpl-xs tpl-muted tpl-center">Find it in “Your parking lot” on Home or in Library.</p>
         <div className="tpl-row"><button className="tpl-link" onClick={reopen}>Reopen note</button><button className="tpl-link" onClick={() => finish("/parking-lot")}>Review in daylight</button></div>

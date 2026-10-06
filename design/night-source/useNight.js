@@ -1,16 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { SpotifyAdapter, AppleAdapter } from './providers.js';
-import { LocalAudio, SleepClock } from './playback.js';
+import { LocalAudio } from './playback.js';
+import { readNightSetup, writeNightSetup, clockForSetup } from './setup.js';
 import { loadRecords } from '../../src/lib/tomorrowParking/storage.js';
 export function useNight(channels) {
-  const [channel, setChannel] = useState(channels[0].id),
-    [view, setView] = useState(false);
-  const [status, setStatus] = useState('idle'),
-    [message, setMessage] = useState('Choose a channel. No recordings have been added yet.');
-  const [minutes, setMinutes] = useState(15),
-    [seconds, setSeconds] = useState(900),
-    [volume, setVolume] = useState(0.5),
-    [texture, setTexture] = useState(0.38);
+  const [restored] = useState(()=>readNightSetup(channels.map(channel=>channel.id)));
+  const [channel, setChannel] = useState(restored?.channel || channels[0].id),
+    [view, setView] = useState(restored?.view || false);
+  const [status, setStatus] = useState(restored?'paused':'idle'),
+    [message, setMessage] = useState(restored?'Your setup is back. Nothing is playing; choose Play when ready.':'Choose a channel. No recordings have been added yet.');
+  const [minutes, setMinutes] = useState(restored?.minutes || 15),
+    [seconds, setSeconds] = useState(restored?.seconds ?? 900),
+    [volume, setVolume] = useState(restored?.volume ?? 0.5),
+    [texture, setTexture] = useState(restored?.texture ?? 0.38);
+  const [needsFile,setNeedsFile] = useState(restored?.kind==='file');
+  const [noteId,setNoteId] = useState(restored?.noteId || null);
+  const [setupOk,setSetupOk] = useState(true);
   const [files, setFiles] = useState({}),
     [panel, setPanel] = useState(null),
     [providerStates, setProviderStates] = useState({
@@ -18,20 +23,26 @@ export function useNight(channels) {
       apple: 'config_missing'
     });
   const [hasStarted, setHasStarted] = useState(false);
-  const [source, setSource] = useState('local'),
+  const [source, setSource] = useState(restored?.source || 'local'),
     [title, setTitle] = useState(null),
     [worries, setWorries] = useState(false),
     [busy, setBusy] = useState(false);
-  const clock = useRef(new SleepClock());
+  const clock = useRef(null);
+  if (!clock.current) clock.current = clockForSetup(restored);
   const engines = useRef({});
-  const active = useRef('local');
-  const currentStatus = useRef('idle');
+  const active = useRef(restored?.source || 'local');
+  const currentStatus = useRef(restored?'paused':'idle');
   const lock = useRef(false);
   const stopped = useRef(false);
   const providerSelection = useRef(null);
   const selected = useRef(null);
   const fileRefs = useRef({});
   const mounted = useRef(true);
+  const persistSetup = useRef(()=>true);
+  useEffect(()=>{
+    persistSetup.current=()=>writeNightSetup({channel,minutes,seconds:clock.current.seconds,volume,texture,source,kind:source!=='local'?'provider':needsFile || fileRefs.current[channel]?'file':'preview',view,noteId});
+    setSetupOk(persistSetup.current());
+  },[channel,minutes,seconds,volume,texture,source,view,noteId,needsFile]);
   function update(next, detail = '', track) {
     if (!mounted.current) return;
     if (stopped.current && ['playing', 'loading', 'paused'].includes(next)) return;
@@ -107,6 +118,7 @@ export function useNight(channels) {
       update('playing');
       return;
     }
+    if (needsFile && !file) throw new Error('Your file was not kept after leaving. Attach it again, or explicitly choose a different channel. No substitute audio has started.');
     if (same) {
       await engines.current.spotify?.disconnect();
       await engines.current.local.resume();
@@ -138,6 +150,7 @@ export function useNight(channels) {
       ...fileRefs.current
     });
     setChannel(id);
+    setNeedsFile(false);
     selected.current = null;
     active.current = 'local';
     setSource('local');
@@ -235,15 +248,19 @@ export function useNight(channels) {
     const pagehide = () => {
       stopped.current = true;
       clock.current.pause();
+      persistSetup.current();
       Object.values(engines.current).forEach(e => e.pause().catch(() => {}));
     };
     window.addEventListener('pagehide', pagehide);
+    const pageshow=event=>{if(event.persisted){stopped.current=false;pause();}};
+    window.addEventListener('pageshow',pageshow);
     return () => {
       cancelled = true;
       mounted.current = false;
       clearInterval(interval);
       document.removeEventListener('visibilitychange', tick);
       window.removeEventListener('pagehide', pagehide);
+      window.removeEventListener('pageshow',pageshow);
       engines.current.local.dispose();
       engines.current.spotify?.player?.disconnect();
       engines.current.apple?.pause().catch(() => {});
@@ -261,11 +278,16 @@ export function useNight(channels) {
     active.current = 'local';
     setSource('local');
     setChannel(id);
+    setNeedsFile(false);
     selected.current = null;
     setView(false);
     update('ready', 'Channel selected. Tap Tune In when ready.');
   });
   return {
+    needsFile,
+    noteId,
+    setNoteId,
+    setupOk,
     select,
     hasStarted,
     channel,

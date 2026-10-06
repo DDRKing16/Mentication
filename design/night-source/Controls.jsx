@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { captureGoalBaseline, goalPointChange, GOAL_ASSESSMENTS } from '../../src/lib/goalAssessment.js';
+import SetupNote from './SetupNote.jsx';
 export function NightControls({
-  night
+  night, channelName
 }) {
   const [link, setLink] = useState(''),
     [baseline, setBaseline] = useState(null),
     [finish, setFinish] = useState(false),
     [after, setAfter] = useState(null),
     [baselineOpen, setBaselineOpen] = useState(false);
+  useEffect(() => {
+    const receive=event=>{
+      if(event.origin!==location.origin || event.source!==window.parent || event.data?.type!=='mentication:pause-for-alternative' || typeof event.data.requestId!=='string')return;
+      Promise.resolve(night.pause()).then(paused=>{if(paused)window.parent.postMessage({type:'mentication:alternative-ready',requestId:event.data.requestId},location.origin);}).catch(()=>{});
+    };
+    window.addEventListener('message',receive);return ()=>window.removeEventListener('message',receive);
+  },[night.pause]);
   useEffect(() => {
     const receive = event => {
       const b = event.data?.baseline;
@@ -29,7 +37,7 @@ export function NightControls({
     assessment = baseline || GOAL_ASSESSMENTS.sleep;
   return <section className="night-controls" data-remaining={night.seconds} aria-label="Playback controls">
     <p role="status">{night.status.replaceAll('_', ' ')}{night.message ? ` — ${night.message}` : ''}</p>
-    <p>{night.source === 'local' ? night.files[night.channel] ? 'Your attached file • plays once' : ['podcast', 'documentary', 'audible'].includes(night.channel) ? 'Recording not added yet' : 'Generated noise preview • no recorded scene or voices' : `${night.source === 'spotify' ? 'Spotify' : 'Apple Music'} • ${night.title || 'waiting for track information'}`}</p>
+    <p>{night.source === 'local' ? night.needsFile ? 'Your previous file needs attaching again. It was not stored.' : night.files[night.channel] ? 'Your attached file • plays once' : ['podcast', 'documentary', 'audible'].includes(night.channel) ? 'Recording not added yet' : 'Generated noise preview • no recorded scene or voices' : `${night.source === 'spotify' ? 'Spotify' : 'Apple Music'} • ${night.title || 'waiting for track information'}`}</p>
     <div className="night-actions">
       <button disabled={night.busy} onClick={() => night.status === 'playing' ? night.pause() : night.play()}>{night.status === 'playing' ? 'Pause' : night.status === 'error' ? 'Retry playback' : 'Play / resume'}</button>
       <button onClick={night.stop}>STOP</button>
@@ -38,6 +46,9 @@ export function NightControls({
     <label>Sleep timer <select aria-label="Sleep timer" value={night.minutes} onChange={e => night.changeTimer(Number(e.target.value))}>{[15, 30, 45, 60].map(m => <option key={m} value={m}>{m} minutes</option>)}</select></label>
     <p>{Math.floor(night.seconds / 60)}:{String(night.seconds % 60).padStart(2, '0')} remaining while playing. {night.source === 'local' ? 'Local sound fades in the final minute.' : 'Provider audio stops at the timer; no fade or volume control is promised.'} Pause and STOP keep position. A new timer selection resets the remaining time.</p>
     <p>Locked-screen and background playback are unverified on this device. Browser suspension can delay the stop timer; keep this page open for the tested controls.</p>
+    <p>{night.setupOk?'Channel, timer and sound controls can return paused in this tab for up to 24 hours. Audio does not restart on return.':'This tab could not remember your setup. Keep the page open if you want to retain these controls.'}</p>
+    <details className="night-practice-guide"><summary>What do I do with my attention?</summary><p>Choose a sound or familiar item you want to stay with for a while. Set a stopping point, then let the sound hold some attention without needing to follow every detail.</p><p>When a thought pulls you away, you can return to one sound you hear. You do not have to solve the thought or finish listening. Pause, change the source or choose quiet rest whenever you want.</p><p>The scene recordings have not been added yet. The six ambient channels are generated noise previews; podcast, documentary and audiobook slots need your own file. Spotify and Apple Music need a configured connection and your authorization. Audible uses its own controls and timer.</p></details>
+    <SetupNote night={night} channelName={channelName}/>
     {!night.view && <div className="night-actions"><button onClick={() => night.setPanel('spotify')}>Spotify settings</button><button onClick={() => night.setPanel('apple')}>Apple Music settings</button></div>}
     {provider && <section className="night-provider" aria-label={`${provider} connection`}>
       <h2>{provider === 'spotify' ? 'Spotify' : 'Apple Music'}</h2><p>Connection: {state?.replaceAll('_', ' ')}</p>

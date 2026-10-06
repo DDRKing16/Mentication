@@ -73,6 +73,8 @@
   -webkit-font-smoothing: antialiased;
   font-synthesis-weight: none;
 }
+.tpl-parked-preview p{white-space:pre-wrap;overflow-wrap:anywhere;padding:14px 16px;border:1px solid var(--tpl-border);border-radius:var(--tpl-radius);background:var(--tpl-card)}
+.tpl-practice-guide p{font-size:15px;line-height:1.6}
 
 .tpl--daylight {
   --tpl-bg: oklch(0.955 0.013 85);

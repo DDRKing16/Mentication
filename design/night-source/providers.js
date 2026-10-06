@@ -221,7 +221,7 @@ export class SpotifyAdapter {
     this.player = null;
     this.device = null;
     this.token = null;
-    this.report('unauthorized');
+    this.report(this.configured?'unauthorized':'config_missing');
   }
 }
 export function appleSongId(value) {
@@ -295,6 +295,6 @@ export class AppleAdapter {
   async disconnect() {
     await this.pause();
     if (this.music) await this.music.unauthorize();
-    this.report('unauthorized');
+    this.report(this.configured?'unauthorized':'config_missing');
   }
 }

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { jsx as p, jsxs as S, Fragment as Gn } from 'react/jsx-runtime';
 import { useNight } from './useNight.js';
 import { NightControls, AudibleSlot } from './Controls.jsx';
+import { useAccessibilityPrefs } from '../../src/hooks/useAccessibilityPrefs.js';
 var Vr = [{
   id: "night-desk",
   name: "The Night Desk",
@@ -110,6 +111,7 @@ for (const channel of Vr) {
   if (channel.id === 'audible') channel.description = 'Your chosen audiobook. External Audible playback uses Audible’s own controls and timer.';
 }
 function Bi() {
+  useAccessibilityPrefs();
   const night = useNight(Vr);
   const {
     channel: e,
@@ -124,6 +126,16 @@ function Bi() {
     a = t && u <= 60 && night.source === 'local';
   const [h, w] = M.useState(false),
     [E, _] = M.useState(false);
+  const picker=M.useRef(null),explanation=M.useRef(null);
+  M.useEffect(()=>{
+    const dialog=h?picker.current:E?explanation.current:null;
+    if(!dialog)return;
+    const trigger=document.activeElement,overflow=document.body.style.overflow;
+    dialog.showModal();document.body.style.overflow='hidden';dialog.querySelector('button')?.focus();
+    const contain=event=>{if(event.key!=='Tab')return;const controls=[...dialog.querySelectorAll('button:not(:disabled),input:not(:disabled),a[href]')].filter(el=>el.getClientRects().length),first=controls[0],last=controls.at(-1);if(event.shiftKey && document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first?.focus();}};
+    dialog.addEventListener('keydown',contain);
+    return ()=>{dialog.removeEventListener('keydown',contain);dialog.close();document.body.style.overflow=overflow;if(trigger?.isConnected)trigger.focus();};
+  },[h,E]);
   M.useEffect(() => {
     const dismiss = event => { if (event.key === 'Escape') { w(false); _(false); } };
     window.addEventListener('keydown', dismiss);
@@ -275,7 +287,7 @@ function Bi() {
             style: {
               fontFamily: "Quicksand, sans-serif"
             },
-            children: night.files[e] ? "Your attached audio file" : Xe.subtitle
+            children: night.needsFile ? 'Your file needs attaching again' : night.files[e] ? "Your attached audio file" : Xe.subtitle
           }), p("p", {
             className: "relative text-[14px] leading-[1.32] text-[#DDD6FE]/90 font-light line-clamp-2",
             style: {
@@ -470,7 +482,7 @@ function Bi() {
                   style: {
                     fontFamily: "Quicksand, sans-serif"
                   },
-                  children: ["Playing from ", ao === "spotify" ? "Spotify" : ao === "apple" ? "Apple Music" : "Audible", " • timer stop; no fade"]
+                  children: [night.status==='playing'?"Playing from ":"Selected source: ", ao === "spotify" ? "Spotify" : ao === "apple" ? "Apple Music" : "Audible", " • timer stop; no fade"]
                 })]
               })]
             }), p("button", {
@@ -712,11 +724,12 @@ function Bi() {
           })]
         })
       }), p(NightControls, {
-        night
+        night, channelName:Xe.name
       })]
-    }), h && S("div", {
+    }), h && S("dialog", {
+      ref:picker,onCancel:event=>{event.preventDefault();w(false);},
       role:"dialog", "aria-modal":true, "aria-label":"Cozy channels",
-      className: "fixed inset-0 z-40 overflow-hidden max-w-[100vw]",
+      className: "night-modal fixed inset-0 z-40 overflow-hidden max-w-[100vw]",
       children: [p("div", {
         className: "absolute inset-0 bg-[#1D1333]/75 backdrop-blur-[12px] max-w-[100vw]",
         onClick: () => w(false)
@@ -899,10 +912,12 @@ function Bi() {
           })]
         })]
       })]
-    }), E && S("div", {
-      className: "fixed inset-0 z-50 flex items-end justify-center sm:items-center overflow-hidden max-w-[100vw]",
+    }), E && S("dialog", {
+      ref:explanation,onCancel:event=>{event.preventDefault();_(false);},
+      className: "night-modal fixed inset-0 z-50 flex items-end justify-center sm:items-center overflow-hidden max-w-[100vw]",
       role: "dialog",
       "aria-modal": "true",
+      "aria-labelledby":"night-how-title",
       "data-how-modal": "true",
       children: [p("div", {
         className: "absolute inset-0 bg-[#1D1333]/80 backdrop-blur-[12px] max-w-[100vw]",
@@ -910,6 +925,7 @@ function Bi() {
       }), S("div", {
         className: "relative w-full max-w-[420px] mx-6 mb-10 sm:mb-0 rounded-[28px] bg-[#2F2354] border border-[#4B3D7A] p-7 shadow-[0_20px_80px_rgba(29,19,51,0.8)] max-w-[90vw]",
         children: [p("h3", {
+          id:'night-how-title',
           className: "text-[24px] tracking-[-0.01em] text-[#F3EFFF]",
           style: {
             fontFamily: "Caveat, cursive",

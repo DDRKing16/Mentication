@@ -19,6 +19,8 @@ import {
   tryLoadRecords,
   updateNoteText,
   writeDraft,
+  readParkingReturn,
+  writeParkingReturn,
 } from "./storage.js";
 import { savedWhenLabel, daysRemaining } from "./dates.js";
 import { buildIcs, GENERIC_EVENT_TITLE } from "./ics.js";
@@ -133,6 +135,26 @@ describe("Tomorrow Parking Lot storage", () => {
     expect(readDraft(new Date(NIGHT.getTime() + 25 * 3_600_000))).toBeNull();
     writeDraft("   ");
     expect(readDraft()).toBeNull();
+  });
+  it('restores the actual saved note and quiet position without duplicating its words into session storage',()=>{
+    const note=parkNote({id:'synthetic-return',text:'Synthetic parked words'},NIGHT);
+    expect(writeParkingReturn(note.id,'quiet',NIGHT)).toBe(true);
+    expect(readDraft(NIGHT)).toBeNull();expect(readParkingReturn(NIGHT)).toEqual({step:'quiet',record:note});
+    expect([...window.sessionStorage.values.values()].join('')).not.toContain(note.text);
+  });
+  it('does not restore a deleted or expired parked note or an expired return pointer',()=>{
+    const note=parkNote({id:'synthetic-return',text:'Synthetic parked words'},NIGHT);writeParkingReturn(note.id,'parked',NIGHT);
+    expect(readParkingReturn(new Date(NIGHT.getTime()+25*3_600_000))).toBeNull();
+    deleteRecord(note.id,NIGHT);expect(readParkingReturn(NIGHT)).toBeNull();
+    const old=parkNote({id:'expired-return',text:'Expired'},NIGHT),later=new Date(NIGHT.getTime()+31*86_400_000);writeParkingReturn(old.id,'parked',later);expect(readParkingReturn(later)).toBeNull();
+  });
+  it('retains the explicitly chosen wait confirmation and unclosed shutter position in the existing draft',()=>{
+    writeDraft('Synthetic unclosed note','synthetic-draft',NIGHT,{step:'seal',canWait:true});
+    expect(readDraft(NIGHT)).toMatchObject({text:'Synthetic unclosed note',recordId:'synthetic-draft',step:'seal',canWait:true});expect(readParkingReturn(NIGHT)).toBeNull();
+  });
+  it('does not falsely promise draft or parked-screen return after a silent session-storage failure',()=>{
+    const session=window.sessionStorage,write=session.setItem.bind(session);session.setItem=(key,value)=>{if(key!=='mentication.tomorrowParking.draft.v1')write(key,value);};
+    expect(writeDraft('Synthetic draft','draft',NIGHT)).toBe(false);expect(writeParkingReturn('synthetic-id','parked',NIGHT)).toBe(false);
   });
 
   it("migrates the legacy pending item only after the new record is verified", () => {
