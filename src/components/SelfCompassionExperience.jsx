@@ -1,2 +1,16 @@
-import CarePracticeExperience from './care-practices/CarePracticeExperience';
-export default function SelfCompassionExperience(props) { return <CarePracticeExperience key="selfCompassion" {...props} id="selfCompassion" />; }
+import useCarePractice from './care-practices/useCarePractice';
+import { CareFrame, Primary, Quiet, Scene, SharedScene, WordChoices } from './care-practices/CarePracticeFrame';
+import { CompassionVisual } from './care-practices/CareVisuals';
+import { COMPASSION_STARTERS, compassionateSuggestions } from '@/lib/carePracticeDesign';
+
+export default function SelfCompassionExperience(props) {
+  const flow=useCarePractice('selfCompassion',props); const {s}=flow;
+  const common=<SharedScene flow={flow} visual={<CompassionVisual s={s} mode="response"/>}/>;
+  return <CareFrame flow={flow}>
+    {['notice','perspective','practice'].includes(s.stage) ? <>
+      {s.stage==='notice' && <Scene flow={flow} eyebrow="Notice the critic" title="What is the line you keep hearing?" body="Pick something close, or use your own words."><CompassionVisual s={s}/><WordChoices label="The critical line" value={s.notice} choices={COMPASSION_STARTERS.map(x=>x.line)} onChange={notice=>flow.patch({notice,perspective:'',responseRead:false})}/><Primary disabled={!s.notice.trim()} onClick={()=>flow.go('perspective')}>Find a kinder response</Primary><Quiet onClick={()=>flow.go('perspective',{notice:''})}>Keep the line in my mind</Quiet></Scene>}
+      {s.stage==='perspective' && <Scene flow={flow} eyebrow="Try a voice on your side" title="What would you say to someone you care about?" body="Choose a believable response. You can change every word.">{s.notice && <div className="compassion-before"><span>They are hearing this</span><p>“{s.notice}”</p></div>}<WordChoices label="A compassionate response" value={s.perspective} choices={compassionateSuggestions(s.notice)} onChange={perspective=>flow.patch({perspective,responseRead:false})} placeholder="Something caring that I can believe"/>{s.perspective && <div className="compassion-response-preview"><span>Now offer these words to yourself</span><p>{s.perspective}</p></div>}<Primary disabled={!s.perspective.trim()} onClick={()=>flow.go('practice',{practiceTaken:true})}>Let this be my response</Primary><Quiet onClick={()=>flow.go('action')}>Choose an act of care instead</Quiet></Scene>}
+      {s.stage==='practice' && <Scene flow={flow} eyebrow="One moment of care" title="Say it as if you are on your own side." body="Read your words slowly. They can be only a little believable."><CompassionVisual s={s} mode="practice"/><div className="compassion-voice" role="group" aria-label="A tone to try">{['steady','gentle'].map(tone=><button type="button" aria-pressed={s.responseTone===tone} key={tone} onClick={()=>flow.patch({responseTone:tone})}>{tone==='steady'?'A steady voice':'A gentle voice'}</button>)}</div><p className="compassion-tone-hint">{s.responseTone==='gentle' ? 'Try a soft, unhurried tone, as you would with someone you care about.' : 'Try a calm, steady tone. You can be clear without being harsh.'}</p><button type="button" className="care-experience-action" aria-pressed={s.responseRead} onClick={()=>flow.patch({responseRead:!s.responseRead})}>{s.responseRead?'These are the words I tried':'I have tried saying these words'}</button><Primary onClick={()=>flow.go('action')}>Choose one act of care</Primary><Quiet onClick={()=>flow.go('orient')}>Stop and look around</Quiet></Scene>}
+    </> : common}
+  </CareFrame>;
+}

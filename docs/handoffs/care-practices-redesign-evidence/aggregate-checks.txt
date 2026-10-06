@@ -1,0 +1,9 @@
+Test Files  60 passed (60)
+Tests  473 passed (473)
+Typecheck: passed
+Lint: passed
+Production build: passed (existing large-chunk advisory)
+V3 algorithm verification: passed
+Nine integrated mobile flows: passed
+Six integrated long-input flows: passed
+Native iOS and screen-reader audio output: not run
