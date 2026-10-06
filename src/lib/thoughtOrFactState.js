@@ -95,6 +95,10 @@ export function normaliseThoughtOrFactDraft(draft = {}) {
     },
     support: normaliseEntries(draft.support),
     evidenceAgainst: normaliseEntries(draft.evidenceAgainst),
+    evidenceDrafts: {
+      support: typeof draft.evidenceDrafts?.support === 'string' ? draft.evidenceDrafts.support : '',
+      against: typeof draft.evidenceDrafts?.against === 'string' ? draft.evidenceDrafts.against : '',
+    },
     distortions: normaliseEntries(draft.distortions),
     alternatives: normaliseEntries(draft.alternatives),
     uncertainty: normaliseEntries(draft.uncertainty),

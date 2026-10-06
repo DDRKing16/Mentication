@@ -1,4 +1,4 @@
-import {removeVerified} from './verifiedStorage';
+import {removeVerified, writeVerified} from './verifiedStorage';
 import { clearDraft, clearNextStepHandoff, DRAFT_KEY, NEXT_STEP_HANDOFF_KEY } from "@/lib/tomorrowParking/storage";
 
 const PREF_KEY = "mentation.flagship.preferences.v1";
@@ -57,8 +57,11 @@ export function getFlagshipPreferences() {
 }
 
 export function saveActiveFlagship(state) {
-  if (!state?.interventionId) return;
-  save(ACTIVE_KEY, { ...state, updatedAt: new Date().toISOString(), expiresAt: Date.now() + ACTIVE_TTL_MS });
+  if (!state?.interventionId) return false;
+  try {
+    writeVerified(localStorage, ACTIVE_KEY, JSON.stringify({ ...state, updatedAt: new Date().toISOString(), expiresAt: Date.now() + ACTIVE_TTL_MS }));
+    return true;
+  } catch { return false; }
 }
 
 export function getActiveFlagship() {

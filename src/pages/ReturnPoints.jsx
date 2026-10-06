@@ -1,4 +1,5 @@
-import {writeVerified} from '@/lib/verifiedStorage';
+import {readThoughtRecords as readThoughts, deleteThoughtRecord} from '@/lib/thoughtOrFactStorage';
+import ThoughtEvidence from '@/components/thought-or-fact/ThoughtEvidence';
 import { savedWorkMatches, taraReportedResult, validSavedDate } from '@/lib/savedWorkPresentation';
 import { getBrandAtmosphere, getBrandInk } from '@/lib/interventionBrand';
 import { loadTara, deleteTaraRecap } from '@/lib/taraTacticianStorage';
@@ -11,13 +12,6 @@ import { Link } from 'react-router-dom';
 import { takeawayStore } from '@/lib/localData';
 import { JOURNEY_EXPERIENCES } from '@/lib/journeyExperience';
 
-const THOUGHT_KEY = 'mentation.thought-or-fact.records.v1';
-function readThoughts() {
-  const records = JSON.parse(localStorage.getItem(THOUGHT_KEY) || '[]');
-  if (!Array.isArray(records)) throw new Error('Unreadable saved perspectives');
-  if (records.some(record => !record || typeof record.id !== 'string')) throw new Error('Unreadable saved perspectives');
-  return records;
-}
 function SavedHeading({id,children,date}) {
   const world=getBrandAtmosphere(id), saved=validSavedDate(date);
   return <header className="-mx-5 -mt-5 mb-4 rounded-t-2xl border-b border-border p-5" style={{background:world.background,color:getBrandInk(id)}}><h3 className="font-heading text-xl leading-snug">{children}</h3>{saved && <time className="mt-1 block text-sm opacity-80" dateTime={date}>{saved.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}</time>}</header>;
@@ -39,11 +33,13 @@ export default function ReturnPoints() {
   useEffect(() => {
     const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
     window.addEventListener('mentation:takeaways-changed', refresh);
+    window.addEventListener('mentation:thoughts-changed', refresh);
     window.addEventListener('storage', refresh);
     window.addEventListener('focus', refresh);
     document.addEventListener('visibilitychange', onVisible);
     return () => {
       window.removeEventListener('mentation:takeaways-changed', refresh);
+      window.removeEventListener('mentation:thoughts-changed', refresh);
       window.removeEventListener('storage', refresh);
       window.removeEventListener('focus', refresh);
       document.removeEventListener('visibilitychange', onVisible);
@@ -51,7 +47,7 @@ export default function ReturnPoints() {
   }, [refresh]);
   const archives = Object.entries(JOURNEY_EXPERIENCES).filter(([, meta]) => meta.archive && meta.archive !== '/return-points');
   const visibleNotes=notes?.filter(note=>savedWorkMatches(query,[note.text,JOURNEY_EXPERIENCES[note.interventionId]?.name]));
-  const visibleThoughts=thoughts?.filter(record=>savedWorkMatches(query,['Thought or Fact',record.thought,record.balancedConfirmed?record.ruling:'',record.returnPhrase]));
+  const visibleThoughts=thoughts?.filter(record=>savedWorkMatches(query,['Thought or Fact',record.thought,record.balancedConfirmed?record.ruling:'',record.returnPhrase,...(Array.isArray(record.support)?record.support:[]),...(Array.isArray(record.evidenceAgainst)?record.evidenceAgainst:[])]));
   const visibleTara=taraRecaps?.filter(record=>savedWorkMatches(query,['Tara Tactician',record.prediction,record.actual,record.learning,record.nextStep,taraReportedResult(record)?.text]));
   const visibleCards=cards?.filter(({id,state})=>savedWorkMatches(query,[CARE_PRACTICES[id].title,...careSavedWorkRows(id,state).map(row=>row.value)]));
   const count=[visibleNotes,visibleThoughts,visibleTara,visibleCards].reduce((sum,list)=>sum+(list?.length||0),0);
@@ -77,9 +73,11 @@ export default function ReturnPoints() {
       <SavedHeading id="factCheck" date={record.createdAt}>Thought or Fact</SavedHeading>
       {typeof record.thought === 'string' && <p className="whitespace-pre-wrap break-words">Your thought: {record.thought}</p>}
       {record.balancedConfirmed === true && typeof record.ruling === 'string' && <p className="mt-3 whitespace-pre-wrap break-words">Your confirmed perspective: {record.ruling}</p>}
+      {record.balancedConfirmed === false && <p className="mt-3">You chose to leave this unresolved.</p>}
+      <ThoughtEvidence support={record.support} against={record.evidenceAgainst}/>
       {typeof record.returnPhrase === 'string' && record.returnPhrase.trim() && <p className="mt-3 whitespace-pre-wrap break-words">Your return phrase: {record.returnPhrase}</p>}
       <button type="button" className="mt-3 min-h-11 underline" onClick={() => {
-        try { writeVerified(localStorage,THOUGHT_KEY, JSON.stringify(readThoughts().filter(item => item.id !== record.id))); setThoughts(readThoughts()); setError(''); }
+        try { deleteThoughtRecord(record.id); setThoughts(readThoughts()); setError(''); }
         catch { setError('Could not delete this perspective. It is still saved. Try again.'); }
       }}>Delete this perspective</button>
     </article>)}
