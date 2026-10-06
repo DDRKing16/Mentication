@@ -26,7 +26,7 @@ with sync_playwright() as p:
     page.goto(origin+'/vector-shift')
     page.get_by_role('slider').fill('4')
     page.get_by_role('button',name='Start Vector Shift',exact=True).click()
-    expect(page.frame_locator('iframe').locator('body')).not_to_be_empty(timeout=15000)
+    expect(page.frame_locator('iframe').get_by_role('button',name='Tap here to begin',exact=True)).to_be_visible(timeout=15000)
     page.get_by_role('button',name='Another way',exact=True).click()
     expect(page.get_by_role('dialog',name='Another way · Vector Shift')).to_be_visible()
     page.get_by_role('button',name='Return to Vector Shift',exact=True).click()

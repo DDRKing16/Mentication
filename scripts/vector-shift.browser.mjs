@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules/playwright/index.mjs');
 const base=process.env.VECTOR_TEST_URL || 'http://127.0.0.1:5178';
-const out='evidence/vector-shift';fs.mkdirSync(out,{recursive:true});
+const out=process.env.VECTOR_TEST_OUT || 'evidence/vector-shift';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--mute-audio','--no-first-run']});
 const results=[];const errors=[];
 const record=(name)=>{results.push(name);console.log('PASS',name)};
@@ -58,7 +58,7 @@ try{
   const definitions={ground:{question:'How intense is it right now?',scale:'disconnection',left:'Present',right:'Gone',higherIsBetter:false},calm:{question:'How intense is it right now?',scale:'distress',left:'Calm',right:'Extreme',higherIsBetter:false},lift:{question:'How is your mood right now?',scale:'mood',left:'Very low',right:'Great',higherIsBetter:true}};
   for(const [direction,after,helpfulness] of [['ground',6,'same'],['ground',8,'worse'],['ground',null,null],['calm',6,'unsure'],['lift',8,'helpful']]){
     const host=await pageFor();const id=`host-${direction}-${after}-${helpfulness}`;
-    await host.addInitScript(()=>localStorage.setItem('haven_onboarded','1'));await host.goto(`${base}/reset`);
+    await host.addInitScript(()=>{if(window===window.top)localStorage.setItem('haven_onboarded','1')});await host.goto(`${base}/reset`);
     const baseline={...definitions[direction],direction,min:0,max:10,value:6,answered:true};
     const entry={prebuilt:true,pathway:['vectorShift'],direction,intensity:6,goal_baseline:baseline,whereFelt:'both',timeMin:5,audio:'no',reset_phase:'guiding',reset_session_id:id};
     await host.evaluate(entry=>history.replaceState({usr:entry,key:'test'},'',location.href),entry);await host.reload();
@@ -77,6 +77,6 @@ try{
     if(helpfulness===null)assert.equal(sessions[0].attempts[0].helpfulness_response,undefined);
     record(`Host ${direction}: baseline 6 → ${after??'unanswered'}, feedback ${helpfulness??'unanswered'}, identical scale, one session/attempt`);await host.close();
   }
-  const entry=await pageFor();await entry.addInitScript(()=>localStorage.setItem('haven_onboarded','1'));await entry.goto(`${base}/vector-shift`);await entry.waitForURL(/reset/);await entry.getByRole('heading',{name:'How intense is it right now?',exact:true}).waitFor();assert.equal(await entry.locator('iframe[title="Vector Shift activities"]').count(),0);assert.match(await entry.locator('body').innerText(),/How intense|How are|right now/i);assert.equal(await entry.getByRole('button',{name:'Build my reset'}).isEnabled(),false);await snapshot(entry,'phone-explicit-baseline');record('Direct route without an answered baseline stays in shared check-in');await entry.close();
+  const entry=await pageFor();await entry.addInitScript(()=>{if(window===window.top)localStorage.setItem('haven_onboarded','1')});await entry.goto(`${base}/vector-shift`);await entry.waitForURL(/reset/);await entry.getByRole('heading',{name:'How intense is it right now?',exact:true}).waitFor();assert.equal(await entry.locator('iframe[title="Vector Shift activities"]').count(),0);assert.match(await entry.locator('body').innerText(),/How intense|How are|right now/i);assert.equal(await entry.getByRole('button',{name:'Start Vector Shift',exact:true}).isEnabled(),false);await snapshot(entry,'phone-explicit-baseline');record('Direct route without an answered baseline stays in shared check-in');await entry.close();
   assert.deepEqual(errors,[]);record('No browser runtime errors; phone/desktop screenshots have no horizontal overflow');
 }finally{await browser.close();fs.writeFileSync(`${out}/browser-results.json`,JSON.stringify({results,errors},null,2)+'\n')}

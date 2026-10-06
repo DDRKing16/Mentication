@@ -706,6 +706,20 @@ function Aa() {
       return `rgb(${le},${j},${A})`;
     }, []);
   w.useEffect(()=>{if(l.current){if(paused||stopped)l.current.suspend();else l.current.resume().catch(()=>{})}},[paused,stopped]);
+  // Keep the secure host pause contract in editable source, so rebuilds retain it.
+  w.useEffect(() => {
+    const receive = async event => {
+      if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'mentication:pause-for-alternative' || typeof event.data.requestId !== 'string') return;
+      vectorClock.paused = true;
+      setPaused(true);
+      try {
+        await l.current?.suspend();
+        window.parent.postMessage({type:'mentication:alternative-ready',requestId:event.data.requestId},location.origin);
+      } catch { /* No acknowledgement if audio could not be paused. The host retains its retry/exit controls. */ }
+    };
+    window.addEventListener('message',receive);
+    return ()=>window.removeEventListener('message',receive);
+  },[]);
   vectorClock.paused = paused || stopped;
   document.documentElement.classList.toggle("vs-paused", paused || stopped);
   const progress = {e,easy,helpfulness,skipped,exitReason,np,jt,score:$e,be,en:[...en],Hn:[...Hn],nn,cp,xu,eo,direction:Sn.current,align:M,hold:ee};

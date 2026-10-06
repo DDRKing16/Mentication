@@ -14,16 +14,21 @@ export default function Palace() {
   const navigate = useNavigate();
   const goBack=useAppBack();
   const [palace, setPalace] = useState(null);
+  const [readError,setReadError] = useState(false);
+  const [readVersion,setReadVersion] = useState(0);
 
   useEffect(() => {
-    let alive = true;
-    sessionStore.list("-created_date", 500).then((sessions) => {
-      if (alive) setPalace(derivePeacePalace(sessions));
-    }).catch(() => {
-      if (alive) setPalace(derivePeacePalace([]));
-    });
-    return () => { alive = false; };
-  }, []);
+    let alive = true, request = 0;
+    const read = event => {
+      if(event?.type==='storage' && event.key!==null && event.key!=='mentation.sessions.v1')return;
+      const current=++request;
+      sessionStore.list("-created_date",500).then(sessions=>{
+        if(alive && current===request){setPalace(derivePeacePalace(sessions));setReadError(false);}
+      }).catch(()=>{if(alive && current===request){setPalace(null);setReadError(true);}});
+    };
+    read();window.addEventListener('storage',read);window.addEventListener('mentation:sessions-changed',read);window.addEventListener('focus',read);
+    return () => {alive=false;window.removeEventListener('storage',read);window.removeEventListener('mentation:sessions-changed',read);window.removeEventListener('focus',read);};
+  },[readVersion]);
 
   const level = palace?.level ?? 0;
   const stage = palace?.stage;
@@ -42,14 +47,16 @@ export default function Palace() {
           </h1>
         </motion.div>
 
-        <motion.div
+        {palace && <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
           className="mt-6 overflow-hidden rounded-3xl border border-border soft-depth"
         >
           <PeacePalace level={level} className="block h-auto w-full" />
-        </motion.div>
+        </motion.div>}
+        {readError && <div role="alert" className="mt-6 rounded-2xl border border-border bg-card p-5"><p>Your saved practice history could not be read. Your stones cannot be checked yet. Nothing has been replaced.</p><button type="button" className="mt-3 min-h-11 underline" onClick={()=>setReadVersion(value=>value+1)}>Try reading practice history again</button></div>}
+        {!palace && !readError && <p role="status" className="mt-6">Reading your saved practice visits…</p>}
 
         {palace && (
           <div className="mt-6">
@@ -84,6 +91,7 @@ export default function Palace() {
         {palace && (
           <div className="mt-8 rounded-2xl border border-border bg-card p-6 soft-depth">
             <h2 className="font-heading text-lg font-medium tracking-tight text-primary">How the palace grows</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Stones record saved practice visits. They do not measure how you feel or whether a practice helped.</p>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>Using an intervention plants a stone in the grounds.</li>
               <li>Finishing one all the way through lays the palace itself — two stones at a time.</li>
