@@ -14,10 +14,13 @@ export function threatCheckPassed(book) {
   const score = scoreThreatCheck(book?.threatCheck);
   return book?.threatCheck?.submitted === true && score !== null && score >= 3;
 }
+export function threatStepComplete(book) {
+  return book?.threatVisualSeen === true && threatCheckPassed(book);
+}
 export function requiredThreatStep(book, step) {
-  return step > 3 && !threatCheckPassed(book) ? 3 : step;
+  return step > 3 && !threatStepComplete(book) ? 3 : step;
 }
 export function requiredThreatView(book, view) {
-  return book?.answers?.want?.trim() && !threatCheckPassed(book) && (view === 'plan' || view === 'journey' && book.step > 3) ? 'journey' : view;
+  return book?.answers?.want?.trim() && !threatStepComplete(book) && (view === 'plan' || view === 'journey' && book.step > 3) ? 'journey' : view;
 }
 export const emptyThreatCheck = () => ({ answers: [null, null, null, null], submitted: false });

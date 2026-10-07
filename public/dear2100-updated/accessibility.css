@@ -42,3 +42,8 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 @media(max-width:680px) { .flow-experience:has(.sequential-question) > .chapter-rail {display:none;} }
 .urge-surf-plan > .primary-button {width:100%;margin-top:1rem;}
 .urge-wave-stage.is-complete .urge-wave-play {background:transparent;box-shadow:none;border-color:currentColor;}
+/* The authored evolution visual is a required page, with every explanation open. */
+.threat-required-visual { background:#fffaf1; color:#112b50; border-radius:20px; padding:clamp(16px,4vw,32px); min-height:100svh; }
+.threat-required-visual h1 { color:inherit; }
+.threat-screen .threat-required-visual > .primary-button { background:#112b50; color:#fffaf1; }
+.threat-screen .threat-required-visual .learn-content > .fine-print { color:#5b6c7b; }

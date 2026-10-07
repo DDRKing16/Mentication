@@ -12,7 +12,11 @@ with sync_playwright() as p:
   if book is not None:ctx.add_init_script('localStorage.setItem('+json.dumps(KEY)+','+json.dumps(json.dumps({'version':1,'book':book}))+')')
   page=ctx.new_page();page.set_default_timeout(7000);page.on('pageerror',lambda error:errors.append(str(error)));page.goto(URL);return ctx,page
  def click(page,name):page.get_by_role('button',name=name,exact=True).click()
- def teaching(page):expect(page.get_by_role('region',name='Our Threat Detection System',exact=True)).to_be_visible()
+ def teaching(page):
+  visual=page.locator('.threat-required-visual')
+  if visual.count():
+   expect(visual).to_be_visible();expect(visual.locator('.evolution-copy em')).to_have_count(8);click(page,'Continue to the four threat phases')
+  expect(page.get_by_role('region',name='Our Threat Detection System',exact=True)).to_be_visible()
  def check(page,answers):
   for index,answer in enumerate(answers):
    assert page.locator('.threat-understanding-check fieldset').count()==1
