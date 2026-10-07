@@ -152,7 +152,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   useEffect(() => () => {flowRequest.current+=1;audioRequest.current+=1;mixer.current?.dispose();mixer.current=null;cues.current?.dispose();cues.current=null;},[]);
 
   function audioController(){
-    if(!mixer.current)mixer.current=createTappingAudio({onError:kind=>{setSoundError(`${kind==='voice'?'Voice':kind==='music'?'Music':'Tapping sound'} couldn’t load. The illustrated guide and captions are here.`);},onInterrupted:()=>{pausePractice();setSound(false);setSoundError('Audio was interrupted. Resume to restart your guide.');}});
+    if(!mixer.current)mixer.current=createTappingAudio({onError:kind=>{setSoundError(`${kind==='voice'?'Voice':kind==='music'?'Music':'Tapping sound'} couldn’t load. Retry audio when ready.`);},onInterrupted:()=>{pausePractice();setSound(false);setSoundError('Audio was interrupted. Resume to restart your guide.');}});
     return mixer.current;
   }
   function startRhythmAt(epoch) {
@@ -166,7 +166,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     if(silent||(!force&&muted)||(!voiceOn&&!musicOn&&!beatOn))return false;
     const token=++audioRequest.current;setAudioStarting(true);setSoundError('');
     try{const enabled=await audioController().activate(concern.id,{voice:voiceOn,music:musicOn,beat:beatOn});if(token!==audioRequest.current)return false;setSound(enabled);return enabled;}
-    catch{if(token===audioRequest.current){setSound(false);setSoundError('Audio couldn’t start. Follow the fingers, or retry sound in the controls.');}return false;}
+    catch{if(token===audioRequest.current){setSound(false);setSoundError('Audio couldn’t start. Tap Retry audio.');}return false;}
     finally{if(token===audioRequest.current)setAudioStarting(false);}
   }
 
@@ -180,7 +180,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   async function toggleSound() {
     if (silent) return;
     if (!voiceOn && !musicOn && !beatOn) { openSettings(); return; }
-    if(!muted&&(stage!=='round'||paused||sound)){audioRequest.current+=1;mixer.current?.cancel();setAudioStarting(false);setMuted(true);setSound(false);return;}
+    if(!muted&&!(stage==='round'&&!paused&&soundError)&&(stage!=='round'||paused||sound)){audioRequest.current+=1;mixer.current?.cancel();setAudioStarting(false);setMuted(true);setSound(false);return;}
     setMuted(false);
     if(stage==='round'&&!paused){if(await unlockAudio({force:true})){mixer.current?.run();if(tapping&&rhythmEpoch.current!=null)mixer.current?.startRhythm({beatMs:plan.beatMs,contactMs:plan.contactMs,phaseMs:(performance.now()-rhythmEpoch.current)%plan.beatMs});}}
   }
@@ -310,7 +310,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
         {soundError&&<p role="status" className="tap-error-note">{soundError}</p>}
         <button data-sfx="none" className="tap-text-button tap-adjust" onClick={openSettings}>Adjust pace or cues <span aria-hidden="true">→</span></button>
       </main>}
-      {stage === 'round' && <main className={`tap-round ${paused ? 'is-paused' : ''} ${artworkError ? 'has-art-error' : ''}`} hidden={settingsOpen}>
+      {stage === 'round' && <main className={`tap-round ${paused ? 'is-paused' : ''} ${artworkError ? 'has-art-error' : ''} ${soundError || hapticError ? 'has-cue-error' : ''}`} hidden={settingsOpen}>
         <div className="tap-round-meta"><span>{paused?'YOUR PLACE IS KEPT':locating?'FIND YOUR PLACE':'TAP WITH ME'}</span><span>{String(index+1).padStart(2,'0')} <span aria-hidden="true">/</span> 09</span></div>
         <div className="tap-round-title" aria-live="polite" aria-atomic="true"><h1 ref={heading} tabIndex={-1}>{point.name}</h1><p>{placement}</p></div>
         <div className={`tap-main-art tap-frame-${point.id}`} key={point.id}>
@@ -325,7 +325,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
           <div className={`tap-next ${movingSoon ? 'is-next' : ''}`} aria-live="off"><span>{nextPoint?'Next':'Then'}</span><strong>{nextPoint?.name || 'Rest & notice'}</strong><span aria-hidden="true">→</span></div>
           <div className="tap-progress" role="progressbar" aria-label="Guided point progress" aria-valuemin={0} aria-valuemax={9} aria-valuenow={index} aria-valuetext={`Place ${index+1} of 9: ${point.name}${roundSkipped.current ? '. Some points skipped.' : ''}`}>{TAPPING_POINTS.map((p, i) => <span key={p.id} className={i < index ? 'done' : i === index ? 'current' : ''}><i style={{width: i < index ? '100%' : i === index ? `${Math.min(100, second / secondsPerPoint * 100)}%` : '0%'}}/></span>)}</div>
           <div className="tap-controls"><button data-sfx="none" disabled={audioStarting} aria-label={audioStarting?'Preparing guide…':paused?'Resume my round':'Pause'} className={paused?'tap-primary':'tap-pause'} onClick={()=>void pauseRound()}><span>{audioStarting?'Preparing guide…':paused?'Resume':'Pause'}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={paused?'M9 6L18 12L9 18Z':'M9 6V18M15 6V18'}/></svg></button><button data-sfx="none" className="tap-stop" onClick={stop}>Stop round</button></div>
-          <div className="tap-audio-controls"><button data-sfx="none" disabled={silent||audioStarting} onClick={()=>void toggleSound()} aria-label={channelsOff?'Adjust sound':muted?'Turn sound on':!paused&&!sound?'Retry audio':'Mute audio'}>{silent?'Quiet reset':channelsOff?'Sound off':muted?'Sound off':paused?'Sound ready':sound?'Sound on':'Retry audio'} <span aria-hidden="true">{muted||silent||channelsOff?'◌':'♪'}</span></button><button data-sfx="none" onClick={openSettings}>Guide controls <span aria-hidden="true">→</span></button></div>
+          <div className="tap-audio-controls"><button data-sfx="none" disabled={silent||audioStarting} onClick={()=>void toggleSound()} aria-label={channelsOff?'Adjust sound':!paused&&soundError?'Retry audio':muted?'Turn sound on':!paused&&!sound?'Retry audio':'Mute audio'}>{silent?'Quiet reset':channelsOff?'Sound off':!paused&&soundError?'Retry audio':muted?'Sound off':paused?'Sound ready':sound?'Sound on':'Retry audio'} <span aria-hidden="true">{muted||silent||channelsOff?'◌':'♪'}</span></button><button data-sfx="none" onClick={openSettings}>Guide controls <span aria-hidden="true">→</span></button></div>
           {(soundError || hapticError) && <p role="status" className="tap-error-note">{soundError || hapticError}</p>}
           <div className="tap-practice-tools"><button data-sfx="none" className="tap-text-button tap-skip" onClick={skipPoint}>Skip this point</button><span className="tap-small">Your own rhythm is welcome.</span></div>
         </div>

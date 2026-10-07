@@ -274,3 +274,8 @@
 .large-text .tap-round-title p {font-size:14px;}
 .large-text .tap-guidance {min-height:98px;}
 .large-text .tap-cue p {font-size:26px;}
+
+/* Keep a real audio failure and its Retry control visible on a phone. */
+.tap-round.has-cue-error .tap-main-art {height:clamp(150px,calc(100dvh - 494px),350px);}
+.tap-round .tap-error-note {margin:6px 0!important;padding:0;}
+.large-text .tap-round.has-cue-error .tap-main-art {height:clamp(130px,calc(100dvh - 532px),280px);}
