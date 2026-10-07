@@ -30,6 +30,22 @@ describe('authored practice discovery',()=>{
 import { NEED_GROUPS, PRACTICE_PREVIEWS, practiceDestination } from './practiceDiscovery';
 
 describe('practice discovery contracts', () => {
+  it.each([
+    ['eftTapping', 'Gentle Tapping', ['ground', 'calm']],
+    ['taraTactician', 'Let’s get through this', ['lift', 'focus', 'calm']],
+  ])('keeps %s available in its requested categories through the canonical launch', (id, name, categories) => {
+    const matches = INTERVENTIONS.filter(practice => practice.id === id);
+    expect(matches).toHaveLength(1);
+    const [practice] = matches;
+    expect(practice.name).toBe(name);
+    for (const category of categories) {
+      const visible = INTERVENTIONS.filter(item => item.primaryDirection === category || item.directions.includes(category));
+      expect(visible.filter(item => item.id === id)).toHaveLength(1);
+      expect(practiceSearchMatches(practice, category)).toBe(true);
+    }
+    expect(practiceDestination(id).state.pathway).toEqual([id]);
+    expect(practiceDestination(id).state.intensity).toBeNull();
+  });
   it('keeps every existing need available exactly once, without changing its practice mapping', () => {
     const ids = NEED_GROUPS.flatMap(group => group.needs);
     expect(ids.length).toBe(new Set(ids).size);

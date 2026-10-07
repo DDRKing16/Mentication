@@ -7,7 +7,7 @@ export const FINAL_50_ALGORITHM_META = Object.freeze({
     ["eftTapping", ["ground", "calm"], "eft-style-tapping", ["tense", "overloaded"]],
     ["selfCompassion", ["calm"], "self-compassion", ["self_criticism"]],
     ["unhook", ["reset"], "cognitive-defusion", ["racing_thoughts"]],
-    ["taraTactician", ["focus", "calm"], "preparation-rehearsal-reflection", ["avoiding", "overloaded"]],
+    ["taraTactician", ["focus", "lift", "calm"], "preparation-rehearsal-reflection", ["avoiding", "overloaded"]],
     ["makeRoom", ["calm"], "emotional-acceptance", ["overloaded"]],
   ].map(([id, algorithmDirections, mechanismFamily, supportedSubstates]) => [id, { evidenceGrade: "Unrated", algorithmDirections, mechanismFamily, supportedSubstates, unsuitableSubstates: ["acute", "disconnected"], pathwayRoles: ["core"], intensityMin: 0, intensityMax: 10 }])),
   "happyBump": {"evidenceGrade": "B+", "preferredIntensityMin": 1, "preferredIntensityMax": 5, "intensityMin": 0, "intensityMax": 7, "bestWhen": "Low energy, low mood or inertia where a gentle sequence can build momentum", "algorithmTarget": "Body + environment + connection + behaviour", "algorithmDirections": ["lift", "calm"], "pathwayRoles": ["opener", "core"], "algorithmContext": "Safe movement route available", "mechanismFamily": "stacked-behavioural-activation", "supportedSubstates": ["low_energy", "low_mood", "tired"], "unsuitableSubstates": ["acute", "physical_instability"]},
