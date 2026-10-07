@@ -1,5 +1,5 @@
 import JourneyOptions from '@/components/journey/JourneyOptions';
-import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
+import TappingTakeaway from './TappingTakeaway';
 import { readTappingDraft, writeTappingDraft, deleteTappingDraft } from './tappingDraft';
 import { useEffect, useRef, useState } from 'react';
 import TappingSilhouette from './TappingSilhouette';
@@ -27,6 +27,10 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const [stillLight, setStillLight] = useState(restored?.stillLight === true);
   const [systemReduced, setSystemReduced] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingPage, setSettingPage] = useState('menu');
+  const [takeawayText, setTakeawayText] = useState(restored?.takeawayText ?? null);
+  const [takeawayId, setTakeawayId] = useState(restored?.takeawayId || null);
+  const [savedCueText, setSavedCueText] = useState(null);
   const quiet = stillLight || systemReduced || prefs.reducedMotion;
   const [sound, setSound] = useState(false);
   const [soundError, setSoundError] = useState('');
@@ -46,6 +50,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const finished = useRef(false);
   const roundSkipped = useRef(restored?.roundSkipped === true);
   const heading = useRef(null);
+  const settingHeading = useRef(null);
   const point = TAPPING_POINTS[index];
   const grounding = concern.id === 'grounding';
   const placement = TAPPING_ARTWORK[point.id].placement;
@@ -59,10 +64,10 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
 
   useEffect(() => {
     if (draft.error || finished.current) return;
-    try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current }); setDraftStatus('Draft saved on this device. If interrupted, the round returns paused.'); }
+    try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current, takeawayText, takeawayId }); setDraftStatus('Draft saved on this device. If interrupted, the round returns paused.'); }
     catch { setDraftStatus('Your draft could not be saved. It is available for this visit only.'); }
-  }, [stage, concern, before, after, index, second, slow, stillLight, rounds, stopped, skipped, draft.error]);
-  useEffect(() => { heading.current?.focus(); }, [stage]);
+  }, [stage, concern, before, after, index, second, slow, stillLight, rounds, stopped, skipped, takeawayText, takeawayId, draft.error]);
+  useEffect(() => { (settingsOpen ? settingHeading : heading).current?.focus(); }, [stage, settingsOpen, settingPage]);
   useEffect(() => {
     if (stage !== 'round' || index === TAPPING_POINTS.length - 1) return;
     // One point ahead: keep the next contact ready without downloading a whole tour.
@@ -157,7 +162,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
       await callback(makeTappingResult({ concern: concern.id, before, after, roundsCompleted: rounds, stopped, skippedPoints: skipped, durationSeconds: duration.current }));
     } catch {
       finished.current = false;
-      try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current }); }
+      try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current, takeawayText, takeawayId }); }
       catch { setDraftStatus('Your draft could not be saved. It is available for this visit only.'); }
       setError('That didn’t finish. Your check-in is still here. Please try again.'); setBusy(false);
     }
@@ -179,7 +184,8 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   </details>;
   function openSettings() {
     if (stage === 'round') pausePractice();
-    setSettingsOpen(value => !value);
+    setSettingPage('menu');
+    setSettingsOpen(true);
   }
   function changePace() {
     const nextSlow = !slow;
@@ -191,38 +197,35 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     }
     setSlow(nextSlow);
   }
+  function closeSettings() { setSettingsOpen(false); setSettingPage('menu'); }
   function back() {
     cues.current?.cancel();
-    setSettingsOpen(false);
-    if (stage === 'before') setStage('choose');
+    if (settingsOpen) { if (settingPage === 'menu') closeSettings(); else setSettingPage('menu'); }
+    else if (stage === 'before') setStage('choose');
     else if (stage === 'ready') setStage('before');
+    else if (stage === 'result') setStage('after');
+    else if (stage === 'next') setStage('result');
+    else if (stage === 'note') setStage('next');
     else exit();
   }
   const nextPoint = TAPPING_POINTS[index + 1];
   const movingSoon = !paused && !locating && second >= secondsPerPoint - 3;
-  const roundSettings = <div className="tap-settings">
-    <button data-sfx="none" aria-pressed={slow} onClick={changePace}>Pace: {slow ? 'Spacious' : 'Gentle'}</button>
-    <button data-sfx="none" aria-pressed={quiet} disabled={systemReduced || prefs.reducedMotion} onClick={() => setStillLight(!stillLight)}>Still light: {quiet ? 'On' : 'Off'}</button>
-    <button data-sfx="none" aria-pressed={sound} disabled={silent} onClick={toggleSound}>Soft beat: {sound ? 'On' : 'Off'}</button>
-    <button data-sfx="none" aria-pressed={haptic} disabled={systemReduced || prefs.reducedMotion} onClick={toggleHaptic}>Touch cues: {haptic ? 'On' : 'Off'}</button>
-    <p className="tap-small">{slow ? 'More time at each place. ' : ''}One beat for your rhythm. Two cues for a new place. Your own rhythm is welcome.{silent && ' Sound stays off for this reset.'}{(systemReduced || prefs.reducedMotion) && ' Touch cues stay off with reduced motion.'}</p>
-  </div>;
+  const settingPrompts = { menu: <>What would you<br/><em>like to adjust?</em></>, pace: <>What pace feels<br/><em>comfortable?</em></>, light: <>How would you<br/><em>like the light?</em></>, sound: <>Would a soft beat<br/><em>help you?</em></>, touch: <>Would touch cues<br/><em>help you?</em></> };
+  const settingChoice = (label, selected, action, disabled = false) => <button data-sfx="none" aria-pressed={selected} disabled={disabled} onClick={action}><span>{label}</span><i aria-hidden="true">{selected ? '✓' : ''}</i></button>;
   return <section className={`tapping-experience tap-stage-${stage} ${quiet ? 'tap-reduced' : ''}`} aria-label="Gentle Tapping">
     <div className="tap-wrap">
       <header className="tap-header">
-        {['before', 'ready'].includes(stage) ? <button data-sfx="none" className="tap-back" aria-label="Back" onClick={back}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6L9 12L15 18"/></svg></button> : <span className="tap-header-goal">CALM + GROUND</span>}
+        {(settingsOpen || ['before', 'ready', 'result', 'next', 'note'].includes(stage)) ? <button data-sfx="none" className="tap-back" aria-label="Back" onClick={back}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6L9 12L15 18"/></svg></button> : <span className="tap-header-goal">CALM + GROUND</span>}
         <img className="tap-wordmark" src="/media/brand/logo/jade-champagne/wordmark.png" alt="MentiCation"/>
         <button data-sfx="none" className="tap-exit" aria-label="Exit tapping" onClick={exit}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7L17 17M17 7L7 17"/></svg></button>
       </header>
       {draftError && <p className="tap-error-note" role="status">{draftStatus}</p>}
       {stage === 'choose' && <main className="tap-entry">
         <p className="tap-eyebrow">GENTLE TAPPING · EFT-STYLE</p>
-        <h1 ref={heading} tabIndex={-1}>Let’s make<br/><em>a little room.</em></h1>
-        <p className="tap-lead">Two fingertips. A gentle way to meet this moment.</p>
-        <div className="tap-entry-contact"><div className="tap-portrait"><TappingSilhouette point={TAPPING_POINTS[0]} paused quiet/></div><span className="tap-art-note">A LIGHT TOUCH · EITHER HAND</span></div>
-        <button data-sfx="none" className="tap-primary" onClick={() => { setConcern(CONCERNS[3]); setStage('before'); }}>Just help me ground <span aria-hidden="true">→</span></button>
-        <div className="tap-choice-area"><p className="tap-choice-label">OR STAY WITH SOMETHING PRESENT</p><div className="tap-choices">{CONCERNS.slice(0,3).map(c => <button data-sfx="none" key={c.id} onClick={() => { setConcern(c); setStage('before'); }}>{c.label}</button>)}</div></div>
-        <p className="tap-small tap-entry-note">Something manageable. No memory to revisit.</p>
+        <h1 ref={heading} tabIndex={-1}>What’s here<br/><em>right now?</em></h1>
+        <p className="tap-lead">Choose one to continue. No memory to revisit.</p>
+        <div className="tap-focus-choices" role="group" aria-label="What’s here right now?">{[CONCERNS[3], ...CONCERNS.slice(0,3)].map(c => <button data-sfx="none" key={c.id} onClick={() => { setConcern(c); setStage('before'); }}><span>{c.label}</span><span aria-hidden="true">→</span></button>)}</div>
+        <div className="tap-entry-contact"><div className="tap-portrait"><TappingSilhouette point={TAPPING_POINTS[0]} paused quiet/></div><span className="tap-art-note">TWO FINGERTIPS · A LIGHT TOUCH</span></div>
         <footer className="tap-entry-footer"><span>One guided round</span><span>About 2 minutes</span></footer>
         <details className="tap-about"><summary>About this practice</summary><p>For a concern, EFT-style tapping pairs the standard points with a gentle setup and a short reminder. Grounding uses the same points with your attention on the present.</p></details>
         {(restored || draft.error) && storageNote}
@@ -233,26 +236,23 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
         <div className="tap-checkin-context"><span>{concern.label}</span><span>{stage === 'before' ? 'A starting point' : 'The same scale'}</span></div>
         <h1 ref={heading} tabIndex={-1}>{RATING_QUESTION}</h1>
         <p className="tap-lead">{stage === 'after' ? 'Let your hands rest. Notice the same feeling.' : grounding ? 'Notice what’s here, without bringing anything back.' : `Just notice ${concern.phrase}, as it is.`}</p>
-        <div className="tap-rating" role="group" aria-label={`${RATING_QUESTION} 0 means none; 10 means as intense as it gets.`}>{Array.from({ length: 11 }, (_, n) => <button data-sfx="none" key={n} style={{ '--rating-size': `${5 + n * 2}px` }} onClick={() => rate(n)} aria-pressed={stage === 'before' && before === n} aria-label={`${n} out of 10`}><span>{n}</span><i aria-hidden="true"/></button>)}</div>
+        <div className="tap-rating" role="group" aria-label={`${RATING_QUESTION} 0 means none; 10 means as intense as it gets.`}>{Array.from({ length: 11 }, (_, n) => <button data-sfx="none" key={n} style={{ '--rating-size': `${5 + n * 2}px` }} onClick={() => rate(n)} aria-pressed={(stage === 'before' ? before : after) === n} aria-label={`${n} out of 10`}><span>{n}</span><i aria-hidden="true"/></button>)}</div>
         <div className="tap-scale"><span>0 · None</span><span>10 · As intense as it gets</span></div>
         <p className="tap-small">An estimate is enough. You can also leave this blank.</p>
         <button data-sfx="none" className="tap-text-button" onClick={() => rate(null)}>Skip this rating <span aria-hidden="true">→</span></button>
       </main>}
-      {stage === 'ready' && <main className="tap-ready">
+      {stage === 'ready' && <main className="tap-ready" hidden={settingsOpen}>
         <p className="tap-eyebrow">YOUR HANDS TAKE IT FROM HERE</p>
         <h1 ref={heading} tabIndex={-1}>Start here.<br/><em>We’ll move together.</em></h1>
         <div className="tap-ready-contact"><div className="tap-portrait"><TappingSilhouette point={TAPPING_POINTS[0]} paused quiet/></div><div className="tap-first-point"><span>01 / 09</span><strong>Side of hand</strong></div></div>
         <p className="tap-ready-placement">{TAPPING_ARTWORK.hand.placement}</p>
         <p className="tap-ready-instruction">Set your phone where you can see it.<br/>Use two fingertips with a light touch.</p>
         <p className="tap-small tap-ready-note">Skip tender spots; stop if this feels worse.</p>
-        <div className="tap-settings-summary"><button data-sfx="none" className="tap-text-button" aria-expanded={settingsOpen} onClick={openSettings}>Adjust your round <span aria-hidden="true">{settingsOpen ? '−' : '+'}</span></button><span>{slow ? 'Spacious' : 'Gentle'} · {sound ? 'soft beat' : 'quiet'}{haptic ? ' · touch' : ''}</span></div>
-        {settingsOpen && roundSettings}
-        {soundError && <p role="status" className="tap-error-note">{soundError}</p>}
-        {hapticError && <p role="status" className="tap-error-note">{hapticError}</p>}
+        <p className="tap-ready-pace tap-small">{slow ? 'Spacious' : 'Gentle'} pace · {sound ? 'soft beat' : 'quiet'}{haptic ? ' · touch cues' : ''}</p>
         <button data-sfx="none" className="tap-primary" onClick={begin}>Begin my round <span aria-hidden="true">→</span></button>
-        <p className="tap-ready-footnote">{grounding ? 'Grounding with the standard EFT points.' : 'A gentle setup, then one short reminder at each place.'}</p>
+        <button data-sfx="none" className="tap-text-button tap-adjust" onClick={openSettings}>Adjust pace or cues <span aria-hidden="true">→</span></button>
       </main>}
-      {stage === 'round' && <main className={`tap-round ${paused ? 'is-paused' : ''} ${artworkError ? 'has-art-error' : ''}`}>
+      {stage === 'round' && <main className={`tap-round ${paused ? 'is-paused' : ''} ${artworkError ? 'has-art-error' : ''}`} hidden={settingsOpen}>
         <div className="tap-round-meta"><span>{index === 0 ? 'THE SETUP' : 'FOLLOW THE GUIDE'}</span><span>PLACE {String(index + 1).padStart(2,'0')} / 09</span></div>
         <div className="tap-round-title" aria-live="polite" aria-atomic="true"><h1 ref={heading} tabIndex={-1}>{point.name}</h1><p>{placement}</p></div>
         <div className={`tap-main-art tap-frame-${point.id}`} key={point.id}>
@@ -268,8 +268,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
           <div className={`tap-next ${movingSoon ? 'is-next' : ''}`} aria-live="off"><span>{nextPoint ? movingSoon ? 'COMING NEXT' : 'UP NEXT' : 'THEN'}</span><strong>{nextPoint?.name || 'Rest & notice'}</strong><span aria-hidden="true">→</span></div>
           <div className="tap-progress" role="progressbar" aria-label="Guided point progress" aria-valuemin={0} aria-valuemax={9} aria-valuenow={index} aria-valuetext={`Place ${index+1} of 9: ${point.name}${roundSkipped.current ? '. Some points skipped.' : ''}`}>{TAPPING_POINTS.map((p, i) => <span key={p.id} className={i < index ? 'done' : i === index ? 'current' : ''}><i style={{width: i < index ? '100%' : i === index ? `${Math.min(100, second / secondsPerPoint * 100)}%` : '0%'}}/></span>)}</div>
           <div className="tap-controls"><button data-sfx="none" className={paused ? 'tap-primary' : 'tap-pause'} onClick={pauseRound}><span>{paused ? 'Resume my round' : 'Pause'}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={paused ? 'M9 6L18 12L9 18Z' : 'M9 6V18M15 6V18'}/></svg></button><button data-sfx="none" className="tap-stop" onClick={stop}>Stop round</button></div>
-          <div className="tap-practice-tools"><button data-sfx="none" className="tap-text-button tap-skip" onClick={skipPoint}>Skip this point</button><button data-sfx="none" className="tap-text-button" aria-expanded={settingsOpen} onClick={openSettings}>Pace & cues <span aria-hidden="true">{settingsOpen ? '−' : '+'}</span></button></div>
-          {settingsOpen && <div className="tap-paused-settings">{roundSettings}<p className="tap-small">Resume when you’re ready. Your place is kept.</p></div>}
+          <div className="tap-practice-tools"><button data-sfx="none" className="tap-text-button tap-skip" onClick={skipPoint}>Skip this point</button><button data-sfx="none" className="tap-text-button" onClick={openSettings}>Pace & cues <span aria-hidden="true">→</span></button></div>
         </div>
       </main>}
       {stage === 'result' && <main className="tap-result">
@@ -280,13 +279,39 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
         <p>{outcomeText(before, after)}</p>
         <p className="tap-small">{before == null || after == null ? 'A blank rating stays blank. There’s no comparison to make.' : 'Your own check-in, on the same 0–10 scale.'}</p>
         <div className="tap-result-actions"><button data-sfx="none" disabled={busy} className="tap-primary" onClick={() => deliver()}>{busy ? 'Finishing…' : 'Finish'} <span aria-hidden="true">→</span></button>
-          {!(before != null && after != null && after > before) && <button data-sfx="none" disabled={busy} className="tap-text-button" onClick={begin}>Try another gentle round <span aria-hidden="true">↻</span></button>}
-          {onChangeCourse && <button data-sfx="none" disabled={busy} className="tap-text-button" onClick={() => deliver(true)}>Try a different approach <span aria-hidden="true">→</span></button>}
         </div>
-        <JourneyTakeaway id="eftTapping" initialText={`Chosen focus: ${concern.label}.\nPace: ${slow ? 'Spacious' : 'Gentle'}.\nA light touch; either side is fine.`}/>
+        {savedCueText != null && <p className="tap-small tap-saved-cue" role="status">{takeawayText != null && savedCueText !== takeawayText.trim() ? 'Your previous cue is saved. These edits are still a draft.' : 'Cue saved on this device.'}</p>}
+        <button data-sfx="none" disabled={busy} className="tap-text-button tap-more-steps" onClick={() => setStage('next')}>Other next steps <span aria-hidden="true">→</span></button>
+      </main>}
+      {stage === 'next' && <main className="tap-next-screen">
+        <p className="tap-eyebrow">YOUR NEXT CHOICE · OPTIONAL</p>
+        <h1 ref={heading} tabIndex={-1}>What would<br/><em>help now?</em></h1>
+        <div className="tap-next-choices" role="group" aria-label="What would help now?">
+          <button data-sfx="none" onClick={() => setStage('note')}>Keep a cue for next time <span aria-hidden="true">→</span></button>
+          {!(before != null && after != null && after > before) && <button data-sfx="none" onClick={begin}>Try another gentle round <span aria-hidden="true">→</span></button>}
+          {onChangeCourse && <button data-sfx="none" disabled={busy} onClick={() => deliver(true)}>Try a different approach <span aria-hidden="true">→</span></button>}
+        </div>
+        <p className="tap-small">Back returns to your check-in and Finish.</p>
         {storageNote}
       </main>}
-      {stage === 'round' && (soundError || hapticError) && <p role="status" className="tap-error-note">{soundError || hapticError}</p>}
+      {['result', 'next', 'note'].includes(stage) && <TappingTakeaway active={stage === 'note'} initialText={`Chosen focus: ${concern.label}.\nPace: ${slow ? 'Spacious' : 'Gentle'}.\nA light touch; either side is fine.`} draftText={takeawayText} savedId={takeawayId} onTextChange={setTakeawayText} onSaved={record => { setTakeawayId(record.id); setTakeawayText(record.text); setSavedCueText(record.text); setStage('result'); }} onSavedStateChange={record => { setSavedCueText(record?.text ?? null); setTakeawayId(record?.id || null); }} onReadError={() => setSavedCueText(null)} onSkip={() => setStage('result')}/>}
+      {settingsOpen && <main className="tap-setting-screen">
+        <p className="tap-eyebrow">{stage === 'round' ? 'YOUR ROUND IS PAUSED' : 'OPTIONAL · YOUR ROUND'}</p>
+        <h1 ref={settingHeading} tabIndex={-1}>{settingPrompts[settingPage]}</h1>
+        {settingPage === 'menu' ? <div className="tap-setting-menu" role="group" aria-label="What would you like to adjust?">{[['pace','Pace',slow ? 'Spacious' : 'Gentle'],['light','Light',quiet ? 'Still' : 'Pulse'],['sound','Soft beat',sound ? 'On' : 'Off'],['touch','Touch cues',haptic ? 'On' : 'Off']].map(([id,label,value]) => <button data-sfx="none" key={id} onClick={() => setSettingPage(id)}><span>{label}</span><small>{value}</small><span aria-hidden="true">→</span></button>)}</div> : <>
+          <div className="tap-setting-choices" role="group" aria-label={settingPage === 'pace' ? 'Comfortable pace' : settingPage === 'light' ? 'Light preference' : settingPage === 'sound' ? 'Soft beat preference' : 'Touch cue preference'}>
+            {settingPage === 'pace' && <>{settingChoice('Gentle',!slow,() => { if (slow) changePace(); })}{settingChoice('Spacious',slow,() => { if (!slow) changePace(); })}</>}
+            {settingPage === 'light' && <>{settingChoice('A gentle pulse',!quiet,() => setStillLight(false),systemReduced || prefs.reducedMotion)}{settingChoice('A still guide',quiet,() => setStillLight(true))}</>}
+            {settingPage === 'sound' && <>{settingChoice('Keep it quiet',!sound,() => { if (sound) void toggleSound(); })}{settingChoice('Use a soft beat',sound,() => { if (!sound) void toggleSound(); },silent)}</>}
+            {settingPage === 'touch' && <>{settingChoice('No touch cues',!haptic,() => { if (haptic) void toggleHaptic(); })}{settingChoice('Use touch cues',haptic,() => { if (!haptic) void toggleHaptic(); },systemReduced || prefs.reducedMotion)}</>}
+          </div>
+          <p className="tap-small tap-setting-hint">{settingPage === 'pace' ? 'Spacious gives you more time at each face and body point.' : settingPage === 'light' ? (systemReduced || prefs.reducedMotion ? 'Your reduced-motion preference keeps the guide still.' : 'The point stays visible with either choice.') : settingPage === 'sound' ? (silent ? 'Sound stays off for this reset.' : 'One soft beat for rhythm. Two cues for a new place.') : (systemReduced || prefs.reducedMotion ? 'Touch cues stay off with reduced motion.' : 'Light touch cues follow the same rhythm as the guide.')}</p>
+          {((settingPage === 'sound' && soundError) || (settingPage === 'touch' && hapticError)) && <p className="tap-error-note" role="status">{settingPage === 'sound' ? soundError : hapticError}</p>}
+          <button data-sfx="none" className="tap-primary" onClick={closeSettings}>Back to my round <span aria-hidden="true">→</span></button>
+        </>}
+        {stage === 'round' && <p className="tap-small tap-setting-footnote">Your place is kept. Resume when you’re ready.</p>}
+      </main>}
+      {stage === 'round' && !settingsOpen && (soundError || hapticError) && <p role="status" className="tap-error-note">{soundError || hapticError}</p>}
       {error && <p className="tap-error-note" role="alert">{error}</p>}
       <footer className="tap-secondary"><JourneyOptions id="eftTapping" onOpen={pausePractice} /></footer>
     </div>

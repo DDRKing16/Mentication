@@ -150,3 +150,36 @@
 .tap-rest-thread span {flex:1;background:#e2c08b9c;border-radius:2px;}
 .tap-result-route {margin-top:14px!important;color:#e3d6bc;font-size:11px;}
 .tap-result-route span {color:var(--tap-gold);margin:0 7px;}
+
+/* One prompt at a time; the automatic body guide retains its own layout. */
+.tapping-experience [hidden] {display:none!important;}
+.tap-focus-choices {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px;}
+.tap-focus-choices button {min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border:1px solid #c9c5a668;border-radius:18px;font-size:14px;text-align:left;}
+.tap-focus-choices button>span:last-child {color:var(--tap-label);}
+.tap-focus-choices button:hover {background:#e2c08b14;border-color:var(--tap-label);}
+.tap-entry-contact {height:150px;margin:15px 0 14px;}
+.tap-entry-footer {margin-top:13px;}
+.tap-entry h1 {font-size:clamp(45px,12.5vw,54px);}
+.tap-ready-pace {margin:16px 0 12px!important;}
+.tap-adjust,.tap-more-steps {width:100%;margin-top:9px;}
+.tap-setting-screen,.tap-next-screen,.tap-note-screen {padding-top:26px;}
+.tap-setting-screen h1,.tap-next-screen h1,.tap-note-screen h1 {font-size:clamp(39px,10.5vw,46px);line-height:1.08;margin:21px 0 22px;}
+.tap-setting-menu,.tap-next-choices {display:flex;flex-direction:column;gap:12px;margin:30px 0 20px;}
+.tap-setting-menu button,.tap-next-choices button {display:flex;align-items:center;gap:12px;width:100%;min-height:64px;border:1px solid #c9c5a668;border-radius:20px;padding:15px 18px;text-align:left;font-size:15px;}
+.tap-setting-menu button small {margin-left:auto;color:var(--tap-muted);font-size:12px;}
+.tap-setting-menu button>span:last-child,.tap-next-choices button>span {margin-left:auto;color:var(--tap-label);}
+.tap-setting-menu button:hover,.tap-next-choices button:hover {background:#e2c08b14;border-color:var(--tap-label);}
+.tap-setting-choices {display:flex;flex-direction:column;gap:13px;margin:30px 0 18px;}
+.tap-setting-choices button {display:flex;align-items:center;justify-content:space-between;gap:15px;width:100%;min-height:72px;border:1px solid #c9c5a668;border-radius:20px;padding:18px;text-align:left;font-size:17px;}
+.tap-setting-choices button i {width:22px;height:22px;border:1px solid var(--tap-muted);border-radius:50%;font-size:15px;font-style:normal;text-align:center;line-height:20px;}
+.tap-setting-choices button[aria-pressed=true] {background:#e2c08b18;border-color:var(--tap-label);}
+.tap-setting-choices button[aria-pressed=true] i {color:#17373c;background:var(--tap-label);border-color:var(--tap-label);}
+.tap-setting-hint {margin-bottom:24px!important;min-height:36px;}
+.tap-setting-footnote {margin:22px 0 12px!important;}
+.tap-saved-cue {margin-top:18px!important;}
+.tap-note-screen textarea {display:block;width:100%;min-height:150px;max-width:100%;resize:vertical;background:#f3eddf;color:#18383c;border:1px solid #c9cda6;border-radius:18px;font:400 16px/1.5 'Hanken Grotesk',sans-serif;padding:16px;margin:24px 0 15px;overflow-wrap:anywhere;}
+.tap-note-screen textarea:focus-visible {outline:2px solid var(--tap-label);outline-offset:4px;}
+.tap-note-screen>.tap-primary {margin-top:24px;}
+.tap-note-screen>.tap-text-button {width:100%;margin-top:8px;}
+@media(max-height:740px){.tap-entry-contact{height:125px}.tap-setting-screen,.tap-next-screen,.tap-note-screen{padding-top:16px}.tap-setting-screen h1,.tap-next-screen h1,.tap-note-screen h1{font-size:39px}.tap-setting-menu,.tap-next-choices{margin-top:24px}.tap-setting-choices{margin-top:25px}}
+.large-text .tap-focus-choices button,.large-text .tap-setting-menu button,.large-text .tap-next-choices button {font-size:17px;}
