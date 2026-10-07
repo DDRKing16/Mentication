@@ -36,7 +36,10 @@ describe('offline tapping voice/music/contact mixer',()=>{
   expect([...data.slice(offset,offset+120)].every(x=>x===.25)).toBe(true);
   expect([...data.slice(offset+120)].every(x=>x===0)).toBe(true);
   expect(f.events[1]).toMatchObject({kind:'beat',key:'contact'});
-  expect(f.events[1].offset).toBeCloseTo(.055);
+  expect(f.events[1].offset).toBeCloseTo(0);
+  expect(f.events[1].at).toBeCloseTo(10.05);
+  f.contexts[0].currentTime=10.1;expect(f.mixer.rhythmPhase()).toBeCloseTo(0);
+  f.contexts[0].currentTime=10.1+beatMs*.4/1000;expect(f.mixer.rhythmPhase()).toBeCloseTo(beatMs*.4);
   f.mixer.dispose();
  });
  it.each([600,800])('does not cancel or recreate the native %ims loop during a main-thread stall or stalled audio output',async beatMs=>{
@@ -44,8 +47,8 @@ describe('offline tapping voice/music/contact mixer',()=>{
   f.mixer.startRhythm({beatMs,contactMs:beatMs*.4});const source=f.sources[1];
   f.setClock(10000,.05);f.contexts[0].currentTime=10.18;vi.advanceTimersByTime(9000);
   expect(f.events).toHaveLength(2);expect(source.stop).not.toHaveBeenCalled();
-  expect(f.mixer.rhythmPhase()).toBeCloseTo(180);
-  f.contexts[0].currentTime=19;expect(f.mixer.rhythmPhase()).toBeCloseTo(9000);
+  expect(f.mixer.rhythmPhase()).toBeCloseTo(80);
+  f.contexts[0].currentTime=19;expect(f.mixer.rhythmPhase()).toBeCloseTo(8900);
   expect(f.events).toHaveLength(2);expect(source.start).toHaveBeenCalledOnce();
   f.mixer.pause();expect(source.stop).toHaveBeenCalledOnce();expect(f.mixer.rhythmPhase()).toBeNull();
   f.mixer.dispose();
@@ -54,25 +57,25 @@ describe('offline tapping voice/music/contact mixer',()=>{
   const f=fixture({outputClock:true});f.setClock(1000,.05);await f.mixer.activate('worry');f.mixer.run();
   f.mixer.startRhythm({beatMs:600,contactMs:240});const contact=f.sources[1];
   f.setClock(1866,.05);f.contexts[0].currentTime=10.69;
-  expect(contact.stop).not.toHaveBeenCalled();expect(f.mixer.rhythmPhase()).toBeCloseTo(690);
+  expect(contact.stop).not.toHaveBeenCalled();expect(f.mixer.rhythmPhase()).toBeCloseTo(590);
   f.setClock(2200,.05);f.contexts[0].currentTime=10.74;
-  expect(f.mixer.rhythmPhase()).toBeCloseTo(740);expect(f.events).toHaveLength(2);
+  expect(f.mixer.rhythmPhase()).toBeCloseTo(640);expect(f.events).toHaveLength(2);
   f.mixer.dispose();
  });
  it('uses reported output latency without timestamps and never moves the visual backwards on timestamp jitter',async()=>{
   const f=fixture();await f.mixer.activate('worry');f.contexts[0].baseLatency=.01;f.contexts[0].outputLatency=.04;
   f.mixer.run();f.mixer.startRhythm({beatMs:600,contactMs:240,phaseMs:100});
-  expect(f.events[1].offset).toBeCloseTo(.155);expect(f.mixer.rhythmPhase()).toBeCloseTo(100);
-  f.contexts[0].currentTime=10.3;expect(f.mixer.rhythmPhase()).toBeCloseTo(400);
+  expect(f.events[1].offset).toBeCloseTo(.1);expect(f.mixer.rhythmPhase()).toBeCloseTo(100);
+  f.contexts[0].currentTime=10.3;expect(f.mixer.rhythmPhase()).toBeCloseTo(300);
   f.contexts[0].getOutputTimestamp=()=>({contextTime:10.2,performanceTime:100});f.setClock(110);
-  expect(f.mixer.rhythmPhase()).toBeCloseTo(400);f.mixer.dispose();
+  expect(f.mixer.rhythmPhase()).toBeCloseTo(300);f.mixer.dispose();
  });
  it('tempo change cancels the old loop and starts at the current visual phase without a burst or voice pitch change',async()=>{
   const f=fixture({outputClock:true});f.setClock(1000,.05);await f.mixer.activate('worry');f.mixer.run();
   f.mixer.startRhythm({beatMs:600,contactMs:240});const old=f.sources[1];
   f.mixer.startRhythm({beatMs:800,contactMs:320,phaseMs:350});
   expect(old.stop).toHaveBeenCalledOnce();expect(f.sources[2].buffer.duration).toBe(.8);
-  expect(f.events[2].offset).toBeCloseTo(.405);expect(f.mixer.rhythmPhase()).toBeCloseTo(350);
+  expect(f.events[2].offset).toBeCloseTo(.35);expect(f.mixer.rhythmPhase()).toBeCloseTo(350);
   f.mixer.speak('place-hand');expect(f.sources.at(-1).playbackRate.value).toBe(1);
   f.mixer.configure({beat:false});expect(f.sources[2].stop).toHaveBeenCalledOnce();expect(f.mixer.rhythmPhase()).toBeNull();
   f.mixer.dispose();

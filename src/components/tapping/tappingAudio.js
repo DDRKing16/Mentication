@@ -107,13 +107,13 @@ export function createTappingAudio({
     stopRhythm();
     if(!playing||!channels.beat||!context||disposed)return;
     try{
-      const buffer=contactLoop(beatMs,contactMs),period=buffer.duration;
+      const buffer=contactLoop(beatMs,contactMs);
       const phase=((phaseMs%beatMs)+beatMs)%beatMs;
-      const origin=outputTime()-phase/1000,start=context.currentTime+.005;
-      // Start at the current cycle position, including hardware output lead.
+      const start=context.currentTime+.05,origin=start-phase/1000;
+      // Start at the current cycle position, with a short native scheduling lead.
       // The native loop survives main-thread stalls without missed contacts or
       // a burst of replacement sources. Pause/Stop still cancel it immediately.
-      sourceFor('contact','beat',beatGain,{buffer,loop:true,at:start,offset:((start-origin)%period+period)%period});
+      sourceFor('contact','beat',beatGain,{buffer,loop:true,at:start,offset:phase/1000});
       rhythmClock={origin,lastPhase:phase};
     }catch{stopRhythm();channels.beat=false;onError('beat');}
   }
