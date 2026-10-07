@@ -195,6 +195,13 @@
 .tap-contact-shadow {opacity:.14;}
 .tap-contact-shadow.is-tapping {animation:tap-shadow-contact var(--tap-cycle,600ms) infinite;}
 @keyframes tap-shadow-contact {0%,100%{opacity:.025}40%,48%{opacity:.22}}
+.tap-pmr-body {filter:drop-shadow(0 0 9px #8adcba18) drop-shadow(0 0 25px #28775c18);opacity:.96;}
+.tap-face-landmarks {opacity:.36;}
+.tap-contact-target {transform-box:view-box;transform:scale(.86);opacity:.82;}
+.tap-contact-target.is-tapping {animation:tap-light-contact var(--tap-cycle,600ms) infinite both;}
+@keyframes tap-light-contact {0%,100%{transform:scale(.76);opacity:.42;animation-timing-function:cubic-bezier(.4,0,.6,1)}40%,48%{transform:scale(1);opacity:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}}
+.tap-reduced .tap-contact-target,.reduce-motion .tap-contact-target {animation:none!important;transform:none!important;opacity:1!important;}
+@media(prefers-reduced-motion:reduce){.tap-contact-target{animation:none!important;transform:none!important;opacity:1!important;}}
 .tap-main-art .tap-portrait {border-radius:32px;background:radial-gradient(ellipse at 50% 43%,#608f7a20,transparent 70%);}
 .tap-ready-contact .tap-portrait {border-radius:30px;mask-image:none;}
 .tap-motion-location {pointer-events:none;}

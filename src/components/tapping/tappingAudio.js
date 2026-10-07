@@ -1,8 +1,9 @@
 import manifest from './tappingAudioManifest.json';
 import { TAPPING_CONTACT_MS } from './tappingGuidance';
+import { tappingNarration, tappingNarrationKeys, TAPPING_VOICE_RATE } from './tappingNarration';
 
 const ROOT='/media/tapping/audio/';
-const files=concern=>[...Object.keys(manifest).filter(key=>key.startsWith('place-')||key.startsWith(concern+'-')||['tap','rest'].includes(key)),'warm-room','contact'];
+const files=concern=>[...tappingNarrationKeys(concern),'warm-room','contact'];
 
 // Offline mixer. Schedule from the hand's performance-clock epoch, translated
 // through output timestamps: the audio clock can drift or stall independently.
@@ -12,6 +13,7 @@ export function createTappingAudio({
   fetchAudio=(url,options)=>fetch(url,options),
   onError=()=>{}, onInterrupted=()=>{}, onEvent=()=>{},
   now=()=>performance.now(),
+  resolveNarration=tappingNarration,
 }={}) {
   let context=null,master=null,musicGain=null,voiceGain=null,beatGain=null;
   let disposed=false,playing=false,generation=0,musicNode=null,voiceNode=null;
@@ -20,10 +22,13 @@ export function createTappingAudio({
   let rhythmTimer=null,rhythmGeneration=0;
   const bytes=new Map(),buffers=new Map(),nodes=new Set(),abort=new AbortController();
   const isLive=token=>!disposed&&generation===token;
+  const assetFor=key=>manifest[key]?resolveNarration(key)?.url:ROOT+key+'.mp3';
   function preload(concern) {
     return Promise.allSettled(files(concern).map(async key=>{
+      const url=assetFor(key);
+      if(!url)return;
       if(!bytes.has(key)){
-        const promise=fetchAudio(ROOT+(manifest[key]?.file||key+'.mp3'),{signal:abort.signal})
+        const promise=fetchAudio(url,{signal:abort.signal})
           .then(response=>{if(!response.ok)throw Error('Audio unavailable');return response.arrayBuffer();});
         bytes.set(key,promise);promise.catch(()=>{if(bytes.get(key)===promise)bytes.delete(key);});
       }
@@ -60,7 +65,9 @@ export function createTappingAudio({
   function sourceFor(key,kind,gain,{offset=0,delay=0,at=null,loop=false}={}){
     if(!buffers.has(key)||context.state!=='running')throw Error('Audio unavailable');
     const source=context.createBufferSource();source.buffer=buffers.get(key);source.loop=loop;source.connect(gain);
-    const node={source,kind,key,start:at??context.currentTime+delay,offset};nodes.add(node);
+    const rate=kind==='voice'?TAPPING_VOICE_RATE:1;
+    source.playbackRate.value=rate;
+    const node={source,kind,key,start:at??context.currentTime+delay,offset,rate};nodes.add(node);
     source.onended=()=>{nodes.delete(node);try{source.disconnect();}catch{/* ended */}if(node===voiceNode){voiceNode=null;voiceCursor=null;duck(.45);}if(node===musicNode)musicNode=null;};
     source.start(node.start,offset);onEvent(kind,{key,at:node.start,offset});return node;
   }
@@ -121,7 +128,7 @@ export function createTappingAudio({
   }
   function pause(){
     generation+=1;playing=false;stopRhythm();
-    if(voiceNode)voiceCursor={key:voiceNode.key,offset:Math.max(0,voiceNode.offset+context.currentTime-voiceNode.start)};
+    if(voiceNode)voiceCursor={key:voiceNode.key,offset:Math.max(0,voiceNode.offset+(context.currentTime-voiceNode.start)*voiceNode.rate)};
     if(musicNode)musicOffset+=Math.max(0,context.currentTime-musicStarted);
     for(const node of [...nodes])stopNode(node);musicNode=null;voiceNode=null;
   }
