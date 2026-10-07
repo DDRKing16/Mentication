@@ -11,7 +11,7 @@ with sync_playwright() as p:
  for baseline in [True,False]:
   for width in [320,390]:
    for barrier in (['fear'] if baseline else ['fear','practical','both']):
-    ctx=b.new_context(viewport={'width':width,'height':844},reduced_motion='reduce');ctx.add_init_script("localStorage.setItem('haven_onboarded','1')");page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)));page.goto((BEFORE if baseline else BASE)+'/dear-2100');f=page.frame_locator('iframe[title="Dear 2100"]')
+    ctx=b.new_context(viewport={'width':width,'height':844},reduced_motion='reduce');ctx.add_init_script("if(window===window.top)localStorage.setItem('haven_onboarded','1')");page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)));page.goto((BEFORE if baseline else BASE)+'/dear-2100');f=page.frame_locator('iframe[title="Dear 2100"]')
     def click(name):f.get_by_role('button',name=name,exact=True).click()
     click('Begin');click('I have my own idea');f.get_by_role('textbox').fill('Learn music');click('Explore this')
     if barrier!='fear':f.get_by_role('radio',name='Practical limits' if barrier=='practical' else 'Both',exact=True).check()
