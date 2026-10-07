@@ -88,7 +88,7 @@ export function createTappingAudio({
   function startRhythm({beatMs,contactMs,phaseMs=0}){
     stopRhythm();
     if(!playing||!channels.beat||!context||disposed)return;
-    const token=rhythmGeneration,horizonMs=Math.max(1000,beatMs*2);
+    const token=rhythmGeneration,horizonMs=Math.max(1000,beatMs*2),contactGraceMs=20;
     let next=now()+contactMs-phaseMs,pending=[];
     if(next<now())next+=Math.ceil((now()-next)/beatMs)*beatMs;
     function audioTime(target,clock){
@@ -105,7 +105,9 @@ export function createTappingAudio({
       try{
         pending=pending.filter(item=>nodes.has(item.node)&&item.node.start>context.currentTime);
         for(const item of pending){
-          if(item.target<clock-.02){stopNode(item.node);item.node=null;continue;}
+          // Performance timestamps are milliseconds; retain imminent audio
+          // through one frame of clock jitter rather than cancelling its onset.
+          if(item.target<clock-contactGraceMs){stopNode(item.node);item.node=null;continue;}
           const at=Math.max(context.currentTime+.005,audioTime(item.target,clock));
           // Adjust only unplayed contacts, with enough lead to cancel safely.
           if(item.node.start-context.currentTime>.06&&Math.abs(at-item.node.start)>.025){
@@ -114,7 +116,7 @@ export function createTappingAudio({
           }
         }
         pending=pending.filter(item=>item.node);
-        if(next<clock-.02)next+=Math.ceil((clock-next)/beatMs)*beatMs;
+        if(next<clock-contactGraceMs)next+=Math.ceil((clock-next)/beatMs)*beatMs;
         while(next<clock+horizonMs&&token===rhythmGeneration){
           const at=audioTime(next,clock);
           if(at>=context.currentTime)pending.push({target:next,node:sourceFor('contact','beat',beatGain,{at})});

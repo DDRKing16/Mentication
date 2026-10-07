@@ -30,6 +30,24 @@ describe('offline tapping voice/music/contact mixer',()=>{
  it('falls back to the visual clock when output timestamps have not started',async()=>{const f=fixture({outputClock:true});await f.mixer.activate('worry');f.contexts[0].getOutputTimestamp=()=>({contextTime:0,performanceTime:0});f.mixer.run();f.mixer.startRhythm({beatMs:600,contactMs:240});expect(f.events.filter(e=>e.kind==='beat').map(e=>e.at)).toEqual([10.24,10.84]);f.mixer.dispose();});
  it('does not drop an imminent contact when a clock update maps it into the past',async()=>{vi.useFakeTimers();const f=fixture({outputClock:true});f.setClock(1000,.05);await f.mixer.activate('worry');f.mixer.run();f.mixer.startRhythm({beatMs:600,contactMs:240});f.setClock(1180,.15);f.contexts[0].currentTime=10.1;vi.advanceTimersByTime(40);expect(f.sources[1].stop).toHaveBeenCalledOnce();const replacement=f.events.filter(e=>e.kind==='beat').slice(-2)[0];expect(replacement.at).toBeCloseTo(10.105);expect(replacement.at).toBeGreaterThan(f.contexts[0].currentTime);f.mixer.dispose();});
  it('rejects transient output timestamps in the future and retains a playable rhythm',async()=>{vi.useFakeTimers();const f=fixture({outputClock:true});f.setClock(1000,.05);await f.mixer.activate('worry');f.mixer.run();f.mixer.startRhythm({beatMs:800,contactMs:320});f.setClock(1100);f.contexts[0].currentTime=10.1;f.contexts[0].getOutputTimestamp=()=>({contextTime:10.09,performanceTime:1150});vi.advanceTimersByTime(40);const replacements=f.events.filter(e=>e.kind==='beat').slice(-2);expect(replacements[0].at).toBeCloseTo(10.32);expect(replacements[1].at).toBeCloseTo(11.12);f.mixer.dispose();});
+ it('retains the crown contact when its visual deadline is 18ms past but the audio source is still imminent',async()=>{
+  vi.useFakeTimers();
+  const f=fixture({outputClock:true});
+  f.setClock(1000,.05);
+  await f.mixer.activate('worry');f.mixer.run();
+  f.mixer.startRhythm({beatMs:600,contactMs:240});
+  const contact=f.sources[1];
+  expect(f.events[1].at).toBeCloseTo(10.19);
+  // Retained crown trace: visual target passed, but audio onset is still ahead.
+  f.setClock(1258,.05);f.contexts[0].currentTime=10.18;
+  vi.advanceTimersByTime(40);
+  expect(contact.stop).not.toHaveBeenCalled();
+  f.setClock(1290,.05);f.contexts[0].currentTime=10.20;
+  vi.advanceTimersByTime(40);
+  expect(contact.stop).not.toHaveBeenCalled();
+  expect(contact.start).toHaveBeenCalledOnce();
+  f.mixer.dispose();
+ });
  it('cancels an expired visual contact while the audio clock is stalled',async()=>{vi.useFakeTimers();const f=fixture({outputClock:true});f.setClock(1000,.05);await f.mixer.activate('worry');f.mixer.run();f.mixer.startRhythm({beatMs:600,contactMs:240});const length=f.events.length;f.setClock(1500);f.contexts[0].currentTime=10.08;vi.advanceTimersByTime(40);expect(f.sources[1].stop).toHaveBeenCalledOnce();const future=f.events.slice(length);expect(future).toHaveLength(2);expect(future[0].at).toBeCloseTo(10.37);expect(future[1].at).toBeCloseTo(10.97);f.mixer.dispose();});
  it('changing one channel stops only that channel and releases ducking',async()=>{const f=fixture();await f.mixer.activate('worry');f.mixer.run();f.mixer.speak('place-collar');f.mixer.beat();f.mixer.configure({voice:false});expect(f.sources[1].stop).toHaveBeenCalledOnce();expect(f.sources[0].stop).not.toHaveBeenCalled();f.mixer.configure({music:false,beat:false});expect(f.sources[0].stop).toHaveBeenCalledOnce();expect(f.sources[2].stop).toHaveBeenCalledOnce();f.mixer.dispose();});
  it('reports a failed voice asset, keeps the available bed/beat and genuinely retries',async()=>{const f=fixture();f.fetchAudio.mockImplementation(async url=>({ok:!url.includes('place-brow'),arrayBuffer:async()=>new ArrayBuffer(16)}));expect(await f.mixer.activate('worry')).toBe(true);expect(f.errors).toHaveBeenCalledWith('voice');f.mixer.run();f.mixer.speak('place-hand');f.mixer.beat();expect(f.events.map(e=>e.kind)).toEqual(['music','beat']);f.mixer.pause();f.fetchAudio.mockImplementation(async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(16)}));await f.mixer.activate('worry',{voice:true,music:true,beat:true});f.mixer.run();f.mixer.speak('place-brow');expect(f.events.at(-1).kind).toBe('voice');f.mixer.dispose();});
