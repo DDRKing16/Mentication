@@ -1,0 +1,125 @@
+ORIGINAL PRACTICES — SECOND PHASE, LOCAL REVIEW
+
+Scope
+This follows the accepted shared-screen work in cc64609 and 70e0892 on
+codex/remaining-journeys-quality. The bounded second phase changes two original
+intervention internals: Next Easiest Step and Progressive Muscle Relaxation.
+It is not a claim that every remaining intervention was redesigned.
+
+Prioritized observed weaknesses, before implementation
+1. Next Easiest Step: two Pause controls, separate decorative progress meters,
+   a checked icon before the action was done, and multiple similarly weighted
+   actions compete with the actual microinstruction. The review dashboard
+   foregrounds statistics over the task and what remains. Own active/review
+   JSX in NextEasiestStepExperience; preserve its state and generation logic.
+2. PMR: the generic Upper body / Centre / Lower body / Rest line does not show
+   the actual short route's three selected regions. Body artwork dominates
+   for someone trying to follow the words. Own PMRExperience presentation and
+   pmr-session.css; preserve PMRV2Stage artwork, playback and protocol.
+3. Thought or Fact: the persistent privacy/draft paragraph takes substantial
+   space above the classification exercise; seven classifications add reading
+   load. Observed through classification only. Not changed in this increment.
+4. Other opening observations: Box Breathing repeats the identical opening
+   instruction. Next setup's Three steps button sets pathLength to speedy,
+   the same value as One step (source finding; three-step UI not validated).
+   Reconcile these with the approved broad passes before a separate correction.
+
+Implemented changes and rationale
+Next Easiest Step now presents the task, a single dominant action card and its
+full original instruction. Done is attached to the action. Adaptation offers
+existing smaller actions and explicit custom editing. Skip, undo and finishing
+for now remain available with less competing weight. A disclosed task trail
+supports multi-step state. The review is a task receipt with actual done,
+skipped and unfinished entries, a return-to-current-action path, undo and
+optional response fields. No answer is selected by default. Burgundy/sage and
+the teal review world remain; type, spacing and quiet arch geometry replace
+neon dashboard decoration. Task data, microinstructions, generation, storage,
+advance/undo, outcome and original pause handlers remain the original ones.
+
+PMR previews the actual chosen route in a disclosure and shows current/next
+area during practice. Expanded route state says Moved past, Skipped and Here
+now, never inferring relaxation. Body guide preserves the original artwork;
+Words only presents the same live instructions in a readable card. Switching
+views does not remount playback or reset the timer. Setup keeps mode/safety
+teaching intact and makes the selected route and primary start action clearer.
+The old generic section indicator is hidden only inside PMRExperience. Expanded
+routes and larger text use one scrolling surface, with controls after content.
+
+Owned source files / overlap for integration
+Modified: src/components/NextEasiestStepExperience.jsx (focus/dashboard adapters
+and obsolete UI-only state/import removal), its headerLayout and keyboard tests;
+src/components/pmr/PMRExperience.jsx (presentation wiring only);
+src/styles/pmr-session.css.
+Added: src/components/next-step/NextStepPractice.jsx,
+src/styles/next-step-practice.css, src/components/pmr/PMRRoute.jsx and its tests,
+scripts/verify-original-practices.cjs.
+No shared API, storage schema, recommendation score, PMR protocol/timing,
+arrangement of original safety teaching, media/provider, purchase or dependency
+was introduced. Specialist files and shared care internals are untouched.
+
+Qualitative assessment, not a measured quality score
+Visual craft: original worlds retained; action/review hierarchy is deliberate.
+Practice quality: original instructions remain central; adaptations and actual
+route are easier to inspect. No effectiveness claim is inferred from completion.
+Personalization: existing smaller-action/custom options are brought into the
+practice, and a reversible guidance-view preference is added. No diagnosis or
+unreported intensity is invented. Guide view is session-local, not persisted.
+Engagement: interruption can lead back to an unfinished action; PMR makes the
+upcoming region visible. No streak/reward mechanic was added.
+Cognitive burden: removed duplicate pause/progress clutter and disclosed review
+helpfulness/route details; PMR adds a route and view choice, so body view may
+require more scrolling than before. This tradeoff is visible in real captures.
+Mobile/accessibility: native buttons/disclosures, focus on new action/review,
+44px controls, wrapping and 150% root text checked at 320/390px with reduced
+motion. Larger text intentionally scrolls; it is not squeezed into one viewport.
+Reliability: exercised action/state transitions and nullable outcomes. Browser
+and unit tests establish those behaviors, not premium quality or clinical value.
+
+Evidence
+before/ contains real rendered 390px baseline captures, including entry screens
+of other inspected journeys. after/ contains real rendered 320/390px captures
+of active/adapt/review and PMR setup/body/words/route states. PMR is a fixed,
+scrolling overlay: screenshots are its first viewport, not a complete capture
+of all content below. Text such as Put one pen in its cup is synthetic input.
+PMR before is the whole-body introduction; after is the hands region after
+Continue. They demonstrate layout/state choices, not a same-phase outcome.
+No screenshots were composited, retouched or generated.
+
+Verification
+- Full unit suite: 66 files / 536 tests passed.
+- Lint, typecheck, production build, V3 algorithm verification, diff check pass.
+- Existing build >500kB chunk warning remains.
+- Both 320x844 and 390x844, reduced motion: Next pause/resume; unfinished
+  review/return; custom edit; reload/resume saved task; done; undo; skip;
+  final rating skipped with exactly one real stored session and null intensity.
+- Both widths: PMR full/short route selection; words/body switching without
+  changing paused remaining time; continue, area skip, resume/pause; stop;
+  skipped tension/final response remain null; stopped=true; hands stored as
+  skipped, not relaxed. Zero uncaught page errors in these browser loops.
+- 150% root text checked on active Next and words PMR at both widths; no
+  horizontal overflow. Timer/control geometry is asserted in body view.
+- PMR route unit tests verify every short release/contrast step is represented
+  exactly once, plus seven full-route areas and no mutation of source steps.
+- Existing static Next header/keyboard assertions updated to the new native
+  controls; reduced-motion checks remain. These are not visual-quality tests.
+Reproduce: start npm run dev, then node scripts/verify-original-practices.cjs.
+PLAYWRIGHT_MODULE, CHROMIUM_PATH, BASE_URL and EVIDENCE_DIR are configurable.
+No new package required in the application; current cloud browser tools used.
+
+Dependencies and limits
+Latest fetched origin/main is still e292234. Approved local commits 8a2cde51 +
+16c1f93 are unavailable here. Parent must reconcile the listed source overlaps
+against the approved release before final integration. Another way remains at
+the top in baseline captures; its relocation belongs to that approved release,
+and must be present before the combined result is accepted. No duplicate fix
+was made here. Dear teaching and mandatory 3/4 quiz are not touched or certified
+by this branch. Do not hold the already-approved release for this work.
+
+Unchanged limitations: Next setup/landing is not redesigned; its Three steps
+mapping needs reconciliation. Multi-step task rendering is implemented but the
+browser loop uses the original one-step path, not every task/protocol. PMR's
+page-reload/resume persistence was not added or verified. No native VoiceOver,
+real device haptics/audio, full uninterrupted timed PMR protocol, actual-user
+usability or clinical effectiveness study was performed. Deeper Thought/Urge
+inspection is incomplete; see coverage.txt rather than inferring coverage from
+catalogue preview copy. No push, merge, deploy, upload or external message.

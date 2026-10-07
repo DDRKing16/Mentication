@@ -12,8 +12,8 @@ describe("Next Easiest Step's primary controls are keyboard-reachable", () => {
     expect(src).toMatch(/role="button"[\s\S]{0,40}tabIndex=\{0\}[\s\S]{0,60}onClick=\{\(\) => navigateTo\("intent"\)\}[\s\S]{0,200}onKeyDown=/);
   });
 
-  it('the dashboard\'s "start new task" card responds to Enter and Space, not only a click', () => {
-    const matches = src.match(/className="card play-pulse-glow"[\s\S]{0,300}?onKeyDown=\{\(e\) => \{ if \(e\.key === "Enter" \|\| e\.key === " "\)/g) || [];
-    expect(matches.length).toBe(1);
+  it('the review task return uses a native button with keyboard activation', () => {
+    const review = readFileSync("src/components/next-step/NextStepPractice.jsx", "utf8");
+    expect(review).toMatch(/<button type="button"[^>]+onClick=\{onNewTask\}>Back to tasks<\/button>/);
   });
 });

@@ -1,15 +1,13 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-// The focus screen's own Pause button used to sit in the exact same
-// top-right corner as the shared floating Home button (InterventionNav),
-// which is fixed to that corner on every screen. The Home button, painted
-// on top, fully covered the Pause button, so a tap there always hit Home
-// instead. Pause now carries a right margin to clear it.
-describe("Next Easiest Step's focus header doesn't collide with the shared Home button", () => {
-  const src = readFileSync("src/components/NextEasiestStepExperience.jsx", "utf8");
-
-  it("the Pause button has a right margin clearing the fixed Home button", () => {
-    expect(src).toMatch(/onClick=\{\(\) => setShowPause\(true\)\}[\s\S]{0,600}marginRight: "48px"/);
+// The dedicated active view now places Pause in document flow below the host
+// navigation. Real 320/390px hit-target geometry is covered by the browser check.
+describe("Next Easiest Step's active Pause remains available", () => {
+  it("keeps the existing pause behavior wired to the active view", () => {
+    const host = readFileSync("src/components/NextEasiestStepExperience.jsx", "utf8");
+    const active = readFileSync("src/components/next-step/NextStepPractice.jsx", "utf8");
+    expect(host).toContain('onPause={() => setShowPause(true)}');
+    expect(active).toMatch(/<button type="button" onClick=\{onPause\}>[\s\S]*?Pause<\/button>/);
   });
 });

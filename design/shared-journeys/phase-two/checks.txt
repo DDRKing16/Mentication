@@ -1,0 +1,7 @@
+Final local validation: lint, typecheck, diff --check passed.
+V3 algorithm verification passed.
+ Test Files  66 passed (66)
+      Tests  536 passed (536)
+   Duration  9.41s (transform 2.09s, setup 0ms, import 7.73s, tests 2.55s, environment 9ms)
+(!) Some chunks are larger than 500 kB after minification. Consider:
+✓ built in 9.37s

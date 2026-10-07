@@ -1,0 +1,75 @@
+REMAINING JOURNEY COVERAGE — PRECISE HANDOFF
+
+Phase one inspected Home/entry, Library, My Plan, Return points and completion
+in the actual browser before changing shared screens. It deeply exercised only
+Next Easiest Step and PMR internals. Action descriptions for all 19 catalogue
+items do NOT mean their internals were fully reviewed or redesigned.
+
+Phase two internal coverage, with evidence level:
+
+Next Easiest Step (nextAction): actual entry, setup, one-step active, adaptation,
+edit, pause, unfinished review/return, completed/skipped review, final rating,
+local saved resume after reload at 320/390. Active and review redesigned.
+Weaknesses: duplicate pause/progress, equal-weight controls, old review clutter.
+Original landing/setup retained. Three steps mapping source issue recorded.
+
+Progressive Muscle Relaxation (progressive-muscle-relaxation-v2): actual setup,
+short release-only intro and region, pause/resume, skip, stop/check-in, final
+rating and optional saved cue/return. Full route selection displayed, not timed
+through to the end. Active/setup presentation improved with actual route and
+reversible text/body views. Playback/artwork/protocol/outcome handlers untouched.
+
+Thought or Fact? (factCheck): actual thought capture, optional belief-rating
+skip, teaching continue and classification screen; no later evidence/balanced
+thought/save/completion validation. Persistent draft paragraph and seven-choice
+classification burden observed. Internals untouched.
+
+Urge Surfing (urgeSurf): actual opening intensity screen; source read for body,
+anchor and timer stages. An attempted deeper browser script stopped before an
+active screenshot; do not count it as active-flow verification. No conclusion
+about complete practice quality. Internals untouched.
+
+Tomorrow Parking Lot (tomorrowParking): actual opening note/safety-choice UI;
+no save/reopen/delete/completion loop in this phase. Clear explicit waiting
+choice and unsaved-note status observed. Internals untouched.
+
+5-4-3-2-1 Grounding (grounding54321V2): actual first See stage, visible suggested
+time and alternative-sense/early-finish actions. No complete sense loop. Internal
+practice quality beyond opening remains unassessed. Internals untouched.
+
+Box Breathing (boxV2): actual Find your seat opening and safety copy. Identical
+opening instruction shown twice. No full breathing loop; internals untouched.
+Reconcile duplicate with approved broad passes before correction.
+
+Self-Compassion (selfCompassion): actual optional starting-rating screen only.
+Shares care internals with specialist-owned work; no internal edits. Practice
+quality beyond entry unassessed.
+
+Change the Scene (changeScene): shared preview, host Lift setup reached; fresh
+Lift inputs required, so direct active practice not reached in inspection.
+Source read only for internal journey. No active claim or internal changes.
+
+Happy Bump (happyBump): shared preview and source read; no internal browser
+walkthrough. Internals untouched; practice quality not assessed.
+
+The Good Map (goodMap): shared preview only. Internals not inspected or changed.
+
+Dear 2100 (dear2100): shared preview/navigation only. Internals not revalidated
+or changed. Mandatory teaching/4-question 75% gate belongs to approved pending
+release and must be preserved during integration.
+
+Signal Lock (signalLock), Vector Shift (vectorShift), Night Channel
+(nightChannel): shared catalogue cards/preview copy only. Finished internal
+builds explicitly preserved; no internal walkthrough or edits.
+
+Foundations (outside these 19 catalogue previews): no internal walkthrough or
+changes. Remaining coverage gap, not claimed as reviewed.
+
+Excluded specialist owners: Gentle Tapping (eftTapping), Unhook (unhook), Make
+Room (makeRoom), Tara Tactician (taraTactician). Their internals are untouched.
+Shared entry/return presentation may link into these original routes; that is
+not an internal practice review. No shared care API changes were introduced.
+
+All untouched assessments remain open. Highest-impact implemented selection
+was based on actual Next/PMR screens plus direct interaction evidence, not on a
+fabricated app-wide quality score or a claim of exhaustive coverage.

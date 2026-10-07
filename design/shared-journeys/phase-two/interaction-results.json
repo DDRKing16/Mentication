@@ -1,0 +1,26 @@
+[
+  {
+    "width": 320,
+    "name": "Next action: pause, unfinished review/resume, edit, reload/resume, done, undo, skip, honest nullable finish"
+  },
+  {
+    "width": 320,
+    "name": "PMR: real short/full routes, view switch, pause/continue/skip/resume, skipped area labelled honestly, stopped finish"
+  },
+  {
+    "width": 320,
+    "name": "No uncaught browser errors"
+  },
+  {
+    "width": 390,
+    "name": "Next action: pause, unfinished review/resume, edit, reload/resume, done, undo, skip, honest nullable finish"
+  },
+  {
+    "width": 390,
+    "name": "PMR: real short/full routes, view switch, pause/continue/skip/resume, skipped area labelled honestly, stopped finish"
+  },
+  {
+    "width": 390,
+    "name": "No uncaught browser errors"
+  }
+]
