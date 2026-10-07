@@ -1,0 +1,269 @@
+{
+  "results": [
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "fullJourney": true,
+      "singleDecision": true,
+      "keyboard": true,
+      "backAndResume": true,
+      "matchedAndBlankRatings": true,
+      "saveReturnDelete": true,
+      "declinedAndDone": true,
+      "storageFailures": false
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "fullJourney": true,
+      "singleDecision": true,
+      "keyboard": true,
+      "backAndResume": true,
+      "matchedAndBlankRatings": true,
+      "saveReturnDelete": true,
+      "declinedAndDone": true,
+      "storageFailures": false
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "fullJourney": true,
+      "singleDecision": true,
+      "keyboard": true,
+      "backAndResume": true,
+      "matchedAndBlankRatings": true,
+      "saveReturnDelete": true,
+      "declinedAndDone": true,
+      "storageFailures": false
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "fullJourney": true,
+      "singleDecision": true,
+      "keyboard": true,
+      "backAndResume": true,
+      "matchedAndBlankRatings": true,
+      "saveReturnDelete": true,
+      "declinedAndDone": true,
+      "storageFailures": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "fullJourney": true,
+      "singleDecision": true,
+      "keyboard": true,
+      "backAndResume": true,
+      "matchedAndBlankRatings": true,
+      "saveReturnDelete": true,
+      "declinedAndDone": true,
+      "storageFailures": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "fullJourney": true,
+      "singleDecision": true,
+      "keyboard": true,
+      "backAndResume": true,
+      "matchedAndBlankRatings": true,
+      "saveReturnDelete": true,
+      "declinedAndDone": true,
+      "storageFailures": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "height": 640,
+      "largeText": false,
+      "longInput": 300,
+      "keyboardPractice": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "height": 640,
+      "largeText": true,
+      "longInput": 300,
+      "keyboardPractice": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "height": 640,
+      "largeText": false,
+      "longInput": 300,
+      "keyboardPractice": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "height": 640,
+      "largeText": true,
+      "longInput": 300,
+      "keyboardPractice": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "height": 640,
+      "largeText": false,
+      "longInput": 300,
+      "keyboardPractice": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "height": 640,
+      "largeText": true,
+      "longInput": 300,
+      "keyboardPractice": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "height": 640,
+      "primaryInitiallyVisible": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "height": 640,
+      "primaryInitiallyVisible": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "height": 640,
+      "primaryInitiallyVisible": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "height": 640,
+      "primaryInitiallyVisible": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "height": 640,
+      "primaryInitiallyVisible": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "height": 640,
+      "primaryInitiallyVisible": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "draft",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": true,
+      "mode": "card",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "notice-own",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "action-own",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "draft",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": true,
+      "mode": "card",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "notice-own",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "action-own",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "draft",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": true,
+      "mode": "card",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "notice-own",
+      "exactWords": true,
+      "noInventedCredit": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "legacyVersion": 1,
+      "saved": false,
+      "mode": "action-own",
+      "exactWords": true,
+      "noInventedCredit": true
+    }
+  ],
+  "errors": []
+}
