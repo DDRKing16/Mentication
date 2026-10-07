@@ -1,0 +1,97 @@
+{
+  "results": [
+    {
+      "id": "unhook",
+      "width": 320,
+      "explicitDone": true,
+      "sharedAlternative": true,
+      "touchTargets": true,
+      "fullJourney": true,
+      "exactWords": true,
+      "selfReportsOnly": true,
+      "stopBlankRepeat": true,
+      "interruptedBack": true,
+      "savedReturnDelete": true,
+      "storageFailures": false
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "explicitDone": true,
+      "sharedAlternative": true,
+      "touchTargets": true,
+      "fullJourney": true,
+      "exactWords": true,
+      "selfReportsOnly": true,
+      "stopBlankRepeat": true,
+      "interruptedBack": true,
+      "savedReturnDelete": true,
+      "storageFailures": false
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "explicitDone": true,
+      "sharedAlternative": true,
+      "touchTargets": true,
+      "fullJourney": true,
+      "exactWords": true,
+      "selfReportsOnly": true,
+      "stopBlankRepeat": true,
+      "interruptedBack": true,
+      "savedReturnDelete": true,
+      "storageFailures": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "explicitDone": true,
+      "sharedAlternative": true,
+      "touchTargets": true,
+      "fullJourney": true,
+      "exactWords": true,
+      "selfReportsOnly": true,
+      "stopBlankRepeat": true,
+      "interruptedBack": true,
+      "savedReturnDelete": true,
+      "storageFailures": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "largeText": false,
+      "longCore": true,
+      "noticeLength": 300,
+      "keyboardAction": true,
+      "reducedMotion": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "largeText": true,
+      "longCore": true,
+      "noticeLength": 300,
+      "keyboardAction": true,
+      "reducedMotion": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "largeText": false,
+      "longCore": true,
+      "noticeLength": 300,
+      "keyboardAction": true,
+      "reducedMotion": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "largeText": true,
+      "longCore": true,
+      "noticeLength": 300,
+      "keyboardAction": true,
+      "reducedMotion": true
+    }
+  ],
+  "errors": []
+}

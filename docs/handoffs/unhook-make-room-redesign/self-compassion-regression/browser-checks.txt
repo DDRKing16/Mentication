@@ -1,0 +1,3 @@
+PASS selfCompassion 320px: library entry, personal interaction, matched/blank ratings, resume, alternatives, save/return/delete, repeat, stopped/done/planned truthfulness, keyboard, reduced motion, large text, high contrast
+PASS selfCompassion 390px: library entry, personal interaction, matched/blank ratings, resume, alternatives, save/return/delete, repeat, stopped/done/planned truthfulness, keyboard, reduced motion, large text, high contrast, storage failures/retries
+PASS selfCompassion 430px: library entry, personal interaction, matched/blank ratings, resume, alternatives, save/return/delete, repeat, stopped/done/planned truthfulness, keyboard, reduced motion, large text, high contrast
