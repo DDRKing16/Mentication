@@ -14,6 +14,8 @@ const click = (p, name) => p.getByRole('button', { name, exact: true }).click();
 const state = p => p.evaluate(key => JSON.parse(localStorage.getItem(key)).experience, key);
 const errors = [], results = [];
 async function layout(p) {
+  await p.evaluate(() => document.fonts.ready);
+  assert.equal(await p.evaluate(() => ['EB Garamond','Hanken Grotesk'].every(family => [...document.fonts].some(face => face.family===family && face.status==='loaded'))), true);
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   assert.equal(await p.locator('.xr-experience button').evaluateAll(nodes => nodes.every(node => { const r=node.getBoundingClientRect(); return r.height>=44 && r.width>=44; })), true);
 }
