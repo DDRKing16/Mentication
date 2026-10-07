@@ -30,6 +30,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const [beat, setBeat] = useState(0);
   const feedbackForBeat = useRef(null);
   const rhythmEpoch = useRef(null);
+  const readVisualPhase = useRef(null);
   const [artworkStatus, setArtworkStatus] = useState({ id: '', status: 'loading' });
   const [paused, setPaused] = useState(restored?.stage === 'round');
   const [slow, setSlow] = useState(restored?.slow === true);
@@ -122,22 +123,32 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     cueTick.current = tick;
     if(sound&&!muted&&!silent){mixer.current?.run();const spoken=narrationForTick(point.id,concern.id,second,plan);if(spoken)mixer.current?.speak(spoken);}
   }, [stage, paused, index, second, tapping, sound,muted,haptic,systemReduced,prefs.reducedMotion,secondsPerPoint,silent,artworkReady,point.id,concern.id,plan]);
-  // Narration uses elapsed seconds; contact has its own explicit cadence.
-  // Muting a channel never restarts the wrist cycle or changes its speed.
+  // The native audio loop owns contact timing; quiet rounds use their visual
+  // clock. Discrete and touch cues follow contacts without a catch-up burst.
   useEffect(() => {
     if (!tapping) return;
-    const pulse = () => setBeat(value => value + 1);
-    pulse();
-    const timer = window.setInterval(pulse, plan.beatMs);
-    return () => clearInterval(timer);
-  }, [tapping, plan.beatMs]);
+    const epoch = performance.now();
+    let frame, previous = -1, previousPhase = 0;
+    const pulse = () => {
+      const phase = mixer.current?.rhythmPhase() ?? readVisualPhase.current?.() ?? performance.now() - (rhythmEpoch.current ?? epoch);
+      if (phase < previousPhase - plan.beatMs / 2) previous = Math.floor((phase - plan.contactMs) / plan.beatMs) - 1;
+      const contact = Math.floor((phase - plan.contactMs) / plan.beatMs);
+      if (contact >= 0 && contact > previous) { previous = contact; setBeat(value => value + 1); }
+      previousPhase = phase;
+      frame = requestAnimationFrame(pulse);
+    };
+    frame = requestAnimationFrame(pulse);
+    return () => cancelAnimationFrame(frame);
+  }, [tapping, plan.beatMs, plan.contactMs]);
   useEffect(() => {
     const current = feedbackForBeat.current;
     if (!beat || !current?.tapping || document.hidden) return;
-    cues.current?.emit('beat', { haptic: current.haptic, contactDelay: current.contactMs });
-  }, [beat]);
+    const phase = mixer.current?.rhythmPhase() ?? readVisualPhase.current?.() ?? performance.now() - (rhythmEpoch.current ?? performance.now());
+    // A delayed frame can update the discrete marker, but should not buzz late.
+    if (phase % plan.beatMs <= plan.contactMs + 80) cues.current?.emit('beat', { haptic: current.haptic });
+  }, [beat, plan.beatMs, plan.contactMs]);
   useEffect(() => {
-    if (!tapping) { rhythmEpoch.current = null; mixer.current?.stopRhythm(); return; }
+    if (!tapping) { rhythmEpoch.current = null; readVisualPhase.current = null; mixer.current?.stopRhythm(); return; }
     if (quiet) startRhythmAt(performance.now());
   }, [tapping, quiet, plan.beatMs]);
   useEffect(() => {
@@ -155,12 +166,14 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     if(!mixer.current)mixer.current=createTappingAudio({onError:kind=>{setSoundError(`${kind==='voice'?'Voice':kind==='music'?'Music':'Tapping sound'} couldn’t load. Retry audio when ready.`);},onInterrupted:()=>{pausePractice();setSound(false);setSoundError('Audio was interrupted. Resume to restart your guide.');}});
     return mixer.current;
   }
-  function startRhythmAt(epoch) {
+  function startRhythmAt(epoch, readPhase) {
     rhythmEpoch.current = epoch;
+    readVisualPhase.current = readPhase;
     const current = feedbackForBeat.current;
     if (current?.tapping && current.sound && !current.muted && !current.silent) {
       mixer.current?.startRhythm({ beatMs: plan.beatMs, contactMs: plan.contactMs, phaseMs: (performance.now() - epoch) % plan.beatMs });
     }
+    return () => mixer.current?.rhythmPhase() ?? null;
   }
   async function unlockAudio({force=false}={}){
     if(silent||(!force&&muted)||(!voiceOn&&!musicOn&&!beatOn))return false;
@@ -182,7 +195,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     if (!voiceOn && !musicOn && !beatOn) { openSettings(); return; }
     if(!muted&&!(stage==='round'&&!paused&&soundError)&&(stage!=='round'||paused||sound)){audioRequest.current+=1;mixer.current?.cancel();setAudioStarting(false);setMuted(true);setSound(false);return;}
     setMuted(false);
-    if(stage==='round'&&!paused){if(await unlockAudio({force:true})){mixer.current?.run();if(tapping&&rhythmEpoch.current!=null)mixer.current?.startRhythm({beatMs:plan.beatMs,contactMs:plan.contactMs,phaseMs:(performance.now()-rhythmEpoch.current)%plan.beatMs});}}
+    if(stage==='round'&&!paused){if(await unlockAudio({force:true})){mixer.current?.run();if(tapping&&rhythmEpoch.current!=null)mixer.current?.startRhythm({beatMs:plan.beatMs,contactMs:plan.contactMs,phaseMs:(readVisualPhase.current?.() ?? performance.now()-rhythmEpoch.current)%plan.beatMs});}}
   }
   async function toggleHaptic() {
     if (haptic) { cues.current?.stopHaptics(); setHaptic(false); return; }

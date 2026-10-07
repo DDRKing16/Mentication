@@ -40,7 +40,7 @@ export default function TappingHandDemonstration({ point, location, id, paused, 
   const rig = useRef(null), callback = useRef(onRhythmStart);
   callback.current = onRhythmStart;
   useAnimationEffect(() => {
-    if (active && rig.current) observeTappingAnimationStart(rig.current, epoch => callback.current?.(epoch));
+    if (active && rig.current) return observeTappingAnimationStart(rig.current, (...args) => callback.current?.(...args));
   }, [active, beatMs, point.id]);
   return <g className="tap-hand-demonstration" aria-hidden="true">
     <defs>
@@ -50,9 +50,7 @@ export default function TappingHandDemonstration({ point, location, id, paused, 
     </defs>
     <path className="tap-demonstration-arm" mask={`url(#${id}-arm-join)`} d={armContour(shoulder, pose.elbow, wrist, pose.scale * 11)} fill={`url(#${id}-jade-hand)`} stroke="#80b69b" strokeOpacity=".45" strokeWidth="1.1" strokeLinejoin="round"/>
     <g transform={`translate(${location.x} ${location.y}) rotate(${pose.angle}) scale(${pose.scale})`}>
-      <g transform="translate(0 82)"><g ref={rig} className={`tap-finger-rig ${active ? 'is-tapping' : ''}`} data-beat={beat} data-motion={quiet ? 'still' : paused ? 'rest' : 'approach-contact-lift'} style={{ '--tap-cycle': `${beatMs}ms` }} onAnimationStart={event => {
-          if (event.animationName === 'tap-wrist-contact') observeTappingAnimationStart(event.currentTarget, epoch => callback.current?.(epoch));
-        }}>
+      <g transform="translate(0 82)"><g ref={rig} className={`tap-finger-rig ${active ? 'is-tapping' : ''}`} data-beat={beat} data-motion={quiet ? 'still' : paused ? 'rest' : 'approach-contact-lift'} style={{ '--tap-cycle': `${beatMs}ms` }}>
         <g transform="translate(-5 -86)" fill={`url(#${id}-jade-hand)`} stroke="#8cbaa0" strokeOpacity=".6" strokeWidth=".8" strokeLinejoin="round">
           <path d="M-11 87L-16 63C-23 55-25 42-22 36C-19 31-14 34-11 40L-6 48L-6 31Q5 27 13 33L22 30L28 39C36 39 38 43 36 51C35 61 25 69 12 76L13 88Z"/>
           <g transform="translate(8 34)"><g className={`tap-knuckle-motion ${active ? 'is-tapping' : ''}`} style={{ '--tap-cycle': `${beatMs}ms` }}><g transform="translate(-8 -34)">

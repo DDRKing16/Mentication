@@ -54,6 +54,6 @@ export default function TappingPMRSilhouette({ point, paused = true, quiet = fal
       <circle cx={location.x} cy={location.y} r="8" fill="#f2d6a3" fillOpacity=".15"/>
       <circle cx={location.x} cy={location.y} r="3.5" fill="#f8e2b9"/>
     </g>
-    {!overview && <TappingHandDemonstration point={point} location={location} id={id} paused={paused} quiet={quiet} beat={beat} beatMs={beatMs} onRhythmStart={epoch => callbacks.current.onRhythmStart?.(epoch)}/>}
+    {!overview && <TappingHandDemonstration point={point} location={location} id={id} paused={paused} quiet={quiet} beat={beat} beatMs={beatMs} onRhythmStart={(...args) => callbacks.current.onRhythmStart?.(...args)}/>}
   </svg>;
 }
