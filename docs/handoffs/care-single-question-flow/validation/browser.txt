@@ -1,0 +1,30 @@
+PASS selfCompassion 320
+PASS unhook 320
+PASS makeRoom 320
+PASS selfCompassion 390
+PASS unhook 390
+PASS makeRoom 390
+PASS long selfCompassion false
+PASS long selfCompassion true
+PASS long unhook false
+PASS long unhook true
+PASS long makeRoom false
+PASS long makeRoom true
+PASS short selfCompassion 320
+PASS short selfCompassion 390
+PASS short unhook 320
+PASS short unhook 390
+PASS short makeRoom 320
+PASS short makeRoom 390
+PASS legacy selfCompassion draft
+PASS legacy selfCompassion card
+PASS legacy selfCompassion notice-own
+PASS legacy selfCompassion action-own
+PASS legacy unhook draft
+PASS legacy unhook card
+PASS legacy unhook notice-own
+PASS legacy unhook action-own
+PASS legacy makeRoom draft
+PASS legacy makeRoom card
+PASS legacy makeRoom notice-own
+PASS legacy makeRoom action-own

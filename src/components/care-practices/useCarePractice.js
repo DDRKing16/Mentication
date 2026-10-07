@@ -49,8 +49,8 @@ export default function useCarePractice(id, props) {
     props.onComplete?.({ requireGoalReassessment: true, outcome: careOutcome(id, state) });
   };
   const save = () => {
-    if (adapter.current.writeSaved(id, state)) { setSaved(state); setError(''); setMessage('Saved on this device. You can find it in Return points.'); }
-    else { setMessage(''); setError('Saving did not work. Your card has not been saved. Try again.'); }
+    if (adapter.current.writeSaved(id, state)) { setSaved(state); setError(''); setMessage('Saved on this device. You can find it in Return points.'); return true; }
+    else { setMessage(''); setError('Saving did not work. Your card has not been saved. Try again.'); return false; }
   };
   const deleteSaved = () => {
     if (!adapter.current.deleteSaved(id)) { setError('The saved card could not be deleted. Please try again.'); return; }

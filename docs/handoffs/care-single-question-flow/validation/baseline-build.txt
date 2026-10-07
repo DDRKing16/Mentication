@@ -1,0 +1,208 @@
+
+> mentation@0.0.0 prebuild
+> node scripts/build-home-document.mjs && node scripts/build-dear2100.mjs
+
+Rebuilt public/home.html: 2556393 bytes
+
+> mentation@0.0.0 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 3225 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                    1.05 kB │ gzip:   0.46 kB
+dist/assets/hanken-grotesk-vietnamese-400-normal-BLrFBAHj.woff2    4.65 kB
+dist/assets/hanken-grotesk-vietnamese-500-normal-DxwlvJEc.woff2    4.74 kB
+dist/assets/eb-garamond-vietnamese-400-normal-CLvJdMEL.woff2       6.20 kB
+dist/assets/eb-garamond-vietnamese-400-italic-DQ8HKnks.woff2       6.27 kB
+dist/assets/eb-garamond-greek-ext-400-normal-K8pwR3tn.woff2        6.46 kB
+dist/assets/hanken-grotesk-vietnamese-400-normal-C-iWyKLC.woff     6.50 kB
+dist/assets/hanken-grotesk-vietnamese-500-normal-DkDHNoXI.woff     6.54 kB
+dist/assets/eb-garamond-greek-ext-400-italic-CHZOQEtG.woff2        6.61 kB
+dist/assets/eb-garamond-vietnamese-400-normal-ifvNSiWx.woff        7.76 kB
+dist/assets/eb-garamond-vietnamese-400-italic-ORtyMVfw.woff        7.90 kB
+dist/assets/eb-garamond-greek-ext-400-normal-BaZl8BIK.woff         8.37 kB
+dist/assets/eb-garamond-greek-ext-400-italic-BL1XYHtS.woff         8.96 kB
+dist/assets/hanken-grotesk-latin-ext-400-normal-DR7lHpW4.woff2     9.05 kB
+dist/assets/hanken-grotesk-latin-ext-500-normal-DLb9JDK8.woff2     9.25 kB
+dist/assets/eb-garamond-greek-400-italic-Dqr5KC66.woff2           10.50 kB
+dist/assets/eb-garamond-greek-400-normal-CVAbzS9p.woff2           10.75 kB
+dist/assets/urbanist-latin-600-normal-BuXRW95m.woff2              12.11 kB
+dist/assets/eb-garamond-greek-400-italic-BamGE6QP.woff            12.41 kB
+dist/assets/eb-garamond-greek-400-normal-d4JlP2QH.woff            12.55 kB
+dist/assets/hanken-grotesk-latin-ext-400-normal-DI-aIsWt.woff     12.55 kB
+dist/assets/hanken-grotesk-latin-ext-500-normal-BNvrJ0Ju.woff     12.60 kB
+dist/assets/eb-garamond-cyrillic-400-normal-DDLP67lu.woff2        13.27 kB
+dist/assets/hanken-grotesk-latin-400-normal-BG6hkEXj.woff2        13.46 kB
+dist/assets/eb-garamond-cyrillic-400-italic-BGIwiowF.woff2        13.57 kB
+dist/assets/hanken-grotesk-latin-600-normal-CIXX6EOa.woff2        13.78 kB
+dist/assets/hanken-grotesk-latin-500-normal-DrDcrrxK.woff2        13.80 kB
+dist/assets/hanken-grotesk-latin-700-normal-CeQ8H3UY.woff2        13.84 kB
+dist/assets/urbanist-latin-600-normal-cDQtY_pk.woff               15.18 kB
+dist/assets/eb-garamond-cyrillic-400-normal-C0kVTdou.woff         15.50 kB
+dist/assets/eb-garamond-cyrillic-400-italic-BZInx2ys.woff         16.13 kB
+dist/assets/eb-garamond-cyrillic-ext-400-normal-o8fRvAFQ.woff2    16.80 kB
+dist/assets/hanken-grotesk-latin-400-normal-CjyVwvJV.woff         17.24 kB
+dist/assets/hanken-grotesk-latin-600-normal-NEn2C4Q3.woff         17.51 kB
+dist/assets/hanken-grotesk-latin-500-normal-Bo-NxEKf.woff         17.52 kB
+dist/assets/hanken-grotesk-latin-700-normal-6IGCzoPh.woff         17.54 kB
+dist/assets/eb-garamond-cyrillic-ext-400-italic-Bz1w3xqM.woff2    17.95 kB
+dist/assets/eb-garamond-cyrillic-ext-400-normal-DG8lny6_.woff     20.43 kB
+dist/assets/eb-garamond-cyrillic-ext-400-italic-CYS3phfl.woff     22.17 kB
+dist/assets/eb-garamond-latin-400-normal-BCNrxLz_.woff2           23.82 kB
+dist/assets/eb-garamond-latin-500-normal-DehAIUv0.woff2           25.26 kB
+dist/assets/eb-garamond-latin-400-italic-DSEbMgZu.woff2           25.39 kB
+dist/assets/eb-garamond-latin-500-italic-FSVaZR0V.woff2           26.95 kB
+dist/assets/eb-garamond-latin-400-normal-maQnHeKB.woff            28.61 kB
+dist/assets/eb-garamond-latin-500-normal-DZU8xF9o.woff            30.21 kB
+dist/assets/eb-garamond-latin-400-italic-CDFyLPXJ.woff            30.86 kB
+dist/assets/eb-garamond-latin-500-italic-DgyxMZyx.woff            32.51 kB
+dist/assets/eb-garamond-latin-ext-400-italic-V7s3nWfX.woff2       45.47 kB
+dist/assets/eb-garamond-latin-ext-400-normal-o4A__6QZ.woff2       56.96 kB
+dist/assets/eb-garamond-latin-ext-400-italic-DUSsnRSD.woff        62.90 kB
+dist/assets/eb-garamond-latin-ext-400-normal-B4EmgUmt.woff        76.61 kB
+dist/assets/JourneyTakeaway-CprVqHeR.css                           2.75 kB │ gzip:   0.91 kB
+dist/assets/NextEasiestStepExperience-BExM4cff.css                 7.70 kB │ gzip:   2.18 kB
+dist/assets/ResetPlayer-DqeOmT05.css                               8.85 kB │ gzip:   2.34 kB
+dist/assets/TaraTacticianExperience-Cnsury_Z.css                  11.12 kB │ gzip:   3.12 kB
+dist/assets/discovery-ClNPAPs1.css                                12.03 kB │ gzip:   2.84 kB
+dist/assets/thought-or-fact-BcbNdtw5.css                          12.52 kB │ gzip:   3.09 kB
+dist/assets/PracticeSupport-DPlhG3lm.css                          13.17 kB │ gzip:   3.23 kB
+dist/assets/NewFlagshipExperiences-stJT2A34.css                   17.78 kB │ gzip:   4.09 kB
+dist/assets/tomorrow-parking-BaWWyNyG.css                         20.86 kB │ gzip:   5.06 kB
+dist/assets/UrgeSurfExperience-DZess-XK.css                       23.55 kB │ gzip:   5.32 kB
+dist/assets/GentleTappingExperience-m7K8zb6L.css                  29.59 kB │ gzip:   9.71 kB
+dist/assets/CarePracticeFrame-CQyJj2Xg.css                        36.52 kB │ gzip:   7.13 kB
+dist/assets/index-BDOso8vy.css                                   217.24 kB │ gzip:  40.64 kB
+dist/assets/appBack-8xsyzCXq.js                                    0.10 kB │ gzip:   0.11 kB
+dist/assets/web-UZ8Y_Jkm.js                                        0.12 kB │ gzip:   0.13 kB
+dist/assets/useAppBack-DGQJAEVd.js                                 0.20 kB │ gzip:   0.18 kB
+dist/assets/VectorShift-B0YVm5x5.js                                0.24 kB │ gzip:   0.21 kB
+dist/assets/check-D2reqlfc.js                                      0.29 kB │ gzip:   0.25 kB
+dist/assets/chevron-left-06C4M6oQ.js                               0.30 kB │ gzip:   0.25 kB
+dist/assets/play-W9GBIRou.js                                       0.31 kB │ gzip:   0.25 kB
+dist/assets/moon-0Imz8Y5K.js                                       0.32 kB │ gzip:   0.26 kB
+dist/assets/plus-Dre3f_Ni.js                                       0.33 kB │ gzip:   0.26 kB
+dist/assets/bookmark-CEAJbQW8.js                                   0.34 kB │ gzip:   0.27 kB
+dist/assets/arrow-right-BcDkXNnu.js                                0.34 kB │ gzip:   0.27 kB
+dist/assets/arrow-left-Cp-j6Ozp.js                                 0.34 kB │ gzip:   0.27 kB
+dist/assets/corner-down-left-BNiVV5iW.js                           0.37 kB │ gzip:   0.29 kB
+dist/assets/lock-BkUOYWC0.js                                       0.37 kB │ gzip:   0.30 kB
+dist/assets/pause-Dk2tJhuE.js                                      0.38 kB │ gzip:   0.27 kB
+dist/assets/ellipsis-BriWrk0t.js                                   0.39 kB │ gzip:   0.27 kB
+dist/assets/FlowHomeButton-Cvw41vo3.js                             0.40 kB │ gzip:   0.30 kB
+dist/assets/ear-CFu9mwfO.js                                        0.41 kB │ gzip:   0.30 kB
+dist/assets/heart-DWmLN9Nk.js                                      0.41 kB │ gzip:   0.31 kB
+dist/assets/type-DP9dq-mw.js                                       0.42 kB │ gzip:   0.30 kB
+dist/assets/compass-NZ3yrNpD.js                                    0.42 kB │ gzip:   0.31 kB
+dist/assets/external-link-GNVlpCB1.js                              0.42 kB │ gzip:   0.31 kB
+dist/assets/lock-keyhole-DxY2rd0e.js                               0.43 kB │ gzip:   0.33 kB
+dist/assets/zap-DmJhwSo8.js                                        0.44 kB │ gzip:   0.31 kB
+dist/assets/mic-19L_9Vjo.js                                        0.44 kB │ gzip:   0.32 kB
+dist/assets/pencil-sLatqXEC.js                                     0.45 kB │ gzip:   0.33 kB
+dist/assets/heart-pulse-B0-x3p-l.js                                0.49 kB │ gzip:   0.36 kB
+dist/assets/shield-check-DHvvRN3s.js                               0.49 kB │ gzip:   0.36 kB
+dist/assets/trash-2-DSGL8g9N.js                                    0.53 kB │ gzip:   0.35 kB
+dist/assets/life-buoy-CRT9PCoh.js                                  0.55 kB │ gzip:   0.33 kB
+dist/assets/phone-CvnSBo3u.js                                      0.57 kB │ gzip:   0.36 kB
+dist/assets/hand-_VEOGRNr.js                                       0.58 kB │ gzip:   0.36 kB
+dist/assets/layers-DCq1TzDf.js                                     0.59 kB │ gzip:   0.34 kB
+dist/assets/index-Hv8aLGVm.js                                      0.60 kB │ gzip:   0.36 kB
+dist/assets/SignalLock-BwocOiw7.js                                 0.61 kB │ gzip:   0.39 kB
+dist/assets/sun-CVUWt_OL.js                                        0.65 kB │ gzip:   0.37 kB
+dist/assets/castle-BTGcUrKG.js                                     0.65 kB │ gzip:   0.37 kB
+dist/assets/clock-LJ-POiAU.js                                      0.71 kB │ gzip:   0.38 kB
+dist/assets/sliders-horizontal-Bt6-QP_d.js                         0.76 kB │ gzip:   0.37 kB
+dist/assets/utensils-CLHT1J83.js                                   0.78 kB │ gzip:   0.41 kB
+dist/assets/journeyBridge-Dgecer7K.js                              0.81 kB │ gzip:   0.49 kB
+dist/assets/web-R06RZg9R.js                                        0.84 kB │ gzip:   0.40 kB
+dist/assets/preloadBoxV2-BaSfnTlT.js                               0.87 kB │ gzip:   0.55 kB
+dist/assets/happyBumpFunnel-D_D-vOd_.js                            0.87 kB │ gzip:   0.51 kB
+dist/assets/brain-B39R7Sje.js                                      0.91 kB │ gzip:   0.47 kB
+dist/assets/spoken-C1_j9C7z.js                                     0.94 kB │ gzip:   0.46 kB
+dist/assets/web-C02SM-iO.js                                        0.94 kB │ gzip:   0.47 kB
+dist/assets/users-D8A2u6Bp.js                                      1.05 kB │ gzip:   0.52 kB
+dist/assets/tomorrow-parking-m5P9Ir5_.js                           1.13 kB │ gzip:   0.56 kB
+dist/assets/InterventionNav-kkBt3swD.js                            1.18 kB │ gzip:   0.65 kB
+dist/assets/NightChannel-B-X-m02W.js                               1.24 kB │ gzip:   0.71 kB
+dist/assets/Foundations-PZofY1f2.js                                1.26 kB │ gzip:   0.68 kB
+dist/assets/GoodMap-OxDKFRg6.js                                    1.32 kB │ gzip:   0.77 kB
+dist/assets/BrandThreadProgress-C1SBsTLC.js                        1.33 kB │ gzip:   0.70 kB
+dist/assets/JourneyOptions-JC2EHr4q.js                             1.40 kB │ gzip:   0.78 kB
+dist/assets/goalAssessment-CsBfe3G3.js                             1.48 kB │ gzip:   0.69 kB
+dist/assets/programmes-CL7G8-YG.js                                 1.52 kB │ gzip:   0.87 kB
+dist/assets/web-BzEUQ14b.js                                        1.64 kB │ gzip:   0.57 kB
+dist/assets/VectorShiftFrame-BpPJ6Did.js                           1.68 kB │ gzip:   0.95 kB
+dist/assets/Dear2100-DgJCmbwF.js                                   1.82 kB │ gzip:   1.01 kB
+dist/assets/ThoughtEvidence-CK0VG-ZO.js                            1.87 kB │ gzip:   0.91 kB
+dist/assets/index-tvjnCWjX.js                                      1.91 kB │ gzip:   0.80 kB
+dist/assets/StandaloneFrame-Bh5TDY9x.js                            2.12 kB │ gzip:   1.12 kB
+dist/assets/reminders-5hk5MFVc.js                                  2.13 kB │ gzip:   1.10 kB
+dist/assets/carePracticeStorage-D2S99URX.js                        2.37 kB │ gzip:   1.10 kB
+dist/assets/PlusGate-BVjAMXHO.js                                   2.44 kB │ gzip:   1.12 kB
+dist/assets/Privacy-C_uF5pOK.js                                    2.69 kB │ gzip:   1.09 kB
+dist/assets/useGuideVoice-WW1SGkXA.js                              2.96 kB │ gzip:   1.30 kB
+dist/assets/button-h-6G4bCm.js                                     2.98 kB │ gzip:   1.34 kB
+dist/assets/WithBrandThreshold-Dd6M6pFN.js                         3.05 kB │ gzip:   1.36 kB
+dist/assets/Welcome-D38D9NLR.js                                    3.27 kB │ gzip:   1.53 kB
+dist/assets/flagshipMemory-D3dB-LZJ.js                             3.29 kB │ gzip:   1.46 kB
+dist/assets/IntensityDial-BS3-mXAy.js                              3.35 kB │ gzip:   1.56 kB
+dist/assets/practiceDiscovery-DGkFE_LP.js                          3.64 kB │ gzip:   1.88 kB
+dist/assets/Restructure-HwoWC5gt.js                                3.75 kB │ gzip:   1.64 kB
+dist/assets/flagshipHandoffs-Nb-uAfbV.js                           3.77 kB │ gzip:   1.64 kB
+dist/assets/Crisis-U50-pfbf.js                                     3.95 kB │ gzip:   1.68 kB
+dist/assets/interventionBrand-D4QZwNvr.js                          4.07 kB │ gzip:   1.57 kB
+dist/assets/SafetyFooter-BlDBicuI.js                               4.31 kB │ gzip:   1.88 kB
+dist/assets/AccessibilityPanel-9fQZgtwH.js                         4.32 kB │ gzip:   1.85 kB
+dist/assets/Plus-CjoN0Sd-.js                                       4.43 kB │ gzip:   1.89 kB
+dist/assets/web-DDEbIr8x.js                                        4.59 kB │ gzip:   1.37 kB
+dist/assets/MyPlan-BliTCsQF.js                                     4.71 kB │ gzip:   1.80 kB
+dist/assets/ThoughtOrFactEntry-Cb7-_Ts2.js                         4.92 kB │ gzip:   1.80 kB
+dist/assets/NeedStart-7CJHihXo.js                                  4.96 kB │ gzip:   1.84 kB
+dist/assets/LiftFollowup-Bv6g_Wi5.js                               5.16 kB │ gzip:   2.27 kB
+dist/assets/InterventionControlShell-CvN98ijc.js                   5.83 kB │ gzip:   2.15 kB
+dist/assets/ChangeSceneFollowup-CbPZJD9C.js                        6.28 kB │ gzip:   2.43 kB
+dist/assets/Programmes-DfmBdIgl.js                                 6.73 kB │ gzip:   2.54 kB
+dist/assets/PracticeSupport-PeReVIOw.js                            7.10 kB │ gzip:   2.72 kB
+dist/assets/SelfCompassionExperience-blBmzN3R.js                   7.63 kB │ gzip:   3.02 kB
+dist/assets/journeyExperience-BumULRB7.js                          7.65 kB │ gzip:   2.85 kB
+dist/assets/MakeRoomExperience-BRcP483x.js                         8.37 kB │ gzip:   2.89 kB
+dist/assets/JourneyTakeaway-Dxx4gs6c.js                            8.76 kB │ gzip:   3.70 kB
+dist/assets/UnhookExperience-uo5b4Yu5.js                           9.21 kB │ gzip:   3.18 kB
+dist/assets/Palace-Dd4Wda4z.js                                     9.99 kB │ gzip:   4.16 kB
+dist/assets/InterventionLibrary-CMrmcLpl.js                       10.65 kB │ gzip:   4.07 kB
+dist/assets/ReturnPoints-CbOPMA1N.js                              10.78 kB │ gzip:   3.63 kB
+dist/assets/RegulationProfile-BwB5qGJy.js                         12.54 kB │ gzip:   4.07 kB
+dist/assets/CarePracticeFrame-BAtMc_Km.js                         13.02 kB │ gzip:   4.53 kB
+dist/assets/Settings-BwiiZaDG.js                                  14.41 kB │ gzip:   4.84 kB
+dist/assets/ParkingLot-iwEMCayH.js                                16.01 kB │ gzip:   5.08 kB
+dist/assets/EffectivenessDashboard-DJd81gLG.js                    16.12 kB │ gzip:   5.01 kB
+dist/assets/TomorrowParkingExperience-DIN1g5sS.js                 19.47 kB │ gzip:   6.52 kB
+dist/assets/taraTacticianStorage-FBBMNx0l.js                      20.58 kB │ gzip:   6.83 kB
+dist/assets/ChangeSceneExperience-DB1amcYR.js                     21.97 kB │ gzip:   6.99 kB
+dist/assets/GentleTappingExperience-CqbDdVkk.js                   27.94 kB │ gzip:   9.53 kB
+dist/assets/TaraTacticianExperience-Bx1kgDrH.js                   30.29 kB │ gzip:   8.58 kB
+dist/assets/ThoughtOrFactExperience-EmeXk4cn.js                   34.11 kB │ gzip:  11.34 kB
+dist/assets/UrgeSurfExperience-CNsXEkIQ.js                        43.80 kB │ gzip:  13.29 kB
+dist/assets/FlagshipExperience-CH9xX93C.js                        59.50 kB │ gzip:  20.65 kB
+dist/assets/Journal-hGHuuCKg.js                                   61.08 kB │ gzip:  13.51 kB
+dist/assets/NewFlagshipExperiences-BLLMqU9-.js                    62.41 kB │ gzip:  19.97 kB
+dist/assets/ResetFlow-Cs68s5eA.js                                 65.50 kB │ gzip:  19.97 kB
+dist/assets/ResetPlayer-eQGqIK6h.js                              127.82 kB │ gzip:  37.87 kB
+dist/assets/NextEasiestStepExperience--zRRQbQz.js                228.55 kB │ gzip:  68.61 kB
+dist/assets/ResetHistory-DoxBmbeO.js                             417.06 kB │ gzip: 114.95 kB
+dist/assets/narrationService-DyN1Do6H.js                         437.50 kB │ gzip: 119.05 kB
+dist/assets/index-ZW9TaF2Q.js                                    688.49 kB │ gzip: 208.63 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 15.17s
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
