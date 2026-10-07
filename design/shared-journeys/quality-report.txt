@@ -1,0 +1,135 @@
+SHARED JOURNEY QUALITY UPGRADE — LOCAL REVIEW
+
+Scope and baseline
+Branch: codex/remaining-journeys-quality
+Worktree: /workspace/mentication-quality
+Base: e292234f998c34bf76fa32e8cd7485b8ad5d5563
+Inspected actual Vite-rendered Home, NeedStart, Library, My Plan, Return points,
+Next Easiest Step entry, setup and practice before implementation. Baseline
+390px screenshots are in verification/before. Browser contexts were isolated;
+no existing user data was modified.
+
+Priority diagnosis and ownership
+1. Entry: ten equal-weight need choices obscure the selected recommendation,
+   which appears below the whole list. Own src/pages/NeedStart.jsx.
+2. Library: three destination blocks plus search and two filter rows precede
+   the practices. Small cards truncate the activity descriptions. Own
+   src/pages/InterventionLibrary.jsx.
+3. Plan: opaque labels hide the suggested activities. Explanations compete
+   with the primary action; empty history copy implies a guaranteed effective
+   result after completion. Own src/pages/MyPlan.jsx.
+4. Return: saved freeform cues have a delete action but no practice re-entry;
+   the empty state is dominated by six notebook links without actual records.
+   Own src/pages/ReturnPoints.jsx.
+5. Completion: the optional note offers little help turning an experience
+   into a usable reminder. Own JourneyTakeaway presentation and its existing
+   CSS selectors only.
+
+Implemented
+- Four clear starting domains retain all ten original need-to-practice
+  mappings. Select a specific need, see its actual branded practice, reason,
+  activity and duration together, then enter the existing flow. Browser Back,
+  refresh and heading focus work across the chooser's stages.
+- Library foregrounds practice selection. Setting/time filters expand on
+  request. Search/category/filter state survives reload, result counts and
+  clear-all make empty results recoverable. Action descriptions cover all
+  19 catalogue entries; they describe doing, not guaranteed benefits.
+  Approved atmosphere colours and supplied logo assets are retained. Card
+  descriptions use full width, including at larger text sizes.
+- My Plan reveals the activities and durations inside a proposed sequence;
+  the time/history explanation is available beside it. Lift still starts a
+  fresh check-in. Current feelings are not inferred from history. This uses
+  the existing recommendation engine, with no scoring changes. Plan refreshes
+  on return, focus and session-change events. It has loading/error states.
+- Return points distinguishes explicit reminders/reflections from notebooks.
+  Kept words have a readable typographic hierarchy, a date when valid, and
+  a direct practice re-entry action. Empty state explains how to save a cue.
+  Existing care/Tara/thought records and storage/deletion handlers are kept.
+- Completion invites an optional concrete "When… I could…" cue. The prompt is
+  a placeholder, never a prefilled answer. Save/update/delete semantics stay
+  explicit, and unsaved-text/device-only limitations remain visible.
+- Scoped paper/emerald surfaces, serif hierarchy and restrained arch markers
+  connect these shared screens. Dark/high-contrast modes, keyboard focus and
+  reduced-motion behavior are supported. No new animation dependency.
+
+Files and contracts
+Changed: the four pages above, src/components/journey/JourneyTakeaway.jsx,
+src/styles/journey-tools.css.
+Added: src/components/discovery/PracticePreview.jsx, src/lib/practiceDiscovery.js,
+its contract tests, src/styles/discovery.css, scripts/verify-shared-journeys.cjs.
+No storage schema, specialist props, session outcome schema, or recommendation
+engine APIs changed. New discovery helpers are consumed only by these pages.
+Navigation supplies no measured starting rating and uses the existing reset
+handoff. Sound starts off for new discovery/plan launches and existing setup
+and practice audio controls remain available; reconcile this with the release's
+sound handoff during integration.
+
+Qualitative review (judgment, not a measured score)
+Visual craft: shared pages now use consistent spacing, type, material and
+hierarchy while preserving the distinct practice worlds and Home artwork.
+Practice quality: previews explain the concrete action; optional cues invite
+reuse in a real moment. Core remaining practice mechanics are not redesigned
+in this bounded increment.
+Personalization: the source and contents of a suggestion are inspectable;
+a user can choose a current need instead. No new inferred diagnosis/outcome.
+Engagement: the path from Home's Guide me to a practice, and from a kept cue
+back to its practice, is continuous and explicit.
+Cognitive burden: staged choice removes the ten-option wall, filter disclosure
+keeps the Library focused, and unused notebooks no longer dominate empty return.
+Mobile/accessibility: 320/390px rendered review, 150% root text at 320px,
+keyboard chooser, reduced motion and dark screenshots. Larger-text inspection
+led to the full-width Library description refinement.
+Reliability: browser checks establish navigation/storage behavior; they do not
+establish clinical effectiveness, preference, or a "2x" quality increase.
+
+Verification
+- npm test -- --run: 65 files / 534 tests passed.
+- npm run lint: passed.
+- npm run typecheck: passed on this snapshot.
+- npm run build: passed (existing >500kB chunk warning remains).
+- node scripts/verify-v3-algorithm.mjs: passed.
+- git diff --check: passed.
+- Browser at BOTH 320x844 and 390x844, reduced motion:
+  chooser selection/change/Back/reload and heading focus; category/search/filter
+  and empty-result recovery; Next Easiest Step edit -> one action -> final
+  rating skipped (stored null, one session); PMR pause/resume/stop -> skip
+  tension answer -> save/update a cue -> final rating skipped -> Return points
+  reload and practice re-entry; failed deletion retains the record; successful
+  deletion persists; corrupt notes remain untouched with recovery UI.
+  Zero uncaught page errors in the exercised browser loops.
+- Actual Home iframe Guide me bridge verified at both widths to open the new
+  chooser after the host reported ready. An earlier concurrent run had an
+  intermittent timing failure; the stable, readiness-gated rerun passed.
+- No page-level horizontal overflow on the owned screens at both widths,
+  nor on the four main surfaces with 150% root text at 320px. Scrolling within
+  the Library category strip is intentional.
+Screenshots and interaction-results.json are in verification/. Text mentioning
+"Test device" and task actions are explicit synthetic browser test input, not
+claims about an actual user's psychological response.
+
+Browser reproduction
+Start npm run dev. Then node scripts/verify-shared-journeys.cjs.
+PLAYWRIGHT_MODULE, BASE_URL and EVIDENCE_DIR can override the environment's
+installed Playwright path, localhost URL and local output directory. No runtime
+or dev dependency was added to the app. The script creates isolated contexts.
+
+Integration dependency and limits
+Remote main remained e292234 at the final fetch during this work. The approved
+8a2cde51 + 16c1f93 cumulative release is not present here. No attempt was made to
+reimplement its Dear teaching/3-of-4 gate, ten hardening/broad passes, or Another
+way relocation. This baseline still shows the known top-level Another way in
+some practices: use the approved release's correction, then verify the combined
+result. Reconcile shared pages and JourneyTakeaway against that release before
+integration; do not let this branch block that already approved release.
+
+Untouched: GentleTappingExperience, Unhook/MakeRoom care internals,
+TaraTacticianExperience, Dear internals, Home source/generated asset, the finished
+Signal Lock/Vector Shift/Night Channel builds, and recommendation scoring.
+No push, merge, deployment, upload, native sync, external communication, purchase,
+provider, new media or intervention was performed.
+
+Coverage is a bounded shared-experience improvement, not a complete internal
+redesign or exhaustive revalidation of every intervention. Native VoiceOver,
+real device audio/haptics and actual-user usability/clinical outcomes were not
+validated in this Linux Chromium environment. Final approved-release and
+specialist integration testing remains the parent task's responsibility.

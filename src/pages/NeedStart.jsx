@@ -1,42 +1,44 @@
-import { practiceLaunchEntry } from '@/lib/practiceLaunch';
-import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
-import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { NEED_ENTRIES, JOURNEY_EXPERIENCES } from '@/lib/journeyExperience';
+import React, { useEffect, useRef } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Bookmark, Compass } from 'lucide-react';
+import { NEED_ENTRIES } from '@/lib/journeyExperience';
 import { INTERVENTIONS } from '@/lib/interventions';
-import { standaloneRouteFor } from '@/lib/standaloneInterventions';
+import { NEED_GROUPS, practiceDestination } from '@/lib/practiceDiscovery';
+import PracticePreview from '@/components/discovery/PracticePreview';
+import '@/styles/discovery.css';
 
 export default function NeedStart() {
-  const [need, setNeed] = useState(null);
+  const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const preview=useRef(null), choices=useRef(null), lastChoice=useRef(null);
-  const {prefs}=useAccessibilityPrefs();
-  useEffect(()=>{
-    if(!need)return;
-    preview.current?.focus({preventScroll:true});
-    preview.current?.scrollIntoView({block:'center',behavior:prefs.reducedMotion?'instant':'smooth'});
-  },[need,prefs.reducedMotion]);
-  function begin() {
-    const iv = INTERVENTIONS.find(item => item.id === need.practice);
-    if (!iv) return;
-    const route = standaloneRouteFor(iv.id);
-    if (route) { navigate(route); return; }
-    navigate('/reset', { state: practiceLaunchEntry(iv) });
-  }
-  return <main className="mx-auto max-w-xl px-5 py-10 safe-top-lg text-foreground">
-    <Link className="inline-block min-h-11 underline" to="/">Home</Link>
-    <h1 className="font-heading text-3xl">What would help you begin?</h1>
-    <p className="my-4">Choose what sounds close. These are starting ideas; you can choose any practice instead.</p>
-    <div ref={choices} className="grid gap-3" role="group" aria-label="What you need now">
-      {NEED_ENTRIES.map(item => <button type="button" key={item.id} aria-pressed={need?.id === item.id} className={`min-h-14 rounded-2xl border p-4 text-left ${need?.id === item.id ? 'border-primary bg-secondary' : 'border-border bg-card'}`} onClick={event => { lastChoice.current=event.currentTarget; setNeed(item); }}>{item.label}</button>)}
+  const heading = useRef(null);
+  const need = NEED_ENTRIES.find(item => item.id === params.get('need'));
+  const group = NEED_GROUPS.find(item => item.id === params.get('group'));
+  const practice = need && INTERVENTIONS.find(item => item.id === need.practice);
+  const stage = practice ? 3 : group ? 2 : 1;
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' }); }, [params]);
+  const chooseGroup = item => setParams(item.needs.length === 1 ? { group: item.id, need: item.needs[0] } : { group: item.id });
+  const begin = () => { const destination = practiceDestination(need.practice); if (destination) navigate(destination.to, { state: destination.state }); };
+  return <main className="discovery-page"><div className="discovery-shell">
+    <nav className="discovery-topline" aria-label="Page navigation">
+      {stage > 1 ? <button type="button" className="discovery-text-button" onClick={() => setParams(practice && group?.needs.length > 1 ? { group: group.id } : {})}><ArrowLeft size={17} aria-hidden="true" />{practice && group?.needs.length > 1 ? 'Change your choice' : 'All starting points'}</button> : <Link to="/" className="discovery-text-button"><ArrowLeft size={17} aria-hidden="true" />Home</Link>}
+      <span className="discovery-eyebrow">Find your practice</span>
+    </nav>
+    <div className="discovery-progress" aria-label={`Step ${stage} of 3`}><span className="is-current" /><span className={stage >= 2 ? 'is-current' : ''} /><span className={stage === 3 ? 'is-current' : ''} /></div>
+    <header className="discovery-header"><p className="discovery-eyebrow">{practice ? 'Your starting point' : group ? 'A little closer' : 'Right here, right now'}</p>
+      <h1 ref={heading} tabIndex={-1}>{practice ? 'One practice. Your pace.' : group ? 'What sounds closest?' : 'What would help you begin?'}</h1>
+      <p>{practice ? 'A starting idea based on what you chose. You decide whether it fits.' : group ? group.description + '. Choose what feels closest, even if it is not an exact fit.' : 'You do not need the perfect words. Start with one part of what is happening.'}</p>
+    </header>
+    {practice ? <>
+      <div className="discovery-selection"><span>You chose</span><p>{need.label}</p></div>
+      <PracticePreview practice={practice} onBegin={begin} />
+      <section className="discovery-reason"><h2>Why this starting point?</h2><p>{need.reason}</p></section>
+    </> : <div className="discovery-choices" aria-label={group ? 'What you need now' : 'Starting points'}>
+      {group ? NEED_ENTRIES.filter(item => group.needs.includes(item.id)).map(item => <button type="button" className="discovery-choice" key={item.id} onClick={() => setParams({ group: group.id, need: item.id })}><span>{item.label}</span><ArrowRight size={19} aria-hidden="true" /></button>) : NEED_GROUPS.map(item => <button type="button" className={`discovery-choice discovery-choice--${item.id}`} key={item.id} onClick={() => chooseGroup(item)}><span className="discovery-choice-mark" aria-hidden="true">{item.mark}</span><span><strong>{item.title}</strong><small>{item.description}</small></span><ArrowRight size={19} aria-hidden="true" /></button>)}
+    </div>}
+    <div className="discovery-footer-links">
+      <Link to="/reset" state={{ unsure: true }}><Compass size={19} aria-hidden="true" /><span>Still unsure? Guide me</span><ArrowRight size={17} aria-hidden="true" /></Link>
+      <Link to="/library"><span>Browse all practices</span><ArrowRight size={17} aria-hidden="true" /></Link>
+      <Link to="/return-points"><Bookmark size={18} aria-hidden="true" /><span>Return to saved work</span><ArrowRight size={17} aria-hidden="true" /></Link>
     </div>
-    {need && <section className="my-6 rounded-2xl border border-border p-5" aria-live="polite">
-      <h2 ref={preview} tabIndex={-1} className="font-heading text-2xl">You could try {JOURNEY_EXPERIENCES[need.practice].name}</h2>
-      <p className="my-3">{need.reason}</p>
-      <p className="mb-4 text-sm text-muted-foreground">You chose: {need.label}. You can explore this, change your choice, or leave.</p>
-      <button type="button" className="min-h-12 rounded-full bg-primary px-6 text-primary-foreground" onClick={begin}>Explore this practice</button>
-      <button type="button" className="mt-3 block min-h-11 underline" onClick={() => { lastChoice.current?.focus({preventScroll:true}); lastChoice.current?.scrollIntoView({block:'center',behavior:prefs.reducedMotion?'instant':'smooth'}); }}>Choose another starting point</button>
-    </section>}
-    <div className="my-5 flex flex-col gap-3"><Link className="min-h-11 underline" to="/library">Choose from all practices</Link><Link className="min-h-11 underline" to="/reset" state={{ unsure:true }}>I am not sure — guide me</Link><Link className="min-h-11 underline" to="/return-points">Return to something I saved</Link></div>
-  </main>;
+  </div></main>;
 }

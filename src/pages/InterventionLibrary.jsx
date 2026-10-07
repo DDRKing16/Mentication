@@ -1,17 +1,22 @@
-import {useAppBack} from '@/hooks/useAppBack';
-import { practiceLaunchEntry } from '@/lib/practiceLaunch';
-import { PRACTICE_CATEGORIES, practiceSearchMatches, practiceTimeLabel } from '@/lib/practiceDiscovery';
-import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
-import React, { useState, useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { PRACTICE_PREVIEWS, practiceDuration, practiceDestination, practiceSearchMatches, PRACTICE_CATEGORIES } from "@/lib/practiceDiscovery";
+import "@/styles/discovery.css";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Search, X, ArrowRight } from "lucide-react";
-import { standaloneRouteFor } from "@/lib/standaloneInterventions";
+import { Search, X, ArrowRight, SlidersHorizontal, Bookmark } from "lucide-react";
 import { getBrandAtmosphere, getBrandInk, getBrandLogoParts } from "@/lib/interventionBrand";
 import { INTERVENTIONS } from "@/lib/interventions";
 
 const CATEGORY_ORDER = PRACTICE_CATEGORIES.map(([id]) => id);
 const CATEGORY_LABELS = Object.fromEntries(PRACTICE_CATEGORIES);
-const CATEGORY_SHORT = CATEGORY_LABELS;
+const CATEGORY_SHORT = {
+  calm: "Calm",
+  lift: "Lift",
+  ground: "Ground",
+  focus: "Focus",
+  sleep: "Sleep",
+  reset: "Reset",
+};
 
 // User-friendly filters mapped to existing intervention metadata.
 const FILTERS = [
@@ -92,34 +97,24 @@ function WorldCard({ id, name, meta, why, iv, onClick, className = "" }) {
     <button
       type="button"
       onClick={onClick}
-      className={`no-tap group relative w-full overflow-hidden rounded-3xl border p-5 text-left transition-all active:scale-[0.99] ${className}`}
+      className={`library-world no-tap group relative w-full overflow-hidden rounded-3xl border p-5 text-left transition-all active:scale-[0.99] ${className}`}
       style={{
         background: `radial-gradient(120% 100% at 100% 0%, ${world.glow}, transparent 62%), ${world.background}`,
         borderColor: light ? "rgba(14,42,82,0.14)" : "rgba(255,255,255,0.10)",
         color: ink,
       }}
     >
-      <span className="flex items-start gap-4">
+      <span className="library-world-heading">
         <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-baseline gap-x-2">
-            <span className="font-heading text-[1.05rem] font-semibold tracking-tight">{name}</span>
-            <span className="text-xs opacity-60">· {meta}</span>
-          </span>
-          <span className="mt-1.5 line-clamp-2 block text-sm leading-snug opacity-75">{why}</span>
-          {tags.length ? (
-            <span className="mt-2.5 flex flex-wrap gap-1">
-              {tags.map((t) => (
-                <span key={t} className="rounded-full px-2 py-0.5 text-[0.68rem] font-medium" style={{ background: light ? "rgba(14,42,82,0.08)" : "rgba(255,255,255,0.10)" }}>
-                  {t}
-                </span>
-              ))}
-            </span>
-          ) : null}
+          <span className="block font-heading text-[1.05rem] font-semibold tracking-tight">{name}</span>
+          <span className="mt-1 block text-xs opacity-75">{meta}</span>
         </span>
-        <span className="flex shrink-0 flex-col items-end gap-3">
-          <MiniLockup parts={getBrandLogoParts(id)} />
-          <ArrowRight className="h-4 w-4 opacity-70 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-        </span>
+        <MiniLockup parts={getBrandLogoParts(id)} />
+      </span>
+      <span className="mt-2 block text-sm leading-relaxed opacity-90">{why}</span>
+      <span className="library-world-bottom">
+        <span className="flex flex-wrap gap-1">{tags.map(t => <span key={t} className="rounded-full px-2 py-0.5 text-[0.68rem] font-medium" style={{ background: light ? "rgba(14,42,82,0.08)" : "rgba(255,255,255,0.10)" }}>{t}</span>)}</span>
+        <ArrowRight className="h-4 w-4 shrink-0 opacity-80" aria-hidden="true" />
       </span>
     </button>
   );
@@ -127,12 +122,16 @@ function WorldCard({ id, name, meta, why, iv, onClick, className = "" }) {
 
 export default function InterventionLibrary() {
   const navigate = useNavigate();
-  const goBack=useAppBack();
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState(null);
-  const [filters, setFilters] = useState({});
-
-  const toggleFilter = (key) => setFilters((f) => ({ ...f, [key]: !f[key] }));
+  const [params, setParams] = useSearchParams();
+  const q = params.get('q') || '';
+  const cat = CATEGORY_ORDER.includes(params.get('category')) ? params.get('category') : null;
+  const filters = Object.fromEntries(FILTERS.map(f => [f.key, params.getAll('filter').includes(f.key)]));
+  const change = (key, value) => { const next = new URLSearchParams(params); value ? next.set(key, value) : next.delete(key); setParams(next, { replace: true, preventScrollReset: true }); };
+  const setQ = value => change('q', value);
+  const setCat = value => change('category', value);
+  const toggleFilter = key => { const next = new URLSearchParams(params); next.delete('filter'); FILTERS.filter(f => f.key === key ? !filters[f.key] : filters[f.key]).forEach(f => next.append('filter', f.key)); setParams(next, { replace: true, preventScrollReset: true }); };
+  const activeCount = FILTERS.filter(f => filters[f.key]).length;
+  const hasRefinement = !!(q || cat || activeCount);
 
   const grouped = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -142,50 +141,20 @@ export default function InterventionLibrary() {
       if (cat && iv.primaryDirection !== cat && !(iv.directions || []).includes(cat)) return false;
       if (activeFilters.length && !activeFilters.every((f) => f.test(iv))) return false;
       if (!term) return true;
-      return practiceSearchMatches(iv, term);
+      return practiceSearchMatches({...iv, why: `${iv.why || ""} ${PRACTICE_PREVIEWS[iv.id] || ""}`}, term);
     });
     const map = {};
     list.forEach((iv) => { (map[iv.primaryDirection] = map[iv.primaryDirection] || []).push(iv); });
     return CATEGORY_ORDER.filter((c) => map[c]?.length).map((c) => ({ category: c, items: map[c] }));
   }, [q, cat, filters]);
 
-  const launch = (iv) => {
-    if (iv.id === "dear2100") {
-      navigate("/dear-2100");
-      return;
-    }
-    const standalone = standaloneRouteFor(iv.id);
-    if (standalone) {
-      navigate(standalone);
-      return;
-    }
-    navigate("/reset", {
-      state: practiceLaunchEntry(iv, {audio:"yes"}),
-    });
-  };
-
+  const launch = iv => { const destination = practiceDestination(iv.id, 'yes'); if (destination) navigate(destination.to, { state: destination.state }); };
+  const resultCount = grouped.reduce((sum, group) => sum + group.items.length, 0);
   return (
-    <div className="min-h-full bg-background text-foreground">
-      <div className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:px-8 safe-top-lg">
-        <header className="flex items-center gap-3">
-          <button
-            onClick={goBack}
-            aria-label="Back"
-            className="no-tap flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-secondary active:scale-95"
-          >
-            <ChevronLeft className="h-5 w-5" strokeWidth={1.7} />
-          </button>
-          <div>
-            <h1 className="font-heading text-2xl font-medium tracking-tight">Intervention Library</h1>
-            <p className="text-sm text-muted-foreground">Pick any practice. {INTERVENTIONS.length + 1} in total.</p>
-          </div>
-        </header>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <button type="button" className="min-h-14 rounded-2xl border border-border bg-card p-4 text-left" onClick={() => navigate('/start')}>Not sure where to start? Choose what you need</button>
-          <button type="button" className="min-h-14 rounded-2xl border border-border bg-card p-4 text-left" onClick={() => navigate('/return-points')}>Return points · your saved work</button>
-        </div>
-
+    <main className="discovery-page discovery-page--tab">
+      <div className="discovery-shell library-shell">
+        <header className="discovery-header"><p className="discovery-eyebrow">Intervention Library · {INTERVENTIONS.length + 1} practices</p><h1>Find your way in.</h1><p>A small action, a different perspective, a place to pause.</p></header>
+        <Link to="/start" className="library-guide"><span>Not sure? Choose what you need</span><ArrowRight size={18} aria-hidden="true" /></Link>
         <div className="relative mt-5">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -199,19 +168,18 @@ export default function InterventionLibrary() {
             <button
               onClick={() => setQ("")}
               aria-label="Clear"
-              className="no-tap absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
+              className="no-tap absolute right-1 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        {<button type="button" className="mt-4 w-full rounded-2xl border border-border bg-card p-4 text-left" onClick={() => navigate("/parking-lot")}><span className="block font-medium">Your parking lot</span><span className="text-sm text-muted-foreground">{hasParkedNotes() ? "Saved on this device · Review when ready →" : "View notes saved on this device →"}</span></button>}
-
         {/* category navigation */}
         <div className="mt-4 -mx-5 overflow-x-auto scrollbar-none px-5 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="Practice categories">
           <div className="flex gap-2">
             <button
+              aria-pressed={cat === null}
               onClick={() => setCat(null)}
               className={
                 "no-tap min-h-11 shrink-0 rounded-full border px-3.5 py-2 text-sm font-medium transition-all active:scale-95 " +
@@ -225,6 +193,7 @@ export default function InterventionLibrary() {
             {CATEGORY_ORDER.map((c) => (
               <button
                 key={c}
+                aria-pressed={cat === c}
                 onClick={() => setCat(cat === c ? null : c)}
                 className={
                   "no-tap min-h-11 shrink-0 rounded-full border px-3.5 py-2 text-sm font-medium transition-all active:scale-95 " +
@@ -239,29 +208,14 @@ export default function InterventionLibrary() {
           </div>
         </div>
 
-        {/* filters */}
-        <div className="mt-2.5 -mx-5 overflow-x-auto scrollbar-none px-5 pb-1 sm:mx-0 sm:px-0" role="group" aria-label="Practice filters">
-          <div className="flex gap-2">
-            {FILTERS.map((f) => (
-              <button
-                key={f.key}
-                onClick={() => toggleFilter(f.key)}
-                aria-pressed={!!filters[f.key]}
-                className={
-                  "no-tap min-h-11 shrink-0 rounded-full border px-3.5 py-2 text-sm font-medium transition-all active:scale-95 " +
-                  (filters[f.key]
-                    ? "border-primary/30 bg-primary/10 text-primary"
-                    : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground")
-                }
-              >
-                {f.label}
-              </button>
-            ))}
+        <details className="library-refine">
+          <summary><SlidersHorizontal size={16} aria-hidden="true" />Refine by time & setting{activeCount > 0 ? ` · ${activeCount} on` : ''}</summary>
+          <div className="library-filter-options" role="group" aria-label="Practice filters">
+            {FILTERS.map(f => <button type="button" key={f.key} aria-pressed={!!filters[f.key]} onClick={() => toggleFilter(f.key)}>{f.label}</button>)}
           </div>
-        </div>
-
-        <p className="mt-5 text-sm text-muted-foreground" role="status" aria-live="polite">{grouped.reduce((count, group) => count + group.items.length, 0)} practices shown</p>
-        <div className="mt-5 flex flex-col gap-10">
+        </details>
+        <div className="library-result-line"><p role="status">{resultCount} {resultCount === 1 ? 'practice' : 'practices'}{cat ? ` · ${CATEGORY_LABELS[cat]}` : ''}{activeCount ? ` · ${activeCount} ${activeCount === 1 ? 'filter' : 'filters'}` : ''}</p>{hasRefinement && <button type="button" onClick={() => setParams({}, { replace: true, preventScrollReset: true })}>Clear all</button>}</div>
+        <div className="mt-8 flex flex-col gap-10">
           {grouped.map((g) => (
             <section key={g.category}>
               <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -271,7 +225,7 @@ export default function InterventionLibrary() {
                 {g.items.map((iv) => {
                   const isKing = iv.isKing;
                   if (!isKing) {
-                    return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={practiceTimeLabel(iv)} why={iv.why} iv={iv} onClick={() => launch(iv)} />;
+                    return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={practiceDuration(iv)} why={PRACTICE_PREVIEWS[iv.id] || iv.why} iv={iv} onClick={() => launch(iv)} />;
                   }
                   return (
                     <button
@@ -292,13 +246,13 @@ export default function InterventionLibrary() {
                           }>
                             {iv.name}
                           </span>
-                          <span className="text-xs text-muted-foreground">· {practiceTimeLabel(iv)}</span>
+                          <span className="text-xs text-muted-foreground">· {iv.id === "progressive-muscle-relaxation-v2" ? "2–5" : `${iv.durationMin}${iv.durationMax ? `–${iv.durationMax}` : ""}`} min</span>
                         </div>
                         <p className={
-                          "mt-1 text-sm leading-snug line-clamp-2 " +
+                          "mt-1 text-sm leading-snug " +
                           (isKing ? "text-[#315E51] dark:text-[#A1BBA2]" : "text-muted-foreground")
                         }>
-                          {iv.why}
+                          {PRACTICE_PREVIEWS[iv.id] || iv.why}
                         </p>
                         <Badges iv={iv} />
                         
@@ -306,7 +260,7 @@ export default function InterventionLibrary() {
                           <div className="mt-3.5 border-t border-[#CE9131]/20 dark:border-[#C99646]/20 pt-2.5">
                             <p className="text-xs italic text-[#7A572E] dark:text-[#C99646] font-medium leading-relaxed flex items-center gap-1.5">
                               <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#CE9131] dark:bg-[#C99646] shrink-0" />
-                              Take your time. You can leave and return to your local draft.
+                              Intended for longer durations (15+ minutes) and repeated use.
                             </p>
                           </div>
                         )}
@@ -322,10 +276,11 @@ export default function InterventionLibrary() {
             </section>
           ))}
           {!grouped.length && (
-            <div className="py-8 text-center"><p className="text-sm text-muted-foreground">No practices match these choices.</p><button type="button" className="mt-3 min-h-11 underline" onClick={() => { setQ(""); setCat(null); setFilters({}); }}>Clear search and filters</button></div>
+            <div className="discovery-panel"><h2>No match this time</h2><p>Try a broader word, or clear the filters to see every practice.</p><button type="button" className="discovery-text-button" onClick={() => setParams({}, { replace: true, preventScrollReset: true })}>Show all practices</button></div>
           )}
         </div>
+        <div className="discovery-footer-links"><Link to="/return-points"><Bookmark size={18} aria-hidden="true" /><span>Return to your saved work</span><ArrowRight size={17} aria-hidden="true" /></Link><Link to="/parking-lot"><span>Your parking lot</span><ArrowRight size={17} aria-hidden="true" /></Link></div>
       </div>
-    </div>
+    </main>
   );
 }

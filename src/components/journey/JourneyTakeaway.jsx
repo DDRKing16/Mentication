@@ -45,10 +45,11 @@ export default function JourneyTakeaway({ id, initialText = '' }) {
   if (!meta) return null;
   if (meta.archive) return <aside className="journey-takeaway"><p>{meta.prompt}</p><Link to={meta.archive}>Return to saved work</Link></aside>;
   return <details className="journey-takeaway">
-    <summary>{saved ? 'Review my saved note' : initialText ? 'Keep these practice choices · optional' : 'Keep something for later · optional'}</summary>
+    <summary><span>{saved ? 'Review my saved note' : initialText ? 'Keep these practice choices' : 'Keep a cue for next time'}</span><small>Optional · in your own words</small></summary>
     <label htmlFor={fieldId}>{meta.prompt}</label>
     {initialText && !saved && <p>From your entries and confirmed choices. Edit or clear anything before saving.</p>}
-    <textarea id={fieldId} maxLength={1500} value={text} onChange={event => { dirty.current = true; setText(event.target.value); setError(''); }} rows={3} />
+    <p className="takeaway-coach">Name a moment you might need it, and one small thing you would choose then.</p>
+    <textarea placeholder="When… I could…" id={fieldId} maxLength={1500} value={text} onChange={event => { dirty.current = true; setText(event.target.value); setError(''); }} rows={3} />
     <p>Only saved when you choose Save. Stored in this browser or app on this device, not synced. Read or delete it in Return points. Unsaved text is lost when you leave.</p>
     <button type="button" disabled={!text.trim() || saved?.text === text.trim()} onClick={() => {
       try { const record = takeawayStore.save({ id: saved?.id || scope, interventionId: id, text }); currentSaved.current = record; dirty.current = false; setSaved(record); setError(''); }

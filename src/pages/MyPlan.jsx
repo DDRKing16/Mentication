@@ -1,103 +1,47 @@
-import { repeatLaunchEntry, suggestionLaunchEntry } from '@/lib/practiceLaunch';
-// My Plan — a focused view of the user's personalised regulation plan.
-// Reuses the existing recommendation engine and history (no new data): the
-// time-of-day reset plus their best-performing practice. Both start buttons
-// launch the existing /reset flow with a prebuilt pathway.
-import React, { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDeviceSessions } from "@/hooks/useDeviceSessions";
-import { pickLastWorked, improvementOf, buildPersonalBest } from "@/lib/interventions";
-import { buildRecommendation } from "@/lib/recommend";
-import RecommendedCard from "@/components/home/RecommendedCard";
-import LastWorkedCard from "@/components/home/LastWorkedCard";
+import React, { useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Bookmark } from 'lucide-react';
+import { useDeviceSessions } from '@/hooks/useDeviceSessions';
+import { suggestionLaunchEntry, repeatLaunchEntry } from '@/lib/practiceLaunch';
+import { INTERVENTIONS, pickLastWorked, buildPersonalBest } from '@/lib/interventions';
+import { buildRecommendation } from '@/lib/recommend';
+import { PRACTICE_PREVIEWS, practiceDuration } from '@/lib/practiceDiscovery';
+import '@/styles/discovery.css';
+
+function PlanContents({ ids = [] }) {
+  const practices = ids.map(id => INTERVENTIONS.find(iv => iv.id === id)).filter(Boolean);
+  return <ol className="plan-contents">{practices.map((iv, index) => <li key={`${iv.id}-${index}`}><span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><strong>{iv.name}</strong><small>{practiceDuration(iv)}</small><p>{PRACTICE_PREVIEWS[iv.id] || iv.why}</p></div></li>)}</ol>;
+}
 
 export default function MyPlan() {
   const navigate = useNavigate();
-  const {sessions,ready,error,reload}=useDeviceSessions(30);
-  const lastWorked=useMemo(()=>pickLastWorked(sessions),[sessions]);
-  const personalBest=useMemo(()=>buildPersonalBest(sessions),[sessions]);
-  const recommendation=useMemo(()=>ready?buildRecommendation(sessions):null,[sessions,ready]);
-
-  const doRecommend = () => {
+  const { sessions, ready, error, reload } = useDeviceSessions(30);
+  const data = useMemo(() => ready ? { lastWorked: pickLastWorked(sessions), personalBest: buildPersonalBest(sessions), recommendation: buildRecommendation(sessions) } : null, [sessions, ready]);
+  const recommendation = data?.recommendation;
+  const repeat = data?.personalBest || data?.lastWorked;
+  function beginSuggested() {
     if (!recommendation || (!recommendation.requiresCheckIn && !recommendation.pathway?.length)) return;
-    navigate("/reset", {
-      state: suggestionLaunchEntry(recommendation),
-    });
-  };
-
-  const doLastWorked = () => {
-    if (personalBest?.pathway?.length) {
-      navigate("/reset", {
-        state: {
-          prebuilt: true, pathway: personalBest.pathway, direction: personalBest.direction,
-          directionLabel: "What works for you", intensity: null, distress: null, goal_baseline: null, whereFelt: "both",
-          timeMin: 6, audio: "yes", movement: "seated",
-        },
-      });
-      return;
-    }
-    const s = lastWorked;
-    if (!s) return;
-    navigate("/reset", {
-      state: repeatLaunchEntry(s),
-    });
-  };
-
-  const lastSub = personalBest
-    ? "Based on your reported practice ratings"
-    : (() => {
-        const imp = improvementOf(lastWorked);
-        return imp > 0 ? `Last shifted you ${imp.toFixed(1)} pts` : "Repeat your most effective reset";
-      })();
-
-  return (
-    <div className="min-h-full bg-[#ECE2D2] text-[#0E4536]">
-      <div className="mx-auto max-w-[36rem] px-[18px] pt-[max(2rem,env(safe-area-inset-top))] pb-28">
-        <header>
-          <p className="text-[0.72rem] font-medium uppercase tracking-[0.26em] text-[#7A572E]">Your plan</p>
-          <h1 className="mt-1.5 font-heading text-[1.9rem] font-medium leading-tight text-[#0E4536]">My Plan</h1>
-          <p className="mt-1 text-[0.92rem] text-[#5F726B]">Starting ideas for today, with your saved local feedback where available.</p>
-        </header>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <button type="button" onClick={() => navigate('/start')} className="min-h-12 rounded-2xl border border-[#0E4536]/20 p-3 text-left">Choose what you need now</button>
-          <button type="button" onClick={() => navigate('/return-points')} className="min-h-12 rounded-2xl border border-[#0E4536]/20 p-3 text-left">Return to saved work</button>
-        </div>
-        <p className="mt-4 text-sm leading-relaxed text-[#5F726B]">Today's suggestion uses the time of day and saved feedback where available. It does not know how you feel now; choose what you need or answer a fresh check-in.</p>
-        {error && <div role="alert" className="mt-5 rounded-2xl border border-border p-4"><p>{error}</p><button className="min-h-11 underline" onClick={reload}>Try history again</button></div>}
-
-        <section className="mt-8">
-          <p className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[#5F726B]">Today</p>
-          <h2 className="mt-1.5 font-heading text-[1.15rem] font-medium text-[#0E4536]">Your reset for today</h2>
-          {ready && recommendation ? (
-            <div className="mt-3">
-              <RecommendedCard
-                title={recommendation.title}
-                descriptor={recommendation.requiresCheckIn ? "Check in to choose your Lift reset" : `${recommendation.minutes} min · ${recommendation.tag}`}
-                onClick={doRecommend}
-              />
-            </div>
-          ) : (
-            <div className="mt-3 h-[88px] animate-pulse rounded-[1.5rem] bg-[#1E3C42]/10" />
-          )}
-        </section>
-
-        <section className="mt-8">
-          <p className="text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[#5F726B]">Built from your history</p>
-          <h2 className="mt-1.5 font-heading text-[1.15rem] font-medium text-[#0E4536]">From your reported check-ins</h2>
-          {ready && (lastWorked || personalBest) ? (
-            <div className="mt-3">
-              <LastWorkedCard title="From your reported check-ins" subtitle={lastSub} onClick={doLastWorked} overlap={false} />
-            </div>
-          ) : ready ? (
-            <p className="mt-3 text-[0.92rem] leading-relaxed text-[#5F726B]">
-              When you have comparable check-ins, a practice you reported useful can appear here. You can always choose any practice.
-            </p>
-          ) : (
-            <div className="mt-3 h-[76px] animate-pulse rounded-[1.5rem] bg-[#1E3C42]/10" />
-          )}
-        </section>
-      </div>
-    </div>
-  );
+    navigate('/reset', { state: suggestionLaunchEntry(recommendation) });
+  }
+  function beginRepeat() {
+    if (!repeat?.pathway?.length) return;
+    navigate('/reset', { state: data.personalBest ? repeatLaunchEntry({ ...repeat, direction_label: 'From your feedback', time_min: 6, where_felt: 'both', audio: 'yes', movement: 'seated' }) : repeatLaunchEntry(repeat) });
+  }
+  return <main className="discovery-page discovery-page--tab"><div className="discovery-shell">
+    <header className="discovery-header"><p className="discovery-eyebrow">My Plan</p><h1>A little direction.<br />Room to choose.</h1><p>Start with a suggestion, or choose what fits this moment.</p></header>
+    <Link className="plan-choose" to="/start"><span><strong>What do you need right now?</strong><small>Choose a starting point that feels close.</small></span><ArrowRight size={20} aria-hidden="true" /></Link>
+    {error && <div className="discovery-alert" role="alert"><p>{error}</p><button type="button" className="discovery-text-button" onClick={reload}>Try again</button></div>}
+    {!data && !error && <p role="status" className="discovery-panel">Loading your starting ideas…</p>}
+    {recommendation && <section className="plan-today" aria-labelledby="today-title">
+      <div className="plan-card-top"><span className="discovery-eyebrow">A suggestion for today</span><span>{recommendation.requiresCheckIn ? 'Start with a check-in' : `About ${recommendation.minutes} min`}</span></div>
+      <h2 id="today-title">{recommendation.title}</h2>
+      {recommendation.requiresCheckIn ? <p className="plan-intro">A brief check-in helps choose a Lift practice for where you are now.</p> : <PlanContents ids={recommendation.pathway} />}
+      <button type="button" className="discovery-light-button" onClick={beginSuggested}>{recommendation.requiresCheckIn ? 'Check in & choose' : 'Explore this reset'}<ArrowRight size={18} aria-hidden="true" /></button>
+      <details className="plan-explanation"><summary>Why this suggestion?</summary><p>The time of day sets the starting direction. Saved practice feedback can help choose the activities. This is a starting idea, not a reading of how you feel now.</p></details>
+    </section>}
+    <section className="discovery-panel" aria-labelledby="feedback-title"><p className="discovery-eyebrow">From your feedback</p><h2 id="feedback-title">{repeat ? 'Something to return to' : 'Your experience belongs here'}</h2>
+      {repeat ? <><p>{data.personalBest ? 'A sequence suggested using your saved practice feedback. It may include something to explore.' : 'A previous reset with a positive change in your recorded ratings. Today may feel different.'}</p><PlanContents ids={repeat.pathway} /><button type="button" className="discovery-primary" onClick={beginRepeat}>Explore this sequence<ArrowRight size={18} aria-hidden="true" /></button></> : <><p>When you choose to leave feedback, it can help shape future suggestions. Skipped ratings stay unanswered; a practice does not have to make you feel better.</p><Link className="discovery-text-button" to="/library">Find a practice to try<ArrowRight size={16} aria-hidden="true" /></Link></>}
+    </section>
+    <div className="discovery-footer-links"><Link to="/return-points"><Bookmark size={19} aria-hidden="true" /><span>Return to your saved words & plans</span><ArrowRight size={17} aria-hidden="true" /></Link><Link to="/library"><span>Browse every practice</span><ArrowRight size={17} aria-hidden="true" /></Link></div>
+  </div></main>;
 }

@@ -26,3 +26,37 @@ describe('authored practice discovery',()=>{
   expect(practiceTimeLabel({id:'urgeSurf',durationMin:4})).toBe('30–60 sec practice · optional setup');
  });
 });
+
+import { NEED_GROUPS, PRACTICE_PREVIEWS, practiceDestination } from './practiceDiscovery';
+
+describe('practice discovery contracts', () => {
+  it('keeps every existing need available exactly once, without changing its practice mapping', () => {
+    const ids = NEED_GROUPS.flatMap(group => group.needs);
+    expect(ids.length).toBe(new Set(ids).size);
+    expect([...ids].sort()).toEqual(NEED_ENTRIES.map(item => item.id).sort());
+    for (const need of NEED_ENTRIES) expect(practiceDestination(need.practice)).not.toBeNull();
+  });
+  it('describes and opens every catalogue practice without inventing a starting rating', () => {
+    for (const iv of INTERVENTIONS) {
+      expect(PRACTICE_PREVIEWS[iv.id]).toBeTruthy();
+      const destination = practiceDestination(iv.id);
+      expect(destination).not.toBeNull();
+      if (destination.to === '/reset') {
+        expect(destination.state.pathway).toEqual([iv.id]);
+        expect(destination.state.intensity).toBeNull();
+        expect(destination.state.goal_baseline).toBeNull();
+        expect(destination.state.distress).toBeNull();
+      }
+    }
+  });
+  it('preserves standalone routes and the Happy Bump check-in; unknown IDs never launch', () => {
+    expect(practiceDestination('signalLock')).toEqual({ to: '/signal-lock' });
+    expect(practiceDestination('vectorShift')).toEqual({ to: '/vector-shift' });
+    expect(practiceDestination('nightChannel')).toEqual({ to: '/night-channel' });
+    expect(practiceDestination('dear2100')).toEqual({ to: '/dear-2100' });
+    expect(practiceDestination('happyBump').state.prebuilt).toBe(false);
+    expect(practiceDestination('missing')).toBeNull();
+    expect(practiceDestination('boxV2').state.audio).toBe('no');
+    expect(practiceDestination('boxV2', 'yes').state.audio).toBe('yes');
+  });
+});

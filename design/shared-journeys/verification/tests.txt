@@ -1,0 +1,11 @@
+> mentation@0.0.0 test
+> vitest run --run
+
+
+ RUN  v4.1.11 /workspace/mentication-quality
+
+
+ Test Files  65 passed (65)
+      Tests  534 passed (534)
+   Start at  00:37:51
+   Duration  9.95s (transform 2.29s, setup 0ms, import 9.02s, tests 2.52s, environment 17ms)
