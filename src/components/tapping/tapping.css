@@ -1,221 +1,152 @@
 @import '@fontsource/eb-garamond/400.css';
+@import '@fontsource/eb-garamond/400-italic.css';
 @import '@fontsource/hanken-grotesk/400.css';
 @import '@fontsource/hanken-grotesk/500.css';
 
-.tapping-experience {
-  --tap-ink: #ece2d2;
-  --tap-gold: #e2c08b;
-  --tap-line: #c7c5a62a;
-  --tap-muted: #bac6b8;
-  min-height: 100dvh;
-  color: var(--tap-ink);
-  background: radial-gradient(ellipse at 50% 38%, #2b4845 0, #1e3c42 45%, #112b32 100%);
-  font: 400 15px/1.45 'Hanken Grotesk', sans-serif;
-  padding: env(safe-area-inset-top) 24px env(safe-area-inset-bottom);
-  isolation: isolate;
-}
-.tapping-experience *, .tapping-experience { box-sizing: border-box; }
-.tap-wrap { max-width: 430px; margin: auto; padding-bottom: 24px; }
-.tap-header { height: 70px; display: flex; align-items: center; justify-content: space-between; }
-.tap-wordmark { font: 400 25px/1 'EB Garamond', serif; letter-spacing: -1px; }
-.tap-header-tools { display: flex; align-items: center; gap: 10px; }
-.tapping-experience button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; min-height: 44px; border: 0; background: none; }
-.tapping-experience button:focus-visible, .tapping-experience summary:focus-visible { outline: 2px solid #ffe1a5; outline-offset: 4px; }
-.tapping-experience h1:focus { outline: none; }
-.tapping-experience button:disabled { opacity: .45; cursor: default; }
-.tap-header .journey-options-button { border: 0; padding: 0 4px; font: 400 11px 'Hanken Grotesk', sans-serif; color: #d7d7c7; border-radius: 0; }
-.tap-exit { width: 44px; display: grid; place-items: center; margin-right: -10px; }
-.tap-exit svg { width: 21px; height: 21px; stroke: #cbd1c0; stroke-width: 1.4; fill: none; }
-.tap-eyebrow { color: var(--tap-gold); font-size: 9px; letter-spacing: 1.8px; line-height: 1.5; }
-.tap-eyebrow span { color: #8fa492; margin: 0 5px; }
-.tapping-experience h1 { font: 400 clamp(39px, 10.9vw, 48px)/.98 'EB Garamond', serif; letter-spacing: -.7px; margin: 16px 0 12px; }
-.tapping-experience p { margin: 0; }
-.tap-lead { color: #d5dccc; font-size: 14px; line-height: 1.5; }
-.tap-small { font-size: 11px; line-height: 1.5; color: var(--tap-muted); }
-.tap-primary { width: 100%; min-height: 54px!important; padding: 14px 23px; border-radius: 30px; background: #e8d2a8!important; color: #18363a!important; display: flex; align-items: center; justify-content: space-between; font-weight: 500!important; box-shadow: 0 6px 28px #071e2430; }
-.tap-primary:hover { background: #f1dfbc!important; }
-.tap-primary svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-.tap-text-button { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 9px 0; font-size: 12px!important; }
-.tap-text-button:hover { color: var(--tap-gold); }
-.tap-text-button>span { color: var(--tap-gold); }
-.tap-entry h1 { font-size: clamp(45px, 12.3vw, 55px); margin-bottom: 11px; }
-.tap-entry .tap-eyebrow { margin-top: 12px; }
-.tap-intro-art { height: clamp(190px, 31dvh, 280px); margin: 0 -15px -20px; position: relative; }
-.tap-silhouette { width: 100%; height: 100%; display: block; overflow: hidden; pointer-events: none; }
-.tap-choice-area { position: relative; }
-.tap-choice-label { font-size: 9px; letter-spacing: 1.5px; color: var(--tap-gold); margin-bottom: 5px!important; }
-.tap-choices { display: flex; flex-direction: column; margin-bottom: 10px; }
-.tap-choices button { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; min-height: 49px; text-align: left; border-bottom: 1px solid var(--tap-line); font-size: 16px; }
-.tap-choices button:hover { color: var(--tap-gold); }
-.tap-choices svg { width: 20px; height: 20px; stroke: var(--tap-gold); fill: none; stroke-width: 1.2; }
-.tap-entry-footer { display: flex; justify-content: space-between; margin: 22px 0 4px; color: #c9cdb8; font-size: 10px; }
-.tap-checkin { padding: clamp(28px, 6dvh, 62px) 0 24px; }
-.tap-checkin h1 { font-size: clamp(38px, 10.7vw, 47px); line-height: 1.02; max-width: 365px; margin: 20px 0 16px; }
-.tap-rating-visual { height: clamp(72px, 14dvh, 120px); display: flex; align-items: center; justify-content: center; gap: 8px; margin: 15px 0 10px; }
-.tap-rating-visual span { width: 9px; height: 9px; background: #e2c08b; border-radius: 50%; opacity: .45; }
-.tap-rating-visual span:nth-child(2) { width: 30px; height: 30px; background: #e2c08b14; border: 1px solid #e2c08b80; opacity: 1; position: relative; }
-.tap-rating-visual span:nth-child(2)::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tap-gold); position: absolute; inset: 0; margin: auto; }
-.tap-rating { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-.tap-rating button { border: 1px solid #cad0b755; border-radius: 12px; min-height: 48px; font: 400 23px 'EB Garamond', serif; }
-.tap-rating button:hover { color: #19383c; background: #e8d2a8; }
-.tap-scale { display: flex; justify-content: space-between; font-size: 10px; color: #c9cdb8; margin: 16px 0 28px; }
-.tap-checkin>.tap-text-button { margin-top: 14px; width: 100%; border-bottom: 1px solid var(--tap-line); }
-.tap-ready { padding-top: 15px; animation: tap-enter .55s ease-out both; }
-.tap-ready h1 { font-size: clamp(36px, 9.7vw, 44px); }
-.tap-reveal-art { height: clamp(205px, 31dvh, 290px); position: relative; margin: -5px -20px -20px; }
-.tap-reveal-light { width: 34px; height: 34px; border: 1px solid #e9cd9640; border-radius: 50%; position: absolute; top: 20%; left: calc(50% - 17px); box-shadow: 0 0 44px #e9cd9615; animation: tap-reveal 1.2s ease-out both; }
-.tap-ready-instruction { display: flex; align-items: center; gap: 18px; margin: 15px 0 12px; }
-.tap-instruction-number { font: 400 29px 'EB Garamond', serif; color: var(--tap-gold); border-right: 1px solid var(--tap-line); padding-right: 16px; }
-.tap-ready-instruction p { font-size: 15px; line-height: 1.5; }
-.tap-ready-instruction strong { font-weight: 400; color: #d0d6c5; }
-.tap-ready-note { max-width: 345px; margin-bottom: 15px!important; }
-.tap-settings-summary { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--tap-line); margin: 15px 0 10px; gap: 15px; }
-.tap-settings-summary>span { font-size: 10px; color: var(--tap-muted); }
-.tap-settings-summary button { gap: 12px; }
-.tap-settings { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 14px; }
-.tap-settings button { border: 1px solid #d4cda442; border-radius: 22px; padding: 9px 12px; font-size: 11px; }
-.tap-settings p { width: 100%; margin-top: 3px; }
-.tap-stage-round .tap-wrap { padding-bottom: 12px; }
-.tap-round { display: flex; flex-direction: column; min-height: calc(100dvh - 82px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
-.tap-round-meta { display: flex; align-items: center; justify-content: space-between; color: var(--tap-gold); font-size: 9px; letter-spacing: 1.5px; margin-top: 11px; }
-.tap-round-title h1 { font-size: clamp(32px, 9vw, 40px); line-height: 1; margin: 12px 0 7px; }
-.tap-round-title p { color: #d7dccb; font-size: 13px; line-height: 1.45; max-width: 350px; min-height: 38px; }
-.tap-main-art { flex: 1; min-height: 250px; height: clamp(245px, 39dvh, 430px); margin: 12px -15px 0; position: relative; padding-bottom: 32px; animation: tap-enter .45s ease-out; }
-.tap-frame-crown, .tap-frame-brow, .tap-frame-sideEye, .tap-frame-underEye, .tap-frame-nose, .tap-frame-chin { padding-left: 20px; padding-right: 20px; }
-.tap-main-art svg { mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 90%, transparent); }
-.tap-art-caption { position: absolute; right: 10px; top: 7px; font-size: 7px; letter-spacing: 1.6px; color: #c5cebb; writing-mode: vertical-rl; }
-.tap-art-caption span { margin: 7px 0; }
-.tap-rhythm { position: absolute; left: 0; right: 0; bottom: 2px; display: flex; justify-content: center; gap: 10px; align-items: center; color: #d5d8c4; font-size: 10px; }
-.tap-rhythm>span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--tap-gold); box-shadow: 0 0 0 5px #e2c08b12; }
-.tap-beating { animation: tap-beat .86s ease-out; }
-.tap-cue { text-align: center; margin: 13px 0 12px; min-height: 75px; }
-.tap-cue-label { color: var(--tap-gold); font-size: 8px; letter-spacing: 1.6px; margin-bottom: 7px; }
-.tap-cue p { font: 400 24px/1.12 'EB Garamond', serif; max-width: 365px; margin: auto; }
-.tap-progress { display: flex; gap: 5px; margin: 0 0 15px; }
-.tap-progress span { flex: 1; height: 2px; background: #cfcca638; border-radius: 2px; }
-.tap-progress span.done { background: #e2c08b9e; }
-.tap-progress span.current { background: #f0ddb4; box-shadow: 0 0 9px #e2c08b20; }
-.tap-controls { display: flex; gap: 12px; align-items: center; }
-.tap-controls>.tap-primary, .tap-controls>.tap-pause { flex: 1; min-height: 47px!important; padding: 10px 22px; }
-.tap-pause { display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2c08b60!important; border-radius: 30px; color: #e8d2a8!important; }
-.tap-pause svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-.tap-stop { padding: 8px 6px; min-width: 90px; font-size: 12px!important; color: #d8dccb!important; }
-.tap-skip { margin: 3px auto -5px; font-size: 10px!important; color: var(--tap-muted)!important; }
-.tap-point-core { transform-box: fill-box; transform-origin: center; }
-.tap-alive .tap-point-core { animation: tap-beat .86s ease-out; }
-.tap-ripple { transform-box: fill-box; transform-origin: center; }
-.tap-alive .tap-ripple { animation: tap-ripple .86s ease-out; }
-.tap-still .tap-ripple { opacity: .4; }
-.tap-result { padding: 38px 0 0; }
-.tap-result h1 { font-size: clamp(45px, 12vw, 54px); margin: 20px 0 34px; }
-.tap-comparison { display: flex; align-items: center; gap: 27px; margin: 0 0 34px; padding: 21px 0 27px; border-top: 1px solid var(--tap-line); border-bottom: 1px solid var(--tap-line); }
-.tap-comparison>div { display: flex; flex-direction: column; gap: 10px; }
-.tap-comparison>div>span { font-size: 10px; color: var(--tap-muted); }
-.tap-comparison strong { font: 400 62px/1 'EB Garamond', serif; color: var(--tap-gold); }
-.tap-comparison svg { width: 60px; stroke: #b7bba2; stroke-width: .8; fill: none; }
-.tap-result>p:not(.tap-eyebrow):not(.tap-small) { font-size: 15px; line-height: 1.55; max-width: 330px; margin-bottom: 12px; }
-.tap-result-actions { margin-top: 30px; }
-.tap-result-actions>.tap-text-button { width: 100%; border-bottom: 1px solid var(--tap-line); padding: 14px 0; }
-.tapping-experience .journey-takeaway { border: 0; border-radius: 0; padding: 0; margin: 20px 0 0; font: 400 12px/1.5 'Hanken Grotesk', sans-serif; }
-.tapping-experience .journey-takeaway summary { min-height: 44px; color: #d5d9c8; font-size: 12px; padding-top: 11px; }
-.tapping-experience .journey-takeaway p { font: inherit; color: var(--tap-muted); margin: 10px 0; }
-.tapping-experience .journey-takeaway button { border: 1px solid #b5bba15c; border-radius: 24px; padding: 10px 15px; font: inherit; }
-.tapping-experience .journey-takeaway textarea { border-color: #c9cda655; background: #f4efdf; font: 400 14px/1.5 'Hanken Grotesk', sans-serif; }
-.tap-storage { border-top: 1px solid var(--tap-line); margin-top: 16px; color: var(--tap-muted); font-size: 10px; }
-.tap-storage summary { padding: 13px 0; min-height: 44px; cursor: pointer; }
-.tap-storage p { margin: 0 0 8px; }
-.tap-storage button { text-decoration: underline; padding: 8px 0; font-size: 11px; }
-.tap-error-note { font-size: 12px; line-height: 1.5; color: #ffe0b3; margin: 10px 0!important; padding: 10px 0; }
-@keyframes tap-enter { from { opacity: .2; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes tap-reveal { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
-@keyframes tap-beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.35); } 55% { transform: scale(1); } }
-@keyframes tap-ripple { from { opacity: .65; transform: scale(.7); } to { opacity: 0; transform: scale(1.8); } }
-.tap-reduced *, .reduce-motion .tapping-experience * { animation: none!important; transition: none!important; }
-@media (prefers-reduced-motion: reduce) { .tapping-experience * { animation: none!important; transition: none!important; } }
-@media (max-height: 740px) {
-  .tap-header { height: 58px; }
-  .tap-entry .tap-eyebrow { margin-top: 5px; }
-  .tap-intro-art { height: 185px; }
-  .tap-entry h1 { font-size: 44px; }
-  .tap-entry-footer { margin-top: 14px; }
-  .tap-main-art { min-height: 200px; height: 245px; margin-top: 4px; }
-  .tap-cue { min-height: 68px; margin-top: 8px; }
-  .tap-cue p { font-size: 22px; }
-  .tap-round { min-height: calc(100dvh - 70px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
-  .tap-reveal-art { height: 210px; }
-}
-@media (max-width: 350px) {
-  .tapping-experience { padding-left: 20px; padding-right: 20px; }
-  .tap-eyebrow { font-size: 8px; letter-spacing: 1.3px; }
-  .tap-header-tools { gap: 5px; }
-  .tap-rating { gap: 6px; }
-  .tap-rating button { min-height: 44px; font-size: 21px; }
-  .tap-main-art { min-height: 185px; }
-  .tap-round-title p { font-size: 12px; }
-  .tap-cue p { font-size: 21px; }
-  .tap-checkin h1 { font-size: 36px; }
-}
-.large-text .tapping-experience { font-size: 18px; }
-.large-text .tap-lead, .large-text .tap-ready-instruction p,
-.large-text .tap-round-title p, .large-text .tap-result>p:not(.tap-eyebrow) { font-size: 16px; }
-.large-text .tap-cue p { font-size: 26px; }
-.large-text .tap-small { font-size: 14px!important; }
-.large-text .tap-main-art { min-height: 260px; }
-.high-contrast .tapping-experience { --tap-muted: #eee9d9; --tap-line: #eee9d980; }
-@media (min-width: 700px) { .tap-wrap { max-width: 420px; } }
+.tapping-experience { --tap-ink:#f1e7d5;--tap-gold:#e2c08b;--tap-label:#f2d5a2;--tap-muted:#b8c8c2;--tap-line:#c9c5a631; min-height:100dvh; color:var(--tap-ink);background:radial-gradient(ellipse at 50% 31%,#244c4b 0,#173b40 43%,#0d2832 100%); font:400 15px/1.5 'Hanken Grotesk',sans-serif; padding:env(safe-area-inset-top) 24px env(safe-area-inset-bottom);isolation:isolate; }
+.tapping-experience,.tapping-experience * {box-sizing:border-box;}
+.tap-wrap {max-width:430px;margin:auto;padding-bottom:20px;}
+.tap-header {height:68px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;}
+.tap-wordmark {display:block;width:114px;height:auto;}
+.tap-header-goal {font-size:10px;letter-spacing:1px;color:var(--tap-muted);white-space:nowrap;}
+.tapping-experience button {font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;min-height:44px;border:0;background:none;}
+.tapping-experience button:focus-visible,.tapping-experience summary:focus-visible {outline:2px solid #ffdc9f;outline-offset:4px;}
+.tapping-experience h1:focus {outline:none;}
+.tapping-experience button:disabled {opacity:.45;cursor:default;}
+.tap-exit,.tap-back {width:44px;display:grid;place-items:center;padding:0;}
+.tap-exit {justify-self:end;margin-right:-10px;}
+.tap-back {justify-self:start;margin-left:-10px;}
+.tap-exit svg,.tap-back svg {width:20px;height:20px;stroke:#d4dcce;stroke-width:1.5;fill:none;}
+.tap-eyebrow {font-size:11px;font-weight:500;letter-spacing:1.3px;color:var(--tap-label);line-height:1.5;}
+.tapping-experience p {margin:0;}
+.tapping-experience h1 {font:400 clamp(39px,10.5vw,46px)/1.03 'EB Garamond',serif;letter-spacing:-.8px;margin:15px 0 12px;}
+.tapping-experience h1 em {font-weight:400;color:#e4d3b4;}
+.tap-lead {font-size:14px;color:#d4ded4;line-height:1.5;}
+.tap-small {font-size:12px;line-height:1.5;color:var(--tap-muted);}
+.tap-primary {width:100%;min-height:54px!important;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 23px;border-radius:32px;background:linear-gradient(105deg,#f1ddba,#e2c295)!important;color:#17373c!important;font-weight:500!important;box-shadow:0 7px 28px #041b272b;}
+.tap-primary:hover {background:#f2dfbd!important;}
+.tap-primary svg,.tap-pause svg {width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;}
+.tap-text-button {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;font-size:12px!important;}
+.tap-text-button>span {color:var(--tap-gold);}
+.tap-text-button:hover,.tap-secondary button:hover {color:var(--tap-gold);}
+.tap-entry {padding-top:12px;}
+.tap-entry h1 {font-size:clamp(47px,12.5vw,57px);margin-top:17px;}
+.tap-entry>.tap-lead {max-width:280px;}
+.tap-entry-contact {position:relative;margin:15px auto 19px;width:100%;height:clamp(210px,29dvh,270px);}
+.tap-portrait {position:relative;width:100%;height:100%;overflow:hidden;border-radius:47% 47% 42% 42%;background:radial-gradient(ellipse,#54706118,#193e3d12 65%,transparent);}
+.tap-silhouette {display:block;width:100%;height:100%;overflow:hidden;pointer-events:none;}
+.tap-entry-contact .tap-portrait,.tap-ready-contact .tap-portrait {mask-image:linear-gradient(to bottom,#000 77%,transparent 100%);}
+.tap-art-note {position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:10px;font-weight:500;letter-spacing:1px;color:#c4cfbc;}
+.tap-choice-area {margin-top:18px;}
+.tap-choice-label {font-size:10px;letter-spacing:1px;color:var(--tap-muted);margin-bottom:8px!important;}
+.tap-choices {display:flex;gap:6px;flex-wrap:wrap;}
+.tap-choices button {flex:1 1 auto;min-height:44px;padding:8px 11px;border:1px solid var(--tap-line);border-radius:26px;font-size:12px;white-space:nowrap;}
+.tap-choices button:hover {background:#e2c08b14;border-color:#e2c08b80;}
+.tap-entry-note {margin-top:13px!important;font-size:11px;}
+.tap-entry-footer {display:flex;justify-content:space-between;color:var(--tap-muted);font-size:10px;letter-spacing:.3px;margin-top:23px;padding-top:13px;border-top:1px solid var(--tap-line);}
+.tap-about {font-size:11px;color:var(--tap-muted);margin-top:5px;}
+.tap-about summary,.tap-storage summary {min-height:44px;display:list-item;padding:13px 0;cursor:pointer;}
+.tap-about p {line-height:1.6;padding-bottom:15px;}
+.tap-checkin {padding:32px 0 15px;}
+.tap-checkin-context {display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--tap-line);padding:17px 0;margin-top:12px;color:#e4d7bd;font-size:13px;}
+.tap-checkin-context span:last-child {font-size:10px;color:var(--tap-muted);}
+.tap-checkin h1 {font-size:clamp(36px,10vw,43px);line-height:1.09;margin:27px 0 18px;}
+.tap-rating {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-top:35px;}
+.tap-rating button {height:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;border-bottom:1px solid #e2c08b45;padding:10px 2px 12px;border-radius:20px 20px 3px 3px;font:400 29px/1 'EB Garamond',serif;}
+.tap-rating button i {height:var(--rating-size);width:3px;background:#e2c08b70;border-radius:2px;}
+.tap-rating button[aria-pressed=true],.tap-rating button:hover,.tap-rating button:focus-visible {background:#e2c08b12;color:#ffe2b6;}
+.tap-scale {display:flex;justify-content:space-between;gap:10px;font-size:10px;color:var(--tap-muted);margin:18px 0 25px;}
+.tap-checkin>.tap-text-button {margin-top:16px;width:100%;border-bottom:1px solid var(--tap-line);}
+.tap-ready {padding-top:12px;animation:tap-arrive .55s ease-out both;}
+.tap-ready h1 {font-size:clamp(37px,10.3vw,45px);}
+.tap-ready-contact {height:clamp(185px,26dvh,230px);position:relative;margin:17px 0 14px;}
+.tap-first-point {position:absolute;left:0;bottom:5px;display:flex;flex-direction:column;gap:7px;}
+.tap-first-point span {font-size:11px;font-weight:500;letter-spacing:1px;color:var(--tap-label);}
+.tap-first-point strong {font:400 26px/1.1 'EB Garamond',serif;}
+.tap-ready-placement {font-size:13px;color:#d7dfd0;max-width:330px;padding:8px 0 16px;border-bottom:1px solid var(--tap-line);}
+.tap-ready-instruction {font-size:14px;margin:16px 0 9px!important;color:#e6dfce;line-height:1.6;}
+.tap-ready-note {font-size:11px;}
+.tap-settings-summary {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 10px;border-top:1px solid var(--tap-line);}
+.tap-settings-summary>span {font-size:10px;color:var(--tap-muted);}
+.tap-settings {display:flex;gap:7px;flex-wrap:wrap;padding-bottom:16px;}
+.tap-settings button {border:1px solid #d4cda44d;border-radius:23px;padding:9px 13px;font-size:12px;}
+.tap-settings button[aria-pressed=true] {background:#e2c08b18;border-color:#e2c08b80;}
+.tap-settings .tap-small {width:100%;margin-top:4px;}
+.tap-ready-footnote {text-align:center;font-size:10px;color:var(--tap-muted);margin-top:15px!important;}
+.tap-round {padding-top:4px;}
+.tap-round-meta {display:flex;justify-content:space-between;color:var(--tap-label);font-size:11px;font-weight:500;letter-spacing:1px;}
+.tap-round-title h1 {font-size:34px;line-height:1.05;margin:10px 0 7px;}
+.tap-round-title p {font-size:13px;color:#cedbcd;line-height:1.4;min-height:37px;max-width:335px;}
+.tap-main-art {animation:tap-arrive .32s ease-out both;position:relative;height:clamp(170px,calc(100dvh - 486px),320px);margin:7px 0 0;}
+.tap-main-art .tap-portrait {padding:0 5px 12px;}
+.tap-main-art .tap-art-note {bottom:0;font-size:10px;letter-spacing:1px;}
+.tap-main-art .tap-contact-portrait {mask-image:linear-gradient(to bottom,#000 0%,#000 85%,transparent 100%);}
+.tap-image-error {position:absolute;inset:30% 12px auto;color:#e7d5b3;font-size:12px;line-height:1.5;}
+.tap-guidance {min-height:126px;padding-top:15px;}
+.tap-contact-action {display:grid;grid-template-columns:18px auto;column-gap:11px;align-items:center;}
+.tap-contact-action h2 {font:400 25px/1.15 'EB Garamond',serif;margin:0;letter-spacing:-.3px;}
+.tap-phase-note {grid-column:2;font-size:11px;color:var(--tap-muted);margin-top:4px;}
+.tap-rhythm-light {width:8px;height:8px;border-radius:50%;background:#f2d5a2;box-shadow:0 0 0 5px #e2c08b15;}
+.tap-cue {margin-top:14px;min-height:61px;}
+.tap-cue-label {font-size:11px;font-weight:500;letter-spacing:1px;color:var(--tap-label);margin-bottom:5px;}
+.tap-cue p {font:400 25px/1.14 'EB Garamond',serif;max-width:365px;}
+.tap-cue p.tap-settle-note {font:400 12px/1.5 'Hanken Grotesk',sans-serif;color:var(--tap-muted);max-width:270px;}
+.tap-next {display:flex;align-items:center;gap:10px;font-size:12px;color:#b8c8c2;padding:9px 0 10px;transition:color .2s;}
+.tap-next>span:first-child {font-size:11px;font-weight:500;letter-spacing:.8px;color:var(--tap-label);}
+.tap-next>span:last-child {margin-left:auto;}
+.tap-next strong {font-weight:400;}
+.tap-next.is-next {color:#f2d5a2;}
+.tap-progress {display:flex;gap:5px;margin-bottom:9px;}
+.tap-progress>span {height:2px;flex:1;background:#a6b2a430;border-radius:2px;overflow:hidden;}
+.tap-progress i {height:100%;display:block;background:#e2c08b8f;}
+.tap-progress .current i {background:#f2d5a2;}
+.tap-controls {display:flex;justify-content:space-between;align-items:center;gap:18px;}
+.tap-controls>.tap-primary {flex:1;min-height:48px!important;padding:12px 17px;}
+.tap-pause {display:flex;align-items:center;gap:12px;font-size:13px!important;padding:0;}
+.tap-pause svg {width:15px;height:15px;}
+.tap-stop {font-size:13px!important;padding:0 5px;min-width:90px;}
+.tap-practice-tools {display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.tap-practice-tools .tap-text-button {font-size:12px!important;color:var(--tap-muted);}
+.tap-paused-settings {padding:15px 0;border-top:1px solid var(--tap-line);}
+.tap-point-core,.tap-ripple {transform-box:fill-box;transform-origin:center;}
+.tap-alive .tap-point-core,.tap-beating {animation:tap-beat .86s ease-out;}
+.tap-alive .tap-ripple {animation:tap-ripple .86s ease-out;}
+.tap-still .tap-ripple {opacity:.35;}
+.tap-result {padding:30px 0 0;}
+.tap-result h1 {font-size:clamp(45px,12vw,54px);margin:20px 0 26px;}
+.tap-comparison {display:flex;justify-content:space-between;align-items:center;margin:0 0 27px;border-top:1px solid var(--tap-line);border-bottom:1px solid var(--tap-line);padding:24px 16px;}
+.tap-comparison>div {display:flex;flex-direction:column;align-items:center;gap:8px;min-width:73px;}
+.tap-comparison span {font-size:11px;color:var(--tap-muted);}
+.tap-comparison strong {font:400 66px/1 'EB Garamond',serif;color:#edd5b0;}
+.tap-comparison small {font-size:10px;color:var(--tap-muted);}
+.tap-comparison svg {width:53px;fill:none;stroke:#e2c08b80;stroke-width:1;}
+.tap-result>p:not(.tap-eyebrow):not(.tap-small) {font-size:15px;line-height:1.6;max-width:335px;margin-bottom:12px;}
+.tap-result-actions {margin-top:26px;}
+.tap-result-actions>.tap-text-button {width:100%;padding:15px 0;border-bottom:1px solid var(--tap-line);}
+.tapping-experience .journey-takeaway {border:0;border-radius:0;padding:0;margin:20px 0 0;font:400 12px/1.5 'Hanken Grotesk',sans-serif;overflow-wrap:anywhere;}
+.tapping-experience .journey-takeaway summary {min-height:44px;font-size:12px;color:#dce1cf;padding-top:10px;}
+.tapping-experience .journey-takeaway p {font:inherit;color:var(--tap-muted);margin:10px 0;}
+.tapping-experience .journey-takeaway button {border:1px solid #c4cda454;border-radius:24px;padding:10px 15px;font:inherit;}
+.tapping-experience .journey-takeaway textarea {background:#f3eddf;color:#18383c;border-color:#c9cda655;font:400 14px/1.5 'Hanken Grotesk',sans-serif;}
+.tap-storage {border-top:1px solid var(--tap-line);margin-top:15px;font-size:10px;color:var(--tap-muted);}
+.tap-storage p {margin-bottom:9px;}
+.tap-storage button {padding:8px 0;font-size:11px;text-decoration:underline;}
+.tap-error-note {font-size:12px;line-height:1.5;color:#ffe0b3;margin:10px 0!important;padding:8px 0;}
+.tap-secondary {border-top:1px solid var(--tap-line);margin-top:8px;padding:4px 0 0;}
+.tap-secondary .journey-secondary {margin:0!important;padding:0!important;}
+.tap-secondary .journey-options-button {border:0;border-radius:0;padding:9px 0;font:400 11px 'Hanken Grotesk',sans-serif;color:#b9c9c2;min-height:44px;}
+@keyframes tap-arrive {from{opacity:.2;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes tap-beat {0%,100%{transform:scale(1)}15%{transform:scale(1.4)}55%{transform:scale(1)}}
+@keyframes tap-ripple {from{opacity:.65;transform:scale(.7)}to{opacity:0;transform:scale(1.8)}}
+.tap-reduced *,.reduce-motion .tapping-experience * {animation:none!important;transition:none!important;}
+@media(prefers-reduced-motion:reduce){.tapping-experience *{animation:none!important;transition:none!important;}}
+@media(max-height:740px){.tap-header{height:52px}.tap-entry{padding-top:5px}.tap-entry h1{font-size:44px}.tap-entry-contact{height:190px;margin-top:10px;margin-bottom:15px}.tap-ready{padding-top:5px}.tap-ready h1{font-size:36px}.tap-ready-contact{height:170px;margin-top:12px;margin-bottom:10px}.tap-ready-placement{padding-bottom:12px}.tap-ready-instruction{margin-top:12px!important}.tap-settings-summary{margin-top:10px}.tap-round-title h1{font-size:31px;margin-top:8px}.tap-main-art{height:clamp(156px,calc(100dvh - 460px),250px)}.tap-guidance{min-height:112px;padding-top:12px}.tap-cue{margin-top:10px}.tap-cue p{font-size:23px}.tap-next{padding:7px 0 9px}}
+@media(max-width:350px){.tapping-experience{padding-left:20px;padding-right:20px}.tap-header{gap:8px}.tap-header-goal{font-size:9px;letter-spacing:.8px}.tap-wordmark{width:105px}.tap-entry h1{font-size:44px}.tap-choice-area{margin-top:14px}.tap-choices{gap:6px}.tap-choices button{font-size:11px;padding-left:9px;padding-right:9px}.tap-entry-footer{margin-top:18px}.tap-checkin{padding-top:22px}.tap-checkin h1{font-size:36px}.tap-rating{gap:7px;margin-top:25px}.tap-rating button{height:69px;font-size:27px}.tap-round-title p{font-size:12px;min-height:34px}.tap-contact-action h2{font-size:23px}.tap-cue p{font-size:22px}.tap-ready-footnote{font-size:9px}}
+.large-text .tapping-experience{font-size:18px}.large-text .tap-lead,.large-text .tap-ready-instruction,.large-text .tap-round-title p,.large-text .tap-ready-placement,.large-text .tap-result>p:not(.tap-eyebrow){font-size:16px}.large-text .tap-small{font-size:14px}.large-text .tap-cue p{font-size:27px}.large-text .tap-guidance{min-height:145px}.large-text .tap-contact-action h2{font-size:27px}.large-text .tap-phase-note{font-size:12px}.large-text .tap-main-art{height:clamp(130px,calc(100dvh - 540px),250px)}
+.high-contrast .tapping-experience{--tap-muted:#f0eadc;--tap-line:#ece9d980}
+@media(min-width:700px){.tap-wrap{max-width:420px}}
 
-@media (max-height: 680px) {
-  .tap-main-art { height: 190px; min-height: 170px; }
-  .tap-round-meta { margin-top: 5px; }
-  .tap-round-title h1 { margin-top: 9px; font-size: 30px; }
-  .tap-round-title p { min-height: 32px; }
-  .tap-cue { min-height: 62px; }
-}
-/* Position the vector within the allocated practice frame. Its intrinsic
-   viewBox must not increase the flex row and push stop controls off-screen. */
-.tap-main-art > svg { position: absolute; left: 0; top: 0; width: 100%; height: calc(100% - 32px); }
-.tap-frame-crown > svg, .tap-frame-brow > svg, .tap-frame-sideEye > svg,
-.tap-frame-underEye > svg, .tap-frame-nose > svg, .tap-frame-chin > svg { left: 20px; width: calc(100% - 40px); }
-
-/* V3 contact design gate: photographic anatomy with one action per phase. */
-.tap-photo-overview { mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 68%, transparent); }
-.tap-intro-art:has(.tap-photo-overview) { margin-top: 5px; margin-bottom: -5px; height: clamp(220px, 29dvh, 255px); }
-.tap-contact-round .tap-round-meta { letter-spacing: 1.3px; font-size: 10px; }
-.tap-contact-round .tap-round-title h1 { font: 400 29px/1.1 'EB Garamond', serif; margin-top: 11px; }
-.tap-contact-round .tap-main-art { min-height: 400px; padding-bottom: 115px; margin-top: 0; }
-.tap-contact-round .tap-main-art>svg { left: 0; width: 100%; height: calc(100% - 75px); mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 70%, transparent); }
-.tap-contact-action { position: absolute; bottom: 0; left: 15px; right: 15px; text-align: left; min-height: 116px; }
-.tap-contact-action h2 { font: 400 35px/1.02 'EB Garamond', serif; letter-spacing: -.3px; margin: 0; max-width: 285px; }
-.tap-contact-action p { color: #c4ccbd; font-size: 13px; margin: 10px 0 0; }
-.tap-contact-rhythm { display: flex; align-items: center; gap: 8px; height: 15px; margin-top: 13px; }
-.tap-contact-rhythm span { width: 7px; height: 7px; border-radius: 50%; background: #e8c796; opacity: .3; }
-.tap-contact-rhythm span:first-child { opacity: 1; box-shadow: 0 0 0 5px #e8c79612; }
-.tap-contact-round .tap-cue { text-align: left; min-height: 60px; margin-top: 3px; }
-.tap-contact-round .tap-cue p { margin-left: 0; font-size: 26px; }
-.tap-contact-round .tap-cue-label { font-size: 9px; }
-.tap-controls .tap-pause { border: 0!important; border-radius: 0; min-height: 44px!important; padding-left: 0; flex: 0 0 auto; gap: 12px; font-size: 13px; color: #c9d2c4!important; }
-.tap-controls .tap-pause svg { width: 16px; height: 16px; stroke-width: 1.4; }
-.tap-controls { justify-content: space-between; }
-.tap-stop { font-size: 13px!important; }
-@media (max-height: 740px) {
-  .tap-contact-round .tap-main-art { min-height: 330px; }
-  .tap-contact-action { min-height: 104px; }
-  .tap-contact-action h2 { font-size: 31px; }
-  .tap-contact-round .tap-cue { min-height: 51px; }
-}
-@media (max-width: 350px) {
-  .tap-contact-round .tap-main-art { min-height: 310px; }
-  .tap-contact-action h2 { font-size: 30px; max-width: 240px; }
-  .tap-contact-action p { font-size: 12px; }
-  .tap-contact-round .tap-cue p { font-size: 24px; }
-}
-.tap-intro-art:has(.tap-photo-overview), .tap-reveal-art:has(.tap-photo-overview) { display: flex; justify-content: center; }
-.tap-photo-overview { width: auto; max-width: 100%; aspect-ratio: 1024 / 1160; }
-.tap-photo-overview, .tap-contact-round .tap-main-art>svg {
-  mask-image: linear-gradient(to right, transparent, #000 13%, #000 87%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 73%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-}
-
-/* A failed photograph leaves room for its accessible placement fallback. */
-.tap-main-art .tap-image-error { position: absolute; top: 27%; left: 15px; right: 15px; max-width: 275px; margin: 0; color: #e5d2ac; font-size: 13px; line-height: 1.5; }
+.tap-rest-thread {display:flex;gap:6px;margin-top:18px;height:2px;}
+.tap-rest-thread span {flex:1;background:#e2c08b9c;border-radius:2px;}
+.tap-result-route {margin-top:14px!important;color:#e3d6bc;font-size:11px;}
+.tap-result-route span {color:var(--tap-gold);margin:0 7px;}
