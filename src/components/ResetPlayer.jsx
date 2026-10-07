@@ -78,6 +78,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
   const [stepsDone, setStepsDone] = useState(groundingResume?.step ?? boxResume?.step ?? 0);
   const transitionTimer = useRef(null);
   const [boxFeedback, setBoxFeedback] = useState(boxResume?.feedback || null);
+  const [showBoxFeedback,setShowBoxFeedback] = useState(Boolean(boxResume?.feedback) && boxResume?.feedbackVisible!==false);
   const [boxHelpfulness,setBoxHelpfulness] = useState(boxResume?.helpfulness || null);
   const boxFeedbackSent = useRef(false);
 
@@ -120,16 +121,17 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
     return ()=>cancelAnimationFrame(frame);
   },[isGroundingV2,stepIndex,showGroundingFeedback,groundingFeedbackStep]);
 
-  useJourneyScreenHistory(isGroundingV2 || isBoxV2 ? iv.id : "inactive-reset-player", isGroundingV2 ? showGroundingFeedback ? `feedback:${groundingFeedbackStep}` : `sense:${stepIndex}` : isBoxV2 ? `practice:${stepIndex}` : null, screen => {
+  useJourneyScreenHistory(isGroundingV2 || isBoxV2 ? iv.id : "inactive-reset-player", isGroundingV2 ? showGroundingFeedback ? `feedback:${groundingFeedbackStep}` : `sense:${stepIndex}` : isBoxV2 ? showBoxFeedback ? "feedback" : `practice:${stepIndex}` : null, screen => {
     setRunning(false);
+    if (isBoxV2 && screen === "feedback") {setShowBoxFeedback(Boolean(boxFeedback));return;}
     if (isGroundingV2 && screen.startsWith("feedback:")) { setShowGroundingFeedback(true); setGroundingFeedbackStep(screen.endsWith("helpfulness")?"helpfulness":"presence"); }
-    else if (screen.startsWith("sense:") || screen.startsWith("practice:")) { const next=Number(screen.split(":")[1]); if (Number.isInteger(next)&&next>=0&&next<(iv?.steps.length||0)) {setStepIndex(next);setShowGroundingFeedback(false);} }
+    else if (screen.startsWith("sense:") || screen.startsWith("practice:")) { const next=Number(screen.split(":")[1]); if (Number.isInteger(next)&&next>=0&&next<(iv?.steps.length||0)) {setStepIndex(next);setShowGroundingFeedback(false);setShowBoxFeedback(false);} }
   });
 
   useEffect(() => {
     if (!isBoxV2 || pathway.length!==1 || !sessionId) return;
-    setBoxSaved(writeBoxPosition(globalThis.history,{sessionId,step:stepIndex,elapsed,clockElapsed:boxClock.current,feedback:boxFeedback,helpfulness:boxHelpfulness},sessionId));
-  },[isBoxV2,pathway.length,sessionId,stepIndex,elapsed,boxFeedback,boxHelpfulness]);
+    setBoxSaved(writeBoxPosition(globalThis.history,{sessionId,step:stepIndex,elapsed,clockElapsed:boxClock.current,feedback:boxFeedback,feedbackVisible:showBoxFeedback,helpfulness:boxHelpfulness},sessionId));
+  },[isBoxV2,pathway.length,sessionId,stepIndex,elapsed,boxFeedback,showBoxFeedback,boxHelpfulness]);
 
   // ---- narration (natural guide voice) ----
   const { speak, stop: stopVoice, pause: pauseVoice, resume: resumeVoice, preload } = useGuideVoice();
@@ -283,14 +285,15 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
   }, [running, transition, ivIndex, stepIndex, isGroundingV2, narrate, narrationEnded, isPMRV2]);
 
   const finishBoxSequence = useCallback((exitReason = "completed") => {
-    if (boxFeedback) return;
+    if (showBoxFeedback) return;
     const total = iv.steps.reduce((sum, item) => sum + item.holdSec, 0);
     const completed = iv.steps.slice(0, stepIndex).reduce((sum, item) => sum + item.holdSec, 0)
       + Math.min(elapsed, step?.holdSec || 0);
+    setShowBoxFeedback(true);
     setBoxFeedback({ exitReason, completedPercentage: exitReason === "completed" ? 1 : Math.min(0.99, completed / total) });
     setRunning(false);
     stopVoice();
-  }, [boxFeedback, iv, stepIndex, elapsed, step, stopVoice]);
+  }, [showBoxFeedback, iv, stepIndex, elapsed, step, stopVoice]);
 
   const submitBoxFeedback = (helpfulness) => {
     if (!boxFeedback || boxFeedbackSent.current) return;
@@ -649,7 +652,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
       {/* stage */}
       <div ref={groundingContent} className={`relative flex min-h-0 flex-1 flex-col items-center ${isBoxV2 || isGroundingV2 ? "justify-start" : "justify-center"} overflow-x-hidden overflow-y-auto overscroll-contain py-2 ${isPMRV2 ? "px-4 sm:px-6" : "px-4 sm:px-6"}`}>
         <AnimatePresence mode="wait">
-          {boxFeedback ? (
+          {showBoxFeedback ? (
             <BoxBreathingV2Feedback key="box-feedback" answer={boxHelpfulness} onAnswer={setBoxHelpfulness} onContinue={submitBoxFeedback} />
           ) : isGroundingV2 && showGroundingFeedback ? (
             <GroundingFeedback key="grounding-feedback" step={groundingFeedbackStep} onStep={setGroundingFeedbackStep} feedback={groundingPresence} helpfulness={groundingHelpfulness} onFeedback={setGroundingPresence} onHelpfulness={setGroundingHelpfulness} onComplete={completeGrounding} />
@@ -771,7 +774,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         </AnimatePresence>
       </div>
 
-      {isBoxV2 && boxResume && !boxFeedback && !running && <p role="status" className="relative px-5 text-center text-sm text-cream">Your place is back, paused. Choose Play when ready.</p>}
+      {isBoxV2 && boxResume && !showBoxFeedback && !running && <p role="status" className="relative px-5 text-center text-sm text-cream">Your place is back, paused. Choose Play when ready.</p>}
       {isBoxV2 && !boxSaved && <p role="status" className="relative px-5 text-center text-sm text-cream">This tab could not remember your place. Keep it open; refresh may lose your progress.</p>}
       {isGroundingV2 && !groundingSaved && <p role="status" className="relative px-5 text-center text-sm">This tab could not remember your grounding place. Your current practice is still here; refresh may lose it.</p>}
       {isGroundingV2 && groundingResume && !showGroundingFeedback && !running && <p role="status" className="relative px-5 text-center text-sm">Your chosen sense is back, paused. Choose Play when ready.</p>}
@@ -780,7 +783,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         {!isLastStep && <button type="button" className="min-h-14 w-full max-w-md rounded-full bg-white/90 px-5 py-3 text-lg font-medium" onClick={goNextStep}>{step?.sense === "taste" ? "Recenter when ready" : "Next sense"}</button>}
         <button type="button" className={isLastStep?"min-h-14 w-full max-w-md rounded-full bg-white/90 px-5 py-3 font-medium":"min-h-11 px-5 py-3 underline"} onClick={finishGrounding}>{isLastStep ? "Finish grounding" : "Finish grounding early"}</button>
       </div>}
-      {!boxFeedback && <>
+      {!showBoxFeedback && <>
       {isBoxV2 && (
         <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
           <p className="text-xs leading-relaxed text-cream/75">
