@@ -1,0 +1,150 @@
+{
+  "passed": [
+    "390px compiled actual /tara-tactician→/reset route: visible primary action, fonts/art, named words, two explicit practice beats, save/leave/reopen, support/Back/refresh, truthful reflection and next-use plan, one private-safe completed session and no duplicate on revisit",
+    "320px compiled actual /tara-tactician→/reset route: visible primary action, fonts/art, named words, two explicit practice beats, save/leave/reopen, support/Back/refresh, truthful reflection and next-use plan, one private-safe completed session and no duplicate on revisit"
+  ],
+  "pageErrors": [],
+  "failedRequests": [],
+  "navigationCancellations": [
+    {
+      "url": "http://127.0.0.1:5203/media/brand/mentation-primary.png",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:5203/audio/home-ambient.mp3",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:5203/home.html",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:5203/audio/home-ambient.mp3",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "externalRequests": [],
+  "captures": [
+    {
+      "file": "production-entry-390.png",
+      "bytes": 228692,
+      "sha256": "80d43c3ea3d773fba925b6c6417b33542783057cc1366d0e228a62e17d73339c",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 879
+      }
+    },
+    {
+      "file": "production-pocket-390.png",
+      "bytes": 202401,
+      "sha256": "3c413236045d03f0d73c0889114d4e2e4532c8940104dc897902ff3f382e78e4",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1031
+      }
+    },
+    {
+      "file": "production-live-390.png",
+      "bytes": 166423,
+      "sha256": "e96fbfb2b1eee9bea6b3c55abaf5ab0acd4b868495761fb26aef3101a3541d2c",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 960
+      }
+    },
+    {
+      "file": "production-reflection-390.png",
+      "bytes": 104692,
+      "sha256": "b944113d88a8848dbab36e938ee149c5c96bf9e8f2def6dc18154701293e9a73",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      }
+    },
+    {
+      "file": "production-takeaway-390.png",
+      "bytes": 122261,
+      "sha256": "55f0d435ed40abccd24852ed87c9eeae7e75adafb26e5681f84f02379e253a43",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      }
+    },
+    {
+      "file": "production-entry-320.png",
+      "bytes": 270228,
+      "sha256": "5b9c0095172815f57de83b5b0c41b97f6c36a9e6768d1a58b275eda1e42930af",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1244
+      }
+    },
+    {
+      "file": "production-pocket-320.png",
+      "bytes": 267913,
+      "sha256": "a1b62ba02f6b3fde3fb3c0c57a34bf36b83334c6c657d82b82fb71ccd6c4d5e7",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1535
+      }
+    },
+    {
+      "file": "production-live-320.png",
+      "bytes": 200128,
+      "sha256": "19553b18b382367bde9f249800db6e8547fb93d045e3f9f6d808bf92456bf5da",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1316
+      }
+    },
+    {
+      "file": "production-reflection-320.png",
+      "bytes": 138208,
+      "sha256": "e6499c65142ea8c32a07b686dac5bea8e91dcca0f371631147ae11212cbc19d1",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1083
+      }
+    },
+    {
+      "file": "production-takeaway-320.png",
+      "bytes": 171531,
+      "sha256": "02e8e62538c30d251d1b73c93e872b3c69032194ec56c44a113dc87ef0ff3c6d",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1264
+      }
+    }
+  ],
+  "fixtureProvenance": "Synthetic automated user choices only; no real user data or claimed real-world result."
+}

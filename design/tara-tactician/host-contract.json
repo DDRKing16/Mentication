@@ -1,5 +1,5 @@
 {
-  "status": "Practice-first implementation complete; visual review approved and regression checks passed. Parent owns host integration and release.",
+  "status": "Local guided redesign completed and verified against main a3d2cad; owner review and publication remain separate.",
   "interventionId": "taraTactician",
   "displayName": "Tara Tactician",
   "component": "src/components/tara-tactician/TaraTacticianExperience.jsx",
@@ -60,7 +60,7 @@
       "viewing a previously completed recap"
     ],
     "exit": "onAttemptEvent action=exited then onExit; no forced reflection",
-    "privacy": "No situation, prediction, plan, rehearsal, observation, learning or next-step wording in host outcome or history.state",
+    "privacy": "No situation, prediction, plan, practice words, observation, learning or next-step wording in host outcome or history.state. Confirmed try wordings remain only in private local records/explicit export.",
     "predictionResult": [
       "happened",
       "partly",
@@ -70,31 +70,26 @@
     ]
   },
   "hostRegistration": {
-    "componentImport": "const TaraTacticianExperience = lazy(() => import('@/components/tara-tactician/TaraTacticianExperience'));",
-    "resetOption": "Add a taraTactician Experience branch and catalogue resolution, forwarding existing ResetFlow callbacks.",
-    "standaloneOption": "Register /tara-tactician with a thin host-owned page, normal exit/completion callbacks, and standaloneRouteFor mapping; no iframe is required.",
-    "catalogueOwner": "Parent handles catalogue/router/library entry/takeaway/alternatives and associated invariants together.",
-    "existingInvariant": "Verified main snapshot 6ce9473 has 22 FLAGSHIP_IDS, 19 INTERACTIVE_FLAGSHIP_IDS, 17 active catalogue practices and 19 JOURNEY_EXPERIENCES. The historical evidence library remains 18 items. The old 18-flagship membership warning is superseded.",
-    "coarseOutcome": "Callbacks unchanged. Explicitly allowlist eventStatus and predictionResult enums, legacy predictionComparison enum, and rehearsed boolean if host history needs them; never spread a local record or infer one comparison from the other.",
-    "brandThreshold": "Optional host atmosphere: light pale-aqua surface, teal ink and pink accent; current unknown-ID threshold uses its default atmosphere. Parent owns any brand registration.",
-    "typecheck": "Existing jsconfig includes ResetFlow and transitively imported components; parent import provides integration typechecking. The isolated component was also production-bundled separately.",
-    "verifiedMain": "6ce94730424ba67bb27281fc846ce2bec2606949",
-    "taraFlagshipInvariantUpdate": "If registered as an additional active flagship and journey: registry 22 -> 23, interactive 19 -> 20, active catalogue 17 -> 18, journey coverage 19 -> 20. Keep historical evidence library at 18; include taraTactician in the original-build Unrated evidence exception. Update hardcoded counts in eliteInterventionSystem.test.js and integratedExperiences.test.js and derive coverage from registries where practical.",
-    "preferredResetRegistration": "Register taraTactician in flagshipRegistry and final50Catalog definitions/specs, add it to INTERACTIVE_FLAGSHIP_IDS, lazy-import its component in ResetFlow and add the Experience selector branch before the generic fallback. Existing onAttemptEvent/onComplete/onExit callbacks are compatible.",
-    "journeyRegistration": "Add JOURNEY_EXPERIENCES.taraTactician with a return-to-Tara archive destination and a deliberate leave/return alternative. Tara already has its own confirmed recap, so skipReflection=true should avoid adding a second forced reflection or recap."
+    "verifiedMain": "a3d2cadfd95b565e13d7e23912c35013e08a4a9f",
+    "existingIntegration": "Tara is already registered in ResetFlow, catalogue, /tara-tactician route, saved return, validated export and deletion. No new registration or registry count change is needed.",
+    "componentImport": "Existing lazy import of TaraTacticianExperience and existing ResetFlow callbacks remain compatible.",
+    "coarseOutcome": "Existing enum/boolean allowlist remains unchanged. Never spread the local draft into host history or infer difficulty from prediction result.",
+    "sharedContracts": "This patch changes only Tara-owned files. Dear 2100 gate, host router, shared sound handoff, shared JourneyOptions and secondary alternatives from a3d2cad remain unchanged.",
+    "journeyPlacement": "Tara renders the existing JourneyOptions after main content and save status, as a secondary footer action.",
+    "typecheck": "Full-project typecheck passed with current host import."
   },
   "storage": {
     "key": "mentation.tara-tactician.v1",
     "schemaVersion": 1,
     "contents": "One resumable draft and at most 20 explicitly saved recaps",
     "writeContract": "Read-back verified; failed/unavailable storage leaves editable in-memory state and a truthful error",
-    "resume": "Refresh reopens the saved phase and authored content",
+    "resume": "Refresh restores authored words, selected context, practice progress and phase. Back changes the viewed question without rewinding selected private content or confirmed practice.",
     "delete": "Clear Tara data deletes draft and all recaps; existing app-wide deletion covers mentation. and clears mounted Tara state via its event",
     "integrity": "Unreadable/future-schema data is preserved until the user chooses deletion",
     "completedRecap": "A persisted completionReported flag prevents a normal recap refresh from emitting another completion; saved-recap browsing is review-only. Host session persistence is authoritative if local writes fail.",
-    "exportIntegration": "Current main exportLocalAppData omits the Tara key. Include validated Tara draft/recaps in explicit data export if the host promises export of saved practices.",
-    "savedMemoryIntegration": "Current deleteFlagshipMemory(saved/all) uses explicit SHARED_RETURN_KEYS; include mentation.tara-tactician.v1 there, and notify/unmount the active Tara view when deletion is invoked. Full deleteAllLocalAppData already covers the key and emits the observed sessions-changed signal.",
-    "experienceVersion": "Additive experienceVersion=2 within unchanged schemaVersion=1 container. Missing experienceVersion loads as legacy 1; preserve original difficulty comparisons. New flow uses separate predictionResult. Unsupported experience versions are rejected without overwriting stored data."
+    "exportIntegration": "Existing exportLocalAppData uses loadTara validation and includes current Tara records in explicit device data export.",
+    "savedMemoryIntegration": "Current flagshipMemory SHARED_RETURN_KEYS includes the Tara key and emits mentation:tara-cleared after verified deletion; app-wide deletion is also observed.",
+    "experienceVersion": "Additive experienceVersion=3 in unchanged schemaVersion=1 container. Includes prepareView, bounded two-beat practice responses/current wording/explicit tried flags/confirmed wording snapshots, optional usability and explicit carryChoice. Versions 1 and 2 load without changing original outcomes or inventing confirmed tries; unsupported versions remain protected."
   },
   "visualReference": {
     "branch": "design/tara-reference-20261006-1041",
@@ -103,7 +98,7 @@
     "bytes": 1889393,
     "blob": "3678b9c08c4097ae80d6395626e61311970b6945",
     "pixelsInspectedLocally": true,
-    "chosenTreatment": "Warm ivory/pale aqua and teal editorial design, substantial existing Tara artwork at welcome and preparation/practice transitions. Live mode places the actionable move first and collapses prediction/backup details. One-field editors replace the open worksheet.",
+    "chosenTreatment": "Selected Calm Steps reference adapted into an ivory/aqua character entry, contextual coaching, deliberate tactics, two imagined practice beats, a pocket plan and dark-teal live support. Existing Tara artwork is preserved.",
     "omittedReferenceElements": [
       "handwriting",
       "decorative completed steps",
@@ -113,28 +108,25 @@
       "extra onboarding screens"
     ],
     "asset": "public/media/brand/tara-tactician.webp already exists in base repository; no image edit or new dependency",
-    "checkpoint": "design/tara-tactician/screenshots/practice-first-gate/: 14 screen states, full and viewport PNGs, 390px plus 320px with root text enlarged from 16px to 24px; authored synthetic review fixtures only.",
-    "review": "Independent actual-pixel review approved practice-first gate. Applied sole requested polish: native reflection placeholder is now Choose an answer; unknown action remains available.",
-    "finalProductionCaptures": "design/tara-tactician/verification/: 390px and 320px/150% text live and reflection PNGs, including approved select-placeholder polish."
+    "checkpoint": "guided-redesign/baseline/: 14 baseline rendered states; guided-redesign/after/: 15 final states at 390px and 320px/24px root text, full and viewport PNGs with hashes.",
+    "review": "Actual pixels inspected locally. Previous practice-first approval is historical and does not constitute approval of this new redesign. Qualitative review and limitations are in guided-redesign/review.md.",
+    "finalProductionCaptures": "guided-redesign/verification/main/: 10 actual compiled host screenshots from main a3d2cad plus this local Tara patch, with production-results.json."
   },
   "validation": {
-    "unit": "33 Tara state/storage/tactics/prediction-result/legacy-compatibility tests passed",
-    "browser": "20 isolated browser scenarios passed, with no page errors: two meaningful reveals, explicit rehearsal vs selection, all five prediction-result branches, actual action, legacy draft phases and recap revisit, refresh/native Back, quota error/retry, local and app-wide deletion, failed deletion, large text, reduced motion, keyboard/focus, long wording, and duplicate-completion prevention.",
-    "productionBrowser": "2 production mobile flows passed at 390px and 320px/150% text, with no page errors or failed requests. Assets, fonts, art, practise/return/reflection/save/refresh/finish/revisit tested.",
     "fullProject": {
       "command": "npm test -- --run",
-      "files": 54,
-      "passed": 435,
+      "files": 80,
+      "passed": 652,
       "failed": 0
     },
+    "browser": "30 isolated authored-flow/lifecycle scenarios passed; no page errors. Includes 320px/24px and 390px, all five prediction results, legacy v1/v2 phases, genuine try vs choice, save/resume, Back, keyboard/focus, storage failure/retry and verified deletion.",
+    "productionBrowser": "2 actual compiled /tara-tactician -> /reset mobile flows passed on latest main plus this patch. No page errors, HTTP/request failures or external requests. Browser-aborted local home document/art/ambient loads caused by leaving Home are recorded separately.",
     "lint": "npm run lint passed",
     "typecheck": "npm run typecheck passed",
     "build": "npm run build passed; existing large-chunk warning remains",
-    "isolatedProductionBuild": "Vite build using design/tara-tactician/preview.html input passed, includes Tara and host styles",
     "diffCheck": "git diff --check passed",
-    "evidence": "design/tara-tactician/verification/",
-    "integrationLimit": "This branch does not register Tara in catalogue/router. Parent must validate final combined navigation, memory/export deletion integration and coarse outcome allowlist.",
-    "nativeLimit": "No iOS simulator/device run performed in this Linux executor."
+    "evidence": "guided-redesign/verification/",
+    "nativeLimit": "No iOS simulator/device run in this Linux executor. No usability study, clinical effectiveness test or numeric improvement claim."
   },
-  "release": "Owner-authorized commits and push to codex/tara-tactician only; no main merge or deployment"
+  "release": "Local branch codex/tara-guided-redesign-20261007-main based on a3d2cad. No redesign push, merge, source upload or deployment performed."
 }

@@ -1,0 +1,91 @@
+{
+  "generatedAt": "2026-10-07T01:16:57.583812+00:00",
+  "baseMain": "a3d2cadfd95b565e13d7e23912c35013e08a4a9f",
+  "comparisonBaseline": "e292234f998c34bf76fa32e8cd7485b8ad5d5563",
+  "branch": "codex/tara-guided-redesign-20261007-main",
+  "worktree": "/workspace/Mentication-tara-guided-final",
+  "checks": {
+    "fullProject": {
+      "command": "npm test -- --run",
+      "exitCode": 0,
+      "files": 80,
+      "passed": 652,
+      "failed": 0
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "warning": "Existing minified chunk >500kB warning"
+    },
+    "browser": {
+      "passed": 30,
+      "pageErrors": [],
+      "runtime": "Final worktree Vite dev on 5204; explicit TARA_PREVIEW_URL"
+    },
+    "production": {
+      "passed": 2,
+      "pageErrors": [],
+      "failedRequests": [],
+      "externalRequests": [],
+      "navigationCancellations": [
+        {
+          "url": "http://127.0.0.1:5203/media/brand/mentation-primary.png",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5203/audio/home-ambient.mp3",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5203/home.html",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5203/audio/home-ambient.mp3",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "runtime": "Actual final worktree compiled host /tara-tactician -> /reset on 5203"
+    },
+    "screenshots": {
+      "baselinePNG": 28,
+      "finalFlowPNG": 60,
+      "compiledHostPNG": 10,
+      "hashesVerified": 98,
+      "horizontalOverflow": false
+    }
+  },
+  "sourceHashes": {
+    "src/components/tara-tactician/TaraTacticianExperience.jsx": "0dc2086fc0a8a8e417a167a59132b08bea8bcf9a0c9a439d7d08140870685f3d",
+    "src/lib/taraGuidance.js": "fac7f1e1b27574ab121b1ba3ed5bcbe4778141dfbcb4c303f756213fe9cddb88",
+    "src/lib/taraGuidance.test.js": "d110e8b2da56112d23dd0d5e8d1c42fa95df33177c1d99c670babd5cb0a7155b",
+    "src/lib/taraTacticianState.js": "71a37724edab79743647d6e8af0ab7f4a71a9f580d475a22d3bbb91fe2870f4d",
+    "src/lib/taraTactician.test.js": "cd5840d3b76c9a5e7e2dab233adfe649e795b66bbdb2dfc4ea26e40e32b23061",
+    "src/styles/tara-tactician.css": "f464df9212e2c98dca82549b12bd40b281e04a01066522f9fc768208ae95730f",
+    "scripts/tara-tactician.browser.mjs": "e904fb15f942ec494d6631c45547042f75f9d73b65d657b028b9a14f847f3e81",
+    "scripts/tara-tactician.production.mjs": "034d92f93d97baff91332dad9b5c006f9effd9334909b9f82fc6bff6867faa21",
+    "scripts/tara-tactician.capture.mjs": "c67a2a1344510dfeb0cce20b668f10122b5786a300cb4a1aca776e8d9320e9ef"
+  },
+  "sharedFilesChanged": [],
+  "release": {
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "uploaded": false
+  },
+  "limits": [
+    "No native iOS/device run",
+    "No user study or validated numeric improvement/clinical efficacy claim",
+    "No independent approval of this new redesign",
+    "Earlier full 16-file Library materialization failed; selected Calm Steps reference inspected and used without access workaround"
+  ],
+  "fixtureProvenance": "Authored synthetic interactions and words only; not real user data or real-world outcomes."
+}
