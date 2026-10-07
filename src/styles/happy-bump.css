@@ -8,3 +8,18 @@
 .happy-bump-stage-11 > .fixed.inset-x-0.bottom-0{position:relative;bottom:auto}
 .happy-bump-feedback{width:100%;max-width:32rem;margin:1rem auto 0}
 .happy-bump-feedback small{color:var(--bump-muted)}
+
+/* Long choice/reflection steps must remain tappable above their secondary tools. */
+.happy-bump.intervention-control-shell{padding-bottom:1.25rem}
+.happy-bump > .fixed.inset-x-0.bottom-0{position:relative;bottom:auto;background:none;padding-top:.5rem}
+.happy-bump .happy-bump-content{padding-bottom:1rem}
+.happy-bump .happy-bump-text-input-row input{min-width:0}
+@media(max-height:680px){
+ .happy-bump .happy-bump-content{min-height:0;padding-top:1rem}
+ .happy-bump .happy-bump-walk-ring,.happy-bump .happy-bump-mission-orbit{width:7.5rem;height:7.5rem;margin:.75rem auto}
+}
+.happy-bump-contract>p{margin:0 0 .6rem;color:var(--bump-light);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}
+.happy-bump-contract dl{margin:0;display:grid;gap:.6rem}.happy-bump-contract dt{font-size:.75rem;color:var(--bump-muted)}
+.happy-bump-contract dd{margin:.1rem 0 0;color:var(--bump-ink);font-size:1rem;line-height:1.5;overflow-wrap:anywhere}
+
+.happy-bump-draft-note{max-width:31rem;margin:.7rem auto 0;color:var(--bump-muted);font-size:.8rem;line-height:1.5}
