@@ -1,3 +1,4 @@
+import PMRRoute, { PMRGuideChoice } from './PMRRoute';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import PMRV2Stage from '@/components/PMRV2Stage';
@@ -24,6 +25,7 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
   const [phase, setPhase] = useState('setup');
   const [mode, setMode] = useState('release');
   const [length, setLength] = useState('short');
+  const [guideView, setGuideView] = useState('body');
   const [index, setIndex] = useState(0);
   const [running, setRunning] = useState(true);
   const [audio, setAudio] = useState(!answers?.noAudio && !answers?.discreet && answers?.audio === 'yes');
@@ -62,7 +64,7 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
       outcome: { type: 'pmr', tensionResponse: outcome, mode, length, skippedRegions: skipped, stopped } });
   };
   const palette = paletteForIntervention(intervention, answers?.direction);
-  return <div className="intervention-theme pmr-session" data-intervention-theme={palette.id} style={interventionThemeStyle(palette)}>
+  return <div className="intervention-theme pmr-session" data-guide-view={guideView} data-intervention-theme={palette.id} style={interventionThemeStyle(palette)}>
     <div className="pmr-v2-player-ambient" aria-hidden="true" />
     <header className="pmr-session-header"><button onClick={onExit} aria-label="Exit Progressive Muscle Relaxation">Exit</button><span>Progressive Muscle Relaxation</span></header>
     {phase === 'setup' ? <main className="pmr-session-panel">
@@ -76,11 +78,15 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
         <button aria-pressed={length === 'short'} onClick={() => setLength('short')}>Short · three areas<span>Hands, shoulders, calves and feet.</span></button>
         <button aria-pressed={length === 'full'} onClick={() => setLength('full')}>Full · seven areas<span>The complete body sequence.</span></button>
       </fieldset>
+      <PMRRoute steps={steps} preview />
+      <PMRGuideChoice value={guideView} onChange={setGuideView} />
       <p>About {Math.ceil(steps.reduce((sum, item) => sum + item.holdSec, 0) / 60)} minutes. Breathe normally. Relax, skip or stop whenever you need. Total relaxation is not required.</p>
       <button className="pmr-session-primary" onClick={() => { startedAt.current = Date.now(); setPhase('practice'); }}>Begin {mode === 'release' ? 'release only' : 'gentle tense and release'}</button>
     </main> : phase === 'practice' ? <>
+      <PMRRoute steps={steps} index={index} skipped={skipped} />
       <main className="pmr-session-stage"><Playback step={step} index={index} running={running} audio={audio} onPause={pause} onResume={resume} onNext={advance} released={released} onSkip={skip} /></main>
       <footer className="pmr-session-controls">
+        <PMRGuideChoice value={guideView} onChange={setGuideView} />
         {!running && <p role="status">Paused. Let go of any tension. Continue only if comfortable.</p>}
         <button onClick={() => setRunning(value => !value)} aria-label={running ? 'Pause PMR' : 'Resume PMR'}>{running ? 'Pause' : 'Resume'}</button>
         <button aria-pressed={audio} onClick={() => setAudio(value => !value)} disabled={answers?.noAudio || answers?.discreet}>Audio {audio ? 'on' : 'off'}</button>
