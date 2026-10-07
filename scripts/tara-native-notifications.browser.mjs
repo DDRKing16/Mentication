@@ -42,7 +42,7 @@ async function open({ width = 390, records, path = '/', coldId, permission = 'gr
     const callbacks = new Map();
     let pending = JSON.parse(sessionStorage.getItem('tara-native-queue') || 'null') || (records?.draft?.checkIns?.status === 'scheduled'
       ? [{ id: 41001, extra: { interventionId: 'taraTactician', draftId: records.draft.id } }] : []);
-    const calls = [];
+    const calls = []; let failCancel = 0;
     const persist = () => sessionStorage.setItem('tara-native-queue', JSON.stringify(pending));
     window.webkit = { messageHandlers: { bridge: {} } };
     const methods = ['checkPermissions', 'requestPermissions', 'schedule', 'getPending', 'cancel', 'removeDeliveredNotificationsById', 'removeListener'];
@@ -56,7 +56,7 @@ async function open({ width = 390, records, path = '/', coldId, permission = 'gr
         if (method === 'requestPermissions') { permission = deny ? 'denied' : 'granted'; return { display: permission }; }
         if (method === 'schedule') { pending.push(...options.notifications); persist(); return { notifications: options.notifications }; }
         if (method === 'getPending') return { notifications: pending };
-        if (method === 'cancel') { pending = pending.filter(item => !options.notifications.some(removal => removal.id === item.id)); persist(); }
+        if (method === 'cancel') { if (failCancel > 0) { failCancel -= 1; throw new Error('Synthetic OS cancellation failure'); } pending = pending.filter(item => !options.notifications.some(removal => removal.id === item.id)); persist(); }
         return {};
       },
       nativeCallback: (plugin, method, options, handler) => {
@@ -68,6 +68,7 @@ async function open({ width = 390, records, path = '/', coldId, permission = 'gr
     window.taraNativeMock = { calls, get pending() { return pending; },
       tap: (draftId, id = 41001) => callbacks.get('LocalNotifications:localNotificationActionPerformed')?.({ notification: { id, extra: { interventionId: 'taraTactician', draftId } } }),
       permission: value => { permission = value; },
+      failNextCancel: () => { failCancel = 1; },
       resume: () => callbacks.get('App:appStateChange')?.({ isActive: true }) };
   }, { records, coldId, permission, deny, corrupt });
   const page = await context.newPage(); page.on('pageerror', error => errors.push(error.message));
@@ -158,6 +159,20 @@ try {
     assert.ok((await page.locator('.tara-footer').innerText()).includes('no longer saved'));
     assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null);
     await context.close(); passed.push('App-wide deletion cancels reminders while Tara is unmounted; a late tap leaves data deleted');
+  }
+  {
+    const record = active('failed-stop-plan');
+    const { context, page } = await open({ records: { draft: record, recaps: [] }, path: '/settings' });
+    await page.waitForTimeout(700);
+    await page.evaluate(key => { window.taraNativeMock.failNextCancel(); localStorage.removeItem(key); window.dispatchEvent(new CustomEvent('mentation:sessions-changed')); }, key);
+    await page.getByText('Phone check-ins could not be cleared.', { exact: false }).waitFor();
+    await take(page, 'native-stop-pending');
+    assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null);
+    assert.equal((await native(page)).queue.length, 1);
+    await page.getByRole('button', { name: 'Retry stopping', exact: true }).click();
+    await page.waitForFunction(() => window.taraNativeMock.pending.length === 0);
+    await page.getByText('Phone check-ins could not be cleared.', { exact: false }).waitFor({ state: 'hidden' });
+    await context.close(); passed.push('Failed native cancellation is visible outside Tara and clears only after successful retry; private data remains deleted');
   }
   assert.deepEqual(errors, []);
 } finally {

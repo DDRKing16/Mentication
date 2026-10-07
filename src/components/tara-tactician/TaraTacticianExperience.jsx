@@ -13,9 +13,11 @@ import { choosePracticeResponse, chooseTaraNextStep, confirmPracticeTry, guidanc
 import { clearTara, loadTara, saveTaraDraft, saveTaraRecap } from '@/lib/taraTacticianStorage';
 import { atScreen, GET_THROUGH_TITLE, previousScreen, resumeFromEntry, screenFor } from '@/lib/getThroughFlow';
 import { answerCheckIn, checkInDue, startCheckIns, SUPPORT_FIELDS } from '@/lib/taraSupportPlan';
-import { cancelTaraNotifications, scheduleTaraNotifications, supportsTaraNotifications, verifyTaraNotifications, watchTaraNotificationDeletion } from '@/lib/taraCheckInNotifications';
+import { supportsTaraNotifications, watchTaraNotificationDeletion } from '@/lib/taraCheckInNotifications';
+import { startTaraCheckInDelivery, stopTaraCheckInDelivery as cancelTaraNotifications, verifyTaraCheckInDelivery as verifyTaraNotifications } from '@/lib/taraCheckInDelivery';
+import { webCheckInAvailability } from '@/lib/webCheckIns';
 import { targetForTaraNotification } from '@/lib/taraNotificationRouting';
-import { CheckInQuestion, PocketSupport, SupportPlanQuestion, TaraSupportScreens } from './TaraSupportScreens';
+import { CheckInQuestion, PocketSupport, SupportPlanQuestion, TaraSupportScreens, TaraWebCheckInNotice } from './TaraSupportScreens';
 import '@/styles/tara-tactician.css';
 
 const STAGES = ['Prepare', 'Practise', 'Get through', 'Reflect'];
@@ -112,6 +114,15 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
     return () => { disposed = true; window.removeEventListener('focus', verify); window.removeEventListener('mentation:app-active', verify); document.removeEventListener('visibilitychange', verify); };
   }, [state.id, state.checkIns.startedAt, state.checkIns.status, state.completionReported, reviewOnly]);
   useEffect(() => {
+    const changed = event => {
+      if (reviewOnly || notificationBusyRef.current || supportsTaraNotifications() || !['scheduled', 'unverified'].includes(event.detail?.status)) return;
+      setState(value => value.id !== event.detail.draftId || value.completionReported || !value.checkIns.startedAt || value.checkIns.preference !== 'device' || value.checkIns.status === event.detail.status
+        ? value : { ...value, checkIns: { ...value.checkIns, status: event.detail.status } });
+    };
+    window.addEventListener('mentation:tara-web-delivery', changed);
+    return () => window.removeEventListener('mentation:tara-web-delivery', changed);
+  }, [reviewOnly]);
+  useEffect(() => {
     window.history.replaceState({ ...window.history.state, tara: { id: currentRef.current.id, phase: currentRef.current.phase, screen: screenFor(currentRef.current), key: historyKeyRef.current } }, '');
     const pop = event => {
       if (currentRef.current.completionReported) return;
@@ -187,19 +198,20 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
   const selectMove = id => go(atScreen({...chooseTaraMove(state,id),experienceVersion:3},'move-confirm'));
   const pocket = (input = state) => { const value = input?.schemaVersion === 1 ? input : state; go(atScreen(keepUnpractisedPlan({ ...value, plan: { ...value.plan, do: value.plan.do || '“Let me take a moment.”', spikes: value.plan.spikes || guidanceFor(value).backups[0][2] } }), 'ready')); };
   const practise = (input = state) => { const value = input?.schemaVersion === 1 ? input : state; go(atScreen(startTaraPractice({ ...value, plan: { ...value.plan, do: value.plan.do || '“Let me take a moment.”', spikes: value.plan.spikes || guidanceFor(value).backups[0][2] } }), 'practice-choose')); };
-  const startLive = async () => {
+  const startLive = async (inAppOnly = false) => {
     if (notificationBusyRef.current) return;
     notificationBusyRef.current = true; setNotificationBusy(true); setNotificationError('');
     const activationKey = historyKeyRef.current;
-    let next = atScreen({ ...beginTackle(state), checkIns: startCheckIns(state.checkIns) }, 'live');
+    let next = atScreen({ ...beginTackle(state), checkIns: startCheckIns({ ...state.checkIns, ...(inAppOnly ? { preference: 'in-app' } : {}) }) }, 'live');
     try {
+      if (inAppOnly) await cancelTaraNotifications();
       // Never queue reminders for an unsaved/unresumable plan.
       saveTaraDraft(next);
       if (next.checkIns.preference === 'device') {
         try {
-          const result = await scheduleTaraNotifications(next.id, next.checkIns);
+          const result = await startTaraCheckInDelivery(next.id, next.checkIns);
           next = { ...next, checkIns: { ...next.checkIns, status: result.status } };
-        } catch { next = { ...next, checkIns: { ...next.checkIns, status: 'error' } }; setNotificationError('Phone check-ins could not be queued. Use the check-in here while this plan is open.'); }
+        } catch { next = { ...next, checkIns: { ...next.checkIns, status: 'error' } }; setNotificationError('Background check-ins could not be confirmed. Use the check-in here while this plan is open.'); }
         if (!mountedRef.current || currentRef.current.id !== next.id || historyKeyRef.current !== activationKey) { await cancelTaraNotifications(); return; }
         try { saveTaraDraft(next); } catch (error) { await cancelTaraNotifications(); throw error; }
       }
@@ -258,7 +270,7 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
         {screen === 'practice-choose' && <><p className="tara-practice-cue">{practice.round === 0 ? tactic.cue : guidance.recovery}</p><Answers advance name="practice" items={practiceOptions(state).slice(0, practice.round === 0 ? 2 : 3).map(([id, label, wording]) => [id, label, wording])} value={practice.responses[practice.round]} onChange={id => go(atScreen(choosePracticeResponse(state, id), 'practice-try'))} /><Link onClick={pocket}>Keep my plan without this practice</Link></>}
         {screen === 'practice-try' && <><MoveCard value={practice.wordings[practice.round]} label="Try these words or this action" edit={() => openEditor('practice', 'My practice words')} editLabel="Use my own practice words" /><p className="tara-lead">Try it once, aloud or silently.</p><Action disabled={!practice.wordings[practice.round].trim()} onClick={() => { const tried = confirmPracticeTry(state); go(atScreen(tried, tried.phase === 'ready' ? 'usability' : 'practice-choose')); }}>I tried this</Action><Link onClick={pocket}>Continue without recording a try</Link><Coach><p>{practiceOptions(state).find(([id]) => id === practice.responses[practice.round])?.[3]}</p></Coach></>}
         {screen === 'usability' && <><Answers advance name="usability" items={USABILITY} value={practice.usability} onChange={usability => nextScreen('ready',{ practice: { ...practice, usability } })} /><Link onClick={() => nextScreen('ready')}>Skip this check-in</Link><p className="tara-note">You can continue without choosing an answer.</p></>}
-        {screen === 'ready' && <><MoveCard value={move} label="My way in" edit={() => openEditor('plan.do', 'My first move')} /><Action disabled={notificationBusy} onClick={startLive}>{notificationBusy ? 'Starting my plan…' : state.checkIns.preference === 'device' && supportsTaraNotifications() ? 'Allow phone check-ins & use my plan' : 'Use my plan'}</Action><PocketSupport state={state} onEdit={() => nextScreen('plan-pause')} /><p className="tara-note">{state.checkIns.preference === 'off' ? 'Check-ins are off.' : `Check-ins every ${state.checkIns.intervalMinutes} minutes for ${state.checkIns.durationMinutes} minutes, starting when you use this plan.`}</p>{state.checkIns.preference === 'off' && <Link onClick={() => nextScreen('plan-check-ins')}>Choose check-ins</Link>}<Link onClick={saveAndLeave}>Save plan & leave for now</Link>{saveStatus === 'error' && <Link onClick={() => go(atScreen({ ...beginTackle(state), checkIns: { ...state.checkIns, preference: 'off', status: 'off', startedAt: 0, nextAt: 0 } }, 'live'))}>Use immediate support without check-ins</Link>}<p className="tara-note">{practice.tried.every(Boolean) ? 'You confirmed trying both practice moments.' : state.rehearsed ? 'Earlier practice is recorded; these words remain editable.' : 'No practice try is recorded.'}</p></>}
+        {screen === 'ready' && <><MoveCard value={move} label="My way in" edit={() => openEditor('plan.do', 'My first move')} />{!supportsTaraNotifications() && state.checkIns.preference !== 'off' && <TaraWebCheckInNotice />}<Action disabled={notificationBusy} onClick={() => startLive()}>{notificationBusy ? 'Starting my plan…' : state.checkIns.preference === 'device' && supportsTaraNotifications() ? 'Allow phone check-ins & use my plan' : state.checkIns.preference === 'device' && webCheckInAvailability() === 'ready' ? 'Allow background check-ins & use my plan' : 'Use my plan'}</Action>{!supportsTaraNotifications() && state.checkIns.preference === 'device' && webCheckInAvailability() === 'ready' && <Link onClick={() => startLive(true)}>Use in-app check-ins instead</Link>}<PocketSupport state={state} onEdit={() => nextScreen('plan-pause')} /><p className="tara-note">{state.checkIns.preference === 'off' ? 'Check-ins are off.' : `Check-ins every ${state.checkIns.intervalMinutes} minutes for ${state.checkIns.durationMinutes} minutes, starting when you use this plan.`}</p>{state.checkIns.preference === 'off' && <Link onClick={() => nextScreen('plan-check-ins')}>Choose check-ins</Link>}<Link onClick={saveAndLeave}>Save plan & leave for now</Link>{saveStatus === 'error' && <Link onClick={() => go(atScreen({ ...beginTackle(state), checkIns: { ...state.checkIns, preference: 'off', status: 'off', startedAt: 0, nextAt: 0 } }, 'live'))}>Use immediate support without check-ins</Link>}<p className="tara-note">{practice.tried.every(Boolean) ? 'You confirmed trying both practice moments.' : state.rehearsed ? 'Earlier practice is recorded; these words remain editable.' : 'No practice try is recorded.'}</p></>}
         {['live', 'take-break', 'regulate', 'leave-support', 'help-support', 'affirmation-support', 'check-in'].includes(screen) && <TaraSupportScreens screen={screen} state={state} go={(value, target, answer) => go(atScreen({ ...value, ...(answer ? { checkIns: answerCheckIn(value.checkIns, answer) } : {}) }, target))} onReturn={() => go(atScreen(returnToEvent(state), 'live'))} finishEvent={finishEvent} now={clock} due={checkInDue(state.checkIns, clock)} stopCheckIns={stopCheckIns} notificationBusy={notificationBusy} notificationError={notificationError} />}
         {screen === 'support' && <><MoveCard value={state.support === 'racing' ? state.plan.spikes || tactic.pause : guidance.smaller} label={state.support === 'racing' ? 'Find my words' : 'Make it smaller'} /><Action onClick={() => go(atScreen(returnToEvent(state), 'live'))}>Back to my situation</Action><Coach><p>Use this step, then return to your situation when you choose.</p></Coach></>}
         {screen === 'pace' && <><Answers name="pace" items={[[ 'stay', 'Stay with my plan' ], [ 'pause', 'Step out intentionally' ]]} value={state.paceChoice} onChange={paceChoice => editState({ paceChoice })} /><Action disabled={!state.paceChoice} onClick={() => go(atScreen({ ...returnToEvent(state), ...(state.paceChoice === 'pause' ? { eventStatus: 'stepped-out' } : {}) }, 'live'))}>Continue</Action><Coach><p>You can change the pace without losing your plan.</p></Coach></>}

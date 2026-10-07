@@ -1,35 +1,31 @@
-# Hosted web check-ins — isolated source draft
+# Hosted web check-ins — deployment proposal and source contract
 
 Prepared on 2026-10-07 from verified `origin/main` / remote main
 `fe6d76f9925bdacf5e16ae73986b10252d4ebebd`.
-Branch: `codex/hosted-web-checkins`.
+Infrastructure source branch: `codex/hosted-web-checkins`.
+Integrated review branch: `codex/tara-background-check-ins-20261007`.
 
-**Not deployed, not wired into the app, and actual background delivery has not been verified.**
+**Not deployed; actual background delivery has not been verified.** Tara integration now uses this adapter. See `../tara-background-check-ins/README.md` for the integrated app behavior and validation. Public configuration remains unset.
 No credentials, provider resources, subscriptions, paid services, or application
 external data flows were created. No dependency was added or installed. The
 server entry point deliberately requires the not-yet-approved `web-push` library.
-The existing source task `01a110b7-26dd-7108-8eae-ed1301e4400f` was not interrupted
-or edited. There was no available cross-thread messaging channel; this document
-is the explicit integration contract for its owner and the parent.
 
 ## Ownership and integration contract
 
-All changes are additive files. No changes to native notification handling,
-`taraCheckInNotifications.js`, Tara components, App boot/routing, manifest,
-package manifests, or existing Render configuration. Native routing and the Tara
-component remain owned by the other task. The parent should integrate these new
-exports after reconciling that task's changes:
+The hosted infrastructure consists of additive files. The integrated app adds
+Tara provider selection, boot/tap routing, setup wording, cancellation ownership
+and status messages; see the integrated handoff for those changes. Manifest,
+package dependencies and Render configuration are unchanged.
 
-1. **Browser-only ready screen slot:** render
-   `src/components/web-checkins/WebCheckInSetup.jsx`, outside native Capacitor.
-   `getPlan()` must synchronously create and locally persist the same active draft
-   used by the journey, then return `{ draftId: draft.id, checkIns }`.
-   `checkIns` must contain fresh `startedAt`, `endsAt`, and `intervalMinutes`.
-   Use existing `startCheckIns` logic; do not pass situation/plan text. Set
-   `preference: 'device'`. `onStatus({status})` saves the result to the local draft.
-   Do not call a second native permission/schedule action on web, and do not
-   await network/practice work before the explicit permission call. The component
-   immediately calls `startWebCheckIns` from its click handler.
+1. **Browser ready-screen action:** Tara keeps its existing primary action and
+   disclosure rather than adding another required setup screen. That action
+   synchronously saves the active draft with fresh `startedAt`, `endsAt` and
+   `intervalMinutes`, then calls `startWebCheckIns` through
+   `taraCheckInDelivery.js`. It passes only the local draft ID and timing, never
+   situation/plan text. The browser permission call occurs before any async work.
+   `WebCheckInSetup.jsx` remains an optional reusable setup component; the Tara
+   flow uses its own action and `TaraWebCheckInNotice` with the same requirements.
+   Status is saved to the draft; non-scheduled results retain foreground support.
 2. **Provider selection:** native continues with existing exports. Browser uses
    `startWebCheckIns`, `cancelWebCheckIns`, `verifyWebCheckIns` from
    `src/lib/webCheckIns.js`. `scheduled` means server queue acceptance, not a

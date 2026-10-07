@@ -10,6 +10,8 @@ export const supportsTaraNotifications = () => Capacitor.isNativePlatform();
 let watchingDeletion = false;
 let pendingCleanup = Promise.resolve();
 let routingPromise = null;
+let stopFailure = false;
+export const taraNativeStopFailed = () => stopFailure;
 // Capacitor retains cold-start notification actions until this boot listener consumes them.
 // It survives route changes and is installed before a journey is mounted.
 export function initializeTaraNotificationRouting() {
@@ -29,11 +31,15 @@ export function watchTaraNotificationDeletion() {
   watchingDeletion = true;
   initializeTaraNotificationRouting();
   const changed = () => {
+    initializeTaraNotificationRouting(); // Retry a transient bridge failure on resume.
     try {
       const raw = localStorage.getItem('mentation.tara-tactician.v1');
       const draft = raw === null ? null : JSON.parse(raw).draft;
       if (!draft || draft.completionReported || draft.eventStatus !== 'in-progress' || !draft.checkIns?.startedAt || draft.checkIns?.endsAt < Date.now() || draft.checkIns?.status === 'ended' || draft.checkIns?.preference === 'off') {
-        pendingCleanup = pendingCleanup.then(() => cancelTaraNotifications()).catch(() => window.dispatchEvent(new CustomEvent('mentation:tara-notification-error')));
+        pendingCleanup = pendingCleanup.then(() => cancelTaraNotifications()).catch(() => {
+          stopFailure = true;
+          window.dispatchEvent(new CustomEvent('mentation:tara-notification-error'));
+        });
       }
     } catch { /* Preserve unreadable data and its ownership until the user clears it. */ }
   };
@@ -52,6 +58,8 @@ export async function cancelTaraNotifications(api) {
   await client.cancel({ notifications: TARA_NOTIFICATION_IDS.map(id => ({ id })) });
   // Cancel means cancel pending; remove our delivered copies as well, never another journey's.
   await client.removeDeliveredNotificationsById({ ids: TARA_NOTIFICATION_IDS });
+  stopFailure = false;
+  if (supportsTaraNotifications() && typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('mentation:tara-notifications-stopped'));
 }
 export function notificationsForPlan(draftId, checkIns, now = Date.now()) {
   if (!validTaraPlanId(draftId) || checkIns.preference !== 'device' || !checkIns.startedAt || checkIns.endsAt <= now) return [];
