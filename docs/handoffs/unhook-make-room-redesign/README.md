@@ -6,7 +6,7 @@ The two practices now teach an action a person can repeat outside the app. Their
 
 ## Inspect the actual comparison
 
-Before captures came from the full integrated Library journeys on the exact published baseline, before applying the patch. After captures came from the same Library entry through the final redesigned code, with stage assertions. Screenshots are browser captures, not design mockups. The comparison images simply place those screenshots beside each other.
+Before captures came from the full integrated Library journeys on the exact published baseline, using its production build. After captures came from the same Library entry through the final redesigned code, using the redesign's production build, with stage and loaded-font assertions. Screenshots are browser captures, not design mockups. The comparison images simply place those screenshots beside each other.
 
 - [Unhook: before → framing → return](unhook-comparison.png)
 - [Make Room: before → allowing → useful step](makeRoom-comparison.png)
@@ -47,7 +47,7 @@ All new interface prose, progression and CSS are original. No WHO exercise text,
 - Aggregate: **80 test files / 647 tests passed**; lint, type checking, production build and V3 recommendation verification passed. The production build retains its existing large-chunk advisory.
 - Integrated browser: Unhook and Make Room at **320 and 390 px**, plus four genuine 320 px long-input normal/enlarged cases; zero uncaught page errors. The existing aggregate care verifier now runs Self-Compassion's original journey and delegates these two updated journeys to their own verifier.
 - Self-Compassion: **320, 390 and 430 px** journeys passed with the new stylesheet also present; ratings, resume, alternatives, save/return/delete, stopping/repeat, keyboard, reduced motion, large text, high contrast and storage retries.
-- Run with Vite running: `CARE_PREVIEW_URL=http://localhost:5177 node scripts/verify-care-practices.cjs`. Playwright/Chromium are verification tooling, not new application dependencies. Run just the two redesigned practices with `scripts/verify-experiential-care.cjs`.
+- Run with a production preview running: `CARE_PREVIEW_URL=http://localhost:5178 node scripts/verify-care-practices.cjs`. Use `npm run build` then `npm run preview -- --port 5178`; production preview also avoids Vite filesystem restrictions when dependencies are symlinked across worktrees. Playwright/Chromium are verification tooling, not new application dependencies. Run just the two redesigned practices with `scripts/verify-experiential-care.cjs`.
 - Stable experience IDs and default exports remain `unhook` / `UnhookExperience` and `makeRoom` / `MakeRoomExperience`, accepting the same host props and using the same completion callbacks. **No registration or migration is required.**
 - Scope: two experience wrappers, isolated `experiential-care/` components/styles, `experientialCare.js` and its tests, browser verification and this evidence. No shared application infrastructure edits.
 

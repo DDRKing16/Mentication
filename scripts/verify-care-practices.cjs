@@ -25,6 +25,8 @@ async function start(p,id){
   await p.locator(`[data-care="${id}"]`).waitFor();
   // Exercise Self-Compassion with the new stylesheet present, as after visiting either redesigned practice.
   await p.addStyleTag({path:path.resolve(__dirname,'../src/components/experiential-care/experiential-care.css')});
+  await p.evaluate(()=>document.fonts.ready);
+  assert.equal(await p.evaluate(()=>['EB Garamond','Hanken Grotesk'].every(family=>[...document.fonts].some(face=>face.family===family&&face.status==='loaded'))),true);
   await p.getByRole('button',{name:'Begin',exact:true}).click({trial:true});
 }
 async function baseline(p,value){
