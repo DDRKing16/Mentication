@@ -1,16 +1,18 @@
-const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright-core/index.mjs');
-import { writeFileSync,readFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
-const browser=await chromium.launch({executablePath:process.env.CHROME_PATH || '/usr/bin/chromium',headless:true,args:['--no-sandbox']});
-const dir=process.env.TARA_CAPTURE_DIR || 'design/tara-tactician/guided-redesign/after';const errors=[];const captures=[];
-for(const width of [390,320]){
-const context=await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce'});const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(process.env.TARA_PREVIEW_URL || 'http://127.0.0.1:5173/design/tara-tactician/preview.html');if(width===320)await page.addStyleTag({content:'html{font-size:24px!important}'});
-const click=n=>page.getByRole('button',{name:n,exact:true}).click();
-const choice=n=>page.getByRole('button',{name:new RegExp('^'+n)}).click();
-async function capture(name){await page.getByRole('heading',{level:1}).waitFor();await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0)});await page.waitForTimeout(100);const base=`${name}-${width}${width===320?'-large':''}`;const files=[];for(const kind of ['full','viewport']){const file=`${base}-${kind}.png`;await page.screenshot({path:`${dir}/${file}`,fullPage:kind==='full'});const bytes=readFileSync(`${dir}/${file}`);files.push({file,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});}captures.push({name:base,heading:await page.getByRole('heading',{level:1}).innerText(),dimensions:await page.evaluate(()=>({width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,rootFontSize:getComputedStyle(document.documentElement).fontSize})),files});}
-await capture('01-entry');await click('Plan with Tara');await capture('02-situation');await choice('A conversation');await capture('03-challenge');await choice('Holding a boundary');await capture('04-tactics');await choice('Name one clear limit');await capture('05-chosen-move');
-await page.getByText('Make it about my real situation',{exact:true}).click();await click('Name this moment');await page.getByRole('textbox',{name:'Name this moment',exact:true}).fill('A conversation about taking on extra work');await click('Keep this wording');
-await click('Try it with Tara');await capture('06-practice-way-in');await choice('Use my first move');await capture('07-try-response');await click('I tried it — practise a way back');await capture('08-practice-recovery');await choice('Repeat the limit');await click('I tried it — keep my pocket plan');await capture('09-pocket-plan');
-await click('Open live support');await capture('10-live');await choice('Find my words');await capture('11-support');await click('Back to my moment');await click('Return to reflect');await capture('12-actual-action');await choice('Took part in all or some');await capture('13-prediction-result');await choice('Part of it happened');await click('Add what happened (optional)');await page.getByRole('textbox',{name:'What actually happened?',exact:true}).fill('I named one limit and paused. Part of my prediction happened; I do not know the rest yet.');await click('Keep this wording');await click('Keep my reflection');await capture('14-next-use-choice');await choice('Make the next attempt smaller');await capture('15-takeaway');
-await context.close();}
-writeFileSync(`${dir}/capture-manifest.json`,JSON.stringify({mainBase:'a3d2cadfd95b565e13d7e23912c35013e08a4a9f',comparisonBaseline:'e292234f998c34bf76fa32e8cd7485b8ad5d5563',branch:'codex/tara-guided-redesign-20261007-main',captures,fixtures:'Synthetic work-boundary example only. Not user data or a real outcome. All recorded practice/outcome choices are explicit scripted user interactions.',pageErrors:errors},null,2));console.log(JSON.stringify({count:captures.length,pageErrors:errors,dimensions:captures.map(x=>({name:x.name,...x.dimensions}))}));await browser.close();
+import { writeFileSync } from 'node:fs';
+import { browserFor, click, select, assertScreen, captureFor, prepareAndPractise, reflectAndCarry } from './tara-tactician.browser-support.mjs';
+const browser = await browserFor(); const captures = []; const errors = [];
+const directory = process.env.TARA_CAPTURE_DIR || 'design/tara-tactician/one-question/after'; const take = captureFor(directory, captures);
+try {
+ for (const width of [390, 320]) {
+  const context = await browser.newContext({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
+  const page = await context.newPage(); page.on('pageerror', error => errors.push(error.message));
+  await page.goto(process.env.TARA_PREVIEW_URL || 'http://127.0.0.1:5173/design/tara-tactician/preview.html');
+  if (width === 320) await page.addStyleTag({ content: 'html{font-size:24px!important}' });
+  const capture = name => take(page, name + '-' + width + (width === 320 ? '-large' : ''));
+  await prepareAndPractise(page, capture); await click(page, 'Use my plan'); await assertScreen(page, 'live'); await capture('14-live');
+  await select(page, 'Find my words'); await click(page, 'Show support'); await assertScreen(page, 'support'); await capture('15-support'); await click(page, 'Back to my situation');
+  await reflectAndCarry(page, capture); await context.close();
+ }
+ writeFileSync(directory + '/capture-manifest.json', JSON.stringify({ baseMain: 'b4f406c9f3f638bba11d04bebb10df7c60274609', branch: 'codex/get-through-one-question', captures, pageErrors: errors, fixtures: 'Synthetic work-boundary example; explicit authored user choices, not real outcomes.' }, null, 2));
+ console.log(JSON.stringify({ captures: captures.length, pageErrors: errors }));
+} finally { await browser.close(); }

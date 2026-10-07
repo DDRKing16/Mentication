@@ -1,0 +1,206 @@
+{
+  "passed": [
+    "390px compiled actual host route: one prompt/answer group/primary action, two explicit tries, save/leave/resume, support/Back/refresh, actual vs prediction result, explicit saved vs unsaved reflection, one coarse session with nullable intensity and no private words or duplicate",
+    "320px compiled actual host route: one prompt/answer group/primary action, two explicit tries, save/leave/resume, support/Back/refresh, actual vs prediction result, explicit saved vs unsaved reflection, one coarse session with nullable intensity and no private words or duplicate"
+  ],
+  "pageErrors": [],
+  "failedRequests": [],
+  "navigationCancellations": [
+    {
+      "url": "http://127.0.0.1:5211/audio/home-ambient.mp3",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:5211/home.html",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:5211/audio/home-ambient.mp3",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "externalRequests": [],
+  "captures": [
+    {
+      "name": "production-01-entry-390",
+      "prompt": "Let’s get through this",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "production-01-entry-390-full.png",
+          "bytes": 96313,
+          "sha256": "5990460ba21709981c8b88f9729323c00a55ed77c75b73b0a90fbf97c0a551ac"
+        }
+      ]
+    },
+    {
+      "name": "production-08-practice-choice-390",
+      "prompt": "What will you try here?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "production-08-practice-choice-390-full.png",
+          "bytes": 101922,
+          "sha256": "e6ef419c35725d12d0065341034c85b9a2356e5107137fe7329666367714cd1c"
+        }
+      ]
+    },
+    {
+      "name": "production-13-pocket-plan-390",
+      "prompt": "Your plan is ready.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 910
+      },
+      "files": [
+        {
+          "file": "production-13-pocket-plan-390-full.png",
+          "bytes": 108461,
+          "sha256": "1da629cbd0a77e5870cbb1939a583d2d1a49730dcab85de4d3f9b274f29f6bb1"
+        }
+      ]
+    },
+    {
+      "name": "production-16-actual-action-390",
+      "prompt": "What did you actually do?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "production-16-actual-action-390-full.png",
+          "bytes": 85525,
+          "sha256": "0e74709f8d6d8e421f34621f7cfd6094d606bf211aed75911bdade0c1af68767"
+        }
+      ]
+    },
+    {
+      "name": "production-20-save-reflection-390",
+      "prompt": "Keep a saved reflection?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1075
+      },
+      "files": [
+        {
+          "file": "production-20-save-reflection-390-full.png",
+          "bytes": 122341,
+          "sha256": "0ee4bafe32cd4984264faddaa7e94e45170eb33dec6199efb87ff4dff2e8e710"
+        }
+      ]
+    },
+    {
+      "name": "production-01-entry-320",
+      "prompt": "Let’s get through this",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "production-01-entry-320-full.png",
+          "bytes": 84563,
+          "sha256": "3b25dddd89be7d92c3fd94fabecb3a1a3bc2d20d6189a26efaafafbb483463ab"
+        }
+      ]
+    },
+    {
+      "name": "production-08-practice-choice-320",
+      "prompt": "What will you try here?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "production-08-practice-choice-320-full.png",
+          "bytes": 90738,
+          "sha256": "be83624390852168ebbb08ce875a994a45fdad617b080088835ac02e6641db7e"
+        }
+      ]
+    },
+    {
+      "name": "production-13-pocket-plan-320",
+      "prompt": "Your plan is ready.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 906
+      },
+      "files": [
+        {
+          "file": "production-13-pocket-plan-320-full.png",
+          "bytes": 97609,
+          "sha256": "183fe8a71a993aedc5d27059371d59cd783a21d05b7dec9d0c70cb36d80f8886"
+        }
+      ]
+    },
+    {
+      "name": "production-16-actual-action-320",
+      "prompt": "What did you actually do?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "production-16-actual-action-320-full.png",
+          "bytes": 76333,
+          "sha256": "8b682605f6eaf9832edcc8cce3af441579fa32f1106271b648a7fe328132efe3"
+        }
+      ]
+    },
+    {
+      "name": "production-20-save-reflection-320",
+      "prompt": "Keep a saved reflection?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1066
+      },
+      "files": [
+        {
+          "file": "production-20-save-reflection-320-full.png",
+          "bytes": 109662,
+          "sha256": "137cf3f239c8067d7d92ce226869afca66524de8ff6670248bcb0f8e8757ad85"
+        }
+      ]
+    }
+  ],
+  "fixtureProvenance": "Synthetic explicit user actions only, including nullable uncertainty and separate save preference. Not real user data or an observed real-world outcome."
+}

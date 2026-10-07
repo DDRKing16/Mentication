@@ -1,4 +1,5 @@
 import { newTaraPractice } from './taraGuidance';
+import { FLOW_PHASES, screenFor } from './getThroughFlow';
 // Tara uses authored, offline guidance. No generated conversation or inferred outcome.
 export const TARA_ID = 'taraTactician';
 export const PHASES = ['entry', 'prepare', 'plan', 'ready', 'rehearse', 'tackle', 'support', 'reflect', 'recap'];
@@ -25,7 +26,7 @@ const GUIDANCE = {
 };
 export function newTaraState() {
   return { schemaVersion: 1, experienceVersion: 3, practice: newTaraPractice(), carryChoice: '', selectedMoveId: '', rehearsalChoice: '', rehearsalResponse: '', predictionResult: '', id: globalThis.crypto?.randomUUID?.() || `tara-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-    phase: 'entry', prepareView: 'event', entryMode: null, event: '', situation: '', challenge: '', prediction: '', predictionEdited: false,
+    phase: 'entry', flowScreen: 'entry', savePreference: '', actionChoice: '', paceChoice: '', prepareView: 'event', entryMode: null, event: '', situation: '', challenge: '', prediction: '', predictionEdited: false,
     likelihood: '', plan: { mind: '', notice: '', do: '', spikes: '' }, rehearsal: '', rehearsed: false,
     support: '', eventStatus: 'not-started', actualActionConfirmed: false, completionReported: false, actual: '', comparison: '', learning: '', nextStep: '', saved: false };
 }
@@ -92,6 +93,11 @@ export function validateTaraState(raw) {
   state.comparison = COMPARISONS.some(([value]) => value === raw.comparison) ? raw.comparison : '';
   state.support = ['racing', 'overwhelmed', 'step-out'].includes(raw.support) ? raw.support : '';
   state.plan = Object.fromEntries(['mind', 'notice', 'do', 'spikes'].map(key => [key, text(raw.plan?.[key])]));
+  if (raw.flowScreen !== undefined && !Object.hasOwn(FLOW_PHASES, raw.flowScreen)) return null;
+  state.flowScreen = FLOW_PHASES[raw.flowScreen] === state.phase ? raw.flowScreen : screenFor({ ...state, flowScreen: undefined });
+  state.savePreference = ['save', 'skip'].includes(raw.savePreference) ? raw.savePreference : '';
+  state.actionChoice = ['finished', 'stepped-out', 'not-attempted', 'unknown'].includes(raw.actionChoice) ? raw.actionChoice : '';
+  state.paceChoice = ['stay', 'pause'].includes(raw.paceChoice) ? raw.paceChoice : '';
   if (state.phase === 'recap' && (!(state.experienceVersion >= 2 ? state.predictionResult : state.comparison) || !state.actualActionConfirmed || !['finished', 'stepped-out', 'not-attempted', 'unknown'].includes(state.eventStatus))) return null;
   return state;
 }

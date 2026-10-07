@@ -53,7 +53,7 @@ describe('Tara authored planning and two-beat practice', () => {
   it('records usability only when provided and retains authored wording across refresh', () => {
     const store = memory();
     const state = { ...choosePracticeResponse(startTaraPractice(plan()), 'move'), practice: { ...newTaraPractice(), step: 'try', responses: ['move', ''], wordings: ['My long practice wording '.repeat(30), ''], tried: [false, false], triedWordings: ['', ''], usability: 'unsure' } };
-    saveTaraDraft(state, store); expect(loadTara(store).draft).toEqual(state);
+    saveTaraDraft(state, store); expect(loadTara(store).draft).toEqual({ ...state, flowScreen: 'practice-try' });
     expect(loadTara(store).draft.practice.usability).toBe('unsure');
     expect(taraCompletion(state)).not.toHaveProperty('practice');
     expect(taraCompletion(state)).not.toHaveProperty('situation');

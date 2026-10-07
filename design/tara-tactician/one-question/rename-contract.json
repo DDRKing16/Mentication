@@ -1,0 +1,45 @@
+{
+  "displayName": "Let\u2019s get through this",
+  "keep": {
+    "interventionId": "taraTactician",
+    "route": "/tara-tactician",
+    "storageKey": "mentation.tara-tactician.v1",
+    "callbacks": "Existing props, explicit completion and coarse outcome enums unchanged"
+  },
+  "integrationOwnerEdits": [
+    {
+      "file": "src/lib/final50Catalog.js",
+      "field": "taraTactician.name",
+      "value": "Let\u2019s get through this"
+    },
+    {
+      "file": "src/lib/flagshipRegistry.js",
+      "field": "display name in taraTactician tuple",
+      "value": "Let\u2019s get through this"
+    },
+    {
+      "file": "src/lib/journeyExperience.js",
+      "field": "JOURNEY_EXPERIENCES.taraTactician.name",
+      "value": "Let\u2019s get through this"
+    },
+    {
+      "file": "src/lib/journeyExperience.js",
+      "field": "JOURNEY_EXPERIENCES.taraTactician.prompt",
+      "value": "Your explicitly saved reflection and next step are in Let\u2019s get through this. Your unfinished plan is a separate device-local draft."
+    },
+    {
+      "file": "src/pages/ReturnPoints.jsx",
+      "field": "visibleTara saved-work search labels",
+      "value": [
+        "Let\u2019s get through this",
+        "Tara Tactician"
+      ]
+    },
+    {
+      "file": "src/pages/ReturnPoints.jsx",
+      "field": "SavedHeading id=taraTactician",
+      "value": "Let\u2019s get through this \u00b7 saved reflection"
+    }
+  ],
+  "sharedFilesChanged": []
+}

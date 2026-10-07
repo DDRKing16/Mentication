@@ -1,0 +1,700 @@
+{
+  "mainBase": "b4f406c9f3f638bba11d04bebb10df7c60274609",
+  "comparisonBaseline": "b4f406c9f3f638bba11d04bebb10df7c60274609",
+  "branch": "codex/get-through-one-question",
+  "captures": [
+    {
+      "name": "01-entry-390",
+      "heading": "Difficult moment.\nClear next move.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 879,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "01-entry-390-full.png",
+          "bytes": 228896,
+          "sha256": "f12a278190c5f23688a5e4f855e297cfc1be98fc16da67c1578cf9a2faef5ea1"
+        },
+        {
+          "file": "01-entry-390-viewport.png",
+          "bytes": 228526,
+          "sha256": "866d8c2fc0a0c43cd23b5dd01c4874768e596bb3ecb682a7fc76407594a06fdb"
+        }
+      ]
+    },
+    {
+      "name": "02-situation-390",
+      "heading": "What\u2019s coming up?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "02-situation-390-full.png",
+          "bytes": 83164,
+          "sha256": "de50ff9300efc72111725128b0bebfb371d6d8aec07118a1537b547d4857d3bb"
+        },
+        {
+          "file": "02-situation-390-viewport.png",
+          "bytes": 83164,
+          "sha256": "de50ff9300efc72111725128b0bebfb371d6d8aec07118a1537b547d4857d3bb"
+        }
+      ]
+    },
+    {
+      "name": "03-challenge-390",
+      "heading": "What feels difficult?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "03-challenge-390-full.png",
+          "bytes": 83458,
+          "sha256": "2a50e6dc1d4953fa5c303730ecf555cb2f2cdb0cd7507e8b9563d298fbad5b07"
+        },
+        {
+          "file": "03-challenge-390-viewport.png",
+          "bytes": 83458,
+          "sha256": "2a50e6dc1d4953fa5c303730ecf555cb2f2cdb0cd7507e8b9563d298fbad5b07"
+        }
+      ]
+    },
+    {
+      "name": "04-tactics-390",
+      "heading": "Choose your way in.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 926,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "04-tactics-390-full.png",
+          "bytes": 114975,
+          "sha256": "692e8980ba0a8715c7353019514fe535e3119d49578c3052fffa22346c91db6f"
+        },
+        {
+          "file": "04-tactics-390-viewport.png",
+          "bytes": 111851,
+          "sha256": "47e8d7b38f36182a0a05ddfa98957375ae2c1ba8e974a636e97e2622b3c87da2"
+        }
+      ]
+    },
+    {
+      "name": "05-chosen-move-390",
+      "heading": "Choose your way in.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 913,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "05-chosen-move-390-full.png",
+          "bytes": 174924,
+          "sha256": "681b46df3fb4bc8158a5435db857e6d8a72d8fa4548507cf4fce1a16075a1ffb"
+        },
+        {
+          "file": "05-chosen-move-390-viewport.png",
+          "bytes": 171948,
+          "sha256": "6233ea40cd7b2d8cadeae36accc033b7df0202aaf53e0f17a5bc9546195fa455"
+        }
+      ]
+    },
+    {
+      "name": "06-practice-way-in-390",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 909,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "06-practice-way-in-390-full.png",
+          "bytes": 138190,
+          "sha256": "b4ee70880f8b61066ed4ed39baf66d3fc9f85e6fe43100d820b243abaed37bea"
+        },
+        {
+          "file": "06-practice-way-in-390-viewport.png",
+          "bytes": 135497,
+          "sha256": "4d43c782eac9d6864eeafc1ed9e2f08aeb1516f18ef5273e8fc2885d3fdbed13"
+        }
+      ]
+    },
+    {
+      "name": "07-try-response-390",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 888,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "07-try-response-390-full.png",
+          "bytes": 139294,
+          "sha256": "38f50fb4c87477cc555f6b3acfdc2faf1d84e602893c34f072b4509d64bcdcaa"
+        },
+        {
+          "file": "07-try-response-390-viewport.png",
+          "bytes": 138665,
+          "sha256": "638988024720cbbdddfc16394b56601015ae57113a65483d31b7767abf7e5323"
+        }
+      ]
+    },
+    {
+      "name": "08-practice-recovery-390",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 973,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "08-practice-recovery-390-full.png",
+          "bytes": 180106,
+          "sha256": "92f0429ceab20a2acefd3d7f864102765751f94d0ce74163f550401619826752"
+        },
+        {
+          "file": "08-practice-recovery-390-viewport.png",
+          "bytes": 172335,
+          "sha256": "006a798bb3acee337462c4a378ee671dafe40e90cb75d9769d53f771e995c6df"
+        }
+      ]
+    },
+    {
+      "name": "09-pocket-plan-390",
+      "heading": "Your pocket plan.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 1064,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "09-pocket-plan-390-full.png",
+          "bytes": 163070,
+          "sha256": "18a6704ac1484b4e4245f0640ebf43b04eb1fb808551f63de10e97e508508a6c"
+        },
+        {
+          "file": "09-pocket-plan-390-viewport.png",
+          "bytes": 150804,
+          "sha256": "e12c7a298f12ef8d443e7330a6c702ec8671e315a37a88f8ff6549d72863b487"
+        }
+      ]
+    },
+    {
+      "name": "10-live-390",
+      "heading": "Right now.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 993,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "10-live-390-full.png",
+          "bytes": 175017,
+          "sha256": "12e9e0dc0eb4f00f1134e1a22e67f4b4b3114c4aaa978f0bb30a26fc8fb45c0d"
+        },
+        {
+          "file": "10-live-390-viewport.png",
+          "bytes": 160802,
+          "sha256": "4b4d24d8aaa0575c8253ec1f689ef25961e5f4a53813de7a807bedadcabab55e"
+        }
+      ]
+    },
+    {
+      "name": "11-support-390",
+      "heading": "Find your way back.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "11-support-390-full.png",
+          "bytes": 140344,
+          "sha256": "548f83e2e19e5cfa5da92080ef14d5c7590331599f5dd14e7b82d8a6c054b76c"
+        },
+        {
+          "file": "11-support-390-viewport.png",
+          "bytes": 140344,
+          "sha256": "548f83e2e19e5cfa5da92080ef14d5c7590331599f5dd14e7b82d8a6c054b76c"
+        }
+      ]
+    },
+    {
+      "name": "12-actual-action-390",
+      "heading": "How did it go?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 844,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "12-actual-action-390-full.png",
+          "bytes": 102161,
+          "sha256": "71e8dbba214190ec9fc8df7a1c4ddacc0449a4e73dd115f0ce11913300ab364e"
+        },
+        {
+          "file": "12-actual-action-390-viewport.png",
+          "bytes": 102161,
+          "sha256": "71e8dbba214190ec9fc8df7a1c4ddacc0449a4e73dd115f0ce11913300ab364e"
+        }
+      ]
+    },
+    {
+      "name": "13-prediction-result-390",
+      "heading": "How did it go?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 967,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "13-prediction-result-390-full.png",
+          "bytes": 103581,
+          "sha256": "1029aa3b898d7c565af476ae29060b26e312688454f794af5dd97493c5cf0c11"
+        },
+        {
+          "file": "13-prediction-result-390-viewport.png",
+          "bytes": 97414,
+          "sha256": "039db44faf4e3de823f9e2a52364502ed21ec4c77829e44da11c8b875dcae374"
+        }
+      ]
+    },
+    {
+      "name": "14-next-use-choice-390",
+      "heading": "What comes next.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 1114,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "14-next-use-choice-390-full.png",
+          "bytes": 142838,
+          "sha256": "3a2c6567b87e1a39f3099b07ab9613267d8416d4c7c097c5d65be2b83fc25e30"
+        },
+        {
+          "file": "14-next-use-choice-390-viewport.png",
+          "bytes": 125164,
+          "sha256": "76e5a9d1deea242d7cccd3b626cdc85e113272b06004839d3ea22480985be9f5"
+        }
+      ]
+    },
+    {
+      "name": "15-takeaway-390",
+      "heading": "What comes next.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "scrollHeight": 905,
+        "rootFontSize": "16px"
+      },
+      "files": [
+        {
+          "file": "15-takeaway-390-full.png",
+          "bytes": 187927,
+          "sha256": "952c5ba2d10b81bdccdbc3764acb36f870935cc52b25ffd18f05d5a2e6823ccc"
+        },
+        {
+          "file": "15-takeaway-390-viewport.png",
+          "bytes": 185212,
+          "sha256": "4f39a041ab57a528ccbdbf0f4c77032d4c62d837830a50d6ed440fec44d19597"
+        }
+      ]
+    },
+    {
+      "name": "01-entry-320-large",
+      "heading": "Difficult moment.\nClear next move.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1244,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "01-entry-320-large-full.png",
+          "bytes": 268587,
+          "sha256": "0f8475820c7d0ab2eb561d3fe6335375d8e06f6e771cc163feff78cc3de7c0f5"
+        },
+        {
+          "file": "01-entry-320-large-viewport.png",
+          "bytes": 203362,
+          "sha256": "5143ba87ccc1c87d713e589a84941f032cc11938efb4bd17fc059485b443727b"
+        }
+      ]
+    },
+    {
+      "name": "02-situation-320-large",
+      "heading": "What\u2019s coming up?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 920,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "02-situation-320-large-full.png",
+          "bytes": 139523,
+          "sha256": "8edb49b68f537c3cbf0e52bb7288619a920cc68dda7a741c28796bcb66a80f76"
+        },
+        {
+          "file": "02-situation-320-large-viewport.png",
+          "bytes": 135943,
+          "sha256": "8ac8eeeb164e607ff585c01cb8596bf615ba3859e99e8cb924559e6e07d2928b"
+        }
+      ]
+    },
+    {
+      "name": "03-challenge-320-large",
+      "heading": "What feels difficult?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 844,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "03-challenge-320-large-full.png",
+          "bytes": 90755,
+          "sha256": "26a92651819b87d3528ae35156f0fef31b95c9c60c1c0690e87b9abc2da6c0f8"
+        },
+        {
+          "file": "03-challenge-320-large-viewport.png",
+          "bytes": 90755,
+          "sha256": "26a92651819b87d3528ae35156f0fef31b95c9c60c1c0690e87b9abc2da6c0f8"
+        }
+      ]
+    },
+    {
+      "name": "04-tactics-320-large",
+      "heading": "Choose your way in.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1517,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "04-tactics-320-large-full.png",
+          "bytes": 204357,
+          "sha256": "62f1e92043183323e90c81e64d05851299eb47a4b5eedb8e186c58c9e36d98bb"
+        },
+        {
+          "file": "04-tactics-320-large-viewport.png",
+          "bytes": 145058,
+          "sha256": "3e1a34d1344215e88dbed462ebf2724d5a858d48e17ed3057a36b3260d5c2120"
+        }
+      ]
+    },
+    {
+      "name": "05-chosen-move-320-large",
+      "heading": "Choose your way in.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1418,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "05-chosen-move-320-large-full.png",
+          "bytes": 226264,
+          "sha256": "92c18a6210cfb92aa106d56faf0dc5efe4d7b130d4ec3796f308618e8deb9838"
+        },
+        {
+          "file": "05-chosen-move-320-large-viewport.png",
+          "bytes": 128772,
+          "sha256": "59246f1e67915689188e126d29b7a8e041e312d27c2fa0967e9cbf3e3eab0b8b"
+        }
+      ]
+    },
+    {
+      "name": "06-practice-way-in-320-large",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1425,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "06-practice-way-in-320-large-full.png",
+          "bytes": 191399,
+          "sha256": "4ccbaac5bd05a9f18e0f19bc9c71969c9f732c12d5ac917b71220425435b271d"
+        },
+        {
+          "file": "06-practice-way-in-320-large-viewport.png",
+          "bytes": 153557,
+          "sha256": "d6476db1146bd377a881cfec16984934c41fba58c512df35123727fa808054f3"
+        }
+      ]
+    },
+    {
+      "name": "07-try-response-320-large",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1522,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "07-try-response-320-large-full.png",
+          "bytes": 234511,
+          "sha256": "34b6edc38c012a2e0b244db559d75d96168a1620f65de89246d362351c756bbe"
+        },
+        {
+          "file": "07-try-response-320-large-viewport.png",
+          "bytes": 132332,
+          "sha256": "2197ccd54e723a722bad0f1fed35f2ea9ece16900f1cc29799ef5904e6d4c7c8"
+        }
+      ]
+    },
+    {
+      "name": "08-practice-recovery-320-large",
+      "heading": "Try the moment.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1587,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "08-practice-recovery-320-large-full.png",
+          "bytes": 249572,
+          "sha256": "37c69c8a062f977a995cdb86c6dc3f72a7e22539458987b0c40dcb18eb6c1f1d"
+        },
+        {
+          "file": "08-practice-recovery-320-large-viewport.png",
+          "bytes": 194055,
+          "sha256": "26e6e4010e362953a8b747511da061aaf6e5850fa026ae8eb179ea81d2ddc18b"
+        }
+      ]
+    },
+    {
+      "name": "09-pocket-plan-320-large",
+      "heading": "Your pocket plan.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1619,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "09-pocket-plan-320-large-full.png",
+          "bytes": 228024,
+          "sha256": "e02e7c89f7664ecf6e67f806fdfe12ff4c4f7db9d8c2af13da98b417cf65f354"
+        },
+        {
+          "file": "09-pocket-plan-320-large-viewport.png",
+          "bytes": 145584,
+          "sha256": "da6b8f712f3f4461865414534298d4a7cebfa01349ece6f8103d7af7e93505c9"
+        }
+      ]
+    },
+    {
+      "name": "10-live-320-large",
+      "heading": "Right now.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1400,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "10-live-320-large-full.png",
+          "bytes": 214844,
+          "sha256": "2d9278fb16a60499d931c1d68ce4ac8ffd3d61d40e038c2713cf92982ef41974"
+        },
+        {
+          "file": "10-live-320-large-viewport.png",
+          "bytes": 148260,
+          "sha256": "483f00574af06d16014654fd8f272b087181697b6100be218f7bc2afc03c6844"
+        }
+      ]
+    },
+    {
+      "name": "11-support-320-large",
+      "heading": "Find your way back.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1043,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "11-support-320-large-full.png",
+          "bytes": 163277,
+          "sha256": "6c52ff898ffa0ca1d6ac2051bd7bfaf40ee77a8ea9f4477c6e59cdd535c80f8e"
+        },
+        {
+          "file": "11-support-320-large-viewport.png",
+          "bytes": 147015,
+          "sha256": "939de835354c69c0bb572b3d6e79cdb6522cce91f7160879133a1ddb8c4d97ad"
+        }
+      ]
+    },
+    {
+      "name": "12-actual-action-320-large",
+      "heading": "How did it go?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1148,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "12-actual-action-320-large-full.png",
+          "bytes": 132904,
+          "sha256": "7833482a6efe683d5f7eeb36195fca9ef6bbd64d82824b13ae9179091a9db24c"
+        },
+        {
+          "file": "12-actual-action-320-large-viewport.png",
+          "bytes": 106944,
+          "sha256": "5184485b7d61e288871c4e67a958da2b11d21def8526cdf48ed3f1645fa9da24"
+        }
+      ]
+    },
+    {
+      "name": "13-prediction-result-320-large",
+      "heading": "How did it go?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1297,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "13-prediction-result-320-large-full.png",
+          "bytes": 142012,
+          "sha256": "1bccb4b2b15f061e114eb11cabf5f5a9fd6c957ce4132ca77c224c797e52c5ad"
+        },
+        {
+          "file": "13-prediction-result-320-large-viewport.png",
+          "bytes": 88437,
+          "sha256": "9aa1461425e060bb39607109f1439ddc5645dea5da251495474774d0c6cff605"
+        }
+      ]
+    },
+    {
+      "name": "14-next-use-choice-320-large",
+      "heading": "What comes next.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1763,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "14-next-use-choice-320-large-full.png",
+          "bytes": 201511,
+          "sha256": "aa4fbd5d2fbbc309d18f1f216be662b0c72f04398941441d4c59869650403ee0"
+        },
+        {
+          "file": "14-next-use-choice-320-large-viewport.png",
+          "bytes": 129579,
+          "sha256": "4c249d42d397190628a67944188699c3bbb054e87620684c80e047bcf3cc7f50"
+        }
+      ]
+    },
+    {
+      "name": "15-takeaway-320-large",
+      "heading": "What comes next.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "scrollWidth": 320,
+        "scrollHeight": 1387,
+        "rootFontSize": "24px"
+      },
+      "files": [
+        {
+          "file": "15-takeaway-320-large-full.png",
+          "bytes": 251996,
+          "sha256": "d1460d35360ce6bfd22df5d2d64096253438b1ac3fba4c6ff654d5959ff6dfe7"
+        },
+        {
+          "file": "15-takeaway-320-large-viewport.png",
+          "bytes": 192825,
+          "sha256": "dbd58abbfa41ad960ecf845179f8c54d656f06ff367e47bc89347bd0ee27d6c9"
+        }
+      ]
+    }
+  ],
+  "fixtures": "Synthetic work-boundary example only. Not user data or a real outcome. All recorded practice/outcome choices are explicit scripted user interactions.",
+  "pageErrors": [],
+  "captureStage": "Before any one-question implementation edit; current-main baseline pixels."
+}
