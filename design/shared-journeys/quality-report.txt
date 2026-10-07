@@ -60,9 +60,10 @@ its contract tests, src/styles/discovery.css, scripts/verify-shared-journeys.cjs
 No storage schema, specialist props, session outcome schema, or recommendation
 engine APIs changed. New discovery helpers are consumed only by these pages.
 Navigation supplies no measured starting rating and uses the existing reset
-handoff. Sound starts off for new discovery/plan launches and existing setup
-and practice audio controls remain available; reconcile this with the release's
-sound handoff during integration.
+handoff. Need-based launches retain their quiet default; Library and today's
+plan retain their existing audio-enabled default, and repeats retain recorded
+audio choice when present. Existing setup/practice audio controls stay available.
+Reconcile this with the approved release's sound handoff during integration.
 
 Qualitative review (judgment, not a measured score)
 Visual craft: shared pages now use consistent spacing, type, material and
@@ -90,7 +91,8 @@ Verification
 - node scripts/verify-v3-algorithm.mjs: passed.
 - git diff --check: passed.
 - Browser at BOTH 320x844 and 390x844, reduced motion:
-  chooser selection/change/Back/reload and heading focus; category/search/filter
+  chooser selection/change/Back/reload and heading focus; recommendation
+  opens its correct practice with no measured baseline, and Back restores it; category/search/filter
   and empty-result recovery; Next Easiest Step edit -> one action -> final
   rating skipped (stored null, one session); PMR pause/resume/stop -> skip
   tension answer -> save/update a cue -> final rating skipped -> Return points

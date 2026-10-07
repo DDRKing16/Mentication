@@ -9,13 +9,13 @@
   },
   {
     "width": 320,
-    "check": "Need → Next Easiest Step: edit, action, finish, unanswered final rating",
+    "check": "Library \u2192 Next Easiest Step: edit, action, finish, unanswered final rating",
     "sessions": 1,
     "finalRating": null
   },
   {
     "width": 320,
-    "check": "PMR → pause/resume/stop → optional cue save/update → return/reopen",
+    "check": "PMR \u2192 pause/resume/stop \u2192 optional cue save/update \u2192 return/reopen",
     "notes": 1
   },
   {
@@ -44,13 +44,13 @@
   },
   {
     "width": 390,
-    "check": "Need → Next Easiest Step: edit, action, finish, unanswered final rating",
+    "check": "Library \u2192 Next Easiest Step: edit, action, finish, unanswered final rating",
     "sessions": 1,
     "finalRating": null
   },
   {
     "width": 390,
-    "check": "PMR → pause/resume/stop → optional cue save/update → return/reopen",
+    "check": "PMR \u2192 pause/resume/stop \u2192 optional cue save/update \u2192 return/reopen",
     "notes": 1
   },
   {
