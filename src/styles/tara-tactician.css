@@ -78,3 +78,43 @@
 @media(prefers-reduced-motion:no-preference) { .tara-step { animation:tara-reveal .16s ease-out; } }
 @keyframes tara-reveal { from { opacity:.7; transform:translateY(3px); } to { opacity:1; transform:translateY(0); } }
 .reduce-motion .tara *, .tara[data-reduced-motion] * { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+
+/* The plan is a quiet field notebook; live support becomes a teal pocket companion. */
+.tara-practical-support { --tara-bg:#f7f4e9; --tara-surface:#fffdf7; background:radial-gradient(ellipse at 90% 0,#d8e9df,transparent 65%),var(--tara-bg); }
+.tara-practical-support.tara--live { --tara-bg:#0b343b; --tara-surface:#174b50; background:radial-gradient(ellipse at 100% 0,#1b686a,transparent 75%),var(--tara-bg); }
+.tara-practical-support .tara-heading { border-bottom:0; padding-bottom:0; }
+.tara-practical-support .tara-step { gap:16px; }
+.tara-practical-support .tara-welcome-scene { justify-content:center; background:linear-gradient(145deg,#e2ebdb,#f8f5e9); }
+.tara-practical-support .tara-welcome-scene .practice-illustration { width:90%; }
+.tara-support-guide { display:flex; gap:15px; align-items:center; font-size:.88rem; line-height:1.5; }
+.tara-support-guide img { width:68px; height:82px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 5px 12px #0002); }
+.tara-support-guide .tara-small-label { margin-bottom:6px; }
+.tara-live-actions { display:grid; gap:10px; }
+.tara-live-actions>button { display:flex; align-items:center; gap:14px; width:100%; min-height:76px; padding:15px 16px; border:1px solid #9dcab9; border-radius:7px 22px 22px 7px; color:#103f43; background:#e1f1e5; text-align:left; font-weight:600; }
+.tara-live-actions>button:nth-child(2) { background:#c6e4df; }
+.tara-live-actions>button:nth-child(3) { background:#eee9d8; }
+.tara-live-actions>button>svg { flex-shrink:0; }
+.tara-live-actions>button>span { flex:1; }
+.tara-live-actions small { display:block; margin-top:4px; font-weight:400; color:#35595c; font-size:.79rem; }
+.tara-live-tools { display:flex; flex-wrap:wrap; gap:4px 20px; }
+.tara-support-card { display:grid; gap:14px; padding:21px; border:1px solid var(--tara-line); border-radius:5px 24px 24px 5px; background:linear-gradient(130deg,#edf5e908,#ddeded12); }
+.tara-support-card .tara-small-label { display:flex; align-items:center; gap:8px; }
+.tara-support-card .tara-wording { font-size:1.6rem; line-height:1.3; }
+.tara-pause-scene,.tara-grounding-scene { display:grid; place-items:center; gap:14px; min-height:160px; padding:16px; color:#d7efe2; border:1px solid #80afa44d; border-radius:130px 130px 24px 24px; background:radial-gradient(ellipse at 50% 10%,#548f7e44,transparent 80%); }
+.tara-pause-scene span,.tara-grounding-scene span { font-size:.75rem; letter-spacing:.06em; }
+.tara-grounding-orb { width:84px; height:84px; border-radius:50%; border:1px solid #d6efd6; background:radial-gradient(circle at 40% 35%,#e0eed2,#79b9ab 45%,#345f61); box-shadow:0 0 0 12px #a0d2bd0c,0 0 0 25px #a0d2bd08; }
+.tara-affirmation-scene { display:grid; place-items:center; gap:25px; text-align:center; padding:30px 25px; border-radius:130px 130px 20px 20px; min-height:270px; border:1px solid #a7c4a888; background:linear-gradient(160deg,#466b572e,#9ea38210); }
+.tara-affirmation-scene .tara-wording { font-size:2rem; max-width:20ch; }
+.tara-check-in-explainer { display:flex; align-items:flex-start; gap:14px; color:var(--tara-muted); font-size:.9rem; }
+.tara-check-in-explainer svg { flex-shrink:0; }
+.tara-check-in-status { padding:14px 16px; border-left:2px solid #b3d1bd; background:#e3efe008; font-size:.79rem; }
+.tara-check-in-status .tara-text-button { font-size:.8rem; }
+.tara-practical-support .tara-pocket-details { border:1px solid var(--tara-line); border-radius:6px 20px 20px 6px; padding:0 16px; }
+.tara-practical-support .tara--live .tara-error { color:#63393b; }
+.tara-practical-support .tara-coach img { height:70px; }
+.tara-practical-support .tara-character--coach { width:57px; height:70px; }
+.tara-practical-support[data-flow-screen^=plan-] .tara-eyebrow { color:#686343; }
+.tara-practical-support[data-flow-screen^=plan-] .tara-heading { border-left:3px solid #bfa369; padding-left:14px; }
+@media(max-width:359px) { .tara-support-guide img { width:52px; height:68px; } .tara-live-actions>button { padding:13px 12px; gap:10px; } .tara-support-card { padding:17px; } }
+@media(prefers-reduced-motion:no-preference) { .tara-grounding-orb { animation:tara-steady-light 8s ease-in-out infinite; } }
+@keyframes tara-steady-light { 50% { opacity:.82; } }

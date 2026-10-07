@@ -2,8 +2,11 @@ export const GET_THROUGH_TITLE = 'Let’s get through this';
 export const FLOW_PHASES = {
   entry: 'entry', timing: 'prepare', event: 'prepare', challenge: 'prepare',
   prediction: 'plan', move: 'plan', 'move-confirm': 'plan',
+  'plan-pause': 'plan', 'plan-regulation': 'plan', 'plan-affirmation': 'plan', 'plan-leave': 'plan', 'plan-help': 'plan',
+  'plan-check-ins': 'plan', 'check-in-duration': 'plan',
   'practice-choose': 'rehearse', 'practice-try': 'rehearse', usability: 'ready', ready: 'ready',
   live: 'tackle', support: 'support', pace: 'support',
+  'take-break': 'support', regulate: 'support', 'leave-support': 'support', 'help-support': 'support', 'affirmation-support': 'support', 'check-in': 'support',
   'reflect-action': 'reflect', 'reflect-prediction': 'reflect', 'reflect-observation': 'reflect',
   'next-step': 'recap', recap: 'recap',
 };
@@ -25,6 +28,7 @@ export function atScreen(state, screen) {
 }
 export function resumeFromEntry(state) {
   if (state.actualActionConfirmed) return atScreen(state, state.nextStep || state.savePreference ? 'recap' : state.predictionResult ? 'reflect-observation' : 'reflect-prediction');
+  if (state.eventStatus === 'in-progress') return atScreen(state, 'live');
   if (state.practice.step === 'ready' || state.practice.tried.every(Boolean)) return atScreen(state, 'ready');
   if (state.practice.tried[0] || state.practice.responses[0]) {
     const round = state.practice.tried[0] ? 1 : 0;
@@ -40,7 +44,8 @@ export function previousScreen(state) {
   if (screen === 'practice-choose' && state.practice.round === 1) return atScreen({ ...state, practice: { ...state.practice, round: 0, step: 'try' } }, 'practice-try');
   const previous = { timing: 'entry', event: 'timing', challenge: 'event', prediction: 'challenge', move: 'prediction', 'move-confirm': 'move',
     'practice-choose': 'move-confirm', 'practice-try': 'practice-choose', usability: 'practice-try', ready: state.practice.tried.some(Boolean) ? 'usability' : 'move-confirm',
-    live: state.entryMode === 'live' ? 'timing' : 'ready', support: 'live', pace: 'live',
+    'plan-pause': 'move-confirm', 'plan-regulation': 'plan-pause', 'plan-affirmation': 'plan-regulation', 'plan-leave': 'plan-affirmation', 'plan-help': 'plan-leave', 'plan-check-ins': 'plan-help', 'check-in-duration': 'plan-check-ins',
+    live: state.entryMode === 'live' ? 'timing' : 'ready', support: 'live', pace: 'live', 'take-break': 'live', regulate: 'live', 'leave-support': 'live', 'help-support': 'live', 'affirmation-support': 'live', 'check-in': 'live',
     'reflect-action': 'live', 'reflect-prediction': 'reflect-action', 'reflect-observation': 'reflect-prediction', 'next-step': 'reflect-observation', recap: 'next-step' }[screen];
   const next = previous === 'practice-try' ? { ...state, practice: { ...state.practice, step: 'try' } }
     : previous === 'practice-choose' ? { ...state, practice: { ...state.practice, step: 'choose' } } : state;

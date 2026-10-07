@@ -1,5 +1,6 @@
 import { newTaraPractice } from './taraGuidance';
 import { FLOW_PHASES, screenFor } from './getThroughFlow';
+import { newSupportPlan, newTaraCheckIns, readSupportPlan, readTaraCheckIns } from './taraSupportPlan';
 // Tara uses authored, offline guidance. No generated conversation or inferred outcome.
 export const TARA_ID = 'taraTactician';
 export const PHASES = ['entry', 'prepare', 'plan', 'ready', 'rehearse', 'tackle', 'support', 'reflect', 'recap'];
@@ -28,7 +29,7 @@ export function newTaraState() {
   return { schemaVersion: 1, experienceVersion: 3, practice: newTaraPractice(), carryChoice: '', selectedMoveId: '', rehearsalChoice: '', rehearsalResponse: '', predictionResult: '', id: globalThis.crypto?.randomUUID?.() || `tara-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     phase: 'entry', flowScreen: 'entry', savePreference: '', actionChoice: '', paceChoice: '', prepareView: 'event', entryMode: null, event: '', situation: '', challenge: '', prediction: '', predictionEdited: false,
     likelihood: '', plan: { mind: '', notice: '', do: '', spikes: '' }, rehearsal: '', rehearsed: false,
-    support: '', eventStatus: 'not-started', actualActionConfirmed: false, completionReported: false, actual: '', comparison: '', learning: '', nextStep: '', saved: false };
+    supportPlan: newSupportPlan(), checkIns: newTaraCheckIns(), support: '', eventStatus: 'not-started', actualActionConfirmed: false, completionReported: false, actual: '', comparison: '', learning: '', nextStep: '', saved: false };
 }
 export function chooseEvent(state, event) {
   if (!EVENTS.some(item => item.id === event)) return state;
@@ -66,6 +67,8 @@ export function validateTaraState(raw) {
   }
 
   const state = newTaraState();
+  state.supportPlan = readSupportPlan(raw.supportPlan);
+  state.checkIns = readTaraCheckIns(raw.checkIns);
   for (const key of ['situation', 'prediction', 'rehearsal', 'rehearsalResponse', 'actual', 'learning', 'nextStep']) state[key] = text(raw[key]);
   for (const key of ['predictionEdited', 'rehearsed', 'saved', 'actualActionConfirmed', 'completionReported']) state[key] = raw[key] === true;
   state.experienceVersion = [2, 3].includes(raw.experienceVersion) ? raw.experienceVersion : 1;
