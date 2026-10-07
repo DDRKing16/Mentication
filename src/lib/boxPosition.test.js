@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { boxPosition, writeBoxPosition } from './boxPosition';
 import { createBoxBreathingClock } from './boxBreathingClock';
 import { resetNavigationEntry, freshResetEntry } from './resetNavigation';
-const value={sessionId:'same',step:1,elapsed:12,clockElapsed:12345,helpfulness:'worse',note:'PRIVATE',running:true};
+const value={sessionId:'same',step:1,elapsed:12,clockElapsed:12345,helpfulness:'worse',feedback:{exitReason:'skipped',completedPercentage:0.2},note:'PRIVATE',running:true};
 describe('Box Breathing paused return',()=>{
   it('retains active elapsed time while excluding private words and playback state',()=>{
-    const clean=boxPosition(value,'same');expect(clean.clockElapsed).toBe(12345);expect(clean.helpfulness).toBe('worse');expect(JSON.stringify(clean)).not.toMatch(/PRIVATE|running/);
+    const clean=boxPosition(value,'same');expect(clean.clockElapsed).toBe(12345);expect(clean.helpfulness).toBe('worse');expect(clean.feedback).toEqual({exitReason:'skipped',completedPercentage:0.2});expect(JSON.stringify(clean)).not.toMatch(/PRIVATE|running/);
     const clock=createBoxBreathingClock(4,clean.clockElapsed);expect(clock.tick(900000,false).elapsed).toBe(12345);expect(clock.tick(900001,true).elapsed).toBe(12345);expect(clock.tick(900101,true).elapsed).toBe(12445);
   });
   it('keeps a same-session place through coarse routing and clears it for a new attempt',()=>{
