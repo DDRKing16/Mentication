@@ -16,7 +16,7 @@ export const MOTION_POINTS = {
 
 // A tapered continuous limb: broad upper arm, a rounded elbow, a narrow wrist.
 function forearmContour(side,hand,wrist,scale) {
-  const segments=hand?[[[65,403],[63,346],[72,286],[wrist.x,wrist.y]]]:side?[[[266,295],[293,320],[302,356],[282,360]],[[282,360],[259,365],[249,331],[wrist.x,wrist.y]]]:[[[99,307],[88,323],[70,353],[59,339]],[[59,339],[48,323],[65,216],[wrist.x,wrist.y]]];
+  const segments=hand?[[[65,403],[63,346],[72,286],[wrist.x,wrist.y]]]:side?[[[266,295],[293,320],[302,356],[282,360]],[[282,360],[259,365],[249,331],[wrist.x,wrist.y]]]:[[[99,307],[94,347],[76,451],[56,440]],[[56,440],[35,428],[wrist.x-10,wrist.y+95],[wrist.x,wrist.y]]];
   const left=[],right=[];
   segments.forEach((points,segment)=>{
     for(let i=0;i<=32;i++){
