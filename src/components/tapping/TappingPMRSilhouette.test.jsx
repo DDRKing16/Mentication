@@ -15,6 +15,7 @@ describe('PMR silhouette tapping guide', () => {
     const html = renderToStaticMarkup(<TappingPMRSilhouette point={point}/>);
     expect(html).toContain(TAPPING_BODY_ASSET);
     expect(html).toContain('The light marks the place to tap.');
+    expect(html).toContain('tap-hand-demonstration');
     expect(html).not.toContain('is-tapping');
   });
   it('keeps quiet guides still and gives each selected rhythm its actual animation period', () => {
