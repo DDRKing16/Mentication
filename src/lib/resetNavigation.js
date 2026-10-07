@@ -2,6 +2,7 @@ import { boxPosition } from "./boxPosition.js";
 import { groundingPosition } from "./groundingPosition.js";
 import { resetCompletionSnapshot } from './resetCompletion.js';
 import { captureGoalBaseline, hasGoalBaseline } from './goalAssessment.js';
+import { validTaraPlanId } from './taraNotificationRouting.js';
 
 // Only coarse routing/context data belongs in history.state. Never copy an
 // experience's thought, task, note or transcript into it. Final outcomes use
@@ -24,6 +25,9 @@ export function resetNavigationEntry(entry, answers, phase, session = {}) {
     ...(phase === "questions" ? {reset_question:["goal","distress","time"].includes(entry?.reset_question) ? entry.reset_question : "goal"} : {}),
     reset_session_id: session.id || entry?.reset_session_id,
     reset_started_at: session.startedAt || entry?.reset_started_at,
+    ...(phase === 'guiding' && entry?.pathway?.length === 1 && entry.pathway[0] === 'taraTactician' && validTaraPlanId(entry.taraNotificationPlanId)
+      ? { taraNotificationPlanId: entry.taraNotificationPlanId,
+        taraNotificationRequestId: validTaraPlanId(entry.taraNotificationRequestId) ? entry.taraNotificationRequestId : entry.taraNotificationPlanId } : {}),
     ...(phase==='guiding' && entry?.pathway?.length===1 && entry.pathway[0]==='boxV2' && boxPosition(entry?.reset_box,session.id || entry?.reset_session_id) ? {reset_box:boxPosition(entry.reset_box,session.id || entry.reset_session_id)} : {}),
     ...(phase==='guiding' && entry?.pathway?.length===1 && entry.pathway[0]==='grounding54321V2' && groundingPosition(entry?.reset_grounding,session.id || entry?.reset_session_id) ? {reset_grounding:groundingPosition(entry.reset_grounding,session.id || entry.reset_session_id)} : {}),
   };

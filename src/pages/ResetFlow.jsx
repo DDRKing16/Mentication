@@ -803,6 +803,8 @@ export default function ResetFlow() {
           initialThought={interventionId === "factCheck" ? tofEntryThought : undefined}
           initialCertainty={interventionId === "factCheck" ? answers.intensity : undefined}
           answers={{ ...answers, intensity: lastValue }}
+          notificationPlanId={interventionId === 'taraTactician' ? entry?.taraNotificationPlanId : undefined}
+          notificationRequestId={interventionId === 'taraTactician' ? entry?.taraNotificationRequestId : undefined}
           onGoalBaseline={(baseline) => {
             if (!hasGoalBaseline({ direction:answers.direction, goal_baseline:baseline })) return;
             const next = { ...answers, intensity: baseline.value, goal_baseline: baseline };

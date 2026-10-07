@@ -1,17 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-const native = vi.hoisted(() => ({ enabled: false, api: null }));
+const native = vi.hoisted(() => ({ enabled: false, api: null, thenReads: 0 }));
 vi.mock('@capacitor/core', () => ({ Capacitor: { isNativePlatform: () => native.enabled } }));
-vi.mock('@capacitor/local-notifications', () => ({ LocalNotifications: new Proxy({}, { get: (_, name) => name === 'then' ? undefined : (...args) => native.api[name](...args) }) }));
-import { cancelTaraNotifications, notificationsForPlan, scheduleTaraNotifications, TARA_NOTIFICATION_IDS, verifyTaraNotifications, watchTaraNotificationDeletion } from './taraCheckInNotifications';
+vi.mock('@capacitor/local-notifications', () => ({ LocalNotifications: new Proxy({}, { get: (_, name) => {
+  if (name === 'then') { native.thenReads += 1; return () => { throw new Error('LocalNotifications.then is not implemented'); }; }
+  return (...args) => native.api[name](...args);
+} }) }));
+import { cancelTaraNotifications, notificationsForPlan, scheduleTaraNotifications, TARA_NOTIFICATION_IDS, taraNativeStopFailed, verifyTaraNotifications, watchTaraNotificationDeletion } from './taraCheckInNotifications';
 import { newTaraCheckIns, startCheckIns } from './taraSupportPlan';
 let api;
 beforeEach(() => {
+  vi.resetModules();
+  native.thenReads = 0;
   native.enabled = false;
   let pending = [];
   api = { checkPermissions: vi.fn(async () => ({ display: 'prompt' })), requestPermissions: vi.fn(async () => ({ display: 'granted' })),
     cancel: vi.fn(async ({ notifications }) => { pending = pending.filter(item => !notifications.some(removal => removal.id === item.id)); }),
     removeDeliveredNotificationsById: vi.fn(async () => {}), schedule: vi.fn(async ({ notifications }) => { pending.push(...notifications); }),
-    getPending: vi.fn(async () => ({ notifications: pending })) };
+    getPending: vi.fn(async () => ({ notifications: pending })), addListener: vi.fn(async () => ({ remove: vi.fn() })) };
   native.api = api;
 });
 describe('bounded, explicitly permitted local notifications', () => {
@@ -19,6 +24,13 @@ describe('bounded, explicitly permitted local notifications', () => {
   it('offers a browser fallback with no permission or scheduling calls', async () => {
     expect(await scheduleTaraNotifications('private-id', active())).toEqual({ status: 'in-app', reason: 'browser' });
     expect(api.schedule).not.toHaveBeenCalled();
+  });
+  it('loads the native plugin proxy without calling a fictitious then method', async () => {
+    native.enabled = true;
+    expect(await scheduleTaraNotifications('native-plan', active())).toEqual({ status: 'scheduled' });
+    expect(api.schedule).toHaveBeenCalledOnce();
+    await cancelTaraNotifications(); expect((await api.getPending()).notifications).toEqual([]);
+    expect(native.thenReads).toBe(0);
   });
   it('schedules at most twelve nonrepeating future checks without private wording', async () => {
     const checks = active(); const result = await scheduleTaraNotifications('private-id', checks, api);
@@ -60,6 +72,16 @@ describe('bounded, explicitly permitted local notifications', () => {
     expect(ids).toEqual(TARA_NOTIFICATION_IDS); expect(ids).not.toContain(2101);
     expect(api.removeDeliveredNotificationsById).toHaveBeenCalledWith({ ids: TARA_NOTIFICATION_IDS });
   });
+  it('replaces the future native schedule when cadence changes and retains another journey’s reminder', async () => {
+    await api.schedule({ notifications: [{ id: 2101, extra: { daily: true } }] });
+    const checks = active(); await scheduleTaraNotifications('first-plan', checks, api);
+    await scheduleTaraNotifications('replacement-plan', { ...checks, intervalMinutes: 30 }, api);
+    const queue = (await api.getPending()).notifications;
+    expect(queue.filter(item => item.id !== 2101)).toHaveLength(4);
+    expect(queue.some(item => item.extra?.draftId === 'first-plan')).toBe(false);
+    expect(queue.find(item => item.id === 2101)).toBeTruthy();
+    expect(queue.filter(item => item.id !== 2101).every(item => item.schedule.at.getTime() <= checks.endsAt)).toBe(true);
+  });
   it('never backfills past notification slots or schedules after the chosen window', () => {
     const checks = active();
     expect(notificationsForPlan('id', checks, checks.startedAt + 115 * 60000)).toHaveLength(1);
@@ -86,6 +108,17 @@ describe('bounded, explicitly permitted local notifications', () => {
     target.dispatchEvent(new Event('mentation:tara-plan-changed'));
     await vi.waitFor(() => expect(api.cancel).toHaveBeenCalledOnce());
     expect((await api.getPending()).notifications).toEqual([]);
+    data.set('mentation.tara-tactician.v1', JSON.stringify({ draft: { eventStatus: 'in-progress', checkIns: { ...checkIns, endsAt: Date.now() - 1 } } }));
+    api.cancel.mockClear(); target.dispatchEvent(new Event('focus'));
+    await vi.waitFor(() => expect(api.cancel).toHaveBeenCalledOnce());
+    api.cancel.mockClear(); data.set('mentation.tara-tactician.v1', '{unreadable');
+    target.dispatchEvent(new Event('mentation:tara-plan-changed')); await Promise.resolve();
+    expect(api.cancel).not.toHaveBeenCalled();
+    api.cancel.mockRejectedValueOnce(new Error('OS cancellation failed'));
+    data.clear(); target.dispatchEvent(new Event('mentation:tara-cleared'));
+    await vi.waitFor(() => expect(taraNativeStopFailed()).toBe(true));
+    target.dispatchEvent(new Event('mentation:app-active'));
+    await vi.waitFor(() => expect(taraNativeStopFailed()).toBe(false));
     vi.unstubAllGlobals();
   });
 });
