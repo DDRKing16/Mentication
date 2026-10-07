@@ -21,3 +21,8 @@
 .intervention-control-shell > .fixed .journey-secondary { align-self:stretch; width:100%; max-width:28rem; margin:0 auto; }
 html.large-text .journey-secondary .journey-options-button { font-size:1.125rem; }
 html.large-text :is(.journey-options-dialog,.journey-takeaway) { font-size:1.125rem; }
+.journey-takeaway summary span { display:block; font-weight:600; }
+.journey-takeaway summary small { display:block; font-size:.8rem; margin-top:.2rem; font-weight:400; }
+.journey-takeaway .takeaway-coach { font-size:.9rem; line-height:1.6; }
+.journey-takeaway .takeaway-privacy { font-size:.76rem; line-height:1.5; }
+.journey-takeaway label { font-weight:600; }
