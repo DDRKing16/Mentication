@@ -1,5 +1,5 @@
-import TappingMotionVisual from './TappingMotionVisual';
+import TappingPMRSilhouette from './TappingPMRSilhouette';
 
 export default function TappingSilhouette(props) {
-  return <TappingMotionVisual {...props}/>;
+  return <TappingPMRSilhouette {...props}/>;
 }

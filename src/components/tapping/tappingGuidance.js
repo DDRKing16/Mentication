@@ -16,6 +16,7 @@ export const TAPPING_REMINDERS = {
   overwhelm: {setup:'Even with this overwhelm, I can be kind to myself right now.', reminder:'This overwhelm.'},
   grounding: {setup:'My feet. The room. This moment.', reminder:'My feet. The room. This moment.'},
 };
-export const TAPPING_BEAT_MS = 1000;
-// The two illustrated fingertips make contact 200 ms after each supplied beat.
-export const TAPPING_CONTACT_MS = 200;
+// Authored demonstration cadences, not a claim about an ideal therapeutic tempo.
+export const TAPPING_BEAT_MS = 600;
+export const TAPPING_SPACIOUS_BEAT_MS = 800;
+export const TAPPING_CONTACT_MS = TAPPING_BEAT_MS * .4;
