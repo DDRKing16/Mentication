@@ -514,3 +514,6 @@ footer .quiet {
 .feelings{grid-template-columns:1fr}
 .feelings button{font-size:17px;text-align:left;padding:15px}
 .large-text .summary legend,.large-text .guidance h2{font-size:1.6rem}
+/* The same room is revealed through earned detail windows, preserving its artwork. */
+.scene .room-discovery{width:66px;height:66px;display:block;border-radius:50%;background-image:url('./assets/images/image_20260921_071849.webp');background-size:360% 360%;border:2px solid #f8f2dc;box-shadow:0 0 0 6px #f8f2dc22,0 10px 24px #193e3029;filter:none;opacity:1;pointer-events:none}.scene .room-discovery.halo{width:110px;height:110px;background-size:210%;border-radius:50%}.scene{box-shadow:0 26px 55px -35px #183c3a88}.scene-foot{backdrop-filter:blur(12px);background:linear-gradient(transparent,#f2eedca6);padding-top:20px}.connection{stroke:#436c56;stroke-width:.6}.target{box-shadow:0 0 0 7px #fdf9e744,0 9px 24px #234b3322}.guidance{margin-bottom:18px}.heading h1{letter-spacing:-.035em}.still .room-discovery{animation:none}
+@media(max-width:359px){.scene .room-discovery{width:52px;height:52px}.scene .room-discovery.halo{width:90px;height:90px}}

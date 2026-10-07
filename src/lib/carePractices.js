@@ -45,7 +45,7 @@ export const CARE_PRACTICES = Object.freeze({
 export const CARE_STAGES = ['arrival', 'baseline', 'notice', 'perspective', 'practice', 'action', 'rerate', 'complete'];
 export const validCareRating = value => Number.isInteger(value) && value >= 0 && value <= 10;
 export function freshCareState() {
-  return { version: 1, careScreen: null, careTrail: [], stage: 'arrival', before: null, after: null, notice: '', perspective: '', action: '', clicks: 0, milestone: '', practiceTaken: false, actionStatus: null, responseRead: false, responseTone: 'steady', defusionStep: 0, distance: 'near', anchorType: null, anchorText: '', anchorNoticed: false, allowance: null, attentionFocused: false };
+  return { version: 1, noticeConfirmed:false, responseConfirmed:false, actionConfirmed:false, careScreen: null, careTrail: [], stage: 'arrival', before: null, after: null, notice: '', perspective: '', action: '', clicks: 0, milestone: '', practiceTaken: false, actionStatus: null, responseRead: false, responseTone: 'steady', defusionStep: 0, distance: 'near', anchorType: null, anchorText: '', anchorNoticed: false, allowance: null, attentionFocused: false };
 }
 export function restoreCareState(value) {
   const s = freshCareState();
@@ -53,6 +53,7 @@ export function restoreCareState(value) {
   for (const key of ['notice', 'perspective', 'action', 'milestone', 'anchorText']) if (typeof value[key] === 'string') s[key] = value[key].slice(0, 300);
   if ([...CARE_STAGES, 'orient'].includes(value.stage)) s.stage = value.stage;
   s.careScreen = validCareScreen(value.careScreen) ? value.careScreen : null;
+  for (const key of ['noticeConfirmed','responseConfirmed','actionConfirmed']) s[key] = value[key] === true;
   s.careTrail = Array.isArray(value.careTrail) ? value.careTrail.filter(validCareScreen).slice(-64) : [];
   for (const key of ['before', 'after']) s[key] = validCareRating(value[key]) ? value[key] : null;
   s.clicks = Number.isSafeInteger(value.clicks) && value.clicks >= 0 ? value.clicks : 0;

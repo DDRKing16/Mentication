@@ -1,3 +1,6 @@
+import { useProgressGate } from '@/hooks/useProgressGate';
+import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
+import { validCareScreenFor, CARE_SCREEN_STAGES } from '@/lib/careQuestionFlow';
 import { useEffect } from 'react';
 import { CARE_PRACTICES } from '@/lib/carePractices';
 import { COMPASSION_STARTERS, CARE_ACTIONS } from '@/lib/carePracticeDesign';
@@ -7,10 +10,15 @@ import { careScreen, careForwardPatch, careBackPatch, careScreenProgress, careSc
 
 export default function useSingleQuestionCare(id, props) {
   const flow = useCarePractice(id, props);
+  const acceptProgress = useProgressGate();
   const notices = id === 'selfCompassion' ? COMPASSION_STARTERS.map(item => item.line) : CARE_PRACTICES[id].notices;
   const actions = (id === 'selfCompassion' ? CARE_ACTIONS.selfCompassion : id === 'unhook' ? UNHOOK_STEPS : ROOM_STEPS).map(item => item.action);
   const screen = flow.viewingSaved && flow.s.careScreen !== 'options' ? 'card' : careScreen(id, flow.s, { notices, actions });
+  useJourneyScreenHistory(id, flow.returning ? null : screen, next => {
+    if (validCareScreenFor(id, next)) flow.go(CARE_SCREEN_STAGES[next], {careScreen:next});
+  });
   const advance = (next, values = {}) => {
+    if (!acceptProgress()) return;
     const patch = careForwardPatch(id, flow.s, screen, next, values);
     flow.go(patch.stage, patch);
   };

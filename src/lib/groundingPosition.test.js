@@ -35,3 +35,9 @@ it('retains a separate optional feedback screen without turning old feedback int
   expect(groundingPosition({...value,feedbackStep:'helpfulness',helpfulness:null},'same')).toMatchObject({feedbackStep:'helpfulness',helpfulness:null});
   expect(groundingPosition({...value,feedbackStep:'PRIVATE'},'same').feedbackStep).toBeUndefined();
 });
+
+it('retains only explicitly noticed, distinct valid senses without upgrading skips',()=>{
+  expect(groundingPosition({...value,noticed:[0,0,2,-1,8,'PRIVATE']},'same').noticed).toEqual([0,2]);
+  expect(groundingPosition({...value,noticed:[]},'same').noticed).toEqual([]);
+  expect(groundingPosition(value,'same')).not.toHaveProperty('noticed');
+});

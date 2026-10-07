@@ -1,3 +1,5 @@
+import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
+import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
 // =====================================================================
 // PRODUCTION-LOCKED · Box Breathing V2 (approved benchmark)
 // Premium polish pass requested 29 Aug 2026.
@@ -402,6 +404,7 @@ export default function BoxBreathingV2Pacer({
           ? `${status.remainingRounds} ${status.remainingRounds === 1 ? "round" : "rounds"} remaining, including this one`
           : "Breathing rounds complete"}
       </p>
+      <PracticeCheckpoint compact variant="breath" title="A rhythm to return to" events={Array.from({length:Math.max(0,status.round - 1)},(_,i)=>earned(`round-${i}`,'Guided round completed',i % 2 ? 'Rejoin at the next inhale whenever you lose the count.' : 'Four equal phases, with the option to breathe naturally.'))}/>
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {running ? `${PHASE_LABELS[phaseIndex]} for four seconds. Round ${status.round} of ${rounds}.`
           : "Breathing paused. Press Play when you are ready to continue."}

@@ -8,7 +8,7 @@ function readVectorProgress() {
   try {
     const value = JSON.parse(sessionStorage.getItem(vectorStorageKey));
     if (!value || !Number.isInteger(value.e) || value.e < 1 || value.e > 7) return null;
-    return {...value,nn:Number.isInteger(value.nn) && value.nn>=0 && value.nn<Qu.length?value.nn:0,
+    return {...value,practiceEvents:Array.isArray(value.practiceEvents)?value.practiceEvents.filter(event=>event && typeof event.id === "string" && typeof event.detail === "string").slice(0,100):[],nn:Number.isInteger(value.nn) && value.nn>=0 && value.nn<Qu.length?value.nn:0,
       reflectionAnswers:Object.fromEntries(Object.entries(value.reflectionAnswers || {}).filter(([key,answer])=>Number.isInteger(Number(key)) && Qu[Number(key)] && Number.isInteger(answer) && answer>=0 && answer<Qu[Number(key)].a.length))};
   } catch { return null; }
 }

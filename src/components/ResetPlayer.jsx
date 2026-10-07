@@ -1,3 +1,7 @@
+import { useProgressGate } from '@/hooks/useProgressGate';
+import '@/styles/practice-editorial.css';
+import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
+import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
 import { useJourneyScreenHistory } from "@/hooks/useJourneyScreenHistory";
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import { useFlowNav } from "@/components/brand/InterventionNav";
@@ -46,6 +50,8 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
   const [groundingPresence,setGroundingPresence] = useState(groundingResume?.presence || null);
   const [groundingHelpfulness,setGroundingHelpfulness] = useState(groundingResume?.helpfulness || null);
   const groundingContent = useRef(null);
+  const [noticedSenses,setNoticedSenses] = useState(groundingResume?.noticed || []);
+  const acceptSense = useProgressGate();
   const [remaining, setRemaining] = useState(pathway);
   const [ivIndex, setIvIndex] = useState(0);
   const [stepIndex, setStepIndex] = useState(groundingResume?.step ?? boxResume?.step ?? 0);
@@ -113,8 +119,8 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
 
   useEffect(() => {
     if (!isGroundingV2 || pathway.length!==1 || !sessionId) return;
-    setGroundingSaved(writeGroundingPosition(globalThis.history,{sessionId,step:stepIndex,elapsed,feedback:showGroundingFeedback,...(showGroundingFeedback?{feedbackStep:groundingFeedbackStep}:{}),presence:groundingPresence,helpfulness:groundingHelpfulness},sessionId));
-  },[isGroundingV2,pathway.length,sessionId,stepIndex,elapsed,showGroundingFeedback,groundingFeedbackStep,groundingPresence,groundingHelpfulness]);
+    setGroundingSaved(writeGroundingPosition(globalThis.history,{sessionId,step:stepIndex,elapsed,feedback:showGroundingFeedback,noticed:noticedSenses,...(showGroundingFeedback?{feedbackStep:groundingFeedbackStep}:{}),presence:groundingPresence,helpfulness:groundingHelpfulness},sessionId));
+  },[isGroundingV2,pathway.length,sessionId,stepIndex,elapsed,showGroundingFeedback,groundingFeedbackStep,groundingPresence,groundingHelpfulness,noticedSenses]);
   useEffect(() => {
     if (!isGroundingV2) return;
     const frame=requestAnimationFrame(()=>{const content=groundingContent.current;if(content){content.scrollTop=0;const heading=content.querySelector('h2');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}}});
@@ -314,7 +320,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
       setElapsed(0);
     } else if (!isLastIv) {
       setStepsDone((s) => s + 1);
-      
+
       // Emit completion event for current intervention as it transitions
       if (onAttemptEvent && iv?.id) {
         onAttemptEvent({
@@ -324,7 +330,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
           timestamp: Date.now(),
         });
       }
-      
+
       const nextIv = remaining[ivIndex + 1];
       setTransition({ to: nextIv, sentence: transitionSentence(nextIv) });
       stopVoice();
@@ -336,7 +342,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
       }, 4200);
     } else {
       setStepsDone((s) => s + 1);
-      
+
       // Emit completion event for final intervention
       if (onAttemptEvent && iv?.id) {
         onAttemptEvent({
@@ -346,7 +352,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
           timestamp: Date.now(),
         });
       }
-      
+
       stopVoice();
       onComplete();
     }
@@ -420,10 +426,10 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
     // Record a negative vote for the practice being abandoned, so repeated
     // "this isn't helping" taps progressively demote it and its mechanism.
     recordDislike(iv?.id, iv?.mechanism);
-    
+
     stopVoice();
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
-    
+
     // Use adaptive alternative selection: prefers interventions with proven
     // effectiveness in this context if available, falls back to standard suggest
     const newIv = suggestAdaptiveAlternative(iv.id, mode, answers, effectiveness)
@@ -470,7 +476,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     setStepsDone((s) => s + 1);
     stopVoice();
-    
+
     // Emit attempt event for the intervention being skipped
     if (onAttemptEvent && iv?.id && !isLastIv) {
       onAttemptEvent({
@@ -480,7 +486,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         timestamp: Date.now(),
       });
     }
-    
+
     setTransition(null);
     if (!isLastIv) {
       setIvIndex((i) => i + 1);
@@ -594,7 +600,8 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
     <div
       className={`intervention-theme ${isBoxV2 ? "box-v2-player" : ""} fixed inset-0 z-50 flex flex-col overflow-hidden`}
       data-box-motion={isBoxV2 ? (boxReducedMotion ? "reduced" : "full") : undefined}
-      data-grounding-reduced={isGroundingV2 && a11y.prefs.reducedMotion}
+      data-grounding-player={isGroundingV2 || undefined}
+      data-grounding-reduced={isGroundingV2 ? a11y.prefs.reducedMotion : undefined}
       data-intervention-theme={interventionPalette.id}
       data-theme-mode={interventionPalette.mode}
       style={{ ...interventionThemeStyle(interventionPalette), ...(isBoxV2 ? { overflow: "clip" } : {}) }}
@@ -774,13 +781,16 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         </AnimatePresence>
       </div>
 
+      {isBoxV2 && !isBoxV2Paced && boxClock.current >= 64000 && <PracticeCheckpoint compact variant="breath" title="A rhythm you can revisit" events={Array.from({length:4},(_,i)=>earned(`round-${i}`,'Guided round completed',i === 3 ? 'Let your next breath find its own pace.' : 'Four equal phases; breathing naturally is always an option.'))}/>}
       {isBoxV2 && boxResume && !showBoxFeedback && !running && <p role="status" className="relative px-5 text-center text-sm text-cream">Your place is back, paused. Choose Play when ready.</p>}
       {isBoxV2 && !boxSaved && <p role="status" className="relative px-5 text-center text-sm text-cream">This tab could not remember your place. Keep it open; refresh may lose your progress.</p>}
       {isGroundingV2 && !groundingSaved && <p role="status" className="relative px-5 text-center text-sm">This tab could not remember your grounding place. Your current practice is still here; refresh may lose it.</p>}
       {isGroundingV2 && groundingResume && !showGroundingFeedback && !running && <p role="status" className="relative px-5 text-center text-sm">Your chosen sense is back, paused. Choose Play when ready.</p>}
-      {isGroundingV2 && !showGroundingFeedback && <button type="button" className="relative mx-auto rounded-full border px-5 py-2 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}>Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}</button>}
-      {isGroundingV2 && !showGroundingFeedback && <div className="relative flex flex-wrap justify-center gap-3 px-4 py-3">
-        {!isLastStep && <button type="button" className="min-h-14 w-full max-w-md rounded-full bg-white/90 px-5 py-3 text-lg font-medium" onClick={goNextStep}>{step?.sense === "taste" ? "Recenter when ready" : "Next sense"}</button>}
+
+      {isGroundingV2 && <PracticeCheckpoint compact variant="senses" title="A little more of the room" events={noticedSenses.map(index=>earned(`sense-${index}`,'You marked as noticed',iv.steps[index]?.title))}/>}
+      {isGroundingV2 && !showGroundingFeedback && <div className="grounding-practice-actions relative flex flex-wrap justify-center gap-3 px-4 py-3">
+        {!isLastStep && <button type="button" className="min-h-14 w-full max-w-md rounded-full bg-white/90 px-5 py-3 text-lg font-medium" onClick={() => { if (!acceptSense()) return; setNoticedSenses(values=>[...new Set([...values,stepIndex])]); goNextStep(); }}>{step?.sense === "taste" ? "I noticed — recenter" : "I noticed — next sense"}</button>}
+        {!isLastStep && <button type="button" className="min-h-11 px-5 py-3 underline" onClick={() => {if (acceptSense()) goNextStep();}}>Skip this sense</button>}
         <button type="button" className={isLastStep?"min-h-14 w-full max-w-md rounded-full bg-white/90 px-5 py-3 font-medium":"min-h-11 px-5 py-3 underline"} onClick={finishGrounding}>{isLastStep ? "Finish grounding" : "Finish grounding early"}</button>
       </div>}
       {!showBoxFeedback && <>
@@ -827,6 +837,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
             {running ? <Pause className="h-5 w-5" strokeWidth={1.7} /> : <Play className="h-5 w-5" strokeWidth={1.7} />}
           </CtrlButton>
           <details className="relative"><summary className="min-h-11 cursor-pointer px-3 py-3 text-sm">Guidance options</summary><div className="intervention-themed-surface absolute bottom-full right-0 z-50 mb-3 flex max-w-[85vw] flex-wrap gap-1 rounded-2xl border p-2">
+          {isGroundingV2 && <button type="button" className="min-h-11 px-3 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}>Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}</button>}
           <CtrlButton light={lightChrome} active={narrate} onClick={toggleNarrate} label={narrate ? "Audio on" : "Audio off"}>
             {narrate ? <Volume2 className="h-5 w-5" strokeWidth={1.7} /> : <VolumeX className="h-5 w-5" strokeWidth={1.7} />}
           </CtrlButton>

@@ -73,3 +73,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #gmSound { width:44px!important; height:44px!important; }
 
 .gm-status.error { font-size:16px; }
+.gm-practice-reveal{position:relative;max-width:600px;margin:16px auto;padding:16px 20px;border:1px solid #f9dbe33b;border-radius:20px;color:#fbe7ed;background:#351324}.gm-practice-reveal .gm-reveal-title{font-size:10px;text-transform:uppercase;letter-spacing:.15em;margin:0 0 10px}.gm-practice-reveal>div{display:grid;grid-template-columns:1fr 1fr;gap:20px}.gm-practice-reveal p{margin:0}.gm-practice-reveal span,.gm-practice-reveal strong{display:block;font-size:13px;line-height:1.5}.gm-practice-reveal span{font-weight:400}.gm-practice-reveal strong{margin-top:4px}
+/* A pair of real illustrated choices becomes a small, usable map fragment. */
+.gm-practice-reveal{border-radius:5px 20px 20px 5px;padding:12px 14px;background:linear-gradient(115deg,#faf1e7,#f3eaf9);box-shadow:0 16px 36px -28px #38263c66;color:#38263c}
+.gm-practice-reveal>div{display:grid;grid-template-columns:1fr 1fr;gap:12px}.gm-practice-reveal>div>p{display:grid;grid-template-columns:42px 1fr;gap:3px 9px;align-items:center;min-width:0}.gm-practice-reveal img{width:42px;height:54px;object-fit:cover;grid-row:span 2;border-radius:3px;box-shadow:0 3px 8px #38263c22}.gm-practice-reveal span{font-size:11px}.gm-practice-reveal strong{font-size:12px!important}.gm-reveal-title{font-size:10px;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}

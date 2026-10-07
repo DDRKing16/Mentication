@@ -1,3 +1,6 @@
+import '@/styles/practice-editorial.css';
+import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
+import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
 import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
@@ -262,6 +265,7 @@ function TimerStage({ session, dispatch, audioEnabled, runtimeAvailable }) {
           {PRACTICE_STAGES.map((item, index) => <span className={index === stageIndex ? "is-active" : index < stageIndex ? "is-complete" : ""} key={item.label}><i />{item.label}</span>)}
         </div>
         <p className="urge-lovable__guidance" aria-live="polite">{stage.copy}</p>
+        <PracticeCheckpoint compact variant="wave" title="A little space before acting" events={PRACTICE_STAGES.slice(0,stageIndex).map((item,i)=>earned(`guide-${i}`,'Guidance reached',item.label === 'Notice' ? 'Notice without needing the urge to change.' : item.label === 'Allow' ? 'There is room to wait before choosing.' : item.copy))}/>
         {runtimeAvailable === false && <p role="status" className="urge-lovable__reassurance">Timer position could not be kept for refresh. Keep this page open; you can still pause or stop.</p>}
         <div className="urge-lovable__practice-controls">
           <button

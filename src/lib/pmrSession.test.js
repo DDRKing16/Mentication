@@ -67,3 +67,12 @@ describe('PMR interruption restoration', () => {
     expect(restored.index).toBe(createPMRSteps(original,{mode:'release',length:'short'}).length-1);expect(restored.outcome).toBeNull();expect(restored.helpfulness).toBeNull();
   });
 });
+
+describe('PMR explicit route decisions',()=>{
+ it('restores earned choices and does not infer them from default or legacy settings',()=>{
+  const legacy=restorePMRSession({phase:'practice',mode:'release',length:'full'},original);
+  expect(legacy.modeChosen).toBe(false);expect(legacy.lengthChosen).toBe(false);
+  const explicit=restorePMRSession({phase:'practice',mode:'release',length:'full',modeChosen:true,lengthChosen:true},original);
+  expect(explicit.modeChosen).toBe(true);expect(explicit.lengthChosen).toBe(true);
+ });
+});

@@ -1,3 +1,4 @@
+import { mindPattern } from '@/lib/experientialCare';
 import { EXTERNAL_ANCHORS } from '@/lib/carePracticeDesign';
 
 export function CompassionVisual({ s, mode = 'line' }) {
@@ -12,7 +13,7 @@ export function ThoughtVisual({ s, mode = 'thought' }) {
   const beside = s.distance === 'beside' || mode === 'anchor';
   return <div className={`unhook-field ${beside?'is-beside':''} ${s.defusionStep?'is-noticing':''} ${s.anchorNoticed?'has-anchor':''}`}>
     <svg className="unhook-orbits" viewBox="0 0 400 310" aria-hidden="true"><ellipse cx="200" cy="178" rx="174" ry="98"/><ellipse cx="200" cy="178" rx="116" ry="61"/><path d="M0 271 Q112 178 190 248 T400 202"/><circle cx="328" cy="222" r="3"/></svg>
-    <div className="unhook-thought"><span>{s.defusionStep ? 'I am noticing the thought…' : !s.notice && s.stage==='arrival' ? 'A thought might sound like…' : 'My mind says…'}</span><p>{s.notice || (s.stage==='arrival' ? 'What if it all goes wrong?' : 'The words I am holding in mind')}</p></div>
+    <div className="unhook-thought"><span>{s.defusionStep ? `${mindPattern(s.perspective).phrase}…` : !s.notice && s.stage==='arrival' ? 'A thought might sound like…' : 'My mind says…'}</span><p>{s.notice || (s.stage==='arrival' ? 'What if it all goes wrong?' : 'The words I am holding in mind')}</p></div>
     {beside && <div className="unhook-attention"><span>{mode==='anchor'?'Attention returns to':'There is also room for'}</span><p>{s.anchorText || (s.anchorType ? EXTERNAL_ANCHORS[s.anchorType].short : 'the world around me')}</p><i aria-hidden="true"/></div>}
     <div className="unhook-field-label">{beside?'The thought stays. Your attention can move.':'Words your mind is offering.'}</div>
   </div>;

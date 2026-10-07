@@ -1,3 +1,5 @@
+import PracticeIllustration from '@/components/journey/PracticeIllustration';
+import '@/styles/practice-editorial.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Minus, Pause, Pencil, CornerDownLeft } from 'lucide-react';
 import { HELPFULNESS } from '@/lib/attemptFeedback';
@@ -26,7 +28,7 @@ export function NextStepActive({ state, onDone, onSkip, onUndo, onReplace, onPau
     <header className="nes-practice-heading"><p className="nes-practice-eyebrow">Next Easiest Step</p><p className="nes-task-name">{state.task}</p></header>
     {!adapting && <section className="nes-action-card" aria-labelledby="nes-current-action">
       <div className="nes-action-position"><span>Step {state.currentStepIndex + 1} of {state.ladder.length}</span><span>Only this step</span></div>
-      <div className="nes-action-arch" aria-hidden="true"><span>{String(state.currentStepIndex + 1).padStart(2, '0')}</span></div>
+      <div className="nes-step-landscape"><PracticeIllustration kind="path"/><span aria-hidden="true">{String(state.currentStepIndex + 1).padStart(2, '0')}</span></div>
       <h1 id="nes-current-action" ref={heading} tabIndex={-1}>{step?.title || 'Choose a small action'}</h1>
       <p className="nes-action-instruction">{step?.micro}</p>
       <button type="button" className="nes-action-done" onClick={onDone}>Done ✓<ArrowRight size={19} aria-hidden="true" /></button>

@@ -1,3 +1,8 @@
+import { useProgressGate } from '@/hooks/useProgressGate';
+import { clearPracticeDraft } from '@/lib/practiceInteraction';
+import '@/styles/practice-editorial.css';
+import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
+import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
 import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useEffect, useRef, useState } from "react";
@@ -199,6 +204,8 @@ const STEPS = [
 export default function ChangeSceneExperience({ intervention, answers, onComplete, onAttemptEvent, onExit }) {
   const [session,setSession]=useState(()=>restoreSceneSession(getActiveFlagship()?.interventionId===ID ? getActiveFlagship().experience : null));
   const [showAlternatives,setShowAlternatives]=useState(false);
+  const acceptProgress = useProgressGate();
+  const [finishError,setFinishError] = useState(false);
   const [draftOk,setDraftOk]=useState(true);
   const [showAdapt,setShowAdapt]=useState(false);
   const [showAccessibility,setShowAccessibility]=useState(false);
@@ -246,9 +253,9 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const record=(event)=>setSession(s=>sceneAction(s,step,event));
   const finish=(target)=>{
     if(completed.current)return;
+    if (!clearPracticeDraft(undefined,ID)) {setFinishError(true);return;}
     completed.current=true;
     stop();
-    clearActiveFlagship(ID);
     rememberFlagshipEvent({interventionId:ID,completed:outcome.confirmedActions>0,options:{confirmedActions:outcome.confirmedActions,skippedActions:outcome.skippedActions}});
     onAttemptEvent?.({interventionId:ID,mechanism:intervention.mechanism,action:'completed',startedAt:startedAt.current,exitReason:outcome.confirmedActions?'completed':'skipped',completedPercentage:outcome.confirmedActions/6,timestamp:Date.now()});
     onComplete?.({requireGoalReassessment:true,exitReason:outcome.confirmedActions?'completed':'skipped',helpfulness:session.helpfulness,outcome:{...outcome,...(target?{handoffToken:handoffToken.current}:{})},navigateTo:target?`/scene-followup?practice=${target}&session=${handoffToken.current}`:undefined});
@@ -263,10 +270,12 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       <button aria-label="Exit intervention" onClick={onExit}>×</button>
     </header>
     <main className="scene-card">
+      {finishError && <p role="alert">Progress could not be cleared. Try Finish again; this review is still here.</p>}
       {!draftOk&&<p role="status" className="scene-caption">Progress could not be saved in this tab. Keep it open to retain these choices; refreshing may lose them.</p>}
       <nav className="scene-progress" aria-label="Journey progress">
         {['Start','Move','Water','View','Connect','Rest','Plan','Review'].map((label,i)=><div key={label} role="img" aria-label={`${label}: ${session.actions[i]?.status==='done'?'confirmed':session.actions[i]?.status==='skipped'?'skipped':i>0&&i<7?'not confirmed':''}${i===step?', current step':''}`} aria-current={i===step?'step':undefined}><span aria-hidden="true">{i===0?'✦':session.actions[i]?.status==='done'?'✓':session.actions[i]?.status==='skipped'?'−':i}</span><small>{label}</small></div>)}
       </nav>
+      <PracticeCheckpoint variant="scene" title="Your scene is changing" events={SCENE_ACTIONS.map((item,i) => earned(`action-${i}`, item.title, session.actions[i+1]?.choice === 'alternative' ? item.alternateDone : item.done, session.actions[i+1]?.status === 'done'))}/>
       <p className="scene-kicker">{step===0?'One small shift at a time':step===7?'Your check-in':`Step ${step} of 6`}</p>
       <h1 ref={heading} tabIndex={-1}>{action?.title || (step===0?'Change the Scene':'Was this useful?')}</h1>
       {step<7 && <div className="scene-art" aria-hidden="true">{current.art}</div>}
@@ -280,8 +289,8 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
           {['primary','alternative'].map(value=><button key={value} aria-pressed={choice===value} onClick={()=>{record(value);setShowAlternatives(false);}}>{action[value]}{choice===value?' ✓':''}</button>)}
         </details>
         <p className="scene-caption">Choose what fits. Confirm only after you have tried it.</p>
-        {status==='done' ? <div className="scene-confirmed"><p role="status">Recorded: {choice==='alternative'?action.alternateDone:action.done}.</p><button onClick={()=>record('undo')}>Undo confirmation</button><button className="scene-primary" onClick={()=>go(step+1)}>Continue</button></div> : <button className="scene-primary" onClick={()=>setSession(s=>({...sceneAction(s,step,'done'),step:step+1}))}>{choice==='alternative'?action.alternateDone:action.done}</button>}
-        <button className="scene-secondary" onClick={()=>{setSession(s=>({...sceneAction(s,step,'skip'),step:step+1}));}}>Skip this action</button>
+        {status==='done' ? <div className="scene-confirmed"><p role="status">Recorded: {choice==='alternative'?action.alternateDone:action.done}.</p><button onClick={()=>record('undo')}>Undo confirmation</button><button className="scene-primary" onClick={()=>go(step+1)}>Continue</button></div> : <button className="scene-primary" onClick={()=>{if(acceptProgress())setSession(s=>({...sceneAction(s,step,'done'),step:step+1}));}}>{choice==='alternative'?action.alternateDone:action.done}</button>}
+        <button className="scene-secondary" onClick={()=>{if(acceptProgress())setSession(s=>({...sceneAction(s,step,'skip'),step:step+1}));}}>Skip this action</button>
       </> : <>
         <p className="scene-summary">You confirmed {outcome.confirmedActions} of 6 actions{outcome.skippedActions?` and skipped ${outcome.skippedActions}`:''}. Choosing an action alone does not count as doing it.</p>
         <details className="scene-options"><summary>Review or undo your actions</summary>{SCENE_ACTIONS.map((item,i)=><button key={item.title} onClick={()=>go(i+1)}>{item.title} · {session.actions[i+1]?.status==='done'?'confirmed':session.actions[i+1]?.status==='skipped'?'skipped':'not confirmed'}</button>)}</details>

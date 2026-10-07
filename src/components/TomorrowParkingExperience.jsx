@@ -1,3 +1,7 @@
+import PracticeIllustration from '@/components/journey/PracticeIllustration';
+import '@/styles/practice-editorial.css';
+import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
+import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
 import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -122,7 +126,11 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
 
       {readNotice && <p role="status" className="tpl-xs tpl-muted">{readNotice}</p>}
       {restored.error && <p role="alert" className="tpl-alert">Your saved return could not be read. Existing notes have not been replaced. You can review them in Your parking lot.</p>}
-      {step === "suitability" && <div className="tpl-rise tpl-capture">
+      {['seal','parked','feedback'].includes(step) && <PracticeCheckpoint variant="night" compact title={saved ? 'A place to return to' : 'Ready for your decision'} events={[
+        earned('wait','You decided','This can safely wait',suitability === 'wait'),
+        earned('note',saved ? 'Saved for tomorrow' : 'Your note, still a draft',saved?.text || text,!!text.trim()),
+      ]}/>}
+      {step === "suitability" && <div className="tpl-rise tpl-capture"><PracticeIllustration kind="letter"/>
         {heading("Can this wait until tomorrow?")}
         <p className="tpl-lede">Park something unfinished only if it can safely wait.</p>
         <fieldset className="tpl-urgency">

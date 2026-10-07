@@ -470,6 +470,8 @@ function qv({
 }
 function Aa() {
   const [saved] = w.useState(readVectorProgress);
+  const [practiceEvents,setPracticeEvents] = w.useState(saved?.practiceEvents || []);
+  const recordPractice = w.useCallback((id,detail) => setPracticeEvents(events => events.some(event=>event.id===id) ? events.map(event=>event.id===id?{id,detail}:event) : [...events,{id,detail}]),[]);
   const [progressSaved,setProgressSaved] = w.useState(true);
   const [paused,setPaused] = w.useState(Boolean(saved && saved.e > 1));
   const [stopped,setStopped] = w.useState(false);
@@ -724,7 +726,7 @@ function Aa() {
   },[]);
   vectorClock.paused = paused || stopped;
   document.documentElement.classList.toggle("vs-paused", paused || stopped);
-  const progress = {e,easy,helpfulness,skipped,exitReason,reflectionAnswers,np,jt,score:$e,be,en:[...en],Hn:[...Hn],nn,cp,xu,eo,direction:Sn.current,align:M,hold:ee};
+  const progress = {e,easy,practiceEvents,helpfulness,skipped,exitReason,reflectionAnswers,np,jt,score:$e,be,en:[...en],Hn:[...Hn],nn,cp,xu,eo,direction:Sn.current,align:M,hold:ee};
   const progressRef = w.useRef(progress); progressRef.current=progress;
   w.useEffect(()=>{const save=()=>{setProgressSaved(saveVectorProgress(progressRef.current))};
     save();const timer=window.setInterval(save,500);window.addEventListener("pagehide",save);
@@ -795,7 +797,7 @@ function Aa() {
           try {
             navigator.vibrate?.(60);
           } catch {}
-          o(1400, 0.4, 2100), qt(!0);
+          recordPractice("alignment","You held the star in its ring"), o(1400, 0.4, 2100), qt(!0);
           return;
         }
         if (_e) {
@@ -965,6 +967,7 @@ function Aa() {
           y: O
         };
         if (U.x === jt.x && U.y === jt.y) {
+          recordPractice(`light-${$e+1}`,`Light ${$e+1} collected`);
           Xa(A => {
             let H = A + 1;
             if (H >= 15) vectorClock.timeout(() => {
@@ -1028,6 +1031,7 @@ function Aa() {
     },
     pp = p => {
       if (en.has(p) || il) return;
+      recordPractice(`letter-${p}`,be.includes(p) ? `You revealed ${p} in the word` : `${p} is not in this word`);
       u();
       let v = new Set(en);
       if (v.add(p), ol(v), be.includes(p)) {
@@ -1116,6 +1120,7 @@ function Aa() {
         if (Q < H) H = Q, A = ce;
       }
       if (A && H < 34) {
+        recordPractice(`feature-${A.id}`,`You noticed ${A.label}`);
         uo(_e => {
           let Te = new Set(_e);
           if (Te.add(A.id), Te.size >= 10) {
@@ -1272,16 +1277,17 @@ function Aa() {
         transition: "filter 0.7s ease"
       },
       children: [
+        practiceEvents.length>=2 && s("aside",{className:"vs-practice-reveal", "data-practice-count":practiceEvents.length,"data-checkpoint":Math.floor(practiceEvents.length/2),role:"status",children:practiceEvents.slice(Math.floor(practiceEvents.length/2)*2-2,Math.floor(practiceEvents.length/2)*2).map(event=>event.detail).join(" · ")}),
         e!==6 && e!==7 && s("section",{className:"vs-instructions",children:[
           !progressSaved && s("p",{role:"alert",children:["This tab could not save your place. Your activity is still here; refresh may lose progress. ",s("button",{onClick:retryProgress,children:"Retry saving place"})]}),
           e!==6 && e!==7 && s("h2",{className:"vs-current-instruction",tabIndex:-1,children:vectorInstructions[e]}),
           e===1 && s("p",{children:"Putting attention on colours, movement and simple choices may help you reconnect with what is around you. It may not change how you feel. These games do not measure your mood or nervous system."}),
-          e>=2 && e<=5 && s("details",{className:"vs-activity-options",children:[s("summary",{children:"Activity options"}),s("button",{"aria-pressed":easy,onClick:()=>setEasy(v=>!v),children:easy?"Use original activity":"Try an easier option"})]}),
-          easy && e===2 && s("button",{onClick:()=>n(3),children:"I noticed a colour or shape — continue"}),
-          easy && e===3 && s("button",{onClick:()=>{Xa(v=>v+1);nc(np);if($e>=2)n(4)},children:`Collect a light at your pace (${$e}/3)`}),
+          e>=2 && e<=5 && s("details",{className:"vs-activity-options",children:[s("summary",{children:"Activity options"}),s("button",{"aria-pressed":easy,onClick:()=>{recordPractice("mode",easy?"You chose the original activity":"You chose an activity at your pace");setEasy(v=>!v)},children:easy?"Use original activity":"Try an easier option"})]}),
+          easy && e===2 && s("button",{onClick:()=>{recordPractice("alignment","You noticed a colour or shape");n(3)},children:"I noticed a colour or shape — continue"}),
+          easy && e===3 && s("button",{onClick:()=>{recordPractice(`light-${$e+1}`,`Light ${$e+1} collected`);Xa(v=>v+1);nc(np);if($e>=2)n(4)},children:`Collect a light at your pace (${$e}/3)`}),
           e===4 && s("button",{onClick:()=>{const letter=be.split("").find(v=>!en.has(v));if(letter)pp(letter)},children:"Reveal a letter"}),
           easy && e===4 && s("p",{children:`Match the letters in ${be}. You can also reveal them one at a time.`}),
-          easy && e===5 && s("div",{className:"vs-scan-list",children:Qa.filter(item=>!Hn.has(item.id)).slice(0,1).map(item=>s("button",{onClick:()=>{uo(v=>new Set([...v,item.id]));vt(`Noticed ${item.label}`)},children:`Notice ${item.label} — then tap here`},item.id))}),
+          easy && e===5 && s("div",{className:"vs-scan-list",children:Qa.filter(item=>!Hn.has(item.id)).slice(0,1).map(item=>s("button",{onClick:()=>{recordPractice(`feature-${item.id}`,`You noticed ${item.label}`);uo(v=>new Set([...v,item.id]));vt(`Noticed ${item.label}`)},children:`Notice ${item.label} — then tap here`},item.id))}),
           easy && e===5 && s("button",{onClick:()=>n(6),children:"I've looked — continue"})
         ]}),
         e === 1 && _("div", {

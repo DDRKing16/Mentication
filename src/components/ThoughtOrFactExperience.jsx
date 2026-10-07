@@ -1,3 +1,9 @@
+import { useProgressGate } from '@/hooks/useProgressGate';
+import { clearPracticeDraft } from '@/lib/practiceInteraction';
+import PracticeIllustration from '@/components/journey/PracticeIllustration';
+import '@/styles/practice-editorial.css';
+import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
+import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
 import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
@@ -137,8 +143,7 @@ function BeliefStage({ thought, value, onChange, onContinue }) {
   return <motion.div className="tof-stage" {...fade}>
     <Heading title={BELIEF_QUESTION} body="Optional. This is about belief in the thought, separate from how you feel." />
     <q className="tof-quote">{thought}</q>
-    <BeliefRating value={value} onChange={onChange} />
-    <div className="tof-actions"><Button onClick={onContinue}>Continue <ArrowRight /></Button></div>
+    <BeliefRating value={value} onChange={rating => { onChange(rating); onContinue(); }} />
   </motion.div>;
 }
 
@@ -153,7 +158,7 @@ function CaptureStage({ thought, setThought, onContinue }) {
   ];
   return (
     <motion.div className="tof-stage" {...fade}>
-      <Heading title="What’s the thought?" body="Type your own, or tap a starting point and edit it if needed." />
+      <PracticeIllustration kind="evidence"/><Heading title="What’s the thought?" body="Type your own, or tap a starting point and edit it if needed." />
       <div className="tof-chips" aria-label="Suggested thoughts">
         {suggestions.map((suggestion) => <button key={suggestion} type="button" className="tof-pill" onClick={() => setThought(suggestion)}>{suggestion}</button>)}
       </div>
@@ -165,7 +170,7 @@ function CaptureStage({ thought, setThought, onContinue }) {
 }
 
 function SortStage({ claim, selectedCategory, onSelect, onPatterns, currentIndex = 0, total = 1 }) {
-  return <motion.div className="tof-stage" {...fade}><Heading eyebrow={total > 1 ? `Part ${currentIndex + 1} of ${total}` : "Your thought"} title="What kind of thought is this?" /><q className="tof-quote">{claim}</q><div className="tof-options" role="group" aria-label="Ways to describe this thought">{CATEGORIES.map(category => {const Icon=category.icon;return <button key={category.id} type="button" className="tof-option" aria-pressed={selectedCategory===category.id} onClick={()=>onSelect(category.id)}><Icon aria-hidden="true"/><span><strong>{category.label}</strong><small>{category.short}</small></span><ChevronRight aria-hidden="true"/></button>;})}</div><p className="tof-sub">Tap the closest fit to continue. Back lets you change it.</p><button type="button" className="tof-text-action" onClick={onPatterns}>Explore thinking patterns · optional</button></motion.div>;
+  return <motion.div className="tof-stage" {...fade}><Heading eyebrow={total > 1 ? `Part ${currentIndex + 1} of ${total}` : "Your thought"} title="What kind of thought is this?" /><q className="tof-quote">{claim}</q><div className="tof-options" role="group" aria-label="Ways to describe this thought">{CATEGORIES.map(category => {const Icon=category.icon;return <button key={category.id} type="button" className="tof-option" aria-label={category.label} aria-pressed={selectedCategory===category.id} onClick={()=>onSelect(category.id)}><Icon aria-hidden="true"/><span><strong>{category.label}</strong><small>{category.short}</small></span><ChevronRight aria-hidden="true"/></button>;})}</div><p className="tof-sub">Tap the closest fit to continue. Back lets you change it.</p><button type="button" className="tof-text-action" onClick={onPatterns}>Explore thinking patterns · optional</button></motion.div>;
 }
 
 function PatternsStage({ claim, selected, setSelected, onContinue }) {
@@ -272,7 +277,7 @@ function RulingStage({ fairerView, initialFairerView, onContinue, onUnresolved, 
   return (
     <motion.div className="tof-stage" {...fade}>
       <Heading title="Does this statement fit?" body="Keep the facts and uncertainty. Edit the draft if it needs changing." />
-      <section className="tof-fairer" aria-label="A more balanced thought">
+      <div className="tof-evidence-ledger" aria-label="Two sides to keep in view"><div><span>Details that support it</span><p>{fairerView.known || "No supporting detail added."}</p></div><div><span>Another perspective</span><p>{fairerView.against || fairerView.open || "An answer may still be unknown."}</p></div></div><section className="tof-fairer" aria-label="A more balanced thought">
         {editing
           ? <textarea className="tof-field" value={fairerView.adaptive} onChange={(event) => updateFairerView({ ...fairerView, adaptive: event.target.value })} aria-label="A more balanced thought" />
           : <p className="tof-fairer__body">{fairerView.adaptive}</p>}
@@ -379,6 +384,8 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   const startedAt = useRef(Date.now());
   const reflectionIdentity = useRef({id:restored?.data?.reflectionId || globalThis.crypto?.randomUUID?.() || `tof-${Date.now()}`,createdAt:restored?.data?.reflectionCreatedAt || new Date().toISOString()});
   const [savedRecord,setSavedRecord] = useState(()=>{try{return readThoughtRecords().find(record=>record.id===reflectionIdentity.current.id) || null;}catch{return null;}});
+  const acceptProgress = useProgressGate();
+  const [finishError,setFinishError] = useState(false);
   const [saveError,setSaveError] = useState(false);
   const [draftOk,setDraftOk] = useState(true);
   const saved = isCurrentThoughtReflection(savedRecord,data);
@@ -392,6 +399,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   const stageAnnouncement = { patterns:"Optional thinking patterns. Choose only what fits.", counterEvidence:"One detail pointing another way, or leave this unanswered.", afterBelief:"Optional current belief rating for the original thought.", returnPhrase:"An optional phrase in your own words to remember later.", belief: "Rate how true the original thought feels, or leave it unanswered.", capture: "Thought capture. Enter one thought in your own words.", sort: "Choose the closest description for the thought.", evidence: "Look at the thought from both sides. Everything here is optional.", ruling: "Review your more balanced thought.", direction: "Choose what would be useful now.", complete: "Your private reflection is ready." }[stage];
   const update = (patch) => setData((current) => ({ ...current, ...patch }));
   const go = (nextStage, patch = {}) => {
+    if (!acceptProgress()) return;
     setStage(nextStage);
     setData((current) => ({ ...current, ...patch, stage: nextStage }));
     window.scrollTo({ top: 0, behavior: a11y.prefs.reducedMotion ? "auto" : "smooth" });
@@ -431,7 +439,11 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
 
   const createFairerView = (patch = {}) => defaultFairerView(data.thought, fragments, data.assignments || {}, data.alternatives || [], data.uncertainty || [], { ...data, ...patch });
 
+  const completedOnce = useRef(false);
   const finish = () => {
+    if (completedOnce.current) return;
+    if (!clearPracticeDraft(undefined,"factCheck")) {setFinishError(true);return;}
+    completedOnce.current = true;
     const learningRecord = buildThoughtOrFactLearningRecord({
       assignments: data.assignments,
       certaintyBefore: data.certaintyBefore,
@@ -445,7 +457,6 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
       // The shared preference sanitizer turns null into "selected"; omit missing measurements.
       options: Object.fromEntries(Object.entries(learningRecord).filter(([, value]) => value !== null)),
     });
-    clearActiveFlagship("factCheck");
     onAttemptEvent?.({ interventionId: "factCheck", mechanism: intervention.mechanism, action: "completed", completedPercentage: 1, timestamp: Date.now(), startedAt: startedAt.current });
     onComplete?.({ requireGoalReassessment: true, outcome: { classificationCounts: counts, certaintyBefore: data.certaintyBefore, certaintyAfter: data.certaintyAfter, saved } });
   };
@@ -473,8 +484,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
   };
 
   return (
-    <MotionConfig reducedMotion={a11y.prefs.reducedMotion ? "always" : "never"}>
-    <InterventionControlShell
+    <MotionConfig reducedMotion={a11y.prefs.reducedMotion ? "always" : "user"}><InterventionControlShell
       id="factCheck"
       goal="calm"
       title="Thought or Fact?"
@@ -494,6 +504,7 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
       <div className="tof-experience" data-tof-stage={stage}>
         <div className="tof-live-region sr-only" role="status" aria-live="polite">{stageAnnouncement}</div>
         <div className="tof-practice-options"><details className="tof-details tof-privacy"><summary><LockKeyhole aria-hidden="true"/>About your private draft</summary><p>Your thought, progress and typed evidence stay in a device-local draft, resumable for 24 hours after your last change. Add or Continue includes typed details in the review. Finish clears the draft; optional Save keeps a separate reflection. This is not synced across devices.</p></details></div>
+        {finishError && <p role="alert">The draft could not be cleared. Your reflection is still here. Try Finish again.</p>}
         {!draftOk && <p className="tof-sub" role="status">This draft could not be saved. Your words are still here, but leaving or refreshing may lose these changes.</p>}
         {stepFor(stage) > 0 && <Steps current={stepFor(stage)} />}
         <AnimatePresence initial={false} mode="wait">
@@ -513,9 +524,17 @@ export default function ThoughtOrFactExperience({ intervention, answers, initial
           {stage === "returnPhrase" && <motion.div key="returnPhrase" className="tof-stage" {...fade}><Heading title="What would you like to remember?" body="Optional. A short phrase in your own words, if useful." /><input className="tof-field" aria-label="A short phrase for yourself" value={data.returnPhrase || ""} onChange={event=>update({returnPhrase:event.target.value,saved:false})} maxLength={140} placeholder="A phrase for when this thought returns"/><div className="tof-actions"><Button onClick={()=>go("complete")}>Continue <ArrowRight /></Button></div></motion.div>}
           {stage === "complete" && <CompletionStage key="complete" confirmed={data.balancedConfirmed === true} saveError={saveError} thought={data.thought} fairerView={data.fairerView} support={data.support} against={data.evidenceAgainst} returnPhrase={data.returnPhrase || ""} setReturnPhrase={(returnPhrase) => update({ returnPhrase, saved: false })} saved={saved} onSave={handleSave} onFinish={finish} onPhrase={()=>go("returnPhrase")} />}
         </AnimatePresence>
+        <PracticeCheckpoint variant="thought" title="Your thought, in perspective" events={[
+          earned('thought','The thought you brought',data.refinedClaim),
+          earned('belief','How true it felt',`${data.certaintyBefore} / 10`,Number.isInteger(data.certaintyBefore)),
+          ...fragments.map(fragment => earned(fragment.id, CATEGORIES.find(category => category.id === data.assignments?.[fragment.id])?.label || 'Your description', fragment.text, !!data.assignments?.[fragment.id])),
+          ...(data.support || []).map((text,i) => earned(`support-${i}`,'What supports it',text)),
+          ...(data.evidenceAgainst || []).map((text,i) => earned(`against-${i}`,'What points another way',text)),
+          earned('balanced','Words you confirmed',data.fairerView?.adaptive,data.balancedConfirmed),
+          earned('after','How true it feels now',`${data.certaintyAfter} / 10`,Number.isInteger(data.certaintyAfter)),
+        ]}/>
         <JourneyOptions id="factCheck"/>
       </div>
-    </InterventionControlShell>
-    </MotionConfig>
+    </InterventionControlShell></MotionConfig>
   );
 }

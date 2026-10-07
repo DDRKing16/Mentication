@@ -8,6 +8,7 @@ export function useNight(channels) {
   const [restored] = useState(()=>readNightSetup(channels.map(channel=>channel.id)));
   const [channel, setChannel] = useState(restored?.channel || channels[0].id),
     [view, setView] = useState(restored?.kind === 'preview' && restored.view || false);
+  const [timerConfirmed,setTimerConfirmed] = useState(restored?.timerConfirmed || false);
   const [setupStep,setSetupStep] = useState(restored?.kind === 'file' ? 'file' : restored?.setupStep || 'source');
   const [status, setStatus] = useState(restored?'paused':'idle'),
     [message, setMessage] = useState(restored?'Your setup is back. Nothing is playing; choose Play when ready.':'Choose a channel. No recordings have been added yet.');
@@ -43,9 +44,9 @@ export function useNight(channels) {
   const mounted = useRef(true);
   const persistSetup = useRef(()=>true);
   useEffect(()=>{
-    persistSetup.current=()=>writeNightSetup({channel,minutes,seconds:clock.current.seconds,volume,texture,source,kind:source!=='local'?'provider':needsFile || fileRefs.current[channel]?'file':'preview',view,noteId,setupStep});
+    persistSetup.current=()=>writeNightSetup({channel,minutes,seconds:clock.current.seconds,volume,texture,source,kind:source!=='local'?'provider':needsFile || fileRefs.current[channel]?'file':'preview',view,noteId,setupStep,timerConfirmed});
     setSetupOk(persistSetup.current());
-  },[channel,minutes,seconds,volume,texture,source,view,noteId,needsFile,setupStep]);
+  },[channel,minutes,seconds,volume,texture,source,view,noteId,needsFile,setupStep,timerConfirmed]);
   function update(next, detail = '', track) {
     if (!mounted.current) return;
     if (stopped.current && ['playing', 'loading', 'paused'].includes(next)) return;
@@ -179,6 +180,7 @@ export function useNight(channels) {
     update('playing');
   });
   const changeTimer = value => {
+    setTimerConfirmed(true);
     setMinutes(value);
     clock.current.set(value);
     if (currentStatus.current === 'playing') clock.current.start();
@@ -331,6 +333,7 @@ export function useNight(channels) {
     setNoteId,
     setupOk,
     setupStep,
+    timerConfirmed,
     setSetupStep,
     select,
     hasStarted,

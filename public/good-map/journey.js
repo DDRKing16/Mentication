@@ -134,6 +134,20 @@
     busy = false;
     jApplyPhotos(JST.photo || {});
   }
+  function practiceReveal() {
+    SCR().querySelector('.gm-practice-reveal')?.remove();
+    const events = ORDER.slice(0,N).flatMap((di,n)=>hist[n] === undefined ? [] : [{key:DECK[di].k,label:DECK[di].w,detail:{0:'Not for now',1:'Matters to me',3:'Especially important'}[hist[n]]}]);
+    for (const item of RQ) if (M.rating(RATE[item.k]) !== null) events.push({key:item.k,label:item.w,detail:`Importance: ${RATE[item.k]} / 10`});
+    const pairs = Math.floor(events.length / 2);
+    if (!pairs || !['sort','rate','map'].includes(phase)) return;
+    const reveal = document.createElement('aside'); reveal.className = 'gm-practice-reveal';
+    reveal.dataset.checkpoint = pairs; reveal.dataset.practiceCount = events.length;
+    reveal.setAttribute('aria-label','Your practice checkpoint');
+    const title = document.createElement('p'); title.className='gm-reveal-title'; title.textContent='Your map is taking shape'; reveal.append(title);
+    const row = document.createElement('div'); row.setAttribute('role','status');
+    for (const event of events.slice(pairs*2-2,pairs*2)) { const card=document.createElement('p');const label=document.createElement('span');label.textContent=event.label;const detail=document.createElement('strong');detail.textContent=event.detail;if (CARDS[G]?.[event.key]) {const picture=document.createElement('img');picture.src=`data:image/webp;base64,${CARDS[G][event.key]}`;picture.alt='';card.append(picture);}card.append(label,detail);row.append(card); }
+    reveal.append(row); SCR().append(reveal);
+  }
   function render() {
     loading = true;
     if (!['clinician', 'sharePreview'].includes(phase)) exportRecipient = '';
@@ -160,6 +174,7 @@
       JS.intro();
     }
     loading = false;
+    practiceReveal();
     document.dispatchEvent(new CustomEvent('good-map:phase', {
       detail: phase
     }));
@@ -328,6 +343,7 @@
     }
     if (!loading) {
       phase = 'sort';
+      practiceReveal();
       save();
     }
   };

@@ -146,6 +146,12 @@ export default function ResetFlow() {
   const [showSwitch, setShowSwitch] = useState(false);
   const startTimeRef = useRef(entry?.reset_started_at || Date.now());
   const sessionIdRef = useRef(entry?.reset_session_id || globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`);
+  useEffect(() => {
+    if (phase !== "guiding" || !usablePrebuiltEntry) return;
+    const state = globalThis.history?.state;
+    if (state?.usr?.reset_session_id === sessionIdRef.current) return;
+    try { globalThis.history.replaceState({...state,usr:resetNavigationEntry(state?.usr || entry,answers,"guiding",{id:sessionIdRef.current,startedAt:startTimeRef.current})}, ""); } catch { /* Practice-specific persistence reports unavailable history. */ }
+  }, [phase, usablePrebuiltEntry, entry, answers]);
 
   const [effectiveness, setEffectiveness] = useState({});
   const sessionHistoryRef = useRef([]);

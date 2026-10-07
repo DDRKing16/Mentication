@@ -6,9 +6,9 @@ const PATHS = [
   [[66,65],[40,74]], [[40,74],[23,57]], [[23,57],[25,38]],
 ];
 const GIFTS = [
-  ['✧','A little light appears'], ['⌁','A thread of light connects'],
-  ['❧','A leaf unfolds'], ['✧','The window grows brighter'],
-  ['❧','Another leaf comes into view'], ['☼','The room is connected'],
+  ['','One detail comes into focus'], ['','Two details, joined by a path'],
+  ['','A third detail joins the room'], ['','Four places for your attention'],
+  ['','One more part of the scene'], ['','Your path through the room'],
 ];
 const SCENES = ['THE WINDOW ROOM', 'LIGHT THROUGH LEAVES', 'A QUIET CORNER'];
 let storage;
@@ -83,7 +83,9 @@ function drawScene() {
       $('lines').append(line);
       const gift = document.createElement('span');
       gift.className = i === 5 ? 'reveal halo' : 'reveal';
-      gift.textContent = GIFTS[i][0];
+      gift.classList.add('room-discovery');
+      gift.style.backgroundPosition = `${to[0]}% ${to[1]}%`;
+      gift.style.setProperty('--discovery-index', i);
       gift.style.left = `${i === 5 ? 50 : to[0]}%`;
       gift.style.top = `${i === 5 ? 48 : to[1]}%`;
       if (i < count - 1) gift.style.animation = 'none';

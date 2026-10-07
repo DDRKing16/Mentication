@@ -1248,3 +1248,6 @@ html.reduce-motion .urge-lovable *::after {
 .urge-lovable__screen h1:focus { outline: none; }
 .urge-lovable__screen > .urge-lovable__orb { margin: 1.25rem auto; }
 .urge-lovable__screen > .urge-lovable__primary { width: 100%; white-space: normal; }
+
+/* Decorative water must never intercept the real practice controls. */
+.urge-lovable__start-wave,.urge-lovable__start-wave *{pointer-events:none}
