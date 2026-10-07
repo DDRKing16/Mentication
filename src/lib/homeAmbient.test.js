@@ -19,3 +19,10 @@ it('suspends in background and resumes only when still wanted',async()=>{
  document.visibilityState='visible';document.dispatchEvent(new Event('visibilitychange'));expect(current.play).toHaveBeenCalledTimes(2);ambient.pauseHomeAmbient();window.dispatchEvent(new Event('pageshow'));expect(current.play).toHaveBeenCalledTimes(2);
 });
 it('preserves approved source, handoff position, loop and clamped volume',()=>{ambient.handoffHomeAmbient({currentTime:25,volume:2});expect(current.src).toBe('/audio/home-ambient.mp3');expect(current.currentTime).toBe(25);expect(current.volume).toBe(1);expect(current.loop).toBe(true);});
+
+it('halves the home gain and retains position and gain across mute, setup resume and Begin pause',async()=>{
+ ambient.resumeHomeAmbient();await settle();expect(current.volume).toBe(0.175);
+ current.currentTime=25;ambient.setHomeAmbientMuted(true);ambient.resumeHomeAmbient();expect(current.muted).toBe(true);
+ ambient.setHomeAmbientMuted(false);expect(current.currentTime).toBe(25);expect(current.volume).toBe(0.175);
+ ambient.pauseHomeAmbient();expect(current.paused).toBe(true);ambient.resumeHomeAmbient();expect(current.currentTime).toBe(25);expect(current.volume).toBe(0.175);
+});

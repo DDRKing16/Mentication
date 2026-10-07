@@ -5,7 +5,7 @@ let wanted = false;
 let generation = 0;
 
 const MUSIC_URL = '/audio/home-ambient.mp3';
-const MUSIC_VOLUME = 0.35;
+const MUSIC_VOLUME = 0.175;
 const mayPlay=()=>wanted&&!muted&&(typeof document==='undefined'||document.visibilityState!=='hidden');
 function cancelRetry() {
   if(!retryGesture)return;

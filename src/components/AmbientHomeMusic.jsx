@@ -40,7 +40,7 @@ export default function AmbientHomeMusic() {
     const audio = new Audio("/audio/home-ambient.mp3");
     audio.loop = true;
     audio.preload = "auto";
-    audio.volume = 0.35;
+    audio.volume = 0.175;
     audioRef.current = audio;
 
     const unlock = () => {

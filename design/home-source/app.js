@@ -399,7 +399,7 @@
   // Background music. Browsers block sound until the visitor interacts, so
   // playback starts on the first tap or keypress anywhere in the home document.
   const bgMusic = document.getElementById('bg-music');
-  bgMusic.volume = 0.35;
+  bgMusic.volume = 0.175;
   const startMusic = () => {
     // In the real app the parent owns the persistent audio element so music
     // survives route changes and resumes from the same position.

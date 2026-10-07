@@ -1,4 +1,4 @@
-import { THREAT_QUESTIONS, scoreThreatCheck, threatCheckPassed, requiredThreatStep, requiredThreatView, emptyThreatCheck } from "./threat-check.js";
+import { THREAT_QUESTIONS, scoreThreatCheck, threatStepComplete, requiredThreatStep, requiredThreatView, emptyThreatCheck } from "./threat-check.js";
 import { createBookStore } from "./storage.js";
 import { en, hi, As, ia, ht, Sl, A2, O2, nb, Dd, Y1, q1, lv, J1, h, i, La, za, Nn, tt, Rn, Gr, li, X1, Qe, pu, Mx, LE, tb, Dx, Lx, zx, Rt, Zn, W1, Q1, Ke, hu, F1, fu, ta, Z1, QE, ZE, qE, XE, rb, G1, e2, n2, t2, r2, o2, bs, av, Uh, K1, $1, ob, H1, Bh, Vh, _p, eb, B1, $E, BE, HE, GE, UE, KE, YE, ov } from "./vendor.js";
 const _e = en().max(2e3),
@@ -66,6 +66,7 @@ const _e = en().max(2e3),
   }).strict(),
   os = hi({
     format: Sl(7),
+    threatVisualSeen: A2().default(false),
     threatCheck: hi({answers: As(ht().int().min(0).max(3).nullable()).length(4), submitted: A2()}).nullable().default(null),
     resume: hi({ view: en(), section: en(), planTab: en(), threat: ht().int().min(0).max(3), road: en(), checkpoint: ht().int().min(0).max(2), question: en().default("") }).default({view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0}),
     reflectionDraft: hi({ chapterId: en().uuid(), action: _e, result: ia(["less","same","more","unclear"]), observed: _e, learned: _e, next: _e, actualDiscomfort: ht().min(0).max(10).nullable(), afterLikelihood: ht().min(0).max(100).nullable(), goalStateAfter: ht().min(0).max(10).nullable() }).nullable().default(null),
@@ -169,6 +170,7 @@ const z2 = {
   },
   Co = () => ({
     format: 7,
+    threatVisualSeen: false,
     threatCheck: null,
     resume: {view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0},
     reflectionDraft: null,
@@ -281,7 +283,7 @@ function $u(e) {
   return !!(t && JSON.stringify(t.answers) === JSON.stringify(e.answers) && t.scheduledLabel === e.scheduledLabel);
 }
 function Y2(e, t, n) {
-  if (!threatCheckPassed(e)) throw new Error("Complete the four-question threat-system check with at least 3 of 4 correct first.");
+  if (!threatStepComplete(e)) throw new Error("Complete the four-question threat-system check with at least 3 of 4 correct first.");
   if (!_t(1, e.answers) || !_t(6, e.answers) || !_t(9, e.answers)) throw new Error("Complete your direction, values and plan first.");
   if ($u(e)) return e.committed && e.step === 9 && e.furthestStep === 9 ? e : {
     ...e,
@@ -1520,6 +1522,96 @@ function SequentialQuestions({id, steps, current, onCurrent, onDone, doneLabel="
     index>0&&i.jsx("button",{className:"text-button",onClick:()=>{if(!requestDearHistoryBack())go(index>=optionalStart?optionalStart-1:index-1);},children:"Back to previous question"})
   ]});
 }
+function ThreatFramework({ expanded = false }) {
+  const [T, ae] = h.useState(0);
+  return i.jsxs("div", {
+          className: "learn-content",
+          children: [i.jsx("div", {
+            className: "evolution-kicker",
+            children: "HUMAN DEVELOPMENT · THEN TO NOW"
+          }), i.jsx("h3", {
+            children: "How survival became social"
+          }), i.jsx("p", {
+            children: "One simplified perspective on protection and social comparison, not a proven sequence or an explanation of every person’s experience."
+          }), i.jsx("div", {
+            className: "evolution-model",
+            role: "group",
+            "aria-label": "Eight-stage conceptual evolutionary model",
+            style: {
+              "--evolution-progress": T / 7
+            },
+            children: vN.map((E, A) => i.jsxs("button", {
+              "aria-pressed": T === A,
+              className: T === A ? "selected" : A < T ? "passed" : "",
+              onClick: () => {
+                ae(A), ge.cue();
+              },
+              children: [i.jsx("span", {
+                className: "evolution-node",
+                children: String(A + 1).padStart(2, "0")
+              }), i.jsxs("span", {
+                className: "evolution-copy",
+                children: [i.jsx("small", {
+                  children: E.label
+                }), i.jsx("strong", {
+                  children: E.title
+                }), (expanded || T === A) && i.jsx("em", {
+                  children: E.text
+                })]
+              }), i.jsx(li, {
+                size: 16
+              })]
+            }, E.label))
+          }), i.jsxs("div", {
+            className: "evolution-result",
+            children: [i.jsx("small", {
+              children: "THE MODERN RESULT"
+            }), i.jsx("strong", {
+              children: "Comparison can affect how some people feel about themselves."
+            }), i.jsx("p", {
+              children: "A value that cannot be objectively defined, reliably calculated or permanently secured."
+            })]
+          }), i.jsx("p", {
+            className: "fine-print",
+            children: "This is a simplified conceptual model, not a complete history of evolution or a diagnosis of why you feel something."
+          }), i.jsx("h3", {
+            children: "The practical framework"
+          }), i.jsx("p", {
+            children: "Pattern: name what you want, then examine the block, fear and two possible futures. Direction: understand the protective response and choose your values. Action: use a coping tool, plan one workable step, then review and adjust."
+          }), i.jsx("p", {
+            children: "Prediction Lab uses the established idea of a behavioural experiment. The feature is new to this version; the psychological method is not new."
+          }), i.jsxs("a", {
+            href: "https://www.cci.health.wa.gov.au/Resources/Looking-After-Yourself/Anxiety",
+            target: "_blank",
+            rel: "noopener noreferrer",
+            children: ["Centre for Clinical Interventions · Anxiety resources", " ", i.jsx(tt, {
+              size: 14
+            })]
+          }), i.jsxs("a", {
+            href: "https://www.who.int/publications/i/item/9789240003927",
+            target: "_blank",
+            rel: "noopener noreferrer",
+            children: ["WHO · Doing What Matters in Times of Stress", " ", i.jsx(tt, {
+              size: 14
+            })]
+          }), i.jsx("p", {
+            className: "fine-print",
+            children: "Original app wording, with artwork from the supplied design references. These resources inform the approach; they do not constitute endorsement or validation of this app."
+          })]
+        });
+}
+function RequiredThreatVisual({ onContinue, onCurrent }) {
+  const root = h.useRef(null);
+  h.useEffect(() => { root.current?.querySelector("h1")?.focus({preventScroll:true}); }, []);
+  useQuestionHistory("3", "threat-visual", onCurrent);
+  return i.jsxs("section", {
+    ref: root, className: "threat-required-visual sequential-question",
+    "aria-label": "Required threat-system visual",
+    children: [i.jsx("h1", { id: "screen-title", tabIndex: -1, children: "Our Threat Detection System" }),
+      i.jsx(ThreatFramework, { expanded: true }),
+      i.jsx("button", { className: "primary-button cream-button", onClick: onContinue, children: "Continue to the four threat phases" })]
+  });
+}
 function ThreatCheck({check,onCheck,current,onCurrent,onDone}) {
   useQuestionHistory("3",current?.startsWith("threat:")?current:"threat:0",onCurrent);
   const value=check||emptyThreatCheck(),score=scoreThreatCheck(value),passed=value.submitted&&score!==null&&score>=3;
@@ -1539,7 +1631,7 @@ function ThreatCheck({check,onCheck,current,onCurrent,onDone}) {
 function rN({
   phases: e,
   onLearn: t,
-  phase = 0, onPhase = () => {}, check, onCheck, current, onCurrent, onDone
+  phase = 0, onPhase = () => {}, check, onCheck, current, onCurrent, onDone, visualSeen, onVisualDone
 }) {
   const n = phase, r = onPhase,
     o = h.useRef(null),
@@ -1569,6 +1661,7 @@ function rN({
         w = f.clientY - y.y;
       Math.abs(x) >= 44 && Math.abs(x) > Math.abs(w) * 1.35 && c(n + (x < 0 ? 1 : -1));
     };
+  if (!visualSeen || current === "threat-visual") return i.jsx(RequiredThreatVisual, { onContinue: onVisualDone, onCurrent });
   if(current?.startsWith("threat:"))return i.jsx(ThreatCheck,{check,onCheck,current,onCurrent,onDone});
   return i.jsxs("div", {
     className: "threat-system threat-system-standalone",
@@ -2786,7 +2879,7 @@ function kN({
   onLearn: r,
   futureWalk: o,
   onFutureWalkChange: s,
-  focusRequest: a, onResumeChange, onThreatCheck, onDone
+  focusRequest: a, onResumeChange, onThreatCheck, onThreatVisualDone, onDone
 }) {
   const l = t.answers,
     c = yN(l),
@@ -3107,7 +3200,7 @@ function kN({
       })]
     }), e === 3 && i.jsx(i.Fragment, {
       children: i.jsx(rN, {
-        phases: gN,
+        phases: gN, visualSeen:t.threatVisualSeen, onVisualDone:onThreatVisualDone,
         phase:t.resume.threat, onPhase:threat=>onResumeChange({threat}),
         check:t.threatCheck, onCheck:onThreatCheck,current:t.resume.question,onCurrent:question=>onResumeChange({question}),onDone,
         onLearn: r
@@ -3179,7 +3272,6 @@ function SN() {
     [Z, ne] = h.useState(30),
     [V, F] = h.useState(!1),
     [N, M] = h.useState(!1),
-    [T, ae] = h.useState(0),
     [Q, ie] = h.useState(!1),
     [de, pe] = h.useState(0),
     [re, setReflection] = h.useState({
@@ -3206,7 +3298,7 @@ function SN() {
     Gt = jr(D),
     pi = e.chapters.find(E => E.id === (f || e.activeChapterId));
   h.useEffect(() => {
-    if (I && (requiredThreatView(e,n) !== n || n === "journey" && e.step > 3 && !threatCheckPassed(e))) {
+    if (I && (requiredThreatView(e,n) !== n || n === "journey" && e.step > 3 && !threatStepComplete(e))) {
       t(book=>({...book,step:3})); r("journey");
     }
   }, [I,e,n]);
@@ -3215,7 +3307,7 @@ function SN() {
     const restore=event=>{
       if(event.origin!==location.origin||event.source!==window.parent||event.data?.type!=="mentication:restore-screen"||event.data?.journeyId!=="dear2100")return;
       const screen=event.data.screen,stage=screen?.cursors?.stage;if(!screen||!Number.isInteger(stage)||stage<1||stage>9||typeof screen.id!=="string")return;
-      const known=/^stage-[1-9]$/.test(screen.id)||["2:kind","2:prediction","2:practicalNote","2:other-barriers","4:practicalSupport","4:behavior","4:cost","5:horizon","5:roads","6:values","6:valueAction","6:judgment","8:action","8:day","8:time","8:minutes","8:ifThen","8:budget","8:likelihood","8:discomfort","8:goalState","8:evidenceLookFor","threat:0","threat:1","threat:2","threat:3","threat:score","outcome:observed","outcome:result","outcome:actualDiscomfort","outcome:afterLikelihood","outcome:goalStateAfter","outcome:learned","outcome:next"].includes(screen.id);
+      const known=/^stage-[1-9]$/.test(screen.id)||["threat-visual","2:kind","2:prediction","2:practicalNote","2:other-barriers","4:practicalSupport","4:behavior","4:cost","5:horizon","5:roads","6:values","6:valueAction","6:judgment","8:action","8:day","8:time","8:minutes","8:ifThen","8:budget","8:likelihood","8:discomfort","8:goalState","8:evidenceLookFor","threat:0","threat:1","threat:2","threat:3","threat:score","outcome:observed","outcome:result","outcome:actualDiscomfort","outcome:afterLikelihood","outcome:goalStateAfter","outcome:learned","outcome:next"].includes(screen.id);
       if(!known)return;
       dearHistoryRestoring=dearHistoryCursor!==JSON.stringify({id:screen.id,cursors:{stage}});dearHistoryDepth=Number.isSafeInteger(screen.depth)&&screen.depth>=0?screen.depth:0;
       const target=requiredThreatStep($.current,stage),question=screen.id.startsWith("stage-")?target===3?"threat-teaching":"":screen.id;
@@ -3412,7 +3504,7 @@ function SN() {
       Y(await ge.enable(E));
     },
     qx = () => {
-      if (ue === 3 && !threatCheckPassed(e)) return;
+      if (ue === 3 && !threatStepComplete(e)) return;
       if (!_t(ue, D)) {
         m(A => A + 1);
         const E = document.querySelector(".needs-answer textarea, .flow-value-grid button:not([aria-pressed='true'])");
@@ -3438,7 +3530,7 @@ function SN() {
     },
     Qx = async () => {
       if (!d) {
-        if (!threatCheckPassed(e)) { Ct(3); return; }
+        if (!threatStepComplete(e)) { Ct(3); return; }
         if (!_t(1, D)) {
           bn(1);
           return;
@@ -3468,7 +3560,7 @@ function SN() {
     },
     Cl = async () => {
       if (d) return;
-      if (!threatCheckPassed(e)) { Ct(3); return; }
+      if (!threatStepComplete(e)) { Ct(3); return; }
       p(true);
       try {
         const book = Y2($.current,gc(),new Date().toISOString());
@@ -3884,6 +3976,7 @@ function SN() {
           futureWalk: ee,
           onFutureWalkChange: J,
           onResumeChange: patch => t(book=>({...book,resume:{...book.resume,...patch}})),
+          onThreatVisualDone: () => { t(book=>({...book,threatVisualSeen:true,resume:{...book.resume,question:"threat-teaching"}})); window.scrollTo({top:0,behavior:"instant"}); },
           onThreatCheck: threatCheck => t(book=>({...book,threatCheck})),
           focusRequest: k, onDone:qx
         }, ue), ue < 9 && ![2,3,4,6,8].includes(ue) && !(ue===7&&D.barrierFocus!=="practical") && i.jsxs("footer", {
@@ -3891,14 +3984,14 @@ function SN() {
           children: [i.jsx("span", {
             className: "save-status",
             id: "continue-guidance",
-            children: ue === 3 ? (threatCheckPassed(e) ? "Understanding check passed · 75% or more" : "Answer all four questions · 3 of 4 correct to continue") : i.jsxs(i.Fragment, {
+            children: ue === 3 ? (threatStepComplete(e) ? "Understanding check passed · 75% or more" : "Answer all four questions · 3 of 4 correct to continue") : i.jsxs(i.Fragment, {
               children: [i.jsx(pu, {
                 size: 12
               }), _t(ue, D) ? j === "saved" ? "Saved privately" : j === "saving" ? "Saving…" : j === "loading" ? "Opening…" : "Not saved yet" : G2(ue, D)]
             })
           }), i.jsxs("button", {
             className: "primary-button " + (ss ? "cream-button" : "") + (_t(ue, D) ? "" : " needs-input"),
-            disabled: Kn || ue === 3 && !threatCheckPassed(e),
+            disabled: Kn || ue === 3 && !threatStepComplete(e),
             "aria-describedby": "continue-guidance",
             onClick: qx,
             children: [_t(ue, D) ? x ? "Return to my plan" : rw[ue] : ue === 8 && D.action.trim() ? "Next: my response to fear" : ue === 6 ? "Choose my values above" : "Answer above to continue", i.jsx(Qe, {
@@ -4570,81 +4663,7 @@ function SN() {
         }), a === "pause" && i.jsx("div", {
           className: "pause-modal",
           children: ow
-        }), a === "learn" && i.jsxs("div", {
-          className: "learn-content",
-          children: [i.jsx("div", {
-            className: "evolution-kicker",
-            children: "HUMAN DEVELOPMENT · THEN TO NOW"
-          }), i.jsx("h3", {
-            children: "How survival became social"
-          }), i.jsx("p", {
-            children: "One simplified perspective on protection and social comparison, not a proven sequence or an explanation of every person’s experience."
-          }), i.jsx("div", {
-            className: "evolution-model",
-            role: "group",
-            "aria-label": "Eight-stage conceptual evolutionary model",
-            style: {
-              "--evolution-progress": T / 7
-            },
-            children: vN.map((E, A) => i.jsxs("button", {
-              "aria-pressed": T === A,
-              className: T === A ? "selected" : A < T ? "passed" : "",
-              onClick: () => {
-                ae(A), ge.cue();
-              },
-              children: [i.jsx("span", {
-                className: "evolution-node",
-                children: String(A + 1).padStart(2, "0")
-              }), i.jsxs("span", {
-                className: "evolution-copy",
-                children: [i.jsx("small", {
-                  children: E.label
-                }), i.jsx("strong", {
-                  children: E.title
-                }), T === A && i.jsx("em", {
-                  children: E.text
-                })]
-              }), i.jsx(li, {
-                size: 16
-              })]
-            }, E.label))
-          }), i.jsxs("div", {
-            className: "evolution-result",
-            children: [i.jsx("small", {
-              children: "THE MODERN RESULT"
-            }), i.jsx("strong", {
-              children: "Comparison can affect how some people feel about themselves."
-            }), i.jsx("p", {
-              children: "A value that cannot be objectively defined, reliably calculated or permanently secured."
-            })]
-          }), i.jsx("p", {
-            className: "fine-print",
-            children: "This is a simplified conceptual model, not a complete history of evolution or a diagnosis of why you feel something."
-          }), i.jsx("h3", {
-            children: "The practical framework"
-          }), i.jsx("p", {
-            children: "Pattern: name what you want, then examine the block, fear and two possible futures. Direction: understand the protective response and choose your values. Action: use a coping tool, plan one workable step, then review and adjust."
-          }), i.jsx("p", {
-            children: "Prediction Lab uses the established idea of a behavioural experiment. The feature is new to this version; the psychological method is not new."
-          }), i.jsxs("a", {
-            href: "https://www.cci.health.wa.gov.au/Resources/Looking-After-Yourself/Anxiety",
-            target: "_blank",
-            rel: "noopener noreferrer",
-            children: ["Centre for Clinical Interventions · Anxiety resources", " ", i.jsx(tt, {
-              size: 14
-            })]
-          }), i.jsxs("a", {
-            href: "https://www.who.int/publications/i/item/9789240003927",
-            target: "_blank",
-            rel: "noopener noreferrer",
-            children: ["WHO · Doing What Matters in Times of Stress", " ", i.jsx(tt, {
-              size: 14
-            })]
-          }), i.jsx("p", {
-            className: "fine-print",
-            children: "Original app wording, with artwork from the supplied design references. These resources inform the approach; they do not constitute endorsement or validation of this app."
-          })]
-        }), a === "outcome" && i.jsx(SequentialQuestions,{
+        }), a === "learn" && i.jsx(ThreatFramework, {}), a === "outcome" && i.jsx(SequentialQuestions,{
           id:"outcome",current:e.resume.question,onCurrent:question=>t(book=>({...book,resume:{...book.resume,question}})),optionalStart:1,onDone:Xx,doneLabel:"Save this observation",blocked:d||e.entries.length>=200,
           steps:[{id:"observed",title:"What did you observe?",hint:`The step you tried: ${re.action}. Include anything difficult or unresolved.`,valid:!!re.observed.trim(),field:i.jsx(Ye,{required:true,questionId:"screen-title",label:"What did I observe?",value:re.observed,onChange:observed=>Ne(previous=>({...previous,observed}))})},
           {id:"result",title:"How did it compare with your expectation?",field:i.jsx(Kx,{label:"How the outcome compared",options:Object.values(ms),value:ms[re.result],onChange:value=>Ne(previous=>({...previous,result:Object.keys(ms).find(key=>ms[key]===value)}))})},

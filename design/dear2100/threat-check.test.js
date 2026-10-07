@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { THREAT_QUESTIONS, scoreThreatCheck, threatCheckPassed, requiredThreatStep, requiredThreatView, emptyThreatCheck } from './threat-check';
+import { THREAT_QUESTIONS, scoreThreatCheck, threatCheckPassed, threatStepComplete, requiredThreatStep, requiredThreatView, emptyThreatCheck } from './threat-check';
 const correct = THREAT_QUESTIONS.map(q=>q.correct);
 const book = check => ({step:8,answers:{want:'Learn music'},threatCheck:check});
 describe('Dear 2100 required understanding check',()=>{
@@ -20,6 +20,15 @@ describe('Dear 2100 required understanding check',()=>{
    expect(threatCheckPassed(book({answers,submitted:true}))).toBe(mistakes<=1);
   }
  });
+ it('requires the automatic visual even for a previously passed or resumed quiz',()=>{
+  const passed=book({answers:correct,submitted:true});
+  expect(threatCheckPassed(passed)).toBe(true);
+  expect(threatStepComplete(passed)).toBe(false);
+  expect(requiredThreatStep(passed,8)).toBe(3);
+  expect(requiredThreatView(passed,'plan')).toBe('journey');
+  expect(threatStepComplete({...passed,threatVisualSeen:true})).toBe(true);
+  expect(threatStepComplete({...book(null),threatVisualSeen:true})).toBe(false);
+ });
  it('retry clears answers and cannot retain a prior pass',()=>{
   const retry=emptyThreatCheck();expect(scoreThreatCheck(retry)).toBeNull();expect(threatCheckPassed(book(retry))).toBe(false);
  });
@@ -28,6 +37,6 @@ describe('Dear 2100 required understanding check',()=>{
   for(let step=0;step<=9;step++)expect(requiredThreatStep(prior,step)).toBe(step>3?3:step);
   for(const view of ['home','cover','book','closing'])expect(requiredThreatView(prior,view)).toBe(view);
   expect(requiredThreatView(prior,'plan')).toBe('journey');expect(requiredThreatView(prior,'journey')).toBe('journey');expect(prior.furthestStep).toBe(9);expect(prior.answers.practicalSupport).toBe('Ask for help');
-  const passed={...prior,threatCheck:{answers:correct,submitted:true}};expect(requiredThreatStep(passed,9)).toBe(9);expect(requiredThreatView(passed,'plan')).toBe('plan');
+  const passed={...prior,threatVisualSeen:true,threatCheck:{answers:correct,submitted:true}};expect(requiredThreatStep(passed,9)).toBe(9);expect(requiredThreatView(passed,'plan')).toBe('plan');
  });
 });
