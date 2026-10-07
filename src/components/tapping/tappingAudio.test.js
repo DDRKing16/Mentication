@@ -23,6 +23,13 @@ function fixture({outputClock=false,resolveNarration=key=>({url:'/audio/narratio
 }
 afterEach(()=>vi.useRealTimers());
 describe('offline tapping voice/music/contact mixer',()=>{
+ it('exposes native output time for guide progress before rhythm starts, and no clock when unavailable',async()=>{
+  const f=fixture({outputClock:true});expect(f.mixer.playbackTime()).toBeNull();
+  f.setClock(1000,.05);await f.mixer.activate('worry');expect(f.mixer.playbackTime()).toBeCloseTo(9.95);
+  f.contexts[0].currentTime=10.2;expect(f.mixer.playbackTime()).toBeCloseTo(10.15);
+  f.contexts[0].state='suspended';expect(f.mixer.playbackTime()).toBeNull();
+  f.mixer.dispose();expect(f.mixer.playbackTime()).toBeNull();
+ });
  it('prefetches without hardware and unlocks directly in the Start gesture',async()=>{const f=fixture();await f.mixer.preload('worry');expect(f.contexts).toHaveLength(0);const enabled=f.mixer.activate('worry');expect(f.contexts[0].resume).toHaveBeenCalledOnce();expect(await enabled).toBe(true);expect(f.sources).toHaveLength(0);f.mixer.run();expect(f.events[0].kind).toBe('music');f.mixer.dispose();});
  it('ducks music under the real spoken clip and accepts the selected cadence contact offset',async()=>{const f=fixture();await f.mixer.activate('worry');f.mixer.run();f.mixer.speak('place-brow');f.mixer.beat(320);expect(f.events.map(e=>e.kind)).toEqual(['music','voice','beat']);expect(f.events[2].at).toBe(10.32);expect(f.sources[0].loop).toBe(true);expect(f.contexts[0].gains[1].gain.setTargetAtTime).toHaveBeenLastCalledWith(.12,10,.16);f.sources[1].onended();expect(f.contexts[0].gains[1].gain.setTargetAtTime).toHaveBeenLastCalledWith(.45,10,.16);f.mixer.dispose();});
  it('pause immediately cancels music, voice and queued contact; Resume continues the sentence',async()=>{const f=fixture();await f.mixer.activate('worry');f.mixer.run();f.mixer.speak('place-hand');f.mixer.beat();f.contexts[0].currentTime=11.5;f.mixer.pause();for(const source of f.sources)expect(source.stop).toHaveBeenCalled();f.mixer.run();expect(f.events.at(-1)).toMatchObject({kind:'voice',key:'place-hand'});expect(f.events.at(-1).offset).toBeCloseTo(1.5);expect(f.sources.at(-1).playbackRate.value).toBe(1);f.mixer.cancel();f.mixer.run();expect(f.events.at(-1).kind).toBe('music');f.mixer.dispose();});

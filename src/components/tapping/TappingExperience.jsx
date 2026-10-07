@@ -10,6 +10,7 @@ import { createTappingCues } from './tappingCues';
 import { createTappingAudio } from './tappingAudio';
 import { hasTappingNarration } from './tappingNarration';
 import { tappingPlan, narrationForTick } from './tappingTiming';
+import { createTappingProgressClock } from './tappingProgressClock';
 import { suspendFeedback, resumeFeedback } from '@/lib/feedback';
 import './tapping.css';
 
@@ -103,12 +104,16 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   }, [onExit]);
   useEffect(() => {
     if (stage !== 'round' || paused || !artworkReady) return;
+    const progress = createTappingProgressClock(), elapsed = createTappingProgressClock();
+    const audioTime = () => sound && !muted && !silent && !channelsOff ? mixer.current?.playbackTime() ?? null : null;
+    progress(performance.now(), audioTime()); elapsed(performance.now());
     const timer = window.setInterval(() => {
-      duration.current += 1;
-      setSecond(s => s + 1);
-    }, 1000);
+      const wall = performance.now();
+      if (elapsed(wall)) duration.current += 1;
+      if (progress(wall, audioTime())) setSecond(s => s + 1);
+    }, 250);
     return () => clearInterval(timer);
-  }, [stage, paused, artworkReady]);
+  }, [stage, paused, artworkReady, index, sound, muted, silent, channelsOff]);
   useEffect(() => {
     if (stage !== 'round' || second < secondsPerPoint) return;
     setSecond(0);

@@ -122,6 +122,7 @@ export function createTappingAudio({
     rhythmClock.lastPhase=Math.max(rhythmClock.lastPhase,(outputTime()-rhythmClock.origin)*1000);
     return rhythmClock.lastPhase;
   }
+  function playbackTime(){return !disposed&&context?.state==='running'?outputTime():null;}
   function pause(){
     generation+=1;playing=false;stopRhythm();
     if(voiceNode)voiceCursor={key:voiceNode.key,offset:Math.max(0,voiceNode.offset+(context.currentTime-voiceNode.start)*voiceNode.rate)};
@@ -131,5 +132,5 @@ export function createTappingAudio({
   function cancel(){pause();voiceCursor=null;}
   function configure(options){channels={...channels,...options};if(!channels.voice){stopKind('voice');voiceNode=null;voiceCursor=null;duck(.45);}if(!channels.music){if(musicNode)musicOffset+=Math.max(0,context.currentTime-musicStarted);stopKind('music');musicNode=null;}if(!channels.beat)stopRhythm();}
   function dispose(){if(disposed)return;cancel();disposed=true;abort.abort();context?.removeEventListener?.('statechange',stateChanged);if(context)void context.close().catch(()=>{});}
-  return {preload,activate,run,speak,beat,startRhythm,stopRhythm,rhythmPhase,pause,cancel,configure,dispose};
+  return {preload,activate,run,speak,beat,startRhythm,stopRhythm,rhythmPhase,playbackTime,pause,cancel,configure,dispose};
 }
