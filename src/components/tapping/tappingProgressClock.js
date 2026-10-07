@@ -13,7 +13,7 @@ export function createTappingProgressClock() {
     remainder += Math.max(0, time - previous);
     previous = Math.max(previous, time);
     if (remainder < 1000 - 1e-6) return false;
-    remainder %= 1000;
+    remainder = Math.max(0, remainder - Math.floor((remainder + 1e-6) / 1000) * 1000);
     return true;
   };
 }

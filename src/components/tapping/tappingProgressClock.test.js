@@ -24,6 +24,13 @@ describe('tapping guide output clock', () => {
     for (let i = 1; i <= 40; i++) if (step(i * 250, 20 + i * .25)) seconds++;
     expect(seconds).toBe(10);
   });
+  it('consumes the full second at floating-point boundaries without advancing the next cue early', () => {
+    const step = createTappingProgressClock(); step(0, 10.1);
+    expect(step(1000, 11.1 - 1e-12)).toBe(true);
+    expect(step(1250, 11.35)).toBe(false);
+    expect(step(1750, 11.85)).toBe(false);
+    expect(step(2000, 12.1)).toBe(true);
+  });
   it('advances once after a blocked callback and discards whole seconds of backlog', () => {
     const step = createTappingProgressClock(); step(0, 10);
     expect(step(9000, 19.1)).toBe(true);
