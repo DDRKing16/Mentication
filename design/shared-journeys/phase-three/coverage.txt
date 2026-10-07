@@ -1,0 +1,129 @@
+ACTUAL JOURNEY COVERAGE ON APPROVED BASELINE a3d2cad
+
+All inputs are synthetic, isolated browser data. "Confirmed" below means an
+explicit UI test response, not that a person performed an offline action.
+No external communication, provider integration or calendar export occurred.
+
+Home / NeedStart / Library / My Plan / Return points / completion
+320x844 and 390x844 final regression: staged selection, reload and Back/focus,
+search/category/filter persistence and empty recovery, explicit starting
+rating, Next action completion with null ending, PMR optional note save/update,
+return/reopen, failed deletion preserves data, real deletion survives reload,
+unreadable data stays intact, plan provenance. Actual Home return reached from
+completed Vector/Change Scene. Home art/generated source unchanged.
+Changed in earlier phases; approved contracts retained during reconciliation.
+
+Next Easiest Step
+320x640 and 390x640 final regression: task -> action, pause/resume, unfinished
+review/return, edit, reload/resume, done/undo/skip, null ending. 150% text.
+Active/review design from phase two; approved resume/verified storage retained.
+Three-step mapping retained from main and covered by existing unit suite;
+this follow-up browser run uses the one-step path, not all ladder variants.
+
+Progressive Muscle Relaxation
+320x640 and 390x640: short/full route choices, release-only start, pause/
+continue/skip/resume, words/body switch preserving remaining time, stopped
+finish, unanswered tension and final check-in. 150% text has no horizontal
+overflow. Stop button bounding box asserted inside 640px first viewport.
+Short/full routes displayed; full session was NOT timed through every region.
+Only essential-control priority newly changed; protocol/art remain unchanged.
+
+Thought or Fact
+390x844 full approved path: host check-in -> own thought -> skip belief ->
+Fact classification -> one added supporting detail and one uncommitted
+alternative detail -> reload preserves both -> Continue commits -> own edited
+balanced statement -> explicit confirmation -> leave here -> return phrase ->
+explicit save -> finish -> null ending -> Return points expanded evidence ->
+delete -> reload empty. Actual saved belief-before and belief-after were null.
+Earlier e292234 issues with repeated draft copy/transitions were already fixed
+by main. No new internal changes. Not every classification/handoff tested.
+
+Urge Surfing
+320x640 current path: fresh host check-in -> 30-second external-focus quick
+start -> pause -> reload restores paused 00:30 -> resume -> real 30-second
+elapsed completion -> Ride it again -> pause/end early -> substitute guidance
+-> finish -> null ending. No optional urge rating or feedback/storage opt-in.
+Approved main already added the quick path and persisted paused runtime;
+the earlier e292234 reload observation is NOT an outstanding current defect.
+No new internal changes. Ten-minute extension and all body-anchor variants
+not tested in this follow-up. Prior deeper body path was on the old baseline.
+
+Happy Bump
+320x640 and 390x844 complete final click-only paths: fresh mood/distress ->
+start -> skip energy -> water confirmation -> skip light -> indoor walk ->
+pause/shorter-walk report -> skip connection -> chosen tiny mission -> honest
+start -> optional reflection -> learning area/action -> productive plan,
+pairing/reward -> reload stays at plan but clears unsaved words by design ->
+re-enter -> 150% text -> skip ending energy -> truthful not-measured recap ->
+save note/preferences -> Done -> finish without mood check -> Return points
+delete/reload -> reopen saved preferences -> new energy remains unanswered.
+New local layout/plan/accessibility-copy changes described in report.txt.
+No messaging buttons, microphone, external apps or long walk timer tested.
+
+Change the Scene
+320x640 complete approved path: fresh mood/distress -> Begin Change Scene ->
+alternative position action -> confirm/undo/reconfirm -> Continue -> reload
+returns to water step -> skip four actions -> rest alternative -> confirm ->
+review accurately says 2 confirmed / 4 skipped -> null final rating -> Home.
+Readable action/alternative hierarchy and truthful receipt retained.
+No internal changes. No external message action or suggested follow-on run.
+
+Tomorrow Parking Lot
+320x640: It can wait -> own note -> reload restores draft -> explicit seal/
+save -> quiet view -> daylight -> edit saved note -> reload -> explicit
+excerpt handoff -> Next Step shared setup -> return -> permanent deletion
+confirmation -> reload empty. No automatic excerpt sharing or calendar file.
+Useful save/return distinction and safe explicit handoff already present.
+No internal changes. Handoff reached setup, not a completed Next Step task.
+
+Foundations
+390x844: all 17 check-in questions confirmed via the two-tap rating control ->
+snapshot explains tied areas (synthetic mixed ratings) -> choose daily
+structure -> Prepare first step -> tiny dose -> optional cue/time -> explicit
+save -> reload -> Not yet review -> keep plan/save review -> reload -> finish/
+leave. Planning distinguished from doing and helpfulness not fabricated.
+No internal changes. Not every area, dose, review or deletion path tested.
+
+The Good Map
+320x640: sort all 16 cards (two needed, others not me) -> one explicit
+importance 7, one skipped -> map -> own interpretation left blank -> skip
+satisfaction -> choose focus -> existing support/barrier/desired change ->
+suggested tiny step -> local date/time plan -> map home -> reload -> Not yet
+check-in -> unanswered rating and no helpfulness claim -> save -> reload ->
+dated history shows unanswered -> unanswered -> delete all with explicit
+confirmation -> reload entry. No invented delta or map comparison.
+No internal changes. Only one map/plan, no exports/comparison/provider work.
+
+Signal Lock
+390x844: entry -> signal 1/2 connection -> pause -> reload resumes paused with
+partial scene -> continue -> stop -> accurate 1 connection / 0 complete scenes,
+optional feedback left unanswered. No finished-build changes. This verifies
+one connection and early ending, not all scenes or long engagement.
+
+Vector Shift
+320x640: Library/shared starting check-in -> Align keyboard interaction ->
+pause/reload/resume -> easier option -> notice a colour -> Serpent three light
+collections -> Word match reveal letters -> Solar two noticed features -> skip
+remaining scan -> skip reflection -> optional feedback unanswered -> host
+check-in skip -> Home. No finished-build changes. Original full-game variants
+and every reflection response were not walked in this task.
+
+Night Channel
+390x844: local generated-noise preview honestly labeled as such -> Tune In ->
+actual playing UI/time advances -> STOP -> reload paused at remaining time ->
+Finish by choice -> close quietly. No recordings/providers invented or used.
+Finished build unchanged. Duplicate original/new control surfaces remain a
+design limitation. No 15-minute timer expiry, native background/lock-screen,
+provider authorization or proof of audible playback from screenshot inspection.
+
+5-4-3-2-1 Grounding / Box Breathing
+Earlier phase-two actual entry screens only, preserved. No full-loop claim.
+Not included in the parent's requested deep follow-up list; not redesigned.
+
+Dear 2100
+Approved teaching + mandatory 4-question 75% gate and source/build untouched.
+Existing relevant tests pass. No claim of a new full browser walkthrough here.
+
+Self-Compassion / Gentle Tapping / Unhook / Make Room / Tara
+Excluded implementation internals. Shared previews and saved links are not
+evidence of internal review. No API change, no specialist file ownership taken.

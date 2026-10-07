@@ -1,0 +1,2 @@
+320 640 Happy full click-only path; paused short walk; reload preserves stage and clears unsaved words; re-enter plan; 150% text; optional save/delete; saved preferences repeat with unanswered energy; no errors
+390 844 Happy full click-only path; paused short walk; reload preserves stage and clears unsaved words; re-enter plan; 150% text; optional save/delete; saved preferences repeat with unanswered energy; no errors

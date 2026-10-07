@@ -1,0 +1,16 @@
+320 chooser selection, reload, focus and Back {}
+320 Library category, search, filters, empty state and reload {}
+320 Library → Next Easiest Step: edit, action, finish, unanswered final rating {"sessions":1,"finalRating":null}
+320 PMR → pause/resume/stop → optional cue save/update → return/reopen {"notes":1}
+320 failed deletion preserves note; successful deletion survives reload {}
+320 unreadable saved notes preserved, recovery visible {}
+320 plan provenance readable {}
+320 no uncaught page errors {}
+390 chooser selection, reload, focus and Back {}
+390 Library category, search, filters, empty state and reload {}
+390 Library → Next Easiest Step: edit, action, finish, unanswered final rating {"sessions":1,"finalRating":null}
+390 PMR → pause/resume/stop → optional cue save/update → return/reopen {"notes":1}
+390 failed deletion preserves note; successful deletion survives reload {}
+390 unreadable saved notes preserved, recovery visible {}
+390 plan provenance readable {}
+390 no uncaught page errors {}

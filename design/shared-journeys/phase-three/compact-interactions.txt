@@ -1,0 +1,6 @@
+320 Next action: pause, unfinished review/resume, edit, reload/resume, done, undo, skip, honest nullable finish {}
+320 PMR: real short/full routes, view switch, pause/continue/skip/resume, skipped area labelled honestly, stopped finish {}
+320 No uncaught browser errors {}
+390 Next action: pause, unfinished review/resume, edit, reload/resume, done, undo, skip, honest nullable finish {}
+390 PMR: real short/full routes, view switch, pause/continue/skip/resume, skipped area labelled honestly, stopped finish {}
+390 No uncaught browser errors {}

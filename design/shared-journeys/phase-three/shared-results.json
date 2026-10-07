@@ -1,0 +1,72 @@
+[
+  {
+    "width": 320,
+    "check": "chooser selection, reload, focus and Back"
+  },
+  {
+    "width": 320,
+    "check": "Library category, search, filters, empty state and reload"
+  },
+  {
+    "width": 320,
+    "check": "Library → Next Easiest Step: edit, action, finish, unanswered final rating",
+    "sessions": 1,
+    "finalRating": null
+  },
+  {
+    "width": 320,
+    "check": "PMR → pause/resume/stop → optional cue save/update → return/reopen",
+    "notes": 1
+  },
+  {
+    "width": 320,
+    "check": "failed deletion preserves note; successful deletion survives reload"
+  },
+  {
+    "width": 320,
+    "check": "unreadable saved notes preserved, recovery visible"
+  },
+  {
+    "width": 320,
+    "check": "plan provenance readable"
+  },
+  {
+    "width": 320,
+    "check": "no uncaught page errors"
+  },
+  {
+    "width": 390,
+    "check": "chooser selection, reload, focus and Back"
+  },
+  {
+    "width": 390,
+    "check": "Library category, search, filters, empty state and reload"
+  },
+  {
+    "width": 390,
+    "check": "Library → Next Easiest Step: edit, action, finish, unanswered final rating",
+    "sessions": 1,
+    "finalRating": null
+  },
+  {
+    "width": 390,
+    "check": "PMR → pause/resume/stop → optional cue save/update → return/reopen",
+    "notes": 1
+  },
+  {
+    "width": 390,
+    "check": "failed deletion preserves note; successful deletion survives reload"
+  },
+  {
+    "width": 390,
+    "check": "unreadable saved notes preserved, recovery visible"
+  },
+  {
+    "width": 390,
+    "check": "plan provenance readable"
+  },
+  {
+    "width": 390,
+    "check": "no uncaught page errors"
+  }
+]

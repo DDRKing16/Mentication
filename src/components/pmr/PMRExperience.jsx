@@ -86,11 +86,11 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
       <PMRRoute steps={steps} index={index} skipped={skipped} />
       <main className="pmr-session-stage"><Playback step={step} index={index} running={running} audio={audio} onPause={pause} onResume={resume} onNext={advance} released={released} onSkip={skip} /></main>
       <footer className="pmr-session-controls">
-        <PMRGuideChoice value={guideView} onChange={setGuideView} />
-        {!running && <p role="status">Paused. Let go of any tension. Continue only if comfortable.</p>}
         <button onClick={() => setRunning(value => !value)} aria-label={running ? 'Pause PMR' : 'Resume PMR'}>{running ? 'Pause' : 'Resume'}</button>
         <button aria-pressed={audio} onClick={() => setAudio(value => !value)} disabled={answers?.noAudio || answers?.discreet}>Audio {audio ? 'on' : 'off'}</button>
         <button onClick={() => { setStopped(true); finish(); }}>Stop and check in</button>
+        {!running && <p role="status">Paused. Let go of any tension. Continue only if comfortable.</p>}
+        <PMRGuideChoice value={guideView} onChange={setGuideView} />
       </footer>
     </> : <main className="pmr-session-panel">
       <h1>Where is tension now?</h1>

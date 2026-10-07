@@ -1,0 +1,137 @@
+REMAINING JOURNEYS — APPROVED-BASELINE FOLLOW-UP
+
+Baseline: a3d2cadfd95b565e13d7e23912c35013e08a4a9f (approved release).
+Worktree: /workspace/mentication-followup
+Branch: codex/remaining-journeys-followup
+Local work only. No push, main merge, deployment, or review/source upload.
+
+This report supersedes the coverage/dependency statements in phase-two/coverage.txt.
+Those earlier reports and screenshots remain historical evidence of their own
+e292234 baseline; they are not evidence of defects in the approved release.
+
+RECONCILIATION AND OWNERSHIP
+
+The original cc64609, 70e0892 and 208561f commits remain unchanged on
+codex/remaining-journeys-quality. Their reconciled equivalents here are
+4b25618, ac00560 and d311fc0, in that order, above a3d2cad.
+
+Reconciliation retained the approved launch helpers, unanswered baseline
+contracts, Library token search and duration categories, local session hooks,
+Return points search/evidence/result presentation, scoped takeaway identity and
+storage errors, Next Step verified storage and resumeTask, reduced-motion/audio
+behavior, and the bottom-positioned Another way styles. Shared presentation
+changes were adapted around those contracts. No API changes were introduced.
+
+No changes to the Dear teaching/four-question 3-of-4 gate, public finished
+builds, specialist components, shared care internals, recommendation scoring,
+session storage, provider configuration, or the approved generated Home.
+
+The prior phases supply the substantial shared discovery/return, Next Step
+active/review, and PMR route/view changes. This follow-up deliberately avoids
+duplicating the approved Thought, Urge, Parking Lot, Good Map or Foundations
+improvements after real walkthroughs showed those changes already present.
+
+PRIORITIZED DIAGNOSIS AND NEW CHANGES
+
+1. Happy Bump: the fixed shared tool dock physically covered the one-mission,
+   honest-start and planning actions at 320x640. Ordinary Playwright clicks
+   failed with pointer interception. Before screenshots show the overlap.
+   Ownership: HappyBumpExperience.jsx and happy-bump.css only; the shared shell
+   and specialist experiences are not changed.
+   Change: tools follow the content in normal flow at every Happy Bump stage;
+   compact-height decorative rings are smaller. Primary actions and optional
+   Skip ahead/Another way have separate space. After runs use ordinary clicks,
+   without force clicks or keyboard workarounds.
+
+2. Happy Bump: arbitrary user/suggestion text was interpolated into a sentence
+   that could read "I'll Read two pages while I Favourite playlist, then I'll
+   A guilt-free break." This made a useful plan harder to understand.
+   Change: a labeled Activity / Alongside it / Afterward preview preserves the
+   exact selected words and omits empty fields. Inputs have concise accessible
+   names instead of inheriting all suggestion-button text.
+   Interruption check found the existing privacy filter intentionally excludes
+   free text from automatic persistence. It remains unchanged. The planning
+   screen now explains reload clearing and the optional explicit save at the
+   end. Tests re-enter the plan after reload and verify the saved note/deletion.
+
+3. PMR: at 320x640, guide-style controls preceded pause/stop and pushed the
+   essential controls below the first viewport. Ownership: pmr/PMRExperience.jsx
+   only. Change: pause/resume, audio and stop precede the paused explanation
+   and reversible view selector in both visual and DOM focus order. No content,
+   protocol, timer, playback, artwork or outcome logic removed or changed.
+   Stop is now asserted visible without scrolling at 640px height in the
+   exercised hands/forearms step. Enlarged
+   text still uses one scrolling surface; it is not forced into a fixed height.
+
+QUALITATIVE ASSESSMENT — NOT A NUMERIC QUALITY SCORE
+
+Visual craft: retain the approved illustrated worlds, teal/gold Happy Bump and
+PMR body art; improve hierarchy and spacing where actual content collided.
+The structured plan is more legible but longer; scrolling is intentional.
+
+Practice quality: the larger cumulative work turns Next Step into a usable
+action/review cycle and PMR into an understandable chosen route. This follow-up
+helps a Happy Bump intention remain actionable. It adds no promised benefits.
+The inspected approved cognitive and planning journeys already preserve
+uncertainty and offer explicit next actions, so their content remains intact.
+
+Personalization: discovery describes actual activities; My Plan explains its
+source; saved return work remains the person's own words. The new Happy Bump
+preview reflects the chosen text exactly. No preference is treated as evidence
+of a completed action, an answered rating, or a beneficial outcome.
+
+Engagement: primary actions are tappable; Next Step supports doing, undo and
+unfinished return; saved notes have a reason to reopen. This is an interaction
+assessment, not evidence of retention, motivation, or clinical effectiveness.
+
+Cognitive burden: choice groups/disclosures and clear next actions improve
+shared entry. The new plan labels remove awkward generated prose. Longer
+Foundations/Good Map workflows and Night Channel's duplicate legacy/control
+surfaces remain broader product tradeoffs, not claimed solved by this patch.
+
+Mobile/accessibility: 320/390 browser coverage, 320x640 compact check, 150% root
+text, reduced motion, keyboard interaction in Vector, and normal pointer
+interaction. No physical-device, screen-reader, virtual-keyboard, native
+background-playback, or comprehensive contrast certification is claimed.
+
+Reliability: all 80 test files / 637 tests pass; lint, typecheck, production
+build and git diff --check pass. Browser evidence exercises real reload,
+repeat, save/update/delete, unreadable data, failed deletion and nullable
+endings. These checks support reliability, not a claim that the app is twice
+as good or that all its journeys have been redesigned.
+
+EVIDENCE
+
+before/: approved-baseline Happy Bump obstruction/plan screenshots and the
+reconciled phase-two PMR controls before this compact correction.
+after/: real click-only Happy Bump paths at 320x640 / 390x844, enlarged text,
+saved return and repeated preferences; PMR compact viewport images.
+walkthroughs/: current approved-baseline screenshots and captured rendered
+frame text for each newly walked journey. These are synthetic test contexts,
+not user records. Browser times/ratings describe testing, not outcomes.
+coverage.txt: exact path, tested width and limits per journey.
+*-interactions.txt: successful final browser runs; tests/lint/typecheck/build
+logs are separate. Early harness selector/transition failures are not listed
+as product failures. Happy Bump's diagnosed pointer interception is genuine.
+
+Reproduce the new Happy Bump path with a running local Vite server:
+BASE_URL=http://localhost:5174 EVIDENCE_DIR=/tmp/happy node scripts/verify-happy-journey.cjs
+Compact Next/PMR: same BASE_URL, VIEWPORT_HEIGHT=640, EVIDENCE_DIR=/tmp/compact,
+node scripts/verify-original-practices.cjs.
+Shared regression: same BASE_URL, EVIDENCE_DIR=/tmp/shared,
+node scripts/verify-shared-journeys.cjs.
+The Happy Bump and compact scripts accept PLAYWRIGHT_MODULE and CHROMIUM_PATH
+for installed local tools; the shared script uses /usr/bin/chromium.
+
+REMAINING LIMITS / HANDOFF
+
+The approved release is accessible and reconciled; the earlier dependency is
+resolved. Parent owns final integration and any later publishing approval.
+Use this cumulative branch or its reconciled commit sequence; do not apply
+both the original and reconciled versions of the same phase.
+
+No new tests imply complete coverage of all choices. Full PMR timing,
+every Vector game, Good Map exports/comparison, external messages/providers,
+Night's full sleep timer/background behavior, Foundations all plan variants,
+physical-device assistive technology, and clinical benefit remain unverified.
+Self-Compassion and the four specialist internals remain outside this task.
