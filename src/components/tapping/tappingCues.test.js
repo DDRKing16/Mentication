@@ -15,6 +15,12 @@ function audioFixture() {
 }
 afterEach(() => { vi.useRealTimers(); });
 describe('tapping cue lifecycle', () => {
+  it('aligns optional touch with the +200 ms finger contact and cancels pending contact',async()=>{
+    vi.useFakeTimers();const vibrate=vi.fn(()=>true);const cues=createTappingCues({AudioContextClass:null,native:false,vibrate});
+    cues.emit('beat',{haptic:true,contactDelay:200});expect(vibrate).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(199);expect(vibrate).not.toHaveBeenCalled();await vi.advanceTimersByTimeAsync(1);expect(vibrate).toHaveBeenLastCalledWith(8);
+    cues.emit('beat',{haptic:true,contactDelay:200});cues.cancel();await vi.advanceTimersByTimeAsync(500);expect(vibrate.mock.calls.filter(([value])=>value===8)).toHaveLength(1);cues.dispose();
+  });
   it('stays silent until an explicit activation, and produces one beat per supplied event', async () => {
     const { Audio, tones, contexts } = audioFixture();
     const cues = createTappingCues({ AudioContextClass: Audio, native: false, vibrate: null });

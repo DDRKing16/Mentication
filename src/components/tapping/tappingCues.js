@@ -57,7 +57,7 @@ export function createTappingCues({
       if (!disposed && generation === token) return impact();
     }).catch(() => report('haptic', token)).finally(() => { hapticBusy = false; });
   }
-  function emit(kind, { sound = false, haptic = false } = {}) {
+  function emit(kind, { sound = false, haptic = false, contactDelay = 0 } = {}) {
     if (disposed) return;
     const token = generation;
     if (sound) {
@@ -67,6 +67,10 @@ export function createTappingCues({
       } catch { stopSound(); report('sound', token); }
     }
     if (haptic) {
+      if (contactDelay > 0) {
+        const timer=setTimeout(()=>{timers.delete(timer);if(!disposed&&generation===token)emit(kind,{haptic:true});},contactDelay);
+        timers.add(timer);return;
+      }
       if (native) {
         nativePulse(token);
         if (kind === 'point') {

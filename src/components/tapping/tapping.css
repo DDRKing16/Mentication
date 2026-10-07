@@ -183,3 +183,46 @@
 .tap-note-screen>.tap-text-button {width:100%;margin-top:8px;}
 @media(max-height:740px){.tap-entry-contact{height:125px}.tap-setting-screen,.tap-next-screen,.tap-note-screen{padding-top:16px}.tap-setting-screen h1,.tap-next-screen h1,.tap-note-screen h1{font-size:39px}.tap-setting-menu,.tap-next-choices{margin-top:24px}.tap-setting-choices{margin-top:25px}}
 .large-text .tap-focus-choices button,.large-text .tap-setting-menu button,.large-text .tap-next-choices button {font-size:17px;}
+
+/* The body stays still; only the two-finger hand approaches and lifts. */
+.tap-motion-visual {display:block;width:100%;height:100%;overflow:hidden;}
+.tap-finger-rig {transform-box:fill-box;transform-origin:50% 75%;}
+.tap-finger-rig.is-tapping {animation:tap-finger-contact 1s linear both;}
+@keyframes tap-finger-contact {0%{transform:translate(0,14px) rotate(-4deg)}20%,26%{transform:translate(0,0) rotate(0)}48%,100%{transform:translate(0,14px) rotate(-4deg)}}
+.tap-main-art .tap-portrait {border-radius:32px;background:radial-gradient(ellipse at 50% 43%,#608f7a20,transparent 70%);}
+.tap-ready-contact .tap-portrait {border-radius:30px;mask-image:none;}
+.tap-motion-location {pointer-events:none;}
+.tap-audio-ready {display:flex;align-items:center;gap:12px;margin:10px 0 12px;}
+.tap-audio-ready>span {flex:1;font-size:11px;max-width:210px;}
+.tap-audio-ready button {font-size:11px;padding:5px 10px;border:1px solid var(--tap-line);border-radius:22px;white-space:nowrap;}
+.tap-audio-ready button span,.tap-audio-controls button span {color:var(--tap-label);margin-left:6px;}
+.tap-journey-beads {display:flex;align-items:center;justify-content:space-between;margin:10px 0 12px;}
+.tap-journey-beads span {display:grid;place-items:center;width:23px;height:23px;border:1px solid #b8c8c243;border-radius:50%;font-size:10px;color:var(--tap-muted);}
+.tap-journey-beads .is-here {border-color:#f4d5a4;color:#f4d5a4;box-shadow:0 0 0 4px #f4d5a413;}
+.tap-journey-beads .is-found {color:#102f31;background:#aec5ae;border-color:#aec5ae;}
+.tap-phase-mark {display:grid;place-items:center;width:28px;height:28px;border:1px solid #e2c08b70;border-radius:50%;font:400 11px 'Hanken Grotesk',sans-serif;color:var(--tap-label);}
+.tap-contact-action {grid-template-columns:28px auto;gap:0 11px;}
+.tap-guidance {padding-top:8px;min-height:116px;}
+.tap-phase-note {line-height:15px;}
+.tap-cue {margin-top:9px;min-height:58px;}
+.tap-cue-label {font-size:10px;line-height:14px;margin-bottom:4px;}
+.tap-cue p {font-size:23px;line-height:1.13;}
+.tap-beat-count {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;font-size:11px;color:var(--tap-label);font-variant-numeric:tabular-nums;}
+.tap-beat-count small,.tap-beat-count>span:last-child {font-size:10px;color:var(--tap-muted);}
+.tap-audio-controls {display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:1px solid var(--tap-line);margin-top:4px;}
+.tap-audio-controls button {font-size:12px;padding:4px 0;}
+.tap-practice-tools>.tap-small {font-size:10px;}
+.tap-main-art {height:clamp(188px,calc(100dvh - 544px),300px);margin-top:4px;animation:none;}
+.tap-main-art .tap-portrait {padding-bottom:10px;}
+.tap-round-title h1 {font-size:33px;margin-top:7px;}
+.tap-round-title p {font-size:12px;min-height:32px;}
+.tap-setting-menu {gap:9px;margin-top:23px;}
+.tap-setting-menu button {min-height:56px;padding:11px 16px;}
+.tap-ready-contact {height:clamp(158px,23dvh,220px);}
+.tap-rest-thread {height:20px;align-items:center;justify-content:space-between;gap:9px;}
+.tap-rest-thread span {height:9px;width:9px;flex:0 0 9px;border-radius:50%;box-shadow:0 0 0 5px #e2c08b15;}
+@media(max-height:740px){.tap-journey-beads{margin:7px 0 8px}.tap-round-title h1{font-size:30px}.tap-guidance{min-height:112px}.tap-main-art{height:188px}.tap-cue p{font-size:21px}.tap-next{padding:6px 0}.tap-beat-count{margin-top:6px}.tap-ready-contact{height:155px}.tap-ready-placement{font-size:12px;padding:5px 0 11px}.tap-ready-instruction{font-size:13px;margin:11px 0 7px!important}.tap-ready h1{font-size:34px}.tap-audio-ready{margin:7px 0 9px}}
+.large-text .tap-main-art{height:clamp(165px,calc(100dvh - 585px),240px)}
+.large-text .tap-cue p{font-size:25px}.large-text .tap-phase-note,.large-text .tap-beat-count{font-size:13px}
+.tap-reduced .tap-finger-rig,.reduce-motion .tap-finger-rig {animation:none!important;transform:none!important;}
+@media(prefers-reduced-motion:reduce){.tap-finger-rig{animation:none!important;transform:none!important;}}

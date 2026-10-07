@@ -1,0 +1,97 @@
+{
+  "place-hand": {
+    "file": "place-hand.mp3",
+    "duration": 9.096,
+    "caption": "Side of your hand. Place two fingertips on the soft outer edge, between your little finger and wrist. Use a light touch."
+  },
+  "place-crown": {
+    "file": "place-crown.mp3",
+    "duration": 4.632,
+    "caption": "Top of your head. Place two fingertips at the centre of your crown."
+  },
+  "place-brow": {
+    "file": "place-brow.mp3",
+    "duration": 4.752,
+    "caption": "Inner eyebrow. Where your eyebrow begins, beside the bridge of your nose."
+  },
+  "place-sideEye": {
+    "file": "place-sideEye.mp3",
+    "duration": 5.04,
+    "caption": "Side of your eye. Find the bone beside the outer corner. Stay on the bone."
+  },
+  "place-underEye": {
+    "file": "place-underEye.mp3",
+    "duration": 5.4,
+    "caption": "Under your eye. On the bone below your eye, in line with the pupil."
+  },
+  "place-nose": {
+    "file": "place-nose.mp3",
+    "duration": 4.416,
+    "caption": "Under your nose. In the space between your nose and upper lip."
+  },
+  "place-chin": {
+    "file": "place-chin.mp3",
+    "duration": 4.032,
+    "caption": "Chin crease. Below your lower lip, above your chin."
+  },
+  "place-collar": {
+    "file": "place-collar.mp3",
+    "duration": 5.064,
+    "caption": "Below your collarbone. About an inch out from the centre, just below the bone."
+  },
+  "place-arm": {
+    "file": "place-arm.mp3",
+    "duration": 5.52,
+    "caption": "Under your arm. Reach across to your side, about four inches below your armpit."
+  },
+  "tension-setup": {
+    "file": "tension-setup.mp3",
+    "duration": 3.768,
+    "caption": "Even with this tension, I can be kind to myself right now."
+  },
+  "tension-reminder": {
+    "file": "tension-reminder.mp3",
+    "duration": 1.344,
+    "caption": "This tension."
+  },
+  "worry-setup": {
+    "file": "worry-setup.mp3",
+    "duration": 3.744,
+    "caption": "Even with this worry, I can be kind to myself right now."
+  },
+  "worry-reminder": {
+    "file": "worry-reminder.mp3",
+    "duration": 1.2,
+    "caption": "This worry."
+  },
+  "overwhelm-setup": {
+    "file": "overwhelm-setup.mp3",
+    "duration": 4.368,
+    "caption": "Even with this overwhelm, I can be kind to myself right now."
+  },
+  "overwhelm-reminder": {
+    "file": "overwhelm-reminder.mp3",
+    "duration": 1.272,
+    "caption": "This overwhelm."
+  },
+  "grounding-setup": {
+    "file": "grounding-setup.mp3",
+    "duration": 3.048,
+    "caption": "My feet. The room. This moment."
+  },
+  "grounding-reminder": {
+    "file": "grounding-reminder.mp3",
+    "duration": 2.952,
+    "caption": "My feet. The room. This moment."
+  },
+  "tap": {
+    "file": "tap.mp3",
+    "duration": 2.208,
+    "caption": "Tap with me. A light touch."
+  },
+  "rest": {
+    "file": "rest.mp3",
+    "duration": 3.648,
+    "caption": "Let your hands rest. Notice how you feel now."
+  }
+}
