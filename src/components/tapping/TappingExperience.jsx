@@ -326,6 +326,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
           <div className="tap-progress" role="progressbar" aria-label="Guided point progress" aria-valuemin={0} aria-valuemax={9} aria-valuenow={index} aria-valuetext={`Place ${index+1} of 9: ${point.name}${roundSkipped.current ? '. Some points skipped.' : ''}`}>{TAPPING_POINTS.map((p, i) => <span key={p.id} className={i < index ? 'done' : i === index ? 'current' : ''}><i style={{width: i < index ? '100%' : i === index ? `${Math.min(100, second / secondsPerPoint * 100)}%` : '0%'}}/></span>)}</div>
           <div className="tap-controls"><button data-sfx="none" disabled={audioStarting} aria-label={audioStarting?'Preparing guide…':paused?'Resume my round':'Pause'} className={paused?'tap-primary':'tap-pause'} onClick={()=>void pauseRound()}><span>{audioStarting?'Preparing guide…':paused?'Resume':'Pause'}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={paused?'M9 6L18 12L9 18Z':'M9 6V18M15 6V18'}/></svg></button><button data-sfx="none" className="tap-stop" onClick={stop}>Stop round</button></div>
           <div className="tap-audio-controls"><button data-sfx="none" disabled={silent||audioStarting} onClick={()=>void toggleSound()} aria-label={channelsOff?'Adjust sound':muted?'Turn sound on':!paused&&!sound?'Retry audio':'Mute audio'}>{silent?'Quiet reset':channelsOff?'Sound off':muted?'Sound off':paused?'Sound ready':sound?'Sound on':'Retry audio'} <span aria-hidden="true">{muted||silent||channelsOff?'◌':'♪'}</span></button><button data-sfx="none" onClick={openSettings}>Guide controls <span aria-hidden="true">→</span></button></div>
+          {(soundError || hapticError) && <p role="status" className="tap-error-note">{soundError || hapticError}</p>}
           <div className="tap-practice-tools"><button data-sfx="none" className="tap-text-button tap-skip" onClick={skipPoint}>Skip this point</button><span className="tap-small">Your own rhythm is welcome.</span></div>
         </div>
       </main>}
@@ -371,7 +372,6 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
         </>}
         {stage === 'round' && <p className="tap-small tap-setting-footnote">Your place is kept. Resume when you’re ready.</p>}
       </main>}
-      {stage === 'round' && !settingsOpen && (soundError || hapticError) && <p role="status" className="tap-error-note">{soundError || hapticError}</p>}
       {error && <p className="tap-error-note" role="alert">{error}</p>}
       <footer className="tap-secondary"><JourneyOptions id="eftTapping" onOpen={pausePractice} /></footer>
     </div>

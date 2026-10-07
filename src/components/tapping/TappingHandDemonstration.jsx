@@ -1,3 +1,5 @@
+import { observeTappingAnimationStart } from './tappingAnimationEpoch';
+
 const POSES = {
   hand: { angle: -95, scale: .9, side: 'right', elbow: [540, 700] },
   crown: { angle: 65, scale: .85, side: 'left', elbow: [285, 175] },
@@ -43,8 +45,7 @@ export default function TappingHandDemonstration({ point, location, id, paused, 
       <g transform="translate(0 82)"><g className={`tap-finger-rig ${active ? 'is-tapping' : ''}`} data-beat={beat} data-motion={quiet ? 'still' : paused ? 'rest' : 'approach-contact-lift'} style={{ '--tap-cycle': `${beatMs}ms` }}
         onAnimationStart={event => {
           if (event.animationName !== 'tap-wrist-contact') return;
-          const animation = event.currentTarget.getAnimations().find(item => item.animationName === 'tap-wrist-contact');
-          onRhythmStart?.(performance.now() - Number(animation?.currentTime || 0));
+          observeTappingAnimationStart(event.currentTarget, epoch => onRhythmStart?.(epoch));
         }}>
         <g transform="translate(-5 -86)" fill={`url(#${id}-jade-hand)`} stroke="#8cbaa0" strokeOpacity=".6" strokeWidth=".8" strokeLinejoin="round">
           <path d="M-11 87L-16 63C-23 55-25 42-22 36C-19 31-14 34-11 40L-6 48L-6 31Q5 27 13 33L22 30L28 39C36 39 38 43 36 51C35 61 25 69 12 76L13 88Z"/>
