@@ -131,7 +131,7 @@ describe('Tara practice-first semantics and compatibility', () => {
   });
   it('preserves future experience versions rather than silently downgrading or overwriting them', () => {
     const store = memory();
-    const raw = JSON.stringify({ schemaVersion: 1, draft: { ...prepared(), experienceVersion: 3 }, recaps: [] });
+    const raw = JSON.stringify({ schemaVersion: 1, draft: { ...prepared(), experienceVersion: 4 }, recaps: [] });
     store.setItem(TARA_STORAGE_KEY, raw);
     expect(() => loadTara(store)).toThrow();
     expect(() => saveTaraDraft(prepared(), store)).toThrow();

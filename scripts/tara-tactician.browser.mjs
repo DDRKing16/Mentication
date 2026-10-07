@@ -1,185 +1,158 @@
-// Isolated component regression. Vite must be running; no host registration mutation.
-// Overrides: PLAYWRIGHT_MODULE, CHROME_PATH, TARA_PREVIEW_URL, TARA_EVIDENCE_DIR.
+// Authored Tara journey and lifecycle checks. Start Vite first; no external calls.
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright-core/index.mjs');
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
-const url = process.env.TARA_PREVIEW_URL || 'http://127.0.0.1:5174/design/tara-tactician/preview.html';
-const evidence = process.env.TARA_EVIDENCE_DIR || '/workspace/tara-practice-regression';
+const url = process.env.TARA_PREVIEW_URL || 'http://127.0.0.1:5173/design/tara-tactician/preview.html';
+const evidence = process.env.TARA_EVIDENCE_DIR || 'design/tara-tactician/guided-redesign/verification';
 mkdirSync(evidence, { recursive: true });
 const results = []; const errors = []; const key = 'mentation.tara-tactician.v1';
 const click = (page, name) => page.getByRole('button', { name, exact: true }).click();
+const choice = (page, name) => page.getByRole('button', { name: new RegExp('^' + name) }).click();
 async function pageFor(width = 390, init) {
-  const context = await browser.newContext({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
-  if (init) await context.addInitScript(init);
-  const page = await context.newPage(); page.on('pageerror', error => errors.push(error.message));
-  await page.goto(url); await page.getByRole('heading', { level: 1 }).waitFor();
-  return { page, context };
+ const context = await browser.newContext({ viewport: { width, height: 844 }, reducedMotion: 'reduce' });
+ if (init) await context.addInitScript(init);
+ const page = await context.newPage(); page.on('pageerror', error => errors.push(error.message));
+ await page.goto(url); await page.getByRole('heading', { level: 1 }).waitFor(); return { page, context };
 }
-async function heading(page, text) { await page.getByRole('heading', { level: 1, name: text, exact: true }).waitFor(); }
+async function heading(page, name) { await page.getByRole('heading', { level: 1, name, exact: true }).waitFor(); }
 async function draft(page) { return page.evaluate(key => JSON.parse(localStorage.getItem(key))?.draft, key); }
-async function edit(page, button, label, value) {
-  await click(page, button); await page.getByRole('dialog').waitFor();
-  await page.getByRole('textbox', { name: label, exact: true }).fill(value); await click(page, 'Keep this wording');
+async function edit(page, button, label, value) { await click(page, button); await page.getByRole('textbox', { name: label, exact: true }).fill(value); await click(page, 'Keep this wording'); }
+async function noOverflow(page) { assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true); }
+async function completed(page) { return page.evaluate(() => window.taraReviewEvents.filter(item => item.action === 'completed').length); }
+async function options(page) { await click(page, 'Tara options'); await page.getByRole('dialog', { name: 'Your pace, your choices', exact: true }).waitFor(); }
+async function plan(page, persisted = true) {
+ await click(page, 'Plan with Tara'); assert.equal(await page.getByRole('button', { name: 'Holding a boundary', exact: true }).count(), 0);
+ await choice(page, 'A conversation'); assert.equal(await page.getByRole('button', { name: /^Name one clear limit/ }).count(), 0);
+ await choice(page, 'Holding a boundary'); if (persisted) assert.equal((await draft(page)).plan.do, '');
+ await choice(page, 'Name one clear limit'); await edit(page, 'Edit my move', 'My first move', 'My private first line.');
+ await page.getByText('Make it about my real situation', { exact: true }).click(); await edit(page, 'Name this moment', 'Name this moment', 'My private work conversation');
+ await edit(page, 'Edit prediction', 'My prediction', 'My private prediction.');
 }
-async function prepare(page) {
-  await click(page, 'Prepare for something');
-  assert.equal(await page.getByRole('button', { name: 'Finding the words', exact: true }).count(), 0);
-  await click(page, 'A conversation'); assert.equal(await page.getByRole('button', { name: 'Use this move', exact: true }).count(), 0);
-  await click(page, 'Finding the words');
-  await edit(page, 'Edit prediction', 'My prediction', 'I might lose my place.');
-  await edit(page, 'Edit my move', 'My next move', 'Say “I need a moment.”');
+async function reflect(page, action, result) {
+ await click(page, 'Return to reflect'); await heading(page, 'How did it go?');
+ assert.equal(await completed(page), 0); if (!(await draft(page)).actualActionConfirmed) await choice(page, action); else { await click(page, 'Change what I did'); await choice(page, action); }
+ assert.equal(await page.getByRole('button', { name: 'Stepped out intentionally', exact: true }).count(), 0, 'prior choices collapse');
+ await choice(page, result); assert.equal(await page.getByRole('button', { name: 'It happened', exact: true }).count(), 0, 'result choices collapse');
+ await click(page, 'Keep my reflection'); await heading(page, 'What comes next.');
 }
-async function noOverflow(page) { assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'no horizontal overflow'); }
-async function eventCount(page) { return page.evaluate(() => window.taraReviewEvents.filter(event => event.action === 'completed').length); }
-async function options(page) { await click(page, 'Tara options'); await page.getByRole('dialog').waitFor(); }
-async function seed(page, data) {
-  await page.evaluate(async ({ key, data }) => {
-    const { newTaraState, preparePlan, chooseEvent, chooseChallenge } = await import('/src/lib/taraTacticianState.js');
-    const base = preparePlan(chooseChallenge(chooseEvent(newTaraState(), 'conversation'), 'Finding the words'));
-    const state = { ...base, ...data.patch };
-    if (data.legacy) { delete state.experienceVersion; delete state.predictionResult; }
-    localStorage.setItem(key, JSON.stringify({ schemaVersion: 1, draft: data.savedOnly ? null : state, recaps: data.savedOnly ? [state] : [] }));
-  }, { key, data });
-  await page.reload();
+async function seed(page, { phase, version = 2, savedOnly = false }) {
+ await page.evaluate(async ({ key, phase, version, savedOnly }) => {
+  const { newTaraState, chooseEvent, chooseChallenge } = await import('/src/lib/taraTacticianState.js');
+  const state = { ...chooseChallenge(chooseEvent(newTaraState(), 'conversation'), 'Finding the words'), experienceVersion: version, phase, plan: { mind: 'Legacy reminder', notice: 'Legacy cue', do: 'Legacy exact first words', spikes: 'Legacy exact backup' }, comparison: 'more', predictionResult: version === 1 ? '' : 'partly', actual: 'Legacy exact observation', actualActionConfirmed: true, eventStatus: 'unknown', support: 'racing', rehearsed: true };
+  delete state.practice; delete state.carryChoice;
+  localStorage.setItem(key, JSON.stringify({ schemaVersion: 1, draft: savedOnly ? null : state, recaps: savedOnly ? [state] : [] }));
+ }, { key, phase, version, savedOnly }); await page.reload();
 }
 try {
-  {
-    const { page, context } = await pageFor();
-    await prepare(page); await noOverflow(page); await page.reload(); await heading(page, 'One move is enough.');
-    assert.equal((await draft(page)).plan.do, 'Say “I need a moment.”');
-    await click(page, 'Rehearse this move (optional)'); await page.getByRole('button', { name: /^Use my move/ }).click();
-    assert.equal((await draft(page)).rehearsed, false);
-    assert.equal(await eventCount(page), 0);
-    await click(page, 'Take this move without practising'); await heading(page, 'Your next move.');
-    assert.equal((await draft(page)).rehearsed, false);
-    await click(page, 'Find my words'); await heading(page, 'A cue for right now.'); await page.reload();
-    await heading(page, 'A cue for right now.'); await click(page, 'Back to event'); await page.goBack(); await heading(page, 'A cue for right now.');
-    await click(page, 'Back to event');
-    assert.equal((await draft(page)).plan.do, 'Say “I need a moment.”');
-    assert.equal(JSON.stringify(await page.evaluate(() => history.state)).includes('I need a moment'), false);
-    await click(page, 'Event finished'); assert.equal(await eventCount(page), 0);
-    assert.equal(await page.getByLabel('What did I do?', { exact: true }).inputValue(), '');
-    assert.equal(await page.getByRole('button', { name: 'Keep this reflection', exact: true }).isDisabled(), true);
-    await edit(page, 'Add what happened (optional)', 'What actually happened?', 'I paused and returned. It was still difficult.');
-    await page.getByLabel('What did I do?', { exact: true }).selectOption('finished'); await click(page, 'Part of it happened');
-    await click(page, 'Keep this reflection'); await heading(page, 'What you learned.'); assert.equal(await eventCount(page), 0);
-    assert.equal((await draft(page)).comparison, '');
-    await click(page, 'Save recap on this device (optional)'); assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).recaps.length, key), 1);
-    await click(page, 'Finish'); assert.equal(await eventCount(page), 1);
-    const recorded = await page.evaluate(() => window.taraReviewEvents); assert.equal(JSON.stringify(recorded).includes('I paused'), false);
-    assert.equal(recorded.find(item => item.outcome).outcome.predictionResult, 'partly');
-    await page.reload(); await click(page, 'Close recap'); assert.equal(await eventCount(page), 0);
-    results.push('390px two selection reveals, one-field edits, refresh, selected response unpractised, support refresh/native Back/revisit, opaque history, explicit reflection/save/completion, no duplicate completion');
-    await context.close();
-  }
-  {
-    const { page, context } = await pageFor(); await prepare(page); await click(page, 'Rehearse this move (optional)');
-    await page.getByRole('button', { name: /^Give myself a pause/ }).click();
-    await edit(page, 'Use my own practice words', 'My practice words', 'Let me pause before I answer.');
-    assert.equal((await draft(page)).rehearsed, false); await click(page, 'I tried it — take this move');
-    assert.equal((await draft(page)).rehearsed, true); assert.equal((await draft(page)).plan.do, 'Let me pause before I answer.');
-    await page.reload(); assert.equal((await draft(page)).rehearsed, true); assert.equal(await eventCount(page), 0);
-    results.push('Explicit actual rehearsal confirmation carries chosen authored response; selection/edit/refresh alone do not mark practice or complete'); await context.close();
-  }
-  for (const [label, value, action] of [['It happened', 'happened', 'finished'], ['Part of it happened', 'partly', 'stepped-out'], ['It did not happen', 'did-not', 'finished'], ['I did not test it', 'not-tested', 'not-attempted'], ['I’m not sure yet', 'unsure', 'unknown']]) {
-    const { page, context } = await pageFor(320); await click(page, 'I’m in it now'); await heading(page, 'Your next move.');
-    assert.equal((await draft(page)).event, ''); assert.equal((await draft(page)).prediction, '');
-    if (value === 'happened') {
-      await click(page, 'Edit my move');
-      assert.equal(await page.getByRole('textbox', { name: 'My next move', exact: true }).inputValue(), '“Let me take a moment.”');
-      await click(page, 'Keep this wording');
-      assert.equal((await draft(page)).plan.do, '“Let me take a moment.”');
-      assert.equal((await draft(page)).plan.mind, ''); assert.equal((await draft(page)).plan.notice, '');
-    }
-    await click(page, 'Choose my pace'); await click(page, 'Stay with support'); await click(page, 'Back to event');
-    await click(page, 'Choose my pace'); await click(page, 'Step out intentionally');
-    assert.equal(await eventCount(page), 0); await click(page, 'Event finished');
-    assert.equal(await page.getByLabel('What did I do?', { exact: true }).inputValue(), 'stepped-out');
-    await page.getByLabel('What did I do?', { exact: true }).selectOption(action); await click(page, label); await click(page, 'Keep this reflection');
-    assert.equal((await draft(page)).predictionResult, value); assert.equal((await draft(page)).eventStatus, action);
-    await click(page, 'Save recap on this device (optional)'); await noOverflow(page);
-    await options(page); await click(page, 'Clear Tara data'); await click(page, 'Delete Tara data');
-    assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null);
-    await page.goBack(); await heading(page, 'One small step into something difficult.');
-    assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null);
-    await page.reload(); await heading(page, 'One small step into something difficult.');
-    results.push(`320px live entry, stay/step out, ${value}/${action}, optional save, local deletion and Back/refresh without resurrection`); await context.close();
-  }
-  for (const phase of ['prepare', 'plan', 'rehearse', 'tackle', 'support', 'reflect', 'recap']) {
-    const { page, context } = await pageFor();
-    await seed(page, { legacy: true, patch: { phase, support: 'racing', comparison: 'more', eventStatus: 'unknown', actualActionConfirmed: true, plan: { mind: 'Legacy fear', notice: 'Legacy body', do: 'My old move', spikes: 'My old backup' } } });
-    assert.equal((await draft(page)).comparison, 'more'); assert.equal((await draft(page)).predictionResult, '');
-    assert.equal((await draft(page)).plan.do, 'My old move'); assert.equal(await eventCount(page), 0); await noOverflow(page);
-    if (phase === 'recap') assert.equal(await page.getByText('More difficult than I expected', { exact: true }).count(), 1);
-    results.push(`Legacy unversioned ${phase} draft resumes authored wording and original difficulty comparison without prediction reinterpretation`); await context.close();
-  }
-  {
-    const { page, context } = await pageFor();
-    await seed(page, { savedOnly: true, legacy: true, patch: { phase: 'recap', comparison: 'less', eventStatus: 'finished', actualActionConfirmed: true, saved: true } });
-    await page.getByText('Your saved recaps', { exact: true }).click(); await page.getByRole('button', { name: /A conversation.*Less difficult/ }).click();
-    assert.equal(await page.getByText('Less difficult than I expected', { exact: true }).count(), 1);
-    assert.equal(await page.getByRole('button', { name: 'Save recap on this device (optional)', exact: true }).count(), 0);
-    await click(page, 'Close recap'); assert.equal(await eventCount(page), 0);
-    assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).draft, key), null);
-    results.push('Saved legacy recap revisit is read-only, preserves original comparison and emits no completion'); await context.close();
-  }
-  {
-    const { page, context } = await pageFor(390, () => {
-      window.taraBlockWrites = true; const original = Storage.prototype.setItem;
-      Storage.prototype.setItem = function(key, value) { if (window.taraBlockWrites && key === 'mentation.tara-tactician.v1') throw new DOMException('Quota', 'QuotaExceededError'); return original.call(this, key, value); };
-    });
-    await prepare(page); await page.getByRole('alert').waitFor(); assert.equal(await page.getByText('Changes are not confirmed saved.', { exact: true }).count(), 1);
-    await click(page, 'Use this move'); await click(page, 'Event finished'); await page.getByLabel('What did I do?', { exact: true }).selectOption('unknown');
-    await click(page, 'I’m not sure yet'); await click(page, 'Keep this reflection'); await click(page, 'Save recap on this device (optional)');
-    assert.equal(await page.getByRole('button', { name: 'Recap saved on this device', exact: true }).count(), 0);
-    assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null); await page.screenshot({ path: `${evidence}/save-error-390.png`, fullPage: true });
-    await page.evaluate(() => { window.taraBlockWrites = false; }); await click(page, 'Try saving again');
-    assert.equal((await draft(page)).predictionResult, 'unsure'); await page.reload(); await heading(page, 'What you learned.');
-    results.push('Quota failure preserves editable in-memory flow and honest unsaved recap; explicit retry recovers and survives refresh'); await context.close();
-  }
-  {
-    const { page, context } = await pageFor(320); await prepare(page); await page.evaluate(() => { document.documentElement.style.fontSize = '24px'; });
-    await click(page, 'Edit my move'); assert.equal(await page.getByRole('textbox', { name: 'My next move', exact: true }).evaluate(node => node === document.activeElement), true);
-    await page.getByRole('textbox', { name: 'My next move', exact: true }).fill('Discard this change'); await page.keyboard.press('Escape');
-    assert.equal((await draft(page)).plan.do, 'Say “I need a moment.”');
-    assert.equal(await page.getByRole('button', { name: 'Edit my move', exact: true }).evaluate(node => node === document.activeElement), true);
-    await click(page, 'Use this move'); await noOverflow(page);
-    assert.equal(await page.locator('.tara-move-card').evaluate(node => node.getBoundingClientRect().top < 400), true);
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.tara')).fontSize), '24px');
-    assert.equal(await page.locator('.tara-live-hub').evaluate(node => getComputedStyle(node).animationName), 'none');
-    await page.screenshot({ path: `${evidence}/live-320-large.png`, fullPage: true });
-    await options(page); await page.getByRole('button', { name: 'Leave and return later', exact: true }).focus(); await page.keyboard.press('Tab');
-    assert.equal(await page.getByRole('button', { name: 'Close dialog', exact: true }).evaluate(node => node === document.activeElement), true);
-    await page.keyboard.press('Shift+Tab'); assert.equal(await page.getByRole('button', { name: 'Leave and return later', exact: true }).evaluate(node => node === document.activeElement), true);
-    await page.keyboard.press('Escape'); await click(page, 'Exit Tara'); await page.reload(); await heading(page, 'Your next move.');
-    results.push('320px 150% text, early move, reduced motion, editor focus/Escape cancel/restoration, dialog keyboard trap, exit and resume'); await context.close();
-  }
-  {
-    const { page, context } = await pageFor(); await prepare(page);
-    await page.evaluate(async () => { const { deleteAllLocalAppData } = await import('/src/lib/localData.js'); deleteAllLocalAppData(); });
-    await heading(page, 'One small step into something difficult.'); assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null);
-    await page.goBack(); await page.reload(); await heading(page, 'One small step into something difficult.');
-    results.push('App-wide deletion clears mounted draft and persistent data; Back/refresh does not resurrect it'); await context.close();
-  }
-  {
-    const { page, context } = await pageFor(); await prepare(page);
-    await page.evaluate(() => { Storage.prototype.removeItem = function() {}; }); await options(page); await click(page, 'Clear Tara data'); await click(page, 'Delete Tara data');
-    assert.equal(await page.getByRole('dialog').count(), 1); assert.equal(await page.getByRole('alert').last().innerText(), 'Tara data could not be deleted. Please try again.');
-    assert.notEqual(await draft(page), null); results.push('Silent deletion failure keeps data and confirmation dialog with truthful error'); await context.close();
-  }
-  {
-    const { page, context } = await pageFor(320); await prepare(page);
-    const wording = 'I will take one manageable action, then pause and decide what needs to happen next. '.repeat(8);
-    await edit(page, 'Edit my move', 'My next move', wording); await click(page, 'Use this move');
-    await page.evaluate(() => { document.documentElement.style.fontSize = '24px'; }); await noOverflow(page);
-    assert.equal((await draft(page)).plan.do, wording);
-    await page.locator('.tara-move-card summary').click(); assert.equal(await page.locator('.tara-move-card .tara-long-wording p').textContent(), wording);
-    await page.goBack(); await heading(page, 'One move is enough.'); assert.equal((await draft(page)).plan.do, wording);
-    await page.reload(); assert.equal((await draft(page)).plan.do, wording);
-    results.push('Long authored move stays intact through disclosure, enlarged mobile text, native Back and refresh'); await context.close();
-  }
-  assert.deepEqual(errors, []);
-  writeFileSync(`${evidence}/browser-results.json`, JSON.stringify({ passed: results, pageErrors: errors }, null, 2));
-  console.log(JSON.stringify({ passed: results.length, scenarios: results, pageErrors: errors }, null, 2));
+ for (const width of [390, 320]) {
+  const { page, context } = await pageFor(width); if (width === 320) await page.addStyleTag({ content: 'html { font-size:24px!important; }' });
+  const main = await page.getByRole('button', { name: 'Plan with Tara', exact: true }).boundingBox(); const alternative = await page.getByRole('button', { name: 'Another way', exact: true }).boundingBox(); assert.equal(alternative.y > main.y + main.height, true); assert.equal(main.y + main.height < 844, true);
+  await plan(page); await click(page, 'Try it with Tara');
+  assert.equal(await page.getByText('My private work conversation', { exact: true }).count(), 1);
+  await choice(page, 'Give myself a pause'); assert.equal((await draft(page)).rehearsed, false); assert.deepEqual((await draft(page)).practice.tried, [false, false]);
+  await edit(page, 'Use my own practice words', 'My practice words', 'My private practice pause.'); await click(page, 'I tried it — practise a way back');
+  assert.deepEqual((await draft(page)).practice.tried, [true, false]); assert.equal((await draft(page)).plan.do, 'My private first line.');
+  await choice(page, 'Repeat the limit'); assert.deepEqual((await draft(page)).practice.tried, [true, false]);
+  await edit(page, 'Use my own practice words', 'My practice words', 'My private recovery words.'); await click(page, 'I tried it — keep my pocket plan');
+  assert.deepEqual((await draft(page)).practice.tried, [true, true]); assert.equal((await draft(page)).practice.triedWordings[0], 'My private practice pause.'); assert.equal((await draft(page)).practice.triedWordings[1], 'My private recovery words.'); assert.equal((await draft(page)).practice.usability, '');
+  await page.getByText('How usable does this feel?', { exact: true }).click(); await choice(page, 'I’m not sure yet'); assert.equal((await draft(page)).practice.usability, 'unsure');
+  await click(page, 'Save plan & leave for now'); assert.equal(await completed(page), 0);
+  await page.reload(); await heading(page, 'Your pocket plan.'); assert.equal((await draft(page)).situation, 'My private work conversation');
+  await click(page, 'Open live support'); await choice(page, 'Find my words'); assert.equal(await page.getByText('My private recovery words.', { exact: true }).count(), 1);
+  await click(page, 'Back to my moment'); await page.goBack(); await heading(page, 'Find your way back.'); await page.reload(); await heading(page, 'Find your way back.'); await click(page, 'Back to my moment');
+  assert.equal(JSON.stringify(await page.evaluate(() => history.state)).includes('private'), false);
+  await reflect(page, 'Took part in all or some', 'Part of it happened');
+  assert.equal((await draft(page)).nextStep, ''); assert.equal((await draft(page)).learning, ''); await choice(page, 'Make the next attempt smaller');
+  assert.equal((await draft(page)).actual, ''); assert.equal((await draft(page)).comparison, '');
+  await edit(page, 'Edit my next step', 'My next small step', 'My private next use.');
+  await click(page, 'Save reflection on this device (optional)'); assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).recaps.length, key), 1);
+  await noOverflow(page); await click(page, 'Finish'); assert.equal(await completed(page), 1);
+  const events = await page.evaluate(() => window.taraReviewEvents); assert.equal(JSON.stringify(events).includes('private'), false); assert.equal(events.find(item => item.outcome).outcome.predictionResult, 'partly');
+  await page.reload(); await click(page, 'Close reflection'); assert.equal(await completed(page), 0);
+  results.push(`${width}px full named planning, deliberately chosen move, two confirmed practice beats, edited words, honest usability, save/leave/resume, contextual support, native Back/reload, explicit next-use/save/completion and private outcome`); await context.close();
+ }
+ for (const [result, value, action] of [['It happened', 'happened', 'Took part in all or some'], ['Part of it happened', 'partly', 'Stepped out intentionally'], ['It did not happen', 'did-not', 'Took part in all or some'], ['I did not test it', 'not-tested', 'Did not attempt it'], ['I’m not sure yet', 'unsure', 'I’m not sure yet']]) {
+  const { page, context } = await pageFor(320); await click(page, 'I’m in it now'); assert.equal((await draft(page)).prediction, '');
+  await click(page, 'Edit my move'); assert.equal(await page.getByRole('textbox', { name: 'My first move', exact: true }).inputValue(), '“Let me take a moment.”'); await click(page, 'Cancel');
+  await choice(page, 'Choose my pace'); await click(page, 'Stay with my plan'); await choice(page, 'Choose my pace'); await click(page, 'Step out intentionally');
+  assert.equal(await completed(page), 0); await reflect(page, action, result); assert.equal((await draft(page)).predictionResult, value);
+  await click(page, 'Save reflection on this device (optional)'); await options(page); await choice(page, 'Clear Tara data'); await click(page, 'Delete Tara data');
+  assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null); await page.goBack(); await page.reload(); await heading(page, /Difficult moment.*Clear next move./);
+  assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null); results.push(`320px immediate support, stay/step out, ${value} without inferred participation, optional save, verified delete and Back/refresh`); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(); await plan(page); await click(page, 'Try it with Tara'); await choice(page, 'Use my first move'); await click(page, 'Keep the plan without trying this');
+  assert.equal((await draft(page)).rehearsed, false); assert.deepEqual((await draft(page)).practice.tried, [false, false]);
+  await click(page, 'Go back'); await heading(page, 'Try the moment.'); assert.equal((await draft(page)).plan.do, 'My private first line.');
+  await click(page, 'Go back'); await heading(page, 'Choose your way in.'); await click(page, 'Keep my plan without practising'); await click(page, 'Open live support');
+  await click(page, 'Go back'); await heading(page, 'Your pocket plan.'); assert.equal((await draft(page)).rehearsed, false);
+  results.push('Selected but skipped practice remains unpractised; plan-only route and Back preserve authored first move'); await context.close();
+ }
+ for (const version of [1, 2]) for (const phase of ['prepare', 'plan', 'rehearse', 'tackle', 'support', 'reflect', 'recap']) {
+  const { page, context } = await pageFor(); await seed(page, { version, phase });
+  assert.equal((await draft(page)).plan.do, 'Legacy exact first words'); assert.equal((await draft(page)).plan.spikes, 'Legacy exact backup');
+  assert.equal((await draft(page)).comparison, 'more'); assert.equal((await draft(page)).actual, 'Legacy exact observation'); assert.deepEqual((await draft(page)).practice.tried, [false, false]);
+  assert.equal(await completed(page), 0); await noOverflow(page);
+  if (phase === 'recap') assert.equal(await page.getByRole('heading', { level: 2, name: version === 1 ? 'More difficult than I expected' : 'Part of it happened', exact: true }).count(), 1);
+  results.push(`Legacy v${version} ${phase} resumes private words, exact original outcome and historical practice without inventing new tries`); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(); await seed(page, { version: 1, phase: 'recap', savedOnly: true });
+  await page.getByText('Your saved reflections', { exact: true }).click(); await choice(page, 'A conversation'); assert.equal(await page.getByRole('button', { name: 'Save reflection on this device (optional)', exact: true }).count(), 0);
+  await click(page, 'Close reflection'); assert.equal(await completed(page), 0); assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).draft, key), null);
+  results.push('Saved legacy reflection revisit is read-only, keeps difficulty semantics and emits no completion'); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(390, () => { window.taraBlockWrites = true; const original = Storage.prototype.setItem; Storage.prototype.setItem = function(key, value) { if (key === 'mentation.tara-tactician.v1' && window.taraBlockWrites) throw new DOMException('Quota', 'QuotaExceededError'); return original.call(this, key, value); }; });
+  await plan(page, false); await page.getByRole('alert').waitFor(); await click(page, 'Keep my plan without practising'); await click(page, 'Save plan & leave for now');
+  assert.equal(await page.getByRole('heading', { name: 'Your pocket plan.', exact: true }).count(), 1); assert.equal(await page.evaluate(() => window.taraReviewEvents.length), 0);
+  await page.evaluate(() => { window.taraBlockWrites = false; }); await click(page, 'Try saving again'); await page.reload(); await heading(page, 'Your pocket plan.');
+  assert.equal((await draft(page)).plan.do, 'My private first line.'); results.push('Quota failure never claims a saved plan or exits on Save/leave; explicit retry recovers exact authored words'); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(320); await plan(page); const long = 'My full private wording remains exact. '.repeat(60);
+  await edit(page, 'Edit my move', 'My first move', long); await click(page, 'Keep my plan without practising'); await page.evaluate(() => { document.documentElement.style.fontSize = '24px'; });
+  await noOverflow(page); await page.locator('[aria-label="My way in"] summary').click(); assert.equal(await page.locator('[aria-label="My way in"] .tara-long-wording p').textContent(), long);
+  await edit(page, 'Edit my move', 'My first move', 'Second deliberate wording.'); await edit(page, 'Edit my move', 'My first move', 'Third deliberate wording.'); await page.reload();
+  assert.equal((await draft(page)).plan.do, 'Third deliberate wording.');
+  await click(page, 'Edit my move'); assert.equal(await page.getByRole('textbox').evaluate(node => node === document.activeElement), true); await page.getByRole('textbox').fill('Unsaved modal text'); await page.keyboard.press('Escape');
+  assert.equal((await draft(page)).plan.do, 'Third deliberate wording.'); assert.equal(await page.getByRole('button', { name: 'Edit my move', exact: true }).evaluate(node => node === document.activeElement), true);
+  await options(page); await page.getByRole('button', { name: 'Leave and return later', exact: true }).focus(); await page.keyboard.press('Tab'); assert.equal(await page.getByRole('button', { name: 'Close dialog', exact: true }).evaluate(node => node === document.activeElement), true); await page.keyboard.press('Shift+Tab'); assert.equal(await page.getByRole('button', { name: 'Leave and return later', exact: true }).evaluate(node => node === document.activeElement), true);
+  await page.keyboard.press('Escape'); assert.equal(await page.getByRole('button', { name: 'Tara options', exact: true }).evaluate(node => node === document.activeElement), true);
+  results.push('Long and repeated authored input survives disclosure/refresh; editor cancel preserves committed words; keyboard trap, Escape and focus restoration'); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(); await plan(page); await page.evaluate(async () => { const { deleteAllLocalAppData } = await import('/src/lib/localData.js'); deleteAllLocalAppData(); });
+  await heading(page, /Difficult moment.*Clear next move./); assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null); await page.goBack(); await page.reload();
+  assert.equal(await page.evaluate(key => localStorage.getItem(key), key), null); results.push('App-wide deletion resets mounted state, and Back/refresh cannot resurrect private words'); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(); await plan(page); await page.evaluate(() => { Storage.prototype.removeItem = function() {}; }); await options(page); await choice(page, 'Clear Tara data'); await click(page, 'Delete Tara data');
+  assert.equal(await page.getByRole('dialog', { name: 'Clear Tara data?', exact: true }).count(), 1); assert.equal(await page.getByRole('alert').last().innerText(), 'Tara data could not be deleted. Please try again.'); assert.notEqual(await draft(page), null);
+  results.push('Silent deletion failure keeps data and confirmation open with an honest error'); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(390, () => localStorage.setItem('mentation.tara-tactician.v1', '{unreadable'));
+  await click(page, 'Plan with Tara'); await choice(page, 'A conversation'); assert.equal(await page.evaluate(key => localStorage.getItem(key), key), '{unreadable');
+  await page.getByRole('alert').waitFor(); results.push('Unreadable saved data remains unchanged while an in-memory plan can continue'); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(); await seed(page, { version: 2, phase: 'rehearse' });
+  await page.evaluate(key => { const value = JSON.parse(localStorage.getItem(key)); delete value.draft.practice; value.draft.rehearsalChoice = 'pause'; value.draft.rehearsalResponse = 'My exact earlier selected response.'; value.draft.rehearsed = false; localStorage.setItem(key, JSON.stringify(value)); }, key); await page.reload();
+  assert.equal(await page.getByText('My exact earlier selected response.', { exact: true }).count(), 1); assert.deepEqual((await draft(page)).practice.tried, [false, false]);
+  await click(page, 'Keep the plan without trying this'); assert.equal((await draft(page)).rehearsed, false);
+  results.push('Legacy selected practice response resumes verbatim without an invented try; skipping preserves historical honesty'); await context.close();
+ }
+ {
+  const { page, context } = await pageFor(); await plan(page);
+  const before = await page.evaluate(() => history.state.idx); await click(page, 'Try it with Tara');
+  assert.equal(await page.evaluate(() => history.state.idx), before + 1);
+  await click(page, 'Go back'); await heading(page, 'Choose your way in.'); await click(page, 'Go back'); await heading(page, 'What feels difficult?');
+  assert.equal((await draft(page)).challenge, 'Holding a boundary'); await click(page, 'Go back'); await heading(page, 'What’s coming up?'); await click(page, 'Go back');
+  await heading(page, /Difficult moment.*Clear next move./); await click(page, 'Resume my plan');
+  assert.equal((await draft(page)).event, 'conversation'); assert.equal((await draft(page)).challenge, 'Holding a boundary'); assert.equal((await draft(page)).plan.do, 'My private first line.');
+  results.push('Back returns through question views without erasing selected situation/challenge or latest words; Resume retains context and router history indices advance correctly'); await context.close();
+ }
+ assert.deepEqual(errors, []); writeFileSync(`${evidence}/browser-results.json`, JSON.stringify({ passed: results, pageErrors: errors, fixtureProvenance: 'Synthetic browser fixtures only. No real user data or claimed real-world success.' }, null, 2)); console.log(JSON.stringify({ passed: results.length, scenarios: results, pageErrors: errors }, null, 2));
 } finally { await browser.close(); }
