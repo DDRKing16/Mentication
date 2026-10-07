@@ -787,7 +787,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
       {isBoxV2 && (
         <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
           <p className="text-xs leading-relaxed text-cream/75">
-            If holds feel uncomfortable, breathe naturally. Choose “This isn’t helping” for another practice, or Exit to stop.
+            If holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.
           </p>
           <button type="button" aria-pressed={a11y.prefs.reducedMotion}
             onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}
