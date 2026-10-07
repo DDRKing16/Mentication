@@ -9,7 +9,6 @@ import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import { createTappingCues } from './tappingCues';
 import { createTappingAudio } from './tappingAudio';
 import { tappingPlan, narrationForTick } from './tappingTiming';
-import { TAPPING_BEAT_MS, TAPPING_CONTACT_MS } from './tappingGuidance';
 import { suspendFeedback, resumeFeedback } from '@/lib/feedback';
 import './tapping.css';
 
@@ -22,7 +21,14 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const [before, setBefore] = useState(restored?.before ?? null);
   const [after, setAfter] = useState(restored?.after ?? null);
   const [index, setIndex] = useState(restored?.index || 0);
-  const [second, setSecond] = useState(restored?.second || 0);
+  const [second, setSecond] = useState(() => {
+    if (restored?.stage !== 'round') return restored?.second || 0;
+    const point = TAPPING_POINTS[restored.index];
+    return Math.min(restored.second, tappingPlan(point.id, restored.concern, restored.slow === true).total - 1);
+  });
+  const [beat, setBeat] = useState(0);
+  const feedbackForBeat = useRef(null);
+  const rhythmEpoch = useRef(null);
   const [artworkStatus, setArtworkStatus] = useState({ id: '', status: 'loading' });
   const [paused, setPaused] = useState(restored?.stage === 'round');
   const [slow, setSlow] = useState(restored?.slow === true);
@@ -56,8 +62,6 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const cues = useRef(null);
   const cueTick = useRef('');
   const roundSerial = useRef(0);
-  const currentTick = useRef('');
-  const blockedVisualTick = useRef('');
   const duration = useRef(restored?.duration || 0);
   const finished = useRef(false);
   const roundSkipped = useRef(restored?.roundSkipped === true);
@@ -72,8 +76,8 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const secondsPerPoint = plan.total;
   const locating = second < plan.placement;
   const tapping = stage === 'round' && !paused && artworkReady && !locating;
-  currentTick.current = `${roundSerial.current}:${index}:${second}`;
-  const visualTapping = tapping && blockedVisualTick.current !== currentTick.current;
+  const visualTapping = tapping;
+  feedbackForBeat.current = { tapping, sound, muted, silent, haptic: haptic && !systemReduced && !prefs.reducedMotion, contactMs: plan.contactMs };
 
   useEffect(() => {
     if (draft.error || finished.current) return;
@@ -99,7 +103,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     const timer = window.setInterval(() => {
       duration.current += 1;
       setSecond(s => s + 1);
-    }, TAPPING_BEAT_MS);
+    }, 1000);
     return () => clearInterval(timer);
   }, [stage, paused, artworkReady]);
   useEffect(() => {
@@ -114,10 +118,26 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     const tick = `${roundSerial.current}:${index}:${second}`;
     if (cueTick.current === tick) return;
     cueTick.current = tick;
-    if(sound&&!muted&&!silent){mixer.current?.run();const spoken=narrationForTick(point.id,concern.id,second,plan);if(spoken)mixer.current?.speak(spoken);if(tapping)mixer.current?.beat();}
-    // The supplied tick starts the hand approach; touch/audio contact is +200 ms.
-    if(tapping)cues.current?.emit('beat',{haptic:haptic&&!systemReduced&&!prefs.reducedMotion,contactDelay:TAPPING_CONTACT_MS});
+    if(sound&&!muted&&!silent){mixer.current?.run();const spoken=narrationForTick(point.id,concern.id,second,plan);if(spoken)mixer.current?.speak(spoken);}
   }, [stage, paused, index, second, tapping, sound,muted,haptic,systemReduced,prefs.reducedMotion,secondsPerPoint,silent,artworkReady,point.id,concern.id,plan]);
+  // Narration uses elapsed seconds; contact has its own explicit cadence.
+  // Muting a channel never restarts the wrist cycle or changes its speed.
+  useEffect(() => {
+    if (!tapping) return;
+    const pulse = () => setBeat(value => value + 1);
+    pulse();
+    const timer = window.setInterval(pulse, plan.beatMs);
+    return () => clearInterval(timer);
+  }, [tapping, plan.beatMs]);
+  useEffect(() => {
+    const current = feedbackForBeat.current;
+    if (!beat || !current?.tapping || document.hidden) return;
+    cues.current?.emit('beat', { haptic: current.haptic, contactDelay: current.contactMs });
+  }, [beat]);
+  useEffect(() => {
+    if (!tapping) { rhythmEpoch.current = null; mixer.current?.stopRhythm(); return; }
+    if (quiet) startRhythmAt(performance.now());
+  }, [tapping, quiet, plan.beatMs]);
   useEffect(() => {
     if (systemReduced || prefs.reducedMotion) { cues.current?.stopHaptics(); setHaptic(false); }
   }, [systemReduced, prefs.reducedMotion]);
@@ -132,6 +152,13 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   function audioController(){
     if(!mixer.current)mixer.current=createTappingAudio({onError:kind=>{setSoundError(`${kind==='voice'?'Voice':kind==='music'?'Music':'Tapping sound'} couldn’t load. The illustrated guide and captions are here.`);},onInterrupted:()=>{pausePractice();setSound(false);setSoundError('Audio was interrupted. Resume to restart your guide.');}});
     return mixer.current;
+  }
+  function startRhythmAt(epoch) {
+    rhythmEpoch.current = epoch;
+    const current = feedbackForBeat.current;
+    if (current?.tapping && current.sound && !current.muted && !current.silent) {
+      mixer.current?.startRhythm({ beatMs: plan.beatMs, contactMs: plan.contactMs, phaseMs: (performance.now() - epoch) % plan.beatMs });
+    }
   }
   async function unlockAudio({force=false}={}){
     if(silent||(!force&&muted)||(!voiceOn&&!musicOn&&!beatOn))return false;
@@ -153,7 +180,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     if (!voiceOn && !musicOn && !beatOn) { openSettings(); return; }
     if(!muted&&(stage!=='round'||paused||sound)){audioRequest.current+=1;mixer.current?.cancel();setAudioStarting(false);setMuted(true);setSound(false);return;}
     setMuted(false);
-    if(stage==='round'&&!paused){if(await unlockAudio({force:true}))mixer.current?.run();}
+    if(stage==='round'&&!paused){if(await unlockAudio({force:true})){mixer.current?.run();if(tapping&&rhythmEpoch.current!=null)mixer.current?.startRhythm({beatMs:plan.beatMs,contactMs:plan.contactMs,phaseMs:(performance.now()-rhythmEpoch.current)%plan.beatMs});}}
   }
   async function toggleHaptic() {
     if (haptic) { cues.current?.stopHaptics(); setHaptic(false); return; }
@@ -164,9 +191,9 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     if(audioStarting)return;
     const intent=++flowRequest.current;cues.current?.cancel();mixer.current?.cancel();
     await unlockAudio();if(intent!==flowRequest.current)return;
-    blockedVisualTick.current='';roundSerial.current+=1;roundSkipped.current=false;setIndex(0);setSecond(0);setPaused(false);setStopped(false);setAfter(null);setSettingsOpen(false);setStage('round');
+    roundSerial.current+=1;roundSkipped.current=false;setIndex(0);setSecond(0);setPaused(false);setStopped(false);setAfter(null);setSettingsOpen(false);setStage('round');
   }
-  function pausePractice() {flowRequest.current+=1;audioRequest.current+=1;setAudioStarting(false);blockedVisualTick.current=currentTick.current;cues.current?.cancel();mixer.current?.pause();setPaused(true);}
+  function pausePractice() {flowRequest.current+=1;audioRequest.current+=1;setAudioStarting(false);cues.current?.cancel();mixer.current?.pause();setPaused(true);}
   async function pauseRound() {
     if(!paused){pausePractice();return;}
     const intent=++flowRequest.current;await unlockAudio();if(intent!==flowRequest.current)return;
@@ -221,7 +248,6 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
     if (stage === 'round' && index > 0) {
       const nextSecond = Math.min(second,tappingPlan(point.id,concern.id,nextSlow).total-1);
       cueTick.current = `${roundSerial.current}:${index}:${nextSecond}`;
-      blockedVisualTick.current = cueTick.current;
       setSecond(nextSecond);
     }
     setSlow(nextSlow);
@@ -284,22 +310,19 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
       </main>}
       {stage === 'round' && <main className={`tap-round ${paused ? 'is-paused' : ''} ${artworkError ? 'has-art-error' : ''}`} hidden={settingsOpen}>
         <div className="tap-round-meta"><span>{paused?'YOUR PLACE IS KEPT':locating?'FIND YOUR PLACE':'TAP WITH ME'}</span><span>{String(index+1).padStart(2,'0')} <span aria-hidden="true">/</span> 09</span></div>
-        <div className="tap-journey-beads" aria-label={`Place ${index+1} of 9`}>{TAPPING_POINTS.map((item,i)=><span key={item.id} className={i<index?'is-found':i===index?'is-here':''}>{i<index?'✓':i+1}</span>)}</div>
         <div className="tap-round-title" aria-live="polite" aria-atomic="true"><h1 ref={heading} tabIndex={-1}>{point.name}</h1><p>{placement}</p></div>
         <div className={`tap-main-art tap-frame-${point.id}`} key={point.id}>
-          <div className="tap-portrait"><TappingSilhouette point={point} paused={!visualTapping} quiet={quiet} beat={second} onArtworkStatus={(id, status) => { setArtworkStatus({ id, status }); if (status === 'error') pausePractice(); }}/></div>
-          <span className="tap-art-note">TWO FINGERTIPS · EITHER SIDE</span>
+          <div className="tap-portrait"><TappingSilhouette point={point} paused={!visualTapping} quiet={quiet} beat={beat} beatMs={plan.beatMs} onRhythmStart={startRhythmAt} onArtworkStatus={(id, status) => { setArtworkStatus({ id, status }); if (status === 'error') pausePractice(); }}/></div>
           {artworkError && <p className="tap-image-error" role="status">The image couldn’t load. The placement is above. Resume with the text, or skip this point.</p>}
         </div>
         <div className="tap-guidance">
-          <div className="tap-contact-action" aria-live="polite" aria-atomic="true"><span className="tap-phase-mark" aria-hidden="true">{paused?'Ⅱ':locating?'01':'02'}</span><h2>{paused?'Take your time.':locating?'Find this place.':'Tap with me.'}</h2><span className="tap-phase-note">{paused?'Resume whenever you’re ready.':locating?'Watch where the fingertips meet.':quiet?'One gentle tap with each beat.':'Copy the contact and lift.'}</span></div>
-          <div className="tap-cue">{!locating&&!paused?<><div className="tap-cue-label">{grounding?'GENTLY NOTICE':index===0?`SAY OR THINK · ${Math.min(3,Math.max(1,Math.floor((second-plan.placement-3)/plan.setupGap)+1))} OF 3`:'SAY OR THINK'}</div><p>{phrase}</p></>:<p className="tap-settle-note">{paused?'Your hands can rest.': 'The guide moves for you. No screen taps needed.'}</p>}</div>
-          {!locating&&!paused&&<div className="tap-beat-count" aria-live="off"><span>Tap {Math.min(plan.beats,second-plan.placement+1)} <small>of {plan.beats}</small></span><span>{slow?'Spacious':'Gentle'} · 1 beat / sec</span></div>}
+          <div className="tap-cue" aria-live="polite" aria-atomic="true">{!locating&&!paused?<><div className="tap-cue-label">{grounding?'GENTLY NOTICE':index===0?`SAY OR THINK · ${Math.min(3,Math.max(1,Math.floor((second-plan.placement-3)/plan.setupGap)+1))} OF 3`:'SAY OR THINK'}</div><p>{phrase}</p></>:<><div className="tap-cue-label">{paused?'PAUSED':'A LIGHT TOUCH'}</div><p className="tap-settle-note">{paused?'Your hands can rest.':'Find this place. We’ll tap together.'}</p></>}</div>
+          {quiet&&!locating&&!paused&&<div className="tap-beat-count" aria-live="off"><span key={beat}>Tap gently · {beat%2?'●':'○'}</span><span>{slow?'Spacious':'Gentle'} rhythm</span></div>}
         </div>
         <div className="tap-round-bottom">
-          <div className={`tap-next ${movingSoon ? 'is-next' : ''}`} aria-live="off"><span>{nextPoint ? movingSoon ? 'COMING NEXT' : 'UP NEXT' : 'THEN'}</span><strong>{nextPoint?.name || 'Rest & notice'}</strong><span aria-hidden="true">→</span></div>
+          <div className={`tap-next ${movingSoon ? 'is-next' : ''}`} aria-live="off"><span>{nextPoint?'Next':'Then'}</span><strong>{nextPoint?.name || 'Rest & notice'}</strong><span aria-hidden="true">→</span></div>
           <div className="tap-progress" role="progressbar" aria-label="Guided point progress" aria-valuemin={0} aria-valuemax={9} aria-valuenow={index} aria-valuetext={`Place ${index+1} of 9: ${point.name}${roundSkipped.current ? '. Some points skipped.' : ''}`}>{TAPPING_POINTS.map((p, i) => <span key={p.id} className={i < index ? 'done' : i === index ? 'current' : ''}><i style={{width: i < index ? '100%' : i === index ? `${Math.min(100, second / secondsPerPoint * 100)}%` : '0%'}}/></span>)}</div>
-          <div className="tap-controls"><button data-sfx="none" disabled={audioStarting} className={paused?'tap-primary':'tap-pause'} onClick={()=>void pauseRound()}><span>{audioStarting?'Preparing guide…':paused?'Resume my round':'Pause'}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={paused?'M9 6L18 12L9 18Z':'M9 6V18M15 6V18'}/></svg></button><button data-sfx="none" className="tap-stop" onClick={stop}>Stop round</button></div>
+          <div className="tap-controls"><button data-sfx="none" disabled={audioStarting} aria-label={audioStarting?'Preparing guide…':paused?'Resume my round':'Pause'} className={paused?'tap-primary':'tap-pause'} onClick={()=>void pauseRound()}><span>{audioStarting?'Preparing guide…':paused?'Resume':'Pause'}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d={paused?'M9 6L18 12L9 18Z':'M9 6V18M15 6V18'}/></svg></button><button data-sfx="none" className="tap-stop" onClick={stop}>Stop round</button></div>
           <div className="tap-audio-controls"><button data-sfx="none" disabled={silent||audioStarting} onClick={()=>void toggleSound()} aria-label={channelsOff?'Adjust sound':muted?'Turn sound on':!paused&&!sound?'Retry audio':'Mute audio'}>{silent?'Quiet reset':channelsOff?'Sound off':muted?'Sound off':paused?'Sound ready':sound?'Sound on':'Retry audio'} <span aria-hidden="true">{muted||silent||channelsOff?'◌':'♪'}</span></button><button data-sfx="none" onClick={openSettings}>Guide controls <span aria-hidden="true">→</span></button></div>
           <div className="tap-practice-tools"><button data-sfx="none" className="tap-text-button tap-skip" onClick={skipPoint}>Skip this point</button><span className="tap-small">Your own rhythm is welcome.</span></div>
         </div>
@@ -340,7 +363,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
             {settingPage === 'sound' && <>{settingChoice('Hear each tap',beatOn&&!silent,()=>{setBeatOn(true);setMuted(false);},silent)}{settingChoice('No tapping sound',!beatOn||silent,()=>setBeatOn(false))}</>}
             {settingPage === 'touch' && <>{settingChoice('No touch cues',!haptic,() => { if (haptic) void toggleHaptic(); })}{settingChoice('Use touch cues',haptic,() => { if (!haptic) void toggleHaptic(); },systemReduced || prefs.reducedMotion)}</>}
           </div>
-          <p className="tap-small tap-setting-hint">{settingPage==='pace'?'Spacious gives you more time to find each place and four extra gentle taps.':settingPage==='light'?(systemReduced||prefs.reducedMotion?'Reduced motion keeps the fingers still. The tap count and sound still guide the beat.':'The body stays still. Only the fingertips contact and lift.'):['voice','music','sound'].includes(settingPage)?(silent?'This reset stays quiet. Fingers and captions guide you.':settingPage==='voice'?'Bundled synthetic narration shows you where to tap. Captions stay available.':settingPage==='music'?'A warm, original music bed gets quieter while the voice speaks.':'One soft contact sound for every fingertip contact. No tapping sound while you find a place.'):(systemReduced||prefs.reducedMotion?'Touch cues stay off with reduced motion.':'Touch cues meet the same beat as the fingertips and sound.')}</p>
+          <p className="tap-small tap-setting-hint">{settingPage==='pace'?'Spacious slows the rhythm and gives you more time to find each place.':settingPage==='light'?(systemReduced||prefs.reducedMotion?'Reduced motion keeps the fingers still. A discrete cue and sound can guide the beat.':'A relaxed wrist brings the fingertips gently into contact.'):['voice','music','sound'].includes(settingPage)?(silent?'This reset stays quiet. Fingers and captions guide you.':settingPage==='voice'?'Bundled synthetic narration shows you where to tap. Captions stay available.':settingPage==='music'?'A warm, original music bed gets quieter while the voice speaks.':'One soft contact sound for every fingertip contact. No tapping sound while you find a place.'):(systemReduced||prefs.reducedMotion?'Touch cues stay off with reduced motion.':'Touch cues meet the same beat as the fingertips and sound.')}</p>
           {((settingPage === 'sound' && soundError) || (settingPage === 'touch' && hapticError)) && <p className="tap-error-note" role="status">{settingPage === 'sound' ? soundError : hapticError}</p>}
           <button data-sfx="none" className="tap-primary" onClick={closeSettings}>Back to my round <span aria-hidden="true">→</span></button>
         </>}

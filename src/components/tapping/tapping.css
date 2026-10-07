@@ -186,9 +186,15 @@
 
 /* The body stays still; only the two-finger hand approaches and lifts. */
 .tap-motion-visual {display:block;width:100%;height:100%;overflow:hidden;}
-.tap-finger-rig {transform-box:fill-box;transform-origin:50% 75%;}
-.tap-finger-rig.is-tapping {animation:tap-finger-contact 1s linear both;}
-@keyframes tap-finger-contact {0%{transform:translate(0,14px) rotate(-4deg)}20%,26%{transform:translate(0,0) rotate(0)}48%,100%{transform:translate(0,14px) rotate(-4deg)}}
+.tap-finger-rig {transform-box:view-box;transform-origin:0 0;transform:rotate(-6deg);}
+.tap-finger-rig.is-tapping {animation:tap-wrist-contact var(--tap-cycle,600ms) infinite both;}
+@keyframes tap-wrist-contact {0%{transform:rotate(-6deg);animation-timing-function:cubic-bezier(.4,0,.6,1)}40%,48%{transform:rotate(0);animation-timing-function:cubic-bezier(.4,0,.6,1)}100%{transform:rotate(-6deg)}}
+.tap-knuckle-motion {transform-box:view-box;transform-origin:0 0;transform:rotate(-3deg);}
+.tap-knuckle-motion.is-tapping {animation:tap-knuckle-contact var(--tap-cycle,600ms) infinite both;}
+@keyframes tap-knuckle-contact {0%{transform:rotate(-3deg);animation-timing-function:cubic-bezier(.4,0,.6,1)}40%,48%{transform:rotate(0);animation-timing-function:cubic-bezier(.4,0,.6,1)}100%{transform:rotate(-3deg)}}
+.tap-contact-shadow {opacity:.14;}
+.tap-contact-shadow.is-tapping {animation:tap-shadow-contact var(--tap-cycle,600ms) infinite;}
+@keyframes tap-shadow-contact {0%,100%{opacity:.025}40%,48%{opacity:.22}}
 .tap-main-art .tap-portrait {border-radius:32px;background:radial-gradient(ellipse at 50% 43%,#608f7a20,transparent 70%);}
 .tap-ready-contact .tap-portrait {border-radius:30px;mask-image:none;}
 .tap-motion-location {pointer-events:none;}
@@ -226,3 +232,38 @@
 .large-text .tap-cue p{font-size:25px}.large-text .tap-phase-note,.large-text .tap-beat-count{font-size:13px}
 .tap-reduced .tap-finger-rig,.reduce-motion .tap-finger-rig {animation:none!important;transform:none!important;}
 @media(prefers-reduced-motion:reduce){.tap-finger-rig{animation:none!important;transform:none!important;}}
+
+/* One illustration, one point, one phrase. Controls stay within reach. */
+.tap-stage-round {background:radial-gradient(ellipse at 50% 38%,#284d47,#153b3d 58%,#102f34);}
+.tap-stage-round .tap-header {height:62px;}
+.tap-round-meta {font-size:10px;color:#b7c6b8;letter-spacing:1.4px;}
+.tap-round-title h1 {font-size:35px;margin:16px 0 8px;letter-spacing:-.5px;}
+.tap-round-title p {font-size:13px;line-height:1.45;min-height:38px;color:#ced8ca;max-width:320px;}
+.tap-main-art {height:clamp(210px,calc(100dvh - 434px),410px);margin:9px -12px 0;}
+.tap-main-art .tap-portrait {padding:0;border-radius:28px;background:radial-gradient(ellipse at 50% 45%,#466d5a20,transparent 80%);overflow:hidden;}
+.tap-motion-visual {overflow:hidden;}
+.tap-guidance {padding:8px 0 14px;min-height:89px;text-align:center;}
+.tap-cue {margin:0;min-height:61px;}
+.tap-cue-label {font-size:9px;letter-spacing:1.4px;color:#c5b795;margin:0 0 8px;}
+.tap-cue p {font-size:25px;line-height:1.16;max-width:365px;margin:auto;}
+.tap-cue p.tap-settle-note {font:400 20px/1.25 'EB Garamond',serif;color:#e1d8c5;max-width:320px;}
+.tap-beat-count {margin:3px 0 0;justify-content:center;gap:13px;font-size:11px;}
+.tap-next {padding:6px 0 10px;font-size:11px;letter-spacing:0;}
+.tap-next>span:first-child {font-size:10px;letter-spacing:0;color:#b7c6b8;font-weight:400;}
+.tap-progress {gap:4px;margin-bottom:16px;}
+.tap-progress>span {height:2px;}
+.tap-controls {gap:16px;}
+.tap-pause {flex:1;justify-content:center;min-height:48px!important;background:#e9d5b2!important;color:#193c3c!important;border-radius:27px;padding:12px 18px;font-size:13px!important;}
+.tap-stop {min-width:99px;font-size:12px!important;}
+.tap-audio-controls {margin-top:13px;padding-top:4px;border-top:1px solid #c9c5a623;}
+.tap-audio-controls button {font-size:11px;}
+.tap-practice-tools .tap-text-button {font-size:11px!important;}
+.tap-practice-tools>.tap-small {font-size:9px;}
+.tap-reduced .tap-contact-shadow,.reduce-motion .tap-contact-shadow {animation:none!important;}
+.tap-reduced .tap-knuckle-motion,.reduce-motion .tap-knuckle-motion {animation:none!important;transform:none!important;}
+@media(prefers-reduced-motion:reduce){.tap-contact-shadow{animation:none!important;}.tap-knuckle-motion{animation:none!important;transform:none!important;}}
+@media(max-height:740px){.tap-stage-round .tap-header{height:54px}.tap-round-title h1{font-size:30px;margin-top:10px}.tap-round-title p{font-size:12px;min-height:35px}.tap-main-art{height:clamp(190px,calc(100dvh - 419px),300px);margin-top:3px}.tap-guidance{min-height:79px;padding:5px 0 9px}.tap-cue p{font-size:21px}.tap-cue-label{margin-bottom:6px}.tap-next{padding:4px 0 8px}.tap-progress{margin-bottom:10px}.tap-audio-controls{margin-top:8px}.tap-wrap{padding-bottom:12px}}
+.large-text .tap-main-art {height:clamp(170px,calc(100dvh - 472px),330px);}
+.large-text .tap-round-title p {font-size:14px;}
+.large-text .tap-guidance {min-height:98px;}
+.large-text .tap-cue p {font-size:26px;}
