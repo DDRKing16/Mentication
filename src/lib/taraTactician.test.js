@@ -54,7 +54,7 @@ describe('Tara device persistence', () => {
   it('resumes exact draft and phase with private text kept local', () => {
     const store = memory(); const draft = { ...beginTackle(prepared()), phase: 'support', support: 'racing', rehearsal: 'My words' };
     saveTaraDraft(draft, store);
-    expect(loadTara(store).draft).toEqual(draft);
+    expect(loadTara(store).draft).toEqual({ ...draft, flowScreen: 'support' });
   });
   it('saves recap only by explicit request, updates it without duplicates and clears all Tara data', () => {
     const store = memory(); const recap = reflected('more');

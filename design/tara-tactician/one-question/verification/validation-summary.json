@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-10-07T02:54:58.839640+00:00",
+  "baseMain": "b4f406c9f3f638bba11d04bebb10df7c60274609",
+  "branch": "codex/get-through-one-question",
+  "worktree": "/workspace/Mentication-get-through",
+  "checks": {
+    "unit": {
+      "command": "npm test -- --run",
+      "files": 83,
+      "passed": 694,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "warning": "Existing large minified chunk warning"
+    },
+    "browser": {
+      "scenarios": 40,
+      "pageErrors": [],
+      "runtime": "Final local component runtime on 5210; normal/large/short-phone profiles"
+    },
+    "finalCapture": {
+      "renderedStates": 40,
+      "pageErrors": [],
+      "onePrimaryAndAnswerGroup": true,
+      "noHorizontalOverflow": true,
+      "primaryInViewport": true
+    },
+    "production": {
+      "journeys": 2,
+      "pageErrors": [],
+      "failedRequests": [],
+      "externalRequests": [],
+      "navigationCancellations": [
+        {
+          "url": "http://127.0.0.1:5211/audio/home-ambient.mp3",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5211/home.html",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5211/audio/home-ambient.mp3",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "runtime": "Actual final compiled host on 5211"
+    },
+    "screenshots": {
+      "before": 60,
+      "after": 80,
+      "compiledHost": 10,
+      "hashesVerified": 150
+    }
+  },
+  "sourceHashes": {
+    "src/components/tara-tactician/TaraTacticianExperience.jsx": "79503dd579f0fdeb3de35b123a56295e90dba8f6ff44095a4e2cd38d035a592b",
+    "src/lib/getThroughFlow.js": "5da800c79ebc619e7283ff9f947f43858b4ef0ba6f8f2a5792b9aea05088ce1c",
+    "src/lib/getThroughFlow.test.js": "f04e4ba0dd791de61339020bb2138380da7766ce2d0818ae509e1726df26202d",
+    "src/lib/taraTacticianState.js": "33d51f8cdc48ec7d6b69b858e03942f2a3d046588022ee162ea824d4d637b58d",
+    "src/lib/taraTacticianStorage.js": "fc7c2d8cf4d8e17cd789cf408c28e47afe656c5770681a6842b0fd5cff1e8848",
+    "src/lib/taraTactician.test.js": "be9c62148879af86e0dce78e03e8fe2bbc097de394fca297ca3abcae7807693e",
+    "src/lib/taraGuidance.test.js": "6dda4c43ddfc4a350cb6945faf93f394dc2d4c42b01a00f7238cb0422b2da008",
+    "src/styles/tara-tactician.css": "826c476ecc6ee6de69ccb236a7dc36e2f33541f5d81e26320d822ea6067758d1",
+    "scripts/tara-tactician.browser-support.mjs": "8ff6b5676a7fd08a0108fcd660a348ef2b025cdff968b229b5be1231f1d16d19",
+    "scripts/tara-tactician.browser.mjs": "5bcf2635f18755ea1150d850826fa1a286112dbe77a267baa16a060a2c2bb61e",
+    "scripts/tara-tactician.production.mjs": "795f76a1288eff0f7f133506e5910fa180a36b1b4fcebaf2654e4351c2a3b556",
+    "scripts/tara-tactician.capture.mjs": "b99fa960c3ba06494b2ed50e39e475fe666bda97a88621e63b6eb4404482c3b2",
+    "design/tara-tactician/preview.html": "139ab058cd486174cced46350570d310bad9844255d19a8e793ade61aa216119",
+    "design/tara-tactician/host-contract.json": "2958dd73831b5b5c8fd8b1c7070ec39c243775ce46a82d99042a6c91d58bcc31"
+  },
+  "sharedFilesChanged": [],
+  "release": {
+    "pushed": false,
+    "merged": false,
+    "deployed": false,
+    "uploaded": false
+  },
+  "limits": [
+    "Shared rename edits assigned to integration owner",
+    "No native iOS/device or manual screen-reader run",
+    "Sequential flow adds transitions; enlarged text/long answers require scrolling",
+    "No measured effectiveness/quality multiplier"
+  ],
+  "fixtures": "Synthetic user words and explicit authored choices only; not real user outcomes."
+}

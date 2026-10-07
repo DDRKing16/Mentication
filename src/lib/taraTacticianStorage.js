@@ -13,11 +13,11 @@ export function loadTara(provided) {
   catch { throw new TaraStorageError('Device storage is unavailable. Your current plan is only here until you leave.'); }
   if (raw === null) return { draft: null, recaps: [] };
   let value;
-  try { value = JSON.parse(raw); } catch { throw new TaraStorageError('Your saved Tara data could not be read. It has been kept unchanged.'); }
+  try { value = JSON.parse(raw); } catch { throw new TaraStorageError('Your saved practice data could not be read. It has been kept unchanged.'); }
   if (value?.schemaVersion !== 1 || !Array.isArray(value.recaps)
     || (value.draft !== null && !validateTaraState(value.draft))
     || value.recaps.some(item => !validateTaraState(item) || item.phase !== 'recap')) {
-    throw new TaraStorageError('Your saved Tara data could not be read. It has been kept unchanged.');
+    throw new TaraStorageError('Your saved practice data could not be read. It has been kept unchanged.');
   }
   return { draft: value.draft && validateTaraState(value.draft), recaps: value.recaps.map(validateTaraState) };
 }
@@ -46,7 +46,7 @@ export function clearTara(provided) {
   try {
     const target = storage(provided); target.removeItem(TARA_STORAGE_KEY);
     if (target.getItem(TARA_STORAGE_KEY) !== null) throw new Error();
-  } catch { throw new TaraStorageError('Tara data could not be deleted. Please try again.'); }
+  } catch { throw new TaraStorageError('Practice data could not be deleted. Please try again.'); }
 }
 
 export function deleteTaraRecap(id, provided) {

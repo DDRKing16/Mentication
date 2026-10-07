@@ -1,0 +1,928 @@
+{
+  "baseMain": "b4f406c9f3f638bba11d04bebb10df7c60274609",
+  "branch": "codex/get-through-one-question",
+  "captures": [
+    {
+      "name": "01-entry-390",
+      "prompt": "Let’s get through this",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "01-entry-390-full.png",
+          "bytes": 96776,
+          "sha256": "311ae65387965e62a8f75c817c07ecd0c536a7d552a6cfdcd975de3e613e5cc1"
+        },
+        {
+          "file": "01-entry-390-viewport.png",
+          "bytes": 96776,
+          "sha256": "311ae65387965e62a8f75c817c07ecd0c536a7d552a6cfdcd975de3e613e5cc1"
+        }
+      ]
+    },
+    {
+      "name": "02-timing-390",
+      "prompt": "When do you need this?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "02-timing-390-full.png",
+          "bytes": 85347,
+          "sha256": "8f903fe332b1999753608eaf9b599eb681506b3b44db2b95ae2c7986388dc6f1"
+        },
+        {
+          "file": "02-timing-390-viewport.png",
+          "bytes": 85347,
+          "sha256": "8f903fe332b1999753608eaf9b599eb681506b3b44db2b95ae2c7986388dc6f1"
+        }
+      ]
+    },
+    {
+      "name": "03-situation-390",
+      "prompt": "What are you facing?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "03-situation-390-full.png",
+          "bytes": 88106,
+          "sha256": "2b20742bdc32aedfd5083da0927e85fb98ed72f62fac49acfb815175e77769a7"
+        },
+        {
+          "file": "03-situation-390-viewport.png",
+          "bytes": 88106,
+          "sha256": "2b20742bdc32aedfd5083da0927e85fb98ed72f62fac49acfb815175e77769a7"
+        }
+      ]
+    },
+    {
+      "name": "04-challenge-390",
+      "prompt": "What feels difficult?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "04-challenge-390-full.png",
+          "bytes": 87400,
+          "sha256": "42cd3952e54131caea474387ee66930547d64aab964b0ffa5aeb241ca2760d6a"
+        },
+        {
+          "file": "04-challenge-390-viewport.png",
+          "bytes": 87400,
+          "sha256": "42cd3952e54131caea474387ee66930547d64aab964b0ffa5aeb241ca2760d6a"
+        }
+      ]
+    },
+    {
+      "name": "05-prediction-390",
+      "prompt": "What are you worried might happen?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "05-prediction-390-full.png",
+          "bytes": 92070,
+          "sha256": "088385dce84600940dc65a4179be4ebf8f5ceb7013c3acb22fe284de00cd60b7"
+        },
+        {
+          "file": "05-prediction-390-viewport.png",
+          "bytes": 92070,
+          "sha256": "088385dce84600940dc65a4179be4ebf8f5ceb7013c3acb22fe284de00cd60b7"
+        }
+      ]
+    },
+    {
+      "name": "06-tactic-390",
+      "prompt": "What will you try first?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "06-tactic-390-full.png",
+          "bytes": 91838,
+          "sha256": "eedb31935755b6c424b2e9655857f52609b885a22a2b7be155bb0178930857d2"
+        },
+        {
+          "file": "06-tactic-390-viewport.png",
+          "bytes": 91838,
+          "sha256": "eedb31935755b6c424b2e9655857f52609b885a22a2b7be155bb0178930857d2"
+        }
+      ]
+    },
+    {
+      "name": "07-chosen-move-390",
+      "prompt": "Your first move.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "07-chosen-move-390-full.png",
+          "bytes": 108163,
+          "sha256": "9f992cfe54ecc7f438b2082716f6e343e99afcd74a2534b441691fe711b0e1e0"
+        },
+        {
+          "file": "07-chosen-move-390-viewport.png",
+          "bytes": 108163,
+          "sha256": "9f992cfe54ecc7f438b2082716f6e343e99afcd74a2534b441691fe711b0e1e0"
+        }
+      ]
+    },
+    {
+      "name": "08-practice-choice-390",
+      "prompt": "What will you try here?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "08-practice-choice-390-full.png",
+          "bytes": 104471,
+          "sha256": "11d72096d4be76aeac5f238f84fcb530c28aa3eb17627645fa19b2bd4d71a0c3"
+        },
+        {
+          "file": "08-practice-choice-390-viewport.png",
+          "bytes": 104471,
+          "sha256": "11d72096d4be76aeac5f238f84fcb530c28aa3eb17627645fa19b2bd4d71a0c3"
+        }
+      ]
+    },
+    {
+      "name": "09-try-390",
+      "prompt": "Try it once.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "09-try-390-full.png",
+          "bytes": 113335,
+          "sha256": "e5ce512f612ccde7754712a6562e74d7f76e821a8591675d24324f9e14fa5be5"
+        },
+        {
+          "file": "09-try-390-viewport.png",
+          "bytes": 113335,
+          "sha256": "e5ce512f612ccde7754712a6562e74d7f76e821a8591675d24324f9e14fa5be5"
+        }
+      ]
+    },
+    {
+      "name": "10-recovery-choice-390",
+      "prompt": "What will be your way back?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 903
+      },
+      "files": [
+        {
+          "file": "10-recovery-choice-390-full.png",
+          "bytes": 106253,
+          "sha256": "01b21ec002be88cf928f7a2af04640f4c958a4e1544d4065f6edb9fe8e4b1cb0"
+        },
+        {
+          "file": "10-recovery-choice-390-viewport.png",
+          "bytes": 102989,
+          "sha256": "ee958a6135176227e434c879b46481883aa7ea8614b2cd0e7eca6a6a786abf0a"
+        }
+      ]
+    },
+    {
+      "name": "11-recovery-try-390",
+      "prompt": "Try it once.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "11-recovery-try-390-full.png",
+          "bytes": 110660,
+          "sha256": "3710a440f1d30e40f522779ceb62275120339f198aa24bed2dc9df7ca410865d"
+        },
+        {
+          "file": "11-recovery-try-390-viewport.png",
+          "bytes": 110660,
+          "sha256": "3710a440f1d30e40f522779ceb62275120339f198aa24bed2dc9df7ca410865d"
+        }
+      ]
+    },
+    {
+      "name": "12-usability-390",
+      "prompt": "How usable does your plan feel?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "12-usability-390-full.png",
+          "bytes": 90218,
+          "sha256": "3dee53a4511f769bcbeb479463c2031aae09da09adfd455d2817c3b9fa2c60c6"
+        },
+        {
+          "file": "12-usability-390-viewport.png",
+          "bytes": 90218,
+          "sha256": "3dee53a4511f769bcbeb479463c2031aae09da09adfd455d2817c3b9fa2c60c6"
+        }
+      ]
+    },
+    {
+      "name": "13-pocket-plan-390",
+      "prompt": "Your plan is ready.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 910
+      },
+      "files": [
+        {
+          "file": "13-pocket-plan-390-full.png",
+          "bytes": 109048,
+          "sha256": "71449c2729e2240a5f2d6f28a14370f10fc135a785900ad67bb08ef96877b47c"
+        },
+        {
+          "file": "13-pocket-plan-390-viewport.png",
+          "bytes": 105310,
+          "sha256": "18d8f8dd7965800ffe81f13eb0c42d44822f60945d38206bae667f31ce39ad88"
+        }
+      ]
+    },
+    {
+      "name": "14-live-390",
+      "prompt": "What do you need right now?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 906
+      },
+      "files": [
+        {
+          "file": "14-live-390-full.png",
+          "bytes": 161141,
+          "sha256": "fc3b9790d3cbde373b82dd6fe2b4c897c87f69b49db336bfdd739ea4acde617d"
+        },
+        {
+          "file": "14-live-390-viewport.png",
+          "bytes": 153326,
+          "sha256": "c281fb02c57e2436e9e5a29520eb5f317a520b13e91c3381b09b673ecd29dbce"
+        }
+      ]
+    },
+    {
+      "name": "15-support-390",
+      "prompt": "Use this next.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "15-support-390-full.png",
+          "bytes": 150918,
+          "sha256": "3c788004c91111b8a5c185b22f415503d99f209db69dcecc25ae132c16e337bb"
+        },
+        {
+          "file": "15-support-390-viewport.png",
+          "bytes": 150918,
+          "sha256": "3c788004c91111b8a5c185b22f415503d99f209db69dcecc25ae132c16e337bb"
+        }
+      ]
+    },
+    {
+      "name": "16-actual-action-390",
+      "prompt": "What did you actually do?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "16-actual-action-390-full.png",
+          "bytes": 86492,
+          "sha256": "e2e8d9561f4a94f1e75fc6bbaca23af6beeb147192172866605afb682b20a371"
+        },
+        {
+          "file": "16-actual-action-390-viewport.png",
+          "bytes": 86492,
+          "sha256": "e2e8d9561f4a94f1e75fc6bbaca23af6beeb147192172866605afb682b20a371"
+        }
+      ]
+    },
+    {
+      "name": "17-prediction-result-390",
+      "prompt": "Did your prediction happen?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 988
+      },
+      "files": [
+        {
+          "file": "17-prediction-result-390-full.png",
+          "bytes": 165343,
+          "sha256": "ec131308b97f48629e1807fd7f76ff9f90054a2f89a835d3bfb223cea0c0ae55"
+        },
+        {
+          "file": "17-prediction-result-390-viewport.png",
+          "bytes": 149834,
+          "sha256": "15e393aade7caf88f2123d576fccc8f8937576ca12a8b773b69d5e28ee484c2a"
+        }
+      ]
+    },
+    {
+      "name": "18-observation-390",
+      "prompt": "What happened?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "18-observation-390-full.png",
+          "bytes": 84163,
+          "sha256": "534da33b406b757bbd45265e4e9aeeee5e208fa68ff7514d9d4f4e3f78bd78e1"
+        },
+        {
+          "file": "18-observation-390-viewport.png",
+          "bytes": 84163,
+          "sha256": "534da33b406b757bbd45265e4e9aeeee5e208fa68ff7514d9d4f4e3f78bd78e1"
+        }
+      ]
+    },
+    {
+      "name": "19-next-step-390",
+      "prompt": "What would help next time?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "19-next-step-390-full.png",
+          "bytes": 91186,
+          "sha256": "3e27aa91c9f94ad7198d033898717e269c14427621bb6cfcd2619695d47cbfb0"
+        },
+        {
+          "file": "19-next-step-390-viewport.png",
+          "bytes": 91186,
+          "sha256": "3e27aa91c9f94ad7198d033898717e269c14427621bb6cfcd2619695d47cbfb0"
+        }
+      ]
+    },
+    {
+      "name": "20-save-reflection-390",
+      "prompt": "Keep a saved reflection?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1075
+      },
+      "files": [
+        {
+          "file": "20-save-reflection-390-full.png",
+          "bytes": 123020,
+          "sha256": "45812aaf4c24e8d514411d68254a3d3235126c155896f71a67a6c61dd48db09c"
+        },
+        {
+          "file": "20-save-reflection-390-viewport.png",
+          "bytes": 107387,
+          "sha256": "9fa22bb410cee99d6bf6950f705a4fb52b6772184cfe2aaf143355d6ccc57ab8"
+        }
+      ]
+    },
+    {
+      "name": "01-entry-320-large",
+      "prompt": "Let’s get through this",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "01-entry-320-large-full.png",
+          "bytes": 102666,
+          "sha256": "bfaa134cf0a16250f28966ac3d53aa14cceab108fa3f02a7cb120ed613057a5e"
+        },
+        {
+          "file": "01-entry-320-large-viewport.png",
+          "bytes": 102666,
+          "sha256": "bfaa134cf0a16250f28966ac3d53aa14cceab108fa3f02a7cb120ed613057a5e"
+        }
+      ]
+    },
+    {
+      "name": "02-timing-320-large",
+      "prompt": "When do you need this?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 844
+      },
+      "files": [
+        {
+          "file": "02-timing-320-large-full.png",
+          "bytes": 85589,
+          "sha256": "bfbc2e2d3b4aa7ca0adb5af9cec53dcfd08994cbc71f11fdd3fbc6231998a744"
+        },
+        {
+          "file": "02-timing-320-large-viewport.png",
+          "bytes": 85589,
+          "sha256": "bfbc2e2d3b4aa7ca0adb5af9cec53dcfd08994cbc71f11fdd3fbc6231998a744"
+        }
+      ]
+    },
+    {
+      "name": "03-situation-320-large",
+      "prompt": "What are you facing?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1118
+      },
+      "files": [
+        {
+          "file": "03-situation-320-large-full.png",
+          "bytes": 110825,
+          "sha256": "1f1f7d5c85aa59d8056714eaca0b89831becb402d7751765d91577faa5a5c032"
+        },
+        {
+          "file": "03-situation-320-large-viewport.png",
+          "bytes": 89095,
+          "sha256": "f62b3b2670956524654a3c884c4c40b714ef7db6db68b16b372a85e684abb15a"
+        }
+      ]
+    },
+    {
+      "name": "04-challenge-320-large",
+      "prompt": "What feels difficult?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 976
+      },
+      "files": [
+        {
+          "file": "04-challenge-320-large-full.png",
+          "bytes": 102843,
+          "sha256": "933b0d9eac7a075058de58e790e53de9cae3766a08925bee83774a3473d21c67"
+        },
+        {
+          "file": "04-challenge-320-large-viewport.png",
+          "bytes": 94624,
+          "sha256": "209f27f26861d70a51d384eb5b842fdf586209bd8ef7f01cc9c8ecbf702f12cf"
+        }
+      ]
+    },
+    {
+      "name": "05-prediction-320-large",
+      "prompt": "What are you worried might happen?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 913
+      },
+      "files": [
+        {
+          "file": "05-prediction-320-large-full.png",
+          "bytes": 106204,
+          "sha256": "4feec02e0bbdff1d4621c645956f888f8f37267fe5459628235b83c7ccfeed17"
+        },
+        {
+          "file": "05-prediction-320-large-viewport.png",
+          "bytes": 102331,
+          "sha256": "34737415a963e14ac8afb4d0684c9486120961c27519975238ee8938bcc16c59"
+        }
+      ]
+    },
+    {
+      "name": "06-tactic-320-large",
+      "prompt": "What will you try first?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1223
+      },
+      "files": [
+        {
+          "file": "06-tactic-320-large-full.png",
+          "bytes": 172095,
+          "sha256": "1e98e27b31a39c42cd696c702e081484db4dc2ab4e3bf2d066152c785db3ab97"
+        },
+        {
+          "file": "06-tactic-320-large-viewport.png",
+          "bytes": 127712,
+          "sha256": "c6169e029e8354855b2404c74873fa2762dee8fedc85e8f5dab99a1197b8a4a9"
+        }
+      ]
+    },
+    {
+      "name": "07-chosen-move-320-large",
+      "prompt": "Your first move.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1184
+      },
+      "files": [
+        {
+          "file": "07-chosen-move-320-large-full.png",
+          "bytes": 221099,
+          "sha256": "0255973130841e8b0a5023eda56ed50c1f63739c1ef5f336cf9f8f2278b2e1cd"
+        },
+        {
+          "file": "07-chosen-move-320-large-viewport.png",
+          "bytes": 168159,
+          "sha256": "5b4d0b504b2f1adf16425e13adc5cbb60d01b3276a5c7bd26cfa9ef3164923ac"
+        }
+      ]
+    },
+    {
+      "name": "08-practice-choice-320-large",
+      "prompt": "What will you try here?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1168
+      },
+      "files": [
+        {
+          "file": "08-practice-choice-320-large-full.png",
+          "bytes": 136683,
+          "sha256": "83c373dd94ed53e0bf47d8711a3251eb196ea442ac5cb7d39bcdda6e93334508"
+        },
+        {
+          "file": "08-practice-choice-320-large-viewport.png",
+          "bytes": 110135,
+          "sha256": "2e13d9822bb4cb57b1f225b4ae02c057b8a7654d0999e1a6f41c51f134616cb2"
+        }
+      ]
+    },
+    {
+      "name": "09-try-320-large",
+      "prompt": "Try it once.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1277
+      },
+      "files": [
+        {
+          "file": "09-try-320-large-full.png",
+          "bytes": 156441,
+          "sha256": "0c0ba2c5951b41a947ad1753fe27f6e6922d2b934e35fe1201c28b264594dc9e"
+        },
+        {
+          "file": "09-try-320-large-viewport.png",
+          "bytes": 111108,
+          "sha256": "194ccb15836f563c54bd660c12eaf0404df2ee17c3865861b2a74d402b494bff"
+        }
+      ]
+    },
+    {
+      "name": "10-recovery-choice-320-large",
+      "prompt": "What will be your way back?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1282
+      },
+      "files": [
+        {
+          "file": "10-recovery-choice-320-large-full.png",
+          "bytes": 207439,
+          "sha256": "56c2be55d4e82914fc622b6deeff19b0e94efc98da5c0cb1fde6716685812d32"
+        },
+        {
+          "file": "10-recovery-choice-320-large-viewport.png",
+          "bytes": 155285,
+          "sha256": "e7216ac65d2c8f9c33717aa7e353f668b0eed4c79bd1f3689fbf117684768e78"
+        }
+      ]
+    },
+    {
+      "name": "11-recovery-try-320-large",
+      "prompt": "Try it once.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1203
+      },
+      "files": [
+        {
+          "file": "11-recovery-try-320-large-full.png",
+          "bytes": 145634,
+          "sha256": "7dc38820cf33bd74cd41ceaabb80cbc2256dfbe84d6d4b65b09787cab13f1d38"
+        },
+        {
+          "file": "11-recovery-try-320-large-viewport.png",
+          "bytes": 109645,
+          "sha256": "16e96cf43f7f0db94627100589e0a3f0dbc44db869b26d7420a47185f9dec7bd"
+        }
+      ]
+    },
+    {
+      "name": "12-usability-320-large",
+      "prompt": "How usable does your plan feel?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 989
+      },
+      "files": [
+        {
+          "file": "12-usability-320-large-full.png",
+          "bytes": 163819,
+          "sha256": "d23d6d5c71b43d777bcda0903250b99fd2dd566b257c5ea306a76bbe93446b05"
+        },
+        {
+          "file": "12-usability-320-large-viewport.png",
+          "bytes": 148053,
+          "sha256": "54d1381d66f28c60f566f1a6406bb9de30332def8b0766845751bb528a93e037"
+        }
+      ]
+    },
+    {
+      "name": "13-pocket-plan-320-large",
+      "prompt": "Your plan is ready.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1281
+      },
+      "files": [
+        {
+          "file": "13-pocket-plan-320-large-full.png",
+          "bytes": 141881,
+          "sha256": "73c512fd0eb81c30326695bf6d4009189874ff1f987ac104dab89f510817cb1b"
+        },
+        {
+          "file": "13-pocket-plan-320-large-viewport.png",
+          "bytes": 104796,
+          "sha256": "1217561549371f0d61c688f1ea5a0f9b0a46c6be0b4dd0d4dd04d3dcc652ae49"
+        }
+      ]
+    },
+    {
+      "name": "14-live-320-large",
+      "prompt": "What do you need right now?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1239
+      },
+      "files": [
+        {
+          "file": "14-live-320-large-full.png",
+          "bytes": 208580,
+          "sha256": "c4f9626166a42ae6795a4b648a8eec180f054f64d8614cb366aeb5ad1dfced21"
+        },
+        {
+          "file": "14-live-320-large-viewport.png",
+          "bytes": 148282,
+          "sha256": "a5c5c8c695ba23ad1a67d5750574d7456a0768d1d0e753446b9d73b9c212fb93"
+        }
+      ]
+    },
+    {
+      "name": "15-support-320-large",
+      "prompt": "Use this next.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 896
+      },
+      "files": [
+        {
+          "file": "15-support-320-large-full.png",
+          "bytes": 156798,
+          "sha256": "78b8c8728544c5fd4902d4577ac5c8cf0ddcbeb0694d9c5f18b22464d17ffea5"
+        },
+        {
+          "file": "15-support-320-large-viewport.png",
+          "bytes": 153729,
+          "sha256": "09275129a75741912a304a56d997f644e52411153b44e577bf8a5d6340916765"
+        }
+      ]
+    },
+    {
+      "name": "16-actual-action-320-large",
+      "prompt": "What did you actually do?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1018
+      },
+      "files": [
+        {
+          "file": "16-actual-action-320-large-full.png",
+          "bytes": 148960,
+          "sha256": "3a411dd257bd556541333d8d545b03555724900d402c476c67266af00613f5cb"
+        },
+        {
+          "file": "16-actual-action-320-large-viewport.png",
+          "bytes": 130572,
+          "sha256": "b3f2c573db89bf4692e7e9762cad97bac514d72b1f031c1cae5fe614d176cb1e"
+        }
+      ]
+    },
+    {
+      "name": "17-prediction-result-320-large",
+      "prompt": "Did your prediction happen?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1301
+      },
+      "files": [
+        {
+          "file": "17-prediction-result-320-large-full.png",
+          "bytes": 200914,
+          "sha256": "a0f9496bbbd4930ccdd6272e6192a47099df12cae9c8841f531c67f7cc6f0bde"
+        },
+        {
+          "file": "17-prediction-result-320-large-viewport.png",
+          "bytes": 156555,
+          "sha256": "2e54bd1f00c854c143e5ded4c4f30ee5e64f0cf829e8cf548fedcc7d92d35609"
+        }
+      ]
+    },
+    {
+      "name": "18-observation-320-large",
+      "prompt": "What happened?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 896
+      },
+      "files": [
+        {
+          "file": "18-observation-320-large-full.png",
+          "bytes": 93363,
+          "sha256": "8e91b541f68439f3ba1d659bd1cf1a50a3d98ae70b0d5480a4d53778654ab897"
+        },
+        {
+          "file": "18-observation-320-large-viewport.png",
+          "bytes": 92284,
+          "sha256": "fad1ab11250595c9cc1cc47b06a2f036cdc9fb55b845428762409a7ffe1ce184"
+        }
+      ]
+    },
+    {
+      "name": "19-next-step-320-large",
+      "prompt": "What would help next time?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 972
+      },
+      "files": [
+        {
+          "file": "19-next-step-320-large-full.png",
+          "bytes": 156909,
+          "sha256": "5dac0efdd43f55b833c73b6d5282b8f745434d44061d70c80afb7c17934dd4f9"
+        },
+        {
+          "file": "19-next-step-320-large-viewport.png",
+          "bytes": 145117,
+          "sha256": "dde2f7e7bf389ff9e14f9e94b3e792b62a8224fab64bac3e03efe4f363f4117e"
+        }
+      ]
+    },
+    {
+      "name": "20-save-reflection-320-large",
+      "prompt": "Keep a saved reflection?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "24px",
+        "scrollWidth": 320,
+        "scrollHeight": 1560
+      },
+      "files": [
+        {
+          "file": "20-save-reflection-320-large-full.png",
+          "bytes": 243490,
+          "sha256": "70d0960ab27ca06f526a48c3aa8792b60373781a952306367a62fe385840af97"
+        },
+        {
+          "file": "20-save-reflection-320-large-viewport.png",
+          "bytes": 147250,
+          "sha256": "bb16a0c2f9566b18e1a13c5613a5d6dabe369435bdb1ef7163eaf2333b9cbe61"
+        }
+      ]
+    }
+  ],
+  "pageErrors": [],
+  "fixtures": "Synthetic work-boundary example; explicit authored user choices, not real outcomes."
+}
