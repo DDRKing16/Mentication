@@ -101,7 +101,7 @@ export default function ReturnPoints() {
       {taraReportedResult(recap) && <p className="my-3">{taraReportedResult(recap).label}: {taraReportedResult(recap).text}</p>}
       {recap.learning && <p className="my-3 whitespace-pre-wrap break-words">What you want to remember: {recap.learning}</p>}
       {recap.nextStep && <p className="my-3 whitespace-pre-wrap break-words">Your next step: {recap.nextStep}</p>}
-      <Link className="min-h-11 inline-block underline mr-4" to="/tara-tactician">Open Tara and saved reflections</Link>
+      <Link className="min-h-11 inline-block underline mr-4" to="/tara-tactician">Open your saved reflections</Link>
       <button className="min-h-11 underline" onClick={() => { try { setTaraRecaps(deleteTaraRecap(recap.id).recaps); setError(''); } catch { setError('Could not delete this saved reflection. Try again.'); } }}>Delete saved reflection</button>
     </article>)}
     {visibleCards?.map(({ id, state }) => <article key={id} className="return-record">
