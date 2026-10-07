@@ -67,10 +67,10 @@ export default function JourneyTakeaway({ id, initialText = '' }) {
     <button type="button" className="takeaway-return" onClick={() => noteDialog.current?.close()}>Back to practice</button>
     <h1 id={`${fieldId}-title`}>{meta.prompt}</h1>
     <label className="sr-only" htmlFor={fieldId}>{meta.prompt}</label>
-    {initialText && !saved && <p>From your entries and confirmed choices. Edit or clear anything before saving.</p>}
+    {initialText && !saved && <p>Edit or clear these confirmed choices before saving.</p>}
 
     <textarea placeholder="A cue in your own words" id={fieldId} maxLength={1500} value={text} onChange={event => { dirty.current = true; setText(event.target.value); setError(''); }} rows={3} />
-    <p>Optional. Save keeps this note on this device only, without syncing. Read or delete it in Return points. Unsaved text is lost when you leave.</p>
+    <p>Saved only on this device, without syncing. Unsaved changes are lost when you leave.</p>
     <button type="button" className="takeaway-save" disabled={!text.trim() || saved?.text === text.trim()} onClick={() => {
       try { const record = takeawayStore.save({ id: saved?.id || scope, interventionId: id, text }); currentSaved.current = record; dirty.current = false; setSaved(record); setError(''); }
       catch { setError('Could not save. Your note is still here. Try again or copy it before leaving.'); }
@@ -81,7 +81,7 @@ export default function JourneyTakeaway({ id, initialText = '' }) {
     }}>Delete saved note</button></>}
     {error && <p role="alert">{error}</p>}
     {error.startsWith('Could not read') && <button type="button" onClick={() => setReadVersion(value => value + 1)}>Try reading saved note again</button>}
-    <Link to="/return-points">Return points</Link>
+    <Link to="/return-points">Read or delete saved notes</Link>
     </dialog>
   </details>;
 }
