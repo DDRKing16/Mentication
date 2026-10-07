@@ -1,14 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import { PMR_RATE } from '@/lib/pmrSession';
 import manifest from './tappingAudioManifest.json';
 import { tappingNarration, hasTappingNarration, tappingNarrationKeys, TAPPING_VOICE_RATE } from './tappingNarration';
 
 describe('shared Mentication narration for tapping', () => {
-  it('uses the exact approved spoken-text lookup and the PMR playback rate', () => {
+  it('uses the exact approved spoken-text lookup and the approved recording’s native pitch', () => {
     const lookup = vi.fn(() => ({ url: '/audio/narration/approved.mp3', alignment: [] }));
     expect(tappingNarration('place-brow', lookup)?.url).toBe('/audio/narration/approved.mp3');
     expect(lookup).toHaveBeenCalledWith(manifest['place-brow'].caption);
-    expect(TAPPING_VOICE_RATE).toBe(PMR_RATE);
+    expect(TAPPING_VOICE_RATE).toBe(1);
     expect(tappingNarration('unknown', lookup)).toBeNull();
   });
   it('does not offer a complete voice guide when even one required recording is missing', () => {

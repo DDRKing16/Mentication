@@ -7,7 +7,9 @@ function element(animation) {
 describe('actual CSS rhythm epoch', () => {
   it('uses the start time even when a delayed animationstart still reports zero current time', () => {
     const callback = vi.fn();
-    observeTappingAnimationStart(element({ animationName: 'tap-wrist-contact', startTime: 6500, currentTime: 0, playState: 'running' }), callback);
+    const target = element({ animationName: 'tap-wrist-contact', startTime: 6500, currentTime: 0, playState: 'running' });
+    observeTappingAnimationStart(target, callback);
+    observeTappingAnimationStart(target, callback);
     expect(callback).toHaveBeenCalledExactlyOnceWith(6500);
   });
   it('waits for a pending animation clock and ignores a cancelled or paused guide', async () => {
