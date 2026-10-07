@@ -9,7 +9,7 @@ globalThis.FoundationsStorage = (() => {
   const rating = value => Number.isInteger(value) && value >= 1 && value <= 5;
   const text = value => typeof value === 'string' ? value.slice(0, 240) : '';
   const sizes = ['tiny', 'regular', 'repeat'];
-  const stages = ['intro', 'scan', 'snapshot', 'choices', 'dose', 'plan', 'saved', 'review', 'learned', 'finish'];
+  const stages = ['intro', 'scan', 'snapshot', 'choices', 'dose', 'plan', 'cue', 'time', 'saved', 'review', 'review-effort', 'review-help', 'learned', 'finish'];
   function create(storage, domains, items) {
     const validChoice = plan => domains.some(domain => domain.id === plan?.domain && Number.isInteger(plan.action) && !!domain.actions[plan.action]) && sizes.includes(plan?.size);
     const validResponses = responses => Object.fromEntries(items.filter(item => rating(responses?.[item.id])).map(item => [item.id, responses[item.id]]));

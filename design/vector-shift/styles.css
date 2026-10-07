@@ -33,3 +33,13 @@ button:disabled {opacity:.55}
 
 .vs-game-metrics {gap:12px;flex-wrap:wrap;line-height:1.6}
 .vs-ending p {color:#d4e2d9!important;letter-spacing:.02em;font-style:normal}
+.vs-current-instruction{font-size:clamp(26px,7vw,34px);font-weight:700;line-height:1.2;margin:0 0 16px}
+.vs-activity-options summary{font-size:15px;min-height:44px;display:flex;align-items:center;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.vs-feedback fieldset{border:0;padding:0;margin:0;display:grid;gap:10px}
+.vs-feedback button{width:100%;font-size:17px;text-align:left;padding:14px 18px;margin:0}
+.vs-feedback>button{margin-top:20px;background:#00ff88;text-align:center;min-height:56px;font-size:18px}
+.vs-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.vs-ending{padding:24px!important;gap:18px!important}
+.vs-controls button{background:transparent;color:#fff8e7;border:0;font-weight:400;text-decoration:underline;text-underline-offset:4px}
+.vs-instructions .vs-activity-options button{font-size:16px}
+h1:not(.vs-stage){font-size:28px!important}

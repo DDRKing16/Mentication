@@ -12,6 +12,9 @@
     <header class="masthead"><span class="brand-mark" aria-hidden="true">⌁</span><span>MENTICATION <span class="edition">/ A LITTLE ROOM TO FOCUS</span></span></header>
     <div class="heading"><div><p class="eyebrow">EXTERNAL FOCUS</p><h1 id="title">Signal Lock<span aria-hidden="true">.</span></h1></div><button id="time-toggle" class="quiet icon" aria-pressed="false" aria-label="Show elapsed time">◷</button></div>
     <p id="intro" class="intro">Follow a small signal. Let the room come into view.</p>
+    <section class="guidance" aria-label="Next step"><span class="guide-mark" aria-hidden="true"><span class="arrow"></span></span><div><h2 id="instruction" tabindex="-1">Tap two signals. See what appears.</h2><p id="detail">No rush. Nothing to get wrong.</p></div></section>
+    <div id="start-controls" class="controls"><button id="start" class="primary">Follow the signal <span class="arrow" aria-hidden="true"></span></button><button id="skip" class="quiet">Not now</button></div>
+    <div id="paused-controls" class="controls" hidden><button id="resume" class="primary">Continue the signal <span class="arrow" aria-hidden="true"></span></button><button id="end-paused" class="quiet">End here</button></div>
     <section class="scene" aria-label="A softly lit room with a growing signal path">
       <img class="room" src="./assets/images/image_20260921_071849.webp" alt="" draggable="false">
       <div class="wash" aria-hidden="true"></div>
@@ -25,13 +28,13 @@
       <div id="scene-overlay" class="scene-overlay"><span class="small-reticle" aria-hidden="true">+</span><p id="overlay-text">One small connection<br>at a time.</p></div>
       <div class="scene-foot"><span id="reveal-label">A place to put your attention</span><span id="elapsed" hidden></span></div>
     </section>
-    <section class="guidance" aria-label="Next step"><span class="guide-mark" aria-hidden="true"><span class="arrow"></span></span><div><h2 id="instruction" tabindex="-1">Tap two signals. See what appears.</h2><p id="detail">No rush. Nothing to get wrong.</p></div></section>
-    <div id="start-controls" class="controls"><button id="start" class="primary">Follow the signal <span class="arrow" aria-hidden="true"></span></button><button id="skip" class="quiet">Not now</button></div>
-    <div id="play-controls" class="controls" hidden><button id="pause" class="secondary">Pause</button><button id="stop" class="quiet">Stop here</button><button id="complete" class="secondary" hidden>Finish this scene</button></div>
-    <div id="paused-controls" class="controls" hidden><button id="resume" class="primary">Continue the signal <span class="arrow" aria-hidden="true"></span></button><button id="end-paused" class="quiet">End here</button></div>
+
+
+    <div id="play-controls" class="controls" hidden><button id="pause" class="quiet">Pause</button><button id="stop" class="quiet">Stop here</button><button id="complete" class="quiet" hidden>Finish this scene</button></div>
+
     <section id="summary" class="summary" hidden aria-labelledby="summary-title">
-      <h2 id="summary-title" tabindex="-1">Session ended</h2><p id="summary-detail"></p><p id="unfinished"></p>
-      <fieldset><legend>How does this moment feel? <span>(optional)</span></legend><div id="feelings" class="feelings"></div></fieldset>
+      <h2 id="summary-title" class="summary-status" tabindex="-1">Session ended</h2><p id="summary-detail"></p><p id="unfinished"></p>
+      <fieldset><legend>How does this moment feel?</legend><p>Optional. There is no right answer.</p><div id="feelings" class="feelings"></div></fieldset>
       <p id="feeling-note">There is no right answer. You can leave this unanswered.</p>
       <button id="again" class="primary">Begin another scene <span class="arrow" aria-hidden="true"></span></button>
     </section>

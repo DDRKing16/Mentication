@@ -1361,7 +1361,7 @@ function jStage(i,f){const el=document.querySelector(".jsteps");if(!el)return;
  el.querySelectorAll(".jst2").forEach((c,k)=>{c.className="jst2"+(k<i?" done":k===i?" cur":"");c.style.setProperty("--f",(k<i?100:k===i?Math.round(Math.max(.08,Math.min(1,f))*100):0)+"%")});
  el.querySelector(".jcap").textContent=`${JSTG[i]} · ${i+1} of 6`}
 function jm(d,sz,cls=""){return `<span class="jm ${cls}" style="--c:${ACOL[AREA[d.k]]};--s:${sz}px">${mkIcon(d,Math.round(sz*.48),"#FFF8EE")}</span>`}
-function jPage({pre="",kick,q,sub="",body="",foot=""}){return `<div class="jw"><div class="jbody">${pre}<div class="kick">${kick}</div><div class="q jq">${q}</div>${sub?`<p class="jsub">${sub}</p>`:""}${body}</div><div class="jfoot">${foot}</div></div>`}
+function jPage({pre="",kick,q,sub="",body="",foot=""}){return `<div class="jw"><div class="jbody">${pre}<div class="kick">${kick}</div><h1 class="q jq" tabindex="-1">${q}</h1>${sub?`<p class="jsub">${sub}</p>`:""}${body}</div><div class="jfoot">${foot}</div></div>`}
 function jgo(id,push=true){const tt=document.querySelector(".jtoast");if(tt)tt.classList.remove("show");document.querySelectorAll(".jpeek").forEach(x=>x.remove());jSheetClose(true);
  const st=JST.stack;if(push&&st[st.length-1]!==id)st.push(id);const r=RT();r.classList.remove("jin");JS[id]();const b=r.querySelector(".jbody");if(b)b.scrollTop=0;void r.offsetWidth;r.classList.add("jin");SCR().classList.toggle("home",id==="home");jNavMark(id);jSave(id)}
 function jre(id){RT().classList.remove("jin");const b=RT().querySelector(".jbody"),y=b?b.scrollTop:0;JS[id]();const nb=RT().querySelector(".jbody");if(nb)nb.scrollTop=y}
@@ -1726,14 +1726,14 @@ jSwapCheck();
 #gmSound{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:12px;z-index:50;width:36px;height:36px;border-radius:50%;border:1px solid rgba(244,241,234,.25);background:rgba(18,3,10,.55);color:#F4F1EA;font-size:15px;line-height:1;cursor:pointer}
 </style>
 <script id="mentication-narration-js">
-/* Mentication: a brief spoken line for each screen. Silent on the support and psychologist screens on purpose. */
+/* Existing narration plays only where its words match the current screen. The fixed-score help recording does not adapt to user ratings. */
 (function(){
   var NO_LINE={care:1,clinician:1},cur=null,last=null,on=false,btn;
   try{on=localStorage.getItem("gm_narr")==="on"}catch(e){}
   function stop(){if(cur){try{cur.pause()}catch(e){}cur=null}}
   function say(id){
     if(id===last)return;last=id;stop();
-    if(!on||NO_LINE[id]||!["sort","help","way"].includes(id))return;
+    if(!on||NO_LINE[id]||!["sort","way"].includes(id))return;
     var a=new Audio("audio/"+id+".mp3");cur=a;
     a.play().catch(function(){/* the phone may block sound until the first tap; the next screen will play */});
   }

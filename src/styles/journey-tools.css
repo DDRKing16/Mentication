@@ -26,3 +26,13 @@ html.large-text :is(.journey-options-dialog,.journey-takeaway) { font-size:1.125
 .journey-takeaway .takeaway-coach { font-size:.9rem; line-height:1.6; }
 .journey-takeaway .takeaway-privacy { font-size:.76rem; line-height:1.5; }
 .journey-takeaway label { font-weight:600; }
+
+/* A note is its own optional screen, never a second question beside a rating. */
+.journey-note-screen { position:fixed; inset:0; box-sizing:border-box; width:100%; max-width:none; height:100dvh; max-height:100dvh; margin:0; padding:max(1.25rem,env(safe-area-inset-top)) max(1.25rem,calc((100vw - 30rem)/2)) max(1.5rem,env(safe-area-inset-bottom)); border:0; border-radius:0; overflow:auto; background:#fffdf7; color:#172d32; font:400 1rem/1.5 system-ui,sans-serif; }
+.journey-note-screen::backdrop { background:#fffdf7; }
+.journey-note-screen h1 { margin:1.25rem 0; font:400 2.15rem/1.15 Georgia,serif; overflow-wrap:anywhere; }
+.journey-note-screen textarea { min-height:9rem; font-size:1.125rem; }
+.journey-note-screen button { display:block; width:100%; min-height:48px; margin:.75rem 0; }
+.journey-note-screen button.takeaway-save { background:#172d32; color:#fffdf7; }
+.journey-note-screen .takeaway-return { width:auto; border:0; padding:0; text-decoration:underline; }
+html.large-text .journey-note-screen { font-size:1.125rem; }

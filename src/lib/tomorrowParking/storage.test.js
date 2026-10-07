@@ -191,6 +191,22 @@ describe("Tomorrow Parking Lot storage", () => {
     expect(writeDraft("Synthetic draft")).toBe(false);
   });
 
+  it("keeps sequential draft screens and migrates old capture drafts without inventing suitability", () => {
+    expect(writeDraft("A real draft", "draft-1", NIGHT, {step:"baseline",canWait:true})).toBe(true);
+    expect(readDraft(NIGHT)).toMatchObject({text:"A real draft",step:"baseline",canWait:true});
+    window.sessionStorage.setItem("mentication.tomorrowParking.draft.v1",JSON.stringify({text:"Old words",updatedAt:NIGHT.toISOString()}));
+    expect(readDraft(NIGHT)).toEqual({text:"Old words",updatedAt:NIGHT.toISOString()});
+  });
+
+  it("keeps optional feedback in this tab without changing the saved note", () => {
+    const record=parkNote({id:"feedback-1",text:"Exactly my own note"},NIGHT);
+    expect(writeParkingReturn(record.id,"feedback",NIGHT,{helpfulness:"same"})).toBe(true);
+    expect(readParkingReturn(NIGHT)).toMatchObject({step:"feedback",helpfulness:"same",record:{text:"Exactly my own note"}});
+    expect(loadRecords(NIGHT)).toEqual([record]);
+    deleteRecord(record.id,NIGHT);
+    expect(readParkingReturn(NIGHT)).toBeNull();
+  });
+
   it("exposes verification failures as a distinct error", () => {
     expect(new SaveVerificationError().name).toBe("SaveVerificationError");
   });

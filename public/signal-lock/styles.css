@@ -500,3 +500,17 @@ footer .quiet {
   border-top:1.5px solid currentColor;
   transform:rotate(-45deg);
 }
+/* The current instruction comes before the scene; the scene remains the activity. */
+.guidance h2{font-size:clamp(26px,7vw,32px);font-weight:700;line-height:1.2}
+.heading h1{font-size:26px;letter-spacing:-.03em}
+.guidance p{font-size:15px;line-height:1.5}
+.controls{margin-top:18px}
+#start-controls,#paused-controls{margin:0 0 20px}
+.controls .primary{width:100%;flex-basis:100%;font-size:18px}
+.at-summary .scene,.at-summary .heading,.at-summary .intro{display:none}
+.at-summary .summary{padding-top:22px}
+.summary .summary-status{font-size:15px;font-weight:400;color:#596d5b}
+.summary legend{font-size:clamp(28px,8vw,36px);font-weight:700;line-height:1.2}
+.feelings{grid-template-columns:1fr}
+.feelings button{font-size:17px;text-align:left;padding:15px}
+.large-text .summary legend,.large-text .guidance h2{font-size:1.6rem}

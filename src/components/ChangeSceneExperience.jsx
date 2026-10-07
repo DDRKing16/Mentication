@@ -1,3 +1,4 @@
+import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useEffect, useRef, useState } from "react";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
@@ -198,6 +199,7 @@ const STEPS = [
 export default function ChangeSceneExperience({ intervention, answers, onComplete, onAttemptEvent, onExit }) {
   const [session,setSession]=useState(()=>restoreSceneSession(getActiveFlagship()?.interventionId===ID ? getActiveFlagship().experience : null));
   const [showAlternatives,setShowAlternatives]=useState(false);
+  const [draftOk,setDraftOk]=useState(true);
   const [showAdapt,setShowAdapt]=useState(false);
   const [showAccessibility,setShowAccessibility]=useState(false);
   const [audioOn,setAudioOn]=useState(answers?.audio!=='no');
@@ -209,15 +211,18 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const {prefs}=useAccessibilityPrefs();
   const {speak,stop}=useGuideVoice();
   const {step}=session;
+  useJourneyScreenHistory(ID,String(step),position=>{
+    const value=Number(position);if(Number.isInteger(value)&&value>=0&&value<=7)setSession(current=>({...current,step:value}));
+  });
   const current = STEPS[Math.min(step, Math.max(0, STEPS.length - 1))];
   const action=SCENE_ACTIONS[step-1];
   const choice=session.actions[step]?.choice || 'primary';
   const status=session.actions[step]?.status || 'chosen';
-  const prompt=action ? action[choice] : step===0 ? STEPS[0].prompt : 'Notice how you feel now. A change is not required.';
+  const prompt=action ? action[choice] : step===0 ? STEPS[0].prompt : 'Optional. There is no expected result.';
   const outcome=sceneOutcome(session);
   const handoffToken=useRef(globalThis.crypto?.randomUUID?.() || `scene-${Date.now()}`);
   const narrationAvailable=Boolean(getNarration(prompt)?.url);
-  useEffect(()=>{if(!completed.current) saveActiveFlagship({interventionId:ID,experience:session});},[session]);
+  useEffect(()=>{if(!completed.current) setDraftOk(saveActiveFlagship({interventionId:ID,experience:session}));},[session]);
   useEffect(()=>{setShowAlternatives(false);heading.current?.focus();},[step]);
   useEffect(()=>{stop();if(audioOn)speak(prompt,{voice:voiceFor('lift')});return ()=>stop();},[prompt,audioOn,speak,stop]);
   useEffect(()=>{
@@ -258,11 +263,12 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       <button aria-label="Exit intervention" onClick={onExit}>×</button>
     </header>
     <main className="scene-card">
+      {!draftOk&&<p role="status" className="scene-caption">Progress could not be saved in this tab. Keep it open to retain these choices; refreshing may lose them.</p>}
       <nav className="scene-progress" aria-label="Journey progress">
-        {['Start','Move','Water','View','Connect','Rest','Plan','Review'].map((label,i)=><button key={label} aria-label={`${label}${i===step?', current step':''}`} aria-current={i===step?'step':undefined} disabled={i>step} onClick={()=>go(i)}><span aria-hidden="true">{i===0?'✦':session.actions[i]?.status==='done'?'✓':session.actions[i]?.status==='skipped'?'−':i}</span><small>{label}</small></button>)}
+        {['Start','Move','Water','View','Connect','Rest','Plan','Review'].map((label,i)=><div key={label} role="img" aria-label={`${label}: ${session.actions[i]?.status==='done'?'confirmed':session.actions[i]?.status==='skipped'?'skipped':i>0&&i<7?'not confirmed':''}${i===step?', current step':''}`} aria-current={i===step?'step':undefined}><span aria-hidden="true">{i===0?'✦':session.actions[i]?.status==='done'?'✓':session.actions[i]?.status==='skipped'?'−':i}</span><small>{label}</small></div>)}
       </nav>
       <p className="scene-kicker">{step===0?'One small shift at a time':step===7?'Your check-in':`Step ${step} of 6`}</p>
-      <h1 ref={heading} tabIndex={-1}>{action?.title || (step===0?'Change the Scene':'What did you notice?')}</h1>
+      <h1 ref={heading} tabIndex={-1}>{action?.title || (step===0?'Change the Scene':'Was this useful?')}</h1>
       {step<7 && <div className="scene-art" aria-hidden="true">{current.art}</div>}
       <p className="scene-prompt">{prompt}</p>
       {step===0 ? <>
@@ -274,14 +280,14 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
           {['primary','alternative'].map(value=><button key={value} aria-pressed={choice===value} onClick={()=>{record(value);setShowAlternatives(false);}}>{action[value]}{choice===value?' ✓':''}</button>)}
         </details>
         <p className="scene-caption">Choose what fits. Confirm only after you have tried it.</p>
-        {status==='done' ? <div className="scene-confirmed"><p role="status">Recorded: {choice==='alternative'?action.alternateDone:action.done}.</p><button onClick={()=>record('undo')}>Undo confirmation</button><button className="scene-primary" onClick={()=>go(step+1)}>Continue</button></div> : <button className="scene-primary" onClick={()=>record('done')}>{choice==='alternative'?action.alternateDone:action.done}</button>}
+        {status==='done' ? <div className="scene-confirmed"><p role="status">Recorded: {choice==='alternative'?action.alternateDone:action.done}.</p><button onClick={()=>record('undo')}>Undo confirmation</button><button className="scene-primary" onClick={()=>go(step+1)}>Continue</button></div> : <button className="scene-primary" onClick={()=>setSession(s=>({...sceneAction(s,step,'done'),step:step+1}))}>{choice==='alternative'?action.alternateDone:action.done}</button>}
         <button className="scene-secondary" onClick={()=>{setSession(s=>({...sceneAction(s,step,'skip'),step:step+1}));}}>Skip this action</button>
       </> : <>
         <p className="scene-summary">You confirmed {outcome.confirmedActions} of 6 actions{outcome.skippedActions?` and skipped ${outcome.skippedActions}`:''}. Choosing an action alone does not count as doing it.</p>
         <details className="scene-options"><summary>Review or undo your actions</summary>{SCENE_ACTIONS.map((item,i)=><button key={item.title} onClick={()=>go(i+1)}>{item.title} · {session.actions[i+1]?.status==='done'?'confirmed':session.actions[i+1]?.status==='skipped'?'skipped':'not confirmed'}</button>)}</details>
-        <fieldset className="scene-feedback"><legend>Was this useful? <span>(optional)</span></legend>{[['helpful','Helpful'],['same','No difference'],['worse','Made things worse'],['unsure','Not sure']].map(([value,label])=><button key={value} aria-pressed={session.helpfulness===value} onClick={()=>setSession(s=>({...s,helpfulness:s.helpfulness===value?null:value}))}>{label}</button>)}</fieldset>
+        <fieldset className="scene-feedback"><legend className="sr-only">Was this useful?</legend>{[['helpful','Helpful'],['same','No difference'],['worse','Made things worse'],['unsure','Not sure']].map(([value,label])=><button key={value} aria-pressed={session.helpfulness===value} onClick={()=>setSession(s=>({...s,helpfulness:s.helpfulness===value?null:value}))}>{label}</button>)}</fieldset>
         <p role="status" className="scene-caption">{session.helpfulness==='worse'?'You can stop here. You do not need to try more actions.':session.helpfulness==='same'?'No difference is a valid response.':session.helpfulness==='helpful'?'Keep what was useful; leave the rest.':'There is no expected result. You can leave this unanswered.'}</p>
-        <button className="scene-primary" onClick={()=>finish()}>Continue to final rating</button>
+        <button className="scene-primary" onClick={()=>finish()}>Finish these actions</button>
         {<details className="scene-options"><summary>Explore another practice</summary><p>Finish your check-in first. Availability depends on your setting and current answers.</p><button onClick={()=>finish('happyBump')}>Consider Happy Bump</button><button onClick={()=>finish('dear2100')}>Consider Dear 2100 · longer journey</button></details>}
       </>}
     </main>
@@ -297,9 +303,9 @@ const SCENE_STYLES=`
 .scene-experience button,.scene-experience summary{min-height:48px;cursor:pointer;font-size:16px;line-height:1.45}.scene-chrome button{min-width:48px;border:1px solid #a2f9b855;border-radius:50%;background:#1c443455;font-size:22px}
 .scene-experience :focus-visible{outline:3px solid #f4c95d;outline-offset:4px}.scene-experience h1:focus{outline:none}
 .scene-card{position:relative;max-width:640px;margin:8px auto 0;padding:24px 28px 32px;border-radius:28px;border:1px solid #a2f9b840;background:radial-gradient(ellipse at 10% 90%,#a2f9b81a,transparent 60%),#581825;box-shadow:0 24px 64px #22091055;display:flex;flex-direction:column;gap:18px}
-.scene-progress{display:flex;gap:4px;justify-content:space-between}.scene-progress button{flex:1;min-width:0;display:flex;align-items:center;flex-direction:column;font-size:12px;gap:4px}.scene-progress button:disabled{cursor:default;opacity:.65}.scene-progress button>span{display:grid;place-items:center;width:26px;height:26px;border:2px solid #a2f9b888;border-radius:50%}.scene-progress [aria-current] span{background:#f4c95d;color:#581825;border-color:#f4c95d}.scene-progress small{font-size:11px}
+.scene-progress{display:flex;gap:4px;justify-content:space-between}.scene-progress>div{flex:1;min-width:0;display:flex;align-items:center;flex-direction:column;font-size:12px;gap:4px}.scene-progress>div:disabled{cursor:default;opacity:.65}.scene-progress>div>span{display:grid;place-items:center;width:26px;height:26px;border:2px solid #a2f9b888;border-radius:50%}.scene-progress [aria-current] span{background:#f4c95d;color:#581825;border-color:#f4c95d}.scene-progress small{font-size:11px}
 .scene-kicker{text-align:center;text-transform:uppercase;letter-spacing:.12em;font-size:13px}.scene-card h1{font-family:'EB Garamond',Georgia,serif;font-size:clamp(36px,8vw,52px);line-height:1.07;text-align:center;font-weight:700;letter-spacing:-.025em;margin:0}.scene-art{height:140px;max-width:220px;width:100%;margin:0 auto}.scene-art svg{width:100%;height:100%}.scene-prompt{font-size:21px;line-height:1.45;text-align:center;max-width:480px;margin:auto}.scene-caption{font-size:16px;line-height:1.5;text-align:center;color:inherit;opacity:.85}.scene-primary{background:#a2f9b8;color:#581825;border:2px solid #a2f9b8;border-radius:999px;padding:14px 24px;font-weight:800;box-shadow:0 5px 0 #163c2c;align-self:stretch}.scene-secondary{padding:8px;text-decoration:underline;text-underline-offset:4px}.scene-options{border:1px solid #a2f9b855;border-radius:18px;padding:8px 14px}.scene-options summary{display:list-item;align-content:center;font-weight:600;list-style-position:inside}.scene-options button{display:block;text-align:left;width:100%;padding:12px;border-radius:12px;margin:8px 0;background:#1c4434;color:#a2f9b8;border:1px solid #a2f9b844}.scene-options button[aria-pressed=true]{border-color:#f4c95d}.scene-options p{padding:8px;font-size:16px}.scene-confirmed{display:grid;gap:14px;text-align:center}.scene-confirmed>button:not(.scene-primary){text-decoration:underline}.scene-summary{font-size:18px;line-height:1.5}.scene-feedback{display:grid;grid-template-columns:1fr 1fr;gap:10px}.scene-feedback legend{font-size:20px;margin-bottom:12px}.scene-feedback legend span{font-size:16px}.scene-feedback button{border:1px solid #a2f9b866;border-radius:14px;padding:10px}.scene-feedback [aria-pressed=true]{background:#a2f9b8;color:#581825}.scene-controls{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:24px 16px 0}.scene-controls button{border:1px solid #a2f9b855;border-radius:999px;padding:10px 20px}.scene-modal{position:fixed;inset:0;z-index:100;background:#000a;display:grid;place-items:center;padding:20px}.scene-modal section{width:100%;max-width:440px;background:#1c4434;border:1px solid #a2f9b8;padding:24px;border-radius:24px;display:grid;gap:14px}.scene-modal h2{font-family:'EB Garamond',serif;font-size:28px}.scene-modal button{padding:12px;border:1px solid #a2f9b866;border-radius:12px;text-align:left}
-.scene-step-1,.scene-step-2,.scene-step-3,.scene-step-4{background:#daf1eb;color:#123a30}.scene-step-1 .scene-card,.scene-step-2 .scene-card,.scene-step-3 .scene-card,.scene-step-4 .scene-card{background:radial-gradient(ellipse at 10% 90%,#a2f9b855,transparent 60%),#daf1eb;border-color:#123a3044}.scene-step-1 .scene-chrome button,.scene-step-2 .scene-chrome button,.scene-step-3 .scene-chrome button,.scene-step-4 .scene-chrome button{border-color:#123a3055}.scene-step-1 .scene-progress button>span,.scene-step-2 .scene-progress button>span,.scene-step-3 .scene-progress button>span,.scene-step-4 .scene-progress button>span{border-color:#123a3088}.scene-modal{color:#a2f9b8}
-@media(max-width:680px){.scene-card{margin:0 12px;padding:20px 18px;gap:16px}.scene-art{height:110px}.scene-progress small{display:none}.scene-progress button{font-size:14px}.scene-prompt{font-size:20px}.scene-chrome{padding:12px}.scene-chrome button{min-width:44px;min-height:44px}.scene-progress button{min-height:48px}.scene-feedback{grid-template-columns:1fr 1fr}}
+.scene-step-1,.scene-step-2,.scene-step-3,.scene-step-4{background:#daf1eb;color:#123a30}.scene-step-1 .scene-card,.scene-step-2 .scene-card,.scene-step-3 .scene-card,.scene-step-4 .scene-card{background:radial-gradient(ellipse at 10% 90%,#a2f9b855,transparent 60%),#daf1eb;border-color:#123a3044}.scene-step-1 .scene-chrome button,.scene-step-2 .scene-chrome button,.scene-step-3 .scene-chrome button,.scene-step-4 .scene-chrome button{border-color:#123a3055}.scene-step-1 .scene-progress>div>span,.scene-step-2 .scene-progress>div>span,.scene-step-3 .scene-progress>div>span,.scene-step-4 .scene-progress>div>span{border-color:#123a3088}.scene-modal{color:#a2f9b8}
+@media(max-width:680px){.scene-card{margin:0 12px;padding:20px 18px;gap:16px}.scene-art{height:110px}.scene-progress small{display:none}.scene-progress>div{font-size:14px}.scene-prompt{font-size:20px}.scene-chrome{padding:12px}.scene-chrome button{min-width:44px;min-height:44px}.scene-progress>div{min-height:48px}.scene-feedback{grid-template-columns:1fr 1fr}}
 html.large-text .scene-experience button,html.large-text .scene-experience p{font-size:1.2rem}html.large-text .scene-prompt{font-size:1.4rem}
 `;

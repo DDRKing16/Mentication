@@ -1,3 +1,4 @@
+import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +19,7 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
   const navigate = useNavigate();
   const { prefs } = useAccessibilityPrefs();
   const [restored] = useState(()=>{try{return {draft:readDraft(),parked:readParkingReturn(),error:false};}catch{return {draft:readDraft(),parked:null,error:true};}});
-  const [step, setStep] = useState(restored.parked?.step || restored.draft?.step || "capture");
+  const [step, setStep] = useState(restored.parked?.step || (restored.draft?.canWait ? restored.draft?.step || "capture" : "suitability"));
   const [draft] = useState(restored.draft);
   const [text, setText] = useState(restored.parked?.record.text || draft?.text || "");
   const [suitability, setSuitability] = useState(restored.parked || draft?.canWait ? 'wait' : null);
@@ -29,13 +30,15 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
   const [saving, setSaving] = useState(false);
   const [draftAvailable, setDraftAvailable] = useState(true);
   const [leaving, setLeaving] = useState(false);
-  const [helpfulness, setHelpfulness] = useState(null);
-  const [checkIn, setCheckIn] = useState(false);
+  const [helpfulness, setHelpfulness] = useState(restored.parked?.helpfulness || null);
   const [baseline, setBaseline] = useState(() => hasGoalBaseline(answers) ? answers.goal_baseline : null);
   const [rating, setRating] = useState(5);
   const identity = useRef(restored.parked?.record.id || draft?.recordId || newId());
   const inFlight = useRef(false);
   const completionReported = useRef(!!restored.parked);
+  useJourneyScreenHistory(ID,step,next=>{
+    if(['suitability','capture','baseline','seal','parked','quiet','feedback'].includes(next) && (!['parked','quiet','feedback'].includes(next)||saved))setStep(next);
+  });
   const startedAt = useRef(Date.now());
   const title = useRef(null);
   const assessment = GOAL_ASSESSMENTS[answers?.direction || "sleep"];
@@ -43,9 +46,9 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
 
   useEffect(() => {
     if(step==='seal' && saved?.text===text.trimEnd()) setReturnOk(writeParkingReturn(saved.id,'parked'));
-    else if (step === "capture" || step === "seal") setDraftAvailable(writeDraft(text, identity.current,undefined,{step,canWait:suitability==='wait'}));
-    else if(saved) setReturnOk(writeParkingReturn(saved.id,step));
-  }, [text, step, suitability, saved]);
+    else if (["suitability","capture","baseline","seal"].includes(step)) setDraftAvailable(writeDraft(text, identity.current,undefined,{step,canWait:suitability==='wait'}));
+    else if(saved) setReturnOk(writeParkingReturn(saved.id,step,undefined,{helpfulness}));
+  }, [text, step, suitability, saved, helpfulness]);
   useEffect(() => { title.current?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [step]);
   useEffect(()=>{
     if(!saved)return;
@@ -54,10 +57,10 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
       try {
         const latest=getRecord(saved.id);
         if(!latest) {
-          const dirty=['capture','seal'].includes(step) && text.trimEnd()!==saved.text;
+          const dirty=['suitability','capture','baseline','seal'].includes(step) && text.trimEnd()!==saved.text;
           const allRemoved=event.type==='storage' && event.newValue===null;
           setSaved(null);
-          if(!dirty || allRemoved){setText('');clearDraft();setStep('capture');setSuitability(null);}
+          if(!dirty || allRemoved){setText('');clearDraft();setStep('suitability');setSuitability(null);}
           setReadNotice(dirty && !allRemoved?'The saved version was removed elsewhere. Your current edits are still an unsaved draft.':'This saved note was removed elsewhere. Nothing has been saved again.');
         } else if(JSON.stringify(latest)!==JSON.stringify(saved)) {
           setSaved(latest);if(['parked','quiet'].includes(step))setText(latest.text);setReadNotice('');
@@ -103,7 +106,7 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
     setStep("capture");
   };
   const leave = () => {
-    if (text.trim() && saved?.text !== text.trimEnd() && (step === "capture" || step === "seal")) setLeaving(true);
+    if (text.trim() && saved?.text !== text.trimEnd() && ["suitability","capture","baseline","seal"].includes(step)) setLeaving(true);
     else finish();
   };
   const heading = (content) => <h1 ref={title} tabIndex={-1} className="tpl-display tpl-h1">{content}</h1>;
@@ -112,21 +115,20 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
     {step !== "quiet" && <ThoughtLines still={reducedMotion} intensity={0.25} />}
     <div className="tpl-frame">
       <header className="tpl-topbar tpl-night-header">
-        <button type="button" className="tpl-icon-btn" aria-label={step === "seal" ? "Back to edit the note" : "Leave Tomorrow Parking Lot"} disabled={saving} onClick={step === "seal" ? reopen : leave}><ArrowLeft size={20} aria-hidden="true" /></button>
+        <button type="button" className="tpl-icon-btn" aria-label={step === "seal" ? "Back to edit the note" : "Leave Tomorrow Parking Lot"} disabled={saving} onClick={step === "seal" ? reopen : step === "capture" ? ()=>setStep("suitability") : step === "baseline" ? ()=>setStep("capture") : step === "feedback" ? ()=>setStep("parked") : leave}><ArrowLeft size={20} aria-hidden="true" /></button>
         <p className="tpl-eyebrow">Tomorrow Parking Lot</p>
         <button type="button" className="tpl-icon-btn" aria-label="Exit" disabled={saving} onClick={leave}><X size={18} aria-hidden="true" /></button>
       </header>
 
       {readNotice && <p role="status" className="tpl-xs tpl-muted">{readNotice}</p>}
       {restored.error && <p role="alert" className="tpl-alert">Your saved return could not be read. Existing notes have not been replaced. You can review them in Your parking lot.</p>}
-      {step === "capture" && <div className="tpl-rise tpl-capture">
-        <p className="tpl-kicker">A little less to carry tonight</p>
-        {heading("Leave tomorrow here.")}
-        <p className="tpl-lede">One unfinished thought. One place to put it.</p>
+      {step === "suitability" && <div className="tpl-rise tpl-capture">
+        {heading("Can this wait until tomorrow?")}
+        <p className="tpl-lede">Park something unfinished only if it can safely wait.</p>
         <fieldset className="tpl-urgency">
-          <legend>Can this wait until tomorrow?</legend>
+          <legend className="sr-only">Can this wait until tomorrow?</legend>
           <div className="tpl-row">
-            <button className={`tpl-btn tpl-btn--secondary${suitability === "wait" ? " tpl-selected" : ""}`} aria-pressed={suitability === "wait"} onClick={() => setSuitability("wait")}>It can wait</button>
+            <button className={`tpl-btn tpl-btn--primary${suitability === "wait" ? " tpl-selected" : ""}`} aria-pressed={suitability === "wait"} onClick={() => {setSuitability("wait");setStep("capture");}}>It can wait</button>
             <button className="tpl-btn tpl-btn--outline" aria-expanded={suitability === "help"} onClick={() => setSuitability(suitability === "help" ? null : "help")}>Not sure / urgent</button>
           </div>
         </fieldset>
@@ -134,17 +136,30 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
           <p>If something needs action tonight, deal with it directly. If you or someone else isn’t safe, support comes first.</p>
           <div className="tpl-stack"><button className="tpl-btn tpl-btn--primary tpl-btn--block" onClick={() => navigate("/support")}>Support options</button><button className="tpl-link" onClick={leave}>Leave for now</button></div>
         </section>}
-        {suitability !== "help" && <>
+      </div>}
+      {step === "capture" && <div className="tpl-rise tpl-capture">
+        {heading("What can wait?")}
+        <p className="tpl-lede">One unfinished thought, in your own words.</p>
+        <>
+
           <section className="tpl-writing" aria-label="Your note">
-            <label htmlFor="tpl-note" className="tpl-writing__label">What can wait?</label>
+            <label htmlFor="tpl-note" className="sr-only">What can wait?</label>
             <textarea id="tpl-note" className="tpl-writing__input" value={text} onChange={(e) => setText(e.target.value)} rows={4} placeholder="A task, a worry, something to remember…" spellCheck autoComplete="off" aria-describedby="tpl-draft-status" />
           </section>
           <p id="tpl-draft-status" className="tpl-xs tpl-muted">{saved ? "Editing your parked note. The saved version stays until you save again." : draft?.text ? "Recovered an unfinished draft. It is not parked yet." : "Not saved yet."} {draftAvailable ? "Draft recovery is limited to this tab, for up to 24 hours." : "Draft recovery is unavailable. Keep this tab open until you save."}</p>
           <button className="tpl-btn tpl-btn--primary tpl-btn--block tpl-btn--lg" disabled={!text.trim() || suitability !== "wait"} onClick={() => setStep("seal")}>Ready to put it away</button>
           {suitability !== "wait" && <p className="tpl-xs tpl-muted">Choose “It can wait” before parking. A blank note cannot be saved.</p>}
-          {!baseline && !saved && assessment && <details className="tpl-details"><summary>Optional starting check-in</summary><p className="tpl-small">{assessment.question}</p><input aria-label={assessment.question} type="range" min="0" max="10" value={rating} onChange={(e) => setRating(Number(e.target.value))} /><div className="tpl-scale"><span>0 · {assessment.left}</span><span>10 · {assessment.right}</span></div><button className="tpl-link" onClick={() => { const next = captureGoalBaseline(answers?.direction || "sleep", rating); setBaseline(next); onGoalBaseline?.(next); }}>Confirm starting rating: {rating}</button><p className="tpl-xs tpl-muted">Unanswered until confirmed. You can skip this.</p></details>}
+          {!baseline && !saved && assessment && <button className="tpl-link" onClick={()=>setStep("baseline")}>Starting check-in · optional</button>}
           {baseline && <p className="tpl-xs tpl-muted">Starting {baseline.scale}: {baseline.value}/10. An optional matching check-in is available after saving.</p>}
-        </>}
+        </>
+      </div>}
+      {step === "baseline" && <div className="tpl-rise tpl-capture">
+        {heading(assessment.question)}
+        <p className="tpl-lede">Optional. Your starting rating is unanswered until confirmed.</p>
+        <input aria-label={assessment.question} type="range" min="0" max="10" value={rating} onChange={e=>setRating(Number(e.target.value))}/>
+        <div className="tpl-scale"><span>0 · {assessment.left}</span><span>10 · {assessment.right}</span></div>
+        <button className="tpl-btn tpl-btn--primary tpl-btn--block" onClick={()=>{const next=captureGoalBaseline(answers?.direction || "sleep",rating);setBaseline(next);onGoalBaseline?.(next);setStep("capture");}}>Confirm {rating} and return to my note</button>
+        <button className="tpl-link" onClick={()=>setStep("capture")}>Skip this check-in</button>
       </div>}
 
       {step === "seal" && <div className="tpl-rise tpl-seal">
@@ -168,11 +183,14 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
         <button className="tpl-btn tpl-btn--primary tpl-btn--block tpl-btn--lg" onClick={() => setStep("quiet")}>Let the app go quiet</button>
         <p className="tpl-xs tpl-muted tpl-center">Find it in “Your parking lot” on Home or in Library.</p>
         <div className="tpl-row"><button className="tpl-link" onClick={reopen}>Reopen note</button><button className="tpl-link" onClick={() => finish("/parking-lot")}>Review in daylight</button></div>
-        <button className="tpl-link" aria-expanded={checkIn} onClick={() => setCheckIn(!checkIn)}>Optional check-in</button>
-        {checkIn && <section className="tpl-panel" aria-label="Optional feedback">
-          <p className="tpl-small">Was parking this helpful?</p><div className="tpl-wrap">{[["helpful", "Helpful"], ["same", "Same"], ["worse", "Worse"], ["unsure", "Unsure"]].map(([value, label]) => <button key={value} className="tpl-chip" aria-pressed={helpfulness === value} onClick={() => setHelpfulness(value)}>{label}</button>)}</div>
-          {baseline ? <button className="tpl-link" onClick={() => finish(undefined, true)}>Repeat the starting check-in</button> : <p className="tpl-xs tpl-muted">No starting rating was answered, so there is no before-and-after comparison.</p>}
-        </section>}
+        <button className="tpl-link" onClick={()=>setStep("feedback")}>Practice feedback · optional</button>
+        {baseline && <button className="tpl-link" onClick={()=>finish(undefined,true)}>Repeat my starting check-in · optional</button>}
+      </div>}
+      {step === "feedback" && <div className="tpl-rise tpl-parked">
+        {heading("Was parking this helpful?")}
+        <p className="tpl-lede">Optional. There is no expected result.</p>
+        <div className="tpl-wrap">{[["helpful","Helpful"],["same","Same"],["worse","Worse"],["unsure","Unsure"]].map(([value,label])=><button key={value} className="tpl-chip" aria-pressed={helpfulness===value} onClick={()=>setHelpfulness(helpfulness===value?null:value)}>{label}</button>)}</div>
+        <button className="tpl-btn tpl-btn--primary tpl-btn--block" onClick={()=>setStep("parked")}>Return to my parked note</button>
       </div>}
 
       {step === "quiet" && <div className="tpl-darkness">

@@ -43,7 +43,7 @@
       <div class="answer"><strong id="answerText" aria-live="polite">Choose a response below</strong></div>
       <div class="scale"><div class="scale-line"></div><span class="selection-current" aria-hidden="true"></span><div class="scale-dots" role="group" aria-label="Rate from one to five"><button class="scale-point" type="button" data-value="0" aria-label="1, working against me" aria-pressed="false"><span><em>1</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="1" aria-label="2" aria-pressed="false"><span><em>2</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="2" aria-label="3, mixed" aria-pressed="false"><span><em>3</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="3" aria-label="4" aria-pressed="false"><span><em>4</em><b aria-hidden="true">Continue →</b></span></button><button class="scale-point" type="button" data-value="4" aria-label="5, supporting me" aria-pressed="false"><span><em>5</em><b aria-hidden="true">Continue →</b></span></button></div><input class="range" id="range" type="range" min="0" max="4" step="1" value="2" aria-label="Response"></div>
       <div class="endlabels"><span>Working against me</span><span>Supporting me</span></div>
-      <p class="scale-help">Choose a number, then tap it again to continue.</p>
+      <p class="scale-help">Choose a number, then Continue.</p>
       <div class="footer"><button class="primary" id="questionContinue" disabled><span>Continue</span><span class="arrow">→</span></button></div>
     </section>
 
@@ -95,28 +95,40 @@
       <p class="eyebrow">Your weekly plan</p><h2>One thing. <em>This week.</em></h2>
       <p id="planReveal" class="plan-reveal" role="status">Two choices. One doable next step.</p><div class="weekly-plan-card" id="weeklyPlanCard"><span class="weekly-plan-kicker" id="planSavedWhen">This week</span><span class="weekly-plan-domain" id="planDomain"></span><h3 id="planTitle"></h3><p class="weekly-plan-instruction" id="planInstruction"></p><p id="planCueSummary" class="plan-cue-summary"></p><div class="weekly-plan-meta"><span>One action</span><span id="planDose"></span><span>This week</span></div><button class="weekly-plan-why" id="planWhyToggle" type="button" aria-expanded="false">Why try this <span>＋</span></button><div class="weekly-plan-why-copy" id="planWhyDisclosure" hidden><p id="planWhy"></p><small>A practical hypothesis, not a promise.</small></div></div>
       <p class="fit-note" id="planFitNote"></p>
-      <details class="cue-options" id="cueOptions"><summary>Add a cue or time (optional)</summary><label for="planCue">An existing moment to link it to</label><select id="planCue"><option value="">No cue yet</option><option value="After waking">After waking</option><option value="After a meal">After a meal</option><option value="After work or study">After work or study</option><option value="Before winding down">Before winding down</option><option value="When I notice the usual cue">When I notice the usual cue</option></select><label for="planTime">A time that suits you (optional)</label><input id="planTime" type="time"><p id="cueFeedback" role="status">These are cues on your plan, not scheduled notifications.</p></details>
+      <button class="ghost" data-next="cue">Add a cue or time (optional) →</button>
       <p id="planError" class="save-error" role="alert" hidden></p><button class="ghost" id="reloadSavedPlan" hidden>Open the latest saved plan</button>
       <div class="footer"><button class="primary" id="savePlan"><span>Save my weekly plan</span><span class="arrow">→</span></button><button class="ghost" id="changePlan" style="width:100%">Choose another action</button><button class="ghost" id="reviewPlan" hidden>Review what happened →</button><button class="ghost" id="newCheckIn">Start a new check-in</button></div>
     </section>
 
+    <section class="screen" data-screen="cue">
+      <p class="eyebrow">Optional cue</p><h2>What moment could <em>remind you?</em></h2><p class="small">Choose an existing moment, or leave it blank.</p>
+      <label for="planCue">A moment to link it to</label><select id="planCue"><option value="">No cue yet</option><option>After waking</option><option>After a meal</option><option>After work or study</option><option>Before winding down</option><option>When I notice the usual cue</option></select>
+      <p id="cueFeedback" role="status">This is a cue on your plan, not a notification.</p><div class="footer"><button class="primary" data-next="time">Continue →</button></div>
+    </section>
+    <section class="screen" data-screen="time">
+      <p class="eyebrow">Optional time</p><h2>Is there a time <em>that suits you?</em></h2><p class="small">Leave this blank if you would rather decide later.</p><label for="planTime">Time (optional)</label><input id="planTime" type="time"><div class="footer"><button class="primary" data-next="plan">Return to my plan →</button></div>
+    </section>
     <section class="screen" data-screen="saved">
       <div class="success-orbit"><div class="success-core"><div><b id="savedTitle">Plan ready.</b><span id="savedStatus">One thing this week</span></div></div></div>
       <h2 style="text-align:center">Your plan is here. <em>Try it when it fits.</em></h2><p class="lede" id="savedCopy" style="text-align:center">Try your one small action, then check what helped.</p>
       <button class="ghost" id="viewSavedPlan">View my plan →</button>
-      <div class="footer"><button class="primary" data-next="review"><span>Review what happened</span><span class="arrow">→</span></button><button class="ghost" data-next="finish" style="width:100%">Finish planning for now</button></div>
+      <div class="footer"><button class="primary" data-next="finish"><span>Finish planning for now</span><span class="arrow">→</span></button><button class="ghost" data-next="review" style="width:100%">Review what happened</button></div>
     </section>
 
     <section class="screen" data-screen="review">
-      <p class="eyebrow">Check what happened</p><h2>How did your plan <em>actually go?</em></h2><p class="review-plan" id="reviewPlanSummary"></p><p class="small">If you have not tried it yet, choose “Not yet”. There is no pressure to report a result.</p>
-      <div class="review-q"><b>How much did you try?</b><div class="review-scale" data-review="tried" role="group" aria-label="How much did you try?"></div><div class="review-anchors"><span>Not yet</span><span>As planned</span></div></div><div class="review-q" data-review-followup><b>How manageable was it?</b><div class="review-scale" data-review="effort" role="group" aria-label="How manageable was it?"></div><div class="review-anchors"><span>Too much</span><span>Easy to repeat</span></div></div><p class="review-checkpoint" id="reviewCheckpoint" role="status" aria-live="polite"></p><div class="review-q" data-review-followup><b>How helpful did it feel?</b><div class="review-scale" data-review="help" role="group" aria-label="How helpful did it feel?"></div><div class="review-anchors"><span>Not helpful</span><span>Very helpful</span></div></div><p class="review-not-yet" id="reviewNotYet" hidden>Not yet is useful information. You can keep the plan or choose something that fits better.</p>
-      <div class="footer"><button class="primary" id="reviewContinue" disabled><span>Use what happened</span><span class="arrow">→</span></button></div>
+      <p class="eyebrow">Your attempt</p><h2>How much <em>did you try?</em></h2><p class="review-plan" id="reviewPlanSummary"></p><p class="small">Not yet is a valid answer. You do not need to report a result.</p>
+      <div class="review-scale" data-review="tried" role="group" aria-label="How much did you try?"></div><p id="reviewNotYet" hidden>Keep the plan or choose something that fits better.</p><div class="footer"><button class="primary" id="reviewContinue" disabled>Continue →</button></div>
     </section>
-
+    <section class="screen" data-screen="review-effort">
+      <p class="eyebrow">How it fit</p><h2>How manageable <em>was it?</em></h2><div class="review-scale" data-review="effort" role="group" aria-label="How manageable was it?"></div><p class="small">Describe your own experience.</p><div class="footer"><button class="primary" id="effortContinue" disabled>Continue →</button></div>
+    </section>
+    <section class="screen" data-screen="review-help">
+      <p class="eyebrow">How it helped</p><h2>How helpful <em>did it feel?</em></h2><div class="review-scale" data-review="help" role="group" aria-label="How helpful did it feel?"></div><p class="review-checkpoint" id="reviewCheckpoint" role="status"></p><div class="footer"><button class="primary" id="helpContinue" disabled>Use what happened →</button></div>
+    </section>
     <section class="screen" data-screen="learned">
       <p class="eyebrow">Choose what happens next</p><h2 id="learnedTitle">Keep the mechanism. Adjust the dose.</h2><div class="logic"><div class="logic-path"><span class="logic-pill">What was planned</span><span class="logic-arrow">→</span><span class="logic-pill">What happened</span><span class="logic-arrow">→</span><span class="logic-pill">Your next choice</span></div><p id="learnedCopy">Choose an update below to save this review with your plan.</p></div>
       <div class="success-orbit" style="width:210px;height:210px;margin-top:18px"><div class="success-core" style="width:125px;height:125px"><div><b style="font-size:21px">Your next choice.</b><span>One step at a time</span></div></div></div>
-      <p id="reviewSaveError" class="save-error" role="alert" hidden></p><div class="footer"><button class="primary" id="applyTiny"><span>Use the tiny version and save review</span><span class="arrow">→</span></button><button class="primary" id="keepReviewedPlan"><span>Keep my plan and save review</span><span class="arrow">→</span></button><button class="ghost" id="changeReviewedPlan">Save review and choose another action</button></div>
+      <p id="reviewSaveError" class="save-error" role="alert" hidden></p><div class="footer"><button class="ghost" id="applyTiny"><span>Use the tiny version and save review</span><span class="arrow">→</span></button><button class="primary" id="keepReviewedPlan"><span>Keep my plan and save review</span><span class="arrow">→</span></button><button class="ghost" id="changeReviewedPlan">Save review and choose another action</button></div>
     </section>
 
     <section class="screen" data-screen="finish">

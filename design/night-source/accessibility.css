@@ -47,6 +47,25 @@
 #root h1 {font-size:clamp(42px,12vw,64px);white-space:nowrap}
 .night-stop {background:#eadcff;color:#27173f;border:2px solid #fff;border-radius:12px;padding:10px 16px;font-weight:700}
 #root label:focus-within {outline:3px solid #eee6ff;outline-offset:3px}
+.night-setup-flow h2,.night-provider-flow h2,.night-check h2{font-size:clamp(28px,8vw,36px);font-weight:700;line-height:1.15;letter-spacing:-.02em;margin:0 0 16px;color:#f3efff}
+.night-setup-flow>p{font-size:16px;line-height:1.5;margin:0 0 22px;color:#d8ccff}
+.night-sound-choices,.night-timer-choices{display:grid;gap:10px}
+.night-setup-flow button{width:100%;background:#3a2c65;color:#f3efff;border:1px solid #9985bc;border-radius:16px;padding:16px;text-align:left;font-size:17px}
+.night-sound-choices strong,.night-sound-choices span{display:block}
+.night-sound-choices span{font-size:14px;color:#d8ccff;margin-top:4px}
+.night-timer-choices button[aria-pressed=true]{background:#eee6ff;color:#27173f;border:2px solid #eee6ff}
+#root .night-primary{display:block;width:100%;min-height:56px;margin-top:22px;background:#eee6ff;color:#27173f;font-size:18px;font-weight:700;text-align:center;border-radius:18px;padding:14px}
+#root .night-quiet{background:transparent;color:#d8ccff;border:0;font-size:16px;text-decoration:underline;text-underline-offset:4px;margin-top:12px}
+.night-other-sources,.night-playback-settings{margin-top:18px;font-size:16px}
+.night-other-sources summary,.night-playback-settings summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
+.night-file-action{display:block;background:#eee6ff;color:#27173f;border-radius:18px;padding:18px;font-size:18px;font-weight:700}
+.night-file-action input{display:block;width:100%;margin-top:12px;font-size:16px}
+.night-setup-flow a{color:#eee6ff;text-decoration:underline}
+#root h1{font-size:30px;white-space:normal}
+.night-listening-instruction{font-size:clamp(28px,8vw,36px);line-height:1.15;font-weight:700;margin:0 0 12px}
+.night-listening-support{font-size:16px;line-height:1.5;margin:0 0 20px;color:#d8ccff}
+#root .night-stop{background:transparent;color:#eee6ff;border:1px solid #9883bb;font-size:16px;font-weight:400}
+#root .night-player-status+div button span.uppercase{font-size:20px;letter-spacing:normal;text-transform:none;font-weight:700}
 
 /* Keep Change and STOP independently reachable on phone widths. */
 @media (max-width:420px) {
@@ -54,3 +73,5 @@
   .night-player-status > div {flex-basis:100%}
   .night-player-status > button {flex:1;min-width:0}
 }
+
+.night-required-file>summary{display:none}

@@ -34,3 +34,19 @@
 @media(prefers-reduced-motion:no-preference){.nes-action-done,.nes-review-continue{transition:filter .15s}.nes-action-done:hover,.nes-review-continue:hover{filter:brightness(1.08)}}
 /* The legacy host positions all descendants relatively; keep this overlay out of flow. */
 .nes-v2-wrap .nes-practice-confetti{position:absolute;z-index:4}
+
+.nes-entry h1{font-size:clamp(2rem,8vw,2.8rem);line-height:1.12;color:var(--text-burgundy)}
+.nes-entry>p:not(.nes-practice-eyebrow){font-size:1rem;line-height:1.5;margin:1rem 0}
+.nes-entry-options{display:grid;gap:.65rem;margin:1.25rem 0}
+.nes-entry-options button{display:flex;align-items:center;gap:.8rem;min-height:54px;width:100%;border:1px solid #927768;border-radius:1rem;padding:1rem;text-align:left;font-size:1rem;background:#ffffff70;color:var(--text-burgundy)}
+.nes-entry form{display:grid;gap:.7rem;margin:1rem 0}
+.nes-entry form input{min-height:50px;width:100%;font-size:1rem;padding:.7rem;border:1px solid #927768;border-radius:.75rem;color:var(--text-burgundy);background:#fff}
+.nes-entry .nes-practice-text{display:flex;align-items:center;gap:.5rem;min-height:44px}
+.nes-review-feedback fieldset>div{display:grid;grid-template-columns:1fr;gap:.65rem}
+.nes-review-feedback fieldset button{font-size:1rem;min-height:50px}
+/* Entry uses the original light field, with dark text for readable contrast. */
+.nes-entry,.nes-entry>p,.nes-entry label,.nes-entry .nes-practice-eyebrow{color:#502f37}
+.nes-entry .nes-practice-text{color:#1c5e52;text-decoration:underline}
+.nes-entry .nes-review-continue{background:#1c5e52;color:#f7f2d8;border:1px solid #1c5e52;border-radius:1rem;min-height:54px;justify-content:center;padding:1rem;font-size:1rem}
+.nes-entry .nes-review-continue:disabled{opacity:.55}
+.nes-adapt-content h1{font-size:2rem;line-height:1.15;margin:1rem 0}

@@ -20,6 +20,21 @@
   const clone = x => JSON.parse(JSON.stringify(x));
   const fresh = clone(JST);
   const uid = () => crypto.randomUUID();
+  const historyKey = 'good-map-screen-v1';
+  const historySession = history.state?.[historyKey]?.session || uid();
+  let historyDepth = history.state?.[historyKey]?.depth || 0;
+  const embedded = window.parent !== window;
+  let bridgeStarted = false;
+  const cursor = () => ({ phase, RI, satCursor: JST.satCursor || 0 });
+  function rememberScreen(push = false) {
+    if (embedded) {
+      window.parent.postMessage({ type: 'mentication:screen', journeyId: 'goodMap', mode: bridgeStarted ? push ? 'push' : 'replace' : 'init', screen: { id: phase, cursors: { moment: RI, satisfaction: JST.satCursor || 0 } } }, location.origin);
+      bridgeStarted = true;
+      return;
+    }
+    const data = { [historyKey]: { session: historySession, depth: push ? ++historyDepth : historyDepth, ...cursor() } };
+    if (push) history.pushState(data, ''); else history.replaceState(data, '');
+  }
   let mapId = uid(),
     createdAt = new Date().toISOString();
   const nav = document.createElement('nav');
@@ -121,7 +136,10 @@
   }
   function render() {
     loading = true;
+    if (!['clinician', 'sharePreview'].includes(phase)) exportRecipient = '';
     jSheetClose(true);
+    SCR().querySelectorAll('.jpeek').forEach(node => node.remove());
+    SCR().querySelector('.jtoast')?.classList.remove('show');
     SCR().classList.remove('home');
     SCR().classList.toggle('gm-large', !!JST.largeText);
     if (phase === 'sort') {
@@ -146,7 +164,10 @@
       detail: phase
     }));
     el('gmUndo').disabled = !undo.length;
-    el('gmBack').disabled = phase === 'intro';
+    el('gmBack').disabled = false;
+    const heading = RT().hidden ? SCR().querySelector('.hd .q') : RT().querySelector('.jq,.gm-q');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({ preventScroll: true });
   }
   function go(id) {
     const previous = phase;
@@ -157,6 +178,7 @@
     phase = id;
     render();
     save();
+    rememberScreen(previous !== id);
     window.scrollTo(0, 0);
   }
   jgo = id => go(id);
@@ -164,6 +186,7 @@
     phase = id;
     render();
     save();
+    rememberScreen();
   };
   function checkpoint() {
     lastAction = clone(state());
@@ -176,15 +199,26 @@
   }
   function back() {
     if (busy) return;
-    if (phase === 'sort' && i > 0) {
-      undoAction();
+    if (phase === 'sort' && i > 0) { undoAction(); return; }
+    if (historyDepth > 0) {
+      if (embedded) window.parent.postMessage({ type: 'mentication:screen-back', journeyId: 'goodMap' }, location.origin); else history.back();
       return;
     }
+    if (phase === 'intro') {
+      if (window.parent !== window) window.parent.postMessage({ type: 'good-map:exit' }, location.origin);
+      else history.back();
+      return;
+    }
+    if (phase === 'sat' && JST.satCursor > 0) {
+      JST.satCursor--; render(); save(); rememberScreen(); return;
+    }
+
     if (phase === 'map') {
       RI = Math.max(0, RQ.length - 1);
       phase = 'rate';
       render();
       save();
+      rememberScreen();
       return;
     }
     if (phase === 'rate') {
@@ -192,15 +226,17 @@
         RI--;
         render();
         save();
+        rememberScreen();
         return;
       }
-      go('sort');
+      phase = 'sort'; render(); save(); rememberScreen();
       return;
     }
     const target = JST.stack?.pop();
-    phase = target || 'sort';
+    phase = target || (phase === 'sort' ? 'intro' : 'sort');
     render();
     save();
+    rememberScreen();
   }
   function undoAction() {
     if (busy || !undo.length) return;
@@ -211,7 +247,34 @@
     } else apply(s);
     render();
     save();
+    rememberScreen();
   }
+  function restoreScreen(screen) {
+    if (!screen || !(['intro', 'sort', 'rate', 'map'].includes(screen.phase) || JS[screen.phase])) return;
+    historyDepth = Number.isSafeInteger(screen.depth) && screen.depth >= 0 ? screen.depth : 0;
+    phase = screen.phase;
+    if (!RQ.length && !['intro', 'sort', 'menu', 'paused', 'empty', 'care', 'compare', 'remap'].includes(phase)) phase = 'intro';
+    if (['when', 'whenTime', 'set', 'home', 'chk', 'win', 'helpfulness', 'step', 'ownStep'].includes(phase) && !JST.plan.length) phase = jItems().length ? 'map' : 'intro';
+    RI = Math.max(0, Math.min(RQ.length - 1, Number.isSafeInteger(screen.RI) ? screen.RI : 0));
+    JST.satCursor = Number.isSafeInteger(screen.satCursor) && screen.satCursor >= 0 ? screen.satCursor : 0;
+    if (JST.stack?.at(-1) === phase) JST.stack.pop();
+    render(); save(); rememberScreen(); window.scrollTo(0, 0);
+  }
+  window.addEventListener('popstate', event => {
+    const screen = event.state?.[historyKey];
+    if (!embedded && screen?.session === historySession) restoreScreen(screen);
+  });
+  window.addEventListener('message', event => {
+    if (event.origin !== location.origin || event.source !== window.parent || event.data?.journeyId !== 'goodMap') return;
+    if (event.data.type === 'mentication:screen-history-error') {
+      status('Browser navigation is unavailable. You can keep using this practice.', true);
+      return;
+    }
+    if (event.data.type !== 'mentication:restore-screen') return;
+    const screen = event.data.screen;
+    if (!screen || typeof screen.id !== 'string' || !screen.cursors) return;
+    restoreScreen({ phase: screen.id, RI: screen.cursors.moment, satCursor: screen.cursors.satisfaction, depth: screen.depth });
+  });
   el('gmBack').onclick = back;
   el('gmUndo').onclick = undoAction;
   el('gmMenu').onclick = () => go('menu');
@@ -294,7 +357,7 @@
   }
   const button = (id, text) => `<button class="rcta" id="${id}">${text}<span class="ar"></span></button>`;
   function choices(name, value, extra = '') {
-    return `<div class="gm-options" role="group" aria-label="${jEsc(name)}">${Array.from({
+    return `<div class="gm-options gm-rating-options" role="group" aria-label="${jEsc(name)}">${Array.from({
       length: 11
     }, (_, n) => `<button type="button" data-rating="${n}" ${extra} aria-pressed="${value === n}">${n}</button>`).join('')}</div>`;
   }
@@ -309,6 +372,7 @@
       phase = JST.stack.pop() || 'sort';
       render();
       save();
+      rememberScreen();
     };
   };
   JS.empty = () => {
@@ -330,26 +394,21 @@
       return;
     }
     phase = 'rate';
-    page(`MOMENT ${RI + 1} OF ${RQ.length}`, `How much does<br><em>this</em> add to your life?`, d.w, `<img class="gm-photo" alt="${jEsc(d.w)}" src="data:image/webp;base64,${jImg(d.k)}"><p>0 · A little &nbsp; 10 · A huge amount</p><p id="gmRatingValue">${display(RATE[d.k])}</p>${JST.legacyReview ? `<p class="jtip">Previous unverified value: ${display(JST.legacyRatings?.[d.k])}. Choose a number or Skip to confirm your own answer.</p>` : ''}${choices('How much ' + d.w + ' adds to your life', RATE[d.k])}<p>Optional context, kept separate from importance:</p><label class="gm-field">If it stopped for a month<select id="gmLoss"><option value="">Not answered</option>${LOSSO.map((x, n) => `<option value="${n}" ${LOSS[d.k] === n ? 'selected' : ''}>${x}</option>`).join('')}</select></label><label class="gm-field">How often do you need it?<select id="gmRhythm"><option value="">Not answered</option>${RHYO.map((x, n) => `<option value="${n}" ${RHY[d.k] === n ? 'selected' : ''}>${x}</option>`).join('')}</select></label>`, button('rnext', RI === RQ.length - 1 ? 'Reveal my map' : 'Next moment') + '<button class="jlink" id="gmSkipRating">Skip this rating</button>');
+    page(`IMPORTANCE · MOMENT ${RI + 1} OF ${RQ.length}`, 'How much does this<br><em>add to your life?</em>', d.w, `<img class="gm-photo" alt="${jEsc(d.w)}" src="data:image/webp;base64,${jImg(d.k)}"><p class="gm-scale">0 · A little <span>10 · A huge amount</span></p><p id="gmRatingValue">${display(RATE[d.k])}</p>${JST.legacyReview ? `<p class="jtip">Previous unverified value: ${display(JST.legacyRatings?.[d.k])}. Choose a number or Skip to confirm your own answer.</p>` : ''}${choices('How much ' + d.w + ' adds to your life', RATE[d.k])}`, button('rnext', RI === RQ.length - 1 ? 'Reveal my map' : 'Next moment') + '<button class="jlink" id="gmSkipRating">Skip this rating</button>');
     el('rnext').disabled = M.rating(RATE[d.k]) === null;
     RT().querySelectorAll('[data-rating]').forEach(b => b.onclick = () => {
       RATE[d.k] = +b.dataset.rating;
-      renderRate();
+      RT().querySelectorAll('[data-rating]').forEach(option => option.setAttribute('aria-pressed', option === b));
+      el('gmRatingValue').textContent = display(RATE[d.k]);
+      el('rnext').disabled = false;
       save();
     });
-    el('gmLoss').onchange = e => {
-      LOSS[d.k] = e.target.value === '' ? null : +e.target.value;
-      save();
-    };
-    el('gmRhythm').onchange = e => {
-      RHY[d.k] = e.target.value === '' ? null : +e.target.value;
-      save();
-    };
     const next = () => {
       if (RI < RQ.length - 1) {
         RI++;
-        renderRate();
+        render();
         save();
+        rememberScreen(true);
         window.scrollTo(0, 0);
       } else go(jItems().length ? 'map' : 'empty');
     };
@@ -391,18 +450,36 @@
   };
   openSheet = function (k, items, t) {
     const d = items.find(x => x.k === k);
-    const s = jSheet(`<h3 class="jsh">${jEsc(d.w)}</h3><p>Importance: ${display(RATE[k])}</p><p>Without it: ${LOSS[k] == null ? 'Not answered' : LOSSO[LOSS[k]]}</p><p>How often: ${RHY[k] == null ? 'Not answered' : RHYO[RHY[k]]}</p><p>Which ring fits your experience?</p><div class="gm-options">${TN.map((label, n) => `<button data-ring="${n}" aria-pressed="${t[items.indexOf(d)] === n}">${label}</button>`).join('')}</div><button class="jsec" id="gmEditRating">Edit rating</button><button class="jsec" data-x>Close</button>`);
+    const s = jSheet(`<h3 class="jsh">Which ring fits<br>this moment?</h3><p>${jEsc(d.w)}</p><p>Importance: ${display(RATE[k])}</p><p>Without it: ${LOSS[k] == null ? 'Not answered' : LOSSO[LOSS[k]]}</p><p>How often: ${RHY[k] == null ? 'Not answered' : RHYO[RHY[k]]}</p><div class="gm-options gm-answer-list" role="group" aria-label="Which ring fits this moment?">${TN.map((label, n) => `<button data-ring="${n}" aria-pressed="${t[items.indexOf(d)] === n}">${label}</button>`).join('')}</div><button class="jlink" id="gmEditContext">Optional context about this moment</button><button class="jsec" id="gmEditRating">Edit rating</button><button class="jsec" data-x>Close</button>`);
     s.querySelectorAll('[data-ring]').forEach(b => b.onclick = () => {
       TOV[k] = +b.dataset.ring;
       jSheetClose(true);
       renderMap();
       save();
     });
+    el('gmEditContext').onclick = () => {
+      JST.contextKey = k; go('contextLoss');
+    };
     el('gmEditRating').onclick = () => {
       RI = RQ.findIndex(x => x.k === k);
       go('rate');
     };
   };
+  function contextQuestion(field, options, title, next) {
+    const d = DECK.find(item => item.k === JST.contextKey);
+    if (!d) { phase = 'map'; renderMap(); return; }
+    const values = field === 'loss' ? LOSS : RHY;
+    page('OPTIONAL CONTEXT', title, d.w + ' · Kept separate from importance.', `<div class="gm-options gm-answer-list" role="group" aria-label="${jEsc(title.replace(/<[^>]*>/g, ''))}">${options.map((text, n) => `<button data-context="${n}" aria-pressed="${values[d.k] === n}">${jEsc(text)}</button>`).join('')}</div>`, button('jnext', 'Continue') + '<button class="jlink" id="gmSkipContext">Leave this unanswered</button>');
+    RT().querySelectorAll('[data-context]').forEach(b => b.onclick = () => {
+      values[d.k] = +b.dataset.context;
+      RT().querySelectorAll('[data-context]').forEach(option => option.setAttribute('aria-pressed', option === b));
+      save();
+    });
+    el('jnext').onclick = () => go(next);
+    el('gmSkipContext').onclick = () => { values[d.k] = null; go(next); };
+  }
+  JS.contextLoss = () => contextQuestion('loss', LOSSO, 'If this stopped for a month,<br><em>how would you feel?</em>', 'contextRhythm');
+  JS.contextRhythm = () => contextQuestion('rhythm', RHYO, 'How often do you<br><em>need this?</em>', 'map');
   function recordMap() {
     const record = {
       id: mapId,
@@ -430,7 +507,7 @@
   jStartFromMap = () => go('sat');
   JS.type = () => {
     const suggested = jType().main;
-    page('YOUR INTERPRETATION', 'A starting point,<br><em>not a label.</em>', 'Your answers may suggest “' + suggested.n + '”. Change it, or leave it blank.', `<label class="gm-field">What does your map mean to you?<textarea id="gmInterpretation" maxlength="500">${jEsc(JST.interpretation || '')}</textarea></label><p class="jtip">This is a reflection tool, not a personality test. Your meaning is what matters.</p>`, button('jnext', "How is it going lately?"));
+    page('YOUR INTERPRETATION', 'What does your map<br><em>mean to you?</em>', 'Your answers may suggest “' + suggested.n + '”. Change it, or leave it blank.', `<label class="gm-field">What does your map mean to you?<textarea id="gmInterpretation" maxlength="500">${jEsc(JST.interpretation || '')}</textarea></label><p class="jtip">This is a reflection tool, not a personality test. Your meaning is what matters.</p>`, button('jnext', "How is it going lately?"));
     el('gmInterpretation').oninput = e => {
       JST.interpretation = e.target.value;
       save();
@@ -441,24 +518,24 @@
   };
   JS.sat = () => {
     const items = jItems();
-    page('HOW IT IS GOING', 'Lately, how<br><em>satisfied</em> are you?', 'Use the same question now and at each follow-up. 0 · Not at all. 10 · Completely.', items.map(d => `<section class="gm-record"><b>${jEsc(M.question(d.w).question)}</b><p>${display(JST.sat[d.k])}</p>${choices(M.question(d.w).question, JST.sat[d.k], `data-key="${d.k}"`)}<button class="jlink" data-skip="${d.k}">Skip this answer</button></section>`).join(''), button('jnext', 'Choose my focus'));
+    if (!items.length) { phase = 'empty'; JS.empty(); return; }
+    JST.satCursor = Math.max(0, Math.min(items.length - 1, JST.satCursor || 0));
+    const d = items[JST.satCursor], q = M.question(d.w);
+    page(`SATISFACTION · MOMENT ${JST.satCursor + 1} OF ${items.length}`, jEsc(q.question), 'Use the same question now and at each follow-up.', `<img class="gm-photo" alt="${jEsc(d.w)}" src="data:image/webp;base64,${jImg(d.k)}"><p class="gm-scale">0 · ${q.anchors[0]} <span>10 · ${q.anchors[1]}</span></p><p id="gmSatValue">${display(JST.sat[d.k])}</p>${choices(q.question, JST.sat[d.k], `data-key="${d.k}"`)}`, button('jnext', JST.satCursor === items.length - 1 ? 'Choose my focus' : 'Next moment') + '<button class="jlink" id="gmSkipSat">Leave this unanswered</button>');
     RT().querySelectorAll('[data-rating]').forEach(b => b.onclick = () => {
-      JST.sat[b.dataset.key] = +b.dataset.rating;
-      save();
-      jre('sat');
+      JST.sat[d.k] = +b.dataset.rating;
+      RT().querySelectorAll('[data-rating]').forEach(option => option.setAttribute('aria-pressed', option === b));
+      el('gmSatValue').textContent = display(JST.sat[d.k]); save();
     });
-    RT().querySelectorAll('[data-skip]').forEach(b => b.onclick = () => {
-      JST.sat[b.dataset.skip] = null;
-      save();
-      jre('sat');
-    });
-    el('jnext').onclick = () => {
-      items.forEach(d => {
-        if (!Object.hasOwn(JST.sat, d.k)) JST.sat[d.k] = null;
-        if (!Object.hasOwn(JST.base, d.k)) JST.base[d.k] = JST.sat[d.k];
-      });
-      if (recordMap()) go('focus');
+    const next = () => {
+      if (!Object.hasOwn(JST.sat, d.k)) JST.sat[d.k] = null;
+      if (!Object.hasOwn(JST.base, d.k)) JST.base[d.k] = JST.sat[d.k];
+      if (JST.satCursor < items.length - 1) {
+        JST.satCursor++; render(); save(); rememberScreen(true); window.scrollTo(0, 0);
+      } else if (recordMap()) go('focus');
     };
+    el('jnext').onclick = next;
+    el('gmSkipSat').onclick = () => { JST.sat[d.k] = null; next(); };
   };
   JS.focus = () => {
     const items = jItems();
@@ -483,17 +560,23 @@
     oldBuild = jBuildPlan;
   JS.way = () => {
     oldWay();
-    if (jSat(JST.focus) === null) RT().querySelector('.jrul')?.remove();
+    RT().querySelector('.jrul')?.remove();
   };
   JS.help = () => {
     oldHelp();
+    RT().querySelector('.jq').innerHTML = 'What already<br><em>helps you?</em>';
+    RT().querySelector('.jsub').textContent = 'Choose any that fit. You can leave this blank.';
+    RT().querySelector('.jrul')?.remove();
     if (jSat(JST.focus) === null) {
-      RT().querySelector('.jq').innerHTML = 'What already<br><em>helps?</em>';
+      RT().querySelector('.jq').innerHTML = 'What used to help,<br><em>even a little?</em>';
       RT().querySelector('.jrul')?.remove();
     }
   };
   JS.up = () => {
     oldUp();
+    RT().querySelector('.jq').innerHTML = 'What would you like<br><em>to be different?</em>';
+    RT().querySelector('.jsub').textContent = 'Picture one small, useful change.';
+    RT().querySelector('.jrul')?.remove();
     if (jSat(JST.focus) === null) {
       RT().querySelector('.jq').innerHTML = 'What would<br><em>feel different?</em>';
       RT().querySelector('.jsub').textContent = 'Picture a small, useful change.';
@@ -510,7 +593,14 @@
     oldStep();
     const reward = RT().querySelector('.jrew');
     if (reward) reward.textContent = 'Something to try; notice what happens for you.';
-    if (jSat(JST.focus) === null) RT().querySelector('.jsub').textContent = 'Your aim: ' + RT().querySelector('.jsub').textContent.split(': ').slice(1).join(': ');
+    RT().querySelector('.jsub').innerHTML = 'Your aim: ' + jGoal();
+    const later = RT().querySelector('.jlad');
+    if (later) {
+      const label = RT().querySelector('.jlbl');
+      const details = document.createElement('details');
+      details.className = 'gm-later-steps'; details.innerHTML = '<summary>See later steps</summary>';
+      later.before(details); details.append(later); label?.remove();
+    }
     el('jmine').onclick = () => go('ownStep');
     el('jnext').onclick = () => {
       JST.attemptId = uid();
@@ -519,7 +609,7 @@
     };
   };
   JS.ownStep = () => {
-    page('YOUR STEP', 'Keep it<br><em>small.</em>', 'Write something you could realistically try.', `<label class="gm-field">Your small step<textarea id="gmOwnStep" maxlength="200">${jEsc(JST.customDraft ?? JST.own ?? '')}</textarea></label>`, button('gmUseStep', 'Use this step'));
+    page('YOUR STEP', 'What small step<br><em>would you choose?</em>', 'Write something you could realistically try.', `<label class="gm-field">Your small step<textarea id="gmOwnStep" maxlength="200">${jEsc(JST.customDraft ?? JST.own ?? '')}</textarea></label>`, button('gmUseStep', 'Use this step'));
     el('gmUseStep').disabled = !el('gmOwnStep').value.trim();
     el('gmOwnStep').oninput = e => {
       JST.customDraft = e.target.value;
@@ -536,30 +626,23 @@
   };
   JS.when = () => {
     const w = JST.wk;
-    page('MAKE A PLAN', 'When will you<br><em>try it?</em>', jStep(JST.pstep)[0], `<label class="gm-field">Date<input id="gmDate" type="date" value="${jEsc(w.date || M.localDate())}"></label><label class="gm-field">Local time<input id="gmTime" type="time" value="${jEsc(w.time || '18:00')}"></label><p class="jtip">Times use ${jEsc(Intl.DateTimeFormat().resolvedOptions().timeZone)}. A saved plan does not create a notification. You can export a calendar file next.</p>`, button('jnext', 'Save this plan'));
-    el('gmDate').oninput = e => {
-      w.date = e.target.value;
-      save();
-    };
-    el('gmTime').oninput = e => {
-      w.time = e.target.value;
-      save();
-    };
+    // Date and time are two parts of one answer to "When?", not extra questions.
+    page('MAKE A PLAN', 'When would you<br><em>try this step?</em>', jStep(JST.pstep)[0], `<label class="gm-field">Date<input id="gmDate" type="date" value="${jEsc(w.date || M.localDate())}"></label><label class="gm-field">Local time<input id="gmTime" type="time" value="${jEsc(w.time || '18:00')}"></label><p class="jtip">Times use ${jEsc(Intl.DateTimeFormat().resolvedOptions().timeZone)}. A saved plan does not create a notification. You can export a calendar file next.</p>`, button('jnext', 'Save this plan'));
+    el('gmDate').oninput = e => { w.date = e.target.value; save(); };
+    el('gmTime').oninput = e => { w.time = e.target.value; save(); };
     el('jnext').onclick = () => {
       try {
         const date = M.scheduled(el('gmDate').value, el('gmTime').value);
         if (date <= new Date()) throw Error('Choose a future date and time.');
-        w.date = el('gmDate').value;
-        w.time = el('gmTime').value;
+        w.date = el('gmDate').value; w.time = el('gmTime').value;
         w.atISO = date.toISOString();
-        w.zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        w.exportedAt = null;
+        w.zone = Intl.DateTimeFormat().resolvedOptions().timeZone; w.exportedAt = null;
         if (save()) go('set');
-      } catch (e) {
-        status(e.message, true);
-      }
+      } catch (error) { status(error.message, true); }
     };
   };
+  // A draft from an interrupted local preview retains the same combined answer.
+  JS.whenTime = () => { phase = 'when'; JS.when(); };
   const when = () => JST.wk.atISO ? new Date(JST.wk.atISO).toLocaleString() : 'No date chosen';
   function download(text, type, name) {
     const a = document.createElement('a'),
@@ -588,7 +671,7 @@
     }
   }
   JS.set = () => {
-    page('YOUR PLAN', 'Ready to<br><em>try.</em>', jStep(JST.pstep)[0], `<div class="gm-record"><b>${jEsc(when())}</b><p>No notification is scheduled by Mentication. Export the private calendar file, then open and import it. Your calendar controls alerts.</p><p>The calendar event says only “Your small step”; your answers and notes are not included.</p></div>`, button('jcal', 'Download calendar file') + '<button class="jlink" id="jnext">Go to my map home</button>');
+    page('YOUR PLAN', 'Ready to<br><em>try.</em>', jStep(JST.pstep)[0], `<div class="gm-record"><b>${jEsc(when())}</b><p>No notification is scheduled by Mentication. Export the private calendar file, then open and import it. Your calendar controls alerts.</p><p>The calendar event says only “Your small step”; your answers and notes are not included.</p></div>`, button('jnext', 'Go to my map home') + '<button class="jlink" id="jcal">Download calendar file</button>');
     el('jcal').onclick = () => exportCalendar();
     el('jnext').onclick = () => go('home');
   };
@@ -613,7 +696,7 @@
     el('gmTimeEdit').onclick = () => go('when');
   };
   JS.chk = () => {
-    page('CHECK-IN', 'Did you<br><em>try it?</em>', jStep(JST.pstep)[0], `<div class="gm-options">${[['yes', 'Did it'], ['part', 'Partly'], ['no', 'Not yet']].map(([v, label]) => `<button data-did="${v}">${label}</button>`).join('')}</div>`, '<button class="jlink" id="gmHour">Download a calendar reminder for one hour from now</button>');
+    page('CHECK-IN', 'Did you<br><em>try it?</em>', jStep(JST.pstep)[0], `<div class="gm-options gm-answer-list" role="group" aria-label="Did you try it?">${[['yes', 'Did it'], ['part', 'Partly'], ['no', 'Not yet']].map(([v, label]) => `<button data-did="${v}">${label}</button>`).join('')}</div>`, '<button class="jlink" id="gmHour">Download a calendar reminder for one hour from now</button>');
     RT().querySelectorAll('[data-did]').forEach(b => b.onclick = () => {
       JST.chk.did = b.dataset.did;
       go('win');
@@ -621,20 +704,22 @@
     el('gmHour').onclick = () => exportCalendar(new Date(Date.now() + 3600000).toISOString());
   };
   JS.win = () => {
-    const d = jFocus(),
-      q = M.question(d.w);
-    page('SAME QUESTION · SAME SCALE', 'How is it<br><em>going lately?</em>', q.question, `<p>0 · ${q.anchors[0]} &nbsp; 10 · ${q.anchors[1]}</p><p>Before this attempt: ${display(JST.baseline)} · This answer: ${display(JST.newsat)}</p>${choices(q.question, JST.newsat)}<button class="jlink" id="gmSkipFollowup">Leave this rating unanswered</button><p>Separately, how helpful was trying this step?</p><div class="gm-options">${[['better', 'Helpful'], ['same', 'No difference'], ['worse', 'Unhelpful'], ['skipped', 'Did not try / prefer not to answer']].map(([v, label]) => `<button data-helpful="${v}" aria-pressed="${JST.helpfulness === v}">${label}</button>`).join('')}</div>`, button('jnext', 'Save check-in'));
+    const q = M.question(jFocus().w);
+    page('SAME QUESTION · SAME SCALE', jEsc(q.question), 'No particular result is expected.', `<p class="gm-scale">0 · ${q.anchors[0]} <span>10 · ${q.anchors[1]}</span></p><p>Before this attempt: ${display(JST.baseline)} · This answer: <span id="gmFollowupValue">${display(JST.newsat)}</span></p>${choices(q.question, JST.newsat)}`, button('jnext', 'Continue') + '<button class="jlink" id="gmSkipFollowup">Leave this rating unanswered</button>');
     RT().querySelectorAll('[data-rating]').forEach(b => b.onclick = () => {
       JST.newsat = +b.dataset.rating;
-      jre('win');
+      RT().querySelectorAll('[data-rating]').forEach(option => option.setAttribute('aria-pressed', option === b));
+      el('gmFollowupValue').textContent = display(JST.newsat); save();
     });
-    el('gmSkipFollowup').onclick = () => {
-      JST.newsat = null;
-      jre('win');
-    };
+    el('jnext').onclick = () => go('helpfulness');
+    el('gmSkipFollowup').onclick = () => { JST.newsat = null; go('helpfulness'); };
+  };
+  JS.helpfulness = () => {
+    const d = jFocus();
+    page('ABOUT THE STEP · OPTIONAL', 'How helpful was<br><em>trying this step?</em>', 'This is separate from your satisfaction rating.', `<div class="gm-options gm-answer-list" role="group" aria-label="How helpful was trying this step?">${[['better', 'Helpful'], ['same', 'No difference'], ['worse', 'Unhelpful'], ['skipped', 'Did not try / prefer not to answer']].map(([v, label]) => `<button data-helpful="${v}" aria-pressed="${JST.helpfulness === v}">${label}</button>`).join('')}</div>`, button('jnext', 'Save check-in'));
     RT().querySelectorAll('[data-helpful]').forEach(b => b.onclick = () => {
       JST.helpfulness = b.dataset.helpful;
-      jre('win');
+      RT().querySelectorAll('[data-helpful]').forEach(option => option.setAttribute('aria-pressed', option === b)); save();
     });
     el('jnext').onclick = () => {
       const record = M.outcome({
@@ -661,7 +746,7 @@
   JS.result = () => {
     const r = JST.log.find(x => x.id === JST.attemptId) || JST.log.at(-1);
     const delta = r && M.rating(r.baseline) !== null && M.rating(r.endpoint) !== null ? r.endpoint - r.baseline : null;
-    page('CHECK-IN SAVED', 'Useful information,<br><em>either way.</em>', delta === null ? 'No change score: one or both ratings were unanswered.' : delta === 0 ? 'Your satisfaction rating stayed the same.' : `Your satisfaction rating ${delta > 0 ? 'rose' : 'fell'} by ${Math.abs(delta)}.`, '<p class="jtip">Many things can affect a rating. Keep what helps, adjust the step, take a break, or reach out for support.</p>', button('gmNextStep', 'Choose another step') + '<button class="jlink" id="gmHome">Keep this plan</button><button class="jlink" id="gmSupport">Get support</button>');
+    page('CHECK-IN SAVED', 'Useful information,<br><em>either way.</em>', delta === null ? 'No change score: one or both ratings were unanswered.' : delta === 0 ? 'Your satisfaction rating stayed the same.' : `Your satisfaction rating ${delta > 0 ? 'rose' : 'fell'} by ${Math.abs(delta)}.`, '<p class="jtip">Many things can affect a rating. Keep what helps, adjust the step, take a break, or reach out for support.</p>', button('gmHome', 'Keep this plan') + '<button class="jlink" id="gmNextStep">Choose another step</button><button class="jlink" id="gmSupport">Get support</button>');
     el('gmNextStep').onclick = () => {
       if (JST.pstep < 2) JST.pstep++;
       JST.attemptId = uid();
@@ -706,34 +791,29 @@
   function shareText() {
     return ['The Good Map — private export', `Map date: ${new Date(createdAt).toLocaleString()}`, ...jItems().map(d => `${d.w}: importance ${display(RATE[d.k])}; satisfaction ${display(JST.sat[d.k])}`), ...JST.log.map(r => `${r.at}: satisfaction ${display(r.baseline)} → ${display(r.endpoint)}; tried: ${r.did}; helpfulness: ${r.helpfulness || 'Not answered'}`), 'No notes, custom steps, or interpretation text are included.'].join('\n');
   }
+  let exportRecipient = '';
   JS.clinician = () => {
-    const text = shareText();
-    page('OPTIONAL ONE-TIME EXPORT', 'Choose what<br><em>you share.</em>', 'No one is connected to your map. Nothing is sent automatically.', `<label class="gm-field">Intended recipient<input id="gmRecipient" maxlength="120" placeholder="Name or email — stays here until export"></label><p>Exact export preview:</p><pre class="gm-preview" id="gmExportPreview">${jEsc(text)}</pre><label class="gm-check"><input type="checkbox" id="gmConsent"><span>I want to download this exact summary for the recipient I named. I will choose how to send it.</span></label><p class="jtip">This creates a local file, not a message. You cannot revoke a copy after giving it to someone; ask them to delete it. No ongoing access is granted.</p>`, button('gmExport', 'Download summary') + '<button class="jlink" id="gmCancelShare">Cancel and clear recipient</button>');
-    const update = () => {
-      el('gmExport').disabled = !el('gmRecipient').value.trim() || !el('gmConsent').checked;
-      el('gmExportPreview').textContent = (el('gmRecipient').value.trim() ? 'Intended recipient: ' + el('gmRecipient').value.trim() + '\n\n' : '') + text;
-    };
-    el('gmRecipient').oninput = update;
-    el('gmConsent').onchange = update;
-    update();
+    page('OPTIONAL ONE-TIME EXPORT', 'Who is this<br><em>summary for?</em>', 'Nothing is sent. This name labels a file you can choose to share.', `<label class="gm-field">Intended recipient<input id="gmRecipient" maxlength="120" placeholder="Name or email" value="${jEsc(exportRecipient)}"></label>`, button('gmPreviewExport', 'Preview my summary') + '<button class="jlink" id="gmCancelShare">Cancel and clear recipient</button>');
+    el('gmPreviewExport').disabled = !exportRecipient.trim();
+    el('gmRecipient').oninput = () => { exportRecipient = el('gmRecipient').value; el('gmPreviewExport').disabled = !exportRecipient.trim(); };
+    el('gmPreviewExport').onclick = () => { if (exportRecipient.trim()) go('sharePreview'); };
+    el('gmCancelShare').onclick = () => { exportRecipient = ''; go('menu'); };
+  };
+  JS.sharePreview = () => {
+    // Refresh or re-entry cannot restore a recipient or reuse earlier consent.
+    if (!exportRecipient.trim()) { phase = 'clinician'; JS.clinician(); return; }
+    const text = 'Intended recipient: ' + exportRecipient.trim() + '\n\n' + shareText();
+    page('EXACT EXPORT PREVIEW', 'Save this summary<br><em>as a file?</em>', 'No notes, custom steps or interpretation are included.', `<pre class="gm-preview" id="gmExportPreview">${jEsc(text)}</pre><label class="gm-check"><input type="checkbox" id="gmConsent"><span>I choose to download this exact summary for ${jEsc(exportRecipient.trim())}.</span></label><p class="jtip">Nothing is sent. You choose how to share the file. Copies you give someone cannot be revoked; ask them to delete them. No ongoing access is granted.</p>`, button('gmExport', 'Download summary') + '<button class="jlink" id="gmCancelShare">Cancel and clear recipient</button>');
+    el('gmExport').disabled = true;
+    el('gmConsent').onchange = () => { el('gmExport').disabled = !el('gmConsent').checked; };
     el('gmExport').onclick = () => {
-      if (!el('gmConsent').checked || !el('gmRecipient').value.trim()) return;
-      try {
-        download(el('gmExportPreview').textContent, 'text/plain;charset=utf-8', 'good-map-summary.txt');
-      } catch {
-        status('Could not create the export file. Nothing was sent. Try again.', true);
-        return;
-      }
-      el('gmRecipient').value = '';
-      el('gmConsent').checked = false;
-      update();
+      if (!el('gmConsent').checked || !exportRecipient.trim()) return;
+      try { download(text, 'text/plain;charset=utf-8', 'good-map-summary.txt'); }
+      catch { status('Could not create the export file. Nothing was sent. Try again.', true); return; }
+      exportRecipient = ''; go('clinician');
       status('Summary file download requested. Nothing has been sent; recipient and consent cleared.');
     };
-    el('gmCancelShare').onclick = () => {
-      el('gmRecipient').value = '';
-      el('gmConsent').checked = false;
-      go('menu');
-    };
+    el('gmCancelShare').onclick = () => { exportRecipient = ''; go('menu'); };
   };
   JS.compare = () => {
     page('COMPARE WITH SOMEONE', 'A conversation,<br><em>with consent.</em>', 'Automatic person-to-person comparison is unavailable: this app has no accounts, invite links, or connected recipients.', '<p class="jtip">You can choose to export your own summary, then compare it together with a summary they independently choose to share. No other person’s ratings are supplied here.</p>', button('gmShareInstead', 'Preview my summary'));
@@ -810,6 +890,8 @@
           loading = false;
           render();
           save();
+          rememberScreen();
+          status('Good Map answers and history deleted from this device.');
         }
       } catch {
         status('Could not delete device data. Try again when storage is available.', true);
@@ -915,6 +997,7 @@
     render();
     recovery = 'Saved data could not be displayed. It has not been overwritten. Use Menu to delete it only if you want to start again.';
   }
+  rememberScreen();
   if (recovery) {
     status(recovery, true);
     dirty = true;

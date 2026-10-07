@@ -31,6 +31,7 @@ fs.mkdirSync(out, {
           name,
           exact: true
         }).click();
+        await p.waitForTimeout(220);
       } catch (e) {
         console.log(await p.locator('body').innerText());
         throw e;
@@ -52,18 +53,22 @@ fs.mkdirSync(out, {
     await p.locator('button.library-world').filter({
       hasText: 'Happy Bump'
     }).click();
-    await click('4');
-    await p.getByRole('combobox', {
-      name: 'Current distress'
-    }).selectOption('3');
-    await p.getByRole('button', {
-      name: /^(Start .+|Build my reset)$/
-    }).click();
-    await click('Begin');
+    for(let i=0;i<5;i++){
+      if(await p.locator('.happy-bump').count())break;
+      if(await p.getByRole('button',{name:'4',exact:true}).isVisible())await click('4');
+      if(await p.getByRole('combobox',{name:'Current distress'}).count())await p.getByRole('combobox',{name:'Current distress'}).selectOption('3');
+      await p.waitForTimeout(200);
+      const next=p.getByRole('button',{name:/^(Continue|Start .+|Build my reset)$/}).filter({visible:true});
+      if(!await next.count() || !await next.first().isEnabled())break;
+      try{await next.first().click();}catch(error){console.log(await p.locator('body').innerText());throw error;}await p.waitForTimeout(300);
+    }
+    await p.locator('.happy-bump').or(p.getByRole('button',{name:'Begin',exact:true})).first().waitFor();
+    if(await p.getByRole('button',{name:'Begin',exact:true}).isVisible())await click('Begin');
     await click('Start');
     await click('Skip ahead');
     await click("I've had some water");
     await click('Skip ahead');
+    await click('1 min');
     await click('Walk indoors');
     await p.getByRole('button', {
       name: 'Pause',
@@ -76,6 +81,7 @@ fs.mkdirSync(out, {
     await click('Make it my one mission');
     await shot('mission');
     await click('I made an honest start');
+    await click('Something I am proud of');
     await p.getByRole('textbox', {
       name: 'Your words',
       exact: true
@@ -92,34 +98,34 @@ fs.mkdirSync(out, {
       exact: true
     }).click();
     await click('Favourite playlist');
+    await click('Optional: choose something afterward');
     await click('A guilt-free break');
     await shot('plan');
-    assert.equal(await p.locator('.happy-bump-contract dd').allTextContents().then(a => a.join('|')), 'Read two pages|Favourite playlist|A guilt-free break');
+    await p.goBack();
+    assert.equal(await p.getByRole('textbox',{name:'Pair it with'}).inputValue(),'Favourite playlist');
+    await p.goForward();
+    assert.equal(await p.getByRole('textbox',{name:'Reward after'}).inputValue(),'A guilt-free break');
     await p.reload();
-    await p.getByText('Optional: make it easier', {
-      exact: true
-    }).click();
-    assert.equal(await p.getByRole('textbox', {
-      name: 'Pair it with',
-      exact: true
-    }).inputValue(), '');
-    await p.getByRole('textbox', {
-      name: 'The activity',
-      exact: true
-    }).fill('Read two pages');
+    await p.getByRole('heading',{name:'What is your next small action?',exact:true}).waitFor();
+    assert.equal(await p.getByRole('textbox',{name:'The activity'}).inputValue(),'');
+    await p.getByRole('textbox',{name:'The activity'}).fill('Read two pages');
+    await click('Optional: make it easier');
     await click('Favourite playlist');
+    await click('Optional: choose something afterward');
     await click('A guilt-free break');
     await p.evaluate(() => document.documentElement.style.fontSize = '24px');
     await shot('large-text');
     assert.equal(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await p.evaluate(() => document.documentElement.style.fontSize = '16px');
-    await click("That's my next move");
+    await click("Keep my next move");
     await click('Skip ahead');
+    await click('Skip and continue');
     await shot('completion');
     await p.getByText('Keep these practice choices', {
       exact: true
     }).click();
     await click('Save on this device');
+    if(await p.getByRole('button',{name:'Back to practice',exact:true}).isVisible())await click('Back to practice');
     await click('Save these preferences');
     await click('Done');
     await click('Finish here');
@@ -132,10 +138,17 @@ fs.mkdirSync(out, {
     await p.goto(base + '/library');
     await p.getByRole('textbox', {name:'Search practices'}).fill('Happy Bump');
     await p.locator('button.library-world').filter({hasText:'Happy Bump'}).click();
-    await click('4');
-    await p.getByRole('combobox',{name:'Current distress'}).selectOption('3');
-    await p.getByRole('button',{name:/^(Start .+|Build my reset)$/}).click();
-    await click('Begin');
+    for(let i=0;i<5;i++){
+      if(await p.locator('.happy-bump').count())break;
+      if(await p.getByRole('button',{name:'4',exact:true}).isVisible())await click('4');
+      if(await p.getByRole('combobox',{name:'Current distress'}).count())await p.getByRole('combobox',{name:'Current distress'}).selectOption('3');
+      await p.waitForTimeout(200);
+      const next=p.getByRole('button',{name:/^(Continue|Start .+|Build my reset)$/}).filter({visible:true});
+      if(!await next.count() || !await next.first().isEnabled())break;
+      try{await next.first().click();}catch(error){console.log(await p.locator('body').innerText());throw error;}await p.waitForTimeout(300);
+    }
+    await p.locator('.happy-bump').or(p.getByRole('button',{name:'Begin',exact:true})).first().waitFor();
+    if(await p.getByRole('button',{name:'Begin',exact:true}).isVisible())await click('Begin');
     await p.getByRole('button',{name:'Run my saved bump',exact:true}).click();
     await p.getByText('Not answered · confirm the displayed rating or skip',{exact:true}).waitFor();
     await shot('repeat-unanswered');

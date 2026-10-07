@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createPMRSteps, nextPMRArea, pmrTiming, pmrCueState } from './pmrSession';
+import { createPMRSteps, nextPMRArea, pmrTiming, pmrCueState, restorePMRSession } from './pmrSession';
 import { pathwayByIds } from './interventions';
 const original = pathwayByIds(['progressive-muscle-relaxation-v2'])[0].steps;
 describe('PMR routes and common cue timeline', () => {
@@ -53,5 +53,17 @@ describe('PMR shared feedback integration', () => {
     const attempt = buildAttemptRecord({ interventionId:'progressive-muscle-relaxation-v2', exitReason:'exited', completedPercentage:0 });
     expect(attempt.exit_reason).toBe('exited');
     expect(attempt.completed_percentage).toBe(0);
+  });
+});
+
+describe('PMR interruption restoration', () => {
+  it('keeps the selected route and confirmed progress without inventing outcome', () => {
+    const restored=restorePMRSession({phase:'practice',mode:'release',length:'short',index:2,released:['hands','hands','torso'],skipped:['shoulders','bad'],completedSteps:2},original);
+    expect(restored.released).toEqual(['hands']);expect(restored.skipped).toEqual(['shoulders']);expect(restored.completedSteps).toBe(2);expect(restored.outcome).toBeNull();expect(restored.helpfulness).toBeNull();expect(restored.index).toBe(2);
+  });
+  it('bounds corrupted counters and rejects invalid phases', () => {
+    expect(restorePMRSession({phase:'bad'},original)).toEqual({});
+    const restored=restorePMRSession({phase:'outcome',index:999,completedSteps:999,outcome:'made up',helpfulness:'made up'},original);
+    expect(restored.index).toBe(createPMRSteps(original,{mode:'release',length:'short'}).length-1);expect(restored.outcome).toBeNull();expect(restored.helpfulness).toBeNull();
   });
 });

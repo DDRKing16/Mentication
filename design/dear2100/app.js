@@ -67,7 +67,7 @@ const _e = en().max(2e3),
   os = hi({
     format: Sl(7),
     threatCheck: hi({answers: As(ht().int().min(0).max(3).nullable()).length(4), submitted: A2()}).nullable().default(null),
-    resume: hi({ view: en(), section: en(), planTab: en(), threat: ht().int().min(0).max(3), road: en(), checkpoint: ht().int().min(0).max(2) }).default({view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0}),
+    resume: hi({ view: en(), section: en(), planTab: en(), threat: ht().int().min(0).max(3), road: en(), checkpoint: ht().int().min(0).max(2), question: en().default("") }).default({view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0}),
     reflectionDraft: hi({ chapterId: en().uuid(), action: _e, result: ia(["less","same","more","unclear"]), observed: _e, learned: _e, next: _e, actualDiscomfort: ht().min(0).max(10).nullable(), afterLikelihood: ht().min(0).max(100).nullable(), goalStateAfter: ht().min(0).max(10).nullable() }).nullable().default(null),
     step: ht().int().min(0).max(9),
     furthestStep: ht().int().min(0).max(9).default(0),
@@ -1483,27 +1483,63 @@ class nN {
   }
 }
 const ge = new nN();
-function ThreatCheck({check, onCheck}) {
-  const root = h.useRef(null);
-  const value = check || emptyThreatCheck(), score = scoreThreatCheck(value);
-  const complete = score !== null, passed = value.submitted && complete && score >= 3;
-  return i.jsxs("section", {ref:root, className:"threat-understanding-check", "aria-label":"Threat-system understanding check", children:[
-    i.jsx("h2",{children:"Check what you took away"}),
-    i.jsx("p",{children:"Answer all four questions. Get at least 3 of 4 correct (75%) to continue. This checks understanding of this screen, not your mental health."}),
-    ...THREAT_QUESTIONS.map((question,index)=>i.jsxs("fieldset",{children:[
-      i.jsx("legend",{children:`${index+1}. ${question.question}`}),
-      ...question.options.map((option,answer)=>i.jsxs("label",{children:[i.jsx("input",{type:"radio",name:`threat-check-${question.id}`,value:answer,checked:value.answers[index]===answer,onChange:()=>onCheck({answers:value.answers.map((old,key)=>key===index?answer:old),submitted:false})}),i.jsx("span",{children:option})]},answer)),
-      value.submitted && i.jsxs("p",{className:"threat-check-feedback",children:[i.jsx("strong",{children:value.answers[index]===question.correct?"Matched the screen. ":"Review this takeaway. "}),question.explanation]})
-    ]},question.id)),
-    value.submitted && i.jsx("p",{role:"status",children:`${score} of 4 correct (${score*25}%). ${passed?"You can continue.":"Review the explanations and try again."}`}),
-    i.jsx("button",{type:"button",className:"secondary-button",disabled:!complete || value.submitted,onClick:()=>onCheck({...value,submitted:true}),children:"Check my answers"}),
-    value.submitted && !passed && i.jsx("button",{type:"button",className:"secondary-button",onClick:()=>{onCheck(emptyThreatCheck());requestAnimationFrame(()=>root.current?.querySelector("input")?.focus());},children:"Try the four questions again"})
+const dearEmbeddedHistory=window.parent!==window;
+let dearHistoryStarted=false,dearHistoryRestoring=false,dearHistoryDepth=0,dearHistoryCursor="";
+function rememberDearScreen(id,stage) {
+  const screen={id,cursors:{stage}},cursor=JSON.stringify(screen);
+  if(!dearEmbeddedHistory)return;
+  const mode=!dearHistoryStarted?"init":dearHistoryRestoring||cursor===dearHistoryCursor?"replace":"push";
+  if(mode==="push")dearHistoryDepth++;
+  dearHistoryStarted=true;dearHistoryRestoring=false;dearHistoryCursor=cursor;
+  window.parent.postMessage({type:"mentication:screen",journeyId:"dear2100",mode,screen},location.origin);
+}
+function requestDearHistoryBack(){
+  if(!dearEmbeddedHistory||dearHistoryDepth<=0)return false;
+  window.parent.postMessage({type:"mentication:screen-back",journeyId:"dear2100"},location.origin);return true;
+}
+function useQuestionHistory(id,current,onCurrent) {
+  const restore=h.useRef(false),mounted=h.useRef(false);
+  h.useEffect(()=>{
+    if(dearEmbeddedHistory){rememberDearScreen(current,id==="outcome"?9:Number(id));return;}
+    const state={...history.state,dearQuestion:{id,current:current||""}};if(!mounted.current){history.replaceState(state,"");mounted.current=true;}else if(restore.current){restore.current=false;}else history.pushState(state,"");
+  },[id,current]);
+  h.useEffect(()=>{const pop=event=>{if(dearEmbeddedHistory||event.state?.dearQuestion?.id!==id)return;restore.current=true;onCurrent(event.state.dearQuestion.current);};window.addEventListener("popstate",pop);return()=>window.removeEventListener("popstate",pop);});
+}
+function SequentialQuestions({id, steps, current, onCurrent, onDone, doneLabel="Continue", optionalStart=steps.length, blocked=false}) {
+  useQuestionHistory(id,steps.some(step=>`${id}:${step.id}`===current)?current:`${id}:${steps[0].id}`,onCurrent);
+  const root=h.useRef(null), index=Math.max(0,steps.findIndex(step=>`${id}:${step.id}`===current)), step=steps[index];
+  const go=next=>onCurrent(`${id}:${steps[next].id}`);
+  h.useEffect(()=>{const element=root.current?.querySelector("h1");element?.focus({preventScroll:true});root.current?.scrollIntoView({block:"start"});},[index]);
+  h.useEffect(()=>{const back=event=>{if(requestDearHistoryBack()){event.preventDefault();return;}if(index>0){event.preventDefault();go(index>=optionalStart?optionalStart-1:index-1);}};document.addEventListener("dear:question-back",back);return()=>document.removeEventListener("dear:question-back",back);});
+  return i.jsxs("section",{ref:root,className:"question-page sequential-question",children:[
+    i.jsx("p",{className:"question-kicker",children:index<optionalStart?`One question · ${index+1} of ${optionalStart}`:"Optional detail"}),
+    i.jsx("h1",{id:"screen-title",tabIndex:-1,children:step.title}),
+    step.hint&&i.jsx("p",{className:"lede",children:step.hint}),step.field,
+    i.jsx("button",{className:"primary-button",disabled:blocked||step.valid===false,onClick:()=>index>=optionalStart?go(optionalStart-1):index<optionalStart-1?go(index+1):onDone(),children:index>=optionalStart?"Return to my answer":index<optionalStart-1?"Continue":doneLabel}),
+    index===optionalStart-1&&steps.length>optionalStart&&i.jsxs("details",{className:"foldout",children:[i.jsx("summary",{children:"Add an optional detail"}),...steps.slice(optionalStart).map((extra,key)=>i.jsx("button",{className:"text-button",onClick:()=>go(optionalStart+key),children:extra.title},extra.id))]}),
+    index>0&&i.jsx("button",{className:"text-button",onClick:()=>{if(!requestDearHistoryBack())go(index>=optionalStart?optionalStart-1:index-1);},children:"Back to previous question"})
   ]});
+}
+function ThreatCheck({check,onCheck,current,onCurrent,onDone}) {
+  useQuestionHistory("3",current?.startsWith("threat:")?current:"threat:0",onCurrent);
+  const value=check||emptyThreatCheck(),score=scoreThreatCheck(value),passed=value.submitted&&score!==null&&score>=3;
+  const index=Math.min(3,Math.max(0,Number(current?.split(":")[1])||0)),question=THREAT_QUESTIONS[index],root=h.useRef(null);
+  h.useEffect(()=>{root.current?.querySelector("h1")?.focus();},[index,value.submitted]);
+  h.useEffect(()=>{const back=event=>{event.preventDefault();if(!requestDearHistoryBack())onCurrent(current==="threat:score"?"threat:3":index>0?`threat:${index-1}`:"");};document.addEventListener("dear:question-back",back);return()=>document.removeEventListener("dear:question-back",back);});
+  return i.jsxs("section",{ref:root,className:"threat-understanding-check sequential-question",children:value.submitted&&current==="threat:score"?[
+    i.jsx("h1",{tabIndex:-1,children:"Your understanding check"}),i.jsx("p",{role:"status",children:`${score} of 4 correct (${score*25}%). ${passed?"You can continue.":"Review the takeaways, then try again."}`}),
+    ...THREAT_QUESTIONS.map((q,key)=>i.jsxs("p",{className:"threat-check-feedback",children:[i.jsx("strong",{children:value.answers[key]===q.correct?"Matched the teaching. ":"Review this takeaway. "}),q.explanation]},q.id)),
+    i.jsx("button",{className:"primary-button cream-button",onClick:()=>{if(passed)onDone();else{onCheck(emptyThreatCheck());onCurrent("threat:0");}},children:passed?"Continue":"Try the four questions again"}),i.jsx("button",{className:"text-button",onClick:()=>onCurrent(""),children:"Return to the teaching"})
+  ]:[i.jsx("p",{className:"question-kicker",children:`Understanding · ${index+1} of 4`}),i.jsx("h1",{tabIndex:-1,children:question.question}),
+    i.jsx("p",{children:"Choose one answer. At least 3 of 4 correct (75%) are needed to continue. This checks understanding, not your mental health."}),
+    i.jsxs("fieldset",{children:[i.jsx("legend",{className:"sr-only",children:question.question}),...question.options.map((option,answer)=>i.jsxs("label",{children:[i.jsx("input",{type:"radio",name:`threat-check-${question.id}`,checked:value.answers[index]===answer,onChange:()=>onCheck({answers:value.answers.map((old,key)=>key===index?answer:old),submitted:false})}),i.jsx("span",{children:option})]},answer))]}),
+    i.jsx("button",{className:"primary-button cream-button",disabled:value.answers[index]===null,onClick:()=>{if(index<3)onCurrent(`threat:${index+1}`);else{onCheck({...value,submitted:true});onCurrent("threat:score");}},children:index<3?"Next question":"Check my answers"}),
+    i.jsx("button",{className:"text-button",onClick:()=>{if(!requestDearHistoryBack())onCurrent(index>0?`threat:${index-1}`:"");},children:index>0?"Previous question":"Return to the teaching"})]});
 }
 function rN({
   phases: e,
   onLearn: t,
-  phase = 0, onPhase = () => {}, check, onCheck
+  phase = 0, onPhase = () => {}, check, onCheck, current, onCurrent, onDone
 }) {
   const n = phase, r = onPhase,
     o = h.useRef(null),
@@ -1533,6 +1569,7 @@ function rN({
         w = f.clientY - y.y;
       Math.abs(x) >= 44 && Math.abs(x) > Math.abs(w) * 1.35 && c(n + (x < 0 ? 1 : -1));
     };
+  if(current?.startsWith("threat:"))return i.jsx(ThreatCheck,{check,onCheck,current,onCurrent,onDone});
   return i.jsxs("div", {
     className: "threat-system threat-system-standalone",
     role: "region",
@@ -1696,7 +1733,7 @@ function rN({
           size: 14
         })]
       })]
-    }, `detail-${n}`), i.jsx(ThreatCheck, {check, onCheck})]
+    }, `detail-${n}`), i.jsx("button",{className:"primary-button cream-button",onClick:()=>onCurrent("threat:0"),children:"Check my understanding"})]
   });
 }
 function oN({
@@ -2019,7 +2056,7 @@ function mN({
           }), i.jsxs("div", {
             className: "chapter-fear-response",
             children: [i.jsx("small", {
-              children: D.barrierFocus === "practical" ? "IF THE OBSTACLE RETURNS" : "WHEN FEAR ARRIVES"
+              children: u.barrierFocus === "practical" ? "IF THE OBSTACLE RETURNS" : "WHEN FEAR ARRIVES"
             }), i.jsx("p", {
               children: u.ifThen
             })]
@@ -2287,11 +2324,7 @@ function Ye({
       placeholder: r || "Write what comes to mind…"
     }), i.jsx("div", {
       id: `${c}-suggestions`,
-      children: i.jsx(Yx, {
-        items: a ?? Wu[e] ?? ["I’m still figuring this out", "I’d like to try one small step", "I need more information first"],
-        value: t,
-        onChange: n
-      })
+      children: l === "screen-title" ? i.jsxs("details",{className:"answer-suggestion-disclosure",children:[i.jsx("summary",{children:"Need an idea?"}),i.jsx(Yx,{items:a ?? Wu[e] ?? ["I’m still figuring this out","I’d like to try one small step","I need more information first"],value:t,onChange:n})]}) : i.jsx(Yx,{items:a ?? Wu[e] ?? ["I’m still figuring this out","I’d like to try one small step","I need more information first"],value:t,onChange:n})
     })]
   });
 }
@@ -2537,7 +2570,7 @@ function xc({
     })]
   });
 }
-function bN() {
+function bN({onNext}) {
   const quiet = useQuietMotion();
   const [e, t] = h.useState(30),
     [n, r] = h.useState(0),
@@ -2743,7 +2776,7 @@ function bN() {
     }), i.jsx("p", {
       className: "wave-choice-note",
       children: "Stay for as long as feels useful. You can pause or move on at any time."
-    })]
+    }),i.jsx("button",{className:f?"primary-button":"text-button",onClick:onNext,children:f?"Continue to my plan":"Move on to my plan"})]
   });
 }
 function kN({
@@ -2753,7 +2786,7 @@ function kN({
   onLearn: r,
   futureWalk: o,
   onFutureWalkChange: s,
-  focusRequest: a, onResumeChange, onThreatCheck
+  focusRequest: a, onResumeChange, onThreatCheck, onDone
 }) {
   const l = t.answers,
     c = yN(l),
@@ -2765,7 +2798,7 @@ function kN({
     [f, y] = h.useState(!1),
     x = t.resume.planTab, w = value => onResumeChange({planTab:value}),
     k = h.useRef(0);
-  return h.useEffect(() => {
+  h.useEffect(() => {
     if (!a || k.current === a) return;
     k.current = a, w(e === 8 && l.action.trim() ? "second" : "first");
     const m = requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2775,81 +2808,23 @@ function kN({
       });
     }));
     return () => cancelAnimationFrame(m);
-  }, [a, e, l.action]), i.jsxs("section", {
+  }, [a, e, l.action]);
+  const text=(key,title,required=false,suggestions)=>({id:key,title,valid:!required||!!l[key]?.trim(),field:i.jsx(Ye,{label:title,value:l[key]||"",required,small:true,questionId:"screen-title",onChange:value=>n(key,value),suggestions})});
+  const choice=(key,title,options)=>({id:key,title,valid:!!l[key],field:i.jsx(Kx,{label:title,options,value:l[key],onChange:value=>n(key,value)})});
+  let questions,core;
+  if(e===2){questions=[{id:"kind",title:"What’s getting in the way?",hint:"Choose the kind of barrier you want to work with.",field:i.jsx(Kx,{label:"Kind of barrier",options:["Fear or doubt","Practical limits","Both"],value:{fear:"Fear or doubt",practical:"Practical limits",both:"Both"}[l.barrierFocus],onChange:value=>n("barrierFocus",{"Fear or doubt":"fear","Practical limits":"practical",Both:"both"}[value])})},...(l.barrierFocus!=="practical"?[text("prediction","If you try, what are you afraid might happen?",true,Wu["If I try, I’m afraid…"])]:[]),...(l.barrierFocus!=="fear"?[text("practicalNote","What practical thing is in the way?",true,Wu["A practical barrier or other detail"])]:[])];core=questions.length;}
+  if(e===2){questions.push({id:"other-barriers",title:"Any other barriers you want to note?",field:i.jsx(wN,{items:W2,selected:l.barriers,onChange:value=>n("barriers",value)})});if(l.barrierFocus==="fear")questions.push(text("practicalNote","Any practical detail you want to keep?"));}
+  if(e===4){questions=[l.barrierFocus==="practical"?text("practicalSupport","What would help you start?",true,Wu["A resource, adjustment or support I need"]):text("behavior","When fear shows up, what do you usually do?",true,V2),...(l.barrierFocus==="both"?[text("practicalSupport","What practical support would help?")]:[]),text("cost","What might postponing cost you later?")];core=1;}
+  if(e===6){questions=[{id:"values",title:"Which qualities do you want to carry forward?",hint:"Choose three to five. These are options for one question.",valid:u.length>=3&&u.length<=5,field:i.jsxs(i.Fragment,{children:[i.jsx(eN,{answers:l,onChange:value=>n("values",value)}),i.jsx("label",{htmlFor:"custom-value",children:"Or include your own value"}),i.jsx("input",{id:"custom-value",value:l.customValue,maxLength:60,disabled:!l.customValue.trim()&&u.length>=5,onChange:event=>{if(jr({...l,customValue:event.target.value}).length<=5)n("customValue",event.target.value);}})]})},text("valueAction","How could you act on a value?",false,U2[l.values[0]]),text("judgment","What standard do you want to use?")];core=1;}
+  if(e===8){questions=[text("action","What’s your next small step?",true,H2(l)),choice("day","When would you like to try it?",["Today","Tomorrow","This week","Decide later"]),choice("time","What part of the day suits you?",["Morning","Afternoon","Evening","Decide later"]),{id:"minutes",title:"How long could you give it?",valid:!!l.minutes,field:i.jsx(Kx,{label:"Duration",options:["5 min","15 min","30 min"],value:l.minutes?`${l.minutes} min`:"",onChange:value=>n("minutes",value.split(" ")[0])})},text("ifThen",l.barrierFocus==="practical"?"If the obstacle returns, what will you do?":"When fear returns, what will you do?",true,Wu[l.barrierFocus==="practical"?"If the usual obstacle shows up, then I will…":"When fear arises, I will…"]),choice("budget","What resources could you use?",["none","small","flexible"]),...[["likelihood","How likely does your prediction feel?",100],["discomfort","How much discomfort do you expect?",10],["goalState","How able do you feel to take this step?",10]].map(([key,title,max])=>({id:key,title,field:i.jsx(aa,{label:title,value:l[key],max,suffix:max===10?" / 10":"%",onChange:value=>n(key,value)})})),text("evidenceLookFor","What will you actually look for?")];core=5;}
+  if(e===5&&t.resume.question!=="5:roads")return i.jsx(SequentialQuestions,{id:"5",current:t.resume.question,onCurrent:question=>onResumeChange({question}),steps:[{id:"horizon",title:"How far ahead would you like to look?",hint:"Explore possibilities, not predictions.",field:i.jsx(Kx,{label:"Future horizon",options:["One year","Twenty years"],value:l.horizon==="near"?"One year":"Twenty years",onChange:value=>n("horizon",value==="One year"?"near":"long")})}],onDone:()=>onResumeChange({question:"5:roads"}),doneLabel:"Explore the two roads"});
+  if(e===4&&l.barrierFocus!=="practical"&&l.behavior)questions[0].field=i.jsxs(i.Fragment,{children:[questions[0].field,i.jsxs("details",{className:"foldout",children:[i.jsx("summary",{children:"See the pattern you named"}),i.jsx(Zx,{a:l,committed:t.committed})]})]});
+  if(questions)return i.jsx(SequentialQuestions,{id:String(e),steps:questions,optionalStart:core,current:t.resume.question,onCurrent:question=>onResumeChange({question}),onDone,doneLabel:e===2?"Next: Understand the alarm":"Continue"});
+  return i.jsxs("section", {
     className: `question-page enter flow-stage flow-stage-${e}`,
     "aria-labelledby": "screen-title",
-    children: [e === 2 && i.jsxs(i.Fragment, {
-      children: [i.jsxs("h1", {
-        id: "screen-title",
-        children: ["What’s getting ", i.jsx("em", {
-          children: "in the way?"
-        })]
-      }), i.jsx("p", {
-        className: "lede",
-        children: "Choose the kind of barrier, then answer below."
-      }), i.jsxs("div", {
-        className: "flow-section flow-block-section",
-        children: [i.jsx("div", {
-          className: "barrier-focus",
-          role: "group",
-          "aria-label": "What is getting in the way?",
-          children: [{
-            value: "fear",
-            label: "Fear or doubt"
-          }, {
-            value: "practical",
-            label: "Practical limits"
-          }, {
-            value: "both",
-            label: "Both"
-          }].map(m => i.jsx("button", {
-            type: "button",
-            "aria-pressed": l.barrierFocus === m.value,
-            className: l.barrierFocus === m.value ? "selected" : "",
-            onClick: () => {
-              n("barrierFocus", m.value), ge.cue();
-            },
-            children: m.label
-          }, m.value))
-        }), l.barrierFocus !== "practical" && i.jsx(Ye, {
-          required: !0,
-          small: !0,
-          label: "If I try, I’m afraid…",
-          value: l.prediction,
-          onChange: m => n("prediction", m),
-          placeholder: "Write what comes to mind…"
-        }), l.barrierFocus !== "fear" && i.jsxs(i.Fragment, {
-          children: [i.jsx(Ye, {
-            required: !0,
-            small: !0,
-            label: "The practical thing in the way",
-            value: l.practicalNote,
-            onChange: m => n("practicalNote", m),
-            placeholder: "Time, money, energy, access, caring responsibilities…"
-          }), i.jsx("p", {
-            className: "flow-input-hint",
-            children: "A real limitation deserves a workable response."
-          })]
-        })]
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["Other barriers I want to note ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx(wN, {
-          items: W2,
-          selected: l.barriers,
-          onChange: m => n("barriers", m)
-        }), l.barrierFocus === "fear" && i.jsx(Ye, {
-          small: !0,
-          label: "A practical barrier or other detail",
-          value: l.practicalNote,
-          onChange: m => n("practicalNote", m)
-        })]
-      })]
-    }), e === 5 && i.jsxs(i.Fragment, {
-      children: [i.jsx(Kx,{label:"Choose a future horizon",options:["One year","Twenty years"],value:l.horizon === "near" ? "One year" : "Twenty years",onChange:value=>n("horizon",value === "One year" ? "near" : "long")}),i.jsxs("h1", {
+    children: [e === 5 && i.jsxs(i.Fragment, {
+      children: [i.jsx("button",{className:"text-button",onClick:()=>onResumeChange({question:"5:horizon"}),children:"Change future horizon"}),i.jsxs("h1", {
         id: "screen-title",
         children: [l.horizon === "near" ? "One year. " : "Twenty years. ", i.jsx("em", {
           children: "Two futures."
@@ -3134,185 +3109,9 @@ function kN({
       children: i.jsx(rN, {
         phases: gN,
         phase:t.resume.threat, onPhase:threat=>onResumeChange({threat}),
-        check:t.threatCheck, onCheck:onThreatCheck,
+        check:t.threatCheck, onCheck:onThreatCheck,current:t.resume.question,onCurrent:question=>onResumeChange({question}),onDone,
         onLearn: r
       })
-    }), e === 4 && l.barrierFocus === "practical" && i.jsxs(i.Fragment, {
-      children: [i.jsx("span", {
-        className: "question-kicker",
-        children: "ONE QUESTION · YOUR LIFE"
-      }), i.jsxs("h1", {
-        id: "screen-title",
-        children: ["What would ", i.jsx("em", {
-          children: "help you start?"
-        })]
-      }), i.jsx("p", {
-        className: "lede",
-        children: "A resource, adjustment or support that would make this workable."
-      }), i.jsx("div", {
-        className: "flow-section answer-focus-card",
-        children: i.jsx(Ye, {
-          required: !0,
-          small: !0,
-          questionId: "screen-title",
-          label: "A resource, adjustment or support I need",
-          value: l.practicalSupport,
-          onChange: m => n("practicalSupport", m),
-          placeholder: "Tap here to write what would help…"
-        })
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["The barrier I named ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx("p", {
-          children: l.practicalNote
-        })]
-      })]
-    }), e === 4 && l.barrierFocus !== "practical" && i.jsxs(i.Fragment, {
-      children: [i.jsx("span", {
-        className: "question-kicker",
-        children: "ONE QUESTION · YOUR PATTERN"
-      }), i.jsxs("h1", {
-        id: "screen-title",
-        children: ["When fear shows up,", i.jsx("br", {}), i.jsx("em", {
-          children: "what do you usually do?"
-        })]
-      }), i.jsx("p", {
-        className: "lede",
-        children: "Think about the dream you named. Choose an answer or write your own."
-      }), i.jsx("div", {
-        className: "flow-section answer-focus-card",
-        children: i.jsx(Ye, {
-          required: !0,
-          small: !0,
-          questionId: "screen-title",
-          label: "My usual response",
-          value: l.behavior,
-          onChange: m => n("behavior", m),
-          suggestions: V2,
-          placeholder: "Tap here to write: I usually…"
-        })
-      }), l.barrierFocus === "both" && i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["Make room for the practical barrier too ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx("p", {
-          className: "flow-section-copy",
-          children: l.practicalNote || "Time, money, energy or access may need a practical change as well."
-        }), i.jsx(Ye, {
-          small: !0,
-          label: "A resource, adjustment or support I need",
-          value: l.practicalSupport,
-          onChange: m => n("practicalSupport", m),
-          placeholder: "What would make a first step more workable?"
-        })]
-      }), l.behavior && i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["See my pattern ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx(Zx, {
-          a: l,
-          committed: t.committed
-        })]
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["What might this cost later? ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx(Ye, {
-          small: !0,
-          label: "The longer-term cost",
-          value: l.cost,
-          onChange: m => n("cost", m),
-          placeholder: "What stays untested or unresolved?"
-        })]
-      })]
-    }), e === 6 && i.jsxs(i.Fragment, {
-      children: [i.jsxs("h1", {
-        id: "screen-title",
-        children: ["Re-center on ", i.jsx("em", {
-          children: "values."
-        })]
-      }), i.jsx("p", {
-        className: "lede",
-        children: "Choose the qualities you want to carry forward."
-      }), i.jsx("div", {
-        className: "flow-section flow-values-section",
-        children: i.jsx(eN, {
-          answers: l,
-          onChange: m => {
-            n("values", m), ge.cue();
-          }
-        })
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["A value the list misses? ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx("label", {
-          className: "field-label",
-          htmlFor: "custom-value",
-          children: "My own value · counts towards my five"
-        }), i.jsx("input", {
-          id: "custom-value",
-          className: "custom-value-input",
-          value: l.customValue,
-          maxLength: 60,
-          disabled: !l.customValue.trim() && u.length >= 5,
-          onChange: m => {
-            jr({
-              values: l.values,
-              customValue: m.target.value
-            }).length <= 5 && n("customValue", m.target.value);
-          },
-          placeholder: "A word or short phrase that matters…"
-        }), (u.length < 5 || l.customValue.trim()) && i.jsx(Yx, {
-          items: Wu["My own value"],
-          value: l.customValue,
-          onChange: m => n("customValue", m)
-        }), !l.customValue.trim() && u.length >= 5 && i.jsx("p", {
-          className: "flow-input-hint",
-          children: "Unselect one value above to add your own."
-        })]
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["How could I act on it? ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx(Ye, {
-          small: !0,
-          label: "I am someone who…",
-          value: l.valueAction,
-          onChange: m => n("valueAction", m),
-          suggestions: U2[l.values[0]] || Wu["I am someone who…"],
-          placeholder: "Describe a way of acting, not a perfect outcome."
-        })]
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["Whose standard am I using? ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx(Ye, {
-          small: !0,
-          label: "The standard I want to use",
-          value: l.judgment,
-          onChange: m => n("judgment", m),
-          placeholder: "What matters to me, alongside real responsibilities…"
-        }), i.jsx("p", {
-          className: "flow-contrast-line",
-          children: "Would I still want this if nobody was impressed?"
-        })]
-      })]
     }), e === 7 && l.barrierFocus !== "practical" && i.jsxs(i.Fragment, {
       children: [i.jsxs("h1", {
         id: "screen-title",
@@ -3322,7 +3121,7 @@ function kN({
       }), i.jsx("p", {
         className: "lede",
         children: "Practise staying with an urge without following it."
-      }), i.jsx(bN, {}), i.jsxs("details", {
+      }), i.jsx(bN, {onNext:onDone}), i.jsxs("details", {
         className: "foldout flow-support-detail",
         children: [i.jsxs("summary", {
           children: ["More ways to support myself ", i.jsx(Ke, {
@@ -3357,148 +3156,7 @@ function kN({
           })]
         })]
       })]
-    }), e === 7 && l.barrierFocus === "practical" && i.jsxs(i.Fragment,{children:[i.jsx("h1",{id:"screen-title",children:"Make room for support."}),i.jsx("p",{className:"lede",children:"A practical limit needs a practical response. Check the time, energy, cost or access your step needs. You can choose a smaller step, ask for support or pause."}),i.jsx("p",{children:l.practicalSupport || l.practicalNote})]}), e === 8 && i.jsxs(i.Fragment, {
-      children: [i.jsx("h1", {
-        id: "screen-title",
-        children: x === "first" ? i.jsxs(i.Fragment, {
-          children: ["What’s your ", i.jsx("em", {
-            children: "next small step?"
-          })]
-        }) : i.jsxs(i.Fragment, {
-          children: [l.barrierFocus === "practical" ? "When the obstacle returns," : "When fear returns,", i.jsx("br", {}), i.jsx("em", {
-            children: "what will you do?"
-          })]
-        })
-      }), i.jsx("p", {
-        className: "lede",
-        children: x === "first" ? "Choose a step, then decide when to try it." : "Choose a response you can use in that moment."
-      }), i.jsxs(La, {
-        value: x,
-        onValueChange: w,
-        className: "stage-tabs",
-        children: [i.jsxs(za, {
-          "aria-label": "Build my plan",
-          children: [i.jsxs(Nn, {
-            value: "first",
-            children: ["1 · My step ", l.action.trim() && i.jsx(Rt, {
-              size: 13
-            })]
-          }), i.jsxs(Nn, {
-            value: "second",
-            children: [l.barrierFocus === "practical" ? "2 · My backup plan " : "2 · When fear arrives ", l.ifThen.trim() && i.jsx(Rt, {
-              size: 13
-            })]
-          })]
-        }), i.jsxs(Rn, {
-          value: "first",
-          children: [i.jsxs("div", {
-            className: "flow-section flow-action-section",
-            children: [l.barrierFocus !== "fear" && (l.practicalNote || l.practicalSupport) && i.jsxs("div", {
-              className: "practical-plan-context",
-              children: [i.jsx("small", {
-                children: "MAKE THE STEP FIT MY LIFE"
-              }), i.jsx("p", {
-                children: l.practicalSupport || l.practicalNote
-              })]
-            }), i.jsx(Ye, {
-              required: !0,
-              small: !0,
-              questionId: "screen-title",
-              label: "My next step",
-              value: l.action,
-              onChange: m => n("action", m),
-              suggestions: H2(l),
-              placeholder: "Tap here to write a small action…"
-            }), i.jsxs("div", {
-              className: "plan-schedule-row",
-              "aria-label": "Choose when to try this step",
-              children: [i.jsx(xc, {
-                label: "When",
-                value: l.day,
-                options: ["Today", "Tomorrow", "This week", "Decide later"],
-                onChange: m => n("day", m)
-              }), i.jsx(xc, {
-                label: "Time",
-                value: l.time,
-                options: ["Morning", "Afternoon", "Evening", "Decide later"],
-                onChange: m => n("time", m)
-              }), i.jsx(xc, {
-                label: "For",
-                value: l.minutes ? `${l.minutes} min` : "",
-                options: ["5 min", "15 min", "30 min"],
-                onChange: m => n("minutes", m.split(" ")[0])
-              })]
-            })]
-          }), i.jsxs("button", {
-            type: "button",
-            className: "text-button stage-local-next",
-            onClick: () => w("second"),
-            children: [l.barrierFocus === "practical" ? "Next: my backup plan " : "Next: my response to fear ", i.jsx(Qe, {
-              size: 16
-            })]
-          })]
-        }), i.jsxs(Rn, {
-          value: "second",
-          children: [l.action.trim() && i.jsxs("div", {
-            className: "plan-step-reminder",
-            children: [i.jsx("small", {
-              children: "THE STEP I’M MAKING ROOM FOR"
-            }), i.jsx("p", {
-              children: l.action
-            })]
-          }), i.jsx("div", {
-            className: "flow-section fear-plan-section",
-            children: i.jsx(Ye, {
-              required: !0,
-              small: !0,
-              questionId: "screen-title",
-              label: l.barrierFocus === "practical" ? "If the usual obstacle shows up, then I will…" : "When fear arises, I will…",
-              value: l.ifThen,
-              onChange: m => n("ifThen", m)
-            })
-          })]
-        })]
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["Practical resources ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx(Kx, {
-          label: "Budget",
-          options: ["none", "small", "flexible"],
-          value: l.budget,
-          onChange: m => n("budget", m)
-        })]
-      }), i.jsxs("details", {
-        className: "foldout flow-optional",
-        children: [i.jsxs("summary", {
-          children: ["Make it a small experiment ", i.jsx(Ke, {
-            size: 16
-          })]
-        }), i.jsx("p", {
-          className: "flow-section-copy",
-          children: "If you named a prediction, decide what you can observe instead of trying to read minds."
-        }), i.jsxs("div", {
-          className: "lab-prediction",
-          children: [i.jsx("small", {
-            children: "MY PREDICTION"
-          }), i.jsx("p", {
-            children: l.prediction || "What might happen if I try?"
-          })]
-        }), i.jsx(aa, {
-          label: "How likely does it feel?",
-          value: l.likelihood,
-          onChange: m => n("likelihood", m)
-        }), i.jsx(aa, {label:"Expected discomfort during this action",value:l.discomfort,max:10,suffix:" / 10",ends:["None","Very much"],onChange:m=>n("discomfort",m)}), i.jsx(aa, {label:"How able do I feel to take this exact step?",value:l.goalState,max:10,suffix:" / 10",ends:["Not able","Very able"],onChange:m=>n("goalState",m)}), i.jsx(Ye, {
-          small: !0,
-          label: "What will I actually look for?",
-          value: l.evidenceLookFor,
-          onChange: m => n("evidenceLookFor", m),
-          placeholder: "Something I can see, hear, or do…"
-        })]
-      })]
-    })]
+    }), e === 7 && l.barrierFocus === "practical" && i.jsxs(i.Fragment,{children:[i.jsx("h1",{id:"screen-title",children:"Make room for support."}),i.jsx("p",{className:"lede",children:"A practical limit needs a practical response. Check the time, energy, cost or access your step needs. You can choose a smaller step, ask for support or pause."}),i.jsx("p",{children:l.practicalSupport || l.practicalNote})]})]
   });
 }
 function SN() {
@@ -3552,6 +3210,26 @@ function SN() {
       t(book=>({...book,step:3})); r("journey");
     }
   }, [I,e,n]);
+  h.useEffect(()=>{const pop=event=>{if(dearEmbeddedHistory)return;const question=event.state?.dearQuestion;if(!question)return;const stage=Number(question.id);if(Number.isInteger(stage)&&stage>=1&&stage<=8){t(book=>({...book,step:requiredThreatStep(book,stage),resume:{...book.resume,question:question.current}}));r("journey");l(null);}};window.addEventListener("popstate",pop);return()=>window.removeEventListener("popstate",pop);},[]);
+  h.useEffect(()=>{
+    const restore=event=>{
+      if(event.origin!==location.origin||event.source!==window.parent||event.data?.type!=="mentication:restore-screen"||event.data?.journeyId!=="dear2100")return;
+      const screen=event.data.screen,stage=screen?.cursors?.stage;if(!screen||!Number.isInteger(stage)||stage<1||stage>9||typeof screen.id!=="string")return;
+      const known=/^stage-[1-9]$/.test(screen.id)||["2:kind","2:prediction","2:practicalNote","2:other-barriers","4:practicalSupport","4:behavior","4:cost","5:horizon","5:roads","6:values","6:valueAction","6:judgment","8:action","8:day","8:time","8:minutes","8:ifThen","8:budget","8:likelihood","8:discomfort","8:goalState","8:evidenceLookFor","threat:0","threat:1","threat:2","threat:3","threat:score","outcome:observed","outcome:result","outcome:actualDiscomfort","outcome:afterLikelihood","outcome:goalStateAfter","outcome:learned","outcome:next"].includes(screen.id);
+      if(!known)return;
+      dearHistoryRestoring=dearHistoryCursor!==JSON.stringify({id:screen.id,cursors:{stage}});dearHistoryDepth=Number.isSafeInteger(screen.depth)&&screen.depth>=0?screen.depth:0;
+      const target=requiredThreatStep($.current,stage),question=screen.id.startsWith("stage-")?target===3?"threat-teaching":"":screen.id;
+      t(book=>({...book,step:target,resume:{...book.resume,question}}));
+      if(screen.id.startsWith("outcome:")&&$.current.reflectionDraft&&target===9){setReflection($.current.reflectionDraft);r("plan");l("outcome");}else{l(null);r(target===9?"plan":"journey");}
+    };
+    window.addEventListener("message",restore);return()=>window.removeEventListener("message",restore);
+  },[]);
+  h.useEffect(()=>{
+    if(!dearEmbeddedHistory||!I)return;
+    if(a==="outcome"||n==="journey"&&document.querySelector(".sequential-question"))return;
+    if(n==="journey")rememberDearScreen(e.step===5&&e.resume.question==="5:roads"?"5:roads":`stage-${e.step}`,e.step);
+    else if(n==="plan"||n==="closing")rememberDearScreen("stage-9",9);
+  },[I,n,a,e.step,e.resume.question]);
   const Ne = update => {
     const next = typeof update === "function" ? update(re) : update;
     setReflection(next);
@@ -4157,7 +3835,7 @@ function SN() {
           children: [i.jsxs("button", {
             className: "back-button",
             "aria-label": "Previous stage",
-            onClick: () => Ct(ue - 1),
+            onClick: () => {if(requestDearHistoryBack())return;if(document.dispatchEvent(new Event("dear:question-back",{cancelable:true})))Ct(ue-1);},
             children: [i.jsx(Gr, {
               size: 18
             }), " Back"]
@@ -4207,8 +3885,8 @@ function SN() {
           onFutureWalkChange: J,
           onResumeChange: patch => t(book=>({...book,resume:{...book.resume,...patch}})),
           onThreatCheck: threatCheck => t(book=>({...book,threatCheck})),
-          focusRequest: k
-        }, ue), ue < 9 && i.jsxs("footer", {
+          focusRequest: k, onDone:qx
+        }, ue), ue < 9 && ![2,3,4,6,8].includes(ue) && !(ue===7&&D.barrierFocus!=="practical") && i.jsxs("footer", {
           className: "flow-actions",
           children: [i.jsx("span", {
             className: "save-status",
@@ -4966,85 +4644,13 @@ function SN() {
             className: "fine-print",
             children: "Original app wording, with artwork from the supplied design references. These resources inform the approach; they do not constitute endorsement or validation of this app."
           })]
-        }), a === "outcome" && i.jsxs("div", {
-          className: "outcome-content",
-          children: [i.jsxs("div", {
-            className: "outcome-action",
-            children: [i.jsx("small", {
-              children: "THE STEP I TRIED"
-            }), i.jsx("p", {
-              children: re.action
-            })]
-          }), i.jsx("label", {
-            className: "field-label",
-            children: "Compared with my expectation, it was…"
-          }), i.jsx(Kx, {
-            label: "How the outcome compared",
-            options: Object.values(ms),
-            value: ms[re.result],
-            onChange: E => Ne(A => ({
-              ...A,
-              result: Object.keys(ms).find(X => ms[X] === E)
-            }))
-          }), i.jsx(Ye, {
-            required: !0,
-            label: "What did I observe?",
-            value: re.observed,
-            onChange: E => Ne(A => ({
-              ...A,
-              observed: E
-            })),
-            placeholder: "What happened, including anything difficult or unresolved."
-          }), i.jsxs("details", {
-            className: "foldout outcome-optional",
-            children: [i.jsxs("summary", {
-              children: ["Add more detail, if useful ", i.jsx(Ke, {
-                size: 16
-              })]
-            }), i.jsx(aa, {
-              label: "Discomfort I actually experienced",
-              value: re.actualDiscomfort,
-              max: 10,
-              suffix: " / 10",
-              ends: ["Very little", "Very much"],
-              onChange: E => Ne(A => ({
-                ...A,
-                actualDiscomfort: E
-              }))
-            }), i.jsx(aa, {
-              label: "How likely does my prediction feel now?",
-              value: re.afterLikelihood,
-              onChange: E => Ne(A => ({
-                ...A,
-                afterLikelihood: E
-              }))
-            }), i.jsx(aa,{label:"How able do I feel to take this exact step?",value:re.goalStateAfter,max:10,suffix:" / 10",ends:["Not able","Very able"],onChange:E=>Ne(A=>({...A,goalStateAfter:E}))}), i.jsx(Ye, {
-              small: !0,
-              label: "What did I learn?",
-              value: re.learned,
-              onChange: E => Ne(A => ({
-                ...A,
-                learned: E
-              })),
-              placeholder: "Optional. “I don’t know yet” is a valid conclusion."
-            }), i.jsx(Ye, {
-              small: !0,
-              label: "What would I keep or change next time?",
-              value: re.next,
-              onChange: E => Ne(A => ({
-                ...A,
-                next: E
-              })),
-              placeholder: "An adjustment based on what happened."
-            })]
-          }), i.jsxs("button", {
-            className: "primary-button",
-            disabled: d || !re.observed.trim() || e.entries.length >= 200,
-            onClick: Xx,
-            children: ["Save this observation ", i.jsx(Rt, {
-              size: 18
-            })]
-          })]
+        }), a === "outcome" && i.jsx(SequentialQuestions,{
+          id:"outcome",current:e.resume.question,onCurrent:question=>t(book=>({...book,resume:{...book.resume,question}})),optionalStart:1,onDone:Xx,doneLabel:"Save this observation",blocked:d||e.entries.length>=200,
+          steps:[{id:"observed",title:"What did you observe?",hint:`The step you tried: ${re.action}. Include anything difficult or unresolved.`,valid:!!re.observed.trim(),field:i.jsx(Ye,{required:true,questionId:"screen-title",label:"What did I observe?",value:re.observed,onChange:observed=>Ne(previous=>({...previous,observed}))})},
+          {id:"result",title:"How did it compare with your expectation?",field:i.jsx(Kx,{label:"How the outcome compared",options:Object.values(ms),value:ms[re.result],onChange:value=>Ne(previous=>({...previous,result:Object.keys(ms).find(key=>ms[key]===value)}))})},
+          ...[["actualDiscomfort","How much discomfort did you experience?",10],["afterLikelihood","How likely does your prediction feel now?",100],["goalStateAfter","How able do you feel to take this step?",10]].map(([key,title,max])=>({id:key,title,field:i.jsx(aa,{label:title,value:re[key],max,suffix:max===10?" / 10":"%",onChange:value=>Ne(previous=>({...previous,[key]:value}))})})),
+          ...[["learned","What did you learn?"],["next","What would you keep or change next time?"]].map(([key,title])=>({id:key,title,field:i.jsx(Ye,{questionId:"screen-title",label:title,value:re[key],onChange:value=>Ne(previous=>({...previous,[key]:value}))})}))]
+
         })]
       })
     }), i.jsx($E, {

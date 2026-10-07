@@ -40,3 +40,16 @@ export function pmrCueState(step, elapsed) {
   const reached = alignment.filter(word => word.start <= audioTime);
   return { visibleCount: reached.length, audioTime, alignment };
 }
+
+// A refresh restores navigation/progress, never inferred relaxation or audio consent.
+export function restorePMRSession(saved, sourceSteps) {
+  if (!saved || !['setup','length','practice','outcome','helpfulness'].includes(saved.phase)) return {};
+  const mode = saved.mode === 'contrast' ? 'contrast' : 'release';
+  const length = saved.length === 'full' ? 'full' : 'short';
+  const steps = createPMRSteps(sourceSteps, {mode,length});
+  const regions = new Set(steps.map(step => step.region).filter(region => region !== 'whole'));
+  const keys=new Set(steps.map(step => `${step.region}:${step.phase}`));
+  const completedIds=Array.isArray(saved.completedIds) ? [...new Set(saved.completedIds.filter(key=>keys.has(key)))] : [];
+  const filter = value => Array.isArray(value) ? [...new Set(value.filter(region => regions.has(region)))] : [];
+  return {phase:saved.phase,mode,length,completedIds,guideView:saved.guideView === 'words' ? 'words' : 'body',index:Math.min(steps.length - 1,Math.max(0,Number.isInteger(saved.index) ? saved.index : 0)),released:filter(saved.released),skipped:filter(saved.skipped),completedSteps:Math.min(steps.length,Math.max(0,Number.isInteger(saved.completedSteps) ? saved.completedSteps : 0)),stopped:saved.stopped === true,outcome:PMR_OUTCOMES.some(([id]) => id === saved.outcome) ? saved.outcome : null,helpfulness:['helpful','same','worse','unsure'].includes(saved.helpfulness) ? saved.helpfulness : null,startedAt:Number.isFinite(saved.startedAt) ? saved.startedAt : null};
+}

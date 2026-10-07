@@ -62,6 +62,14 @@ describe('Foundations device storage', () => {
     expect(store.readDraft().value).toMatchObject({ screen: 'scan', checkpointId: 'sleep-1', state: { q: 3, responses: { overall: 4, 'sleep-0': 1, 'sleep-1': 5 }, pendingResponse: 2, dose: { id: 'tiny' }, cue: 'After a meal', time: '14:30', review: { tried: 1 } } });
     expect(store.readDraft().value.state.responses['nutrition-0']).toBeUndefined();
   });
+  it('restores each split planning or review screen without changing recorded answers', () => {
+    const store = storeFor(memory());
+    for (const screen of ['cue', 'time', 'review', 'review-effort', 'review-help']) {
+      expect(store.writeDraft({ version: 2, screen, state: { priority: 'sleep', selected: 0, dose: { id: 'tiny' }, cue: 'After a meal', time: '19:30', review: { tried: 3, effort: 2 }, history: ['plan', 'cue', 'time', 'review', 'review-effort'] } })).toBe(true);
+      expect(store.readDraft().value).toMatchObject({ screen, state: { cue: 'After a meal', time: '19:30', review: { tried: 3, effort: 2 }, history: ['plan', 'cue', 'time', 'review', 'review-effort'] } });
+      expect(store.readDraft().value.state.review.help).toBeUndefined();
+    }
+  });
   it('retains a review with the actual plan that was tried when its new size changes', () => {
     const store = storeFor(memory());
     const plan = { ...store.plan(legacy), size: 'tiny', revision: 2, reviews: [{ id: 'review-one', ratings: { tried: 4, effort: 1, help: 4 }, plan: { domain: 'sleep', action: 0, size: 'regular' }, decision: 'tiny' }] };

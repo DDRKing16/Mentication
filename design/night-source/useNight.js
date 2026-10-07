@@ -4,9 +4,11 @@ import { LocalAudio } from './playback.js';
 import { readNightSetup, writeNightSetup, clockForSetup } from './setup.js';
 import { loadRecords } from '../../src/lib/tomorrowParking/storage.js';
 export function useNight(channels) {
+  const embedded = window.parent !== window;
   const [restored] = useState(()=>readNightSetup(channels.map(channel=>channel.id)));
   const [channel, setChannel] = useState(restored?.channel || channels[0].id),
-    [view, setView] = useState(restored?.view || false);
+    [view, setView] = useState(restored?.kind === 'preview' && restored.view || false);
+  const [setupStep,setSetupStep] = useState(restored?.kind === 'file' ? 'file' : restored?.setupStep || 'source');
   const [status, setStatus] = useState(restored?'paused':'idle'),
     [message, setMessage] = useState(restored?'Your setup is back. Nothing is playing; choose Play when ready.':'Choose a channel. No recordings have been added yet.');
   const [minutes, setMinutes] = useState(restored?.minutes || 15),
@@ -17,12 +19,13 @@ export function useNight(channels) {
   const [noteId,setNoteId] = useState(restored?.noteId || null);
   const [setupOk,setSetupOk] = useState(true);
   const [files, setFiles] = useState({}),
-    [panel, setPanel] = useState(null),
+    [panel, setPanel] = useState(restored?.source && restored.source !== 'local' ? restored.source : null),
     [providerStates, setProviderStates] = useState({
       spotify: 'config_missing',
       apple: 'config_missing'
     });
   const [hasStarted, setHasStarted] = useState(false);
+  const screenStarted = useRef(false), lastScreen = useRef(null), currentScreen = useRef(null);
   const [source, setSource] = useState(restored?.source || 'local'),
     [title, setTitle] = useState(null),
     [worries, setWorries] = useState(false),
@@ -40,9 +43,9 @@ export function useNight(channels) {
   const mounted = useRef(true);
   const persistSetup = useRef(()=>true);
   useEffect(()=>{
-    persistSetup.current=()=>writeNightSetup({channel,minutes,seconds:clock.current.seconds,volume,texture,source,kind:source!=='local'?'provider':needsFile || fileRefs.current[channel]?'file':'preview',view,noteId});
+    persistSetup.current=()=>writeNightSetup({channel,minutes,seconds:clock.current.seconds,volume,texture,source,kind:source!=='local'?'provider':needsFile || fileRefs.current[channel]?'file':'preview',view,noteId,setupStep});
     setSetupOk(persistSetup.current());
-  },[channel,minutes,seconds,volume,texture,source,view,noteId,needsFile]);
+  },[channel,minutes,seconds,volume,texture,source,view,noteId,needsFile,setupStep]);
   function update(next, detail = '', track) {
     if (!mounted.current) return;
     if (stopped.current && ['playing', 'loading', 'paused'].includes(next)) return;
@@ -83,6 +86,46 @@ export function useNight(channels) {
     await engines.current[active.current]?.pause();
     update('paused');
   });
+  const screenId = view ? 'listening' : setupStep;
+  currentScreen.current = {id:screenId,channel,needsFile,source,files,providerStates};
+  function rememberScreen(id, mode) {
+    if (embedded) window.parent.postMessage({type:'mentication:screen',journeyId:'nightChannel',mode,screen:{id,cursors:{}}},location.origin);
+    else {
+      const state = {...history.state,nightScreen:id};
+      if (mode === 'push') history.pushState(state,''); else history.replaceState(state,'');
+    }
+    lastScreen.current = id;
+  }
+  useEffect(()=>{
+    if (!screenStarted.current) {screenStarted.current=true;rememberScreen(screenId,'init');}
+    else if (lastScreen.current !== screenId) rememberScreen(screenId,'push');
+  },[screenId]);
+  useEffect(() => {
+    const valid = id => ['source','file','timer','listening'].includes(id);
+    const restore = async id => {
+      if (!valid(id)) return;
+      if (!await pause()) {
+        // Keep playback/STOP reachable when a provider did not acknowledge pause.
+        rememberScreen(currentScreen.current.id,'replace'); return;
+      }
+      const current = currentScreen.current;
+      const fileRequired = current.needsFile && !current.files[current.channel];
+      const providerRequired = current.source !== 'local' && !['ready','playing','paused'].includes(current.providerStates[current.source]);
+      const next = id !== 'source' && fileRequired ? 'file' : id === 'listening' && providerRequired ? 'source' : id;
+      rememberScreen(next,'replace');
+      window.dispatchEvent(new Event('night:history-restore'));
+      setPanel(id === 'listening' && providerRequired ? current.source : null);
+      setView(next === 'listening');
+      if (next !== 'listening') setSetupStep(next);
+    };
+    const back = event => {if (!embedded) restore(event.state?.nightScreen || event.state?.nightSetupStep);};
+    const message = event => {
+      if (!embedded || event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'mentication:restore-screen' || event.data.journeyId !== 'nightChannel') return;
+      restore(event.data.screen?.id);
+    };
+    window.addEventListener('popstate',back);window.addEventListener('message',message);
+    return () => {window.removeEventListener('popstate',back);window.removeEventListener('message',message);};
+  }, []);
   const stop = async () => {
     stopped.current = true;
     clock.current.pause();
@@ -155,7 +198,6 @@ export function useNight(channels) {
     active.current = 'local';
     setSource('local');
     setTitle(file.name);
-    setView(true);
     update('ready', 'Your file is ready to try. Tap Play; it stays in this tab and is not uploaded.');
   });
   const connect = kind => run(async () => {
@@ -281,13 +323,15 @@ export function useNight(channels) {
     setNeedsFile(false);
     selected.current = null;
     setView(false);
-    update('ready', 'Channel selected. Tap Tune In when ready.');
+    update('ready', 'Sound selected. Nothing is playing yet.');
   });
   return {
     needsFile,
     noteId,
     setNoteId,
     setupOk,
+    setupStep,
+    setSetupStep,
     select,
     hasStarted,
     channel,

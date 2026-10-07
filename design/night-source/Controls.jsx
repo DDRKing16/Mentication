@@ -2,13 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { captureGoalBaseline, goalPointChange, GOAL_ASSESSMENTS } from '../../src/lib/goalAssessment.js';
 import SetupNote from './SetupNote.jsx';
 export function NightControls({
-  night, channelName
+  night, channelName, onFocusMode
 }) {
   const [link, setLink] = useState(''),
     [baseline, setBaseline] = useState(null),
     [finish, setFinish] = useState(false),
     [after, setAfter] = useState(null),
     [baselineOpen, setBaselineOpen] = useState(false);
+  useEffect(()=>{onFocusMode?.(baselineOpen || finish);},[baselineOpen,finish,onFocusMode]);
+  useEffect(()=>{
+    const restore=()=>{setBaselineOpen(false);setFinish(false);};
+    window.addEventListener('night:history-restore',restore);
+    return ()=>window.removeEventListener('night:history-restore',restore);
+  },[]);
   useEffect(() => {
     const receive=event=>{
       if(event.origin!==location.origin || event.source!==window.parent || event.data?.type!=='mentication:pause-for-alternative' || typeof event.data.requestId!=='string')return;
@@ -35,42 +41,28 @@ export function NightControls({
   const provider = night.panel,
     state = night.providerStates[provider],
     assessment = baseline || GOAL_ASSESSMENTS.sleep;
-  return <section className="night-controls" data-remaining={night.seconds} aria-label="Playback controls">
-    <p role="status">{night.status.replaceAll('_', ' ')}{night.message ? ` — ${night.message}` : ''}</p>
-    <p>{night.source === 'local' ? night.needsFile ? 'Your previous file needs attaching again. It was not stored.' : night.files[night.channel] ? 'Your attached file • plays once' : ['podcast', 'documentary', 'audible'].includes(night.channel) ? 'Recording not added yet' : 'Generated noise preview • no recorded scene or voices' : `${night.source === 'spotify' ? 'Spotify' : 'Apple Music'} • ${night.title || 'waiting for track information'}`}</p>
-    <div className="night-actions">
-      <button disabled={night.busy} onClick={() => night.status === 'playing' ? night.pause() : night.play()}>{night.status === 'playing' ? 'Pause' : night.status === 'error' ? 'Retry playback' : 'Play / resume'}</button>
-      <button onClick={night.stop}>STOP</button>
-      {night.view && <button onClick={() => night.setView(false)}>Choose source</button>}
-    </div>
-    <label>Sleep timer <select aria-label="Sleep timer" value={night.minutes} onChange={e => night.changeTimer(Number(e.target.value))}>{[15, 30, 45, 60].map(m => <option key={m} value={m}>{m} minutes</option>)}</select></label>
-    <p>{Math.floor(night.seconds / 60)}:{String(night.seconds % 60).padStart(2, '0')} remaining while playing. {night.source === 'local' ? 'Local sound fades in the final minute.' : 'Provider audio stops at the timer; no fade or volume control is promised.'} Pause and STOP keep position. A new timer selection resets the remaining time.</p>
-    <p>Locked-screen and background playback are unverified on this device. Browser suspension can delay the stop timer; keep this page open for the tested controls.</p>
-    <p>{night.setupOk?'Channel, timer and sound controls can return paused in this tab for up to 24 hours. Audio does not restart on return.':'This tab could not remember your setup. Keep the page open if you want to retain these controls.'}</p>
-    <details className="night-practice-guide"><summary>What do I do with my attention?</summary><p>Choose a sound or familiar item you want to stay with for a while. Set a stopping point, then let the sound hold some attention without needing to follow every detail.</p><p>When a thought pulls you away, you can return to one sound you hear. You do not have to solve the thought or finish listening. Pause, change the source or choose quiet rest whenever you want.</p><p>The scene recordings have not been added yet. The six ambient channels are generated noise previews; podcast, documentary and audiobook slots need your own file. Spotify and Apple Music need a configured connection and your authorization. Audible uses its own controls and timer.</p></details>
+  if (provider) return <section className="night-controls night-provider-flow" aria-label={`${provider} connection`}>
+    <h2>{['ready','playing','paused'].includes(state) ? 'Which song would you like?' : `Connect ${provider === 'spotify' ? 'Spotify' : 'Apple Music'}`}</h2>
+    {['ready','playing','paused'].includes(state) ? <><label>Song link<input aria-label={`${provider} song link`} placeholder={provider === 'spotify' ? 'https://open.spotify.com/track/…' : 'https://music.apple.com/…'} value={link} onChange={e => setLink(e.target.value)}/></label><button className="night-primary" disabled={night.busy || !link} onClick={() => night.playProvider(provider,link)}>Play selected song</button><button className="night-quiet" onClick={() => night.disconnect(provider)}>Disconnect</button></> : <><p>{state === 'config_missing' ? 'This connection is not available yet. Choose another sound while the owner configures it.' : provider === 'spotify' ? 'Spotify Premium and your authorization are required.' : 'An Apple Music subscription and your authorization are required.'}</p>{state === 'config_missing' ? <button className="night-primary" onClick={()=>night.setPanel(null)}>Choose another sound</button> : <button className="night-primary" disabled={night.busy} onClick={() => night.connect(provider)}>Connect {provider === 'spotify' ? 'Spotify' : 'Apple Music'}</button>}<p>No account connects until you authorize with the provider.</p></>}
+    {night.status === 'error' && <p role="alert">{night.message}</p>}{state !== 'config_missing' && <button className="night-quiet" onClick={() => night.setPanel(null)}>Back to sounds</button>}
+  </section>;
+  if (baselineOpen && !baseline && !night.hasStarted) return <section className="night-controls night-check"><h2>{assessment.question}</h2><p>Optional · {assessment.scale}. 0 = {assessment.left}; 10 = {assessment.right}</p><div className="night-ratings">{Array.from({length:11},(_,v)=><button key={v} onClick={()=>{setBaseline(captureGoalBaseline('sleep',v));setBaselineOpen(false);}}>{v}</button>)}</div><button className="night-quiet" onClick={()=>setBaselineOpen(false)}>Skip this check</button></section>;
+  if (finish) return <section className="night-controls night-check" aria-label="Optional end check">
+    <h2>{baseline && after === null ? assessment.question : 'You can leave it here'}</h2>
+    {baseline && after === null ? <><p>Optional · {assessment.scale}. 0 = {assessment.left}; 10 = {assessment.right}</p><div className="night-ratings">{Array.from({length:11},(_,v)=><button key={v} onClick={()=>setAfter(v)}>{v}</button>)}</div></> : after !== null ? <p>Your answer: {after}/10. Change from your starting answer: {goalPointChange(baseline,baseline.direction,after)} points. These answers stay in this tab only.</p> : <p>Sound is stopped. No sleep result has been assumed.</p>}
+    <button className="night-primary" onClick={()=>setFinish(false)}>{baseline && after === null ? 'Leave this unanswered' : 'Return to controls'}</button>
+  </section>;
+  return <section className="night-controls" data-remaining={night.seconds} aria-label="Playback details">
+    {night.view && <><p role={night.status === 'error' ? 'alert' : 'status'}>{night.status.replaceAll('_',' ')}{night.message ? ` — ${night.message}` : ''}</p>
+    <details className="night-playback-settings"><summary>Adjust sound or stop time</summary>
+      <label>Sleep timer<select aria-label="Sleep timer" value={night.minutes} onChange={e=>night.changeTimer(Number(e.target.value))}>{[15,30,45,60].map(m=><option key={m} value={m}>{m} minutes</option>)}</select></label>
+      <p>A new stop time resets the timer. {night.source === 'local' ? 'Local sound fades in the final minute.' : 'Provider audio stops at the timer; fade and volume control are not available here.'}</p>
+      {night.source === 'local' && <><label>Local audio volume<input type="range" aria-label="Local audio volume" min="0" max="1" step="0.01" value={night.volume} onChange={e=>night.setVolume(Number(e.target.value))}/></label>{!night.files[night.channel] && <label>Generated noise texture<input type="range" aria-label="Generated noise texture" min="0" max="1" step="0.01" value={night.texture} onChange={e=>night.setTexture(Number(e.target.value))}/></label>}</>}
+    </details>
     <SetupNote night={night} channelName={channelName}/>
-    {!night.view && <div className="night-actions"><button onClick={() => night.setPanel('spotify')}>Spotify settings</button><button onClick={() => night.setPanel('apple')}>Apple Music settings</button></div>}
-    {provider && <section className="night-provider" aria-label={`${provider} connection`}>
-      <h2>{provider === 'spotify' ? 'Spotify' : 'Apple Music'}</h2><p>Connection: {state?.replaceAll('_', ' ')}</p>
-      <p>{provider === 'spotify' ? 'Requires Spotify Premium and access to the owner’s developer app. Plays a track you choose, without other Night audio.' : 'Requires Apple Music authorization and an active subscription. The owner must first configure secure developer-token delivery.'}</p>
-      <div className="night-actions"><button disabled={night.busy || state === 'config_missing'} onClick={() => night.connect(provider)}>Connect {provider === 'spotify' ? 'Spotify' : 'Apple Music'}</button><button disabled={night.busy || !['ready', 'playing', 'paused', 'error'].includes(state)} onClick={() => night.disconnect(provider)}>Disconnect</button><button onClick={() => night.setPanel(null)}>Close settings</button></div>
-      <label>Song link<input aria-label={`${provider} song link`} placeholder={provider === 'spotify' ? 'https://open.spotify.com/track/…' : 'https://music.apple.com/…'} value={link} onChange={e => setLink(e.target.value)} /></label>
-      <button disabled={night.busy || !link || !['ready', 'playing', 'paused'].includes(state)} onClick={() => night.playProvider(provider, link)}>Play selected song</button>
-      <p>No account is connected by opening these settings. Connect opens the provider’s authorization flow.</p>
-    </section>}
-    {!baseline && !night.hasStarted && <button onClick={() => setBaselineOpen(!baselineOpen)}>Optional starting check</button>}
-    {baselineOpen && !baseline && !night.hasStarted && <fieldset><legend>{assessment.question} ({assessment.scale})</legend><p>0 = {assessment.left}; 10 = {assessment.right}</p><div className="night-ratings">{Array.from({
-          length: 11
-        }, (_, v) => <button key={v} onClick={() => {
-          setBaseline(captureGoalBaseline('sleep', v));
-          setBaselineOpen(false);
-        }}>{v}</button>)}</div><button onClick={() => setBaselineOpen(false)}>Skip</button></fieldset>}
-    <button disabled={night.busy} onClick={async () => {
-      if (await night.stop()) setFinish(true);
-    }}>Finish by choice</button>
-    {finish && <section aria-label="Optional end check"><p>Finished. You can leave quietly.</p>{baseline && after === null && <><p>Optional: {assessment.question} ({assessment.scale})</p><p>0 = {assessment.left}; 10 = {assessment.right}</p><div className="night-ratings">{Array.from({
-            length: 11
-          }, (_, v) => <button key={v} onClick={() => setAfter(v)}>{v}</button>)}</div></>}{after !== null && <p>Your answer: {after}/10. Change from your starting answer: {goalPointChange(baseline, baseline.direction, after)} points. These answers stay in this tab only.</p>}<button onClick={() => setFinish(false)}>Close quietly</button></section>}
+    <button className="night-quiet" disabled={night.busy} onClick={async()=>{if(await night.stop())setFinish(true);}}>Finish by choice</button></>}
+    <details className="night-practice-guide"><summary>How this works</summary><p>Choose a sound, set a stopping point, then let it hold some attention. You do not need to follow every detail, solve a thought or finish listening. Pause, change the sound or choose quiet rest whenever you want.</p><p>Six ambient channels are generated noise previews, not recordings. Podcast, documentary and audiobook slots need your own file. Spotify and Apple Music need configuration and your authorization. Audible uses its own controls and timer.</p><p>Locked-screen and background playback are unverified on this device. Browser suspension can delay the stop timer; keep this page open for the tested controls.</p><p>{night.setupOk ? 'Your choices can return paused in this tab for up to 24 hours. Audio never restarts on return. Files are not kept.' : 'This tab could not remember your setup. Keep the page open to retain these controls.'}</p></details>
+    {!baseline && !night.hasStarted && !night.view && <button className="night-quiet" onClick={()=>setBaselineOpen(true)}>Optional starting check</button>}
   </section>;
 }
 export function AudibleSlot({

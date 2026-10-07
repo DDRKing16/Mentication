@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readNightSetup, writeNightSetup, clockForSetup, nightSetupNote, NIGHT_SETUP_KEY } from './setup.js';
-const source={channel:'rainy',minutes:30,seconds:1773,source:'local',kind:'preview',volume:.3,texture:.2,view:true,noteId:'synthetic-note'};
+const source={channel:'rainy',minutes:30,seconds:1773,source:'local',kind:'preview',volume:.3,texture:.2,view:true,noteId:'synthetic-note',setupStep:'timer'};
 function store(){const values=new Map();return {getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value)};}
 describe('a paused Night setup across interruption',()=>{
   it('restores actual chosen controls and remainder with a paused clock',()=>{
@@ -11,6 +11,17 @@ describe('a paused Night setup across interruption',()=>{
   it('never persists a file, provider secret, song link, title or assessment',()=>{
     const storage=store();writeNightSetup({...source,file:'blob:private',accessToken:'private',link:'private',title:'private',rating:8},storage,100);
     expect(storage.getItem(NIGHT_SETUP_KEY)).not.toContain('private');expect(storage.getItem(NIGHT_SETUP_KEY)).not.toContain('rating');
+  });
+  it('migrates earlier setup records without losing choices or silently starting playback',()=>{
+    const storage=store();const {setupStep,...legacy}=source;
+    storage.setItem(NIGHT_SETUP_KEY,JSON.stringify({...legacy,version:1,expiresAt:1000}));
+    const restored=readNightSetup(['rainy'],storage,200);
+    expect(restored).toEqual({...source,setupStep:'source'});
+    expect(clockForSetup(restored).deadline).toBeNull();
+    for(const step of ['source','file','timer']) {
+      writeNightSetup({...source,setupStep:step},storage,100);
+      expect(readNightSetup(['rainy'],storage,200).setupStep).toBe(step);
+    }
   });
   it('preserves a file requirement and provider source without inventing playback',()=>{
     const storage=store();writeNightSetup({...source,kind:'file'},storage,100);expect(readNightSetup(['rainy'],storage,200).kind).toBe('file');

@@ -12,9 +12,10 @@ describe("free-text inputs have a real accessible name", () => {
     expect(src).toMatch(/aria-label=\{title\}/);
   });
 
-  it("Next Easiest Step's custom task field has an aria-label", () => {
+  it("Next Easiest Step's custom task field has a linked visible label", () => {
     const src = readFileSync("src/components/NextEasiestStepExperience.jsx", "utf8");
-    expect(src).toMatch(/aria-label="What you are stuck on"/);
+    expect(src).toMatch(/htmlFor="nes-quick-task"/);
+    expect(src).toMatch(/id="nes-quick-task"/);
   });
 
   it("Change the Scene's onward check-in controls have accessible names", () => {

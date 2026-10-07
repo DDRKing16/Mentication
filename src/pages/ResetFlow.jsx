@@ -11,9 +11,9 @@ import { withAttemptHelpfulness } from "@/lib/attemptFeedback";
 // @ts-check
 import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Castle, ChevronLeft, ChevronRight, Check, ArrowRight, RotateCcw } from "lucide-react";
+import { Castle, ChevronLeft, ChevronRight, Check, ArrowRight } from "lucide-react";
 import IntensityDial from "@/components/IntensityDial";
 import WithBrandThreshold from "@/components/brand/WithBrandThreshold";
 import { standaloneRouteFor } from "@/lib/standaloneInterventions";
@@ -57,7 +57,7 @@ import FlowHomeButton from "@/components/FlowHomeButton";
 import { sessionStore } from "@/lib/localData";
 import { useFreeQuota } from "@/hooks/useFreeQuota";
 import { playComplete } from "@/lib/feedback";
-import { recordHandoffDecision, clearActiveFlagship } from "@/lib/flagshipMemory";
+import { clearActiveFlagship } from "@/lib/flagshipMemory";
 import { pauseHomeAmbient, resumeHomeAmbient } from "@/lib/homeAmbient";
 import { maybeRequestReview } from "@/lib/reviewPrompt";
 import {
@@ -85,15 +85,28 @@ export default function ResetFlow() {
   const startsDirectFlagship = !needsAnsweredBaseline && directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
   const restoredCompletion = entry?.reset_phase === "goalReassessment" ? resetCompletionSnapshot(entry.reset_completion, directEntryPathway[0]?.id) : null;
   const initialPhase = restoredCompletion ? "goalReassessment" : needsAnsweredBaseline ? "questions" : ["questions", "pathway", "guiding"].includes(entry?.reset_phase) ? entry.reset_phase : startsDirectFlagship ? "guiding" : (usablePrebuiltEntry ? "pathway" : (entry?.unsure || needsGuidedResetEntry({ ...entry, prebuilt: usablePrebuiltEntry }) ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
+  const [questionStep, setQuestionStep] = useState(() => ["goal", "distress", "time"].includes(entry?.reset_question) ? entry.reset_question : "goal");
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
   // swipe-back steps chronologically through the flow instead of exiting.
   const stepParam = useMemo(() => parseInt(new URLSearchParams(location.search).get("step") || "0", 10) || 0, [location.search]);
-  const flowStack = useRef(Object.assign([], { [stepParam]: { phase: initialPhase, unsureStep: 0 } }));
+  const flowStack = useRef(Object.assign([], { [stepParam]: { phase: initialPhase, unsureStep: 0, questionStep: entry?.reset_question || "goal" } }));
   const restoredStepRef = useRef(stepParam);
   const buildingTimer = useRef(null);
   const [answers, setAnswers] = useState(() => createInitialResetAnswers(entry));
+
+  useEffect(() => {
+    if (phase !== "questions") return;
+    const state = globalThis.history?.state;
+    if (!state) return;
+    try { globalThis.history.replaceState({...state,usr:resetNavigationEntry({...entry,reset_question:questionStep},answers,"questions",{id:sessionIdRef.current,startedAt:startTimeRef.current})},""); } catch { /* Practice remains usable if history is unavailable. */ }
+  }, [answers, questionStep, phase]);
+  useEffect(() => {
+    if (phase !== "questions") return;
+    const frame=requestAnimationFrame(()=>document.querySelector("main h1")?.focus({preventScroll:true}));
+    return ()=>cancelAnimationFrame(frame);
+  }, [phase,questionStep]);
 
   const [endIntensity, setEndIntensity] = useState(null);
   const [tofEntryThought, setTofEntryThought] = useState("");
@@ -127,6 +140,8 @@ export default function ResetFlow() {
   const [planRemaining, setPlanRemaining] = useState(0);
   const [lastValue, setLastValue] = useState(answers.intensity ?? 5);
   const [checkinValue, setCheckinValue] = useState(null);
+  const [checkpointScreen,setCheckpointScreen] = useState("rating");
+  const [reflectionScreen,setReflectionScreen] = useState("repeat");
   const [remaining, setRemaining] = useState(null);
   const [showSwitch, setShowSwitch] = useState(false);
   const startTimeRef = useRef(entry?.reset_started_at || Date.now());
@@ -138,6 +153,12 @@ export default function ResetFlow() {
   const pendingCompletionRef = useRef(restoredCompletion ? { ...restoredCompletion.event, mechanism:directEntryPathway[0]?.mechanism } : null);
   const goalCompletionRef = useRef(restoredCompletion?.result || null);
   const [goalEndRating, setGoalEndRating] = useState(restoredCompletion?.goalRating ?? null);
+  useEffect(() => {
+    if (phase !== "goalReassessment" || !pendingCompletionRef.current) return;
+    const state=globalThis.history?.state;
+    if (!state) return;
+    try { globalThis.history.replaceState({...state,usr:resetNavigationEntry({...entry,reset_completion:{event:pendingCompletionRef.current,result:goalCompletionRef.current,goalRating:goalEndRating}},answers,"goalReassessment",{id:sessionIdRef.current,startedAt:startTimeRef.current})},""); } catch { /* Current answer remains available in this screen. */ }
+  }, [phase,goalEndRating]);
   const sessionSavedRef = useRef(false);
   const [weekCount, setWeekCount] = useState(0);
   useEffect(() => {
@@ -176,6 +197,7 @@ export default function ResetFlow() {
       if (buildingTimer.current) { clearTimeout(buildingTimer.current); buildingTimer.current = null; }
       setPhase(snap.phase);
       setUnsureStep(snap.unsureStep ?? 0);
+      setQuestionStep(snap.questionStep || entry?.reset_question || "goal");
       setBuilding(false);
     }
   }, [stepParam]);
@@ -294,10 +316,12 @@ export default function ResetFlow() {
     flowStack.current = appendResetFlowSnapshot(flowStack.current, stepParam, {
       phase: snap.phase,
       unsureStep: snap.unsureStep ?? unsureStep,
+      questionStep: snap.questionStep ?? questionStep,
     });
     setPhase(snap.phase);
     if (snap.unsureStep != null) setUnsureStep(snap.unsureStep);
-    navigate(`/reset?step=${flowStack.current.length - 1}`, { state: resetNavigationEntry(nextEntry, nextAnswers, snap.phase, { id:sessionIdRef.current, startedAt:startTimeRef.current }) });
+    if (snap.questionStep != null) setQuestionStep(snap.questionStep);
+    navigate(`/reset?step=${flowStack.current.length - 1}`, { state: resetNavigationEntry({ ...nextEntry, reset_question:snap.questionStep ?? questionStep }, nextAnswers, snap.phase, { id:sessionIdRef.current, startedAt:startTimeRef.current }) });
   };
   const goBack = () => {
     if (stepParam > 0) navigate(appBackTarget(window.history.state,"/"));
@@ -305,6 +329,8 @@ export default function ResetFlow() {
   };
 
   const nextQuestion = () => {
+    if (questionStep === "goal" && answers.direction === "lift") { advance({phase:"questions",questionStep:"distress"}); return; }
+    if (questionStep !== "time" && !(usablePrebuiltEntry && pathway.length === 1)) { advance({phase:"questions",questionStep:"time"}); return; }
     if (!isPremium && !quotaLoading && allowed <= 0) return;
     if(entry?.prebuilt && pathway.length === 1 && pathway[0].id !== "factCheck") { beginGuided();return; }
     setBuilding(true);
@@ -425,6 +451,7 @@ export default function ResetFlow() {
   const onSegmentComplete = (result) => {
     if (result?.requireGoalReassessment) { startGoalReassessment(result); return; }
     setCheckinValue(null);
+    setCheckpointScreen("rating");
     setRemaining(null);
     advance({ phase: "checkpoint" });
   };
@@ -494,7 +521,7 @@ export default function ResetFlow() {
 
   const continueCoaching = () => {
     const nextIntensity = checkinValue ?? lastValue;
-    const nextEffectiveness = commitPendingPulse(nextIntensity);
+    const nextEffectiveness = commitPendingPulse(checkinValue);
     const remTarget = Math.min(6, Math.max(1, Math.round(planRemaining)));
     const implied = remaining ? REMAINING_STATE_BY_ID[remaining] : null;
     if (implied && implied.direction && implied.direction !== answers.direction) {
@@ -508,21 +535,21 @@ export default function ResetFlow() {
 
   const addMore = (mins) => {
     const nextIntensity = checkinValue ?? lastValue;
-    const nextEffectiveness = commitPendingPulse(nextIntensity);
+    const nextEffectiveness = commitPendingPulse(checkinValue);
     const implied = remaining ? REMAINING_STATE_BY_ID[remaining] : null;
     startSegment({ targetMin: mins, count: 1, whereFelt: implied?.whereFelt }, nextEffectiveness);
   };
 
   const switchDirection = (dir) => {
     const nextIntensity = checkinValue ?? lastValue;
-    const nextEffectiveness = commitPendingPulse(nextIntensity);
+    const nextEffectiveness = commitPendingPulse(checkinValue);
     setShowSwitch(false);
     startSegment({ targetMin: Math.min(6, Math.max(2, answers.timeMin || 5)), direction: dir }, nextEffectiveness);
     setPlanRemaining(0);
   };
 
   const wrapUp = () => {
-    const finalValue = checkinValue ?? lastValue;
+    const finalValue = checkinValue;
     commitPendingPulse(finalValue);
     setEndIntensity(finalValue);
     advance({ phase: "reflect" });
@@ -643,6 +670,7 @@ export default function ResetFlow() {
     flowStack.current = [{ phase: "questions", unsureStep: 0 }];
     startTimeRef.current = Date.now();
     setPhase("questions");
+    setQuestionStep("goal");
     setUnsureStep(0);
     setBuilding(false);
     setActivePathway(null);
@@ -716,14 +744,15 @@ export default function ResetFlow() {
     };
     return <main className={`${goalCompletionRef.current?.interventionId === "tomorrowParking" ? "tpl tpl--bedside tpl-goal" : "calmbg"} min-h-[100dvh] px-5 py-6`}><div className="mx-auto flex max-w-lg flex-col gap-6">
       <FlowHomeButton />
-      <SelectedPracticeContext practice={pathwayByIds([goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id])[0]} label="After your practice" showTime={false} />
+      <SelectedPracticeContext practice={pathwayByIds([goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id])[0]} label="After your practice" showTime={false} compact />
       <h1 className="font-heading text-3xl text-primary">{assessment?.question || INTENSITY_QUESTION.title}</h1>
       <p className="text-muted-foreground">{hasGoalBaseline(answers) ? "The same goal question as at the start." : "An optional goal check-in, separate from the practice question. There is no starting goal rating to compare."} Confirm an honest rating, or skip. You do not need to feel better.</p>
       <IntensityDial value={goalEndRating} onChange={setGoalEndRating} direction={answers.direction} />
       <p className="text-muted-foreground">{goalEndRating == null ? 'Not answered yet.' : goalPointChange(answers.goal_baseline, answers.direction, goalEndRating) == null ? 'No confirmed starting rating to compare.' : `${answers.goal_baseline.value} → ${goalEndRating} · ${goalPointChange(answers.goal_baseline, answers.direction, goalEndRating)} points`}</p>
-      <JourneyTakeaway id={goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id} initialText={confirmedJourneyTakeaway(goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id,goalCompletionRef.current?.outcome)} />
       <Button className="rounded-full" disabled={saving} onClick={() => finishGoal(goalEndRating ?? 5)}>Confirm rating: {goalEndRating ?? 5}</Button>
-      <Button className="rounded-full" variant="outline" disabled={saving} onClick={() => finishGoal(null)}>Skip and finish</Button>
+      <button type="button" className="min-h-11 underline" disabled={saving} onClick={() => finishGoal(null)}>Skip and finish</button>
+      <JourneyTakeaway id={goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id} initialText={confirmedJourneyTakeaway(goalCompletionRef.current?.interventionId || usedIds[usedIds.length - 1] || pathway[0]?.id,goalCompletionRef.current?.outcome)} />
+
     </div></main>;
   }
 
@@ -821,291 +850,44 @@ export default function ResetFlow() {
     );
   }
 
-  // ---------- CHECKPOINT (coaching loop) ----------
+  // Shared follow-up answers are separate optional screens.
   if (phase === "checkpoint") {
-    const isLift = answers.direction === "lift";
-    const v = checkinValue ?? lastValue ?? 5;
-    const delta = v - lastValue;
-    const improved = isLift ? delta : -delta;
-    const implied = remaining ? REMAINING_STATE_BY_ID[remaining] : null;
-    const shiftsDir = implied && implied.direction && implied.direction !== answers.direction;
-    const dirLabel = (id) => (DIRECTIONS.find((d) => d.id === id) || {}).label || id;
-    const remMin = Math.round(planRemaining);
-
-    return (
-      <div className="calmbg min-h-full">
-        <div className="mx-auto flex min-h-full max-w-xl flex-col items-center px-5 pt-6 pb-10 sm:px-8">
-          <div className="flex w-full justify-start">
-            <FlowHomeButton />
-          </div>
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">Let’s check in</p>
-            <h1 className="mt-2 font-heading text-2xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-3xl">
-              How are you now?
-            </h1>
-            {usedIds.length > 0 && (
-              <p className="mt-2 text-sm text-muted-foreground">{usedIds.length} practice{usedIds.length === 1 ? "" : "s"} so far{planRemaining > 0 ? ` · ${remMin} min left in your plan` : ""}</p>
-            )}
-          </motion.div>
-
-          <div className="mt-4 w-full max-w-md">
-            <IntensityDial value={v} onChange={setCheckinValue} direction={answers.direction} compact />
-          </div>
-
-          {delta !== 0 && (
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-3 font-heading text-lg text-indigo italic text-center text-balance">
-              {improved > 0
-                ? isLift ? `Up ${delta} — that’s real.` : `Down ${Math.abs(delta)} — that’s real.`
-                : isLift ? "A little lower still — be gentle." : "Still rising — that happens. Be gentle."}
-            </motion.p>
-          )}
-
-          <div className="mt-5 w-full max-w-md">
-            <p className="text-sm font-medium text-muted-foreground">What’s still in the way?</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {REMAINING_STATE_OPTIONS.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setRemaining(remaining === c.id ? null : c.id)}
-                  className={
-                    "no-tap rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95 " +
-                    (remaining === c.id
-                      ? "border-primary/0 bg-primary text-primary-foreground soft-depth"
-                      : "border-border bg-card text-foreground hover:border-primary/30")
-                  }
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {usedIds.includes("grounding54321V2") && improved > 0 && v >= 4 && (
-            <div className="mt-5 w-full max-w-md rounded-3xl border border-border bg-card p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Optional next route</p>
-              <h2 className="mt-2 font-heading text-xl text-primary">Vector Shift</h2>
-              <p className="mt-2 text-sm text-muted-foreground">You appear more oriented; a short precision-grounding protocol can help consolidate that return.</p>
-              <button onClick={()=>{recordHandoffDecision("grounding54321V2","vectorShift","accepted");navigate("/reset",{replace:true,state:{prebuilt:true,pathway:["vectorShift"],direction:"ground",directionLabel:"Vector Shift",intensity:v,whereFelt:"both",timeMin:5,audio:answers.audio||"yes"}})}} className="mt-4 min-h-11 w-full rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground">Begin Vector Shift with my consent</button>
-            </div>
-          )}
-
-          <div className="mt-6 w-full max-w-md flex flex-col items-center gap-2.5">
-            <Button
-              size="lg"
-              onClick={continueCoaching}
-              className="h-14 w-full rounded-full bg-primary text-base font-medium text-primary-foreground soft-depth active:scale-95"
-            >
-              {shiftsDir
-                ? <>Try {dirLabel(implied.direction)} <ArrowRight className="ml-2 h-5 w-5" /></>
-                : remMin > 1
-                ? <>Keep going — {remMin} min left <ArrowRight className="ml-2 h-5 w-5" /></>
-                : <>Add a little more <ArrowRight className="ml-2 h-5 w-5" /></>}
-            </Button>
-
-            <button
-              type="button"
-              onClick={wrapUp}
-              className="no-tap w-full rounded-full border border-border bg-card py-3 text-base font-medium text-foreground transition-all hover:border-primary/30 active:scale-95"
-            >
-              I’m good — wrap up
-            </button>
-
-            <div className="mt-1 w-full">
-              <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground/70">Adjust my reset</p>
-              <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={repeatLast}
-                  className="no-tap flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:text-foreground active:scale-95"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" strokeWidth={1.8} /> Repeat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => addMore(8)}
-                  className="no-tap rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:text-foreground active:scale-95"
-                >
-                  A lot more
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowSwitch(true)}
-                  className="no-tap rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:text-foreground active:scale-95"
-                >
-                  Switch direction
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {showSwitch && (
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-end bg-black/40 backdrop-blur-sm sm:items-center sm:justify-center"
-              onClick={() => setShowSwitch(false)}
-            >
-              <motion.div
-                initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md rounded-t-3xl bg-card p-6 pb-10 sm:rounded-3xl"
-              >
-                <div className="mx-auto mb-5 h-1.5 w-10 rounded-full bg-muted sm:hidden" />
-                <h3 className="font-heading text-2xl font-medium tracking-tight text-primary">Switch direction</h3>
-                <p className="mt-1 text-muted-foreground">We’ll build a fresh pathway for the new direction.</p>
-                <div className="mt-5 grid grid-cols-2 gap-2.5">
-                  {DIRECTIONS.filter((d) => d.id !== answers.direction).map((d) => (
-                    <button
-                      key={d.id}
-                      type="button"
-                      onClick={() => switchDirection(d.id)}
-                      className="no-tap rounded-2xl border border-border bg-background/60 p-4 text-left transition-all hover:border-primary/30 hover:-translate-y-0.5 active:scale-[0.98]"
-                    >
-                      <span className="block font-heading text-lg font-medium text-foreground">{d.label}</span>
-                      <span className="block text-sm text-muted-foreground">{d.desc}</span>
-                    </button>
-                  ))}
-                </div>
-                <button onClick={() => setShowSwitch(false)} className="no-tap mt-5 w-full rounded-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground">
-                  Stay with {dirLabel(answers.direction)}
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
+    const assessment=GOAL_ASSESSMENTS[answers.direction];
+    const rating=checkpointScreen==="rating";
+    const obstacle=checkpointScreen==="obstacle";
+    return <main className="calmbg min-h-[100dvh]"><div className="mx-auto flex max-w-lg flex-col gap-5 px-5 py-6">
+      <div className="flex items-center justify-between">{!rating && <button type="button" className="min-h-11 underline" onClick={()=>setCheckpointScreen(obstacle?"next":"rating")}>Back</button>}<FlowHomeButton /></div>
+      <h1 className="font-heading text-4xl leading-tight text-primary">{rating ? assessment?.question || "How intense is it right now?" : obstacle ? "What’s still in the way?" : "What would help you now?"}</h1>
+      {rating ? <>
+        <p className="text-muted-foreground">Optional. You can skip this check-in.</p>
+        <IntensityDial value={checkinValue} onChange={setCheckinValue} direction={answers.direction} />
+        <Button className="min-h-14 w-full rounded-full text-lg" onClick={()=>{setCheckinValue(checkinValue??5);setCheckpointScreen("next");}}>Confirm rating: {checkinValue??5}</Button>
+        <button type="button" className="min-h-11 underline" onClick={()=>{setCheckinValue(null);setCheckpointScreen("next");}}>Skip check-in</button>
+      </> : obstacle ? <>
+        <p className="text-muted-foreground">Optional. Choose what feels closest.</p>
+        <div className="grid gap-3">{REMAINING_STATE_OPTIONS.map(choice=><button key={choice.id} type="button" aria-pressed={remaining===choice.id} className={"min-h-12 rounded-2xl border p-4 text-left "+(remaining===choice.id?"bg-primary text-primary-foreground":"bg-card")} onClick={()=>setRemaining(choice.id)}>{choice.label}</button>)}</div>
+        <Button className="min-h-14 w-full rounded-full text-lg" onClick={()=>setCheckpointScreen("next")}>Continue</Button>
+      </> : <>
+        <p className="text-muted-foreground">Continue, stop here, or change the next step.</p>
+        <Button className="min-h-14 w-full rounded-full text-lg" onClick={continueCoaching}>Continue my reset <ArrowRight className="ml-2 h-5 w-5" /></Button>
+        <button type="button" className="min-h-12 w-full underline" onClick={wrapUp}>Finish for now</button>
+        <details className="rounded-2xl border p-4"><summary className="min-h-11 cursor-pointer">Other next steps</summary><div className="grid gap-2"><button type="button" className="min-h-11 text-left underline" onClick={repeatLast}>Repeat this practice</button><button type="button" className="min-h-11 text-left underline" onClick={()=>setCheckpointScreen("obstacle")}>Name what is still in the way</button><button type="button" className="min-h-11 text-left underline" onClick={()=>setShowSwitch(true)}>Choose another direction</button><button type="button" className="min-h-11 text-left underline" onClick={()=>addMore(8)}>Allow more time</button></div></details>
+        {showSwitch && <section className="rounded-2xl border bg-card p-4"><h2 className="sr-only">Another direction</h2><div className="grid gap-2">{DIRECTIONS.filter(direction=>direction.id!==answers.direction).map(direction=><button key={direction.id} type="button" className="min-h-12 w-full rounded-2xl border p-4 text-left" onClick={()=>switchDirection(direction.id)}>{direction.label}</button>)}</div><button type="button" className="min-h-11 underline" onClick={()=>setShowSwitch(false)}>Keep this direction</button></section>}
+      </>}
+    </div></main>;
   }
 
-  // ---------- REFLECT ----------
   if (phase === "reflect") {
-    const isLift = answers.direction === "lift";
-    const improvement = answers.intensity != null && endIntensity != null
-      ? (isLift ? endIntensity - answers.intensity : answers.intensity - endIntensity)
-      : null;
-    const helpedOptions = pathwayByIds(usedIds.length ? usedIds : pathway.map((p) => p.id));
-    return (
-      <div className="calmbg min-h-full">
-        <div className="mx-auto flex min-h-full max-w-xl flex-col items-center px-5 pt-10 pb-28 sm:px-8">
-          <div className="flex w-full justify-start">
-            <FlowHomeButton />
-          </div>
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="text-center">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">Before we wrap up</p>
-            <h1 className="mt-3 font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
-              One last reflection
-            </h1>
-          </motion.div>
-
-          {improvement != null && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-8 font-heading text-2xl text-indigo italic text-center text-balance"
-            >
-              {improvement > 0
-                ? isLift ? `Up ${improvement}. You lifted yourself — that’s real.` : `Down ${improvement}. You settled yourself — that’s real.`
-                : improvement < 0
-                ? isLift ? "A little lower still. Be gentle — you showed up." : "Still rising. Be gentle — you showed up."
-                : "Holding steady. You showed up, and that matters."}
-            </motion.p>
-          )}
-
-          <div className="mt-8 flex w-full max-w-md justify-center">
-            <Button
-              size="lg"
-              onClick={completeSession}
-              disabled={saving}
-              data-sfx="none"
-              className="h-16 w-full rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95"
-            >
-              Done <Check className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-
-          <p className="mt-8 text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground/70">Optional reflection</p>
-          <div className="mt-4 w-full max-w-md">
-            <p className="text-sm font-medium text-muted-foreground">Would you use this reset again?</p>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {[
-                { v: "yes", label: "Yes" },
-                { v: "maybe", label: "Maybe" },
-                { v: "no", label: "No" },
-              ].map((o) => (
-                <button
-                  key={o.v}
-                  type="button"
-                  onClick={() => setWouldUseAgain(o.v)}
-                  className={
-                    "no-tap rounded-full border py-3 text-base font-medium transition-all active:scale-95 " +
-                    (wouldUseAgain === o.v
-                      ? "border-primary/0 bg-primary text-primary-foreground soft-depth"
-                      : "border-border bg-card text-foreground hover:border-primary/30")
-                  }
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {helpedOptions.length > 1 && (
-            <div className="mt-8 w-full max-w-md">
-              <p className="text-sm font-medium text-muted-foreground">
-                What helped most? <span className="text-muted-foreground/60">(optional)</span>
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {helpedOptions.map((iv) => (
-                  <button
-                    key={iv.id}
-                    type="button"
-                    onClick={() => setWhatHelped(whatHelped === iv.name ? "" : iv.name)}
-                    className={
-                      "no-tap rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95 " +
-                      (whatHelped === iv.name
-                        ? "border-primary/0 bg-primary text-primary-foreground soft-depth"
-                        : "border-border bg-card text-foreground hover:border-primary/30")
-                    }
-                  >
-                    {iv.name}
-                  </button>
-                ))}
-                {["Both", "Neither", "Not sure"].map((o) => (
-                  <button
-                    key={o}
-                    type="button"
-                    onClick={() => setWhatHelped(whatHelped === o ? "" : o)}
-                    className={
-                      "no-tap rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95 " +
-                      (whatHelped === o
-                        ? "border-primary/0 bg-primary text-primary-foreground soft-depth"
-                        : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground")
-                    }
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-6 flex w-full max-w-md justify-center">
-            <Button
-              variant="outline"
-              onClick={completeSession}
-              disabled={saving}
-              data-sfx="none"
-              className="h-12 rounded-full border-primary/30 px-8 text-base font-medium text-primary hover:bg-primary/10 active:scale-95"
-            >
-              {saving ? "Saving…" : "Save reflection"}
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+    const helped=pathwayByIds(usedIds.length?usedIds:pathway.map(item=>item.id));
+    const repeat=reflectionScreen==="repeat";
+    return <main className="calmbg min-h-[100dvh]"><div className="mx-auto flex max-w-lg flex-col gap-5 px-5 py-6">
+      <div className="flex items-center justify-between">{!repeat&&<button type="button" className="min-h-11 underline" onClick={()=>setReflectionScreen("repeat")}>Back</button>}<FlowHomeButton /></div>
+      <h1 className="font-heading text-4xl leading-tight text-primary">{repeat?"Would you use this reset again?":"What helped most?"}</h1>
+      <p className="text-muted-foreground">Optional. You can finish without answering.</p>
+      <div className="grid gap-3">{(repeat?[{id:"yes",label:"Yes"},{id:"maybe",label:"Maybe"},{id:"no",label:"No"}]:[...helped.map(item=>({id:item.name,label:item.name})),...['Neither','Not sure'].map(label=>({id:label,label}))]).map(option=><button type="button" key={option.id} aria-pressed={(repeat?wouldUseAgain:whatHelped)===option.id} className={"min-h-12 rounded-2xl border p-4 text-left "+((repeat?wouldUseAgain:whatHelped)===option.id?"bg-primary text-primary-foreground":"bg-card")} onClick={()=>repeat?setWouldUseAgain(option.id):setWhatHelped(option.id)}>{option.label}</button>)}</div>
+      <Button disabled={saving} className="min-h-14 w-full rounded-full text-lg" onClick={completeSession}>{saving?"Saving…":"Done"}</Button>
+      {repeat&&helped.length>1&&<button type="button" className="min-h-11 underline" onClick={()=>setReflectionScreen("helped")}>Add which practice helped · optional</button>}
+    </div></main>;
   }
 
   // ---------- DONE ----------
@@ -1253,76 +1035,19 @@ export default function ResetFlow() {
     );
   }
 
-  // ---------- QUESTIONS ----------
-  return (
-    <div className="calmbg min-h-full">
-      <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <button
-            onClick={prevQuestion}
-            className="no-tap flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className="h-4 w-4" /> Back
-          </button>
-          <div className="flex items-center gap-3">
-            <span className="h-1.5 w-6 rounded-full bg-primary" />
-            <FlowHomeButton />
-          </div>
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key="intensity"
-            initial={{ opacity: 0, x: 18 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -18 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-1 flex-col"
-          >
-            {usablePrebuiltEntry && pathway.length === 1 && <SelectedPracticeContext practice={pathway[0]} />}
-            <h1 className="font-heading text-3xl font-medium leading-tight tracking-tight text-primary text-balance sm:text-4xl">
-              {GOAL_ASSESSMENTS[answers.direction]?.question || INTENSITY_QUESTION.title}
-            </h1>
-            <p className="mt-3 text-lg text-muted-foreground text-balance">
-              {answers.direction === "lift" ? "Low to high. An honest first read." : INTENSITY_QUESTION.description}
-            </p>
-
-            <div className="mt-10 flex flex-1 flex-col items-center">
-              <IntensityDial value={answers.intensity} onChange={(value) => setAnswer("intensity", value)} direction={answers.direction} />
-            </div>
-
-            {answers.direction === "lift" && <div className="mt-8">
-              <label className="flex flex-col gap-3 text-primary">
-                How distressed are you right now?
-                <select aria-label="Current distress" className="min-h-12 rounded-xl border border-border bg-card px-3" value={answers.distress ?? ""} onChange={(event) => setAnswer("distress", event.target.value === "" ? null : Number(event.target.value))}>
-                  <option value="">Choose a rating</option>
-                  {Array.from({ length: 11 }, (_, value) => <option key={value} value={value}>{value}{value === 0 ? " · No distress" : value === 10 ? " · Extreme distress" : ""}</option>)}
-                </select>
-              </label>
-              <p className="mt-2 text-sm text-muted-foreground">This is separate from your mood and helps us choose a suitable reset.</p>
-            </div>}
-
-            {!(usablePrebuiltEntry && pathway.length===1) && <label className="mt-6 flex flex-col gap-3 text-primary">
-              Time available
-              <select aria-label="Time available" className="min-h-12 rounded-xl border border-border bg-card px-3" value={answers.timeMin} onChange={(event) => setAnswer("timeMin", Number(event.target.value))}>
-                {[...new Set([3, 5, 10, 15, answers.timeMin])].sort((a, b) => a - b).map((minutes) => <option key={minutes} value={minutes}>{minutes} minutes</option>)}
-              </select>
-            </label>}
-            {usablePrebuiltEntry && pathway.length===1 && <p className="mt-6 text-sm leading-relaxed text-muted-foreground">An honest starting check-in. The practice opens when you choose Start; you can pause, adapt or stop there.</p>}
-            <div className="mt-10 flex justify-center">
-              <Button
-                size="lg"
-                disabled={answers.intensity === null || !hasGoalBaseline(answers) || (answers.direction === "lift" && answers.distress === null)}
-                onClick={nextQuestion}
-                className="h-16 w-full max-w-sm rounded-full bg-primary text-lg font-medium text-primary-foreground soft-depth active:scale-95 disabled:opacity-40 disabled:shadow-none"
-              >
-                {usablePrebuiltEntry && pathway.length===1 ? pathway[0].id==="factCheck" ? "Continue to your thought" : `Start ${pathway[0].name}` : "Build my reset"}
-                <ChevronRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </div>
-  );
+  // Each independent setup answer has its own history entry. Ratings are
+  // still explicit; selecting a display default never confirms a baseline.
+  const lastSetupQuestion = questionStep === "time" || (usablePrebuiltEntry && pathway.length === 1 && (answers.direction !== "lift" || questionStep === "distress"));
+  const setupTitle = questionStep === "distress" ? "How distressed are you right now?" : questionStep === "time" ? "How much time do you have?" : GOAL_ASSESSMENTS[answers.direction]?.question || INTENSITY_QUESTION.title;
+  const setupDisabled = questionStep === "distress" ? answers.distress === null : questionStep === "goal" ? answers.intensity === null || !hasGoalBaseline(answers) : false;
+  return <main className="calmbg min-h-[100dvh]"><div className="mx-auto flex max-w-lg flex-col px-5 py-6 sm:px-8">
+    <div className="mb-8 flex items-center justify-between"><button type="button" onClick={prevQuestion} className="min-h-11 text-muted-foreground"><ChevronLeft className="inline h-4 w-4" /> Back</button><FlowHomeButton /></div>
+    {usablePrebuiltEntry && pathway.length === 1 && <SelectedPracticeContext practice={pathway[0]} compact />}
+    <h1 tabIndex={-1} className="font-heading text-4xl leading-tight text-primary outline-none">{setupTitle}</h1>
+    <p className="mt-3 text-muted-foreground">{questionStep === "distress" ? "Separate from your mood. This helps choose a suitable practice." : questionStep === "time" ? "Choose the time available for your reset." : "Choose an honest first rating."}</p>
+    {questionStep === "goal" && <div className="my-8"><IntensityDial value={answers.intensity} onChange={value => setAnswer("intensity",value)} direction={answers.direction} /></div>}
+    {questionStep === "distress" && <label className="my-8 flex flex-col gap-3"><span className="sr-only">Current distress</span><select aria-label="Current distress" className="min-h-14 w-full rounded-xl border border-border bg-card px-3 text-lg" value={answers.distress ?? ""} onChange={event => setAnswer("distress",event.target.value === "" ? null : Number(event.target.value))}><option value="">Choose a rating</option>{Array.from({length:11},(_,value)=><option key={value} value={value}>{value}{value===0?" · No distress":value===10?" · Extreme distress":""}</option>)}</select></label>}
+    {questionStep === "time" && <label className="my-8 flex flex-col gap-3"><span className="sr-only">Time available</span><select aria-label="Time available" className="min-h-14 w-full rounded-xl border border-border bg-card px-3 text-lg" value={answers.timeMin} onChange={event => setAnswer("timeMin",Number(event.target.value))}>{[...new Set([3,5,10,15,answers.timeMin])].sort((a,b)=>a-b).map(minutes=><option key={minutes} value={minutes}>{minutes} minutes</option>)}</select></label>}
+    <Button size="lg" disabled={setupDisabled} onClick={nextQuestion} className="min-h-14 w-full rounded-full text-lg">{lastSetupQuestion ? usablePrebuiltEntry && pathway.length===1 ? pathway[0].id==="factCheck" ? "Continue to your thought" : `Start ${pathway[0].name}` : "Build my reset" : "Continue"}<ChevronRight className="ml-2 h-5 w-5" /></Button>
+  </div></main>;
 }

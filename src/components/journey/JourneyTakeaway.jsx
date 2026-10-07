@@ -8,6 +8,19 @@ import '@/styles/journey-tools.css';
 export default function JourneyTakeaway({ id, initialText = '' }) {
   const meta = JOURNEY_EXPERIENCES[id];
   const fieldId = useId();
+  const noteDialog = useRef(null);
+  const noteTrigger = useRef(null);
+  const [editing, setEditing] = useState(false);
+  const historyKey = useRef(globalThis.crypto?.randomUUID?.() || fieldId);
+  useEffect(() => {
+    if (!editing) return;
+    try { noteDialog.current?.showModal(); } catch { setEditing(false); return; }
+    const state = window.history.state || {};
+    try { window.history.pushState({...state,journey_note:historyKey.current,idx:Number.isInteger(state.idx)?state.idx+1:state.idx},''); } catch { /* Native close remains available. */ }
+    const back = () => { if (window.history.state?.journey_note !== historyKey.current) noteDialog.current?.close(); };
+    window.addEventListener('popstate',back);
+    return () => window.removeEventListener('popstate',back);
+  }, [editing]);
   const [scope] = useState(() => journeyTakeawayId(id, window.history.state));
   const [text, setText] = useState(initialText.slice(0,1500));
   const [saved, setSaved] = useState(null);
@@ -44,14 +57,21 @@ export default function JourneyTakeaway({ id, initialText = '' }) {
   }, [id, meta, scope, readVersion]);
   if (!meta) return null;
   if (meta.archive) return <aside className="journey-takeaway"><p>{meta.prompt}</p><Link to={meta.archive}>Return to saved work</Link></aside>;
-  return <details className="journey-takeaway">
-    <summary><span>{saved ? 'Review my saved note' : initialText ? 'Keep these practice choices' : 'Keep a cue for next time'}</span><small>Optional · in your own words</small></summary>
-    <label htmlFor={fieldId}>{meta.prompt}</label>
+  return <details className="journey-takeaway" open={editing}>
+    <summary ref={noteTrigger} onClick={event => { event.preventDefault(); setEditing(true); }}><span>{saved ? 'Review my saved note' : initialText ? 'Keep these practice choices' : 'Keep a cue for next time'}</span><small>Optional · in your own words</small></summary>
+    <dialog ref={noteDialog} className="journey-note-screen" aria-labelledby={`${fieldId}-title`} onClose={() => {
+      setEditing(false);
+      if (window.history.state?.journey_note === historyKey.current) window.history.back();
+      noteTrigger.current?.focus({preventScroll:true});
+    }}>
+    <button type="button" className="takeaway-return" onClick={() => noteDialog.current?.close()}>Back to practice</button>
+    <h1 id={`${fieldId}-title`}>{meta.prompt}</h1>
+    <label className="sr-only" htmlFor={fieldId}>{meta.prompt}</label>
     {initialText && !saved && <p>From your entries and confirmed choices. Edit or clear anything before saving.</p>}
-    <p className="takeaway-coach">Name a moment you might need it, and one small thing you would choose then.</p>
-    <textarea placeholder="When… I could…" id={fieldId} maxLength={1500} value={text} onChange={event => { dirty.current = true; setText(event.target.value); setError(''); }} rows={3} />
-    <p>Only saved when you choose Save. Stored in this browser or app on this device, not synced. Read or delete it in Return points. Unsaved text is lost when you leave.</p>
-    <button type="button" disabled={!text.trim() || saved?.text === text.trim()} onClick={() => {
+
+    <textarea placeholder="A cue in your own words" id={fieldId} maxLength={1500} value={text} onChange={event => { dirty.current = true; setText(event.target.value); setError(''); }} rows={3} />
+    <p>Optional. Save keeps this note on this device only, without syncing. Read or delete it in Return points. Unsaved text is lost when you leave.</p>
+    <button type="button" className="takeaway-save" disabled={!text.trim() || saved?.text === text.trim()} onClick={() => {
       try { const record = takeawayStore.save({ id: saved?.id || scope, interventionId: id, text }); currentSaved.current = record; dirty.current = false; setSaved(record); setError(''); }
       catch { setError('Could not save. Your note is still here. Try again or copy it before leaving.'); }
     }}>{saved ? 'Save changes on this device' : 'Save on this device'}</button>
@@ -62,5 +82,6 @@ export default function JourneyTakeaway({ id, initialText = '' }) {
     {error && <p role="alert">{error}</p>}
     {error.startsWith('Could not read') && <button type="button" onClick={() => setReadVersion(value => value + 1)}>Try reading saved note again</button>}
     <Link to="/return-points">Return points</Link>
+    </dialog>
   </details>;
 }

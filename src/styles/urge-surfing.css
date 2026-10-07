@@ -1242,3 +1242,9 @@ html.reduce-motion .urge-lovable *::after {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* One clear question, with a full-width continuation on small screens. */
+.urge-lovable__heading h1 { font-size: clamp(2rem, 9vw, 2.7rem); line-height: 1.1; }
+.urge-lovable__screen h1:focus { outline: none; }
+.urge-lovable__screen > .urge-lovable__orb { margin: 1.25rem auto; }
+.urge-lovable__screen > .urge-lovable__primary { width: 100%; white-space: normal; }

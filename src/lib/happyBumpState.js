@@ -22,11 +22,14 @@ export function restoreBumpState(initial, saved) {
   // Old defaults and selected actions were not evidence of answers/completion.
   if (saved?.version !== 2) Object.assign(state, { baseline: null, current: null, helpfulness: null, walkStatus: null, taskStatus: null, contactStatus: null });
   state.version = 2;
+  if (state.scene === 'move') Object.assign(state, {elapsedBeforePause:walkElapsed(state),startedAt:null,paused:true});
   if (['grateful', 'anticipate'].includes(state.scene)) state.scene = 'proud';
   if (state.scene === 'reveal') state.scene = 'complete';
   if (state.scene === 'mission' && !state.task) state.scene = 'win';
   if (state.scene === 'nextPlan' && !state.nextMode) state.scene = 'nextMode';
   if (state.scene === 'areaAction' && !state.lifeArea) state.scene = 'lifeArea';
+  if (state.scene === 'comfortIdea' && !state.activeSense) state.scene = 'comfortSense';
+  if (['pairing', 'reward', 'comfortSense', 'comfortIdea'].includes(state.scene) && !state.nextActivity?.trim()) state.scene = 'nextPlan';
   return state;
 }
 export function bumpRecap(state) {

@@ -107,6 +107,7 @@ function render() {
   const active = session.status === 'active';
   const paused = session.status === 'paused';
   const terminal = TERMINAL.includes(session.status);
+  document.body.classList.toggle('at-summary', terminal);
   $('start-controls').hidden = session.status !== 'ready';
   $('play-controls').hidden = !active;
   $('paused-controls').hidden = !paused;

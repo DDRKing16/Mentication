@@ -56,7 +56,7 @@ export default function ReturnPoints() {
   const archives = Object.entries(JOURNEY_EXPERIENCES).filter(([, meta]) => meta.archive && meta.archive !== '/return-points');
   const visibleNotes=notes?.filter(note=>savedWorkMatches(query,[note.text,JOURNEY_EXPERIENCES[note.interventionId]?.name]));
   const visibleThoughts=thoughts?.filter(record=>savedWorkMatches(query,['Thought or Fact',record.thought,record.balancedConfirmed?record.ruling:'',record.returnPhrase,...(Array.isArray(record.support)?record.support:[]),...(Array.isArray(record.evidenceAgainst)?record.evidenceAgainst:[])]));
-  const visibleTara=taraRecaps?.filter(record=>savedWorkMatches(query,['Tara Tactician',record.prediction,record.actual,record.learning,record.nextStep,taraReportedResult(record)?.text]));
+  const visibleTara=taraRecaps?.filter(record=>savedWorkMatches(query,['Let’s get through this','Tara Tactician',record.prediction,record.actual,record.learning,record.nextStep,taraReportedResult(record)?.text]));
   const visibleCards=cards?.filter(({id,state})=>savedWorkMatches(query,[CARE_PRACTICES[id].title,...careSavedWorkRows(id,state).map(row=>row.value)]));
   const count=[visibleNotes,visibleThoughts,visibleTara,visibleCards].reduce((sum,list)=>sum+(list?.length||0),0);
   const savedCount = (notes?.length || 0) + (thoughts?.length || 0) + (cards?.length || 0) + (taraRecaps?.length || 0);
@@ -95,14 +95,14 @@ export default function ReturnPoints() {
       }}>Delete this perspective</button>
     </article>)}
     {visibleTara?.map(recap => <article key={recap.id} className="return-record">
-      <SavedHeading id="taraTactician">Tara Tactician · saved reflection</SavedHeading>
+      <SavedHeading id="taraTactician">Let’s get through this · saved reflection</SavedHeading>
       {recap.prediction && <p className="my-3 whitespace-pre-wrap break-words">Your prediction: {recap.prediction}</p>}
       {recap.actual && <p className="my-3 whitespace-pre-wrap break-words">What you observed: {recap.actual}</p>}
       {taraReportedResult(recap) && <p className="my-3">{taraReportedResult(recap).label}: {taraReportedResult(recap).text}</p>}
       {recap.learning && <p className="my-3 whitespace-pre-wrap break-words">What you want to remember: {recap.learning}</p>}
       {recap.nextStep && <p className="my-3 whitespace-pre-wrap break-words">Your next step: {recap.nextStep}</p>}
       <Link className="min-h-11 inline-block underline mr-4" to="/tara-tactician">Open Tara and saved reflections</Link>
-      <button className="min-h-11 underline" onClick={() => { try { setTaraRecaps(deleteTaraRecap(recap.id).recaps); setError(''); } catch { setError('Could not delete this saved reflection. Try again.'); } }}>Delete Tara reflection</button>
+      <button className="min-h-11 underline" onClick={() => { try { setTaraRecaps(deleteTaraRecap(recap.id).recaps); setError(''); } catch { setError('Could not delete this saved reflection. Try again.'); } }}>Delete saved reflection</button>
     </article>)}
     {visibleCards?.map(({ id, state }) => <article key={id} className="return-record">
       <SavedHeading id={id}>{CARE_PRACTICES[id].title} · saved card</SavedHeading>

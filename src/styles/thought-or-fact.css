@@ -254,3 +254,11 @@ html.one-handed .tof-actions { margin-top: 1rem; }
   .tof-option { min-height: 3.4rem; }
   .tof-button { min-height: 3rem; }
 }
+
+/* Keep the question prominent even on a short phone viewport. */
+.tof-heading h1 { font-size: clamp(2rem, 9vw, 2.8rem); line-height: 1.1; }
+.tof-add { flex-direction: column; }
+.tof-add button { width: auto; align-self: flex-start; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; min-height: 44px; font-size: .95rem; }
+.tof-add button:disabled { display: none; }
+
+.tof-option[aria-pressed="true"] { border-color: var(--tof-accent); background: rgba(0,245,212,.1); }

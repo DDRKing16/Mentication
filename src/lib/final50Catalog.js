@@ -376,7 +376,7 @@ const CONTENT_OVERRIDES = {
 };
 
 const NEW_INTERVENTIONS = {
-  taraTactician: { ...DEFAULTS, id: "taraTactician", name: "Tara Tactician", category: "cognitive", mechanism: "preparation-rehearsal-reflection", directions: ["focus", "calm"], targets: ["thoughts", "both"], states: ["any"], durationMin: 5, cognitiveLoad: 2, physicalDemand: 0, eyes: "open", audio: "no", why: "Prepare a manageable next move, use support during the situation, and reflect on what actually happened. The time estimate covers preparation; the event and return are at your pace.", experienceTier: "flagship", steps: [] },
+  taraTactician: { ...DEFAULTS, id: "taraTactician", name: "Let’s get through this", category: "cognitive", mechanism: "preparation-rehearsal-reflection", directions: ["focus", "calm"], targets: ["thoughts", "both"], states: ["any"], durationMin: 5, cognitiveLoad: 2, physicalDemand: 0, eyes: "open", audio: "no", why: "Prepare a manageable next move, use support during the situation, and reflect on what actually happened. The time estimate covers preparation; the event and return are at your pace.", experienceTier: "flagship", steps: [] },
   eftTapping: { ...DEFAULTS, ...tappingRegistration },
   ...Object.fromEntries(Object.entries(CARE_PRACTICES).map(([id, config]) => [id, { ...DEFAULTS, id, name: config.title, category: "cognitive", type: "cognitive", mechanism: { selfCompassion: "self-compassion", unhook: "cognitive-defusion", makeRoom: "emotional-acceptance" }[id], directions: [config.goal], targets: ["thoughts", "both"], states: ["any"], durationMin: 3, cognitiveLoad: 2, physicalDemand: 0, eyes: "open", audio: "no", energy: "steady", why: config.intro, experienceTier: "flagship", steps: [] }])),
   thenWhat: newIntervention({

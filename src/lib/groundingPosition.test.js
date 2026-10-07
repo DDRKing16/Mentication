@@ -29,3 +29,9 @@ describe('coarse grounding return in the existing reset entry',()=>{
     expect(resetNavigationEntry(entry,{direction:'ground'},'guiding',{id:'new'}).reset_grounding).toBeUndefined();
   });
 });
+
+
+it('retains a separate optional feedback screen without turning old feedback into an answer',()=>{
+  expect(groundingPosition({...value,feedbackStep:'helpfulness',helpfulness:null},'same')).toMatchObject({feedbackStep:'helpfulness',helpfulness:null});
+  expect(groundingPosition({...value,feedbackStep:'PRIVATE'},'same').feedbackStep).toBeUndefined();
+});

@@ -23,3 +23,10 @@
 .happy-bump-contract dd{margin:.1rem 0 0;color:var(--bump-ink);font-size:1rem;line-height:1.5;overflow-wrap:anywhere}
 
 .happy-bump-draft-note{max-width:31rem;margin:.7rem auto 0;color:var(--bump-muted);font-size:.8rem;line-height:1.5}
+
+/* Question-led screens: one decision, full-width answers, one primary action. */
+.happy-bump-copy h1{font-size:clamp(2rem,8vw,2.8rem);line-height:1.12;font-weight:600}
+.happy-bump-task-list .happy-bump-option{width:100%;min-height:52px;justify-content:space-between;text-align:left;font-size:1rem}
+.happy-bump-text-choice input{font-size:1rem;min-height:48px}
+.happy-bump-copy .happy-bump-task-list{display:grid;grid-template-columns:1fr;gap:.65rem}
+.happy-bump-copy .happy-bump-draft-note{font-size:.8rem;line-height:1.5}

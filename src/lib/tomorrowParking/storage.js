@@ -259,7 +259,7 @@ export function readDraft(now = new Date()) {
       s.removeItem(DRAFT_KEY);
       return null;
     }
-    return { text: parsed.text, updatedAt: parsed.updatedAt, ...(typeof parsed.recordId === "string" ? { recordId: parsed.recordId } : {}), ...(parsed.step==='seal'?{step:'seal'}:{}), ...(parsed.canWait===true?{canWait:true}:{}) };
+    return { text: parsed.text, updatedAt: parsed.updatedAt, ...(typeof parsed.recordId === "string" ? { recordId: parsed.recordId } : {}), ...(['suitability','capture','baseline','seal'].includes(parsed.step)?{step:parsed.step}:{}), ...(parsed.canWait===true?{canWait:true}:{}) };
   } catch {
     return null;
   }
@@ -272,7 +272,7 @@ export function writeDraft(text, recordId, now = new Date(), position = {}) {
     try { removeVerified(s,DRAFT_KEY); return true; } catch { return false; }
   }
   try {
-    writeVerified(s,DRAFT_KEY, JSON.stringify({ text, updatedAt: now.toISOString(), ...(recordId ? { recordId } : {}), ...(position.step==='seal'?{step:'seal'}:{}), ...(position.canWait===true?{canWait:true}:{}) }));
+    writeVerified(s,DRAFT_KEY, JSON.stringify({ text, updatedAt: now.toISOString(), ...(recordId ? { recordId } : {}), ...(['suitability','capture','baseline','seal'].includes(position.step)?{step:position.step}:{}), ...(position.canWait===true?{canWait:true}:{}) }));
   } catch {
     return false;
   }
@@ -280,17 +280,17 @@ export function writeDraft(text, recordId, now = new Date(), position = {}) {
 }
 
 /** The same session slot can hold a coarse return to a verified saved note. No words are duplicated. */
-export function writeParkingReturn(recordId, step, now = new Date()) {
+export function writeParkingReturn(recordId, step, now = new Date(), position = {}) {
   const s=sessionStore();
-  if(!s || typeof recordId!=='string' || !['parked','quiet'].includes(step)) return false;
-  try {writeVerified(s,DRAFT_KEY,JSON.stringify({kind:'parked-return',recordId,step,updatedAt:now.toISOString()}));return true;}catch{return false;}
+  if(!s || typeof recordId!=='string' || !['parked','quiet','feedback'].includes(step)) return false;
+  try {writeVerified(s,DRAFT_KEY,JSON.stringify({kind:'parked-return',recordId,step,updatedAt:now.toISOString(),...(['helpful','same','worse','unsure'].includes(position.helpfulness)?{helpfulness:position.helpfulness}:{})}));return true;}catch{return false;}
 }
 export function readParkingReturn(now = new Date()) {
   const s=sessionStore();if(!s)return null;
   let value;try{value=JSON.parse(s.getItem(DRAFT_KEY)||'null');}catch{return null;}
-  if(!value || value.kind!=='parked-return' || !['parked','quiet'].includes(value.step) || typeof value.recordId!=='string' || !isIso(value.updatedAt) || now.getTime()-Date.parse(value.updatedAt)>DRAFT_TTL_HOURS*3_600_000)return null;
+  if(!value || value.kind!=='parked-return' || !['parked','quiet','feedback'].includes(value.step) || typeof value.recordId!=='string' || !isIso(value.updatedAt) || now.getTime()-Date.parse(value.updatedAt)>DRAFT_TTL_HOURS*3_600_000)return null;
   const record=getRecord(value.recordId,now);
-  return record?{step:value.step,record}:null;
+  return record?{step:value.step,record,...(["helpful","same","worse","unsure"].includes(value.helpfulness)?{helpfulness:value.helpfulness}:{})}:null;
 }
 
 export function clearDraft() {

@@ -474,13 +474,15 @@ function Aa() {
   const [paused,setPaused] = w.useState(Boolean(saved && saved.e > 1));
   const [stopped,setStopped] = w.useState(false);
   const [easy,setEasy] = w.useState(saved?.easy || false);
+  const [reflectionAnswers,setReflectionAnswers] = w.useState(saved?.reflectionAnswers || {});
+  const alignmentPlace = w.useRef({align:saved?.align || 0,hold:saved?.hold || 0});
   const [helpfulness,setHelpfulness] = w.useState(saved?.helpfulness || null);
   const [skipped,setSkipped] = w.useState(saved?.skipped || []);
   const [exitReason,setExitReason] = w.useState(saved?.exitReason || "completed");
   const sent = w.useRef(false);
   const stageRef = w.useRef(saved?.e || 1);
   let [e, setStage] = w.useState(saved?.e || 1);
-  const n = (next) => { vectorClock.clear(); stageRef.current=next; ao(null); co(""); if(next!==2)qt(false); if(next===4)ju(false); setStage(next); };
+  const n = (next) => { if(stageRef.current===2)alignmentPlace.current={align:M,hold:ee}; vectorClock.clear(); stageRef.current=next; ao(null); co(""); if(next!==2)qt(false); if(next===4)ju(false); setStage(next); };
   const finish = () => {if(sent.current)return;sent.current=true;
     window.parent.postMessage({type:"vector-shift:complete",sessionId:vectorSession,helpfulness,
       exitReason,outcome:{skippedStages:skipped,easierMode:easy,gameplayOnly:true}},location.origin);
@@ -722,21 +724,21 @@ function Aa() {
   },[]);
   vectorClock.paused = paused || stopped;
   document.documentElement.classList.toggle("vs-paused", paused || stopped);
-  const progress = {e,easy,helpfulness,skipped,exitReason,np,jt,score:$e,be,en:[...en],Hn:[...Hn],nn,cp,xu,eo,direction:Sn.current,align:M,hold:ee};
+  const progress = {e,easy,helpfulness,skipped,exitReason,reflectionAnswers,np,jt,score:$e,be,en:[...en],Hn:[...Hn],nn,cp,xu,eo,direction:Sn.current,align:M,hold:ee};
   const progressRef = w.useRef(progress); progressRef.current=progress;
   w.useEffect(()=>{const save=()=>{setProgressSaved(saveVectorProgress(progressRef.current))};
     save();const timer=window.setInterval(save,500);window.addEventListener("pagehide",save);
     return()=>{save();window.clearInterval(timer);window.removeEventListener("pagehide",save)};
   },[]);
   const retryProgress=()=>setProgressSaved(saveVectorProgress(progressRef.current));
-  w.useEffect(()=>{document.querySelector(".vs-stage")?.focus();window.scrollTo(0,0)},[e]);
+  w.useEffect(()=>{document.querySelector(e===6?".vs-reflection-question":e===7?".vs-ending h2":".vs-current-instruction")?.focus({preventScroll:true});window.scrollTo(0,0)},[e,nn]);
 
   w.useEffect(() => {
     if (e !== 2) return;
     if (Ye) return;
     r(!0);
     let p = vectorClock.timeout(() => r(!1), 2600);
-    N.current = saved?.e===2 ? saved.align || 0 : 0, L.current = saved?.e===2 ? saved.hold || 0 : 0, T.current = 0, I.current = vectorClock.now(), y.current = {
+    N.current = alignmentPlace.current.align, L.current = alignmentPlace.current.hold, T.current = 0, I.current = vectorClock.now(), y.current = {
       x: 180,
       y: 180
     }, h.current = {
@@ -1270,11 +1272,11 @@ function Aa() {
         transition: "filter 0.7s ease"
       },
       children: [
-        s("section",{className:"vs-instructions",children:[
+        e!==6 && e!==7 && s("section",{className:"vs-instructions",children:[
           !progressSaved && s("p",{role:"alert",children:["This tab could not save your place. Your activity is still here; refresh may lose progress. ",s("button",{onClick:retryProgress,children:"Retry saving place"})]}),
-          s("p",{children:vectorInstructions[e]}),
+          e!==6 && e!==7 && s("h2",{className:"vs-current-instruction",tabIndex:-1,children:vectorInstructions[e]}),
           e===1 && s("p",{children:"Putting attention on colours, movement and simple choices may help you reconnect with what is around you. It may not change how you feel. These games do not measure your mood or nervous system."}),
-          e>=2 && e<=5 && s("button",{"aria-pressed":easy,onClick:()=>setEasy(v=>!v),children:easy?"Use original activity":"Try an easier option"}),
+          e>=2 && e<=5 && s("details",{className:"vs-activity-options",children:[s("summary",{children:"Activity options"}),s("button",{"aria-pressed":easy,onClick:()=>setEasy(v=>!v),children:easy?"Use original activity":"Try an easier option"})]}),
           easy && e===2 && s("button",{onClick:()=>n(3),children:"I noticed a colour or shape — continue"}),
           easy && e===3 && s("button",{onClick:()=>{Xa(v=>v+1);nc(np);if($e>=2)n(4)},children:`Collect a light at your pace (${$e}/3)`}),
           e===4 && s("button",{onClick:()=>{const letter=be.split("").find(v=>!en.has(v));if(letter)pp(letter)},children:"Reveal a letter"}),
@@ -2204,7 +2206,7 @@ function Aa() {
             className: "text-left px-8",
             style: {
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: 24,
+              fontSize: 30,
               fontWeight: 700,
               lineHeight: 1.25,
               color: "#1A1A1A",
@@ -2212,16 +2214,20 @@ function Aa() {
               paddingTop: 14,
               paddingBottom: 8
             },
+            tabIndex:-1,
+            className:"vs-reflection-question text-left px-8",
             children: Qu[nn].q
           }), s("div", {
             className: "flex flex-col gap-3.5 px-6 pb-6 pt-4",
             children: Qu[nn].a.map((p, v) => {
-              let k = fl === v,
+              let k = fl === v || (fl===null && reflectionAnswers[nn]===v),
                 C = fl !== null && fl !== v;
               return _("button", {
                 "aria-label": p,
+                "aria-pressed": k,
                 onClick: () => {
                   if (fl !== null) return;
+                  setReflectionAnswers(current=>({...current,[nn]:v}));
                   ao(v), co(Qu[nn].v[v]), o(900 + nn * 80, 0.36, 0);
                   try {
                     navigator.vibrate?.(22);
@@ -2319,49 +2325,22 @@ function Aa() {
                 fontFamily: "'Space Grotesk', sans-serif",
                 color: "#FFF8E7"
               },
-              children: "How was this for you?"
+              tabIndex:-1,children: "Did this practice help?"
             }), s("p", {
               className: "text-[13px] leading-[1.5] tracking-[0.08em] mt-2.5",
               style: {
                 fontFamily: "'JetBrains Mono', monospace",
                 color: "rgba(255,248,231,0.62)"
               },
-              children: "Game progress cannot tell us how you feel."
+              children: "Optional. Game progress cannot tell us how you feel."
             })]
           }), s("div", {
             className: "h-[1px] w-full",
             style: {
               background: "linear-gradient(90deg, transparent, rgba(255,248,231,0.14), transparent)"
             }
-          }), s("div", {
-            className: "flex flex-col gap-3.5",
-            children: ["You can stop here", "You can choose support", "No improvement is required"].map(p => _("div", {
-              className: "flex items-center gap-3 px-4 py-3.5 rounded-[14px]",
-              style: {
-                background: "rgba(255,248,231,0.06)",
-                border: "1px solid rgba(255,248,231,0.10)"
-              },
-              children: [s("div", {
-                className: "w-1.5 h-1.5 rounded-full bg-[#00FF88] shadow-[0_0_8px_#00FF88]"
-              }), s("span", {
-                className: "text-[14px]",
-                style: {
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 500,
-                  color: "#FFF8E7"
-                },
-                children: p
-              })]
-            }, p))
-          }), s("p", {
-            className: "text-[12px] leading-[1.6] italic px-1",
-            style: {
-              fontFamily: "'JetBrains Mono', monospace",
-              color: "rgba(255,248,231,0.48)"
-            },
-            children: "Next, you can answer the same check-in as at the start, or leave it unanswered."
           }), s("div", {className:"vs-feedback", children: [
-            s("fieldset", {children:[s("legend",{children:"Did this practice help? (optional)"}),
+            s("fieldset", {children:[s("legend",{className:"vs-sr-only",children:"Did this practice help? (optional)"}),
               ...[["helpful","Helpful"],["same","No change"],["worse","Felt worse"],["unsure","Not sure"]].map(([value,label])=>s("button",{type:"button","aria-pressed":helpfulness===value,onClick:()=>setHelpfulness(value),children:label},value))]}),
             s("p", {role:"status",children:helpfulness==="helpful"?"You said this was helpful.":helpfulness==="same"?"You reported no change. You do not need to keep trying this.":helpfulness==="worse"?"You reported feeling worse. You can stop and choose rest or support.":helpfulness==="unsure"?"You are not sure whether it helped. That is okay.":"No feedback selected. We will leave it unanswered."}),
             s("button",{onClick:finish,disabled:sent.current,children:"Continue to check-in"})
@@ -2371,7 +2350,7 @@ function Aa() {
     }), s("div", {className:"vs-controls", inert:paused||stopped?"":undefined, children:[
       e>1 && e<7 && s("button",{onClick:()=>setPaused(true),children:"Pause"}),
       e>1 && e<7 && s("button",{onClick:()=>{setSkipped(v=>[...new Set([...v,e])]);n(e+1)},children:"Skip step"}),
-      e>1 && e<7 && s("button",{onClick:()=>n(e-1),children:"Back"}),
+      e>1 && e<=7 && s("button",{onClick:()=>{if(e===6 && nn>0){vectorClock.clear();ao(null);co("");ba(v=>v-1)}else n(e-1)},children:"Back"}),
       e<7 && s("button",{onClick:()=>setStopped(true),children:"Stop"})
     ]}),
     (paused||stopped) && s("div",{className:"vs-overlay",role:"dialog","aria-modal":true,"aria-label":stopped?"Stop or resume":"Paused",onKeyDown:event=>{if(event.key==="Escape"){setPaused(false);setStopped(false)}if(event.key==="Tab"){const buttons=event.currentTarget.querySelectorAll("button");if(event.shiftKey&&document.activeElement===buttons[0]){event.preventDefault();buttons[buttons.length-1].focus()}else if(!event.shiftKey&&document.activeElement===buttons[buttons.length-1]){event.preventDefault();buttons[0].focus()}}},children:s("div",{className:"vs-dialog",children:[

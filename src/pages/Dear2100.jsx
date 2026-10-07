@@ -1,3 +1,4 @@
+import { useStandaloneScreenHistory } from "@/hooks/useStandaloneScreenHistory";
 import { pauseJourneyFrame } from '@/lib/journeyBridge';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 // @ts-check
@@ -9,6 +10,7 @@ export default function Dear2100() {
   const navigate = useNavigate();
   const frame = useRef(null);
   const [saving, setSaving] = useState(false);
+  const historyError = useStandaloneScreenHistory(frame,"dear2100");
   useEffect(() => {
     const receive = event => {
       if (event.origin !== window.location.origin || event.source !== frame.current?.contentWindow) return;
@@ -35,7 +37,7 @@ export default function Dear2100() {
           </button>
         </div>
         <iframe ref={frame} title="Dear 2100" src="/dear2100-updated/index.html" className="min-h-0 flex-1 w-full border-0" allow="autoplay" />
-        <div className="journey-frame-footer text-[#112b50]"><JourneyOptions id="dear2100" onOpen={() => pauseJourneyFrame(frame.current)} /></div>
+        <div className="journey-frame-footer text-[#112b50]">{historyError && <p role="alert">{historyError}</p>}<JourneyOptions id="dear2100" onOpen={() => pauseJourneyFrame(frame.current)} /></div>
       </div>
     </PlusGate>
   );

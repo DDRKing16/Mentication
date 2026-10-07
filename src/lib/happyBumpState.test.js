@@ -75,3 +75,15 @@ describe('explicit helpfulness learning alongside separate mood evidence', () =>
     expect(withLiftCheckin(session('unsure'),7,5).attempts[0].response).toBe('better');
   });
 });
+
+describe('Happy Bump sequential planner restoration', () => {
+  it('keeps valid new screen choices and measured ratings', () => {
+    const initial={nextActivity:'',scene:'arrival'};
+    const saved={version:2,scene:'reward',nextMode:'productive',nextActivity:'Open my notes',pairing:'Coffee',baseline:0};
+    expect(restoreBumpState(initial,saved)).toMatchObject(saved);
+  });
+  it('returns to the activity when an unsaved draft was lost on refresh', () => {
+    expect(restoreBumpState({nextActivity:''},{version:2,scene:'reward',nextMode:'productive'}).scene).toBe('nextPlan');
+    expect(restoreBumpState({nextActivity:'Tea'},{version:2,scene:'comfortIdea',nextMode:'relaxing'}).scene).toBe('comfortSense');
+  });
+});

@@ -8,8 +8,8 @@ let sharedPreferences={},localSound=true;
 try{sharedPreferences=JSON.parse(localStorage.getItem('haven.a11y.v2')||'{}')||{};localSound=localStorage.getItem('mentication.foundations.sound.v1')!=='off'}catch(e){}
 reducedMotion.matches=typeof sharedPreferences.reducedMotion==='boolean'?sharedPreferences.reducedMotion:motionQuery.matches;
 function reveal(element,frames,options){if(!reducedMotion.matches&&element.animate)element.animate(frames,options)}
-const order=['intro','scan','snapshot','choices','dose','plan','saved','review','learned','finish'];
-const flowLabels={intro:'Foundations',scan:'Check-in',snapshot:'Your picture',choices:'Choose an action',dose:'Choose a size',plan:'Your plan',saved:'Plan saved',review:'Review',learned:'Next choice',finish:'For now'};
+const order=['intro','scan','snapshot','choices','dose','plan','cue','time','saved','review','review-effort','review-help','learned','finish'];
+const flowLabels={intro:'Foundations',scan:'Check-in',snapshot:'Your picture',choices:'Choose an action',dose:'Choose a size',plan:'Your plan',cue:'Optional cue',time:'Optional time', 'review-effort':'Review · manageable', 'review-help':'Review · helpful',saved:'Plan saved',review:'Review',learned:'Next choice',finish:'For now'};
 const stageLabels={scan:'Check-in',snapshot:'Picture',plan:'Plan',review:'Review'};
 flowNav.innerHTML=Object.entries(stageLabels).map(([name,label])=>`<button class="flow-stop" type="button" data-screen-target="${name}"><span aria-hidden="true" class="stage-dot"></span>${label}<span class="stage-state"></span></button>`).join('');
 const flowStops=$$('.flow-stop',flowNav);
@@ -60,14 +60,16 @@ function canEnter(name){
  if(name==='snapshot')return answeredCount()>0;
  if(name==='choices')return !!state.priority;
  if(name==='dose')return state.selected!==null&&!!state.priority;
- if(name==='plan')return canEnter('dose')&&!!state.dose;
+ if(['plan','cue','time'].includes(name))return canEnter('dose')&&!!state.dose;
  if(name==='saved')return samePlan(savedPlan);
  if(name==='review'||name==='finish')return !!savedPlan;
+ if(name==='review-effort')return !!savedPlan&&state.review.tried>1;
+ if(name==='review-help')return !!savedPlan&&state.review.tried>1&&!!state.review.effort;
  if(name==='learned')return !!savedPlan&&state.planId===savedPlan.id&&state.planRevision===savedPlan.revision&&store.completeReview(state.review);
  return name==='intro'||name==='scan';
 }
 function safeScreen(name){
- const fallback={snapshot:'scan',choices:'snapshot',dose:'choices',plan:'dose',saved:'plan',review:'plan',learned:'review',finish:'plan'};
+ const fallback={snapshot:'scan',choices:'snapshot',dose:'choices',plan:'dose',saved:'plan',review:'plan',cue:'plan',time:'cue','review-effort':'review','review-help':'review-effort',learned:'review',finish:'plan'};
  for(let i=0;i<order.length&&!canEnter(name);i++)name=fallback[name]||'intro';
  return name;
 }
@@ -85,8 +87,16 @@ function renderCheckpoint(celebrate=false){
  if(celebrate&&!reducedMotion.matches){void checkpoint.offsetWidth;checkpoint.classList.add('checkpoint-earned')}
 }
 function currentName(){return screens.find(s=>s.classList.contains('active')).dataset.screen}
+const embeddedHistory=window.parent!==window;
+let historyBridgeStarted=false,hostHistoryDepth=0;
+function rememberScreen(push=false){
+ const screen={name:currentName(),q:Math.max(0,Math.min(scanItems.length-1,state.q))};
+ if(embeddedHistory){if(push)hostHistoryDepth++;window.parent.postMessage({type:'mentication:screen',journeyId:'foundations',mode:historyBridgeStarted?(push?'push':'replace'):'init',screen:{id:screen.name,cursors:{q:screen.q}}},window.location.origin);historyBridgeStarted=true;return}
+ const data={...window.history.state,foundations:screen};if(push)window.history.pushState(data,'');else window.history.replaceState(data,'');
+}
+
 function updateFlowNav(name){
- const stage=['choices','dose','plan','saved','finish'].includes(name)?'plan':name==='learned'?'review':name;
+ const stage=['choices','dose','plan','cue','time','saved','finish'].includes(name)?'plan':['learned','review-effort','review-help'].includes(name)?'review':name;
  const completed={scan:answeredCount()===scanItems.length,snapshot:!!state.priority,plan:samePlan(savedPlan),review:!!savedPlan?.reviews.some(review=>review.plan.domain===savedPlan.domain&&review.plan.action===savedPlan.action&&review.plan.size===savedPlan.size&&review.plan.cue===savedPlan.cue&&review.plan.time===savedPlan.time)};
  flowStops.forEach(stop=>{const target=stop.dataset.screenTarget;stop.disabled=!canEnter(target);stop.classList.toggle('current',target===stage);stop.classList.toggle('passed',completed[target]);$('.stage-state',stop).textContent=completed[target]?' ✓':'';stop.setAttribute('aria-label',stageLabels[target]+(completed[target]?', completed':'')+(stop.disabled?', not available yet':''));if(target===stage)stop.setAttribute('aria-current','step');else stop.removeAttribute('aria-current')});
 }
@@ -100,13 +110,13 @@ function show(name,push=true){
  screens.forEach(s=>{const active=s.dataset.screen===name;s.classList.toggle('active',active);s.inert=!active;s.setAttribute('aria-hidden',String(!active))});
  app.classList.toggle('scan-active',name==='scan');
  if(name==='scan'&&from!=='scan'&&!scanScreen.classList.contains('question-enter'))animateQuestionEntry(false);
- if(push&&from&&from!==name)state.history.push(from);
+ if(push&&from&&from!==name){state.history.push(from);rememberScreen(true)}else rememberScreen();
  back.hidden=name==='intro';
  step.textContent=name==='scan'?`Question ${state.q+1} of ${scanItems.length}`:flowLabels[name];
  progress.style.width=answeredCount()/scanItems.length*100+'%';
  progress.parentElement.setAttribute('aria-valuenow',String(answeredCount()));$('#progressLabel').textContent=`Check-in: ${answeredCount()} of ${scanItems.length} answers confirmed`;
  progress.parentElement.setAttribute('aria-valuetext',`${answeredCount()} of ${scanItems.length} answers confirmed. This tracks the check-in, not wellbeing.`);
- if(name==='snapshot')renderSnapshot();if(name==='choices')renderChoices();if(name==='dose')renderDoses();if(name==='plan')renderPlan();if(name==='saved')renderSaved();if(name==='review')renderReview();if(name==='learned')renderLearning();
+ if(name==='snapshot')renderSnapshot();if(name==='choices')renderChoices();if(name==='dose')renderDoses();if(['plan','cue','time'].includes(name))renderPlan();if(name==='saved')renderSaved();if(['review','review-effort','review-help'].includes(name))renderReview();if(name==='learned')renderLearning();
  updateFlowNav(name);
  if(name==='intro')scheduleFoundationIdle(1800);else{pauseFoundationIdle();clearFoundationImpact();resetFoundationParallax()}
  const active=$('.screen.active');active.scrollTop=0;
@@ -115,7 +125,7 @@ function show(name,push=true){
 }
 function navigateFlow(target){if(target===currentName())return;if(target==='review'){openReview();return}if(target==='scan')state.q=Math.max(0,Math.min(state.q,scanItems.length-1));calculateDomainScores();show(target)}
 flowStops.forEach(stop=>stop.onclick=()=>navigateFlow(stop.dataset.screenTarget));
-back.onclick=()=>{if(currentName()==='scan'&&state.q>0){state.q--;state.pendingResponse=null;renderQuestion();show('scan',false);return}const prev=state.history.pop()||'intro';show(prev,false)};
+back.onclick=()=>{if(embeddedHistory&&hostHistoryDepth>0){window.parent.postMessage({type:'mentication:screen-back',journeyId:'foundations'},window.location.origin);return}if(currentName()==='scan'&&state.q>0){state.q--;state.pendingResponse=null;renderQuestion();show('scan',false);return}const prev=state.history.pop()||'intro';show(prev,false)};
 $$('[data-next]').forEach(b=>b.onclick=()=>{if(b.dataset.next==='review'){openReview();return}if(b.closest('.screen[data-screen="intro"]'))beginFoundationEntry();else show(b.dataset.next)});
 function exitFoundations(){persistDraft();if(window.parent!==window)window.parent.postMessage({type:'foundations:exit'},window.location.origin);else window.location.assign('/restructure')}
 $('#exit').onclick=exitFoundations;$('#finishExit').onclick=exitFoundations;
@@ -162,11 +172,11 @@ function updateRange(value,save=true){
   range.value=v;answer.textContent=labels[v];answer.dataset.selected='true';dots.forEach((x,i)=>{const selected=i===v;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected));x.setAttribute('aria-label',scaleAria[i])});responseScale.style.setProperty('--scale-fill',fill[v]+'%');responseScale.style.setProperty('--response-position',positions[v]+'%');
   const plinth=balance.querySelector('.plinth'),orb=balance.querySelector('.orb');plinth.style.setProperty('--tilt',tilts[v]);orb.style.setProperty('--orb-left',orbPositions[v]);balance.style.setProperty('--reaction-angle',(reaction*1.6)+'deg');balance.style.setProperty('--reaction-return-angle',(reaction*-.55)+'deg');balance.style.setProperty('--reaction-rebound-angle',(reaction*.24)+'deg');balance.style.setProperty('--reaction-x',(reaction*3.5)+'px');balance.style.setProperty('--reaction-return-x',(reaction*-.9)+'px');balance.style.setProperty('--orb-kick-x',(reaction*5)+'px');balance.style.setProperty('--orb-return-x',(reaction*-1.5)+'px');balance.style.setProperty('--orb-rebound-x',(reaction*.6)+'px');
   window.clearTimeout(balanceResponseTimer);balance.classList.remove('settling','responding');scanScreen.classList.remove('response-set');void balance.offsetWidth;balance.classList.add('settling','responding');scanScreen.classList.add('response-set');balanceResponseTimer=window.setTimeout(()=>balance.classList.remove('settling','responding'),820);qContinue.disabled=false;
-  selectedResponse=v;responseScale.querySelector('.scale-dots').classList.add('is-confirming');dots.forEach((point,index)=>point.classList.toggle('confirming',index===v));dots[v].setAttribute('aria-label',scaleAria[v]+'. Selected. Activate again to continue');state.pendingResponse=v;if(save)persistDraft()
+  selectedResponse=v;responseScale.querySelector('.scale-dots').classList.add('is-confirming');dots.forEach((point,index)=>point.classList.toggle('confirming',index===v));dots[v].setAttribute('aria-label',scaleAria[v]+'. Selected');state.pendingResponse=v;if(save)persistDraft()
 }
-range.oninput=()=>updateRange();dots.forEach(point=>point.onclick=()=>{const value=+point.dataset.value;if(selectedResponse===value){advanceQuestion();return}updateRange(value)});
+range.oninput=()=>updateRange();dots.forEach(point=>point.onclick=()=>updateRange(+point.dataset.value));
 function calculateDomainScores(){domains.forEach(d=>{const values=d.questions.map((_,i)=>state.responses[d.id+'-'+i]).filter(Number.isFinite);state.answers[d.id]=values.length?values.reduce((a,b)=>a+b,0)/values.length:null})}
-function advanceQuestion(){if(selectedResponse===null)return;const item=scanItems[state.q];if(!item)return;const value=+range.value+1,previous=state.responses[item.id];if(previous!==value){state.priority=null;state.selected=null;state.selectionDomain=null;state.dose=null}state.responses[item.id]=value;state.pendingResponse=null;checkpointId=item.id;checkpointRevised=Number.isFinite(previous);renderCheckpoint(previous!==value);state.q++;if(state.q<scanItems.length){renderQuestion();show('scan',false)}else{calculateDomainScores();show('snapshot')}}
+function advanceQuestion(){if(selectedResponse===null)return;const item=scanItems[state.q];if(!item)return;const value=+range.value+1,previous=state.responses[item.id];if(previous!==value){state.priority=null;state.selected=null;state.selectionDomain=null;state.dose=null}state.responses[item.id]=value;state.pendingResponse=null;checkpointId=item.id;checkpointRevised=Number.isFinite(previous);renderCheckpoint(previous!==value);state.q++;if(state.q<scanItems.length){rememberScreen(true);renderQuestion();show('scan',false)}else{calculateDomainScores();show('snapshot')}}
 qContinue.onclick=advanceQuestion;
 function status(v){return Number.isFinite(v)?v+' / 5':'Not answered'}
 function lowestDomains(){const rated=domains.filter(d=>d.questions.every((_,i)=>Number.isFinite(state.responses[d.id+'-'+i])));const lowest=Math.min(...rated.map(d=>state.answers[d.id]));return rated.filter(d=>state.answers[d.id]===lowest)}
@@ -361,8 +371,8 @@ $('#reviewPlan').onclick=openReview;$('#resumeReview').onclick=openReview;
 const reviewLabels={tried:['Not yet','A little','Partly','Mostly','As planned'],effort:['Too much','Difficult','Manageable','Comfortable','Easy to repeat'],help:['Not helpful','A little','Somewhat','Helpful','Very helpful']};
 function renderReview(){
  if(savedPlan)$('#reviewPlanSummary').textContent=actionTitle(savedPlan)+' · '+savedPlan.size+' version';
- $$('.review-scale').forEach(w=>{const key=w.dataset.review;w.innerHTML=reviewLabels[key].map((label,i)=>`<button type="button" data-n="${i+1}" aria-label="${i+1}: ${label}" aria-pressed="${state.review[key]===i+1}" class="${state.review[key]===i+1?'selected':''}">${i+1}<span>${label}</span></button>`).join('');$$('button',w).forEach(b=>b.onclick=()=>{state.review[key]=+b.dataset.n;if(key==='tried'&&state.review.tried===1){delete state.review.effort;delete state.review.help}renderReview();persistDraft();$(`button[data-n="${b.dataset.n}"]`,w).focus({preventScroll:true});if(state.review.tried&&state.review.effort){reveal($('#reviewCheckpoint'),[{opacity:.5,transform:'scale(.98)'},{opacity:1,transform:'none'}],{duration:350});if(key==='effort')$('#reviewCheckpoint').scrollIntoView({block:'nearest',behavior:'instant'})}})});
- const r=state.review,notYet=r.tried===1;$$('[data-review-followup]').forEach(e=>e.hidden=notYet);$('#reviewNotYet').hidden=!notYet;$('#reviewContinue').disabled=!store.completeReview(r);
+ $$('.review-scale').forEach(w=>{const key=w.dataset.review;w.innerHTML=reviewLabels[key].map((label,i)=>`<button type="button" data-n="${i+1}" aria-label="${i+1}: ${label}" aria-pressed="${state.review[key]===i+1}" class="${state.review[key]===i+1?'selected':''}">${i+1}<span>${label}</span></button>`).join('');$$('button',w).forEach(b=>b.onclick=()=>{state.review[key]=+b.dataset.n;if(key==='tried'&&state.review.tried===1){delete state.review.effort;delete state.review.help}renderReview();persistDraft();$(`button[data-n="${b.dataset.n}"]`,w).focus({preventScroll:true});if(state.review.tried&&state.review.effort){reveal($('#reviewCheckpoint'),[{opacity:.5,transform:'scale(.98)'},{opacity:1,transform:'none'}],{duration:350});}})});
+ const r=state.review,notYet=r.tried===1;$('#reviewNotYet').hidden=!notYet;$('#reviewContinue').disabled=!r.tried;$('#effortContinue').disabled=!r.effort;$('#helpContinue').disabled=!store.completeReview(r);
  $('#reviewCheckpoint').textContent=notYet?'':r.tried&&r.effort?`Two pieces connected: you tried it “${reviewLabels.tried[r.tried-1].toLowerCase()}” and found it “${reviewLabels.effort[r.effort-1].toLowerCase()}”. `+(r.help?'Next: choose what to keep or change.':'Next: was it useful?'):'';
 }
 function renderLearning(){
@@ -376,7 +386,9 @@ function renderLearning(){
  $('#learnedTitle').textContent=title;$('#learnedCopy').textContent=copy+' Choose below to save this review.';
  $('#applyTiny').hidden=tiny;$('#reviewSaveError').hidden=true;
 }
-$('#reviewContinue').onclick=()=>{if(store.completeReview(state.review))show('learned')};
+$('#reviewContinue').onclick=()=>{if(state.review.tried)show(state.review.tried===1?'learned':'review-effort')};
+$('#effortContinue').onclick=()=>{if(state.review.effort)show('review-help')};
+$('#helpContinue').onclick=()=>{if(store.completeReview(state.review))show('learned')};
 function saveReview(decision){
  if(currentName()!=='learned'||!savedPlan||state.planId!==savedPlan.id||state.planRevision!==savedPlan.revision||!store.completeReview(state.review))return;
  if(!state.reviewId)state.reviewId=uniqueId();
@@ -411,11 +423,20 @@ window.addEventListener('storage',e=>{
 });
 motionQuery.addEventListener('change',()=>applyPreferences());
 window.addEventListener('pagehide',persistDraft);
+window.addEventListener('message',event=>{
+ if(event.origin!==window.location.origin||event.source!==window.parent||(event.data?.type!=='mentication:restore-screen'||event.data?.journeyId!=='foundations'))return;
+ const screen=event.data.screen,target={name:screen?.id,q:screen?.cursors?.q,depth:screen?.depth};if(!order.includes(target.name))return;
+ hostHistoryDepth=Number.isSafeInteger(target.depth)&&target.depth>=0?target.depth:0;
+ state.q=Math.max(0,Math.min(scanItems.length-1,Number.isInteger(target.q)?target.q:state.q));state.pendingResponse=null;
+ if(target.name==='scan')renderQuestion();show(target.name,false);
+});
+
+window.addEventListener('popstate',event=>{const target=event.state?.foundations;if(embeddedHistory||!target)return;state.q=Math.max(0,Math.min(scanItems.length-1,target.q));state.pendingResponse=null;if(target.name==='scan')renderQuestion();show(target.name,false)});
 const loadedDraft=store.readDraft();refreshSavedPlan();
 let start='intro';
 if(loadedDraft.value){state=loadedDraft.value.state;checkpointId=loadedDraft.value.checkpointId;checkpointRevised=loadedDraft.value.checkpointRevised;calculateDomainScores();if(state.priority&&state.selected!==null&&state.dose)state.dose=doseOptions().find(d=>d.id===state.dose.id);start=loadedDraft.value.screen}
 else if(savedPlan){hydratePlan(savedPlan);start='plan'}
-const staleReview=['review','learned'].includes(start)&&savedPlan&&(state.planId!==savedPlan.id||state.planRevision!==savedPlan.revision);if(staleReview)start='plan';
+const staleReview=['review','review-effort','review-help','learned'].includes(start)&&savedPlan&&(state.planId!==savedPlan.id||state.planRevision!==savedPlan.revision);if(staleReview)start='plan';
 applyPreferences();renderReview();renderQuestion();renderCheckpoint();
 if(reducedMotion.matches)introScreen.classList.add('intro-settled');
 else window.setTimeout(()=>{introScreen.classList.add('intro-settled');if(currentName()==='intro'){playHomeEnergyTransfer();scheduleFoundationIdle(2600)}},2700);

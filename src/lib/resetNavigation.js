@@ -1,3 +1,4 @@
+import { boxPosition } from "./boxPosition.js";
 import { groundingPosition } from "./groundingPosition.js";
 import { resetCompletionSnapshot } from './resetCompletion.js';
 import { captureGoalBaseline, hasGoalBaseline } from './goalAssessment.js';
@@ -20,13 +21,16 @@ export function resetNavigationEntry(entry, answers, phase, session = {}) {
     unsure: Boolean(entry?.unsure),
     reset_phase: completion ? 'goalReassessment' : ['questions', 'pathway', 'guiding'].includes(phase) ? phase : 'guiding',
     ...(completion ? { reset_completion:completion } : {}),
+    ...(phase === "questions" ? {reset_question:["goal","distress","time"].includes(entry?.reset_question) ? entry.reset_question : "goal"} : {}),
     reset_session_id: session.id || entry?.reset_session_id,
     reset_started_at: session.startedAt || entry?.reset_started_at,
+    ...(phase==='guiding' && entry?.pathway?.length===1 && entry.pathway[0]==='boxV2' && boxPosition(entry?.reset_box,session.id || entry?.reset_session_id) ? {reset_box:boxPosition(entry.reset_box,session.id || entry.reset_session_id)} : {}),
     ...(phase==='guiding' && entry?.pathway?.length===1 && entry.pathway[0]==='grounding54321V2' && groundingPosition(entry?.reset_grounding,session.id || entry?.reset_session_id) ? {reset_grounding:groundingPosition(entry.reset_grounding,session.id || entry.reset_session_id)} : {}),
   };
 }
 export function freshResetEntry(entry, answers) {
   const fresh = resetNavigationEntry(entry, { ...answers, intensity:null, distress:null, goal_baseline:null }, 'questions');
+  fresh.reset_question = "goal";
   delete fresh.reset_session_id;
   delete fresh.reset_started_at;
   return fresh;
@@ -42,5 +46,5 @@ export function appendResetFlowSnapshot(stack, index, snapshot) {
 export function resetFlowHistorySnapshot(stack, index, entry) {
   if (stack[index]) return stack[index];
   if (entry?.reset_phase === 'goalReassessment' && resetCompletionSnapshot(entry.reset_completion, entry.pathway?.[0])) return {phase:'goalReassessment',unsureStep:0};
-  return ['questions','pathway','guiding'].includes(entry?.reset_phase) ? {phase:entry.reset_phase,unsureStep:0} : null;
+  return ['questions','pathway','guiding'].includes(entry?.reset_phase) ? {phase:entry.reset_phase,unsureStep:0,...(entry.reset_phase==="questions" ? {questionStep:["goal","distress","time"].includes(entry.reset_question)?entry.reset_question:"goal"} : {})} : null;
 }

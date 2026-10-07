@@ -141,7 +141,7 @@ describe("Urge Surfing session", () => {
     const anchored = reduceUrgeSession(complete, { type: "NAVIGATE", route: "urge.anchor" });
     expect(anchored.currentRoute).toBe("urge.anchor");
     expect(reduceUrgeSession(anchored, { type: "NAVIGATE_BACK" })).toMatchObject({
-      currentRoute: "urge.body", bodyRegionKey: "chest", sensationKeys: ["tight"],
+      currentRoute: "urge.sensation", bodyRegionKey: "chest", sensationKeys: ["tight"],
     });
   });
 

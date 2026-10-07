@@ -17,3 +17,28 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .threat-understanding-check input { flex: none; margin-top: .25rem; width: 1.1rem; height: 1.1rem; accent-color: #f7f1e6; }
 .threat-understanding-check button { margin: .5rem .75rem .5rem 0; }
 .threat-check-feedback { margin: .5rem 0; font-size: .95rem; line-height: 1.5; }
+/* One independent question at a time, retaining the supplied art and typography. */
+.sequential-question { width:100%; min-width:0; padding-top:1rem; }
+.sequential-question h1 { font-size:clamp(2rem,6vw,3.5rem); line-height:1.12; margin:.75rem 0 1.25rem; }
+.sequential-question .primary-button { display:flex; width:100%; min-height:52px; margin-top:1.5rem; justify-content:center; }
+.sequential-question .text-button { min-height:44px; }
+.sequential-question .foldout button { display:block; width:100%; text-align:left; }
+.sequential-question .radio-options { display:grid; grid-template-columns:1fr; }
+.sequential-question .radio-option { min-height:52px; padding:1rem; }
+.sequential-question input:not([type=radio]),.sequential-question textarea { max-width:100%; font-size:16px; }
+.threat-screen:has(.threat-understanding-check) .experience-content { padding-bottom:2rem; }
+.threat-understanding-check { margin-top:0; border-top:0; color:#f7f1e6; }
+.threat-understanding-check label { padding:.8rem; border:1px solid #f7f1e655; border-radius:12px; margin-bottom:.6rem; }
+.threat-understanding-check .text-button { color:inherit; }
+.sr-only { position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+@media(max-width:480px) { .sequential-question .guided-answer { margin-top:0; } .sequential-question .lede {font-size:1rem;} .sequential-question .question-kicker{font-size:.75rem;} }
+/* Local question actions replace the stage action while a subquestion is open. */
+.experience-content:has(.sequential-question) > .flow-actions { display:none; }
+.sequential-question .guided-answer > .field-label { position:absolute; width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0); }
+.sequential-question .answer-location {display:none;}
+.sequential-question .answer-suggestion-disclosure { margin-top:.75rem; font-size:.9rem; }
+.sequential-question .answer-suggestion-disclosure summary {min-height:44px;cursor:pointer;padding:.5rem 0;}
+@media(max-width:680px) { .experience-content:has(.sequential-question) > .flow-stage-rail {display:none;} }
+@media(max-width:680px) { .flow-experience:has(.sequential-question) > .chapter-rail {display:none;} }
+.urge-surf-plan > .primary-button {width:100%;margin-top:1rem;}
+.urge-wave-stage.is-complete .urge-wave-play {background:transparent;box-shadow:none;border-color:currentColor;}

@@ -32,12 +32,14 @@ export default function BoxBreathingV2Pacer({
   onComplete,
   onInterrupted,
   rounds = DEFAULT_ROUNDS,
+  initialElapsed = 0,
+  onPosition,
 }) {
   const a11y = useAccessibilityPrefs();
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [status, setStatus] = useState({ seconds: 4, round: 1, remainingRounds: rounds });
   const clockRef = useRef(null);
-  if (!clockRef.current) clockRef.current = createBoxBreathingClock(rounds);
+  if (!clockRef.current) clockRef.current = createBoxBreathingClock(rounds,initialElapsed);
   const [rewardPulse, setRewardPulse] = useState(0);
   const phaseTone =
     phaseIndex === 0
@@ -55,7 +57,10 @@ export default function BoxBreathingV2Pacer({
   const tracerSvgRef = useRef(null);
   const playerRootRef = useRef(null);
   const LRef = useRef(0);
-  const elapsedRef = useRef(0);
+  const elapsedRef = useRef(initialElapsed);
+  const positionRef = useRef(onPosition);
+  positionRef.current = onPosition;
+  const savedSecond = useRef(-1);
   const lastIndexRef = useRef(-1);
   const completedRoundRef = useRef(0);
   const doneRef = useRef(false);
@@ -118,6 +123,7 @@ export default function BoxBreathingV2Pacer({
       if (frame.interruption) interruptedRef.current?.();
       if (!doneRef.current && !frame.interruption && !document.hidden) {
         elapsedRef.current = frame.elapsed;
+        if (savedSecond.current !== Math.floor(frame.elapsed / 1000)) {savedSecond.current=Math.floor(frame.elapsed / 1000);positionRef.current?.(frame.elapsed);}
         const index = frame.phase;
         const progress = frame.progress;
         setStatus((previous) => previous.seconds === frame.seconds && previous.round === frame.round

@@ -23,7 +23,7 @@ try{
   await p.keyboard.press('Shift+Tab');assert.equal(await p.locator(':focus').textContent(),'Finish here');
   await snapshot(p,'phone-paused');await p.reload();await p.getByRole('dialog',{name:'Paused'}).waitFor();await p.getByRole('button',{name:'Resume',exact:true}).click();await snapshot(p,'phone-align');
   record('Align keyboard, pause freezes clock, focus stays in dialog, refresh resumes paused');
-  await p.getByRole('button',{name:'Try an easier option'}).click();await p.getByRole('button',{name:/I noticed a colour/}).click();
+  await p.getByText('Activity options',{exact:true}).click();await p.getByRole('button',{name:'Try an easier option'}).click();await p.getByRole('button',{name:/I noticed a colour/}).click();
   await waitHeading(p,'Serpent');await snapshot(p,'phone-serpent-easy');
   for(let n=0;n<3;n++)await p.getByRole('button',{name:/Collect a light/}).click();
   await waitHeading(p,'Word match');await p.getByRole('button',{name:'Reveal a letter',exact:true}).click();

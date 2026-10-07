@@ -9,7 +9,10 @@ export const URGE_SURF_DEFAULTS = Object.freeze({
 
 const previousRoute = Object.freeze({
   "urge.voice": "urge.name",
-  "urge.body": "urge.name",
+  "urge.rating": "urge.name",
+  "urge.body": "urge.rating",
+  "urge.sensation": "urge.body",
+  "urge.duration": "urge.anchor",
   "urge.anchor": "urge.body",
   "urge.postRating": "urge.timer",
   "urge.complete": "urge.postRating",
@@ -57,6 +60,10 @@ const canStartTimer = (state) => Boolean(
   && hasObservation(state)
 );
 const canNavigateTo = (state, route) => {
+  if (state.currentRoute === "urge.rating" && route === "urge.body") return true;
+  if (state.currentRoute === "urge.body" && route === "urge.sensation") return Boolean(state.bodyRegionKey);
+  if (state.currentRoute === "urge.sensation" && route === "urge.anchor") return hasObservation(state);
+  if (state.currentRoute === "urge.anchor" && route === "urge.duration") return hasObservation(state);
   if (state.currentRoute === "urge.name" && route === "urge.body") {
     return Boolean(validIntensity(state.initialIntensity));
   }
@@ -70,6 +77,21 @@ export function reduceUrgeSession(session, event) {
   const state = session || createUrgeSession();
   const at = event.nowEpochMs || Date.now();
   const next = (patch) => ({ ...state, ...patch, updatedAtEpochMs: at });
+  if (event.type === "SCREEN_RESTORED") {
+    if(state.status === "draft" && ["urge.name","urge.rating","urge.body","urge.sensation","urge.anchor","urge.duration"].includes(event.route)) {
+      // Private setup details are intentionally absent after refresh. Return to
+      // the visible anchor question instead of showing a Start button with an invisible prerequisite.
+      const needsObservation=["urge.anchor","urge.duration"].includes(event.route) && !hasObservation(state);
+      const needsLocation=event.route === "urge.sensation" && !state.bodyRegionKey;
+      return next({currentRoute:needsObservation || needsLocation ? "urge.body" : event.route});
+    }
+    if(state.status === "timer_complete" && ["urge.complete","urge.postRating","urge.choice","urge.feedback","urge.record","urge.takeaway"].includes(event.route))return next({currentRoute:event.route});
+    // Back during a continuous practice pauses it; it never restarts or gives completion credit.
+    if(state.status === "timer_active")return reduceUrgeSession(state,{type:"TIMER_PAUSED",nowEpochMs:at});
+    return state;
+  }
+  if (event.type === "SETUP_OPENED" && state.status === "draft") return next({currentRoute:"urge.rating"});
+  if (event.type === "OPTIONAL_ROUTE" && state.status === "timer_complete" && ["urge.complete","urge.postRating","urge.choice","urge.feedback","urge.record","urge.takeaway"].includes(event.route)) return next({currentRoute:event.route});
   if (event.type === "INITIAL_INTENSITY_SET") return next({ initialIntensity: validIntensity(event.value) ?? state.initialIntensity });
   if (event.type === "CATEGORY_TOGGLED") return next({ categoryKeys: state.categoryKeys.includes(event.key) ? [] : [event.key] });
   if (event.type === "BODY_REGION_SET") return next({ bodyRegionKey: event.key, environmentCueKey: null });
@@ -82,7 +104,7 @@ export function reduceUrgeSession(session, event) {
   if (event.type === "VOICE_CANCELLED") return next({ currentRoute: "urge.name" });
   if (event.type === "NAVIGATE") return canNavigateTo(state, event.route) ? next({ currentRoute: event.route }) : state;
   if (event.type === "NAVIGATE_BACK") {
-    const previous = previousRoute[state.currentRoute];
+    const previous = state.currentRoute === "urge.anchor" && state.bodyRegionKey ? "urge.sensation" : previousRoute[state.currentRoute];
     return previous ? next({ currentRoute: previous }) : state;
   }
   if (event.type === "DURATION_CHANGED") {
@@ -90,9 +112,9 @@ export function reduceUrgeSession(session, event) {
     const durationMs = validDuration(event.durationMs) ?? state.timer.segmentDurationMs;
     return next({ timer: { ...state.timer, segmentDurationMs: durationMs } });
   }
-  if (event.type === "QUICK_PRACTICE_STARTED" || event.type === "TIMER_STARTED") {
+  if (event.type === "QUICK_PRACTICE_STARTED" || event.type === "TIMER_STARTED" || event.type === "GUIDED_PRACTICE_STARTED") {
     const quick = event.type === "QUICK_PRACTICE_STARTED";
-    if (state.status !== "draft" || (quick ? state.currentRoute !== "urge.name" : !canStartTimer(state))) return state;
+    if (state.status !== "draft" || (quick ? state.currentRoute !== "urge.name" : event.type === "GUIDED_PRACTICE_STARTED" ? state.currentRoute !== "urge.duration" || !hasObservation(state) : !canStartTimer(state))) return state;
     const duration = state.timer.segmentDurationMs;
     return next({ status: "timer_active", currentRoute: "urge.timer", ...(quick ? {entryMode:"external", environmentCueKey:"external", bodyRegionKey:null, sensationKeys:[], anchorText:""} : {}), timer: { ...state.timer, totalPlannedMs: duration, segmentStartedAtEpochMs: at, segmentEndsAtEpochMs: at + duration, pausedRemainingMs: null, completionReason: null } });
   }
@@ -157,7 +179,7 @@ export function urgePracticeCompletion(session) {
 // Coarse position in the existing browser entry, not a saved return point.
 // Never put anchor words, body locations, sensations or private text in history.
 export function captureUrgeRuntime(session, sessionId, now = Date.now()) {
-  if (!sessionId || !["urge.timer", "urge.postRating", "urge.complete"].includes(session.currentRoute)) return null;
+  if (!sessionId || !["urge.timer", "urge.postRating", "urge.complete", "urge.choice", "urge.feedback", "urge.record", "urge.takeaway"].includes(session.currentRoute)) return null;
   const paused = session.status === "timer_active" ? reduceUrgeSession(session, {type:"TIMER_PAUSED", nowEpochMs:now}) : session;
   const {segmentIndex, segmentDurationMs, pausedRemainingMs, totalElapsedMs, totalPlannedMs, completionReason} = paused.timer;
   return {
@@ -178,7 +200,7 @@ export function restoreUrgeRuntime(raw, sessionId, now = Date.now()) {
     || ![...STANDARD_CHOICE_WINDOWS.map(s=>s*1000),600000].includes(timer.segmentDurationMs)
     || !bounded(timer.totalPlannedMs,timer.segmentDurationMs,86400000) || !bounded(timer.totalElapsedMs,0,timer.totalPlannedMs)) return null;
   const paused = raw.status === "timer_paused" && raw.currentRoute === "urge.timer" && bounded(timer.pausedRemainingMs,0,timer.segmentDurationMs) && timer.totalElapsedMs <= timer.totalPlannedMs - timer.segmentDurationMs && timer.completionReason === null;
-  const complete = raw.status === "timer_complete" && ["urge.postRating", "urge.complete"].includes(raw.currentRoute) && ["elapsed","stopped"].includes(timer.completionReason);
+  const complete = raw.status === "timer_complete" && ["urge.postRating", "urge.complete", "urge.choice", "urge.feedback", "urge.record", "urge.takeaway"].includes(raw.currentRoute) && ["elapsed","stopped"].includes(timer.completionReason);
   if (!paused && !complete) return null;
   const fresh = createUrgeSession(now);
   return {...fresh, status:raw.status, currentRoute:raw.currentRoute, entryMode:raw.entryMode,

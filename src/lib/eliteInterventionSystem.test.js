@@ -174,9 +174,9 @@ describe("elite 18 contract", () => {
     });
   });
 
-  it("keeps the Thought or Fact flow short, private, and fully reachable", () => {
+  it("keeps Thought or Fact questions sequential, private, and fully reachable", () => {
     const src = fs.readFileSync("src/components/ThoughtOrFactExperience.jsx", "utf8");
-    expect(src).toContain('const STAGES = ["capture", "belief", "sort", "evidence", "ruling", "direction", "complete"]');
+    expect(src).toContain('const STAGES = ["capture", "belief", "sort", "patterns", "evidence", "counterEvidence", "ruling", "afterBelief", "direction", "returnPhrase", "complete"]');
     expect(src).toContain('onFinish={() => go("complete")}');
     expect(src).toContain("Private on this device");
     expect(src).toContain("Skip for now");

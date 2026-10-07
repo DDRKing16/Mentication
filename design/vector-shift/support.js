@@ -7,7 +7,9 @@ const vectorStorageKey = `vector-shift:v2:${vectorSession}`;
 function readVectorProgress() {
   try {
     const value = JSON.parse(sessionStorage.getItem(vectorStorageKey));
-    return value && Number.isInteger(value.e) && value.e >= 1 && value.e <= 7 ? value : null;
+    if (!value || !Number.isInteger(value.e) || value.e < 1 || value.e > 7) return null;
+    return {...value,nn:Number.isInteger(value.nn) && value.nn>=0 && value.nn<Qu.length?value.nn:0,
+      reflectionAnswers:Object.fromEntries(Object.entries(value.reflectionAnswers || {}).filter(([key,answer])=>Number.isInteger(Number(key)) && Qu[Number(key)] && Number.isInteger(answer) && answer>=0 && answer<Qu[Number(key)].a.length))};
   } catch { return null; }
 }
 function saveVectorProgress(value) {
@@ -16,13 +18,13 @@ function saveVectorProgress(value) {
 const vectorStages = ['', 'Vector Shift', 'Align', 'Serpent', 'Word match', 'Solar scan', 'Reflect', 'Check in'];
 const vectorInstructions = [
   '',
-  'A visual attention practice, at your pace. Pause, skip or stop at any time.',
-  'Drag the star into the ring. You can simply notice a colour or shape with the easier option.',
-  'Use the arrow buttons or arrow keys to guide the serpent to lights. The easier option lets you collect three lights without a timer.',
-  'Choose letters to uncover a word. Reveal a letter whenever you want; there is no penalty for guessing.',
-  'Compare the solar pictures and tap differences. The easier option names things you can look for, with no requirement to find them all.',
-  'Choose an answer that fits, or skip this step. Gameplay is not evidence of recovery.',
-  'What you report matters more than finishing a game.'
+  'Follow one small visual task.',
+  'Drag the star into the ring.',
+  'Guide the serpent to a light.',
+  'Choose a letter to uncover the word.',
+  'Tap a difference between the pictures.',
+  'Choose an answer that fits.',
+  'Did this practice help?'
 ];
 const vectorClock = (() => {
   let paused = false, pauseAt = 0, pausedTime = 0, nextId = 0;

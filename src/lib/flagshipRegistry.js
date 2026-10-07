@@ -25,7 +25,7 @@ export const FLAGSHIP_REGISTRY = Object.freeze({
     ["eftTapping", "Gentle Tapping", "ground", ["calm"], "eft-style-tapping"],
     ["selfCompassion", "Self-Compassion", "calm", [], "self-compassion"],
     ["unhook", "Unhook from the Thought", "reset", [], "cognitive-defusion"],
-    ["taraTactician", "Tara Tactician", "focus", ["calm"], "preparation-rehearsal-reflection"],
+    ["taraTactician", "Let’s get through this", "focus", ["calm"], "preparation-rehearsal-reflection"],
     ["makeRoom", "Make Room for the Feeling", "calm", [], "emotional-acceptance"],
   ].map(([id, displayName, primaryGoal, secondaryGoals, primaryMechanism]) => [id, meta({ id, displayName, primaryGoal, secondaryGoals, primaryMechanism, cognitiveLoad: id === "eftTapping" ? 1 : 2, completionModel: "explicit practice check-in and optional saved return point" })])),
   boxV2: meta({

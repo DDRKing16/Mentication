@@ -9,7 +9,7 @@ from playwright.sync_api import sync_playwright,expect
 p=argparse.ArgumentParser();p.add_argument('--out',required=True);args=p.parse_args()
 out=Path(args.out);out.mkdir(parents=True,exist_ok=True)
 BASE=os.environ.get('JOURNEY_URL','http://127.0.0.1:5191')
-CATALOGUE=[('boxV2','Box Breathing'),('progressive-muscle-relaxation-v2','Progressive Muscle Relaxation'),('factCheck','Thought or Fact?'),('urgeSurf','Urge Surfing'),('happyBump','The Happy Bump'),('changeScene','Change the Scene'),('goodMap','The Good Map'),('grounding54321V2','5-4-3-2-1 Grounding'),('vectorShift','Vector Shift'),('nextAction','Next Easiest Step'),('signalLock','Signal Lock'),('tomorrowParking','Tomorrow Parking Lot'),('nightChannel','Night Channel'),('eftTapping','Gentle Tapping'),('selfCompassion','Self-Compassion'),('unhook','Unhook from the Thought'),('makeRoom','Make Room for the Feeling'),('taraTactician','Tara Tactician'),('dear2100','Dear 2100'),('foundations','Foundations')]
+CATALOGUE=[('boxV2','Box Breathing'),('progressive-muscle-relaxation-v2','Progressive Muscle Relaxation'),('factCheck','Thought or Fact?'),('urgeSurf','Urge Surfing'),('happyBump','The Happy Bump'),('changeScene','Change the Scene'),('goodMap','The Good Map'),('grounding54321V2','5-4-3-2-1 Grounding'),('vectorShift','Vector Shift'),('nextAction','Next Easiest Step'),('signalLock','Signal Lock'),('tomorrowParking','Tomorrow Parking Lot'),('nightChannel','Night Channel'),('eftTapping','Gentle Tapping'),('selfCompassion','Self-Compassion'),('unhook','Unhook from the Thought'),('makeRoom','Make Room for the Feeling'),('taraTactician','Let’s get through this'),('dear2100','Dear 2100'),('foundations','Foundations')]
 report=[]
 with sync_playwright() as pw:
  b=pw.chromium.launch(executable_path='/usr/bin/chromium')
@@ -25,13 +25,21 @@ with sync_playwright() as pw:
     page.wait_for_timeout(400)
     if page.get_by_role('slider').count():
      page.get_by_role('slider').first.fill('4')
+     next_check=page.get_by_role('button',name='Continue',exact=True)
+     if next_check.count():next_check.click()
      distress=page.get_by_role('combobox',name='Current distress',exact=True)
      if distress.count():distress.select_option('4')
      if ident=='factCheck':
       page.get_by_role('button',name='Continue to your thought',exact=True).click()
       page.get_by_role('textbox',name='The thought you want to examine',exact=True).fill('Synthetic thought for mobile hierarchy review.')
       page.get_by_role('button',name='Continue',exact=True).click()
-     else:page.get_by_role('button',name=re.compile('^(Start |Build my reset$)')).click()
+     else:
+      if distress.count():
+       advance=page.get_by_role('button',name='Continue',exact=True)
+       if advance.count():advance.click()
+      time=page.get_by_role('button',name='5 min',exact=True)
+      if time.count():time.click()
+      page.get_by_role('button',name=re.compile('^(Start |Build my reset$)')).click()
      page.wait_for_function("""()=>[...document.querySelectorAll('button')].some(b=>b.getBoundingClientRect().height>0&&(b.classList.contains('journey-options-button')||b.textContent.trim()==='Begin'))""",timeout=25000)
      begin=page.get_by_role('button',name='Begin',exact=True)
      if begin.count():begin.click()

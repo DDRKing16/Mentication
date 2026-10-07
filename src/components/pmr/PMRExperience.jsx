@@ -1,12 +1,14 @@
+import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
 import PMRRoute, { PMRGuideChoice } from './PMRRoute';
 import JourneyOptions from '@/components/journey/JourneyOptions';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PMRV2Stage from '@/components/PMRV2Stage';
 import { HELPFULNESS } from '@/lib/attemptFeedback';
-import { createPMRSteps, nextPMRArea, PMR_OUTCOMES } from '@/lib/pmrSession';
+import { createPMRSteps, nextPMRArea, PMR_OUTCOMES, restorePMRSession } from '@/lib/pmrSession';
 import { usePMRPlayback } from '@/hooks/usePMRPlayback';
 import { usePMRSoundscape } from '@/hooks/usePMRSoundscape';
 import { interventionThemeStyle, paletteForIntervention } from '@/lib/mentationThemes';
+import { getActiveFlagship, saveActiveFlagship, clearActiveFlagship } from '@/lib/flagshipMemory';
 import '@/styles/pmr-session.css';
 
 function Playback({ step, index, running, audio, onPause, onResume, onNext, released, onSkip }) {
@@ -20,28 +22,43 @@ function Playback({ step, index, running, audio, onPause, onResume, onNext, rele
 }
 
 export default function PMRExperience({ intervention, answers, onComplete, onExit, onAttemptEvent }) {
+  const [restored] = useState(() => {const active=getActiveFlagship();return active?.interventionId === intervention.id ? restorePMRSession(active.experience, intervention.steps) : {};});
+  const [resumeError,setResumeError] = useState(false);
   const completionSent = useRef(false);
-  const startedAt = useRef(null);
-  const [phase, setPhase] = useState('setup');
-  const [mode, setMode] = useState('release');
-  const [length, setLength] = useState('short');
-  const [guideView, setGuideView] = useState('body');
-  const [index, setIndex] = useState(0);
-  const [running, setRunning] = useState(true);
-  const [audio, setAudio] = useState(!answers?.noAudio && !answers?.discreet && answers?.audio === 'yes');
-  const [released, setReleased] = useState([]);
-  const [skipped, setSkipped] = useState([]);
-  const [outcome, setOutcome] = useState(null);
-  const [helpfulness, setHelpfulness] = useState(null);
-  const [completedSteps, setCompletedSteps] = useState(0);
-  const [stopped, setStopped] = useState(false);
+  const startedAt = useRef(restored.startedAt || null);
+  const completedIds = useRef(new Set(restored.completedIds || []));
+  const [phase, setPhase] = useState(restored.phase ?? 'setup');
+  const heading = useRef(null);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); document.querySelector('.pmr-session')?.scrollTo({ top: 0 }); }, [phase]);
+  const [mode, setMode] = useState(restored.mode ?? 'release');
+  const [length, setLength] = useState(restored.length ?? 'short');
+  const [guideView, setGuideView] = useState(restored.guideView ?? 'body');
+  const [index, setIndex] = useState(restored.index ?? 0);
+  const [running, setRunning] = useState(!restored.phase);
+  const [audio, setAudio] = useState(!restored.phase && !answers?.noAudio && !answers?.discreet && answers?.audio === 'yes');
+  const [released, setReleased] = useState(restored.released ?? []);
+  const [skipped, setSkipped] = useState(restored.skipped ?? []);
+  const [outcome, setOutcome] = useState(restored.outcome ?? null);
+  const [helpfulness, setHelpfulness] = useState(restored.helpfulness ?? null);
+  const [completedSteps, setCompletedSteps] = useState(restored.completedSteps ?? 0);
+  const [stopped, setStopped] = useState(restored.stopped ?? false);
   const steps = useMemo(() => createPMRSteps(intervention.steps, { mode, length }), [intervention.steps, mode, length]);
+  useJourneyScreenHistory(intervention.id, phase, next => { if (['setup','length','practice','outcome','helpfulness'].includes(next)) { setRunning(false);setPhase(next); } });
   const step = steps[index];
+  const chooseRoute = (nextMode, nextLength) => {
+    const route=createPMRSteps(intervention.steps,{mode:nextMode,length:nextLength});
+    let next=route.findIndex(item=>item.region===step.region && item.phase===step.phase);
+    if(next<0) next=route.findIndex(item=>item.region===step.region);
+    if(next<0) next=route.findIndex(item=>!completedIds.current.has(`${item.region}:${item.phase}`));
+    setMode(nextMode);setLength(nextLength);setIndex(next<0 ? route.length-1 : next);
+  };
+  useEffect(() => { if (!completionSent.current) setResumeError(!saveActiveFlagship({interventionId:intervention.id,experience:{phase,mode,length,guideView,index,released,skipped,outcome,helpfulness,completedSteps,stopped,completedIds:[...completedIds.current],startedAt:startedAt.current}})); }, [intervention.id,phase,mode,length,guideView,index,released,skipped,outcome,helpfulness,completedSteps,stopped]);
   const pause = useCallback(() => setRunning(false), []);
   const resume = useCallback(() => setRunning(true), []);
   const finish = useCallback(() => { setRunning(false); setPhase('outcome'); }, []);
   const advance = () => {
-    setCompletedSteps(value => value + 1);
+    const key = `${step.region}:${step.phase}`;
+    if (!completedIds.current.has(key)) { completedIds.current.add(key);setCompletedSteps(value => Math.min(steps.length, value + 1)); }
     if (step.phase === 'release' && step.region !== 'whole') setReleased(prev => [...new Set([...prev, step.region])]);
     if (index + 1 >= steps.length) finish(); else setIndex(index + 1);
   };
@@ -56,32 +73,35 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
   const complete = (navigateTo) => {
     if (completionSent.current) return;
     completionSent.current = true;
+    clearActiveFlagship(intervention.id);
     // Mechanism-specific report is distinct from the shared before/after scale.
     onAttemptEvent?.({ interventionId: intervention.id, mechanism: intervention.mechanism,
       action: 'completed', exitReason: stopped ? 'exited' : released.length === 0 && skipped.length > 0 ? 'skipped' : 'completed', startedAt: startedAt.current,
-      completedPercentage: completedSteps / steps.length, helpfulness, timestamp: Date.now() });
+      completedPercentage: steps.filter(item => completedIds.current.has(`${item.region}:${item.phase}`)).length / steps.length, helpfulness, timestamp: Date.now() });
     onComplete({ requireGoalReassessment: true, helpfulness, navigateTo,
       outcome: { type: 'pmr', tensionResponse: outcome, mode, length, skippedRegions: skipped, stopped } });
   };
   const palette = paletteForIntervention(intervention, answers?.direction);
   return <div className="intervention-theme pmr-session" data-guide-view={guideView} data-intervention-theme={palette.id} style={interventionThemeStyle(palette)}>
     <div className="pmr-v2-player-ambient" aria-hidden="true" />
-    <header className="pmr-session-header"><button onClick={onExit} aria-label="Exit Progressive Muscle Relaxation">Exit</button><span>Progressive Muscle Relaxation</span></header>
+    <header className="pmr-session-header">{['length', 'outcome', 'helpfulness'].includes(phase) && <button onClick={() => setPhase(phase === 'length' ? 'setup' : phase === 'helpfulness' ? 'outcome' : 'practice')}>Back</button>}<button onClick={onExit} aria-label="Exit Progressive Muscle Relaxation">Exit</button><span>Progressive Muscle Relaxation</span></header>
     {phase === 'setup' ? <main className="pmr-session-panel">
-      <h1>Choose a comfortable way</h1>
-      <p>Is any area painful, injured or unsafe to tense today? If yes or unsure, choose release only, skip that area, or stop.</p>
-      <fieldset><legend>How would you like to practise?</legend>
-        <button aria-pressed={mode === 'release'} onClick={() => setMode('release')}>Release only<span>Notice and soften, without tensing.</span></button>
-        <button aria-pressed={mode === 'contrast'} onClick={() => setMode('contrast')}>Gentle tense and release<span>Only where tensing feels comfortable and safe.</span></button>
+      <h1 ref={heading} tabIndex={-1}>How would you like to practise?</h1>
+      <p>If an area is painful, injured or unsafe to tense, choose release only. You can skip any area or stop.</p>
+      <fieldset><legend className="sr-only">Practice style</legend>
+        <button aria-pressed={mode === 'release'} onClick={() => chooseRoute('release', length)}>Release only<span>Notice and soften, without tensing.</span></button>
+        <button aria-pressed={mode === 'contrast'} onClick={() => chooseRoute('contrast', length)}>Gentle tense and release<span>Only where tensing feels comfortable and safe.</span></button>
       </fieldset>
-      <fieldset><legend>Session length</legend>
-        <button aria-pressed={length === 'short'} onClick={() => setLength('short')}>Short · three areas<span>Hands, shoulders, calves and feet.</span></button>
-        <button aria-pressed={length === 'full'} onClick={() => setLength('full')}>Full · seven areas<span>The complete body sequence.</span></button>
+      <button className="pmr-session-primary" onClick={() => setPhase('length')}>Continue</button>
+    </main> : phase === 'length' ? <main className="pmr-session-panel">
+      <h1 ref={heading} tabIndex={-1}>How long feels comfortable?</h1>
+      <fieldset><legend className="sr-only">Session length</legend>
+        <button aria-pressed={length === 'short'} onClick={() => chooseRoute(mode, 'short')}>Short · three areas<span>Hands, shoulders, calves and feet.</span></button>
+        <button aria-pressed={length === 'full'} onClick={() => chooseRoute(mode, 'full')}>Full · seven areas<span>The complete body sequence.</span></button>
       </fieldset>
       <PMRRoute steps={steps} preview />
-      <PMRGuideChoice value={guideView} onChange={setGuideView} />
-      <p>About {Math.ceil(steps.reduce((sum, item) => sum + item.holdSec, 0) / 60)} minutes. Breathe normally. Relax, skip or stop whenever you need. Total relaxation is not required.</p>
-      <button className="pmr-session-primary" onClick={() => { startedAt.current = Date.now(); setPhase('practice'); }}>Begin {mode === 'release' ? 'release only' : 'gentle tense and release'}</button>
+      <p>About {Math.ceil(steps.reduce((sum, item) => sum + item.holdSec, 0) / 60)} minutes. Breathe normally. Relax, skip or stop whenever you need.</p>
+      <button className="pmr-session-primary" onClick={() => { startedAt.current ||= Date.now(); setRunning(true); setStopped(false); setPhase('practice'); }}>Begin {mode === 'release' ? 'release only' : 'gentle tense and release'}</button>
     </main> : phase === 'practice' ? <>
       <PMRRoute steps={steps} index={index} skipped={skipped} />
       <main className="pmr-session-stage"><Playback step={step} index={index} running={running} audio={audio} onPause={pause} onResume={resume} onNext={advance} released={released} onSkip={skip} /></main>
@@ -90,18 +110,24 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
         <button aria-pressed={audio} onClick={() => setAudio(value => !value)} disabled={answers?.noAudio || answers?.discreet}>Audio {audio ? 'on' : 'off'}</button>
         <button onClick={() => { setStopped(true); finish(); }}>Stop and check in</button>
         {!running && <p role="status">Paused. Let go of any tension. Continue only if comfortable.</p>}
-        <PMRGuideChoice value={guideView} onChange={setGuideView} />
+        <details className="pmr-view-tools"><summary>Guide view</summary><PMRGuideChoice value={guideView} onChange={setGuideView} /></details>
       </footer>
-    </> : <main className="pmr-session-panel">
-      <h1>Where is tension now?</h1>
-      <p>Any answer is valid. This is separate from your starting check-in.</p>
-      <fieldset><legend>Optional tension check</legend>{PMR_OUTCOMES.map(([value, label]) => <button key={value} aria-pressed={outcome === value} onClick={() => setOutcome(value)}>{label}</button>)}</fieldset>
+    </> : phase === 'outcome' ? <main className="pmr-session-panel">
+      <h1 ref={heading} tabIndex={-1}>Where is tension now?</h1>
+      <p>Optional. An unchanged feeling is okay.</p>
+      <fieldset><legend className="sr-only">Optional tension check</legend>{PMR_OUTCOMES.map(([value, label]) => <button key={value} aria-pressed={outcome === value} onClick={() => setOutcome(value)}>{label}</button>)}</fieldset>
       {outcome && <p role="status">{PMR_OUTCOMES.find(([value]) => value === outcome)[2]}</p>}
-      <fieldset className="pmr-helpfulness"><legend>Was this practice helpful? (optional)</legend>{HELPFULNESS.map(item => <button key={item.id} aria-pressed={helpfulness === item.id} onClick={() => setHelpfulness(item.id)}>{item.label}</button>)}</fieldset>
-      <p>{stopped ? 'You stopped the practice.' : 'You reached the end of your chosen route.'}{skipped.length > 0 ? ` You skipped ${skipped.length} ${skipped.length === 1 ? 'area' : 'areas'}.` : ''} The illustration guides attention; it does not measure relaxation.</p>
       <button className="pmr-session-primary" onClick={() => complete()}>{outcome ? 'Continue to check-in' : 'Skip tension check'}</button>
+      <button className="pmr-session-quiet" onClick={() => setPhase('helpfulness')}>Optional: rate helpfulness</button>
+    </main> : <main className="pmr-session-panel">
+      <h1 ref={heading} tabIndex={-1}>Was this practice helpful?</h1>
+      <p>Optional. Choose what fits, or continue without answering.</p>
+      <fieldset className="pmr-helpfulness"><legend className="sr-only">Practice helpfulness</legend>{HELPFULNESS.map(item => <button key={item.id} aria-pressed={helpfulness === item.id} onClick={() => setHelpfulness(item.id)}>{item.label}</button>)}</fieldset>
+      <p>{stopped ? 'You stopped the practice.' : 'You reached the end of your chosen route.'}{skipped.length > 0 ? ` You skipped ${skipped.length} ${skipped.length === 1 ? 'area' : 'areas'}.` : ''} The illustration guides attention; it does not measure relaxation.</p>
+      <button className="pmr-session-primary" onClick={() => complete()}>{helpfulness ? 'Continue to check-in' : 'Skip and continue'}</button>
       {outcome === 'more_uncomfortable' && <button onClick={() => complete('/library')}>Check in, then open Library</button>}
     </main>}
+    {resumeError && <p className="relative z-10 px-5" role="alert">Progress could not be saved on this device. You can continue here, but it may be lost if you leave.</p>}
     <div className="relative z-10 px-5"><JourneyOptions id={intervention.id} onOpen={pause} /></div>
   </div>;
 }

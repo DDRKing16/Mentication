@@ -4,9 +4,9 @@ export const BOX_PHASE_MS = 4000;
 export const BOX_ROUND_MS = BOX_PHASE_MS * 4;
 export const BOX_MAX_FRAME_GAP_MS = 1000;
 
-export function createBoxBreathingClock(rounds = 4) {
+export function createBoxBreathingClock(rounds = 4, initialElapsed = 0) {
   const totalMs = rounds * BOX_ROUND_MS;
-  let elapsed = 0;
+  let elapsed = Number.isFinite(initialElapsed) ? Math.max(0, Math.min(totalMs, initialElapsed)) : 0;
   let last = null;
   let interrupted = false;
   return {

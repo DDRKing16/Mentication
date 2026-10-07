@@ -84,3 +84,12 @@
 .pmr-session-stage .pmr-v2-phase-row{flex-wrap:wrap}
 .pmr-session-stage .pmr-v2-stage{height:auto;max-height:none}
 .pmr-route summary{flex-wrap:wrap}.pmr-route summary>span:first-child{flex:1;min-width:min(100%,10rem)}
+
+/* One decision at a time; choices stay readable on narrow phones. */
+.pmr-session-panel>fieldset:not(.pmr-helpfulness){grid-template-columns:1fr}
+.pmr-session-panel fieldset button{font-size:1rem;padding:1rem;text-align:left}
+.pmr-session-panel h1:focus{outline:none}
+.pmr-view-tools{flex-basis:100%;text-align:left;max-width:360px;width:100%;font-size:.85rem}
+.pmr-view-tools summary{min-height:44px;cursor:pointer;padding:.7rem;text-align:center}
+
+.pmr-session-panel .pmr-session-quiet{width:100%;background:none;border:0;text-align:center;text-decoration:underline;margin-top:.5rem}

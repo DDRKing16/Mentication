@@ -156,3 +156,12 @@
 .large-text .screen[data-screen="scan"] .question-copy .small { font-size:14px; }
 .large-text .screen[data-screen="scan"] .scale-help,.large-text .screen[data-screen="scan"] .endlabels { font-size:16px; }
 .large-text .screen[data-screen="scan"] .answer strong { font-size:20px; }
+/* Each review answer and optional planning cue gets its own screen. */
+.screen[data-screen^="review"] h2,.screen[data-screen="cue"] h2,.screen[data-screen="time"] h2 { font-size:clamp(30px,6vw,42px);line-height:1.12;margin-bottom:24px; }
+.screen[data-screen="cue"] select,.screen[data-screen="time"] input { width:100%;min-height:52px;padding:14px;border:1px solid #9fc5ef66;border-radius:12px;background:#0b192c;color:#eef6ff;font:inherit;font-size:16px; }
+.screen[data-screen="cue"] label,.screen[data-screen="time"] label { display:block;margin:12px 0; }
+
+.screen[data-screen="scan"] .footer { display:flex; }
+.screen[data-screen="scan"] .scale-point.confirming span {width:42px;height:42px;border-radius:50%;}
+.screen[data-screen="scan"] .scale-point.confirming span em {opacity:1;scale:1;}
+.screen[data-screen="scan"] .scale-point.confirming span b {display:none;}

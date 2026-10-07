@@ -24,18 +24,18 @@ export function NextStepActive({ state, onDone, onSkip, onUndo, onReplace, onPau
     <canvas ref={canvasRef} className="nes-practice-confetti" aria-hidden="true" />
     <nav className="nes-practice-nav" aria-label="Practice controls"><button type="button" onClick={onChoices}><ArrowLeft size={17} aria-hidden="true" />Task choices</button><button type="button" onClick={onPause}><Pause size={16} aria-hidden="true" />Pause</button></nav>
     <header className="nes-practice-heading"><p className="nes-practice-eyebrow">Next Easiest Step</p><p className="nes-task-name">{state.task}</p></header>
-    <section className="nes-action-card" aria-labelledby="nes-current-action">
+    {!adapting && <section className="nes-action-card" aria-labelledby="nes-current-action">
       <div className="nes-action-position"><span>Step {state.currentStepIndex + 1} of {state.ladder.length}</span><span>Only this step</span></div>
       <div className="nes-action-arch" aria-hidden="true"><span>{String(state.currentStepIndex + 1).padStart(2, '0')}</span></div>
       <h1 id="nes-current-action" ref={heading} tabIndex={-1}>{step?.title || 'Choose a small action'}</h1>
       <p className="nes-action-instruction">{step?.micro}</p>
       <button type="button" className="nes-action-done" onClick={onDone}>Done ✓<ArrowRight size={19} aria-hidden="true" /></button>
       <p className="nes-action-footnote">Mark done only after trying this action.</p>
-    </section>
+    </section>}
     <section className="nes-adapt" aria-label="Make this step fit">
       <div className="nes-adapt-controls"><button type="button" aria-expanded={adapting} onClick={() => setAdapting(value => !value)}>Too hard? Make it easier<span aria-hidden="true">{adapting ? '−' : '+'}</span></button><button type="button" onClick={edit}><Pencil size={15} aria-hidden="true" />Edit step</button></div>
-      {adapting && <div className="nes-adapt-content"><p>Choose a smaller version, or write one action you could actually try.</p>
-        <div className="nes-smaller-options">{step?.easier.map((title, index) => <button type="button" key={`${title}-${index}`} onClick={() => { onReplace(title); setAdapting(false); heading.current?.focus(); }}>{title}<ArrowRight size={16} aria-hidden="true" /></button>)}</div>
+      {adapting && <div className="nes-adapt-content"><h1>{editing ? 'What smaller action could you try?' : 'Which smaller step feels possible?'}</h1><p>Choose a smaller version, or write one action you could actually try.</p>
+        {!editing && <div className="nes-smaller-options">{step?.easier.map((title, index) => <button type="button" key={`${title}-${index}`} onClick={() => { onReplace(title); setAdapting(false); heading.current?.focus(); }}>{title}<ArrowRight size={16} aria-hidden="true" /></button>)}</div>}
         {editing ? <form onSubmit={event => { event.preventDefault(); if (draft.trim()) { onReplace(draft.trim()); setEditing(false); setAdapting(false); heading.current?.focus(); } }}><label htmlFor="nes-action-edit">Your small action</label><input id="nes-action-edit" autoFocus maxLength={200} value={draft} onChange={event => setDraft(event.target.value)} /><div><button type="submit" disabled={!draft.trim()}>Use this step</button><button type="button" onClick={() => setEditing(false)}>Cancel edit</button></div></form> : <button type="button" className="nes-practice-text" onClick={edit}>Write my own smaller step</button>}
       </div>}
     </section>
@@ -45,23 +45,28 @@ export function NextStepActive({ state, onDone, onSkip, onUndo, onReplace, onPau
   </main>;
 }
 
-export function NextStepReview({ state, onGettingStarted, onHelpfulness, onContinue, onUndo, onResume, onNewTask, canContinue }) {
+export function NextStepReview({ state, onGettingStarted, onHelpfulness, onContinue, onUndo, onResume, onNewTask, canContinue, onScreen }) {
   const heading = useRef(null);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
   const done = state.ladder.filter(step => step.status === 'done').length;
   const skipped = state.ladder.filter(step => step.status === 'skipped').length;
   const unfinished = state.ladder.length - done - skipped;
+  const question = state.screen === 'gettingStarted' || state.screen === 'helpfulness';
   return <main className="nes-practice nes-practice--review">
-    <header className="nes-practice-heading"><p className="nes-practice-eyebrow">Next Easiest Step · Your review</p><h1 ref={heading} tabIndex={-1}>Your task,<br />as it stands.</h1><p>{state.task}</p></header>
-    <section className="nes-task-receipt" aria-label="What you recorded"><div className="nes-receipt-summary"><span><strong>{done}</strong>marked done</span><span><strong>{skipped}</strong>skipped</span>{unfinished > 0 && <span><strong>{unfinished}</strong>not done yet</span>}</div><TaskTrail steps={state.ladder} currentIndex={state.currentStepIndex} review />
-      {unfinished > 0 && !state.submitted && <button type="button" className="nes-review-resume" onClick={onResume}>Return to the current step<ArrowRight size={17} aria-hidden="true" /></button>}
-      <button type="button" className="nes-practice-text" disabled={!state.currentStepIndex || state.submitted} onClick={onUndo}><CornerDownLeft size={15} aria-hidden="true" />Undo previous</button>
-    </section>
-    <section className="nes-review-feedback"><fieldset><legend>Did getting started become easier?<small>Optional · any answer is useful</small></legend><div>{[['easier', 'Easier'], ['same', 'No change'], ['harder', 'Harder'], ['unsure', 'Not sure']].map(([id, label]) => <button type="button" key={id} aria-pressed={state.gettingStarted === id} onClick={() => onGettingStarted(id)}>{label}</button>)}</div></fieldset>
-      <details><summary>Was this practice helpful? · optional</summary><fieldset><legend className="sr-only">Practice helpfulness</legend><div>{HELPFULNESS.map(item => <button type="button" key={item.id} aria-pressed={state.helpfulness === item.id} onClick={() => onHelpfulness(item.id)}>{item.label}</button>)}</div></fieldset></details>
-      <p>You can leave both questions unanswered. Your task does not have to be finished.</p>
-    </section>
+    {question ? <>
+      <button className="nes-practice-text" onClick={() => onScreen('dashboard')}><ArrowLeft size={18} aria-hidden="true" />Back to my task</button>
+      <header className="nes-practice-heading"><p className="nes-practice-eyebrow">Optional reflection</p><h1 ref={heading} tabIndex={-1}>{state.screen === 'gettingStarted' ? 'Did getting started become easier?' : 'Was this practice helpful?'}</h1><p>Any answer is useful. You can leave this unanswered.</p></header>
+      <section className="nes-review-feedback"><fieldset><legend className="sr-only">{state.screen === 'gettingStarted' ? 'Getting started' : 'Helpfulness'}</legend><div>{(state.screen === 'gettingStarted' ? [['easier','Easier'],['same','No change'],['harder','Harder'],['unsure','Not sure']] : HELPFULNESS.map(item => [item.id,item.label])).map(([id,label]) => <button type="button" key={id} aria-pressed={(state.screen === 'gettingStarted' ? state.gettingStarted : state.helpfulness) === id} onClick={() => state.screen === 'gettingStarted' ? onGettingStarted(id) : onHelpfulness(id)}>{label}</button>)}</div></fieldset></section>
+    </> : <>
+      <header className="nes-practice-heading"><p className="nes-practice-eyebrow">Next Easiest Step · Your review</p><h1 ref={heading} tabIndex={-1}>Your task,<br />as it stands.</h1><p>{state.task}</p></header>
+      <section className="nes-task-receipt" aria-label="What you recorded"><div className="nes-receipt-summary"><span><strong>{done}</strong>marked done</span><span><strong>{skipped}</strong>skipped</span>{unfinished > 0 && <span><strong>{unfinished}</strong>not done yet</span>}</div><TaskTrail steps={state.ladder} currentIndex={state.currentStepIndex} review />
+        {unfinished > 0 && !state.submitted && <button type="button" className="nes-review-resume" onClick={onResume}>Return to the current step<ArrowRight size={17} aria-hidden="true" /></button>}
+        <button type="button" className="nes-practice-text" disabled={!state.currentStepIndex || state.submitted} onClick={onUndo}><CornerDownLeft size={15} aria-hidden="true" />Undo previous</button>
+      </section>
+    </>}
     <button type="button" className="nes-review-continue" disabled={!canContinue || state.submitted} onClick={onContinue}>Continue to final rating<ArrowRight size={18} aria-hidden="true" /></button>
+    {!question && <button className="nes-practice-text" onClick={() => onScreen('gettingStarted')}>Optional: reflect on getting started</button>}
+    {state.screen === 'gettingStarted' && <button className="nes-practice-text" onClick={() => onScreen('helpfulness')}>Optional: rate helpfulness</button>}
     <button type="button" className="nes-practice-text nes-review-new" onClick={onNewTask}>Back to tasks</button>
   </main>;
 }

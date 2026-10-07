@@ -67,3 +67,20 @@ describe('browser Back and Forward within a reset', () => {
     expect(resetFlowHistorySnapshot(stack,2,{reset_phase:'unknown'})).toBeNull();
   });
 });
+
+
+describe('sequential setup navigation', () => {
+  it('keeps zero mood and separate distress across refresh without private text', () => {
+    const mood={...answers,direction:'lift',intensity:0,goal_baseline:captureGoalBaseline('lift',0),distress:7};
+    const entry=resetNavigationEntry({prebuilt:true,pathway:['happyBump'],reset_question:'distress',note:'PRIVATE'},mood,'questions',{id:'current'});
+    expect(entry.reset_question).toBe('distress');
+    expect(entry.intensity).toBe(0);expect(entry.distress).toBe(7);
+    expect(resetFlowHistorySnapshot([],2,entry).questionStep).toBe('distress');
+    expect(JSON.stringify(entry)).not.toContain('PRIVATE');
+    expect(freshResetEntry(entry,mood).reset_question).toBe('goal');
+  });
+  it('migrates old setup entries to the first question and rejects unknown screen identifiers', () => {
+    expect(resetNavigationEntry({},answers,'questions').reset_question).toBe('goal');
+    expect(resetNavigationEntry({reset_question:'private thoughts'},answers,'questions').reset_question).toBe('goal');
+  });
+});
