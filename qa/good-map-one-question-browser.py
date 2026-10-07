@@ -253,6 +253,7 @@ with sync_playwright() as pw:
         p.goto(args.base + '/good-map')
         frame = p.frame_locator('iframe[title="The Good Map"]')
         frame.locator('#gmStart').click(timeout=20000)
+        p.wait_for_function("history.state?.['menticationScreen:goodMap']?.id === 'sort'")
         assert frame.locator('.tray').count() > 0
         p.get_by_role('button', name='Another way', exact=True).click()
         p.get_by_role('dialog').wait_for()
@@ -266,6 +267,7 @@ with sync_playwright() as pw:
         expect(frame.locator('#gmStart')).to_be_visible()
         p.evaluate('history.forward()')
         frame.locator('.tray').first.wait_for()
+        p.wait_for_function("history.state?.['menticationScreen:goodMap']?.id === 'sort'")
         p.evaluate('history.back()')
         expect(frame.locator('#gmStart')).to_be_visible()
         frame.locator('#gmBack').click()
