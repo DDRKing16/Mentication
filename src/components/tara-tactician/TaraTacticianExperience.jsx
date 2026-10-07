@@ -13,7 +13,8 @@ import { choosePracticeResponse, chooseTaraNextStep, confirmPracticeTry, guidanc
 import { clearTara, loadTara, saveTaraDraft, saveTaraRecap } from '@/lib/taraTacticianStorage';
 import { atScreen, GET_THROUGH_TITLE, previousScreen, resumeFromEntry, screenFor } from '@/lib/getThroughFlow';
 import { answerCheckIn, checkInDue, startCheckIns, SUPPORT_FIELDS } from '@/lib/taraSupportPlan';
-import { cancelTaraNotifications, listenTaraNotifications, scheduleTaraNotifications, supportsTaraNotifications, verifyTaraNotifications, watchTaraNotificationDeletion } from '@/lib/taraCheckInNotifications';
+import { cancelTaraNotifications, scheduleTaraNotifications, supportsTaraNotifications, verifyTaraNotifications, watchTaraNotificationDeletion } from '@/lib/taraCheckInNotifications';
+import { targetForTaraNotification } from '@/lib/taraNotificationRouting';
 import { CheckInQuestion, PocketSupport, SupportPlanQuestion, TaraSupportScreens } from './TaraSupportScreens';
 import '@/styles/tara-tactician.css';
 
@@ -66,17 +67,21 @@ function Answers({ items, value, onChange, name, advance = false }) {
   return <fieldset className="tara-group"><legend className="tara-sr-only">Choose an answer</legend><div className="tara-stack">{items.map(([id, label, detail]) => <label className={'tara-choice tara-answer-choice' + (value === id ? ' is-selected' : '')} key={id}><input type="radio" name={name} value={id} checked={value === id} onChange={() => onChange(id)} /><span className="tara-choice-copy"><span>{label}</span>{detail && <small>{detail}</small>}</span></label>)}</div></fieldset>;
 }
 
-export default function TaraTacticianExperience({ intervention, sessionId, answers, onAttemptEvent, onComplete, onExit }) {
+export default function TaraTacticianExperience({ intervention, sessionId, answers, onAttemptEvent, onComplete, onExit, notificationPlanId }) {
   const { prefs, setPref } = useAccessibilityPrefs();
   const [initial] = useState(() => { try { return { ...loadTara(), error: '' }; } catch (error) { return { draft: null, recaps: [], error: error.message || 'Device storage is unavailable.' }; } });
-  const [state, setState] = useState(() => initial.draft || newTaraState()); const [recaps, setRecaps] = useState(initial.recaps);
+  const [notificationTarget] = useState(() => targetForTaraNotification(initial, notificationPlanId));
+  const [state, setState] = useState(() => notificationTarget
+    ? notificationTarget.active ? atScreen(notificationTarget.record, 'check-in')
+      : notificationTarget.archived || notificationTarget.record.completionReported ? atScreen(notificationTarget.record, 'recap') : notificationTarget.record
+    : initial.draft || newTaraState()); const [recaps, setRecaps] = useState(initial.recaps);
   const [saveStatus, setSaveStatus] = useState(initial.error ? 'error' : initial.draft ? 'saved' : 'idle'); const [error, setError] = useState(initial.error);
   const [editor, setEditor] = useState(null); const [options, setOptions] = useState(false); const [deleting, setDeleting] = useState(false); const [newPlanMode, setNewPlanMode] = useState(null);
-  const [reviewOnly, setReviewOnly] = useState(false);
-  const [notificationBusy, setNotificationBusy] = useState(false); const [notificationError, setNotificationError] = useState('');
+  const [reviewOnly, setReviewOnly] = useState(Boolean(notificationTarget?.archived || notificationTarget?.record.completionReported));
+  const [notificationBusy, setNotificationBusy] = useState(false); const [notificationError, setNotificationError] = useState(notificationPlanId && !notificationTarget
+    ? initial.error ? 'This notification’s saved plan could not be read. Your saved data has been kept unchanged.' : 'This notification’s plan is no longer saved on this device.' : '');
   const [clock, setClock] = useState(Date.now()); const notificationBusyRef = useRef(false);
   const mountedRef = useRef(true);
-  const navigationRef = useRef(null);
   const headingRef = useRef(null); const currentRef = useRef(state); const completedRef = useRef(false); const startedRef = useRef(Date.now());
   const historyKeyRef = useRef(uid()); const snapshotsRef = useRef(new Map()); const historyDepthRef = useRef(0);
   currentRef.current = state;
@@ -91,24 +96,20 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
     // Foreground only: returning to the app checks elapsed wall time once; no catch-up barrage.
     const tick = () => { if (document.visibilityState !== 'hidden') setClock(Date.now()); };
     const timer = window.setInterval(tick, 15000);
-    window.addEventListener('focus', tick); document.addEventListener('visibilitychange', tick);
-    return () => { clearInterval(timer); window.removeEventListener('focus', tick); document.removeEventListener('visibilitychange', tick); };
+    window.addEventListener('focus', tick); window.addEventListener('mentation:app-active', tick); document.addEventListener('visibilitychange', tick);
+    return () => { clearInterval(timer); window.removeEventListener('focus', tick); window.removeEventListener('mentation:app-active', tick); document.removeEventListener('visibilitychange', tick); };
   }, []);
   useEffect(() => {
     if (reviewOnly || !state.checkIns.startedAt || state.checkIns.status !== 'scheduled' || state.completionReported) return;
-    let disposed = false; let stop = () => {};
+    let disposed = false;
     const verify = () => {
       if (document.visibilityState === 'hidden') return;
       verifyTaraNotifications(state.id).then(confirmed => {
         if (!disposed && !confirmed) setState(value => ({ ...value, checkIns: { ...value.checkIns, status: 'unverified' } }));
       }).catch(() => { if (!disposed) setNotificationError('Phone check-ins could not be verified. The check-in here remains available.'); });
     };
-    verify(); window.addEventListener('focus', verify); document.addEventListener('visibilitychange', verify);
-    listenTaraNotifications(state.id, () => {
-      const value = currentRef.current;
-      if (!value.completionReported && value.eventStatus === 'in-progress') navigationRef.current?.(atScreen(value, 'check-in'));
-    }).then(remove => { if (disposed) remove(); else stop = remove; }).catch(() => {});
-    return () => { disposed = true; stop(); window.removeEventListener('focus', verify); document.removeEventListener('visibilitychange', verify); };
+    verify(); window.addEventListener('focus', verify); window.addEventListener('mentation:app-active', verify); document.addEventListener('visibilitychange', verify);
+    return () => { disposed = true; window.removeEventListener('focus', verify); window.removeEventListener('mentation:app-active', verify); document.removeEventListener('visibilitychange', verify); };
   }, [state.id, state.checkIns.startedAt, state.checkIns.status, state.completionReported, reviewOnly]);
   useEffect(() => {
     window.history.replaceState({ ...window.history.state, tara: { id: currentRef.current.id, phase: currentRef.current.phase, screen: screenFor(currentRef.current), key: historyKeyRef.current } }, '');
@@ -150,7 +151,6 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
     window.history.pushState({ ...window.history.state, ...(Number.isInteger(window.history.state?.idx) ? { idx: window.history.state.idx + 1 } : {}), tara: { id: next.id, phase: next.phase, screen: screenFor(next), key: historyKeyRef.current } }, '');
     setState(next);
   };
-  navigationRef.current = go;
   const nextScreen = (target, patch = {}) => go(atScreen({ ...state, ...patch }, target));
   const exit = () => {
     if (!reviewOnly && !state.completionReported && state.phase !== 'entry') onAttemptEvent?.({ interventionId: TARA_ID, action: 'exited', exitReason: 'exited', completedPercentage: stageFor(state.phase) / 4, startedAt: startedRef.current, timestamp: Date.now() });

@@ -21,6 +21,8 @@ import { useSystemDarkMode } from '@/hooks/useSystemDarkMode';
 import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
 import { hasCompletedOnboarding } from '@/lib/onboarding';
+import TaraNotificationBridge, { taraEntryState } from '@/components/tara-tactician/TaraNotificationBridge';
+import { validTaraPlanId } from '@/lib/taraNotificationRouting';
 
 // Route page components are loaded on demand to keep the initial bundle small.
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
@@ -58,6 +60,12 @@ const PageSpinner = () => (
 const OnboardingGate = ({ children }) => (
   hasCompletedOnboarding() ? children : <Navigate to="/welcome" replace />
 );
+function TaraEntry() {
+  const location = useLocation();
+  const planId = new URLSearchParams(location.search).get('taraCheckIn');
+  const request = validTaraPlanId(planId) ? { planId, requestId: location.key } : null;
+  return <Navigate to="/reset" replace state={taraEntryState(request)} />;
+}
 
 // Direction-aware page transitions: forward nav slides the new page in from the
 // right; back/pop slides the outgoing page off to the right.
@@ -106,10 +114,10 @@ const MenticationRoutes = () => {
                 <Route path="/welcome" element={<Welcome />} />
                 <Route path="/start" element={<NeedStart />} />
                 <Route path="/return-points" element={<ReturnPoints />} />
-                <Route path="/reset" element={<ResetFlow />} />
+                <Route path="/reset" element={<ResetFlow key={location.state?.taraNotificationRequestId || 'reset'} />} />
                 <Route path="/scene-followup" element={<ChangeSceneFollowup />} />
                 <Route path="/lift-followup" element={<LiftFollowup />} />
-                <Route path="/tara-tactician" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["taraTactician"], direction: "focus", intensity: null, timeMin: 5, audio: "no" }} />} />
+                <Route path="/tara-tactician" element={<TaraEntry />} />
                 <Route path="/next-easiest-step" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["nextAction"], direction: "focus", intensity: null, audio: "no" }} />} />
                 <Route path="/next-easiest-step-v2" element={<Navigate to="/reset" replace state={{ prebuilt: true, pathway: ["nextAction"], direction: "focus", intensity: null, audio: "no" }} />} />
                 <Route path="/journal" element={<Journal />} />
@@ -178,6 +186,7 @@ function App() {
     <MotionConfig reducedMotion={prefs.reducedMotion ? "always" : "user"}>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
+          <TaraNotificationBridge />
           <ScrollToTop />
           <MenticationRoutes />
         </Router>
