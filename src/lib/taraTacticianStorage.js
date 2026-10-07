@@ -1,4 +1,9 @@
 import { validateTaraState } from './taraTacticianState';
+import { watchTaraNotificationDeletion } from './taraCheckInNotifications';
+
+// This module is already imported by device-local data at app boot. Install only
+// an ownership-aware deletion observer; never request permission or schedule here.
+watchTaraNotificationDeletion();
 
 export const TARA_STORAGE_KEY = 'mentation.tara-tactician.v1';
 export const MAX_TARA_RECAPS = 20;
@@ -26,6 +31,7 @@ function write(value, provided) {
     const target = storage(provided); const bytes = JSON.stringify({ schemaVersion: 1, ...value });
     target.setItem(TARA_STORAGE_KEY, bytes);
     if (target.getItem(TARA_STORAGE_KEY) !== bytes) throw new Error();
+    if (!provided && typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') window.dispatchEvent(new CustomEvent('mentation:tara-plan-changed'));
     return value;
   } catch (error) {
     if (error instanceof TaraStorageError) throw error;
@@ -46,6 +52,7 @@ export function clearTara(provided) {
   try {
     const target = storage(provided); target.removeItem(TARA_STORAGE_KEY);
     if (target.getItem(TARA_STORAGE_KEY) !== null) throw new Error();
+    if (!provided && typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') window.dispatchEvent(new CustomEvent('mentation:tara-cleared'));
   } catch { throw new TaraStorageError('Practice data could not be deleted. Please try again.'); }
 }
 
