@@ -15,8 +15,10 @@ import '@fontsource/hanken-grotesk/latin-600.css'
 import '@fontsource/hanken-grotesk/latin-700.css'
 import { initializeNativeRuntime } from '@/lib/nativeRuntime'
 import { AccessibilityProvider } from '@/lib/accessibility'
+import { initializeTaraWebCheckIns } from '@/lib/taraWebCheckInLifecycle'
 
 initializeNativeRuntime()
+initializeTaraWebCheckIns()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <AccessibilityProvider>

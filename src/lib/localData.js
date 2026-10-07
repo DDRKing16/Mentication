@@ -7,6 +7,7 @@ import { resetOnboardingSession } from './onboarding';
 // stays in this app's local storage and can be erased in-app at any time.
 import { loadTara } from "./taraTacticianStorage";
 import { notifyAccessibilityPreferencesChanged } from "./accessibilityEvents";
+import { WEB_CHECKIN_CANCELLATION_KEY } from './taraWebCheckInLifecycle';
 
 const SESSION_KEY = "mentation.sessions.v1";
 const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr", "mentication.foundations.", "mentication.tomorrowParking.", "dear2100"];
@@ -67,6 +68,9 @@ export function deleteAllLocalAppData() {
   if (!local) throw new Error("Device storage is unavailable.");
   const keys = Array.from({ length: local.length }, (_, index) => local.key(index)).filter(Boolean);
   for (const key of keys) {
+    // Keep only opaque cancellation ownership until remote deletion is confirmed.
+    // No authored words are stored here; the boot/online observer retries deletion.
+    if (key === WEB_CHECKIN_CANCELLATION_KEY) continue;
     if (key === "mentication_nes_v2_app_state" || key === "daybook" || APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) removeVerified(local,key);
   }
   const temporary=window.sessionStorage;
