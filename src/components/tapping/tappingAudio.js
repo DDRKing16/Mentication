@@ -4,13 +4,14 @@ import { TAPPING_CONTACT_MS } from './tappingGuidance';
 const ROOT='/media/tapping/audio/';
 const files=concern=>[...Object.keys(manifest).filter(key=>key.startsWith('place-')||key.startsWith(concern+'-')||['tap','rest'].includes(key)),'warm-room','contact'];
 
-// Offline mixer. A short lookahead schedules rhythm on the audio clock;
-// the hand's animation epoch anchors its first contact, without React beat jitter.
+// Offline mixer. Schedule from the hand's performance-clock epoch, translated
+// through output timestamps: the audio clock can drift or stall independently.
 // resume() is called directly inside Start/Resume/Unmute, before any await.
 export function createTappingAudio({
   AudioContextClass=window.AudioContext||window.webkitAudioContext,
   fetchAudio=(url,options)=>fetch(url,options),
   onError=()=>{}, onInterrupted=()=>{}, onEvent=()=>{},
+  now=()=>performance.now(),
 }={}) {
   let context=null,master=null,musicGain=null,voiceGain=null,beatGain=null;
   let disposed=false,playing=false,generation=0,musicNode=null,voiceNode=null;
@@ -80,13 +81,39 @@ export function createTappingAudio({
   function startRhythm({beatMs,contactMs,phaseMs=0}){
     stopRhythm();
     if(!playing||!channels.beat||!context||disposed)return;
-    const token=rhythmGeneration,period=beatMs/1000;
-    let next=context.currentTime+(contactMs-phaseMs)/1000;
-    if(next<context.currentTime)next+=Math.ceil((context.currentTime-next)/period)*period;
+    const token=rhythmGeneration,horizonMs=Math.max(1000,beatMs*2);
+    let next=now()+contactMs-phaseMs,pending=[];
+    if(next<now())next+=Math.ceil((now()-next)/beatMs)*beatMs;
+    function audioTime(target,clock){
+      const timestamp=context.getOutputTimestamp?.();
+      if(timestamp?.performanceTime>0&&timestamp.performanceTime<=clock+2&&clock-timestamp.performanceTime<1000&&Number.isFinite(timestamp.contextTime)&&timestamp.contextTime>=0&&timestamp.contextTime<=context.currentTime){
+        return timestamp.contextTime+(target-timestamp.performanceTime)/1000;
+      }
+      // Older engines can still follow the visual epoch without an output clock.
+      return context.currentTime+(target-clock)/1000;
+    }
     function schedule(){
       if(token!==rhythmGeneration||!playing||!channels.beat||disposed)return;
-      if(next<context.currentTime-.02)next+=Math.ceil((context.currentTime-next)/period)*period;
-      try{while(next<context.currentTime+.35&&token===rhythmGeneration){sourceFor('contact','beat',beatGain,{at:next});next+=period;}}
+      const clock=now();
+      try{
+        pending=pending.filter(item=>nodes.has(item.node)&&item.node.start>context.currentTime);
+        for(const item of pending){
+          if(item.target<clock-.02){stopNode(item.node);item.node=null;continue;}
+          const at=Math.max(context.currentTime+.005,audioTime(item.target,clock));
+          // Adjust only unplayed contacts, with enough lead to cancel safely.
+          if(item.node.start-context.currentTime>.06&&Math.abs(at-item.node.start)>.025){
+            stopNode(item.node);
+            item.node=sourceFor('contact','beat',beatGain,{at});
+          }
+        }
+        pending=pending.filter(item=>item.node);
+        if(next<clock-.02)next+=Math.ceil((clock-next)/beatMs)*beatMs;
+        while(next<clock+horizonMs&&token===rhythmGeneration){
+          const at=audioTime(next,clock);
+          if(at>=context.currentTime)pending.push({target:next,node:sourceFor('contact','beat',beatGain,{at})});
+          next+=beatMs;
+        }
+      }
       catch{stopRhythm();channels.beat=false;onError('beat');}
     }
     schedule();
