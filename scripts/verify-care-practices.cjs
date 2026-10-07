@@ -7,7 +7,8 @@ const assert = require('node:assert/strict');
 const base = process.env.CARE_PREVIEW_URL || 'http://127.0.0.1:5174';
 const evidence = process.env.CARE_EVIDENCE_DIR || '/tmp/care-redesign';
 fs.mkdirSync(evidence,{recursive:true});
-const IDS=['selfCompassion','unhook','makeRoom'];
+// Keep Self-Compassion's existing interaction regression; the two redesigned cores have their own journeys.
+const IDS=['selfCompassion'];
 const WIDTHS=process.env.CARE_WIDTHS ? process.env.CARE_WIDTHS.split(',').map(Number) : [320,390,430];
 const NAMES={selfCompassion:'Self-Compassion',unhook:'Unhook from the Thought',makeRoom:'Make Room for the Feeling'};
 const store='mentation.flagship.active.v1', savedStore='mentation.carePractices.saved.v1';
@@ -22,6 +23,8 @@ async function start(p,id){
   await p.getByLabel('Search practices',{exact:true}).fill(NAMES[id]);
   await p.getByRole('button').filter({hasText:NAMES[id]}).last().click();
   await p.locator(`[data-care="${id}"]`).waitFor();
+  // Exercise Self-Compassion with the new stylesheet present, as after visiting either redesigned practice.
+  await p.addStyleTag({path:path.resolve(__dirname,'../src/components/experiential-care/experiential-care.css')});
   await p.getByRole('button',{name:'Begin',exact:true}).click({trial:true});
 }
 async function baseline(p,value){
@@ -159,4 +162,8 @@ async function integratedCompletion(p,id){
   }
   assert.deepEqual(errors,[]);
  }finally{await b.close();fs.writeFileSync(path.join(evidence,'browser-checks.txt'),logs.join('\n')+'\n');}
-})().catch(e=>{console.error(e);process.exitCode=1;});
+})().then(()=>{
+ const result=require('node:child_process').spawnSync(process.execPath,[path.join(__dirname,'verify-experiential-care.cjs')],{stdio:'inherit',env:{...process.env,CARE_PREVIEW_URL:base,CARE_EVIDENCE_DIR:path.join(evidence,'experiential')}});
+ if(result.error)throw result.error;
+ if(result.status!==0)throw Error(`Experiential care checks exited ${result.status}`);
+}).catch(e=>{console.error(e);process.exitCode=1;});
