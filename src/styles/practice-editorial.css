@@ -28,3 +28,4 @@
 .box-v2-player:has(>.practice-checkpoint)>.relative.flex-1{flex:none;min-height:520px;overflow:visible}
 .box-v2-player>.practice-checkpoint{position:relative;z-index:2;flex-shrink:0}
 @media(max-width:359px){.box-v2-player:has(>.practice-checkpoint)>.relative.flex-1{min-height:470px}}
+.box-v2-player:has(>.practice-checkpoint)>.safe-bottom{position:sticky;bottom:0;z-index:5;flex-shrink:0;padding-bottom:14px;background:linear-gradient(transparent,#061321 25%)}
