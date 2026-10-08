@@ -1,14 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 import manifest from './tappingAudioManifest.json';
-import { tappingNarration, hasTappingNarration, tappingNarrationKeys, TAPPING_VOICE_RATE } from './tappingNarration';
+import { tappingNarration, hasTappingNarration, tappingNarrationKeys, TAPPING_VOICE_RATE, tappingNarrationDuration } from './tappingNarration';
+
+vi.mock('../../../narration-manifest.json', () => ({ default: { crown: { text: 'Top of your head. Place two fingertips at the centre of your crown.', audio: '/audio/narration/test-crown.mp3', alignment: [{ word: 'crown.', start: 3.5, end: 4 }] } } }));
 
 describe('shared Mentication narration for tapping', () => {
   it('uses the exact approved spoken-text lookup and the approved recording’s native pitch', () => {
     const lookup = vi.fn(() => ({ url: '/audio/narration/approved.mp3', alignment: [] }));
     expect(tappingNarration('place-brow', lookup)?.url).toBe('/audio/narration/approved.mp3');
     expect(lookup).toHaveBeenCalledWith(manifest['place-brow'].caption);
-    expect(TAPPING_VOICE_RATE).toBe(1);
+    expect(TAPPING_VOICE_RATE).toBe(0.8);
     expect(tappingNarration('unknown', lookup)).toBeNull();
+  });
+  it('scales genuine alignment time to the approved playback rate', () => {
+    expect(tappingNarrationDuration('place-crown')).toBe(5);
   });
   it('does not offer a complete voice guide when even one required recording is missing', () => {
     const lookup = text => text === manifest['place-sideEye'].caption ? null : { url: '/audio/narration/approved.mp3' };

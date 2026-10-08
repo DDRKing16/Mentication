@@ -4,9 +4,8 @@ import approvedManifest from '../../../narration-manifest.json';
 
 const approvedTexts = new Set(Object.values(approvedManifest).map(entry => entry.text.trim().replace(/\s+/g, ' ')));
 
-// Use the approved recording at its native rate. Slowing a decoded WebAudio
-// buffer would transpose the narrator, unlike the pitch-preserving media player.
-export const TAPPING_VOICE_RATE = 1;
+// Narration uses a pitch-preserving media element; bed and contact stay at 1x.
+export const TAPPING_VOICE_RATE = 0.8;
 export function tappingNarration(key, lookup = getNarration) {
   const text = manifest[key]?.caption;
   if (!text || (lookup === getNarration && !approvedTexts.has(text.trim().replace(/\s+/g, ' ')))) return null;

@@ -11,11 +11,13 @@ const files=concern=>[...tappingNarrationKeys(concern),'warm-room','contact'];
 export function createTappingAudio({
   AudioContextClass=window.AudioContext||window.webkitAudioContext,
   fetchAudio=(url,options)=>fetch(url,options),
+  createVoiceElement=()=>new window.Audio(),
   onError=()=>{}, onInterrupted=()=>{}, onEvent=()=>{},
   now=()=>performance.now(),
   resolveNarration=tappingNarration,
 }={}) {
   let context=null,master=null,musicGain=null,voiceGain=null,beatGain=null;
+  let voiceElement=null,voiceOutput=null;
   let disposed=false,playing=false,generation=0,musicNode=null,voiceNode=null;
   let musicOffset=0,musicStarted=0,voiceCursor=null;
   let channels={voice:true,music:true,beat:true};
@@ -43,12 +45,35 @@ export function createTappingAudio({
     if(disposed||!AudioContextClass)throw Error('Audio unavailable');
     if(!context){context=new AudioContextClass();master=context.createGain();master.gain.value=.9;master.connect(context.destination);musicGain=makeGain(.45);voiceGain=makeGain(.95);beatGain=makeGain(.38);context.addEventListener?.('statechange',stateChanged);}
     const unlocked=context.resume();
-    await unlocked;
+    // Unlock the same media element inside the user gesture. Use a real bundled
+    // clip, muted, then rewind; no generated silence or alternative voice.
+    let voiceUnlockFailed=false;
+    const firstVoice=options.voice&&tappingNarrationKeys(concern).map(assetFor).find(Boolean);
+    let voiceUnlocked=Promise.resolve();
+    if(firstVoice){
+      try{
+        if(!voiceElement){
+          voiceElement=createVoiceElement();voiceElement.preload='auto';
+          if(!('preservesPitch' in voiceElement)&&!('webkitPreservesPitch' in voiceElement))throw Error('Pitch preservation unavailable');
+          if('preservesPitch' in voiceElement)voiceElement.preservesPitch=true;
+          if('webkitPreservesPitch' in voiceElement)voiceElement.webkitPreservesPitch=true;
+          voiceElement.defaultPlaybackRate=TAPPING_VOICE_RATE;voiceElement.playbackRate=TAPPING_VOICE_RATE;
+          voiceOutput=context.createMediaElementSource(voiceElement);voiceOutput.connect(voiceGain);
+        }
+        if(!voiceOutput)throw Error('Pitch preservation unavailable');
+        voiceElement.muted=true;voiceElement.src=firstVoice;
+        voiceUnlocked=Promise.resolve(voiceElement.play()).then(()=>{
+          if(!isLive(token)){if(!playing)voiceElement.pause();return;}
+          voiceElement.pause();voiceElement.currentTime=0;voiceElement.muted=false;
+        }).catch(()=>{voiceUnlockFailed=true;});
+      }catch{voiceUnlockFailed=true;}
+    }
+    await Promise.all([unlocked,voiceUnlocked]);
     if(!isLive(token))return false;
     if(context.state!=='running')throw Error('Audio unavailable');
     await preload(concern);
     if(!isLive(token))return false;
-    const errors=new Set();
+    const errors=new Set(voiceUnlockFailed?['voice']:[]);
     await Promise.allSettled(files(concern).map(async key=>{
       if(buffers.has(key))return;
       try{const data=await bytes.get(key);if(!data)throw Error('Audio unavailable');const buffer=await context.decodeAudioData(data.slice(0));if(isLive(token))buffers.set(key,buffer);}
@@ -60,13 +85,18 @@ export function createTappingAudio({
     if(context.state!=='running')throw Error('Audio unavailable');
     return Object.values(channels).some(Boolean);
   }
-  function stopNode(node){if(!node)return;try{node.source.onended=null;node.source.stop();node.source.disconnect();}catch{/* already ended */}nodes.delete(node);}
+  function stopNode(node){
+    if(!node)return;
+    if(node.kind==='voice'){voiceElement.onended=null;voiceElement.onerror=null;voiceElement.pause();}
+    else try{node.source.onended=null;node.source.stop();node.source.disconnect();}catch{/* already ended */}
+    nodes.delete(node);
+  }
   function stopKind(kind){for(const node of [...nodes])if(node.kind===kind)stopNode(node);}
   function duck(value){if(!musicGain)return;musicGain.gain.cancelScheduledValues(context.currentTime);musicGain.gain.setTargetAtTime(value,context.currentTime,.16);}
   function sourceFor(key,kind,gain,{offset=0,delay=0,at=null,loop=false,buffer=null}={}){
     if((!buffer&&!buffers.has(key))||context.state!=='running')throw Error('Audio unavailable');
     const source=context.createBufferSource();source.buffer=buffer||buffers.get(key);source.loop=loop;source.connect(gain);
-    const rate=kind==='voice'?TAPPING_VOICE_RATE:1;
+    const rate=1;
     source.playbackRate.value=rate;
     const node={source,kind,key,start:at??context.currentTime+delay,offset,rate};nodes.add(node);
     source.onended=()=>{nodes.delete(node);try{source.disconnect();}catch{/* ended */}if(node===voiceNode){voiceNode=null;voiceCursor=null;duck(.45);}if(node===musicNode)musicNode=null;};
@@ -77,7 +107,22 @@ export function createTappingAudio({
     if(!playing||!channels.voice)return;
     stopNode(voiceNode);voiceNode=null;voiceCursor=null;
     const clip=buffers.get(key);if(!clip||offset>=clip.duration)return;
-    try{voiceNode=sourceFor(key,'voice',voiceGain,{offset});voiceCursor={key,offset};duck(.12);}catch{channels.voice=false;onError('voice');}
+    if(!voiceElement||!voiceOutput)return;
+    const node={kind:'voice',key};
+    voiceNode=node;nodes.add(node);
+    const failed=()=>{
+      if(voiceNode!==node||disposed)return;
+      stopNode(node);voiceNode=null;voiceCursor=null;channels.voice=false;duck(.45);onError('voice');
+    };
+    try{
+      voiceElement.src=assetFor(key);voiceElement.currentTime=offset;
+      voiceElement.playbackRate=TAPPING_VOICE_RATE;voiceElement.muted=false;
+      voiceCursor={key,offset};
+      voiceElement.onended=()=>{if(voiceNode!==node)return;stopNode(node);voiceNode=null;voiceCursor=null;duck(.45);};
+      voiceElement.onerror=failed;
+      duck(.12);onEvent('voice',{key,at:context.currentTime,offset});
+      Promise.resolve(voiceElement.play()).catch(failed);
+    }catch{failed();}
   }
   function run(){
     if(disposed||!context||context.state!=='running')return;
@@ -125,12 +170,13 @@ export function createTappingAudio({
   function playbackTime(){return !disposed&&context?.state==='running'?outputTime():null;}
   function pause(){
     generation+=1;playing=false;stopRhythm();
-    if(voiceNode)voiceCursor={key:voiceNode.key,offset:Math.max(0,voiceNode.offset+(context.currentTime-voiceNode.start)*voiceNode.rate)};
+    if(voiceNode)voiceCursor={key:voiceNode.key,offset:Math.max(0,voiceElement.currentTime)};
+    voiceElement?.pause();
     if(musicNode)musicOffset+=Math.max(0,context.currentTime-musicStarted);
     for(const node of [...nodes])stopNode(node);musicNode=null;voiceNode=null;
   }
   function cancel(){pause();voiceCursor=null;}
   function configure(options){channels={...channels,...options};if(!channels.voice){stopKind('voice');voiceNode=null;voiceCursor=null;duck(.45);}if(!channels.music){if(musicNode)musicOffset+=Math.max(0,context.currentTime-musicStarted);stopKind('music');musicNode=null;}if(!channels.beat)stopRhythm();}
-  function dispose(){if(disposed)return;cancel();disposed=true;abort.abort();context?.removeEventListener?.('statechange',stateChanged);if(context)void context.close().catch(()=>{});}
+  function dispose(){if(disposed)return;cancel();disposed=true;abort.abort();if(voiceElement){voiceElement.removeAttribute('src');voiceElement.load();voiceOutput?.disconnect();}context?.removeEventListener?.('statechange',stateChanged);if(context)void context.close().catch(()=>{});}
   return {preload,activate,run,speak,beat,startRhythm,stopRhythm,rhythmPhase,playbackTime,pause,cancel,configure,dispose};
 }

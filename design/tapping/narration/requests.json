@@ -1,0 +1,171 @@
+{
+  "status": "awaiting_approved_recordings",
+  "source_commit": "eed6d05c80624a6e909034a07f40fd2aa646131e",
+  "unique_recordings": 18,
+  "keys": 19,
+  "request_characters": 1455,
+  "preset": {
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "model_id": "eleven_v3",
+    "stability": 0.35,
+    "style": 0.7,
+    "use_speaker_boost": false,
+    "delivery_cue": "[warmly, smiling, gently] ",
+    "playback_rate": 0.8
+  },
+  "unspecified_provider_options": "Use provider defaults, document them, and audition the known approved preset before the remaining batch once existing authorized access is available. Historical undocumented settings are not a blocker.",
+  "before_generation": "Verify existing allowance and cost; do not create a key or purchase credits.",
+  "recordings": [
+    {
+      "keys": [
+        "place-hand"
+      ],
+      "text": "Side of your hand. Place two fingertips on the soft outer edge, between your little finger and wrist. Use a light touch.",
+      "request_text": "[warmly, smiling, gently] Side of your hand. Place two fingertips on the soft outer edge, between your little finger and wrist. Use a light touch.",
+      "request_characters": 146
+    },
+    {
+      "keys": [
+        "place-crown"
+      ],
+      "text": "Top of your head. Place two fingertips at the centre of your crown.",
+      "request_text": "[warmly, smiling, gently] Top of your head. Place two fingertips at the centre of your crown.",
+      "request_characters": 93
+    },
+    {
+      "keys": [
+        "place-brow"
+      ],
+      "text": "Inner eyebrow. Where your eyebrow begins, beside the bridge of your nose.",
+      "request_text": "[warmly, smiling, gently] Inner eyebrow. Where your eyebrow begins, beside the bridge of your nose.",
+      "request_characters": 99
+    },
+    {
+      "keys": [
+        "place-sideEye"
+      ],
+      "text": "Side of your eye. Find the bone beside the outer corner. Stay on the bone.",
+      "request_text": "[warmly, smiling, gently] Side of your eye. Find the bone beside the outer corner. Stay on the bone.",
+      "request_characters": 100
+    },
+    {
+      "keys": [
+        "place-underEye"
+      ],
+      "text": "Under your eye. On the bone below your eye, in line with the pupil.",
+      "request_text": "[warmly, smiling, gently] Under your eye. On the bone below your eye, in line with the pupil.",
+      "request_characters": 93
+    },
+    {
+      "keys": [
+        "place-nose"
+      ],
+      "text": "Under your nose. In the space between your nose and upper lip.",
+      "request_text": "[warmly, smiling, gently] Under your nose. In the space between your nose and upper lip.",
+      "request_characters": 88
+    },
+    {
+      "keys": [
+        "place-chin"
+      ],
+      "text": "Chin crease. Below your lower lip, above your chin.",
+      "request_text": "[warmly, smiling, gently] Chin crease. Below your lower lip, above your chin.",
+      "request_characters": 77
+    },
+    {
+      "keys": [
+        "place-collar"
+      ],
+      "text": "Below your collarbone. About an inch out from the centre, just below the bone.",
+      "request_text": "[warmly, smiling, gently] Below your collarbone. About an inch out from the centre, just below the bone.",
+      "request_characters": 104
+    },
+    {
+      "keys": [
+        "place-arm"
+      ],
+      "text": "Under your arm. Reach across to your side, about four inches below your armpit.",
+      "request_text": "[warmly, smiling, gently] Under your arm. Reach across to your side, about four inches below your armpit.",
+      "request_characters": 105
+    },
+    {
+      "keys": [
+        "tension-setup"
+      ],
+      "text": "Even with this tension, I can be kind to myself right now.",
+      "request_text": "[warmly, smiling, gently] Even with this tension, I can be kind to myself right now.",
+      "request_characters": 84
+    },
+    {
+      "keys": [
+        "tension-reminder"
+      ],
+      "text": "This tension.",
+      "request_text": "[warmly, smiling, gently] This tension.",
+      "request_characters": 39
+    },
+    {
+      "keys": [
+        "worry-setup"
+      ],
+      "text": "Even with this worry, I can be kind to myself right now.",
+      "request_text": "[warmly, smiling, gently] Even with this worry, I can be kind to myself right now.",
+      "request_characters": 82
+    },
+    {
+      "keys": [
+        "worry-reminder"
+      ],
+      "text": "This worry.",
+      "request_text": "[warmly, smiling, gently] This worry.",
+      "request_characters": 37
+    },
+    {
+      "keys": [
+        "overwhelm-setup"
+      ],
+      "text": "Even with this overwhelm, I can be kind to myself right now.",
+      "request_text": "[warmly, smiling, gently] Even with this overwhelm, I can be kind to myself right now.",
+      "request_characters": 86
+    },
+    {
+      "keys": [
+        "overwhelm-reminder"
+      ],
+      "text": "This overwhelm.",
+      "request_text": "[warmly, smiling, gently] This overwhelm.",
+      "request_characters": 41
+    },
+    {
+      "keys": [
+        "grounding-setup",
+        "grounding-reminder"
+      ],
+      "text": "My feet. The room. This moment.",
+      "request_text": "[warmly, smiling, gently] My feet. The room. This moment.",
+      "request_characters": 57
+    },
+    {
+      "keys": [
+        "tap"
+      ],
+      "text": "Tap with me. A light touch.",
+      "request_text": "[warmly, smiling, gently] Tap with me. A light touch.",
+      "request_characters": 53
+    },
+    {
+      "keys": [
+        "rest"
+      ],
+      "text": "Let your hands rest. Notice how you feel now.",
+      "request_text": "[warmly, smiling, gently] Let your hands rest. Notice how you feel now.",
+      "request_characters": 71
+    }
+  ],
+  "required_output": [
+    "MP3 in the approved voice",
+    "Genuine provider word alignment for spoken caption text (exclude delivery cue)",
+    "Actual duration and generation metadata"
+  ],
+  "integration": "One grounding recording serves grounding-setup and grounding-reminder. Add to approved narration-manifest.json with local MP3 paths only after generation and playback checks. Existing Piper tapping files are not reusable as approved narration."
+}
