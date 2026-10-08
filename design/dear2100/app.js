@@ -1,3 +1,4 @@
+import { confirmPracticeAnswer, answerPair } from "./practice-checkpoints.js";
 import { THREAT_QUESTIONS, scoreThreatCheck, threatStepComplete, requiredThreatStep, requiredThreatView, emptyThreatCheck } from "./threat-check.js";
 import { createBookStore } from "./storage.js";
 import { en, hi, As, ia, ht, Sl, A2, O2, nb, Dd, Y1, q1, lv, J1, h, i, La, za, Nn, tt, Rn, Gr, li, X1, Qe, pu, Mx, LE, tb, Dx, Lx, zx, Rt, Zn, W1, Q1, Ke, hu, F1, fu, ta, Z1, QE, ZE, qE, XE, rb, G1, e2, n2, t2, r2, o2, bs, av, Uh, K1, $1, ob, H1, Bh, Vh, _p, eb, B1, $E, BE, HE, GE, UE, KE, YE, ov } from "./vendor.js";
@@ -66,6 +67,7 @@ const _e = en().max(2e3),
   }).strict(),
   os = hi({
     format: Sl(7),
+    practiceCheckpoints: As(hi({id:en().max(100),label:en().max(300),detail:en().max(3000)})).max(100).default([]),
     threatVisualSeen: A2().default(false),
     threatCheck: hi({answers: As(ht().int().min(0).max(3).nullable()).length(4), submitted: A2()}).nullable().default(null),
     resume: hi({ view: en(), section: en(), planTab: en(), threat: ht().int().min(0).max(3), road: en(), checkpoint: ht().int().min(0).max(2), question: en().default("") }).default({view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0}),
@@ -170,6 +172,7 @@ const z2 = {
   },
   Co = () => ({
     format: 7,
+    practiceCheckpoints: [],
     threatVisualSeen: false,
     threatCheck: null,
     resume: {view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0},
@@ -1507,7 +1510,11 @@ function useQuestionHistory(id,current,onCurrent) {
   },[id,current]);
   h.useEffect(()=>{const pop=event=>{if(dearEmbeddedHistory||event.state?.dearQuestion?.id!==id)return;restore.current=true;onCurrent(event.state.dearQuestion.current);};window.addEventListener("popstate",pop);return()=>window.removeEventListener("popstate",pop);});
 }
-function SequentialQuestions({id, steps, current, onCurrent, onDone, doneLabel="Continue", optionalStart=steps.length, blocked=false}) {
+function DearPracticeReveal({events=[]}) {
+  const pair=answerPair(events);if(!pair.length)return null;
+  return i.jsxs("aside",{className:"dear-practice-reveal",role:"status","aria-label":"Your two-answer reflection","data-checkpoint":Math.floor(events.length/2),children:[i.jsx("span",{className:"dear-reveal-mark","aria-hidden":true,children:"✦"}),i.jsxs("div",{children:[i.jsx("p",{className:"question-kicker",children:"Two pieces of your picture"}),i.jsx("dl",{children:pair.map(item=>i.jsxs("div",{children:[i.jsx("dt",{children:item.label}),i.jsx("dd",{children:item.detail})]},item.id))})]})]});
+}
+function SequentialQuestions({id, steps, current, onCurrent, onDone, doneLabel="Continue", optionalStart=steps.length, blocked=false, onConfirm}) {
   useQuestionHistory(id,steps.some(step=>`${id}:${step.id}`===current)?current:`${id}:${steps[0].id}`,onCurrent);
   const root=h.useRef(null), index=Math.max(0,steps.findIndex(step=>`${id}:${step.id}`===current)), step=steps[index];
   const go=next=>onCurrent(`${id}:${steps[next].id}`);
@@ -1517,7 +1524,7 @@ function SequentialQuestions({id, steps, current, onCurrent, onDone, doneLabel="
     i.jsx("p",{className:"question-kicker",children:index<optionalStart?`One question · ${index+1} of ${optionalStart}`:"Optional detail"}),
     i.jsx("h1",{id:"screen-title",tabIndex:-1,children:step.title}),
     step.hint&&i.jsx("p",{className:"lede",children:step.hint}),step.field,
-    i.jsx("button",{className:"primary-button",disabled:blocked||step.valid===false,onClick:()=>index>=optionalStart?go(optionalStart-1):index<optionalStart-1?go(index+1):onDone(),children:index>=optionalStart?"Return to my answer":index<optionalStart-1?"Continue":doneLabel}),
+    i.jsx("button",{className:"primary-button",disabled:blocked||step.valid===false,onClick:()=>{onConfirm?.(`${id}:${step.id}`,step.title,step.evidence ?? step.field?.props?.value ?? step.field?.props?.selected);index>=optionalStart?go(optionalStart-1):index<optionalStart-1?go(index+1):onDone();},children:index>=optionalStart?"Return to my answer":index<optionalStart-1?"Continue":doneLabel}),
     index===optionalStart-1&&steps.length>optionalStart&&i.jsxs("details",{className:"foldout",children:[i.jsx("summary",{children:"Add an optional detail"}),...steps.slice(optionalStart).map((extra,key)=>i.jsx("button",{className:"text-button",onClick:()=>go(optionalStart+key),children:extra.title},extra.id))]}),
     index>0&&i.jsx("button",{className:"text-button",onClick:()=>{if(!requestDearHistoryBack())go(index>=optionalStart?optionalStart-1:index-1);},children:"Back to previous question"})
   ]});
@@ -2879,7 +2886,7 @@ function kN({
   onLearn: r,
   futureWalk: o,
   onFutureWalkChange: s,
-  focusRequest: a, onResumeChange, onThreatCheck, onThreatVisualDone, onDone
+  focusRequest: a, onResumeChange, onThreatCheck, onThreatVisualDone, onDone, onConfirm
 }) {
   const l = t.answers,
     c = yN(l),
@@ -2902,17 +2909,17 @@ function kN({
     }));
     return () => cancelAnimationFrame(m);
   }, [a, e, l.action]);
-  const text=(key,title,required=false,suggestions)=>({id:key,title,valid:!required||!!l[key]?.trim(),field:i.jsx(Ye,{label:title,value:l[key]||"",required,small:true,questionId:"screen-title",onChange:value=>n(key,value),suggestions})});
+  const text=(key,title,required=false,suggestions)=>({id:key,title,evidence:l[key],valid:!required||!!l[key]?.trim(),field:i.jsx(Ye,{label:title,value:l[key]||"",required,small:true,questionId:"screen-title",onChange:value=>n(key,value),suggestions})});
   const choice=(key,title,options)=>({id:key,title,valid:!!l[key],field:i.jsx(Kx,{label:title,options,value:l[key],onChange:value=>n(key,value)})});
   let questions,core;
   if(e===2){questions=[{id:"kind",title:"What’s getting in the way?",hint:"Choose the kind of barrier you want to work with.",field:i.jsx(Kx,{label:"Kind of barrier",options:["Fear or doubt","Practical limits","Both"],value:{fear:"Fear or doubt",practical:"Practical limits",both:"Both"}[l.barrierFocus],onChange:value=>n("barrierFocus",{"Fear or doubt":"fear","Practical limits":"practical",Both:"both"}[value])})},...(l.barrierFocus!=="practical"?[text("prediction","If you try, what are you afraid might happen?",true,Wu["If I try, I’m afraid…"])]:[]),...(l.barrierFocus!=="fear"?[text("practicalNote","What practical thing is in the way?",true,Wu["A practical barrier or other detail"])]:[])];core=questions.length;}
   if(e===2){questions.push({id:"other-barriers",title:"Any other barriers you want to note?",field:i.jsx(wN,{items:W2,selected:l.barriers,onChange:value=>n("barriers",value)})});if(l.barrierFocus==="fear")questions.push(text("practicalNote","Any practical detail you want to keep?"));}
   if(e===4){questions=[l.barrierFocus==="practical"?text("practicalSupport","What would help you start?",true,Wu["A resource, adjustment or support I need"]):text("behavior","When fear shows up, what do you usually do?",true,V2),...(l.barrierFocus==="both"?[text("practicalSupport","What practical support would help?")]:[]),text("cost","What might postponing cost you later?")];core=1;}
-  if(e===6){questions=[{id:"values",title:"Which qualities do you want to carry forward?",hint:"Choose three to five. These are options for one question.",valid:u.length>=3&&u.length<=5,field:i.jsxs(i.Fragment,{children:[i.jsx(eN,{answers:l,onChange:value=>n("values",value)}),i.jsx("label",{htmlFor:"custom-value",children:"Or include your own value"}),i.jsx("input",{id:"custom-value",value:l.customValue,maxLength:60,disabled:!l.customValue.trim()&&u.length>=5,onChange:event=>{if(jr({...l,customValue:event.target.value}).length<=5)n("customValue",event.target.value);}})]})},text("valueAction","How could you act on a value?",false,U2[l.values[0]]),text("judgment","What standard do you want to use?")];core=1;}
+  if(e===6){questions=[{id:"values",evidence:u,title:"Which qualities do you want to carry forward?",hint:"Choose three to five. These are options for one question.",valid:u.length>=3&&u.length<=5,field:i.jsxs(i.Fragment,{children:[i.jsx(eN,{answers:l,onChange:value=>n("values",value)}),i.jsx("label",{htmlFor:"custom-value",children:"Or include your own value"}),i.jsx("input",{id:"custom-value",value:l.customValue,maxLength:60,disabled:!l.customValue.trim()&&u.length>=5,onChange:event=>{if(jr({...l,customValue:event.target.value}).length<=5)n("customValue",event.target.value);}})]})},text("valueAction","How could you act on a value?",false,U2[l.values[0]]),text("judgment","What standard do you want to use?")];core=1;}
   if(e===8){questions=[text("action","What’s your next small step?",true,H2(l)),choice("day","When would you like to try it?",["Today","Tomorrow","This week","Decide later"]),choice("time","What part of the day suits you?",["Morning","Afternoon","Evening","Decide later"]),{id:"minutes",title:"How long could you give it?",valid:!!l.minutes,field:i.jsx(Kx,{label:"Duration",options:["5 min","15 min","30 min"],value:l.minutes?`${l.minutes} min`:"",onChange:value=>n("minutes",value.split(" ")[0])})},text("ifThen",l.barrierFocus==="practical"?"If the obstacle returns, what will you do?":"When fear returns, what will you do?",true,Wu[l.barrierFocus==="practical"?"If the usual obstacle shows up, then I will…":"When fear arises, I will…"]),choice("budget","What resources could you use?",["none","small","flexible"]),...[["likelihood","How likely does your prediction feel?",100],["discomfort","How much discomfort do you expect?",10],["goalState","How able do you feel to take this step?",10]].map(([key,title,max])=>({id:key,title,field:i.jsx(aa,{label:title,value:l[key],max,suffix:max===10?" / 10":"%",onChange:value=>n(key,value)})})),text("evidenceLookFor","What will you actually look for?")];core=5;}
-  if(e===5&&t.resume.question!=="5:roads")return i.jsx(SequentialQuestions,{id:"5",current:t.resume.question,onCurrent:question=>onResumeChange({question}),steps:[{id:"horizon",title:"How far ahead would you like to look?",hint:"Explore possibilities, not predictions.",field:i.jsx(Kx,{label:"Future horizon",options:["One year","Twenty years"],value:l.horizon==="near"?"One year":"Twenty years",onChange:value=>n("horizon",value==="One year"?"near":"long")})}],onDone:()=>onResumeChange({question:"5:roads"}),doneLabel:"Explore the two roads"});
+  if(e===5&&t.resume.question!=="5:roads")return i.jsx(SequentialQuestions,{id:"5",onConfirm,current:t.resume.question,onCurrent:question=>onResumeChange({question}),steps:[{id:"horizon",title:"How far ahead would you like to look?",hint:"Explore possibilities, not predictions.",field:i.jsx(Kx,{label:"Future horizon",options:["One year","Twenty years"],value:l.horizon==="near"?"One year":"Twenty years",onChange:value=>n("horizon",value==="One year"?"near":"long")})}],onDone:()=>onResumeChange({question:"5:roads"}),doneLabel:"Explore the two roads"});
   if(e===4&&l.barrierFocus!=="practical"&&l.behavior)questions[0].field=i.jsxs(i.Fragment,{children:[questions[0].field,i.jsxs("details",{className:"foldout",children:[i.jsx("summary",{children:"See the pattern you named"}),i.jsx(Zx,{a:l,committed:t.committed})]})]});
-  if(questions)return i.jsx(SequentialQuestions,{id:String(e),steps:questions,optionalStart:core,current:t.resume.question,onCurrent:question=>onResumeChange({question}),onDone,doneLabel:e===2?"Next: Understand the alarm":"Continue"});
+  if(questions)return i.jsx(SequentialQuestions,{id:String(e),onConfirm,steps:questions,optionalStart:core,current:t.resume.question,onCurrent:question=>onResumeChange({question}),onDone,doneLabel:e===2?"Next: Understand the alarm":"Continue"});
   return i.jsxs("section", {
     className: `question-page enter flow-stage flow-stage-${e}`,
     "aria-labelledby": "screen-title",
@@ -3651,6 +3658,7 @@ function SN() {
         } : X;
         return {
           ...Lt,
+          practiceCheckpoints:confirmPracticeAnswer(Lt.practiceCheckpoints,"direction","My direction",E),
           answers: {
             ...Lt.answers,
             want: E
@@ -3972,6 +3980,7 @@ function SN() {
           step: ue,
           book: e,
           answer: jf,
+          onConfirm:(id,label,value)=>t(book=>({...book,practiceCheckpoints:confirmPracticeAnswer(book.practiceCheckpoints,id,label,value)})),
           onLearn: () => l("learn"),
           futureWalk: ee,
           onFutureWalkChange: J,
@@ -3979,7 +3988,7 @@ function SN() {
           onThreatVisualDone: () => { t(book=>({...book,threatVisualSeen:true,resume:{...book.resume,question:"threat-teaching"}})); window.scrollTo({top:0,behavior:"instant"}); },
           onThreatCheck: threatCheck => t(book=>({...book,threatCheck})),
           focusRequest: k, onDone:qx
-        }, ue), ue < 9 && ![2,3,4,6,8].includes(ue) && !(ue===7&&D.barrierFocus!=="practical") && i.jsxs("footer", {
+        }, ue), i.jsx(DearPracticeReveal,{events:e.practiceCheckpoints}), ue < 9 && ![2,3,4,6,8].includes(ue) && !(ue===7&&D.barrierFocus!=="practical") && i.jsxs("footer", {
           className: "flow-actions",
           children: [i.jsx("span", {
             className: "save-status",

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkpointFor, practiceEvent, careCheckpoints } from './practiceCheckpoints';
+import { checkpointFor, practiceEvent, careCheckpoints, reconcilePracticeEvents } from './practiceCheckpoints';
 import { freshCareState } from './carePractices';
 describe('earned practice checkpoints',()=>{
  it('does not treat a missing confirmation field as an earned default',()=>{
@@ -42,5 +42,21 @@ describe('care route chronology',()=>{
   expect(before.all.map(e=>e.id)).toEqual(['before','notice','response','try','action']);
   expect(after.items.map(e=>e.id)).toEqual(['action','anchor']);
   expect(after.all.slice(2,4)).toEqual(before.items);
+ });
+});
+
+
+describe('checkpoint evidence ordering', () => {
+ const e = id => practiceEvent(id, 'Confirmed', id);
+ it('appends a later optional answer without changing an already-earned pair', () => {
+  const previous = [e('first'), e('second'), e('fourth')];
+  const next = reconcilePracticeEvents(previous, [e('first'), e('second'), e('optional'), e('fourth')]);
+  expect(next.map(item => item.id)).toEqual(['first', 'second', 'fourth', 'optional']);
+  expect(checkpointFor(next).items.map(item => item.id)).toEqual(['fourth', 'optional']);
+ });
+ it('removes undone evidence and updates edits without creating an extra event', () => {
+  const next = reconcilePracticeEvents([e('a'), e('b')], [practiceEvent('a', 'Edited', 'new words'), null]);
+  expect(next).toEqual([practiceEvent('a', 'Edited', 'new words')]);
+  expect(checkpointFor(next).pairs).toBe(0);
  });
 });

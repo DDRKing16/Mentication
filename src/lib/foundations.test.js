@@ -25,6 +25,12 @@ describe('Foundations answer-grounded checkpoints', () => {
     expect(first.answered.filter(Boolean)).toHaveLength(3);
     expect(reflection({ responses, lastId: 'sleep-1', revised: true }).count).toBe(3);
   });
+  it('connects the first two answers including the overall starting point', () => {
+    const result = reflection({ responses: { overall: 3, 'sleep-0': 4 }, lastId: 'sleep-0' });
+    expect(result.title).toBe('Two pieces connected');
+    expect(result.copy).toContain('the basics overall: mixed');
+    expect(result.copy).toContain('sleep timing: mostly supporting you');
+  });
   it('gives a first-answer reflection without pretending to know the other answer', () => {
     const result = reflection({ responses: { 'sleep-0': 1 }, lastId: 'sleep-0' });
     expect(result.title).toBe('One piece revealed');

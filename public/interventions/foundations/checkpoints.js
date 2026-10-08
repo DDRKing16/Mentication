@@ -47,6 +47,16 @@ globalThis.FoundationsCheckpoints = (() => {
           : `You rated ${first > second ? a : b} higher than ${first > second ? b : a}. Both answers belong in your picture.`;
       }
     }
+    // Overall is a real answer too: reveal each even pair, including the
+    // first pair before a domain has both of its own answers.
+    if (count % 2 === 0 && title === (revised ? 'Reflection updated' : 'One piece revealed')) {
+      const pair = items.filter(entry => isRating(responses[entry.id])).slice(-2);
+      title = revised ? 'Connection updated' : 'Two pieces connected';
+      copy = pair.map(entry => {
+        const subject = entry.id === 'overall' ? 'the basics overall' : subjects[entry.domainId][Number(entry.id.slice(-1))];
+        return `${subject}: ${ratingLabels[responses[entry.id] - 1]}`;
+      }).join(' · ') + '.';
+    }
     const nextItem = items[index + 1];
     return {
       ...base, title, copy,

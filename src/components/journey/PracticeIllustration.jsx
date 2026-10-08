@@ -1,6 +1,9 @@
 /** Purposeful practice objects. Instruction and user evidence stay in accessible HTML. */
 export default function PracticeIllustration({ kind = 'path', className = '' }) {
   const drawings = {
+    breath: <><rect className="pi-wash" x="101" y="36" width="98" height="98" rx="26"/><path d="M110 111V63q0-18 18-18h44q18 0 18 18v44q0 18-18 18h-44"/><circle className="pi-solid" cx="110" cy="111" r="7"/><path d="M66 91q14-28 25 0M210 91q14 28 25 0"/></>,
+    wave: <><path className="pi-wash" d="M38 123q34-4 65-47t71 0 88 47v25H38Z"/><path d="M38 123q34-4 65-47t71 0 88 47M40 139h222"/><circle cx="133" cy="58" r="10"/><path d="M133 27V16m-23 23-9-9m55 9 9-9"/></>,
+    care: <><path className="pi-wash" d="M89 133q-31-51 9-83 31-21 53 16 22-37 53-16 40 32 9 83Z"/><path d="M57 121q18 33 50 32h86q32 1 50-32M109 102q41 38 83 0"/><path d="M151 129V85"/></>,
     water: <><path className="pi-wash" d="M97 56h108l-13 91H110Z"/><path d="M94 35h113l-16 115h-80Z"/><path d="M104 82q23-14 47 0t48 0M118 117h62"/><path className="pi-solid" d="M151 17q-16 21 0 25q16-4 0-25"/></>,
     light: <><path className="pi-wash" d="m143 42 64-24v128l-64-24Z"/><path d="M94 150V27h111v123M149 27v123M94 83h111M81 151h139"/><path d="m218 32 10-8m-8 40h17m-18 27 11 8"/><path className="pi-solid" d="M154 47h42v30h-42Z"/></>,
     path: <><path d="M52 153q80-32 72-57t66-61"/><ellipse className="pi-wash" cx="89" cy="133" rx="28" ry="10"/><ellipse className="pi-wash" cx="132" cy="100" rx="23" ry="9"/><ellipse className="pi-wash" cx="147" cy="66" rx="19" ry="8"/><path d="M190 56V18l27 11-27 10"/></>,
