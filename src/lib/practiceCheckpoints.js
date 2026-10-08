@@ -9,6 +9,18 @@ export function checkpointFor(events = []) {
 }
 export const practiceEvent = (id, label, detail, ...confirmation) => (confirmation.length === 0 || confirmation[0] === true) && detail !== null && detail !== undefined && detail !== '' ? { id, label, detail: String(detail) } : null;
 
+/** Keep optional answers in the order they were confirmed during this visit.
+ * Editing updates the existing evidence; undo removes it. Neither earns a new event.
+ * Restored sessions begin from their saved evidence, never from a click counter.
+ */
+export function reconcilePracticeEvents(previous = [], events = []) {
+  const current = checkpointFor(events).all;
+  const byId = new Map(current.map(event => [event.id, event]));
+  const kept = previous.filter(event => byId.has(event.id)).map(event => byId.get(event.id));
+  const known = new Set(kept.map(event => event.id));
+  return [...kept, ...current.filter(event => !known.has(event.id))];
+}
+
 export function careCheckpoints(id, s) {
   const e = practiceEvent;
   // Only a committed screen departure confirms authored words; an open editor does not.

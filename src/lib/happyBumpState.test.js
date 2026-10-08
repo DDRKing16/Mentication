@@ -87,3 +87,12 @@ describe('Happy Bump sequential planner restoration', () => {
     expect(restoreBumpState({nextActivity:'Tea'},{version:2,scene:'comfortIdea',nextMode:'relaxing'}).scene).toBe('comfortSense');
   });
 });
+
+
+it('restores confirmation conservatively and never promotes a pending slider', () => {
+ expect(restoreBumpState({}, {version:2, scene:'baseline', baseline:7}).baselineConfirmed).toBe(false);
+ expect(restoreBumpState({}, {version:2, scene:'hydrate', baseline:7}).baselineConfirmed).toBe(true);
+ expect(restoreBumpState({}, {version:2, scene:'rerate', current:7}).currentConfirmed).toBe(false);
+ expect(restoreBumpState({}, {version:2, scene:'complete', current:7, currentConfirmed:false}).currentConfirmed).toBe(false);
+ expect(restoreBumpState({}, {version:2, scene:'helpfulness', current:0}).currentConfirmed).toBe(true);
+});

@@ -22,6 +22,10 @@ export function restoreBumpState(initial, saved) {
   // Old defaults and selected actions were not evidence of answers/completion.
   if (saved?.version !== 2) Object.assign(state, { baseline: null, current: null, helpfulness: null, walkStatus: null, taskStatus: null, contactStatus: null });
   state.version = 2;
+  // Legacy drafts have no confirmation flags. Only an already-departed rating
+  // screen is evidence of confirmation; a slider being edited is not.
+  state.baselineConfirmed = saved?.baselineConfirmed ?? (answeredEnergy(state.baseline) && !['arrival', 'baseline'].includes(state.scene));
+  state.currentConfirmed = saved?.currentConfirmed ?? (answeredEnergy(state.current) && ['helpfulness', 'complete'].includes(state.scene));
   if (state.scene === 'move') Object.assign(state, {elapsedBeforePause:walkElapsed(state),startedAt:null,paused:true});
   if (['grateful', 'anticipate'].includes(state.scene)) state.scene = 'proud';
   if (state.scene === 'reveal') state.scene = 'complete';
