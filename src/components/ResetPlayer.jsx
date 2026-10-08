@@ -45,6 +45,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
   const [groundingResume] = useState(() => pathway.length===1 && pathway[0]?.id==="grounding54321V2" ? groundingPosition(globalThis.history?.state?.usr?.reset_grounding,sessionId) : null);
   const [boxResume] = useState(() => pathway.length===1 && pathway[0]?.id==="boxV2" ? boxPosition(globalThis.history?.state?.usr?.reset_box,sessionId) : null);
   const boxClock = useRef(boxResume?.clockElapsed || 0);
+  const [boxCompletedRounds,setBoxCompletedRounds] = useState(Math.min(4,Math.floor((boxResume?.clockElapsed || 0) / 16000)));
   const [boxSaved,setBoxSaved] = useState(true);
   const [groundingSaved,setGroundingSaved] = useState(true);
   const [groundingPresence,setGroundingPresence] = useState(groundingResume?.presence || null);
@@ -710,7 +711,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
                   running={running && !showSwitch}
                   onInterrupted={pauseBox}
                   initialElapsed={boxClock.current}
-                  onPosition={position => {boxClock.current=position;if(pathway.length===1)setBoxSaved(writeBoxPosition(globalThis.history,{sessionId,step:stepIndex,elapsed,clockElapsed:position},sessionId));}}
+                  onPosition={position => {boxClock.current=position;setBoxCompletedRounds(Math.min(4,Math.floor(position / 16000)));if(pathway.length===1)setBoxSaved(writeBoxPosition(globalThis.history,{sessionId,step:stepIndex,elapsed,clockElapsed:position},sessionId));}}
                   discreet={discreet}
                   paced={isBoxV2Paced}
                   showBody={captions}
@@ -781,7 +782,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         </AnimatePresence>
       </div>
 
-      {isBoxV2 && !isBoxV2Paced && boxClock.current >= 64000 && <PracticeCheckpoint compact variant="breath" title="A rhythm you can revisit" events={Array.from({length:4},(_,i)=>earned(`round-${i}`,'Guided round completed',i === 3 ? 'Let your next breath find its own pace.' : 'Four equal phases; breathing naturally is always an option.'))}/>}
+      {isBoxV2 && !showBoxFeedback && boxCompletedRounds >= 2 && <PracticeCheckpoint compact variant="breath" title="A rhythm you can revisit" events={Array.from({length:boxCompletedRounds},(_,i)=>earned(`round-${i}`,'Guided round completed',i % 2 ? 'Rejoin at the next inhale whenever you lose the count.' : 'Four equal phases; breathing naturally is always an option.'))}/>}
       {isBoxV2 && boxResume && !showBoxFeedback && !running && <p role="status" className="relative px-5 text-center text-sm text-cream">Your place is back, paused. Choose Play when ready.</p>}
       {isBoxV2 && !boxSaved && <p role="status" className="relative px-5 text-center text-sm text-cream">This tab could not remember your place. Keep it open; refresh may lose your progress.</p>}
       {isGroundingV2 && !groundingSaved && <p role="status" className="relative px-5 text-center text-sm">This tab could not remember your grounding place. Your current practice is still here; refresh may lose it.</p>}
