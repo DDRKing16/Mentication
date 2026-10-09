@@ -53,6 +53,7 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
   const steps = useMemo(() => createPMRSteps(intervention.steps, { mode, length }), [intervention.steps, mode, length]);
   useJourneyScreenHistory(intervention.id, phase, next => { if (['setup','length','practice','outcome','helpfulness'].includes(next)) { setRunning(false);setPhase(next); } });
   const routeEvents = [earned('mode','Your approach',mode === 'release' ? 'Release without tensing' : 'Gentle tense and release',modeChosen),earned('length','Your route',length === 'short' ? 'Hands → shoulders → calves & feet' : 'Seven areas, at your pace',lengthChosen)];
+  const practiceEvents = [...routeEvents,...released.map(region => earned(region,'Release guidance completed', {hands:'Hands & forearms',shoulders:'Arms & shoulders',face:'Jaw & face',torso:'Chest & abdomen',hips:'Glutes & hips',thighs:'Thighs',lowerLegs:'Calves & feet'}[region] || region)), earned('outcome','Your tension check',PMR_OUTCOMES.find(([id])=>id===outcome)?.[1]), earned('helpfulness','Your assessment',HELPFULNESS.find(item=>item.id===helpfulness)?.label)];
   const step = steps[index];
   const chooseRoute = (nextMode, nextLength) => {
     const route=createPMRSteps(intervention.steps,{mode:nextMode,length:nextLength});
@@ -117,7 +118,7 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
     </main> : phase === 'practice' ? <>
       <PMRRoute steps={steps} index={index} skipped={skipped} />
       <main className="pmr-session-stage"><Playback step={step} index={index} running={running} audio={audio} onPause={pause} onResume={resume} onNext={advance} released={released} onSkip={skip} /></main>
-      <PracticeCheckpoint compact variant="body" title="Your guided route" events={[...routeEvents,...released.map(region => earned(region,'Release guidance completed', {hands:'Hands & forearms',shoulders:'Arms & shoulders',face:'Jaw & face',torso:'Chest & abdomen',hips:'Glutes & hips',thighs:'Thighs',lowerLegs:'Calves & feet'}[region] || region))]}/>
+      <PracticeCheckpoint compact variant="body" title="Your guided route" events={practiceEvents}/>
       <footer className="pmr-session-controls">
         <button onClick={() => setRunning(value => !value)} aria-label={running ? 'Pause PMR' : 'Resume PMR'}>{running ? 'Pause' : 'Resume'}</button>
         <button aria-pressed={audio} onClick={() => setAudio(value => !value)} disabled={answers?.noAudio || answers?.discreet}>Audio {audio ? 'on' : 'off'}</button>
@@ -140,6 +141,7 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
       <button className="pmr-session-primary" onClick={() => complete()}>{helpfulness ? 'Continue to check-in' : 'Skip and continue'}</button>
       {outcome === 'more_uncomfortable' && <button onClick={() => complete('/library')}>Check in, then open Library</button>}
     </main>}
+    {['outcome','helpfulness'].includes(phase) && <PracticeCheckpoint compact variant="body" title="Your practice and your own check-in" events={practiceEvents}/>}
     {resumeError && <p className="relative z-10 px-5" role="alert">Progress could not be saved on this device. You can continue here, but it may be lost if you leave.</p>}
     <div className="relative z-10 px-5"><JourneyOptions id={intervention.id} onOpen={pause} /></div>
   </div>;

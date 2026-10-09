@@ -1,4 +1,4 @@
-import { confirmPracticeAnswer, answerPair } from "./practice-checkpoints.js";
+import { confirmPracticeAnswer, answerPair, confirmThreatPracticeAnswer } from "./practice-checkpoints.js";
 import { THREAT_QUESTIONS, scoreThreatCheck, threatStepComplete, requiredThreatStep, requiredThreatView, emptyThreatCheck } from "./threat-check.js";
 import { createBookStore } from "./storage.js";
 import { en, hi, As, ia, ht, Sl, A2, O2, nb, Dd, Y1, q1, lv, J1, h, i, La, za, Nn, tt, Rn, Gr, li, X1, Qe, pu, Mx, LE, tb, Dx, Lx, zx, Rt, Zn, W1, Q1, Ke, hu, F1, fu, ta, Z1, QE, ZE, qE, XE, rb, G1, e2, n2, t2, r2, o2, bs, av, Uh, K1, $1, ob, H1, Bh, Vh, _p, eb, B1, $E, BE, HE, GE, UE, KE, YE, ov } from "./vendor.js";
@@ -67,11 +67,11 @@ const _e = en().max(2e3),
   }).strict(),
   os = hi({
     format: Sl(7),
-    practiceCheckpoints: As(hi({id:en().max(100),label:en().max(300),detail:en().max(3000)})).max(100).default([]),
+    practiceCheckpoints: As(hi({id:en().max(100),label:en().max(300),detail:en().max(3000)})).max(2000).default([]),
     threatVisualSeen: A2().default(false),
     threatCheck: hi({answers: As(ht().int().min(0).max(3).nullable()).length(4), submitted: A2()}).nullable().default(null),
     resume: hi({ view: en(), section: en(), planTab: en(), threat: ht().int().min(0).max(3), road: en(), checkpoint: ht().int().min(0).max(2), question: en().default("") }).default({view:"cover",section:"start",planTab:"first",threat:0,road:"towards",checkpoint:0}),
-    reflectionDraft: hi({ chapterId: en().uuid(), action: _e, result: ia(["less","same","more","unclear"]), observed: _e, learned: _e, next: _e, actualDiscomfort: ht().min(0).max(10).nullable(), afterLikelihood: ht().min(0).max(100).nullable(), goalStateAfter: ht().min(0).max(10).nullable() }).nullable().default(null),
+    reflectionDraft: hi({ checkpointId: en().uuid().optional(), chapterId: en().uuid(), action: _e, result: ia(["less","same","more","unclear"]), observed: _e, learned: _e, next: _e, actualDiscomfort: ht().min(0).max(10).nullable(), afterLikelihood: ht().min(0).max(100).nullable(), goalStateAfter: ht().min(0).max(10).nullable() }).nullable().default(null),
     step: ht().int().min(0).max(9),
     furthestStep: ht().int().min(0).max(9).default(0),
     committed: A2(),
@@ -1619,7 +1619,7 @@ function RequiredThreatVisual({ onContinue, onCurrent }) {
       i.jsx("button", { className: "primary-button cream-button", onClick: onContinue, children: "Continue to the four threat phases" })]
   });
 }
-function ThreatCheck({check,onCheck,current,onCurrent,onDone}) {
+function ThreatCheck({check,onCheck,current,onCurrent,onDone,onConfirm}) {
   useQuestionHistory("3",current?.startsWith("threat:")?current:"threat:0",onCurrent);
   const value=check||emptyThreatCheck(),score=scoreThreatCheck(value),passed=value.submitted&&score!==null&&score>=3;
   const index=Math.min(3,Math.max(0,Number(current?.split(":")[1])||0)),question=THREAT_QUESTIONS[index],root=h.useRef(null);
@@ -1632,13 +1632,13 @@ function ThreatCheck({check,onCheck,current,onCurrent,onDone}) {
   ]:[i.jsx("p",{className:"question-kicker",children:`Understanding · ${index+1} of 4`}),i.jsx("h1",{tabIndex:-1,children:question.question}),
     i.jsx("p",{children:"Choose one answer. At least 3 of 4 correct (75%) are needed to continue. This checks understanding, not your mental health."}),
     i.jsxs("fieldset",{children:[i.jsx("legend",{className:"sr-only",children:question.question}),...question.options.map((option,answer)=>i.jsxs("label",{children:[i.jsx("input",{type:"radio",name:`threat-check-${question.id}`,checked:value.answers[index]===answer,onChange:()=>onCheck({answers:value.answers.map((old,key)=>key===index?answer:old),submitted:false})}),i.jsx("span",{children:option})]},answer))]}),
-    i.jsx("button",{className:"primary-button cream-button",disabled:value.answers[index]===null,onClick:()=>{if(index<3)onCurrent(`threat:${index+1}`);else{onCheck({...value,submitted:true});onCurrent("threat:score");}},children:index<3?"Next question":"Check my answers"}),
+    i.jsx("button",{className:"primary-button cream-button",disabled:value.answers[index]===null,onClick:()=>{{const event=confirmThreatPracticeAnswer([],index,value.answers[index])[0];if(event)onConfirm?.(event.id,event.label,event.detail);}if(index<3)onCurrent(`threat:${index+1}`);else{onCheck({...value,submitted:true});onCurrent("threat:score");}},children:index<3?"Next question":"Check my answers"}),
     i.jsx("button",{className:"text-button",onClick:()=>{if(!requestDearHistoryBack())onCurrent(index>0?`threat:${index-1}`:"");},children:index>0?"Previous question":"Return to the teaching"})]});
 }
 function rN({
   phases: e,
   onLearn: t,
-  phase = 0, onPhase = () => {}, check, onCheck, current, onCurrent, onDone, visualSeen, onVisualDone
+  phase = 0, onPhase = () => {}, check, onCheck, current, onCurrent, onDone, visualSeen, onVisualDone, onConfirm
 }) {
   const n = phase, r = onPhase,
     o = h.useRef(null),
@@ -1669,7 +1669,7 @@ function rN({
       Math.abs(x) >= 44 && Math.abs(x) > Math.abs(w) * 1.35 && c(n + (x < 0 ? 1 : -1));
     };
   if (!visualSeen || current === "threat-visual") return i.jsx(RequiredThreatVisual, { onContinue: onVisualDone, onCurrent });
-  if(current?.startsWith("threat:"))return i.jsx(ThreatCheck,{check,onCheck,current,onCurrent,onDone});
+  if(current?.startsWith("threat:"))return i.jsx(ThreatCheck,{check,onCheck,current,onCurrent,onDone,onConfirm});
   return i.jsxs("div", {
     className: "threat-system threat-system-standalone",
     role: "region",
@@ -2670,7 +2670,7 @@ function xc({
     })]
   });
 }
-function bN({onNext}) {
+function bN({onNext,onConfirm}) {
   const quiet = useQuietMotion();
   const [e, t] = h.useState(30),
     [n, r] = h.useState(0),
@@ -2876,7 +2876,7 @@ function bN({onNext}) {
     }), i.jsx("p", {
       className: "wave-choice-note",
       children: "Stay for as long as feels useful. You can pause or move on at any time."
-    }),i.jsx("button",{className:f?"primary-button":"text-button",onClick:onNext,children:f?"Continue to my plan":"Move on to my plan"})]
+    }),i.jsx("button",{className:f?"primary-button":"text-button",onClick:()=>{if(f)onConfirm?.("wave","Guidance completed",`${e} seconds of urge-surf guidance. This does not measure a change in the urge.`);onNext();},children:f?"Continue to my plan":"Move on to my plan"})]
   });
 }
 function kN({
@@ -3166,6 +3166,11 @@ function kN({
                 value: l.actFuture,
                 onChange: m => n("actFuture", m),
                 placeholder: l.horizon === "near" ? "In one year, I might…" : "In twenty years, I might…"
+              }), i.jsx("button", {
+                type: "button", className: "primary-button",
+                disabled: !(d === "away" ? l.avoidFuture : l.actFuture).trim(),
+                onClick: () => onConfirm?.(`future:${d}`,d === "away" ? "If I keep postponing" : "If I make room to try",d === "away" ? l.avoidFuture : l.actFuture),
+                children: "Keep this reflection"
               }), i.jsxs("button", {
                 type: "button",
                 className: "text-button",
@@ -3209,7 +3214,7 @@ function kN({
       children: i.jsx(rN, {
         phases: gN, visualSeen:t.threatVisualSeen, onVisualDone:onThreatVisualDone,
         phase:t.resume.threat, onPhase:threat=>onResumeChange({threat}),
-        check:t.threatCheck, onCheck:onThreatCheck,current:t.resume.question,onCurrent:question=>onResumeChange({question}),onDone,
+        check:t.threatCheck, onCheck:onThreatCheck,current:t.resume.question,onCurrent:question=>onResumeChange({question}),onDone,onConfirm,
         onLearn: r
       })
     }), e === 7 && l.barrierFocus !== "practical" && i.jsxs(i.Fragment, {
@@ -3221,7 +3226,7 @@ function kN({
       }), i.jsx("p", {
         className: "lede",
         children: "Practise staying with an urge without following it."
-      }), i.jsx(bN, {onNext:onDone}), i.jsxs("details", {
+      }), i.jsx(bN, {onNext:onDone,onConfirm}), i.jsxs("details", {
         className: "foldout flow-support-detail",
         children: [i.jsxs("summary", {
           children: ["More ways to support myself ", i.jsx(Ke, {
@@ -3579,7 +3584,7 @@ function SN() {
         if (existing && existing.chapterId !== chapter.id) {
           R("A reflection draft belongs to another chapter. Finish or export that draft before starting this observation."); return;
         }
-        Ne(existing || {chapterId:chapter.id,action:chapter.answers.action,result:"unclear",observed:"",learned:"",next:"",actualDiscomfort:null,afterLikelihood:null,goalStateAfter:null});
+        Ne(existing ? {...existing,checkpointId:existing.checkpointId||gc()} : {checkpointId:gc(),chapterId:chapter.id,action:chapter.answers.action,result:"unclear",observed:"",learned:"",next:"",actualDiscomfort:null,afterLikelihood:null,goalStateAfter:null});
         l("outcome");
       } catch(error) { R(error.message); } finally { p(false); }
     },
@@ -3591,7 +3596,7 @@ function SN() {
       const answers = chapter.answers;
       const entry = {id:gc(),createdAt:new Date().toISOString(),chapterId:chapter.id,want:answers.want,action:re.action,prediction:answers.prediction,likelihood:answers.likelihood,discomfort:answers.discomfort,goalStateBefore:answers.goalState,goalStateAfter:re.goalStateAfter,result:re.result,observed:re.observed.trim(),learned:re.learned,next:re.next,actualDiscomfort:re.actualDiscomfort,afterLikelihood:re.afterLikelihood};
       const previous = $.current;
-      const book = {...previous,entries:[entry,...previous.entries],reflectionDraft:null};
+      const book = {...previous,entries:[entry,...previous.entries],reflectionDraft:null,practiceCheckpoints:confirmPracticeAnswer(previous.practiceCheckpoints,`observation:${re.checkpointId || previous.entries.length}:outcome:observed`,"What did you observe?",re.observed)};
       $.current = book;t(book);
       for (; Le.current;) await new Promise(resolve=>setTimeout(resolve,30));
       if(await Yn()) {l(null);u(false);r("closing");ge.cue("save");}
@@ -4524,7 +4529,7 @@ function SN() {
         className: "fine-print",
         children: "Your download contains personal reflections. Choose where you keep it."
       })]
-    }), n !== "cover" && n !== "journey" && i.jsxs("nav", {
+    }), ["plan","closing","book"].includes(n) && i.jsx("div",{className:"collection-page",children:i.jsx(DearPracticeReveal,{events:e.practiceCheckpoints})}), n !== "cover" && n !== "journey" && i.jsxs("nav", {
       className: "bottom-nav",
       "aria-label": "Main navigation",
       children: [i.jsxs("button", {
@@ -4672,14 +4677,14 @@ function SN() {
         }), a === "pause" && i.jsx("div", {
           className: "pause-modal",
           children: ow
-        }), a === "learn" && i.jsx(ThreatFramework, {}), a === "outcome" && i.jsx(SequentialQuestions,{
-          id:"outcome",current:e.resume.question,onCurrent:question=>t(book=>({...book,resume:{...book.resume,question}})),optionalStart:1,onDone:Xx,doneLabel:"Save this observation",blocked:d||e.entries.length>=200,
+        }), a === "learn" && i.jsx(ThreatFramework, {}), a === "outcome" && i.jsxs(i.Fragment,{children:[i.jsx(SequentialQuestions,{
+          id:"outcome",onConfirm:(id,label,value)=>t(book=>({...book,practiceCheckpoints:confirmPracticeAnswer(book.practiceCheckpoints,`observation:${re.checkpointId || book.entries.length}:${id}`,label,value)})),current:e.resume.question,onCurrent:question=>t(book=>({...book,resume:{...book.resume,question}})),optionalStart:1,onDone:Xx,doneLabel:"Save this observation",blocked:d||e.entries.length>=200,
           steps:[{id:"observed",title:"What did you observe?",hint:`The step you tried: ${re.action}. Include anything difficult or unresolved.`,valid:!!re.observed.trim(),field:i.jsx(Ye,{required:true,questionId:"screen-title",label:"What did I observe?",value:re.observed,onChange:observed=>Ne(previous=>({...previous,observed}))})},
           {id:"result",title:"How did it compare with your expectation?",field:i.jsx(Kx,{label:"How the outcome compared",options:Object.values(ms),value:ms[re.result],onChange:value=>Ne(previous=>({...previous,result:Object.keys(ms).find(key=>ms[key]===value)}))})},
           ...[["actualDiscomfort","How much discomfort did you experience?",10],["afterLikelihood","How likely does your prediction feel now?",100],["goalStateAfter","How able do you feel to take this step?",10]].map(([key,title,max])=>({id:key,title,field:i.jsx(aa,{label:title,value:re[key],max,suffix:max===10?" / 10":"%",onChange:value=>Ne(previous=>({...previous,[key]:value}))})})),
           ...[["learned","What did you learn?"],["next","What would you keep or change next time?"]].map(([key,title])=>({id:key,title,field:i.jsx(Ye,{questionId:"screen-title",label:title,value:re[key],onChange:value=>Ne(previous=>({...previous,[key]:value}))})}))]
 
-        })]
+        }),i.jsx(DearPracticeReveal,{events:e.practiceCheckpoints})]})]
       })
     }), i.jsx($E, {
       open: g !== null,

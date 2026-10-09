@@ -275,7 +275,6 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       <nav className="scene-progress" aria-label="Journey progress">
         {['Start','Move','Water','View','Connect','Rest','Plan','Review'].map((label,i)=><div key={label} role="img" aria-label={`${label}: ${session.actions[i]?.status==='done'?'confirmed':session.actions[i]?.status==='skipped'?'skipped':i>0&&i<7?'not confirmed':''}${i===step?', current step':''}`} aria-current={i===step?'step':undefined}><span aria-hidden="true">{i===0?'✦':session.actions[i]?.status==='done'?'✓':session.actions[i]?.status==='skipped'?'−':i}</span><small>{label}</small></div>)}
       </nav>
-      <PracticeCheckpoint variant="scene" title="Your scene is changing" events={SCENE_ACTIONS.map((item,i) => earned(`action-${i}`, item.title, session.actions[i+1]?.choice === 'alternative' ? item.alternateDone : item.done, session.actions[i+1]?.status === 'done'))}/>
       <p className="scene-kicker">{step===0?'One small shift at a time':step===7?'Your check-in':`Step ${step} of 6`}</p>
       <h1 ref={heading} tabIndex={-1}>{action?.title || (step===0?'Change the Scene':'Was this useful?')}</h1>
       {step<7 && <div className="scene-art" aria-hidden="true">{current.art}</div>}
@@ -299,6 +298,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
         <button className="scene-primary" onClick={()=>finish()}>Finish these actions</button>
         {<details className="scene-options"><summary>Explore another practice</summary><p>Finish your check-in first. Availability depends on your setting and current answers.</p><button onClick={()=>finish('happyBump')}>Consider Happy Bump</button><button onClick={()=>finish('dear2100')}>Consider Dear 2100 · longer journey</button></details>}
       </>}
+      <PracticeCheckpoint variant="scene" title="Your scene is changing" events={SCENE_ACTIONS.map((item,i) => earned(`action-${i}`, item.title, session.actions[i+1]?.choice === 'alternative' ? item.alternateDone : item.done, session.actions[i+1]?.status === 'done'))}/>
     </main>
     <footer className="scene-controls"><button aria-label={audioOn?'Mute audio':'Enable audio'} aria-pressed={audioOn} onClick={()=>setAudioOn(!audioOn)}>{audioOn?'Audio on':'Audio off'}</button>{audioOn&&!narrationAvailable&&<span className="scene-caption">This instruction is text-only.</span>}<button onClick={()=>setShowAdapt(true)}>This is not helping</button></footer>
     <div className="mx-auto w-full max-w-xl px-5"><JourneyOptions id={ID} onOpen={() => { stop(); setAudioOn(false); }} /></div>

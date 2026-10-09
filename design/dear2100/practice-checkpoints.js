@@ -1,3 +1,4 @@
+import { THREAT_QUESTIONS } from "./threat-check.js";
 // Confirmed answers only. Editing or navigation never adds another action.
 export function confirmPracticeAnswer(previous = [], id, label, value) {
   const detail = Array.isArray(value) ? value.filter(Boolean).join(', ') : value == null ? '' : String(value).trim();
@@ -10,4 +11,13 @@ export function confirmPracticeAnswer(previous = [], id, label, value) {
 export function answerPair(events = []) {
   const count = Math.floor(events.length / 2) * 2;
   return count ? events.slice(count - 2, count) : [];
+}
+
+// Selection remains a draft until Next/Check is pressed. Rechecking the same
+// question updates its evidence without pretending another question was completed.
+export function confirmThreatPracticeAnswer(events, index, answer) {
+  const question = THREAT_QUESTIONS[index];
+  if (!question || !Number.isInteger(answer) || answer < 0 || answer >= question.options.length) return events;
+  return confirmPracticeAnswer(events, `threat:${question.id}`, `Understanding: ${question.question}`,
+    (answer === question.correct ? 'Matched the teaching. ' : 'A takeaway to revisit. ') + question.explanation);
 }
