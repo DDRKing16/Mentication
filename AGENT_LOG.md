@@ -713,3 +713,4 @@ Giving the label an explicit full width fixes it for good regardless of what tex
 (02e6d28). Checked every other screen in the flow before and after -- identical, including the two
 reflection steps that already looked right.
 Full test/typecheck/lint/build suite passes clean on every commit.
+- 2026-10-09: No work done — main branch's git history was force-rewritten and is now unrelated to claude/improvement-agent's history, so the automatic merge failed with 'refusing to merge unrelated histories'. Ran git merge --abort equivalent (no merge state was created); branch left untouched at its previous tip. No commit.
