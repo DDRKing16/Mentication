@@ -1,3 +1,5 @@
+import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
+import { recordTappingProgress } from './tappingCheckpoints';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import TappingTakeaway from './TappingTakeaway';
 import { readTappingDraft, writeTappingDraft, deleteTappingDraft } from './tappingDraft';
@@ -48,6 +50,8 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const flowRequest=useRef(0);
   const [haptic, setHaptic] = useState(false);
   const [hapticError, setHapticError] = useState('');
+  const [practiceEvents, setPracticeEvents] = useState(restored?.practiceEvents || []);
+  const recordProgress = action => setPracticeEvents(events => recordTappingProgress(events, action));
   const [rounds, setRounds] = useState(restored?.rounds || 0);
   const [stopped, setStopped] = useState(restored?.stopped === true);
   const [skipped, setSkipped] = useState(restored?.skipped || 0);
@@ -55,7 +59,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   const [error, setError] = useState('');
   const cues = useRef(null);
   const cueTick = useRef('');
-  const roundSerial = useRef(0);
+  const roundSerial = useRef(restored?.checkpointRound || 0);
   const currentTick = useRef('');
   const blockedVisualTick = useRef('');
   const duration = useRef(restored?.duration || 0);
@@ -77,9 +81,9 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
 
   useEffect(() => {
     if (draft.error || finished.current) return;
-    try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current, takeawayText, takeawayId,voiceOn,musicOn,beatOn,muted }); setDraftStatus('Draft saved on this device. If interrupted, the round returns paused.'); }
+    try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current, takeawayText, takeawayId,voiceOn,musicOn,beatOn,muted,practiceEvents,checkpointRound:roundSerial.current }); setDraftStatus('Draft saved on this device. If interrupted, the round returns paused.'); }
     catch { setDraftStatus('Your draft could not be saved. It is available for this visit only.'); }
-  }, [stage, concern, before, after, index, second, slow, stillLight, rounds, stopped, skipped, takeawayText, takeawayId,voiceOn,musicOn,beatOn,muted,draft.error]);
+  }, [stage, concern, before, after, index, second, slow, stillLight, rounds, stopped, skipped, takeawayText, takeawayId,voiceOn,musicOn,beatOn,muted,draft.error,practiceEvents]);
   useEffect(() => { (settingsOpen ? settingHeading : heading).current?.focus(); }, [stage, settingsOpen, settingPage]);
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -104,6 +108,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   }, [stage, paused, artworkReady]);
   useEffect(() => {
     if (stage !== 'round' || second < secondsPerPoint) return;
+    setPracticeEvents(events => recordTappingProgress(events, { type: 'point', point: TAPPING_POINTS[index].id, round: roundSerial.current }));
     setSecond(0);
     if (index === TAPPING_POINTS.length - 1) { if (!roundSkipped.current) setRounds(r => r + 1); setStage('after'); }
     else setIndex(i => i + 1);
@@ -191,14 +196,14 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
       await callback(makeTappingResult({ concern: concern.id, before, after, roundsCompleted: rounds, stopped, skippedPoints: skipped, durationSeconds: duration.current }));
     } catch {
       finished.current = false;
-      try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current, takeawayText, takeawayId,voiceOn,musicOn,beatOn,muted }); }
+      try { writeTappingDraft({ stage, concern: concern.id, before, after, index, second, slow, stillLight, rounds, stopped, skipped, duration: duration.current, roundSkipped: roundSkipped.current, takeawayText, takeawayId,voiceOn,musicOn,beatOn,muted,practiceEvents,checkpointRound:roundSerial.current }); }
       catch { setDraftStatus('Your draft could not be saved. It is available for this visit only.'); }
       setError('That didn’t finish. Your check-in is still here. Please try again.'); setBusy(false);
     }
   }
   function rate(value) {
-    if (stage === 'before') { setBefore(value); setStage('ready'); }
-    else { setAfter(value); setStage('result'); }
+    if (stage === 'before') { recordProgress({type:'rating',id:'before',value}); setBefore(value); setStage('ready'); }
+    else { recordProgress({type:'rating',id:`after-${roundSerial.current}`,value}); setAfter(value); setStage('result'); }
   }
   const isRating = stage === 'before' || stage === 'after';
   const draftError = draftStatus.includes('could not') || draftStatus.includes('visit only');
@@ -253,7 +258,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
         <p className="tap-eyebrow">GENTLE TAPPING · EFT-STYLE</p>
         <h1 ref={heading} tabIndex={-1}>What’s here<br/><em>right now?</em></h1>
         <p className="tap-lead">Choose a starting point. We’ll show you the way.</p>
-        <div className="tap-focus-choices" role="group" aria-label="What’s here right now?">{[CONCERNS[3], ...CONCERNS.slice(0,3)].map(c => <button data-sfx="none" key={c.id} onClick={() => { setConcern(c); setStage('before'); }}><span>{c.label}</span><span aria-hidden="true">→</span></button>)}</div>
+        <div className="tap-focus-choices" role="group" aria-label="What’s here right now?">{[CONCERNS[3], ...CONCERNS.slice(0,3)].map(c => <button data-sfx="none" key={c.id} onClick={() => { setConcern(c); recordProgress({type:'focus',concern:c.id}); setStage('before'); }}><span>{c.label}</span><span aria-hidden="true">→</span></button>)}</div>
         <div className="tap-entry-contact"><div className="tap-portrait"><TappingSilhouette point={TAPPING_POINTS[0]} paused quiet/></div><span className="tap-art-note">TWO FINGERTIPS · A LIGHT TOUCH</span></div>
         <footer className="tap-entry-footer"><span>Nine small places</span><span>About 3 minutes</span></footer>
         <details className="tap-about"><summary>About this practice</summary><p>For a concern, EFT-style tapping pairs the standard points with a gentle setup and a short reminder. Grounding uses the same points with your attention on the present. No memory to revisit.</p><p>The moving fingers are an instructional illustration. Spoken guidance is a bundled, locally generated synthetic voice.</p></details>
@@ -327,7 +332,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
         <p className="tap-small">Back returns to your check-in and Finish.</p>
         {storageNote}
       </main>}
-      {['result', 'next', 'note'].includes(stage) && <TappingTakeaway active={stage === 'note'} initialText={`Chosen focus: ${concern.label}.\nPace: ${slow ? 'Spacious' : 'Gentle'}.\nA light touch; either side is fine.`} draftText={takeawayText} savedId={takeawayId} onTextChange={setTakeawayText} onSaved={record => { setTakeawayId(record.id); setTakeawayText(record.text); setSavedCueText(record.text); setStage('result'); }} onSavedStateChange={record => { setSavedCueText(record?.text ?? null); setTakeawayId(record?.id || null); }} onReadError={() => setSavedCueText(null)} onSkip={() => setStage('result')}/>}
+      {['result', 'next', 'note'].includes(stage) && <TappingTakeaway active={stage === 'note'} initialText={`Chosen focus: ${concern.label}.\nPace: ${slow ? 'Spacious' : 'Gentle'}.\nA light touch; either side is fine.`} draftText={takeawayText} savedId={takeawayId} onTextChange={setTakeawayText} onSaved={record => { recordProgress({type:'cue',value:record.text}); setTakeawayId(record.id); setTakeawayText(record.text); setSavedCueText(record.text); setStage('result'); }} onSavedStateChange={record => { setSavedCueText(record?.text ?? null); setTakeawayId(record?.id || null); }} onReadError={() => setSavedCueText(null)} onSkip={() => setStage('result')}/>}
       {settingsOpen && <main className="tap-setting-screen">
         <p className="tap-eyebrow">{stage === 'round' ? 'YOUR ROUND IS PAUSED' : 'OPTIONAL · YOUR ROUND'}</p>
         <h1 ref={settingHeading} tabIndex={-1}>{settingPrompts[settingPage]}</h1>
@@ -348,6 +353,7 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
       </main>}
       {stage === 'round' && !settingsOpen && (soundError || hapticError) && <p role="status" className="tap-error-note">{soundError || hapticError}</p>}
       {error && <p className="tap-error-note" role="alert">{error}</p>}
+      {!settingsOpen && stage !== 'choose' && <PracticeCheckpoint compact variant="body" title="Your practice, held together" events={practiceEvents}/>}
       <footer className="tap-secondary"><JourneyOptions id="eftTapping" onOpen={pausePractice} /></footer>
     </div>
   </section>;

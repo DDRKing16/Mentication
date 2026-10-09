@@ -60,3 +60,21 @@ describe('checkpoint evidence ordering', () => {
   expect(checkpointFor(next).pairs).toBe(0);
  });
 });
+
+describe.each(['selfCompassion', 'unhook', 'makeRoom'])('%s branch evidence', id => {
+ it('keeps private wording, optional action and unchanged outcome distinct', () => {
+  const base = {...freshCareState(), before:6, noticeConfirmed:true, notice:'', perspective:'Words I chose', responseConfirmed:true, anchorType:'object', practiceTaken:true};
+  const first = reconcilePracticeEvents([], careCheckpoints(id, base));
+  expect(first.find(event=>event.id==='notice').detail).toBe('Held privately in mind');
+  const planned = reconcilePracticeEvents(first, careCheckpoints(id,{...base, action:'Get water',actionConfirmed:true,actionStatus:'planned',after:6}));
+  expect(planned.find(event=>event.id==='status').detail).toContain('plan');
+  expect(planned.find(event=>event.id==='after').detail).toBe('6 / 10');
+  const done = reconcilePracticeEvents(planned,careCheckpoints(id,{...base,action:'Get water',actionConfirmed:true,actionStatus:'done',after:6}));
+  expect(done.length).toBe(planned.length);
+  expect(done.find(event=>event.id==='status').detail).toContain('done');
+ });
+ it('does not treat skipped practice or an unconfirmed custom response as tried', () => {
+  const draft={...freshCareState(),notice:'Typing',perspective:'Typing',action:'Typing',careTrail:['intro','options','practice','action']};
+  expect(checkpointFor(careCheckpoints(id,draft)).count).toBe(0);
+ });
+});

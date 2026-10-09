@@ -11,3 +11,12 @@ describe('tapping question and optional-cue draft compatibility',()=>{
   it('keeps an unsaved note only in the tapping draft',()=>{const get=storage(null);writeTappingDraft({...legacy,stage:'note',takeawayText:'My unsaved cue',takeawayId:null});expect(JSON.parse(get()).takeawayText).toBe('My unsaved cue');expect(readTappingDraft().after).toBeNull();});
   it.each([{takeawayText:'x'.repeat(1501)},{takeawayText:{}},{takeawayId:{}},{takeawayId:'x'.repeat(161)}])('rejects malformed new fields without overwriting the draft: %j',fields=>{const get=storage({...legacy,...fields});const original=get();expect(()=>readTappingDraft()).toThrow('Unreadable');expect(get()).toBe(original);});
 });
+
+it('restores checkpoint ordering and round identity with an interrupted guide',()=>{
+ const current={...legacy,checkpointRound:2,practiceEvents:[{id:'focus',label:'Focus',detail:'A worry'},{id:'round-2-hand',label:'Guide elapsed',detail:'Side of hand'}]};
+ storage(current); expect(readTappingDraft()).toEqual(current);
+});
+it.each([{checkpointRound:-1},{practiceEvents:{}},{practiceEvents:[{id:'bad'}]}])('preserves malformed checkpoint drafts without overwriting them: %j',fields=>{
+ const get=storage({...legacy,...fields}), original=get();
+ expect(()=>readTappingDraft()).toThrow('Unreadable'); expect(get()).toBe(original);
+});
