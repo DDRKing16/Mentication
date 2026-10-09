@@ -18,6 +18,13 @@ export function answerPair(events = []) {
 export function confirmThreatPracticeAnswer(events, index, answer) {
   const question = THREAT_QUESTIONS[index];
   if (!question || !Number.isInteger(answer) || answer < 0 || answer >= question.options.length) return events;
-  return confirmPracticeAnswer(events, `threat:${question.id}`, `Understanding: ${question.question}`,
-    (answer === question.correct ? 'Matched the teaching. ' : 'A takeaway to revisit. ') + question.explanation);
+  const takeaways = [
+    ['Notice the signal', 'A signal is not a fact. Its meaning is still open.'],
+    ['Make room for context', 'A racing heart is a response, not proof of danger.'],
+    ['Check what happened', 'Look at what was said or done before deciding what it means.'],
+    ['Leave room to choose', 'Noticing the story can help you choose. It does not guarantee less fear.'],
+  ];
+  const [label, detail] = takeaways[index];
+  return confirmPracticeAnswer(events, `threat:${question.id}`, label,
+    (answer === question.correct ? 'Matched the teaching. ' : 'A takeaway to revisit. ') + detail);
 }
