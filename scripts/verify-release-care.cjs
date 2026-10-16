@@ -37,7 +37,7 @@ async function open(p,id) {
  await p.goto(`${base}/library`);await p.getByLabel('Search practices',{exact:true}).fill(names[id]);
  await p.getByRole('button').filter({hasText:names[id]}).last().click();await screen(p,'intro');
 }
-async function context(browser,width=390,height=844) {
+async function context(browser,width=390,height=width===320?568:844) {
  const c=await browser.newContext({viewport:{width,height},reducedMotion:'reduce'}),p=await c.newPage();
  p.on('pageerror',e=>errors.push(e.message));await p.addInitScript(()=>{if(window.top===window)localStorage.setItem('haven_onboarded','1');});return {c,p};
 }

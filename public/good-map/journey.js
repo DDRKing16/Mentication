@@ -137,9 +137,10 @@
   function practiceReveal() {
     SCR().querySelector('.gm-practice-reveal')?.remove();
     const events = ORDER.slice(0,N).flatMap((di,n)=>hist[n] === undefined ? [] : [{key:DECK[di].k,label:DECK[di].w,detail:{0:'Not for now',1:'Matters to me',3:'Especially important'}[hist[n]]}]);
-    for (const item of RQ) if (M.rating(RATE[item.k]) !== null) events.push({key:item.k,label:item.w,detail:`Importance: ${RATE[item.k]} / 10`});
+
+    events.push(...(JST.checkpointEvents || []));
     const pairs = Math.floor(events.length / 2);
-    if (!pairs || !['sort','rate','map'].includes(phase)) return;
+    if (!pairs || ['intro','menu','paused','empty','care','compare','remap','clinician','sharePreview'].includes(phase)) return;
     const reveal = document.createElement('aside'); reveal.className = 'gm-practice-reveal';
     reveal.dataset.checkpoint = pairs; reveal.dataset.practiceCount = events.length;
     reveal.setAttribute('aria-label','Your practice checkpoint');
@@ -147,6 +148,49 @@
     const row = document.createElement('div'); row.setAttribute('role','status');
     for (const event of events.slice(pairs*2-2,pairs*2)) { const card=document.createElement('p');const label=document.createElement('span');label.textContent=event.label;const detail=document.createElement('strong');detail.textContent=event.detail;if (CARDS[G]?.[event.key]) {const picture=document.createElement('img');picture.src=`data:image/webp;base64,${CARDS[G][event.key]}`;picture.alt='';card.append(picture);}card.append(label,detail);row.append(card); }
     reveal.append(row); SCR().append(reveal);
+  }
+  // Capture only a successfully confirmed answer, not a selected draft or navigation.
+  function checkpointAnswer() {
+    const selected = () => [...RT().querySelectorAll('[aria-pressed="true"],button.on')].map(node => node.textContent.trim()).join(' · ');
+    const focus = DECK.find(item => item.k === JST.focus)?.w;
+    const sat = jItems()[JST.satCursor || 0];
+    const entries = {
+      rate: ['importance-' + RQ[RI]?.k, RQ[RI]?.w, M.rating(RATE[RQ[RI]?.k]) !== null ? `Importance: ${RATE[RQ[RI]?.k]} / 10` : ''],
+      type: ['interpretation', 'Your interpretation', JST.interpretation],
+      sat: ['satisfaction-' + sat?.k, sat?.w, sat && M.rating(JST.sat[sat.k]) !== null ? `Satisfaction: ${JST.sat[sat.k]} / 10` : ''],
+      focus: ['focus', 'Your chosen focus', focus],
+      help: ['helps-' + JST.focus, 'What helps', selected()],
+      way: ['barriers-' + JST.focus, 'What gets in the way', selected()],
+      up: ['direction-' + JST.focus, 'Your direction', JST.up === 'own' ? JST.upText : selected()],
+      step: ['step-' + JST.focus + '-' + JST.pstep, 'A step you chose', JST.plan.length ? jStep(JST.pstep)[0] : ''],
+      when: ['day-' + JST.focus + '-' + JST.pstep, 'Your planned day', el('gmDate')?.value],
+      whenTime: ['time-' + JST.focus + '-' + JST.pstep, 'Your planned time', el('gmTime')?.value],
+      chk: ['attempt-' + JST.attemptId, 'What you reported', selected()],
+      win: ['after-' + JST.attemptId, 'Your check-in', M.rating(JST.newsat) !== null ? `${JST.newsat} / 10` : ''],
+      helpfulness: ['helpfulness-' + JST.attemptId, 'Your assessment', JST.helpfulness === 'skipped' ? '' : selected()],
+    };
+    const entry = entries[phase];
+    return entry ? {key:entry[0],label:entry[1],detail:String(entry[2] || '').trim()} : null;
+  }
+  function confirmCheckpointAnswer(event) {
+    if (!event) return;
+    const previous = JST.checkpointEvents || [];
+    JST.checkpointEvents = !event.detail ? previous.filter(item => item.key !== event.key)
+      : previous.some(item => item.key === event.key) ? previous.map(item => item.key === event.key ? event : item) : [...previous,event];
+    practiceReveal(); save();
+  }
+  function wireCheckpointAnswers() {
+    for (const id of ['jnext','rnext','gmSkipRating','gmSkipSat','gmSkipFollowup']) {
+      const button = el(id), original = button?.onclick;
+      if (!original) continue;
+      button.onclick = event => {
+        const before = phase + ':' + RI + ':' + (JST.satCursor || 0);
+        const answer = checkpointAnswer();
+        if (answer && !['jnext','rnext'].includes(id)) answer.detail = '';
+        original(event);
+        if (before !== phase + ':' + RI + ':' + (JST.satCursor || 0)) confirmCheckpointAnswer(answer);
+      };
+    }
   }
   function render() {
     loading = true;
@@ -174,6 +218,7 @@
       JS.intro();
     }
     loading = false;
+    wireCheckpointAnswers();
     practiceReveal();
     document.dispatchEvent(new CustomEvent('good-map:phase', {
       detail: phase

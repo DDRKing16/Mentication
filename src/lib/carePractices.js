@@ -54,6 +54,7 @@ export function restoreCareState(value) {
   if ([...CARE_STAGES, 'orient'].includes(value.stage)) s.stage = value.stage;
   s.careScreen = validCareScreen(value.careScreen) ? value.careScreen : null;
   for (const key of ['noticeConfirmed','responseConfirmed','actionConfirmed']) s[key] = value[key] === true;
+  if (Array.isArray(value.checkpointOrder)) s.checkpointOrder = Array.isArray(value.checkpointOrder) ? [...new Set(value.checkpointOrder.filter(id => typeof id === 'string'))].slice(0, 32) : [];
   s.careTrail = Array.isArray(value.careTrail) ? value.careTrail.filter(validCareScreen).slice(-64) : [];
   for (const key of ['before', 'after']) s[key] = validCareRating(value[key]) ? value[key] : null;
   s.clicks = Number.isSafeInteger(value.clicks) && value.clicks >= 0 ? value.clicks : 0;

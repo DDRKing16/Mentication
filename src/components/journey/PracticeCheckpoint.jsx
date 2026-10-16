@@ -1,14 +1,19 @@
-import { useRef } from 'react';
-import { checkpointFor, reconcilePracticeEvents } from '@/lib/practiceCheckpoints';
+import { useEffect, useRef } from 'react';
+import { checkpointFor, reconcilePracticeEvents, orderedPracticeEvents } from '@/lib/practiceCheckpoints';
 import PracticeIllustration from './PracticeIllustration';
 import '@/styles/practice-checkpoint.css';
 
 const OBJECTS = { thought: 'evidence', bump: 'light', scene: 'light', body: 'body', night: 'letter', step: 'path', senses: 'light', breath: 'breath', wave: 'wave', selfCompassion: 'care', unhook: 'evidence', makeRoom: 'care', plan: 'plan' };
 
 /** The revealed object carries the two actual choices, never an inferred benefit. */
-export default function PracticeCheckpoint({ events, title = 'Something to carry forward', variant = 'path', compact = false, connection }) {
+export default function PracticeCheckpoint({ events, title = 'Something to carry forward', variant = 'path', compact = false, connection, order, onOrderChange }) {
   const confirmed = useRef([]);
-  confirmed.current = reconcilePracticeEvents(confirmed.current, events);
+  confirmed.current = onOrderChange ? orderedPracticeEvents(events, order) : reconcilePracticeEvents(confirmed.current, events);
+  const ids = confirmed.current.map(event => event.id);
+  const signature = JSON.stringify(ids);
+  useEffect(() => {
+    if (onOrderChange && signature !== JSON.stringify(order || [])) onOrderChange(ids);
+  }, [signature, order, onOrderChange]);
   const checkpoint = checkpointFor(confirmed.current);
   if (!checkpoint.pairs) return null;
   return <aside className={`practice-checkpoint practice-checkpoint--${variant}`} data-practice-count={checkpoint.count} data-checkpoint={checkpoint.pairs} data-compact={compact || undefined} aria-label="Your practice checkpoint">

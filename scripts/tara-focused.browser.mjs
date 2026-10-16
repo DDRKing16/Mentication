@@ -18,7 +18,7 @@ const screen = async id => {
 };
 const capture = async name => { await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);}); await page.screenshot({path:`${evidence}/${name}.png`,fullPage:true}); };
 async function open(width=390) {
- const context = await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce'});
+ const context = await browser.newContext({viewport:{width,height:width===320?568:844},reducedMotion:'reduce'});
  await context.addInitScript(()=>{if(window!==window.top)return;localStorage.setItem('haven_onboarded','1');localStorage.setItem('haven.a11y.v2',JSON.stringify({reducedMotion:true,ambientSoundscape:false}));});
  page=await context.newPage();page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));
  page.on('request',r=>{if(r.postData())requests.push({url:r.url(),body:r.postData()});});

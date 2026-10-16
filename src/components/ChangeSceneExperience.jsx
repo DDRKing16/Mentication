@@ -298,7 +298,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
         <button className="scene-primary" onClick={()=>finish()}>Finish these actions</button>
         {<details className="scene-options"><summary>Explore another practice</summary><p>Finish your check-in first. Availability depends on your setting and current answers.</p><button onClick={()=>finish('happyBump')}>Consider Happy Bump</button><button onClick={()=>finish('dear2100')}>Consider Dear 2100 · longer journey</button></details>}
       </>}
-      <PracticeCheckpoint variant="scene" title="Your scene is changing" events={SCENE_ACTIONS.map((item,i) => earned(`action-${i}`, item.title, session.actions[i+1]?.choice === 'alternative' ? item.alternateDone : item.done, session.actions[i+1]?.status === 'done'))}/>
+      <PracticeCheckpoint order={session.checkpointOrder} onOrderChange={checkpointOrder => setSession(value => ({...value, checkpointOrder}))} variant="scene" title="Your scene is changing" events={SCENE_ACTIONS.map((item,i) => earned(`action-${i}`, item.title, session.actions[i+1]?.choice === 'alternative' ? item.alternateDone : item.done, session.actions[i+1]?.status === 'done'))}/>
     </main>
     <footer className="scene-controls"><button aria-label={audioOn?'Mute audio':'Enable audio'} aria-pressed={audioOn} onClick={()=>setAudioOn(!audioOn)}>{audioOn?'Audio on':'Audio off'}</button>{audioOn&&!narrationAvailable&&<span className="scene-caption">This instruction is text-only.</span>}<button onClick={()=>setShowAdapt(true)}>This is not helping</button></footer>
     <div className="mx-auto w-full max-w-xl px-5"><JourneyOptions id={ID} onOpen={() => { stop(); setAudioOn(false); }} /></div>

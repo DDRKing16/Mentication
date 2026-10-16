@@ -67,6 +67,8 @@ export function validateTaraState(raw) {
   }
 
   const state = newTaraState();
+  if (Array.isArray(raw.checkpointOrder)) state.checkpointOrder = Array.isArray(raw.checkpointOrder) ? [...new Set(raw.checkpointOrder.filter(id => typeof id === 'string'))].slice(0, 128) : [];
+  if (typeof raw.predictionConfirmed === 'boolean') state.predictionConfirmed = raw.predictionConfirmed;
   state.supportPlan = readSupportPlan(raw.supportPlan);
   state.checkIns = readTaraCheckIns(raw.checkIns);
   for (const key of ['situation', 'prediction', 'rehearsal', 'rehearsalResponse', 'actual', 'learning', 'nextStep']) state[key] = text(raw[key]);
