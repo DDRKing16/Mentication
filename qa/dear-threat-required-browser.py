@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright, expect
 URL=os.environ.get('DEAR_URL','http://127.0.0.1:5194/dear2100-updated/index.html')
 KEY='dear2100-book-v1'
 with sync_playwright() as p:
- b=p.chromium.launch(executable_path='/usr/bin/chromium');errors=[]
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--mute-audio']);errors=[]
  def open_page(book=None,width=390):
   ctx=b.new_context(viewport={'width':width,'height':640},reduced_motion='reduce')
   ctx.add_init_script("document.modelContext={registerTool:tool=>{(window.dearTools ||= {})[tool.name]=tool;return Promise.resolve();}}")
@@ -33,8 +33,8 @@ with sync_playwright() as p:
   for _ in range(3):click(page,'Next threat phase')
   click(page,'Check my understanding');expect(page.get_by_role('button',name='Next question',exact=True)).to_be_disabled()
   page.reload();expect(page.locator('.threat-understanding-check fieldset')).to_have_count(1)
-  check(page,[0,1,3,1]);expect(page.get_by_role('status')).to_contain_text('2 of 4 correct (50%)');assert page.locator('.threat-check-feedback').count()==4
-  page.reload();expect(page.get_by_role('status')).to_contain_text('50%');click(page,'Try the four questions again');check(page,[0,0,3,1]);expect(page.get_by_role('status')).to_contain_text('3 of 4 correct (75%)')
+  check(page,[0,1,3,1]);expect(page.locator('.threat-understanding-check').get_by_role('status')).to_contain_text('2 of 4 correct (50%)');assert page.locator('.threat-check-feedback').count()==4
+  page.reload();expect(page.locator('.threat-understanding-check').get_by_role('status')).to_contain_text('50%');click(page,'Try the four questions again');check(page,[0,0,3,1]);expect(page.locator('.threat-understanding-check').get_by_role('status')).to_contain_text('3 of 4 correct (75%)')
   click(page,'Continue');expect(page.locator('.flow-experience-4')).to_be_visible();page.reload();expect(page.locator('.flow-experience-4')).to_be_visible()
   page.wait_for_function('JSON.parse(localStorage.getItem("dear2100-book-v1")).book.threatCheck?.submitted===true');base=page.evaluate('JSON.parse(localStorage.getItem("dear2100-book-v1")).book');assert base['answers']['want']=='Learn music'
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
@@ -46,6 +46,6 @@ with sync_playwright() as p:
   teaching(page)
   click(page,'Open journey overview');page.locator('.journey-overview button').last.click();teaching(page)
   page.evaluate('window.dearTools.open_journey_view.execute({view:"plan"})');teaching(page)
-  click(page,'Check my understanding');check(page,[2,0,3,1]);expect(page.get_by_role('status')).to_contain_text('4 of 4 correct (100%)');click(page,'Continue');assert page.evaluate('JSON.parse(localStorage.getItem("dear2100-book-v1")).book.answers.want')=='Learn music'
+  click(page,'Check my understanding');check(page,[2,0,3,1]);expect(page.locator('.threat-understanding-check').get_by_role('status')).to_contain_text('4 of 4 correct (100%)');click(page,'Continue');assert page.evaluate('JSON.parse(localStorage.getItem("dear2100-book-v1")).book.answers.want')=='Learn music'
   print('PASS legacy',view,'no inferred pass, overview/model guard, real 100%');ctx.close()
  assert not errors,errors;b.close()

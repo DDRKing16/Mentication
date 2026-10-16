@@ -7,7 +7,7 @@ export const select = (page, name) => page.getByRole('radio', { name: new RegExp
 export const draft = page => page.evaluate(key => JSON.parse(localStorage.getItem(key))?.draft, key);
 export async function browserFor() {
  const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright-core/index.mjs');
- return chromium.launch({ executablePath: process.env.CHROME_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+ return chromium.launch({ executablePath: process.env.CHROME_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--mute-audio'] });
 }
 export async function assertScreen(page, screen) {
  await page.locator('[data-flow-screen="' + screen + '"]').waitFor();

@@ -1,0 +1,38 @@
+{
+  "allPointsTwoRounds": [
+    "Side of hand",
+    "Top of head",
+    "Inner eyebrow",
+    "Side of eye",
+    "Under eye",
+    "Under nose",
+    "Chin crease",
+    "Below collarbone",
+    "Under arm",
+    "Side of hand",
+    "Top of head",
+    "Inner eyebrow",
+    "Side of eye",
+    "Under eye",
+    "Under nose",
+    "Chin crease",
+    "Below collarbone",
+    "Under arm"
+  ],
+  "result": {
+    "interventionId": "eftTapping",
+    "mode": "eft",
+    "concern": "worry",
+    "before": 6,
+    "after": 8,
+    "ratingQuestion": "How intense is the discomfort right now?",
+    "ratingMin": 0,
+    "ratingMax": 10,
+    "roundsCompleted": 2,
+    "completed": true,
+    "stopped": false,
+    "skippedPoints": 0,
+    "durationSeconds": 270
+  },
+  "errors": []
+}

@@ -1,0 +1,436 @@
+[
+  {
+    "id": "pmr",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 1287,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1776,
+        "label": "Release only\nNotice and soften, without tensing.",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 2211,
+        "label": "Full \u00b7 seven areas\nThe complete body sequence.",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR ROUTE, READY\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 3269,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR ROUTE, READY\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3802,
+        "label": "Begin release only",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR GUIDED ROUTE\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 24501,
+        "label": "Release guidance completed: hands",
+        "kind": "hands-free guidance",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR GUIDED ROUTE\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 38458,
+        "label": "Release guidance completed: shoulders",
+        "kind": "hands-free guidance",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nHands & forearms\n\nRelease guidance completed\nArms & shoulders"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 52485,
+        "label": "Release guidance completed: face",
+        "kind": "hands-free guidance",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nHands & forearms\n\nRelease guidance completed\nArms & shoulders"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 66683,
+        "label": "Release guidance completed: torso",
+        "kind": "hands-free guidance",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nJaw & face\n\nRelease guidance completed\nChest & abdomen"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 80589,
+        "label": "Release guidance completed: hips",
+        "kind": "hands-free guidance",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nJaw & face\n\nRelease guidance completed\nChest & abdomen"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 94598,
+        "label": "Release guidance completed: thighs",
+        "kind": "hands-free guidance",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nGlutes & hips\n\nRelease guidance completed\nThighs"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 108638,
+        "label": "Release guidance completed: lowerLegs",
+        "kind": "hands-free guidance",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nGlutes & hips\n\nRelease guidance completed\nThighs"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR ROUTE, READY\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+      },
+      {
+        "firstAppearanceAt": 7,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nHands & forearms\n\nRelease guidance completed\nArms & shoulders"
+      },
+      {
+        "firstAppearanceAt": 9,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nJaw & face\n\nRelease guidance completed\nChest & abdomen"
+      },
+      {
+        "firstAppearanceAt": 11,
+        "progress": 8,
+        "pair": 4,
+        "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nGlutes & hips\n\nRelease guidance completed\nThighs"
+      }
+    ],
+    "screens": [
+      {
+        "name": "all-guidance-complete",
+        "headings": [
+          "Where is tension now?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "all-guidance-complete",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "realElapsedMs": 162926,
+    "passed": true
+  },
+  {
+    "id": "pmr",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 1198,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1659,
+        "label": "Release only\nNotice and soften, without tensing.",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 2090,
+        "label": "Full \u00b7 seven areas\nThe complete body sequence.",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR ROUTE, READY\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 3113,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR ROUTE, READY\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3633,
+        "label": "Begin release only",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR GUIDED ROUTE\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 24352,
+        "label": "Release guidance completed: hands",
+        "kind": "hands-free guidance",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR GUIDED ROUTE\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 38450,
+        "label": "Release guidance completed: shoulders",
+        "kind": "hands-free guidance",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nHands & forearms\n\nRelease guidance completed\nArms & shoulders"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 52485,
+        "label": "Release guidance completed: face",
+        "kind": "hands-free guidance",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nHands & forearms\n\nRelease guidance completed\nArms & shoulders"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 66377,
+        "label": "Release guidance completed: torso",
+        "kind": "hands-free guidance",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nJaw & face\n\nRelease guidance completed\nChest & abdomen"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 80365,
+        "label": "Release guidance completed: hips",
+        "kind": "hands-free guidance",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nJaw & face\n\nRelease guidance completed\nChest & abdomen"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 94429,
+        "label": "Release guidance completed: thighs",
+        "kind": "hands-free guidance",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nGlutes & hips\n\nRelease guidance completed\nThighs"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 108509,
+        "label": "Release guidance completed: lowerLegs",
+        "kind": "hands-free guidance",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nGlutes & hips\n\nRelease guidance completed\nThighs"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR ROUTE, READY\n\nYour approach\nRelease without tensing\n\nYour route\nSeven areas, at your pace"
+      },
+      {
+        "firstAppearanceAt": 7,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nHands & forearms\n\nRelease guidance completed\nArms & shoulders"
+      },
+      {
+        "firstAppearanceAt": 9,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nJaw & face\n\nRelease guidance completed\nChest & abdomen"
+      },
+      {
+        "firstAppearanceAt": 11,
+        "progress": 8,
+        "pair": 4,
+        "text": "YOUR GUIDED ROUTE\n\nRelease guidance completed\nGlutes & hips\n\nRelease guidance completed\nThighs"
+      }
+    ],
+    "screens": [
+      {
+        "name": "all-guidance-complete",
+        "headings": [
+          "Where is tension now?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "all-guidance-complete",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "realElapsedMs": 162929,
+    "passed": true
+  }
+]

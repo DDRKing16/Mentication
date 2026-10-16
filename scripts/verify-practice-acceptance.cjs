@@ -4,13 +4,14 @@ const assert=require('node:assert/strict');const fs=require('node:fs');const pat
 const base=process.env.BASE_URL || 'http://localhost:5176';const out=process.env.EVIDENCE_DIR || path.resolve('design/three-passes/acceptance-repair');
 fs.mkdirSync(out,{recursive:true});const results=[];const widths=(process.env.WIDTHS || '320,390,1280').split(',').map(Number);
 const selected=(process.env.JOURNEYS || 'selfCompassion,unhook,makeRoom,factCheck,changeScene,happyBump,nextAction,tomorrowParking,grounding54321V2,pmr,taraTactician,nightChannel,goodMap,vectorShift').split(',');
-(async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+(async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--mute-audio']});
 for(const width of widths)for(const id of selected){const record={id,width,actions:[],checkpoints:[],screens:[],accessibility:[],errors:[]};const context=await browser.newContext({viewport:{width,height:844},reducedMotion:'reduce',...(process.env.RECORD==='1' && width===390?{recordVideo:{dir:path.join(out,'recordings'),size:{width:390,height:844}}}:{})});
 await context.addInitScript(id=>{if(window!==window.top)return;localStorage.setItem('haven_onboarded','1');localStorage.setItem('haven.a11y.v2',JSON.stringify({reducedMotion:true,largeText:location.search.includes('large-text')}));if(location.pathname==='/reset'&&!history.state?.usr){history.replaceState({usr:{prebuilt:true,pathway:[id==='pmr'?'progressive-muscle-relaxation-v2':id],direction:'calm',audio:'no',reset_phase:'guiding',goal_baseline:{question:'How intense is it right now?',scale:'distress',left:'Calm',right:'Extreme',higherIsBetter:false,direction:'calm',min:0,max:10,value:6,answered:true}},key:'practice',idx:0},'',location.href)}},id);
 const p=await context.newPage();p.setDefaultTimeout(10000);p.on('pageerror',e=>record.errors.push(e.message));let page=p;
 const routes={signalLock:'/signal-lock',nightChannel:'/night-channel',goodMap:'/good-map',vectorShift:'/reset'};
 const traceStarted=Date.now();let progress=0;const seen=new Set();
-const observe=async(label,kind='navigation',delta=0)=>{progress+=delta;const receipts=await page.locator('[data-checkpoint]').filter({visible:true}).evaluateAll(nodes=>nodes.map(n=>({pair:Number(n.dataset.checkpoint),count:n.dataset.practiceCount?Number(n.dataset.practiceCount):null,text:n.innerText})));const expected=Math.floor(progress/2);const row={sequence:record.actions.length+1,elapsedMs:Date.now()-traceStarted,label,kind,progress,expectedPair:expected,receipts};record.actions.push(row);
+const observe=async(label,kind='navigation',delta=0)=>{progress+=delta;
+ if(delta && progress%2===0) await page.locator(`[data-checkpoint="${progress/2}"]`).filter({visible:true}).first().waitFor({timeout:5000});const receipts=await page.locator('[data-checkpoint]').filter({visible:true}).evaluateAll(nodes=>nodes.map(n=>({pair:Number(n.dataset.checkpoint),count:n.dataset.practiceCount?Number(n.dataset.practiceCount):null,text:n.innerText})));const expected=Math.floor(progress/2);const row={sequence:record.actions.length+1,elapsedMs:Date.now()-traceStarted,label,kind,progress,expectedPair:expected,receipts};record.actions.push(row);
  for(const r of receipts){assert.ok(r.pair<=expected,`${label}: premature pair ${r.pair}, expected ${expected}`);if(!seen.has(r.pair)){seen.add(r.pair);record.checkpoints.push({firstAppearanceAt:row.sequence,progress,pair:r.pair,text:r.text});await p.screenshot({path:path.join(out,`${id}-pair-${r.pair}-${width}.png`),fullPage:true});}}
  if(delta && progress%2===0){assert.ok(receipts.some(r=>r.pair===expected),`${label}: missing pair ${expected} at progress ${progress}`);}
 };
@@ -32,7 +33,7 @@ if(['selfCompassion','unhook','makeRoom'].includes(id)){
  if(id==='makeRoom'){await click('Something I can see',true);await click('Try a gentle moment with this anchor');await click('I tried letting the feeling be here',true);}
  await first('.cq-choices button',true);
  if(id==='unhook'){await click('Something I can see',true);await click('I tried returning attention',true);await click('Continue to my next step');}
- await click('Keep this as my next step',true);await click('6 of 10',true);await snap('carry-card');await click('Save my card on this device');await reload();await click('Resume practice');
+ await click('Keep this as my next step',true);const afterRating=process.env.CARE_AFTER || '6';await click(`${afterRating} of 10`,true);assert.ok((await page.locator('.cq-result').innerText()).includes(`6 → ${afterRating}`),'Actual same-scale outcome stays visible');await snap('carry-card');await click('Save my card on this device');await reload();await click('Resume practice');
 }else if(id==='factCheck'){
  await click('I made a mistake.');await click('Continue',true);await click('7',true);await click('Interpretation',true);
  await fill('What makes it seem true?','I sent the wrong attachment.');await click('Continue',true);
@@ -61,7 +62,7 @@ if(['selfCompassion','unhook','makeRoom'].includes(id)){
  }
  assert.equal(last.length,7,'Seven release regions completed without extra taps');await snap('all-guidance-complete');record.realElapsedMs=Date.now()-started;
 }else if(id==='taraTactician'){
- await click('Get started');await click('Before the situation',true);await click('A conversation',true);await click('Finding the words',true);await click('Continue');await first('.tara-answer-choice',true);await click('Practise this move');await first('.tara-answer-choice',true);await click('I tried this',true);await snap('first-practice');
+ await click('Get started');await click('Before the situation');await click('A conversation',true);await click('Finding the words',true);await click('Continue');await first('.tara-answer-choice',true);await click('Practise this move');await first('.tara-answer-choice',true);await click('I tried this',true);await snap('first-practice');
  await first('.tara-answer-choice',true);await click('I tried this',true);await snap('backup-practice');await reload();
 }else if(id==='nightChannel'){
  await first('.night-sound-choices button',true);await click('15 minutes',true);await click('Tune In');await snap('listening');
@@ -69,7 +70,7 @@ if(['selfCompassion','unhook','makeRoom'].includes(id)){
  await click(/Start sorting/);for(let i=0;i<4;i++){await page.locator('.tray[data-v="3"]').click();await p.waitForTimeout(600);await observe('Sort: I need this','decision',1);}await click('Undo');progress--;await observe('Undo removed the fourth sort','undo');await snap('undo');
 }else if(id==='vectorShift'){
  await page.getByText('Tap here to begin',{exact:true}).click();await p.waitForTimeout(400);await observe('Begin visual task');
- await page.getByText('Activity options',{exact:true}).click();await observe('Open Activity options');await click('Try an easier option',true);await click('I noticed a colour or shape — continue',true);
+ await page.getByText('Activity options',{exact:true}).click();await observe('Open Activity options');await click('Try an easier option');await click('I noticed a colour or shape — continue',true);
  for(let i=0;i<3;i++)await click(`Collect a light at your pace (${i}/3)`,true);
  await click('Z',true);const z=page.getByRole('button',{name:'Z',exact:true});assert.equal(await z.isDisabled(),true);const zb=await z.boundingBox();await p.mouse.click(zb.x+zb.width/2,zb.y+zb.height/2);await observe('Repeat click on disabled Z','repeated choice');
  // Every letter choice is logged; reveal uses the same production handler as the letter keyboard.
