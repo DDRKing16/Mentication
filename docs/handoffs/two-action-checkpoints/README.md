@@ -2,9 +2,13 @@
 
 Base: latest `main` at start, PR30 / `0ca40ca1589136538f8c5b15935140c4c69f2f2b`.
 
-Final runtime SHA: **`40b239b8fc7899fea16384b4528c6d083ad76c67`**. Full package/algorithm checks and the final timed, Good Map and care runs use this SHA. The broad inventory, nine other walkthroughs, action/body, Dear/Foundations, Tara, tapping and focused Happy Bump regression runs use **`6bd361d337109ed81a0011eb37bbb16350ac3d21`**. Subsequent runtime changes are limited to Box Breathing layout and Good Map optional context; those have dedicated final-SHA reruns. The Good Map runner uses `7289bb8025791a2b5c7ff011306b8577abb988c2` (a keyboard-activation test correction; runtime is identical to `40b239b`). The evidence commit adds this report and captures without changing runtime or test code. Final PR head is stated in the PR description. No merge or deployment was performed.
+Original audit runtime SHA: **`40b239b8fc7899fea16384b4528c6d083ad76c67`**. Full package/algorithm checks and the final timed, Good Map and care runs use this SHA. The broad inventory, nine other walkthroughs, action/body, Dear/Foundations, Tara, tapping and focused Happy Bump regression runs use **`6bd361d337109ed81a0011eb37bbb16350ac3d21`**. Subsequent runtime changes are limited to Box Breathing layout and Good Map optional context; those have dedicated final-SHA reruns. The Good Map runner uses `7289bb8025791a2b5c7ff011306b8577abb988c2` (a keyboard-activation test correction; runtime is identical to `40b239b`). The evidence commit adds this report and captures without changing runtime or test code. Final PR head is stated in the PR description. No merge or deployment was performed.
 
 [Per-intervention matrix](coverage.md) · [40 rendered route openings](inventory/routes.json) · [validation output](validation/tests-lint-typecheck-algorithm.txt) · [production build](validation/build.txt)
+
+## Independent-review corrections
+
+[Review fixes and new evidence](review-fixes.md) supersede the original Box Options, Good Map follow-up and Tara prediction-edit claims below. Runtime is now `e19f331dd2ea70585b26817b94ad0c0d14c37915`; full validation passes **110 files / 958 tests**. The original captures below retain their original SHAs.
 
 ## Changes
 
