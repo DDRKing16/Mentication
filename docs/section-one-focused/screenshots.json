@@ -1,5 +1,15 @@
 [
   {
+    "file": "screenshots/discovery.png",
+    "sha256": "8ae967352784bc666c94c312eb09027b9bf731db020a01fd615eb1e0ac4c58a4",
+    "bytes": 156736
+  },
+  {
+    "file": "screenshots/home.png",
+    "sha256": "8bce68aed98c09efb37867809faa469f19e6511b56a35fa6c2fa19278f5ecf94",
+    "bytes": 447635
+  },
+  {
     "file": "screenshots/hospital-visit-affirmation.png",
     "sha256": "2325fe5e64bff46b589d56af87cffda678042573e3d19b19019e4e78c4255c50",
     "bytes": 235752
