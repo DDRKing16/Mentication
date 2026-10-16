@@ -1,0 +1,30 @@
+[
+  {
+    "width": 320,
+    "height": 568,
+    "passed": true,
+    "checks": [
+      "unconfirmed choice excluded before and after reload",
+      "skipped light/walk/contact excluded",
+      "task confirmation counted once",
+      "double-click completion counted once",
+      "same pair after Back/Forward/reload",
+      "unconfirmed optional life area excluded",
+      "later pairing stays after already confirmed reward across reload"
+    ]
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "passed": true,
+    "checks": [
+      "unconfirmed choice excluded before and after reload",
+      "skipped light/walk/contact excluded",
+      "task confirmation counted once",
+      "double-click completion counted once",
+      "same pair after Back/Forward/reload",
+      "unconfirmed optional life area excluded",
+      "later pairing stays after already confirmed reward across reload"
+    ]
+  }
+]

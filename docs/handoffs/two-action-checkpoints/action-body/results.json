@@ -1,0 +1,32 @@
+[
+  {
+    "width": 320,
+    "flow": "Next task entry, keyboard submit/edit, honest done/undo/skip, refresh/resume, separate optional questions, browser Back/Forward preserving answers",
+    "pass": true
+  },
+  {
+    "width": 320,
+    "flow": "PMR split mode/length and tension/helpfulness, honest skipped region, paused refresh with words view and audio off, browser Back preserving route/outcome",
+    "pass": true
+  },
+  {
+    "width": 320,
+    "flow": "Happy separate walk/time, reflection/words, activity/pair/reward, helpfulness/note; paused refresh, browser Back/Forward keeps answers, real note save error recovery/delete; Lift followup mood/distress split, explicit0, Back/Forward/refresh, separate longer journey choice, no uncaught errors",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "flow": "Next task entry, keyboard submit/edit, honest done/undo/skip, refresh/resume, separate optional questions, browser Back/Forward preserving answers",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "flow": "PMR split mode/length and tension/helpfulness, honest skipped region, paused refresh with words view and audio off, browser Back preserving route/outcome",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "flow": "Happy separate walk/time, reflection/words, activity/pair/reward, helpfulness/note; paused refresh, browser Back/Forward keeps answers, real note save error recovery/delete; Lift followup mood/distress split, explicit0, Back/Forward/refresh, separate longer journey choice, no uncaught errors",
+    "pass": true
+  }
+]
