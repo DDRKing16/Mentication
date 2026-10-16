@@ -801,15 +801,11 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
               If holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.
             </p>}
           </div>
-          <button type="button" aria-pressed={a11y.prefs.reducedMotion}
-            onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}
-            className="mt-1 min-h-11 rounded-full px-4 text-xs text-cream/80 underline underline-offset-4">
-            Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}
-          </button>
+
         </div>
       )}
       {/* adaptive actions — calm, integrated chips */}
-      <div style={isGroundingV2 ? { display: "none" } : undefined} className={`flex items-center justify-center px-6 pb-1 pt-3 ${isPMRV2 ? "pmr-v2-actions-wrap" : ""}`}>
+      <div style={isGroundingV2 || isBoxV2 ? { display: "none" } : undefined} className={`flex items-center justify-center px-6 pb-1 pt-3 ${isPMRV2 ? "pmr-v2-actions-wrap" : ""}`}>
         <div className={"flex items-center gap-1 rounded-full p-1 backdrop-blur-md " + (isPMRV2 ? "pmr-v2-actions " : "") + (lightChrome ? "border border-[#1A2E26]/10 bg-white/40" : "border border-white/[0.08] bg-white/[0.03]")}>
           {!isBoxV2 && <>
           <button
@@ -838,7 +834,8 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
           <CtrlButton light={lightChrome} active={running} onClick={togglePause} label={running ? "Pause" : "Play"}>
             {running ? <Pause className="h-5 w-5" strokeWidth={1.7} /> : <Play className="h-5 w-5" strokeWidth={1.7} />}
           </CtrlButton>
-          <details className="relative"><summary className="min-h-11 cursor-pointer px-3 py-3 text-sm">Guidance options</summary><div className="intervention-themed-surface absolute bottom-full right-0 z-50 mb-3 flex max-w-[85vw] flex-wrap gap-1 rounded-2xl border p-2">
+          {isBoxV2 && <button type="button" className="min-h-11 rounded-full px-3 text-sm text-cream" onClick={skipToNext}>Finish here</button>}
+          <details className="relative"><summary className="min-h-11 cursor-pointer px-3 py-3 text-sm">{isBoxV2 ? 'Options' : 'Guidance options'}</summary><div className="intervention-themed-surface absolute bottom-full right-0 z-50 mb-3 flex max-w-[85vw] flex-wrap gap-1 rounded-2xl border p-2">
           {isGroundingV2 && <button type="button" className="min-h-11 px-3 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}>Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}</button>}
           <CtrlButton light={lightChrome} active={narrate} onClick={toggleNarrate} label={narrate ? "Audio on" : "Audio off"}>
             {narrate ? <Volume2 className="h-5 w-5" strokeWidth={1.7} /> : <VolumeX className="h-5 w-5" strokeWidth={1.7} />}

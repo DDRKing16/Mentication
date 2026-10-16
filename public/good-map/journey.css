@@ -80,3 +80,5 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
 .gm-private-detail summary {min-height:44px;display:flex;align-items:center;cursor:pointer;text-decoration:underline;}
 @media(max-height:650px) {.gm-photo {width:85px;margin-block:8px;}}
+/* Later answer pairs have no card artwork: give the label and answer full width. */
+.gm-practice-reveal>div>p:not(:has(img)){grid-template-columns:1fr;align-content:start}
