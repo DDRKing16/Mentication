@@ -262,3 +262,6 @@ html.one-handed .tof-actions { margin-top: 1rem; }
 .tof-add button:disabled { display: none; }
 
 .tof-option[aria-pressed="true"] { border-color: var(--tof-accent); background: rgba(0,245,212,.1); }
+
+.tof-starting-points summary {min-height:44px;display:flex;align-items:center;cursor:pointer;text-decoration:underline;}
+@media(max-height:650px) {.tof-stage > .practice-illustration {height:72px;margin-block:0;}}

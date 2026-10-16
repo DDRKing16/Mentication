@@ -93,3 +93,7 @@
 .pmr-view-tools summary{min-height:44px;cursor:pointer;padding:.7rem;text-align:center}
 
 .pmr-session-panel .pmr-session-quiet{width:100%;background:none;border:0;text-align:center;text-decoration:underline;margin-top:.5rem}
+
+/* Keep the setup action visible on short phones; timed playback is unchanged. */
+.pmr-session-panel > .pmr-session-primary {position:sticky;bottom:12px;z-index:3;background:#315449!important;color:#fff!important;}
+@media(max-height:650px) {.pmr-session-panel > .practice-illustration {height:72px;margin-block:0;}}

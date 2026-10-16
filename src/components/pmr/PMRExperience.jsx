@@ -101,10 +101,10 @@ export default function PMRExperience({ intervention, answers, onComplete, onExi
       <PracticeIllustration kind="body"/><h1 ref={heading} tabIndex={-1}>How would you like to practise?</h1>
       <p>If an area is painful, injured or unsafe to tense, choose release only. You can skip any area or stop.</p>
       <fieldset><legend className="sr-only">Practice style</legend>
-        <button aria-pressed={mode === 'release'} onClick={() => {chooseRoute('release', length);setModeChosen(true);setPhase('length');}}>Release only<span>Notice and soften, without tensing.</span></button>
-        <button aria-pressed={mode === 'contrast'} onClick={() => {chooseRoute('contrast', length);setModeChosen(true);setPhase('length');}}>Gentle tense and release<span>Only where tensing feels comfortable and safe.</span></button>
+        <button aria-pressed={mode === 'release'} onClick={() => {chooseRoute('release', length);setModeChosen(true);}}>Release only<span>Notice and soften, without tensing.</span></button>
+        <button aria-pressed={mode === 'contrast'} onClick={() => {chooseRoute('contrast', length);setModeChosen(true);}}>Gentle tense and release<span>Only where tensing feels comfortable and safe.</span></button>
       </fieldset>
-
+      <button className="pmr-session-primary" onClick={() => { setModeChosen(true); setPhase('length'); }}>Continue</button>
     </main> : phase === 'length' ? <main className="pmr-session-panel">
       <h1 ref={heading} tabIndex={-1}>How long feels comfortable?</h1>
       <fieldset><legend className="sr-only">Session length</legend>
