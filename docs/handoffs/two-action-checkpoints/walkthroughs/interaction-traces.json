@@ -1,0 +1,806 @@
+[
+  {
+    "id": "factCheck",
+    "width": 320,
+    "actions": [
+      "I made a mistake.",
+      "Continue",
+      "7",
+      "Interpretation",
+      "Continue",
+      "Continue"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+      },
+      {
+        "afterAction": 6,
+        "pair": 2,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+      }
+    ],
+    "screens": [
+      {
+        "name": "evidence",
+        "headings": [
+          "Does this statement fit?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "evidence",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "changeScene",
+    "width": 320,
+    "actions": [
+      "Begin Change the Scene",
+      "I moved",
+      "I had some water",
+      "Skip this action",
+      "Go back"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+      },
+      {
+        "afterAction": 4,
+        "pair": 1,
+        "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "A different view"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "skipsExcluded": true,
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "happyBump",
+    "width": 320,
+    "actions": [
+      "Start",
+      "Confirm energy: 5",
+      "I've had some water",
+      "I did that",
+      "1 min",
+      "Walk indoors",
+      "I took a shorter walk",
+      "Skip ahead",
+      "Put one thing away",
+      "Make it my one mission",
+      "Done",
+      "I kept going",
+      "Confirm energy: 5",
+      "No change"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+      },
+      {
+        "afterAction": 5,
+        "pair": 2,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+      },
+      {
+        "afterAction": 6,
+        "pair": 2,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+      },
+      {
+        "afterAction": 11,
+        "pair": 4,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+      },
+      {
+        "afterAction": 14,
+        "pair": 5,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "Open a window or step into some light."
+        ]
+      },
+      {
+        "name": "mission",
+        "headings": [
+          "Put one thing away"
+        ]
+      },
+      {
+        "name": "final-card",
+        "headings": [
+          "A moment to check in."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      },
+      {
+        "name": "mission",
+        "unnamedButtons": []
+      },
+      {
+        "name": "final-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "shortRouteCompleted": true,
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "tomorrowParking",
+    "width": 320,
+    "actions": [
+      "It can wait",
+      "Ready to put it away"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+      },
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+      }
+    ],
+    "screens": [
+      {
+        "name": "draft-reveal",
+        "headings": [
+          "Close it for tonight."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "draft-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "grounding54321V2",
+    "width": 320,
+    "actions": [
+      "Double tap noticed (one advancement)",
+      "I noticed — next sense",
+      "Skip this sense"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+      },
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "Three things you can hear"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "doubleTapGuard": true,
+    "skipsExcluded": true,
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "signalLock",
+    "width": 320,
+    "actions": [
+      "Follow the signal",
+      "First signal",
+      "Second signal",
+      "First signal",
+      "Second signal"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "One detail comes into focus"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "Signal Lock.",
+          "Tap signal 1."
+        ]
+      },
+      {
+        "name": "second-reveal",
+        "headings": [
+          "Signal Lock.",
+          "Tap signal 1."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      },
+      {
+        "name": "second-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "nightChannel",
+    "width": 320,
+    "actions": [
+      "The Night Desk\nGenerated noise preview · no voices",
+      "15 minutes",
+      "Tune In"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "YOUR LISTENING CHOICE\n15\nmin\nThe Night Desk\n\n15 minutes · Generated noise · stops automatically\n\nReady when you are. Nothing is playing yet."
+      }
+    ],
+    "screens": [
+      {
+        "name": "listening-ticket",
+        "headings": [
+          "Night Channel",
+          "When should the sound stop?"
+        ]
+      },
+      {
+        "name": "listening",
+        "headings": [
+          "Night Channel",
+          "Rest your attention on the sound."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "listening-ticket",
+        "unnamedButtons": []
+      },
+      {
+        "name": "listening",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "goodMap",
+    "width": 320,
+    "actions": [
+      "Start sorting",
+      "I need this",
+      "Nice to have",
+      "Undo"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nMatters to me"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": []
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "undoRemovesReward": true,
+    "passed": true
+  },
+  {
+    "id": "vectorShift",
+    "width": 320,
+    "actions": [
+      "Begin visual task",
+      "Try an easier option",
+      "I noticed a colour or shape — continue",
+      "Collect a light at your pace (0/3)",
+      "Collect a light at your pace (1/3)"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 5,
+        "pair": 1,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+      }
+    ],
+    "screens": [
+      {
+        "name": "lights",
+        "headings": [
+          "Serpent",
+          "Guide the serpent to a light."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "lights",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "factCheck",
+    "width": 390,
+    "actions": [
+      "I made a mistake.",
+      "Continue",
+      "7",
+      "Interpretation",
+      "Continue",
+      "Continue"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+      },
+      {
+        "afterAction": 6,
+        "pair": 2,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+      }
+    ],
+    "screens": [
+      {
+        "name": "evidence",
+        "headings": [
+          "Does this statement fit?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "evidence",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "changeScene",
+    "width": 390,
+    "actions": [
+      "Begin Change the Scene",
+      "I moved",
+      "I had some water",
+      "Skip this action",
+      "Go back"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+      },
+      {
+        "afterAction": 4,
+        "pair": 1,
+        "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "A different view"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "skipsExcluded": true,
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "happyBump",
+    "width": 390,
+    "actions": [
+      "Start",
+      "Confirm energy: 5",
+      "I've had some water",
+      "I did that",
+      "1 min",
+      "Walk indoors",
+      "I took a shorter walk",
+      "Skip ahead",
+      "Put one thing away",
+      "Make it my one mission",
+      "Done",
+      "I kept going",
+      "Confirm energy: 5",
+      "No change"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+      },
+      {
+        "afterAction": 5,
+        "pair": 2,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+      },
+      {
+        "afterAction": 6,
+        "pair": 2,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+      },
+      {
+        "afterAction": 11,
+        "pair": 4,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+      },
+      {
+        "afterAction": 14,
+        "pair": 5,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "Open a window or step into some light."
+        ]
+      },
+      {
+        "name": "mission",
+        "headings": [
+          "Put one thing away"
+        ]
+      },
+      {
+        "name": "final-card",
+        "headings": [
+          "A moment to check in."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      },
+      {
+        "name": "mission",
+        "unnamedButtons": []
+      },
+      {
+        "name": "final-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "shortRouteCompleted": true,
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "tomorrowParking",
+    "width": 390,
+    "actions": [
+      "It can wait",
+      "Ready to put it away"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+      },
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+      }
+    ],
+    "screens": [
+      {
+        "name": "draft-reveal",
+        "headings": [
+          "Close it for tonight."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "draft-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "grounding54321V2",
+    "width": 390,
+    "actions": [
+      "Double tap noticed (one advancement)",
+      "I noticed — next sense",
+      "Skip this sense"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+      },
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "Three things you can hear"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "doubleTapGuard": true,
+    "skipsExcluded": true,
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "signalLock",
+    "width": 390,
+    "actions": [
+      "Follow the signal",
+      "First signal",
+      "Second signal",
+      "First signal",
+      "Second signal"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "One detail comes into focus"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": [
+          "Signal Lock.",
+          "Tap signal 1."
+        ]
+      },
+      {
+        "name": "second-reveal",
+        "headings": [
+          "Signal Lock.",
+          "Tap signal 1."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      },
+      {
+        "name": "second-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "passed": true
+  },
+  {
+    "id": "nightChannel",
+    "width": 390,
+    "actions": [
+      "The Night Desk\nGenerated noise preview · no voices",
+      "15 minutes",
+      "Tune In"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "YOUR LISTENING CHOICE\n15\nmin\nThe Night Desk\n\n15 minutes · Generated noise · stops automatically\n\nReady when you are. Nothing is playing yet."
+      }
+    ],
+    "screens": [
+      {
+        "name": "listening-ticket",
+        "headings": [
+          "Night Channel",
+          "When should the sound stop?"
+        ]
+      },
+      {
+        "name": "listening",
+        "headings": [
+          "Night Channel",
+          "Rest your attention on the sound."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "listening-ticket",
+        "unnamedButtons": []
+      },
+      {
+        "name": "listening",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "goodMap",
+    "width": 390,
+    "actions": [
+      "Start sorting",
+      "I need this",
+      "Nice to have",
+      "Undo"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nMatters to me"
+      }
+    ],
+    "screens": [
+      {
+        "name": "first-reveal",
+        "headings": []
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "first-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "undoRemovesReward": true,
+    "passed": true
+  },
+  {
+    "id": "vectorShift",
+    "width": 390,
+    "actions": [
+      "Begin visual task",
+      "Try an easier option",
+      "I noticed a colour or shape — continue",
+      "Collect a light at your pace (0/3)",
+      "Collect a light at your pace (1/3)"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 5,
+        "pair": 1,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+      }
+    ],
+    "screens": [
+      {
+        "name": "lights",
+        "headings": [
+          "Serpent",
+          "Guide the serpent to a light."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "lights",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  }
+]

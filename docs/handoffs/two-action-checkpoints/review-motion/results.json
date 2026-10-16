@@ -1,0 +1,39 @@
+{
+  "head": "817070671c55dab0e5f4fb4cbb6d77d3f5f642d0",
+  "muted": true,
+  "realClock": true,
+  "results": [
+    {
+      "width": 320,
+      "height": 568,
+      "passed": true,
+      "checks": [
+        "keyboard-accessible Options toggle from motion on and off",
+        "aria-pressed and saved preference match",
+        "Options closes and focus returns",
+        "audio remains off",
+        "settings earn no checkpoint",
+        "phase/count/checkpoint unobscured after toggle",
+        "paused reload retains preference and pair",
+        "Finish and Exit remain available"
+      ],
+      "errors": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "passed": true,
+      "checks": [
+        "keyboard-accessible Options toggle from motion on and off",
+        "aria-pressed and saved preference match",
+        "Options closes and focus returns",
+        "audio remains off",
+        "settings earn no checkpoint",
+        "phase/count/checkpoint unobscured after toggle",
+        "paused reload retains preference and pair",
+        "Finish and Exit remain available"
+      ],
+      "errors": []
+    }
+  ]
+}

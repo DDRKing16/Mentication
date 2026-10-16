@@ -67,6 +67,8 @@ export function validateTaraState(raw) {
   }
 
   const state = newTaraState();
+  if (Array.isArray(raw.checkpointOrder)) state.checkpointOrder = Array.isArray(raw.checkpointOrder) ? [...new Set(raw.checkpointOrder.filter(id => typeof id === 'string'))].slice(0, 128) : [];
+  if (typeof raw.predictionConfirmed === 'boolean') state.predictionConfirmed = raw.predictionConfirmed;
   state.supportPlan = readSupportPlan(raw.supportPlan);
   state.checkIns = readTaraCheckIns(raw.checkIns);
   for (const key of ['situation', 'prediction', 'rehearsal', 'rehearsalResponse', 'actual', 'learning', 'nextStep']) state[key] = text(raw[key]);
@@ -108,4 +110,12 @@ export function taraCompletion(state) {
   // Deliberate coarse fields only. Host integration must allowlist any new enums.
   return { interventionId: TARA_ID, completion: 'completed', saved: state.saved,
     eventStatus: state.eventStatus, predictionComparison: state.comparison || null, predictionResult: state.predictionResult || null, rehearsed: state.rehearsed };
+}
+
+/** Draft edits cannot borrow the confirmation of different prediction words. */
+export function editTaraDraft(state, patch) {
+  return { ...state, ...patch,
+    ...(Object.hasOwn(patch, 'prediction') && patch.prediction !== state.prediction ? { predictionConfirmed: false } : {}),
+    saved: false,
+  };
 }

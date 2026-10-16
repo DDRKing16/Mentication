@@ -52,3 +52,13 @@ export function careCheckpointConnection(id, items = []) {
   if (has('response')) return 'These are words to try alongside what you noticed. Selecting them does not mark them as tried.';
   return 'Your check-in and what you noticed give this practice a starting point. No change is expected yet.';
 }
+
+/** Persist only event IDs beside the existing draft, never a second copy of answers.
+ * Unknown/removed IDs are discarded; new evidence is appended in confirmation order.
+ */
+export function orderedPracticeEvents(events, order = []) {
+  const current = checkpointFor(events).all;
+  const byId = new Map(current.map(event => [event.id, event]));
+  const ids = Array.isArray(order) ? [...new Set(order.filter(id => typeof id === 'string' && byId.has(id)))] : [];
+  return [...ids.map(id => byId.get(id)), ...current.filter(event => !ids.includes(event.id))];
+}

@@ -226,7 +226,7 @@ export default function BoxBreathingV2Pacer({
   return (
     <div className="flex w-full flex-col items-center">
       {/* Current 4-second segment is indicated without adding another timer. */}
-      <div aria-hidden="true" className="mb-2 text-center sm:mb-2.5">
+      <div aria-hidden="true" className="box-v2-pacer-heading mb-2 text-center sm:mb-2.5">
         <p className="text-[0.62rem] font-medium uppercase tracking-[0.27em] text-cream/52">
           Breathe
         </p>
@@ -393,7 +393,7 @@ export default function BoxBreathingV2Pacer({
           </motion.span>
         </AnimatePresence>}
       </div>
-      <p className="mt-1 text-center text-sm text-cream/75" aria-live="off">
+      <p className="box-v2-pacer-status mt-1 text-center text-sm text-cream/75" aria-live="off">
         {running ? `${status.seconds} ${status.seconds === 1 ? "second" : "seconds"}` : "Paused · press Play when ready"}
         {" · "}Round {status.round} of {rounds}
       </p>

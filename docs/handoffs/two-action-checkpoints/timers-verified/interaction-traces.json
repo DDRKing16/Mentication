@@ -1,0 +1,258 @@
+[
+  {
+    "id": "boxV2",
+    "width": 320,
+    "actions": [
+      "Pause",
+      "Play"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 0,
+        "pair": 1,
+        "text": "2 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      },
+      {
+        "afterAction": 1,
+        "pair": 1,
+        "text": "2 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      },
+      {
+        "afterAction": 1,
+        "pair": 1,
+        "text": "2 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      },
+      {
+        "afterAction": 2,
+        "pair": 2,
+        "text": "4 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      }
+    ],
+    "screens": [
+      {
+        "name": "opening",
+        "headings": [
+          "Find your seat"
+        ]
+      },
+      {
+        "name": "two-rounds",
+        "headings": []
+      },
+      {
+        "name": "four-rounds",
+        "headings": [
+          "Rest"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "opening",
+        "unnamedButtons": []
+      },
+      {
+        "name": "two-rounds",
+        "unnamedButtons": []
+      },
+      {
+        "name": "four-rounds",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "handsFree": true,
+    "pauseReloadResume": true,
+    "passed": true
+  },
+  {
+    "id": "urgeSurf",
+    "width": 320,
+    "actions": [
+      "Start a 60-second pause",
+      "Pause practice",
+      "Resume practice",
+      "End early",
+      "End gently"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 1,
+        "pair": 1,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nNotice without needing the urge to change.\n\nGuidance reached\nThere is room to wait before choosing."
+      },
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nNotice without needing the urge to change.\n\nGuidance reached\nThere is room to wait before choosing."
+      },
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nNotice without needing the urge to change.\n\nGuidance reached\nThere is room to wait before choosing."
+      },
+      {
+        "afterAction": 3,
+        "pair": 2,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nWhether steady or changing, take one comfortable breath. You can feel the urge without following it.\n\nGuidance reached\nThe urge may rise, stay steady, or ease. Notice what is true for you."
+      }
+    ],
+    "screens": [
+      {
+        "name": "guided-reveal",
+        "headings": [
+          "Ride the lift"
+        ]
+      },
+      {
+        "name": "second-guided-reveal",
+        "headings": [
+          "Find a little steadiness"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "guided-reveal",
+        "unnamedButtons": []
+      },
+      {
+        "name": "second-guided-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "pauseReloadResume": true,
+    "checkpointDoesNotOpenDialog": true,
+    "passed": true
+  },
+  {
+    "id": "boxV2",
+    "width": 390,
+    "actions": [
+      "Pause",
+      "Play"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 0,
+        "pair": 1,
+        "text": "2 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      },
+      {
+        "afterAction": 1,
+        "pair": 1,
+        "text": "2 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      },
+      {
+        "afterAction": 1,
+        "pair": 1,
+        "text": "2 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      },
+      {
+        "afterAction": 2,
+        "pair": 2,
+        "text": "4 guided rounds. Rejoin at the next inhale. Breathe naturally if holds feel uncomfortable."
+      }
+    ],
+    "screens": [
+      {
+        "name": "opening",
+        "headings": [
+          "Find your seat"
+        ]
+      },
+      {
+        "name": "two-rounds",
+        "headings": []
+      },
+      {
+        "name": "four-rounds",
+        "headings": [
+          "Rest"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "opening",
+        "unnamedButtons": []
+      },
+      {
+        "name": "two-rounds",
+        "unnamedButtons": []
+      },
+      {
+        "name": "four-rounds",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "handsFree": true,
+    "pauseReloadResume": true,
+    "passed": true
+  },
+  {
+    "id": "urgeSurf",
+    "width": 390,
+    "actions": [
+      "Start a 60-second pause",
+      "Pause practice",
+      "Resume practice",
+      "End early",
+      "End gently"
+    ],
+    "checkpoints": [
+      {
+        "afterAction": 1,
+        "pair": 1,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nNotice without needing the urge to change.\n\nGuidance reached\nThere is room to wait before choosing."
+      },
+      {
+        "afterAction": 2,
+        "pair": 1,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nNotice without needing the urge to change.\n\nGuidance reached\nThere is room to wait before choosing."
+      },
+      {
+        "afterAction": 3,
+        "pair": 1,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nNotice without needing the urge to change.\n\nGuidance reached\nThere is room to wait before choosing."
+      },
+      {
+        "afterAction": 3,
+        "pair": 2,
+        "text": "A LITTLE SPACE BEFORE ACTING\n\nGuidance reached\nWhether steady or changing, take one comfortable breath. You can feel the urge without following it.\n\nGuidance reached\nThe urge may rise, stay steady, or ease. Notice what is true for you."
+      }
+    ],
+    "screens": [
+      {
+        "name": "guided-reveal",
+        "headings": [
+          "Ride the lift"
+        ]
+      },
+      {
+        "name": "second-guided-reveal",
+        "headings": [
+          "Find a little steadiness"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "guided-reveal",
+        "unnamedButtons": []
+      },
+      {
+        "name": "second-guided-reveal",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "backAndRefresh": true,
+    "pauseReloadResume": true,
+    "checkpointDoesNotOpenDialog": true,
+    "passed": true
+  }
+]

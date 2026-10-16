@@ -1,0 +1,36 @@
+{
+  "base": "0ca40ca1589136538f8c5b15935140c4c69f2f2b",
+  "finalRuntime": "40b239b8fc7899fea16384b4528c6d083ad76c67",
+  "broadBrowserSource": "6bd361d337109ed81a0011eb37bbb16350ac3d21",
+  "goodMapRunner": "7289bb8025791a2b5c7ff011306b8577abb988c2",
+  "finalRuntimeSuites": [
+    "timers-verified",
+    "good-map",
+    "care",
+    "package validation"
+  ],
+  "broadBrowserSuites": [
+    "inventory",
+    "walkthroughs",
+    "action-body",
+    "focused",
+    "tapping",
+    "tara",
+    "regressions"
+  ],
+  "viewports": [
+    [
+      320,
+      568
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "muted": true,
+  "acceleratedTimers": false,
+  "node": "v24.19.0",
+  "chromium": "Chromium 151.0.7922.173 built on Debian GNU/Linux 13 (trixie)",
+  "productionIndexSha256": "9817f82a9bfcd4a1d9ec015bb9e55a48b6c5fc7b7bcda1958e3fe3ab0e4f1075"
+}

@@ -118,3 +118,5 @@
 @media(max-width:359px) { .tara-support-guide img { width:52px; height:68px; } .tara-live-actions>button { padding:13px 12px; gap:10px; } .tara-support-card { padding:17px; } }
 @media(prefers-reduced-motion:no-preference) { .tara-grounding-orb { animation:tara-steady-light 8s ease-in-out infinite; } }
 @keyframes tara-steady-light { 50% { opacity:.82; } }
+/* A support step must remain readable before its next action, including short phones. */
+.tara-practical-support .tara-step > .tara-action { position:static; }

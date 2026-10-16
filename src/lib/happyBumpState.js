@@ -22,6 +22,10 @@ export function restoreBumpState(initial, saved) {
   // Old defaults and selected actions were not evidence of answers/completion.
   if (saved?.version !== 2) Object.assign(state, { baseline: null, current: null, helpfulness: null, walkStatus: null, taskStatus: null, contactStatus: null });
   state.version = 2;
+  // Preserve earned task choices from pre-checkpoint drafts only where the saved
+  // practice screen or an explicit attempt confirms the mission was accepted.
+  state.taskConfirmed = saved?.taskConfirmed ?? (!!state.task && (state.scene === 'mission' || ['completed','started'].includes(state.taskStatus)));
+
   // Legacy drafts have no confirmation flags. Only an already-departed rating
   // screen is evidence of confirmation; a slider being edited is not.
   state.baselineConfirmed = saved?.baselineConfirmed ?? (answeredEnergy(state.baseline) && !['arrival', 'baseline'].includes(state.scene));

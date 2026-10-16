@@ -1,0 +1,34 @@
+[
+  {
+    "width": 320,
+    "pass": true,
+    "checks": [
+      "16 sorts and explicitly confirmed importance ratings; draft selections excluded",
+      "optional context pair survives reload; skipping both removes both without new credit",
+      "16 confirmed satisfaction responses each extend the paired recap",
+      "same checkpoint count after back/forward/reload",
+      "16 satisfaction ratings",
+      "meaning, focus, helps/barriers, direction and own action",
+      "separate date/time",
+      "back/forward/reload retains answers",
+      "saved plan no automatic notification",
+      "honest not-tried check-in with no rating"
+    ]
+  },
+  {
+    "width": 390,
+    "pass": true,
+    "checks": [
+      "16 sorts and explicitly confirmed importance ratings; draft selections excluded",
+      "optional context pair survives reload; skipping both removes both without new credit",
+      "16 confirmed satisfaction responses each extend the paired recap",
+      "same checkpoint count after back/forward/reload",
+      "16 satisfaction ratings",
+      "meaning, focus, helps/barriers, direction and own action",
+      "separate date/time",
+      "back/forward/reload retains answers",
+      "saved plan no automatic notification",
+      "honest not-tried check-in with no rating"
+    ]
+  }
+]

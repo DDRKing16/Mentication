@@ -782,7 +782,6 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         </AnimatePresence>
       </div>
 
-      {isBoxV2 && !showBoxFeedback && boxCompletedRounds >= 2 && <PracticeCheckpoint compact variant="breath" title="A rhythm you can revisit" events={Array.from({length:boxCompletedRounds},(_,i)=>earned(`round-${i}`,'Guided round completed',i % 2 ? 'Rejoin at the next inhale whenever you lose the count.' : 'Four equal phases; breathing naturally is always an option.'))}/>}
       {isBoxV2 && boxResume && !showBoxFeedback && !running && <p role="status" className="relative px-5 text-center text-sm text-cream">Your place is back, paused. Choose Play when ready.</p>}
       {isBoxV2 && !boxSaved && <p role="status" className="relative px-5 text-center text-sm text-cream">This tab could not remember your place. Keep it open; refresh may lose your progress.</p>}
       {isGroundingV2 && !groundingSaved && <p role="status" className="relative px-5 text-center text-sm">This tab could not remember your grounding place. Your current practice is still here; refresh may lose it.</p>}
@@ -797,18 +796,16 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
       {!showBoxFeedback && <>
       {isBoxV2 && (
         <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
-          <p className="text-xs leading-relaxed text-cream/75">
-            If holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.
-          </p>
-          <button type="button" aria-pressed={a11y.prefs.reducedMotion}
-            onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}
-            className="mt-1 min-h-11 rounded-full px-4 text-xs text-cream/80 underline underline-offset-4">
-            Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}
-          </button>
+          <div className="min-h-12 flex items-center justify-center">
+            {boxCompletedRounds >= 2 ? <PracticeCheckpoint brief variant="breath" events={Array.from({length:boxCompletedRounds},(_,i)=>earned(`round-${i}`,'Guided round completed','Four equal phases; breathing naturally is always an option.'))}/> : <p className="text-xs leading-relaxed text-cream/75">
+              If holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.
+            </p>}
+          </div>
+
         </div>
       )}
       {/* adaptive actions — calm, integrated chips */}
-      <div style={isGroundingV2 ? { display: "none" } : undefined} className={`flex items-center justify-center px-6 pb-1 pt-3 ${isPMRV2 ? "pmr-v2-actions-wrap" : ""}`}>
+      <div style={isGroundingV2 || isBoxV2 ? { display: "none" } : undefined} className={`flex items-center justify-center px-6 pb-1 pt-3 ${isPMRV2 ? "pmr-v2-actions-wrap" : ""}`}>
         <div className={"flex items-center gap-1 rounded-full p-1 backdrop-blur-md " + (isPMRV2 ? "pmr-v2-actions " : "") + (lightChrome ? "border border-[#1A2E26]/10 bg-white/40" : "border border-white/[0.08] bg-white/[0.03]")}>
           {!isBoxV2 && <>
           <button
@@ -837,8 +834,15 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
           <CtrlButton light={lightChrome} active={running} onClick={togglePause} label={running ? "Pause" : "Play"}>
             {running ? <Pause className="h-5 w-5" strokeWidth={1.7} /> : <Play className="h-5 w-5" strokeWidth={1.7} />}
           </CtrlButton>
-          <details className="relative"><summary className="min-h-11 cursor-pointer px-3 py-3 text-sm">Guidance options</summary><div className="intervention-themed-surface absolute bottom-full right-0 z-50 mb-3 flex max-w-[85vw] flex-wrap gap-1 rounded-2xl border p-2">
-          {isGroundingV2 && <button type="button" className="min-h-11 px-3 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}>Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}</button>}
+          {isBoxV2 && <button type="button" className="min-h-11 rounded-full px-3 text-sm text-cream" onClick={skipToNext}>Finish here</button>}
+          <details className="relative"><summary className="min-h-11 cursor-pointer px-3 py-3 text-sm">{isBoxV2 ? 'Options' : 'Guidance options'}</summary><div className="intervention-themed-surface absolute bottom-full right-0 z-50 mb-3 flex w-64 max-w-[85vw] flex-wrap gap-1 rounded-2xl border p-2">
+          {(isGroundingV2 || isBoxV2) && <button type="button" className="min-h-11 px-3 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={event => {
+            a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion);
+            if (isBoxV2) {
+              const options = event.currentTarget.closest("details");
+              if (options) { options.open = false; options.querySelector("summary")?.focus(); }
+            }
+          }}>Reduced motion: {a11y.prefs.reducedMotion ? "on" : "off"}</button>}
           <CtrlButton light={lightChrome} active={narrate} onClick={toggleNarrate} label={narrate ? "Audio on" : "Audio off"}>
             {narrate ? <Volume2 className="h-5 w-5" strokeWidth={1.7} /> : <VolumeX className="h-5 w-5" strokeWidth={1.7} />}
           </CtrlButton>

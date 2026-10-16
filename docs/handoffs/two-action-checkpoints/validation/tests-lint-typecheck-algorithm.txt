@@ -1,0 +1,37 @@
+
+> mentation@0.0.0 test
+> vitest run --run
+
+
+ RUN  v4.1.11 /workspace/checkpoints
+
+
+ Test Files  109 passed (109)
+      Tests  956 passed (956)
+   Start at  22:46:39
+   Duration  9.10s (transform 2.12s, setup 0ms, import 7.55s, tests 2.64s, environment 14ms)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+
+> mentation@0.0.0 lint
+> eslint . --quiet
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+
+> mentation@0.0.0 typecheck
+> tsc -p ./jsconfig.json
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+Mentication V3 verification passed.

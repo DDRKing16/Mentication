@@ -1,0 +1,10 @@
+{
+  "runtimeSHA": "e19f331dd2ea70585b26817b94ad0c0d14c37915",
+  "testSHA": "817070671c55dab0e5f4fb4cbb6d77d3f5f642d0",
+  "muted": true,
+  "viewports": [
+    "320x568",
+    "390x844"
+  ],
+  "branches": "Six follow-up branches per viewport, copied from a plan constructed through the UI; pair assertions loaded from 8170706."
+}

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { checkpointFor, practiceEvent, careCheckpoints, reconcilePracticeEvents } from './practiceCheckpoints';
-import { freshCareState } from './carePractices';
+import { checkpointFor, practiceEvent, careCheckpoints, reconcilePracticeEvents, orderedPracticeEvents } from './practiceCheckpoints';
+import { freshCareState, restoreCareState } from './carePractices';
 describe('earned practice checkpoints',()=>{
  it('does not treat a missing confirmation field as an earned default',()=>{
   expect(practiceEvent('duration','Time chosen','3 minutes',undefined)).toBeNull();
@@ -89,4 +89,24 @@ it('distinguishes chosen and observed room anchors without claiming allowing', (
  const s={...freshCareState(),anchorType:'object'};
  expect(careCheckpoints('makeRoom',s).filter(Boolean).map(e=>e.id)).toEqual(['anchor']);
  expect(careCheckpoints('makeRoom',{...s,anchorNoticed:true}).filter(Boolean).map(e=>e.id)).toEqual(['anchor','anchor-noticed']);
+});
+
+describe('saved checkpoint order', () => {
+ const e = id => practiceEvent(id, 'Answer', id);
+ it('keeps a later optional response in its actual pair across reload', () => {
+  const first = orderedPracticeEvents([e('a'),e('b'),e('later')]);
+  const next = orderedPracticeEvents([e('a'),e('optional'),e('b'),e('later')], first.map(e=>e.id));
+  const restored = orderedPracticeEvents([e('a'),e('optional'),e('b'),e('later')], JSON.parse(JSON.stringify(next.map(e=>e.id))));
+  expect(checkpointFor(restored).items.map(e=>e.id)).toEqual(['later','optional']);
+ });
+ it('drops undone IDs and rejects duplicate or malformed saved order', () => {
+  expect(orderedPracticeEvents([e('a'),e('c')],['a','a','removed',null]).map(e=>e.id)).toEqual(['a','c']);
+  expect(orderedPracticeEvents([e('a')],{})).toEqual([e('a')]);
+ });
+});
+
+it('restores the confirmation order alongside care draft answers', () => {
+ const draft = {...freshCareState(),before:6,noticeConfirmed:true,action:'Read a page',actionConfirmed:true,checkpointOrder:['notice','action','before']};
+ const restored = restoreCareState(JSON.parse(JSON.stringify(draft)));
+ expect(orderedPracticeEvents(careCheckpoints('unhook',restored),restored.checkpointOrder).map(e=>e.id)).toEqual(['notice','action','before']);
 });

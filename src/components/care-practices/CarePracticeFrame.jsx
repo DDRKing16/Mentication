@@ -1,6 +1,6 @@
 import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
-import { careCheckpoints, careCheckpointConnection, checkpointFor, reconcilePracticeEvents } from '@/lib/practiceCheckpoints';
-import { useRef, useState } from 'react';
+import { careCheckpoints, careCheckpointConnection, checkpointFor, orderedPracticeEvents } from '@/lib/practiceCheckpoints';
+import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Bookmark, Check, Pencil, X } from 'lucide-react';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import { CARE_PRACTICES, careOutcome } from '@/lib/carePractices';
@@ -20,9 +20,8 @@ export function WordChoices({ label, value, choices, onChange, placeholder = 'A 
 export function CareFrame({ flow, children, compact = true, focused = false }) {
   const { prefs } = useAccessibilityPrefs();
   const config = CARE_PRACTICES[flow.id];
-  const confirmed = useRef([]);
-  confirmed.current = reconcilePracticeEvents(confirmed.current, careCheckpoints(flow.id, flow.s));
-  const checkpoint = checkpointFor(confirmed.current);
+  const confirmed = orderedPracticeEvents(careCheckpoints(flow.id, flow.s), flow.s.checkpointOrder);
+  const checkpoint = checkpointFor(confirmed);
   const practicing = ['say','frame','allow','outside','return','re-hook'].includes(flow.screen);
   const index = flow.progress ?? ['arrival','baseline','notice','perspective','practice','action','rerate','complete'].indexOf(flow.s.stage);
   return <div className="care-practice" data-core={compact || undefined} data-focused={focused || undefined} data-care={flow.id} data-care-stage={flow.s.stage} data-reduced-motion={prefs.reducedMotion || undefined} style={{ '--care-accent': config.accent }}>
@@ -35,7 +34,7 @@ export function CareFrame({ flow, children, compact = true, focused = false }) {
       {!compact && !flow.returning && flow.s.milestone && <div className="care-milestone" role="status" aria-live="polite" aria-atomic="true" key={`pair-${Math.floor(flow.s.clicks / 2)}`}><i aria-hidden="true" /><p>{flow.s.milestone}</p></div>}
       {!flow.draftOk && <p role="alert" className="care-error">This device could not save your draft. You can continue here, but progress may be lost when you leave.</p>}
       {!focused && !flow.returning && !['perspective','practice'].includes(flow.s.stage) && <footer className="care-tools" data-care-tools>{!flow.viewingSaved && !flow.returning && <Quiet onClick={flow.discard}>Delete draft and leave</Quiet>}</footer>}
-      {!flow.returning && !['card','intro','before'].includes(flow.screen) && (!practicing || checkpoint.count % 2 === 0) && <PracticeCheckpoint connection={careCheckpointConnection(flow.id, checkpoint.items)} events={confirmed.current} title={{selfCompassion:"Your care, taking shape",unhook:"A thought and a choice",makeRoom:"Room for both"}[flow.id]} compact variant={flow.id}/> }
+      {!flow.returning && !['card','intro','before'].includes(flow.screen) && (!practicing || checkpoint.count % 2 === 0) && <PracticeCheckpoint order={flow.s.checkpointOrder} onOrderChange={checkpointOrder => flow.patch({checkpointOrder})} connection={careCheckpointConnection(flow.id, checkpoint.items)} events={confirmed} title={{selfCompassion:"Your care, taking shape",unhook:"A thought and a choice",makeRoom:"Room for both"}[flow.id]} compact variant={flow.id}/> }
       <JourneyOptions id={flow.id}/>
     </main>
   </div>;

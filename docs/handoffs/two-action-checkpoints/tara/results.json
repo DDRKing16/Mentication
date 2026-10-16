@@ -1,0 +1,60 @@
+{
+  "origin": "http://localhost:5183",
+  "head": "6bd361d337109ed81a0011eb37bbb16350ac3d21",
+  "workingTreeDirty": true,
+  "results": [
+    {
+      "scenario": "work-boundary",
+      "status": "PASS",
+      "outcome": {
+        "interventionId": "taraTactician",
+        "completion": "completed",
+        "saved": true,
+        "eventStatus": "finished",
+        "predictionComparison": null,
+        "predictionResult": "partly",
+        "rehearsed": true
+      },
+      "observation": "I said the limit. The workload is unchanged."
+    },
+    {
+      "scenario": "hospital-visit",
+      "status": "PASS",
+      "outcome": {
+        "interventionId": "taraTactician",
+        "completion": "completed",
+        "saved": true,
+        "eventStatus": "stepped-out",
+        "predictionComparison": null,
+        "predictionResult": "happened",
+        "rehearsed": true
+      },
+      "observation": "I stepped outside after asking reception. I felt worse, not calmer."
+    },
+    {
+      "scenario": "tax-paperwork",
+      "status": "PASS",
+      "outcome": {
+        "interventionId": "taraTactician",
+        "completion": "completed",
+        "saved": true,
+        "eventStatus": "not-attempted",
+        "predictionComparison": null,
+        "predictionResult": "not-tested",
+        "rehearsed": true
+      },
+      "observation": "I did not open it. No task completion or benefit should be recorded."
+    },
+    {
+      "scenario": "long custom support: readable preview, complete expandable words, exact saved text",
+      "status": "PASS"
+    },
+    {
+      "scenario": "unprepared support and cancel/delete",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "postRequestsObserved": 0,
+  "muted": true
+}

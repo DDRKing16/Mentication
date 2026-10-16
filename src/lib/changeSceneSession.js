@@ -13,7 +13,7 @@ export function restoreSceneSession(saved) {
     const a=saved?.actions?.[i];
     if(a && ['primary','alternative'].includes(a.choice) && ['chosen','done','skipped'].includes(a.status)) actions[i]={choice:a.choice,status:a.status};
   }
-  return {step,actions,helpfulness:['helpful','same','worse','unsure'].includes(saved?.helpfulness)?saved.helpfulness:null};
+  return {step,actions,...(Array.isArray(saved?.checkpointOrder) ? {checkpointOrder:saved.checkpointOrder.filter(id => typeof id === 'string').slice(0,32)} : {}),helpfulness:['helpful','same','worse','unsure'].includes(saved?.helpfulness)?saved.helpfulness:null};
 }
 export function sceneAction(session,step,action) {
   if(step<1||step>6) return session;

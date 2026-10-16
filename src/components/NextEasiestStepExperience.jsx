@@ -2200,7 +2200,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
           </div>
         </dialog>
       )}
-      <div className="nes-journey-tools"><PracticeCheckpoint variant="step" title="Real steps, made visible" events={[
+      <div className="nes-journey-tools"><PracticeCheckpoint order={gameState.checkpointOrder} onOrderChange={checkpointOrder => setGameState(value => ({...value, checkpointOrder}))} variant="step" title="Real steps, made visible" events={[
         earned('task','The task you chose',gameState.task),
         ...gameState.ladder.map((step,index)=>earned(`step-${index}`,'You marked this as done',step.text || step.title || step.action || `Step ${index + 1}`,step.status === 'done')),
         earned('starting','Your check-in',gettingStarted), earned('helpfulness','Your feedback',helpfulness),

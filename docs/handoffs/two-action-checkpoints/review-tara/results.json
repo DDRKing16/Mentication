@@ -1,0 +1,30 @@
+{
+  "head": "e19f331dd2ea70585b26817b94ad0c0d14c37915",
+  "muted": true,
+  "results": [
+    {
+      "width": 320,
+      "passed": true,
+      "checks": [
+        "plain Back preserves confirmation",
+        "clear and replacement remove forecast credit",
+        "unconfirmed replacement survives reload without credit",
+        "explicit reconfirmation restores exactly one event",
+        "repeat Back/Continue and reload preserve count four"
+      ],
+      "errors": []
+    },
+    {
+      "width": 390,
+      "passed": true,
+      "checks": [
+        "plain Back preserves confirmation",
+        "clear and replacement remove forecast credit",
+        "unconfirmed replacement survives reload without credit",
+        "explicit reconfirmation restores exactly one event",
+        "repeat Back/Continue and reload preserve count four"
+      ],
+      "errors": []
+    }
+  ]
+}
