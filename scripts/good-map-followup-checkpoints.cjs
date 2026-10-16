@@ -5,7 +5,7 @@ module.exports=async function(browser,storageState,base,out,width){
   const c=await browser.newContext({storageState,viewport:{width,height:width===320?568:844},reducedMotion:'reduce'}),p=await c.newPage();
   const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(base+'/good-map');const f=p.frameLocator('iframe');
   const read=()=>p.evaluate(()=>JSON.parse(localStorage.getItem('goodmap-journey-v4')).state.JST);
-  const count=async n=>assert.equal(await f.locator('[data-practice-count]').getAttribute('data-practice-count'),String(n));
+  const count=async n=>{assert.equal(await f.locator('[data-practice-count]').getAttribute('data-practice-count'),String(n));assert.equal(await f.locator('[data-checkpoint]').getAttribute('data-checkpoint'),String(Math.floor(n/2)));};
   await f.locator(`[data-did="${did}"]`).waitFor();await count(54);
   await f.locator(`[data-did="${did}"]`).dblclick();await count(55);
   await p.goBack();await f.locator(`[data-did="${did}"]`).waitFor();await count(55);
