@@ -1,0 +1,3 @@
+PASS 320 original senses/optional teaching/accessibility alternative, exact chosen-sense paused refresh/Back/forward, actual independent worse feedback survives refresh, honest partial history and blank endpoint.
+PASS 390 original senses/optional teaching/accessibility alternative, exact chosen-sense paused refresh/Back/forward, actual independent worse feedback survives refresh, honest partial history and blank endpoint.
+PASS all original six grounding stages and accessible alternatives, manual recenter, explicit skipped feedback, actual optional cue/read/delete with no invented outcome.

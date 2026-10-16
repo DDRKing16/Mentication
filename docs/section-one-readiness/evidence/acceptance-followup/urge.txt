@@ -1,0 +1,3 @@
+PASS direct start, early stop, exact paused refresh/resume, modal focus/Escape, independent ratings, retained failed-save note, true partial history, saved return/delete.
+PASS real elapsed wave completes, no fabricated ratings/outcome/note.
+PASS guided route, original questions/scales, no private draft in history, unchanged feedback, repeat clears end ratings.

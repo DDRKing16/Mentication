@@ -4,7 +4,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 p=argparse.ArgumentParser();p.add_argument('--url',default='http://127.0.0.1:5191/good-map/index.html');p.add_argument('--out',required=True);args=p.parse_args();out=Path(args.out);out.mkdir(parents=True,exist_ok=True)
 with sync_playwright() as pw:
- b=pw.chromium.launch(executable_path='/usr/bin/chromium');errors=[]
+ b=pw.chromium.launch(executable_path='/usr/bin/chromium',args=['--mute-audio']);errors=[]
  for width in [320,390]:
   c=b.new_context(viewport={'width':width,'height':844},reduced_motion='reduce',accept_downloads=True);a=c.new_page();a.on('pageerror',lambda e:errors.append(str(e)));a.goto(args.url);a.locator('#gmStart').click()
   for i in range(16):

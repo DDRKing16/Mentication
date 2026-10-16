@@ -50,18 +50,18 @@ All rows still require applicable native accessibility/audio/interruption checks
 | Make Room for the Feeling | Existing outside anchor, optional gentle allowance, explicit practice try, useful next step retained | Production 320/390 checkpoint and saved-card refresh; 320px 6→8 worse outcome and save/restore pass. State tests distinguish outside-only/stopped from trying allowance; no guaranteed relief. |
 | Self-Compassion | Existing believable response, explicit saying try and supportive action retained | Production 320/390 checkpoint and saved-card refresh; 320px 6→8 worse outcome and save/restore pass. Confirmed words differ from typing; trying words differs from completed action. No forced positive appraisal. |
 | Change the Scene | Existing 6 actual action confirmations and alternatives retained | Production 320/390 six-action checkpoint/refresh pass. Rendering wait fixed in QA, not product. Same/worse and undo semantics covered by state tests. |
-| Thought or Fact? | Existing evidence and balanced response retained | Production checkpoint/refresh and full unit suite; exhaustive outcome branches not rerun. |
-| The Happy Bump | Existing energy/activity confirmations and no-change outcome retained | Production checkpoint/refresh, unchanged energy branch; other outcome branches not rerun. |
-| Next Easiest Step | Existing actual completed-step checkpoint retained | Production step completion/refresh; exhaustive task variations not rerun. |
-| Tomorrow Parking Lot | Existing private draft/verified local save retained | Production draft/save checkpoint; full storage tests pass with deterministic Date. Native calendar handoff not tested. |
-| 5-4-3-2-1 Grounding | Existing confirmed sense actions, pause and partial outcome retained | Production four-sense/checkpoint/refresh; rapid double tap advances once. Older shared QA still used obsolete “Next sense” selector; not counted as a pass. |
+| Thought or Fact? | Existing evidence and balanced response retained | Production 320/390 full belief (0→7), optional patterns, sequential evidence, edited/confirmed perspective, private save/error/retry, same-ID edit, live delete, search, return and large text. Unresolved/blank beliefs preserve evidence; corrupt archives and failed draft writes remain honest. See acceptance-followup logs. |
+| The Happy Bump | Existing energy/activity confirmations and no-change outcome retained | Production lower 6→3 at 320px, unchanged 6→6 at 390px, and unrated energy at 320px. Paused walk refresh, honest shorter-walk/started-task status, no invented contact, saved cue/read/delete and blank shared endpoint all pass. |
+| Next Easiest Step | Existing actual completed-step checkpoint retained | Production 320/390 three-step edit/done/skip, paused modal/refresh, genuine return, failed ending save/retry, new-visit-only completion history, unreadable saved-task preservation and silent direct route. Fixed enabled-but-inert Undo at a finished-visit boundary; reducer behavior retained. |
+| Tomorrow Parking Lot | Existing private draft/verified local save retained | Production 320/390 safety option, interrupted seal without save, failed-save/retry, exact saved note, same-ID edit, worse feedback, quiet refresh, daylight review/delete and no resurrection. Native calendar handoff remains outside browser scope. |
+| 5-4-3-2-1 Grounding | Existing confirmed sense actions, pause and partial outcome retained | Production 320/390 paused chosen sense, Back/Forward/refresh, alternatives, independent worse feedback and honest partial history. All five confirmed senses plus recenter, skipped feedback and optional saved cue/read/delete pass. Obsolete selector issue resolved. |
 | Progressive Muscle Relaxation | Existing narrator/artwork and full release-only guidance retained | Live browser 320/390px seven-area hands-free completion; unit suite. Physical narrator audition not performed. |
-| Night Channel | Finished supplied build unchanged | Production sound/duration choices and entry checkpoint. Full 15-minute end-to-end sleep session not rerun. |
-| The Good Map | Existing meaningful sorting and undo retained | Production sorting/undo checkpoint and restore path; entire longer reflection not rerun. |
-| Vector Shift | Finished supplied build unchanged | Production 320/390 actual noticing, three collections, letters/features, disabled-repeat, checkpoints and refresh pass. Complete physical interaction not verified. |
-| Box Breathing | Existing pacing and honest partial outcomes unchanged | Unit suite and entry/hierarchy review; complete timed production branch not newly certified. |
-| Urge Surfing | Existing actual practice/choice and stop options unchanged | Unit suite and entry/hierarchy review; all timed branches not newly certified. |
-| Signal Lock | Finished supplied build unchanged | Unit suite and entry/hierarchy review; full game branches not newly certified. |
+| Night Channel | Finished supplied build unchanged | Production 320/390 generated audio starts/pauses (output muted), exact paused remainder on refresh, alternative pause, same-ID setup save/error/retry/edit/live delete, file reattachment and honest unavailable providers. Full 15-minute timer runs with simulated browser time to zero/stopped; this is not a 15-minute wall-clock listening audition. Native Back/Forward/whole-app refresh pass. |
+| The Good Map | Existing meaningful sorting and undo retained | Production 320/390 complete 16-card sorting, importance/map/interpretation/satisfaction/focus/support/barrier/aim, own step/date, plan refresh, negative zero or blank check-in, calendar and consented summary downloads with privacy, larger text, dated return/delete. |
+| Vector Shift | Finished supplied build unchanged | Production 320/390 noticing, three collections, letters/features, disabled-repeat, easy games, demand/feedback choices, checkpoints, pause/refresh and native Back/Forward with exact earned letter retained. Physical interaction remains unverified. |
+| Box Breathing | Existing pacing and honest partial outcomes unchanged | Production 320/390 full four-round timer via simulated active RAF time, explicit worse/same feedback, complete history and blank endpoint. Separate general 20-minute route confirms baseline/time inputs, paused refresh, alternative return, explicit endpoint zero and truthful partial completion. |
+| Urge Surfing | Existing actual practice/choice and stop options unchanged | Production early stop, real 60-second complete quick wave, guided 30-second option, exact paused refresh/Back/Forward, focus/Escape, same/worse optional feedback, independent urge ratings, save failure/retry, private-note return/delete, honest partial/full history and repeat clearing end ratings. No private anchor/body detail in history. |
+| Signal Lock | Finished supplied build unchanged | Production 320/390 keyboard and alternating enabled targets, two full scenes from 12 actual paired interactions, explicit same/worse feeling retained on refresh, stopped partial scene, repeat, and native Back/Forward/whole-app paused restoration. No inferred wellbeing. |
 | Dear 2100 | Existing automatic dedicated threat education and 4-question gate retained | Production fear/practical/both, one question at a time, keyboard, refresh, 2/4 fail with explanations, retry 3/4 pass, legacy navigation guard, 4/4 pass. Immediate-help structure unchanged. |
 | Foundations | Existing authored flow unchanged | New production 320/390 pass: 17 ratings, optional cue/time, back/refresh, weekly save, Not yet review skip and completed review, persisted exact review ratings. |
 
@@ -96,8 +96,10 @@ All rows still require applicable native accessibility/audio/interruption checks
    verify true alignment/durations plus all voice toggles on hardware.
 2. Physical iPhone: haptic latency, actual audio/visual sync, native interruptions,
    background/foreground, VoiceOver, pitch quality and safe-area/touch behavior.
-3. Exhaustive unchanged/worse/save/next-step branches for rows explicitly marked
-   incomplete above. Existing suite coverage is not a new complete manual certification.
+3. Browser acceptance now covers the previously deferred rows as specified in the
+   matrix. These are representative complete/partial, same/worse, save/recovery
+   and return branches, not every possible user input, task catalogue item or
+   physical-device interaction. Simulated timer checks are labeled explicitly.
 4. Parent coordinates merge/deployment to the established destination. No deployment
    was performed in this environment. Git transport works; GitHub CLI reports its
    configured token invalid, so PR creation through that CLI is unavailable.
@@ -125,3 +127,30 @@ entry after removing a retired library filter, then stops on an obsolete
 Logs: `evidence/contact-fix/`. Strict narration audit remains intentionally blocked
 on 18 missing approved recordings. Hardware/audio audition and the other explicitly
 incomplete matrix branches remain release dependencies. Parent owns merge/deploy.
+
+## Continued browser acceptance
+
+Recovered the older Urge Surfing, Thought or Fact, Next Easiest Step and Grounding
+scripts against the current one-question UI. Explicit ratings, save failures,
+private data boundaries and actual completion assertions remain in place. Tests
+wait outside the existing 250ms accidental-double-tap gate and wait for browser
+Back to settle before Forward; no product progression guards were weakened.
+
+Found and fixed one product defect: Next Easiest Step exposed an enabled Undo
+button at the start of a resumed visit even though undoing a previous completed
+visit was correctly refused by the reducer. Both active/review buttons now show
+the real disabled state. The full task-return browser suite verifies it.
+
+All browser output stayed muted. The supplied Signal Lock, Vector Shift and
+Night Channel builds were not edited. Current sleep recovery and timed suites
+are in `qa/section-one-sleep-browser.py` and `qa/section-one-timed-browser.py`;
+the former replaces obsolete combined sleep-script selectors for this acceptance
+run. Old failure logs under `contact-fix/` are historical and superseded by the
+passing `acceptance-followup/` logs. Full validation remains 109 files / 946 tests,
+lint, typecheck and build passing; V3 algorithm verification also passes.
+
+The Happy Bump follow-up also passes lower (6→3), unchanged (6→6) and unmeasured
+energy branches, paused-walk restoration, honest partial action status and optional
+saved cue/delete. Its three outcomes are in `acceptance-followup/bump-results.json`.
+All eleven continuation browser suites exited successfully; see
+`acceptance-followup/run-summary.json` for the exact commands and timing limits.

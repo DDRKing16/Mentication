@@ -1,0 +1,6 @@
+PASS Night 320 15 simulated minutes run through production timer; no completion injected
+PASS Box 320 full four-round timer, explicit same/worse feedback, honest complete history and blank endpoint
+PASS Signal 320 12 real connections, 2 complete scenes, same/worse outcome retained on refresh
+PASS Night 390 15 simulated minutes run through production timer; no completion injected
+PASS Box 390 full four-round timer, explicit same/worse feedback, honest complete history and blank endpoint
+PASS Signal 390 12 real connections, 2 complete scenes, same/worse outcome retained on refresh
