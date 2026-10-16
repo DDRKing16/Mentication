@@ -158,6 +158,8 @@
       rate: ['importance-' + RQ[RI]?.k, RQ[RI]?.w, M.rating(RATE[RQ[RI]?.k]) !== null ? `Importance: ${RATE[RQ[RI]?.k]} / 10` : ''],
       type: ['interpretation', 'Your interpretation', JST.interpretation],
       sat: ['satisfaction-' + sat?.k, sat?.w, sat && M.rating(JST.sat[sat.k]) !== null ? `Satisfaction: ${JST.sat[sat.k]} / 10` : ''],
+      contextLoss: ['context-loss-' + JST.contextKey, 'Without this moment', selected()],
+      contextRhythm: ['context-rhythm-' + JST.contextKey, 'How often you need it', selected()],
       focus: ['focus', 'Your chosen focus', focus],
       help: ['helps-' + JST.focus, 'What helps', selected()],
       way: ['barriers-' + JST.focus, 'What gets in the way', selected()],
@@ -180,7 +182,7 @@
     practiceReveal(); save();
   }
   function wireCheckpointAnswers() {
-    for (const id of ['jnext','rnext','gmSkipRating','gmSkipSat','gmSkipFollowup']) {
+    for (const id of ['jnext','rnext','gmSkipRating','gmSkipSat','gmSkipFollowup','gmSkipContext']) {
       const button = el(id), original = button?.onclick;
       if (!original) continue;
       button.onclick = event => {
