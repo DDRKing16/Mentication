@@ -782,7 +782,6 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
         </AnimatePresence>
       </div>
 
-      {isBoxV2 && !showBoxFeedback && boxCompletedRounds >= 2 && <PracticeCheckpoint compact variant="breath" title="A rhythm you can revisit" events={Array.from({length:boxCompletedRounds},(_,i)=>earned(`round-${i}`,'Guided round completed',i % 2 ? 'Rejoin at the next inhale whenever you lose the count.' : 'Four equal phases; breathing naturally is always an option.'))}/>}
       {isBoxV2 && boxResume && !showBoxFeedback && !running && <p role="status" className="relative px-5 text-center text-sm text-cream">Your place is back, paused. Choose Play when ready.</p>}
       {isBoxV2 && !boxSaved && <p role="status" className="relative px-5 text-center text-sm text-cream">This tab could not remember your place. Keep it open; refresh may lose your progress.</p>}
       {isGroundingV2 && !groundingSaved && <p role="status" className="relative px-5 text-center text-sm">This tab could not remember your grounding place. Your current practice is still here; refresh may lose it.</p>}
@@ -797,9 +796,11 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
       {!showBoxFeedback && <>
       {isBoxV2 && (
         <div className="relative mx-auto max-w-md px-6 pt-2 text-center">
-          <p className="text-xs leading-relaxed text-cream/75">
-            If holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.
-          </p>
+          <div className="min-h-12 flex items-center justify-center">
+            {boxCompletedRounds >= 2 ? <PracticeCheckpoint brief variant="breath" events={Array.from({length:boxCompletedRounds},(_,i)=>earned(`round-${i}`,'Guided round completed','Four equal phases; breathing naturally is always an option.'))}/> : <p className="text-xs leading-relaxed text-cream/75">
+              If holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.
+            </p>}
+          </div>
           <button type="button" aria-pressed={a11y.prefs.reducedMotion}
             onClick={() => a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion)}
             className="mt-1 min-h-11 rounded-full px-4 text-xs text-cream/80 underline underline-offset-4">
