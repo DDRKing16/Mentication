@@ -87,7 +87,7 @@ describe('Experiential care state and compatibility', () => {
     expect(makeRoomPhrase('x'.repeat(300)).length).toBeLessThanOrEqual(300);
   });
   it('compassion starters respond to the selected line and remain editable suggestions', () => {
-    expect(compassionateSuggestions('I messed everything up.')[0]).toContain('repair');
+    expect(compassionateSuggestions('I messed everything up.')[0]).toContain('care');
     expect(compassionateSuggestions('I should be doing more.')[0]).toContain('capacity');
     expect(compassionateSuggestions('An unrelated private line')[0]).not.toContain('mistake');
   });
@@ -116,4 +116,10 @@ describe('Experiential care state and compatibility', () => {
     local.setItem('mentation.flagship.active.v1',JSON.stringify({...active,expiresAt:Date.now()-1}));
     expect(readCareDraft('makeRoom')).toBeNull();
   });
+});
+
+it('does not infer fault or responsibility from harsh or custom thoughts', () => {
+ for (const line of ['I messed everything up.','I am unsafe because of what someone did.','']) {
+  expect(compassionateSuggestions(line).join(' ')).not.toMatch(/I made a mistake|take responsibility|repair/);
+ }
 });

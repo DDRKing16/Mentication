@@ -35,12 +35,12 @@ describe('earned practice checkpoints',()=>{
 });
 
 describe('care route chronology',()=>{
- it('keeps Unhook action and anchor together without changing the earlier tried pair',()=>{
-  const s={...freshCareState(),before:6,notice:'A thought',noticeConfirmed:true,perspective:'I notice a thought',responseConfirmed:true,practiceTaken:true,action:'Get water',actionConfirmed:true};
+ it('connects Unhook action and reported return without counting an automatic anchor',()=>{
+  const s={...freshCareState(),before:6,notice:'A thought',noticeConfirmed:true,perspective:'I notice a thought',responseConfirmed:true,practiceTaken:true,defusionStep:2,action:'Get water',actionConfirmed:true};
   const before=checkpointFor(careCheckpoints('unhook',s));
-  const after=checkpointFor(careCheckpoints('unhook',{...s,anchorType:'object'}));
+  const after=checkpointFor(careCheckpoints('unhook',{...s,anchorType:'object',anchorNoticed:true}));
   expect(before.all.map(e=>e.id)).toEqual(['before','notice','response','try','action']);
-  expect(after.items.map(e=>e.id)).toEqual(['action','anchor']);
+  expect(after.items.map(e=>e.id)).toEqual(['action','return']);
   expect(after.all.slice(2,4)).toEqual(before.items);
  });
 });
@@ -77,4 +77,16 @@ describe.each(['selfCompassion', 'unhook', 'makeRoom'])('%s branch evidence', id
   const draft={...freshCareState(),notice:'Typing',perspective:'Typing',action:'Typing',careTrail:['intro','options','practice','action']};
   expect(checkpointFor(careCheckpoints(id,draft)).count).toBe(0);
  });
+});
+
+it('does not confuse a return attempt with a phrase attempt', () => {
+ const s={...freshCareState(),practiceTaken:true,defusionStep:1,anchorNoticed:true,action:'Read a line'};
+ const events=careCheckpoints('unhook',s).filter(Boolean);
+ expect(events.some(e=>e.id==='try')).toBe(false);
+ expect(events.some(e=>e.id==='return')).toBe(true);
+});
+it('distinguishes chosen and observed room anchors without claiming allowing', () => {
+ const s={...freshCareState(),anchorType:'object'};
+ expect(careCheckpoints('makeRoom',s).filter(Boolean).map(e=>e.id)).toEqual(['anchor']);
+ expect(careCheckpoints('makeRoom',{...s,anchorNoticed:true}).filter(Boolean).map(e=>e.id)).toEqual(['anchor','anchor-noticed']);
 });

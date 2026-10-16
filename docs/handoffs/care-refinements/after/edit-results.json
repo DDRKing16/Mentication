@@ -1,0 +1,22 @@
+{
+  "results": [
+    {
+      "id": "unhook",
+      "editInvalidatesPriorConfirmation": true,
+      "exactWordsPreserved": true,
+      "explicitReentryConsent": false
+    },
+    {
+      "id": "selfCompassion",
+      "editInvalidatesPriorConfirmation": true,
+      "exactWordsPreserved": true,
+      "explicitReentryConsent": false
+    },
+    {
+      "id": "makeRoom",
+      "editInvalidatesPriorConfirmation": true,
+      "exactWordsPreserved": true,
+      "explicitReentryConsent": true
+    }
+  ]
+}

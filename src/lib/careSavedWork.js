@@ -1,3 +1,4 @@
+import { attentionTarget } from './experientialCare';
 import { EXTERNAL_ANCHORS } from './carePracticeDesign';
 
 const LABELS = {
@@ -14,7 +15,7 @@ export function careSavedWorkRows(id,state) {
   if (words(state.perspective) && (id !== 'makeRoom' || state.practiceTaken === true)) rows.push({kind:'response',label:labels[1],value:words(state.perspective)});
   if (Object.hasOwn(EXTERNAL_ANCHORS,state.anchorType)) {
     const fallback={object:'An ordinary object',sound:'A sound in the room',support:'The surface supporting me'};
-    rows.push({kind:'anchor',label:'An anchor I chose',value:words(state.anchorText)||fallback[state.anchorType]});
+    rows.push({kind:'anchor',label:id === 'unhook' ? 'Attention for my chosen step' : state.anchorNoticed ? 'An anchor I noticed' : 'An anchor I chose',value:id === 'unhook' ? attentionTarget(state) : words(state.anchorText)||fallback[state.anchorType]});
   }
   if (words(state.action) && state.actionStatus !== 'not-now') rows.push({kind:'action',label:`${labels[2]} · ${state.actionStatus === 'done' ? 'Done' : state.actionStatus === 'planned' ? 'Planned' : 'Chosen'}`,value:words(state.action)});
   return rows;

@@ -6,7 +6,7 @@ import '@/styles/practice-checkpoint.css';
 const OBJECTS = { thought: 'evidence', bump: 'light', scene: 'light', body: 'body', night: 'letter', step: 'path', senses: 'light', breath: 'breath', wave: 'wave', selfCompassion: 'care', unhook: 'evidence', makeRoom: 'care', plan: 'plan' };
 
 /** The revealed object carries the two actual choices, never an inferred benefit. */
-export default function PracticeCheckpoint({ events, title = 'Something to carry forward', variant = 'path', compact = false }) {
+export default function PracticeCheckpoint({ events, title = 'Something to carry forward', variant = 'path', compact = false, connection }) {
   const confirmed = useRef([]);
   confirmed.current = reconcilePracticeEvents(confirmed.current, events);
   const checkpoint = checkpointFor(confirmed.current);
@@ -16,6 +16,7 @@ export default function PracticeCheckpoint({ events, title = 'Something to carry
     <div className="practice-checkpoint-copy">
       <p className="practice-checkpoint-label">{title}</p>
       <div className="practice-checkpoint-pair" role="status" aria-live="polite" aria-atomic="true">{checkpoint.items.map(item => <p key={item.id}><span>{item.label}</span><strong>{item.detail}</strong></p>)}</div>
+      {connection && <p className="practice-checkpoint-connection">{connection}</p>}
     </div>
   </aside>;
 }

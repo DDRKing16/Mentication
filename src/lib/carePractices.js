@@ -45,7 +45,7 @@ export const CARE_PRACTICES = Object.freeze({
 export const CARE_STAGES = ['arrival', 'baseline', 'notice', 'perspective', 'practice', 'action', 'rerate', 'complete'];
 export const validCareRating = value => Number.isInteger(value) && value >= 0 && value <= 10;
 export function freshCareState() {
-  return { version: 1, noticeConfirmed:false, responseConfirmed:false, actionConfirmed:false, careScreen: null, careTrail: [], stage: 'arrival', before: null, after: null, notice: '', perspective: '', action: '', clicks: 0, milestone: '', practiceTaken: false, actionStatus: null, responseRead: false, responseTone: 'steady', defusionStep: 0, distance: 'near', anchorType: null, anchorText: '', anchorNoticed: false, allowance: null, attentionFocused: false };
+  return { version: 1, noticeConfirmed:false, responseConfirmed:false, actionConfirmed:false, careScreen: null, careTrail: [], stage: 'arrival', before: null, after: null, notice: '', perspective: '', action: '', clicks: 0, milestone: '', practiceTaken: false, practiceStopped: false, actionStatus: null, responseRead: false, responseTone: 'steady', defusionStep: 0, distance: 'near', anchorType: null, anchorText: '', anchorNoticed: false, allowance: null, attentionFocused: false };
 }
 export function restoreCareState(value) {
   const s = freshCareState();
@@ -58,6 +58,7 @@ export function restoreCareState(value) {
   for (const key of ['before', 'after']) s[key] = validCareRating(value[key]) ? value[key] : null;
   s.clicks = Number.isSafeInteger(value.clicks) && value.clicks >= 0 ? value.clicks : 0;
   s.practiceTaken = value.practiceTaken === true;
+  s.practiceStopped = value.practiceStopped === true;
   s.actionStatus = ['done', 'planned', 'not-now'].includes(value.actionStatus) ? value.actionStatus : null;
   s.responseRead = value.responseRead === true;
   s.responseTone = ['steady', 'gentle'].includes(value.responseTone) ? value.responseTone : 'steady';
@@ -75,5 +76,5 @@ export function careClick(state, id) {
 }
 export function careOutcome(id, state) {
   const config = CARE_PRACTICES[id];
-  return { practice: id, assessment: { question: config.question, left: config.left, right: config.right, min: 0, max: 10, before: state.before, after: state.after }, change: validCareRating(state.before) && validCareRating(state.after) ? state.after - state.before : null, practiceTaken: state.practiceTaken, actionStatus: state.actionStatus };
+  return { practice: id, assessment: { question: config.question, left: config.left, right: config.right, min: 0, max: 10, before: state.before, after: state.after }, change: validCareRating(state.before) && validCareRating(state.after) ? state.after - state.before : null, practiceTaken: state.practiceTaken, practiceStopped: state.practiceStopped, actionStatus: state.actionStatus };
 }

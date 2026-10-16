@@ -1,0 +1,65 @@
+{
+  "commit": "37672f6593909526bf798bb1cdb0be25747ac323",
+  "results": [
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true,
+      "reducedMotion": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true,
+      "reducedMotion": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true,
+      "reducedMotion": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true,
+      "reducedMotion": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true,
+      "reducedMotion": true,
+      "noHorizontalOverflow": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true,
+      "reducedMotion": true,
+      "noHorizontalOverflow": true
+    }
+  ]
+}

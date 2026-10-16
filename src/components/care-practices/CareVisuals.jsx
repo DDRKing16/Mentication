@@ -20,7 +20,7 @@ export function ThoughtVisual({ s, mode = 'thought' }) {
 }
 export function FeelingVisual({ s, mode = 'feeling' }) {
   const space = s.allowance || (mode==='intro'?'small':null);
-  return <div className={`room-field ${space?'has-space':''} ${space==='more'?'has-more-space':''} ${s.attentionFocused?'is-anchored':''}`}>
+  return <div data-long={s.notice?.length > 18 || s.anchorText?.length > 40 || undefined} className={`room-field ${space?'has-space':''} ${space==='more'?'has-more-space':''} ${s.attentionFocused?'is-anchored':''}`}>
     <div className="room-rings" aria-hidden="true"><i/><i/><i/></div>
     <div className="room-feeling"><svg viewBox="0 0 150 150" aria-hidden="true"><path d="M73 19 C118 16 140 50 129 83 C122 122 93 139 58 123 C21 110 13 76 29 49 C39 27 48 19 73 19Z"/></svg><span>{s.notice || 'A feeling'}</span></div>
     <div className="room-field-label">{s.allowance ? 'Room for the feeling. It does not have to change.' : 'Notice only as much as feels workable.'}</div>

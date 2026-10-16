@@ -1,5 +1,5 @@
 import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
-import { careCheckpoints, checkpointFor, reconcilePracticeEvents } from '@/lib/practiceCheckpoints';
+import { careCheckpoints, careCheckpointConnection, checkpointFor, reconcilePracticeEvents } from '@/lib/practiceCheckpoints';
 import { useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Bookmark, Check, Pencil, X } from 'lucide-react';
 import JourneyOptions from '@/components/journey/JourneyOptions';
@@ -35,7 +35,7 @@ export function CareFrame({ flow, children, compact = true, focused = false }) {
       {!compact && !flow.returning && flow.s.milestone && <div className="care-milestone" role="status" aria-live="polite" aria-atomic="true" key={`pair-${Math.floor(flow.s.clicks / 2)}`}><i aria-hidden="true" /><p>{flow.s.milestone}</p></div>}
       {!flow.draftOk && <p role="alert" className="care-error">This device could not save your draft. You can continue here, but progress may be lost when you leave.</p>}
       {!focused && !flow.returning && !['perspective','practice'].includes(flow.s.stage) && <footer className="care-tools" data-care-tools>{!flow.viewingSaved && !flow.returning && <Quiet onClick={flow.discard}>Delete draft and leave</Quiet>}</footer>}
-      {!flow.returning && !['card','intro','before'].includes(flow.screen) && (!practicing || checkpoint.count % 2 === 0) && <PracticeCheckpoint events={confirmed.current} title={{selfCompassion:"Your care, taking shape",unhook:"A thought and a choice",makeRoom:"Room for both"}[flow.id]} compact variant={flow.id}/> }
+      {!flow.returning && !['card','intro','before'].includes(flow.screen) && (!practicing || checkpoint.count % 2 === 0) && <PracticeCheckpoint connection={careCheckpointConnection(flow.id, checkpoint.items)} events={confirmed.current} title={{selfCompassion:"Your care, taking shape",unhook:"A thought and a choice",makeRoom:"Room for both"}[flow.id]} compact variant={flow.id}/> }
       <JourneyOptions id={flow.id}/>
     </main>
   </div>;
