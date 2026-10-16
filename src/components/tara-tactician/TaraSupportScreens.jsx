@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Bell, Coffee, DoorOpen, Heart, LifeBuoy, Waves } from 'lucide-react';
-import { keepSupportField, SUPPORT_CHOICES } from '@/lib/taraSupportPlan';
+import { keepSupportField, supportWordPreview, SUPPORT_CHOICES } from '@/lib/taraSupportPlan';
 import { supportsTaraNotifications } from '@/lib/taraCheckInNotifications';
 import { webCheckInAvailability } from '@/lib/webCheckIns';
 
@@ -9,7 +9,11 @@ const Link = ({ children, onClick }) => <button type="button" className="tara-te
 function Guide({ children, introduction = false }) {
   return <div className="tara-support-guide"><img src="/media/brand/tara-tactician.webp" alt="Tara Tactician, your spaniel guide" /><div><span className="tara-small-label">{introduction ? 'Meet Tara Tactician' : 'Tara · here with your plan'}</span><p>{children}</p></div></div>;
 }
-function Words({ value, fallback }) { return <p className="tara-wording">{value || fallback}</p>; }
+function Words({ value, fallback }) {
+  const words = value || fallback;
+  if (!words || words.length <= 220) return <p className="tara-wording">{words}</p>;
+  return <div><p className="tara-wording">{supportWordPreview(words)}</p><details className="tara-long-wording"><summary>Read the full wording</summary><p>{words}</p></details></div>;
+}
 function Card({ label, value, fallback, icon: Icon = Heart }) { return <section className="tara-support-card"><span className="tara-small-label"><Icon size={16} aria-hidden="true" />{label}</span><Words value={value} fallback={fallback} /></section>; }
 const STEPS = { 'plan-pause': ['pause', 'plan-regulation'], 'plan-regulation': ['regulation', 'plan-affirmation'], 'plan-affirmation': ['affirmation', 'plan-leave'], 'plan-leave': ['leave', 'plan-help'], 'plan-help': ['help', 'plan-check-ins'] };
 const DESCRIPTIONS = {

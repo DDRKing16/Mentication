@@ -1,0 +1,77 @@
+[
+  {
+    "file": "screenshots/hospital-visit-affirmation.png",
+    "sha256": "2325fe5e64bff46b589d56af87cffda678042573e3d19b19019e4e78c4255c50",
+    "bytes": 235752
+  },
+  {
+    "file": "screenshots/hospital-visit-after.png",
+    "sha256": "38583b59ab0b0ac5debb6f0d8cd52697a3823ccbf2515f1d7cc55b526ae2b46d",
+    "bytes": 212213
+  },
+  {
+    "file": "screenshots/hospital-visit-complete-plan.png",
+    "sha256": "76a243ea4db4799a977874e55260c3c06d90b8e34d28745706539a79aeaa32b0",
+    "bytes": 396430
+  },
+  {
+    "file": "screenshots/hospital-visit-exit.png",
+    "sha256": "bb319fb0155075c5710b32fced11f5db76d5f2c2abc7b64fcf387d7122402865",
+    "bytes": 260864
+  },
+  {
+    "file": "screenshots/hospital-visit-help.png",
+    "sha256": "1d6784187dad08c0b7fc1f11d86eaada702e3ac6e36e1ca0381b6b3a1b8db167",
+    "bytes": 247183
+  },
+  {
+    "file": "screenshots/hospital-visit-regulate.png",
+    "sha256": "96411a18d4e0a1571fc5c5b0346ff0d026c8964a59a17321c5adabd6599dda83",
+    "bytes": 260409
+  },
+  {
+    "file": "screenshots/long-pause-after.png",
+    "sha256": "56f6fb2b75ab84d76420c1a4fe9edc10741b4b612e0000c506a5635d774e69db",
+    "bytes": 326093
+  },
+  {
+    "file": "screenshots/long-pause-before.png",
+    "sha256": "26b9bc9c129b128b3b04f0d5c273795a60b7321a775a3c006a206b90ebfcb2e4",
+    "bytes": 588566
+  },
+  {
+    "file": "screenshots/tax-paperwork-after.png",
+    "sha256": "0e34dfea4ee7b717e5ee7bd85ac355d5ac9dffa5de0d208254958d87fa5077ec",
+    "bytes": 232870
+  },
+  {
+    "file": "screenshots/unprepared-live.png",
+    "sha256": "66db62c48f62c2ede1a4ae0b8879a8e583e35df01e4b7ace336b4715fbafbc5c",
+    "bytes": 212820
+  },
+  {
+    "file": "screenshots/unprepared-safe-exit.png",
+    "sha256": "135a27d5c7e87c7679c023a6321ef63ad437d45a652187b54674353e895f5db7",
+    "bytes": 226204
+  },
+  {
+    "file": "screenshots/work-boundary-entry.png",
+    "sha256": "f88487a891f6351c9592bf85691843da6562fd86c4e60cfae7ca71c2011683b8",
+    "bytes": 118055
+  },
+  {
+    "file": "screenshots/work-boundary-first-move.png",
+    "sha256": "befc45c6a349b55d561d97aa5c950dae9848550a30f652db40d4efd16158c0d8",
+    "bytes": 189224
+  },
+  {
+    "file": "screenshots/work-boundary-live.png",
+    "sha256": "480de400217126cf37b3172432cad4fdc569c1134d145473a1cf911d0bbce0ae",
+    "bytes": 276399
+  },
+  {
+    "file": "screenshots/work-boundary-rehearsal.png",
+    "sha256": "a376b51e9513d8886e01553992590f6ee5e9c22358e56ef3f3f5e275b24e236c",
+    "bytes": 183735
+  }
+]

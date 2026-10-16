@@ -1,0 +1,10 @@
+{
+  "production": true,
+  "base": "1468a214ea06c9146150be5e7f3121c73035e6de",
+  "passed": [
+    "390px full before/during/after: two-action checkpoints, five chosen steps, optional check-ins, two explicit practice tries, save/leave/resume, three immediate support buttons, Back/refresh, no inferred leaving or benefit, explicit outcome, archive choice, no duplicate/private host outcome",
+    "320px full before/during/after: two-action checkpoints, five chosen steps, optional check-ins, two explicit practice tries, save/leave/resume, three immediate support buttons, Back/refresh, no inferred leaving or benefit, explicit outcome, archive choice, no duplicate/private host outcome"
+  ],
+  "pageErrors": [],
+  "provenance": "Synthetic user-authored examples and explicit choices. No real user outcomes, notifications or contacts. Native permission/scheduling verified separately with mocked approved adapter; physical OS delivery not tested."
+}

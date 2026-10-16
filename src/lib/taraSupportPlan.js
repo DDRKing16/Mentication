@@ -1,4 +1,6 @@
 // User-chosen, device-local support. These are plans, never evidence of action.
+// Keep long personal wording available in the plan without filling live support.
+export const supportWordPreview = words => words.length > 220 ? `${words.slice(0, 100).trimEnd()}…` : words;
 export const SUPPORT_FIELDS = ['pause', 'regulation', 'affirmation', 'leave', 'help'];
 export const SUPPORT_CHOICES = {
   pause: [
