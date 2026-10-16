@@ -1,0 +1,16 @@
+{
+  "movingTransforms": [
+    "matrix(0.994645, -0.103346, 0.103346, 0.994645, 0, 0)",
+    "matrix(0.998881, -0.0472874, 0.0472874, 0.998881, 0, 0)",
+    "matrix(1, 0, 0, 1, 0, 0)",
+    "matrix(0.999939, -0.0110821, 0.0110821, 0.999939, 0, 0)",
+    "matrix(0.997526, -0.0703007, 0.0703007, 0.997526, 0, 0)"
+  ],
+  "missingVoiceDisabled": true,
+  "noLegacySpeechRequests": true,
+  "muteUnmute": true,
+  "pauseResume": true,
+  "audioInterruptionPauses": true,
+  "skipRefreshStop": true,
+  "errors": []
+}

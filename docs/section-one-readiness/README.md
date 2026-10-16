@@ -63,7 +63,7 @@ All rows still require applicable native accessibility/audio/interruption checks
 | Urge Surfing | Existing actual practice/choice and stop options unchanged | Unit suite and entry/hierarchy review; all timed branches not newly certified. |
 | Signal Lock | Finished supplied build unchanged | Unit suite and entry/hierarchy review; full game branches not newly certified. |
 | Dear 2100 | Existing automatic dedicated threat education and 4-question gate retained | Production fear/practical/both, one question at a time, keyboard, refresh, 2/4 fail with explanations, retry 3/4 pass, legacy navigation guard, 4/4 pass. Immediate-help structure unchanged. |
-| Foundations | Existing authored flow unchanged | Unit suite and entry/hierarchy review; full education branch not rerun. |
+| Foundations | Existing authored flow unchanged | New production 320/390 pass: 17 ratings, optional cue/time, back/refresh, weekly save, Not yet review skip and completed review, persisted exact review ratings. |
 
 ## Shared requirements and evidence
 
@@ -77,7 +77,7 @@ All rows still require applicable native accessibility/audio/interruption checks
   screens separately; this is not proof of every interior screen in every branch.
 - Existing checkpoint tests cover confirmed answers, no credit for typing/navigation,
   distinct actions, undo, optional skipped values and truthful untried outcomes.
-- Full validation: **108 files / 939 tests pass**, lint, typecheck and production
+- Full validation: **109 files / 946 tests pass**, lint, typecheck and production
   build pass. Vite retains its large-chunk advisory. See evidence logs.
 - `qa/tapping-readiness-browser.py` exercises production `/reset` with the existing
   prebuilt entry contract and simulated elapsed clock, without injecting completion.
@@ -101,3 +101,27 @@ All rows still require applicable native accessibility/audio/interruption checks
 4. Parent coordinates merge/deployment to the established destination. No deployment
    was performed in this environment. Git transport works; GitHub CLI reports its
    configured token invalid, so PR creation through that CLI is unavailable.
+
+## PR27 contact/voice follow-up
+
+Fixed the delayed-contact guard from `5b6a64b`: each detected contact carries its
+absolute rhythm timestamp. The animation callback emits at most one touch cue,
+only 0–80ms after that contact, without a later React effect reinterpreting phase.
+Regression tests cover first frames at 700/1300/1900/6100ms, fresh multi-beat
+recovery without replay, both window boundaries and clock restart.
+
+Narration now returns URL and alignment directly from the approved voice/text
+entry. A regression fixture puts another narrator with the same text first;
+Tapping still selects the approved recording and its duration. Missing approved
+clips remain unavailable; no Piper fallback or audio generation was introduced.
+
+Full tests, lint, typecheck, build and V3 algorithm verification pass. Production
+Chromium output was muted throughout. Tapping two-round and real-clock cue suites
+pass again, and Foundations now has the additional acceptance coverage above.
+The older Thought or Fact extended browser script stops on an obsolete Continue
+selector after its belief choice. Urge Surfing’s old script reaches the current
+entry after removing a retired library filter, then stops on an obsolete
+30 seconds selector. No extended pass is claimed for either incomplete run.
+Logs: `evidence/contact-fix/`. Strict narration audit remains intentionally blocked
+on 18 missing approved recordings. Hardware/audio audition and the other explicitly
+incomplete matrix branches remain release dependencies. Parent owns merge/deploy.

@@ -1,0 +1,1 @@
+PASS actual moving fingers, voice unavailable, music/beat activation, mute/unmute, pause, AudioContext suspension, skip/refresh/stop; output muted

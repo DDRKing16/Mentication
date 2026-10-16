@@ -12,6 +12,7 @@ import { createTappingCues } from './tappingCues';
 import { createTappingAudio } from './tappingAudio';
 import { hasTappingNarration } from './tappingNarration';
 import { tappingPlan, narrationForTick } from './tappingTiming';
+import { createTappingContactClock, isFreshTappingContact } from './tappingContactClock';
 import { createTappingProgressClock } from './tappingProgressClock';
 import { suspendFeedback, resumeFeedback } from '@/lib/feedback';
 import './tapping.css';
@@ -138,25 +139,23 @@ export default function TappingExperience({ onComplete, onExit, onChangeCourse, 
   useEffect(() => {
     if (!tapping) return;
     const epoch = performance.now();
-    let frame, previous = -1, previousPhase = 0;
+    let frame;
+    const detectContact = createTappingContactClock(plan);
     const pulse = () => {
       const phase = mixer.current?.rhythmPhase() ?? readVisualPhase.current?.() ?? performance.now() - (rhythmEpoch.current ?? epoch);
-      if (phase < previousPhase - plan.beatMs / 2) previous = Math.floor((phase - plan.contactMs) / plan.beatMs) - 1;
-      const contact = Math.floor((phase - plan.contactMs) / plan.beatMs);
-      if (contact >= 0 && contact > previous) { previous = contact; setBeat(value => value + 1); }
-      previousPhase = phase;
+      const contactAt = detectContact(phase);
+      if (contactAt !== null) {
+        setBeat(value => value + 1);
+        const current = feedbackForBeat.current;
+        if (current?.tapping && !document.hidden && isFreshTappingContact(phase, contactAt)) {
+          cues.current?.emit('beat', { haptic: current.haptic });
+        }
+      }
       frame = requestAnimationFrame(pulse);
     };
     frame = requestAnimationFrame(pulse);
     return () => cancelAnimationFrame(frame);
   }, [tapping, plan.beatMs, plan.contactMs]);
-  useEffect(() => {
-    const current = feedbackForBeat.current;
-    if (!beat || !current?.tapping || document.hidden) return;
-    const phase = mixer.current?.rhythmPhase() ?? readVisualPhase.current?.() ?? performance.now() - (rhythmEpoch.current ?? performance.now());
-    // A delayed frame can update the discrete marker, but should not buzz late.
-    if (phase % plan.beatMs <= plan.contactMs + 80) cues.current?.emit('beat', { haptic: current.haptic });
-  }, [beat, plan.beatMs, plan.contactMs]);
   useEffect(() => {
     if (!tapping) { rhythmEpoch.current = null; readVisualPhase.current = null; mixer.current?.stopRhythm(); return; }
     if (quiet) startRhythmAt(performance.now());

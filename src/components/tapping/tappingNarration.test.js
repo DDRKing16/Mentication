@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import manifest from './tappingAudioManifest.json';
 import { tappingNarration, hasTappingNarration, tappingNarrationKeys, TAPPING_VOICE_RATE, tappingNarrationDuration } from './tappingNarration';
 
-vi.mock('../../../narration-manifest.json', () => ({ default: { wrong: { voice_id: 'unapproved', text: 'Let your hands rest. Notice how you feel now.', audio: '/audio/narration/wrong.mp3', alignment: [] }, crown: { voice_id: 'qKsErzZyZLoLSAUfEopJ', text: 'Top of your head. Place two fingertips at the centre of your crown.', audio: '/audio/narration/test-crown.mp3', alignment: [{ word: 'crown.', start: 3.5, end: 4 }] } } }));
+vi.mock('../../../narration-manifest.json', () => ({ default: { duplicate: { voice_id: 'unapproved', text: 'Top of your head. Place two fingertips at the centre of your crown.', audio: '/audio/narration/wrong-first.mp3', alignment: [{ end: 99 }] }, wrong: { voice_id: 'unapproved', text: 'Let your hands rest. Notice how you feel now.', audio: '/audio/narration/wrong.mp3', alignment: [] }, crown: { voice_id: 'qKsErzZyZLoLSAUfEopJ', text: 'Top of your head. Place two fingertips at the centre of your crown.', audio: '/audio/narration/test-crown.mp3', alignment: [{ word: 'crown.', start: 3.5, end: 4 }] } } }));
 
 describe('shared Mentication narration for tapping', () => {
   it('uses the exact approved spoken-text lookup and the approved recording’s native pitch', () => {
@@ -16,6 +16,7 @@ describe('shared Mentication narration for tapping', () => {
     expect(tappingNarration('rest')).toBeNull();
   });
   it('scales genuine alignment time to the approved playback rate', () => {
+    expect(tappingNarration('place-crown')?.url).toBe('/audio/narration/test-crown.mp3');
     expect(tappingNarrationDuration('place-crown')).toBe(5);
   });
   it('does not offer a complete voice guide when even one required recording is missing', () => {

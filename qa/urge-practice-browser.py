@@ -9,7 +9,7 @@ args = parser.parse_args()
 out = Path(args.out)
 out.mkdir(parents=True, exist_ok=True)
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path='/usr/bin/chromium')
+    b = p.chromium.launch(executable_path='/usr/bin/chromium', args=['--mute-audio'])
     errors = []
 
     def create(width):
@@ -23,7 +23,6 @@ with sync_playwright() as p:
     def launch(a):
         a.goto(args.url + '/library')
         a.get_by_placeholder('Search practices…').fill('Urge Surfing')
-        a.get_by_role('button', name='Short start (≤3 min)', exact=True).click()
         expect(a.get_by_text('30–60 sec practice · optional setup', exact=False)).to_be_visible()
         a.get_by_role('button', name='Urge Surfing').click()
         a.get_by_role('slider').fill('4')
