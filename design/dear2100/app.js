@@ -1524,7 +1524,7 @@ function SequentialQuestions({id, steps, current, onCurrent, onDone, doneLabel="
     i.jsx("p",{className:"question-kicker",children:index<optionalStart?`One question · ${index+1} of ${optionalStart}`:"Optional detail"}),
     i.jsx("h1",{id:"screen-title",tabIndex:-1,children:step.title}),
     step.hint&&i.jsx("p",{className:"lede",children:step.hint}),step.field,
-    i.jsx("button",{className:"primary-button",disabled:blocked||step.valid===false,onClick:()=>{onConfirm?.(`${id}:${step.id}`,step.title,step.evidence ?? step.field?.props?.value ?? step.field?.props?.selected);index>=optionalStart?go(optionalStart-1):index<optionalStart-1?go(index+1):onDone();},children:index>=optionalStart?"Return to my answer":index<optionalStart-1?"Continue":doneLabel}),
+    i.jsx("button",{className:"primary-button",disabled:blocked||step.valid===false,onClick:event=>{if(event.detail>1)return;onConfirm?.(`${id}:${step.id}`,step.title,step.evidence ?? step.field?.props?.value ?? step.field?.props?.selected);index>=optionalStart?go(optionalStart-1):index<optionalStart-1?go(index+1):onDone();},children:index>=optionalStart?"Return to my answer":index<optionalStart-1?"Continue":doneLabel}),
     index===optionalStart-1&&steps.length>optionalStart&&i.jsxs("details",{className:"foldout",children:[i.jsx("summary",{children:"Add an optional detail"}),...steps.slice(optionalStart).map((extra,key)=>i.jsx("button",{className:"text-button",onClick:()=>go(optionalStart+key),children:extra.title},extra.id))]}),
     index>0&&i.jsx("button",{className:"text-button",onClick:()=>{if(!requestDearHistoryBack())go(index>=optionalStart?optionalStart-1:index-1);},children:"Back to previous question"})
   ]});

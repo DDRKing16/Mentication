@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { browserFor, key } from './tara-tactician.browser-support.mjs';
 const origin = process.env.TARA_APP_ORIGIN || 'http://127.0.0.1:5220';
@@ -83,5 +84,5 @@ try {
  await click('Practice options');await click('Clear saved practice');await click('Delete practice data');await screen('entry');await page.goBack();assert.equal(await page.evaluate(k=>localStorage.getItem(k),key),null);await context.close();
  results.push({scenario:'unprepared support and cancel/delete',status:'PASS'});
  assert.deepEqual(errors,[]);assert.equal(requests.some(r=>JSON.stringify(r).includes('Synthetic')),false);
- writeFileSync(evidence+'/results.json',JSON.stringify({origin,base:'1468a214ea06c9146150be5e7f3121c73035e6de',results,errors,postRequestsObserved:requests.length,muted:true},null,2));console.log(JSON.stringify(results,null,2));
+ writeFileSync(evidence+'/results.json',JSON.stringify({origin,head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),workingTreeDirty:!!execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),results,errors,postRequestsObserved:requests.length,muted:true},null,2));console.log(JSON.stringify(results,null,2));
 } catch(error) {if(page&&!page.isClosed()){await capture('FAILURE');writeFileSync(evidence+'/failure.txt',error.stack+'\n'+await page.locator('body').innerText());}throw error;} finally {await browser.close();}
