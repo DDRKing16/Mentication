@@ -111,3 +111,11 @@ export function taraCompletion(state) {
   return { interventionId: TARA_ID, completion: 'completed', saved: state.saved,
     eventStatus: state.eventStatus, predictionComparison: state.comparison || null, predictionResult: state.predictionResult || null, rehearsed: state.rehearsed };
 }
+
+/** Draft edits cannot borrow the confirmation of different prediction words. */
+export function editTaraDraft(state, patch) {
+  return { ...state, ...patch,
+    ...(Object.hasOwn(patch, 'prediction') && patch.prediction !== state.prediction ? { predictionConfirmed: false } : {}),
+    saved: false,
+  };
+}

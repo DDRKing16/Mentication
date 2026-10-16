@@ -7,7 +7,7 @@ import JourneyOptions from '@/components/journey/JourneyOptions';
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Compass, MoreHorizontal, Pencil, X } from 'lucide-react';
 import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
-import { COMPARISONS, EVENTS, PHASES, PREDICTION_RESULTS, TARA_ID, beginTackle, chooseChallenge, chooseEvent, confirmReflection, newTaraState, returnToEvent, taraCompletion } from '@/lib/taraTacticianState';
+import { COMPARISONS, EVENTS, PHASES, PREDICTION_RESULTS, TARA_ID, editTaraDraft, beginTackle, chooseChallenge, chooseEvent, confirmReflection, newTaraState, returnToEvent, taraCompletion } from '@/lib/taraTacticianState';
 import { chooseTaraMove, tacticFor } from '@/lib/taraTactics';
 import { choosePracticeResponse, chooseTaraNextStep, confirmPracticeTry, guidanceFor, keepUnpractisedPlan, practiceOptions, startTaraPractice } from '@/lib/taraGuidance';
 import { clearTara, loadTara, saveTaraDraft, saveTaraRecap } from '@/lib/taraTacticianStorage';
@@ -152,7 +152,7 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
     window.addEventListener('mentation:sessions-changed', erased); window.addEventListener('mentation:tara-cleared', erased); window.addEventListener('storage', changed);
     return () => { window.removeEventListener('mentation:sessions-changed', erased); window.removeEventListener('mentation:tara-cleared', erased); window.removeEventListener('storage', changed); };
   }, []);
-  const editState = patch => setState(value => ({ ...value, ...patch, saved: false }));
+  const editState = patch => setState(value => editTaraDraft(value, patch));
   const acceptProgress = useProgressGate();
   const go = next => {
     if (!acceptProgress()) return;

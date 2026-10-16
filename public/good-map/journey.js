@@ -167,7 +167,7 @@
       step: ['step-' + JST.focus + '-' + JST.pstep, 'A step you chose', JST.plan.length ? jStep(JST.pstep)[0] : ''],
       when: ['day-' + JST.focus + '-' + JST.pstep, 'Your planned day', el('gmDate')?.value],
       whenTime: ['time-' + JST.focus + '-' + JST.pstep, 'Your planned time', el('gmTime')?.value],
-      chk: ['attempt-' + JST.attemptId, 'What you reported', selected()],
+      chk: ['attempt-' + JST.attemptId, 'What you reported', {yes:'Did it',part:'Partly',no:'Not yet'}[JST.chk.did]],
       win: ['after-' + JST.attemptId, 'Your check-in', M.rating(JST.newsat) !== null ? `${JST.newsat} / 10` : ''],
       helpfulness: ['helpfulness-' + JST.attemptId, 'Your assessment', JST.helpfulness === 'skipped' ? '' : selected()],
     };
@@ -767,7 +767,9 @@
   JS.chk = () => {
     page('CHECK-IN', 'Did you<br><em>try it?</em>', jStep(JST.pstep)[0], `<div class="gm-options gm-answer-list" role="group" aria-label="Did you try it?">${[['yes', 'Did it'], ['part', 'Partly'], ['no', 'Not yet']].map(([v, label]) => `<button data-did="${v}">${label}</button>`).join('')}</div>`, '<button class="jlink" id="gmHour">Download a calendar reminder for one hour from now</button>');
     RT().querySelectorAll('[data-did]').forEach(b => b.onclick = () => {
+      if (phase !== 'chk') return;
       JST.chk.did = b.dataset.did;
+      confirmCheckpointAnswer(checkpointAnswer());
       go('win');
     });
     el('gmHour').onclick = () => exportCalendar(new Date(Date.now() + 3600000).toISOString());
