@@ -379,7 +379,7 @@
   }
   const display = value => M.rating(value) === null ? 'Not answered' : value + '/10';
   JS.intro = () => {
-    page('THE GOOD MAP', 'What matters<br><em>to you?</em>', 'Sort 16 illustrated moments, choose what matters, then try one small step. You can pause at any time.', `<img class="gm-photo" src="data:image/webp;base64,${jImg('move')}" alt="Moving my body"><p class="jtip">Your answers stay in this browser on this device. No account or automatic sharing. Clearing browser data removes your saved maps.</p>`, button('gmStart', 'Start sorting'));
+    page('THE GOOD MAP', 'What matters<br><em>to you?</em>', 'Sort 16 moments. Choose what matters, then one small step.', `<img class="gm-photo" src="data:image/webp;base64,${jImg('move')}" alt="Moving my body"><details class="gm-private-detail"><summary>Your private map</summary><p class="jtip">Your answers stay in this browser on this device. No account or automatic sharing. Clearing browser data removes your saved maps.</p></details>`, button('gmStart', 'Start sorting'));
     el('gmStart').onclick = () => go('sort');
   };
   JS.paused = () => {
@@ -642,23 +642,29 @@
   };
   JS.when = () => {
     const w = JST.wk;
-    // Date and time are two parts of one answer to "When?", not extra questions.
-    page('MAKE A PLAN', 'When would you<br><em>try this step?</em>', jStep(JST.pstep)[0], `<label class="gm-field">Date<input id="gmDate" type="date" value="${jEsc(w.date || M.localDate())}"></label><label class="gm-field">Local time<input id="gmTime" type="time" value="${jEsc(w.time || '18:00')}"></label><p class="jtip">Times use ${jEsc(Intl.DateTimeFormat().resolvedOptions().timeZone)}. A saved plan does not create a notification. You can export a calendar file next.</p>`, button('jnext', 'Save this plan'));
+    page('MAKE A PLAN', 'Which day could you<br><em>try this step?</em>', jStep(JST.pstep)[0], `<label class="gm-field">Date<input id="gmDate" type="date" value="${jEsc(w.date || M.localDate())}"></label>`, button('jnext', 'Continue'));
     el('gmDate').oninput = e => { w.date = e.target.value; save(); };
+    el('jnext').onclick = () => {
+      if (!el('gmDate').value) { status('Choose a day to continue.', true); return; }
+      w.date = el('gmDate').value;
+      go('whenTime');
+    };
+  };
+  JS.whenTime = () => {
+    const w = JST.wk;
+    page('MAKE A PLAN', 'What time<br><em>would suit you?</em>', w.date || M.localDate(), `<label class="gm-field">Local time<input id="gmTime" type="time" value="${jEsc(w.time || '18:00')}"></label><p class="jtip">A saved plan does not create a notification.</p><details class="gm-private-detail"><summary>About reminders</summary><p class="jtip">Times use ${jEsc(Intl.DateTimeFormat().resolvedOptions().timeZone)}. You can export a calendar file next, then choose whether to import it.</p></details>`, button('jnext', 'Save this plan'));
     el('gmTime').oninput = e => { w.time = e.target.value; save(); };
     el('jnext').onclick = () => {
       try {
-        const date = M.scheduled(el('gmDate').value, el('gmTime').value);
+        const date = M.scheduled(w.date || M.localDate(), el('gmTime').value);
         if (date <= new Date()) throw Error('Choose a future date and time.');
-        w.date = el('gmDate').value; w.time = el('gmTime').value;
+        w.date ||= M.localDate(); w.time = el('gmTime').value;
         w.atISO = date.toISOString();
         w.zone = Intl.DateTimeFormat().resolvedOptions().timeZone; w.exportedAt = null;
         if (save()) go('set');
       } catch (error) { status(error.message, true); }
     };
   };
-  // A draft from an interrupted local preview retains the same combined answer.
-  JS.whenTime = () => { phase = 'when'; JS.when(); };
   const when = () => JST.wk.atISO ? new Date(JST.wk.atISO).toLocaleString() : 'No date chosen';
   function download(text, type, name) {
     const a = document.createElement('a'),

@@ -1,0 +1,144 @@
+{
+  "completed": true,
+  "results": [
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": false,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": false,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": false,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": true,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": true,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": true,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 390,
+      "height": 640,
+      "longText": 300,
+      "enlarged": true,
+      "keyboard": true
+    },
+    {
+      "id": "unhook",
+      "legacyScreen": "return-next",
+      "resolvedScreen": "status",
+      "noInventedCredit": true
+    },
+    {
+      "id": "makeRoom",
+      "legacyScreen": "allow",
+      "resolvedScreen": "outside",
+      "noInventedCredit": true
+    },
+    {
+      "id": "selfCompassion",
+      "legacyScreen": "say",
+      "resolvedScreen": "say",
+      "noInventedCredit": true
+    }
+  ],
+  "errors": []
+}

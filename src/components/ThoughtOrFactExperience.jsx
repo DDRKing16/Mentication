@@ -159,9 +159,9 @@ function CaptureStage({ thought, setThought, onContinue }) {
   return (
     <motion.div className="tof-stage" {...fade}>
       <PracticeIllustration kind="evidence"/><Heading title="What’s the thought?" body="Type your own, or tap a starting point and edit it if needed." />
-      <div className="tof-chips" aria-label="Suggested thoughts">
+      <details className="tof-starting-points"><summary>Need a starting point?</summary><div className="tof-chips" aria-label="Suggested thoughts">
         {suggestions.map((suggestion) => <button key={suggestion} type="button" className="tof-pill" onClick={() => setThought(suggestion)}>{suggestion}</button>)}
-      </div>
+      </div></details>
       <textarea className="tof-field" value={thought} onChange={(event) => setThought(event.target.value)} maxLength={360} rows={4} placeholder="For example: I made a mistake." aria-label="The thought you want to look at" aria-describedby="tof-capture-privacy" />
       <p id="tof-capture-privacy" className="tof-note"><LockKeyhole aria-hidden="true" /> Private on this device{nearingLimit ? ` · ${thought.length}/360` : ""}</p>
       <div className="tof-actions"><Button disabled={!hasThought} onClick={onContinue}>Continue <ArrowRight /></Button></div>

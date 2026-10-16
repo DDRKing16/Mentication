@@ -263,8 +263,9 @@ function renderChoices(){
  const update=()=>{
    $$('.minimal-choice',wrap).forEach(btn=>{const selected=+btn.dataset.i===state.selected;btn.classList.toggle('selected',selected);btn.setAttribute('aria-pressed',String(selected))});
    wrap.classList.toggle('has-selection',state.selected!==null);
+   $('#actionContinue').disabled=state.selected===null;
  };
- $$('.minimal-choice',wrap).forEach(btn=>btn.onclick=()=>{const index=+btn.dataset.i;if(state.selected!==index){state.dose=null}state.selected=index;update();show('dose')});update();
+ $$('.minimal-choice',wrap).forEach(btn=>btn.onclick=()=>{const index=+btn.dataset.i;if(state.selected!==index){state.dose=null}state.selected=index;update();persistDraft()});update();
 }
 
 function chosen(){return priority().actions[state.selected??0]}
@@ -284,6 +285,7 @@ function renderDoses(){
  const doses=doseOptions(),wrap=$('#doseList'),path=$('#dosePath'),preview=$('#dosePreview'),positions=[{progress:0,x:0,y:0},{progress:53,x:120,y:-59},{progress:100,x:265,y:-154}];
  wrap.innerHTML=doses.map((x,i)=>`<button class="dose" type="button" data-i="${i}" aria-pressed="false"><b>${x.name}</b><span>${['Start small','As described','Twice this week'][i]}</span></button>`).join('');
  const update=(animate=false)=>{
+   $('#doseContinue').disabled=!state.dose;
    const index=doses.findIndex(x=>x.id===state.dose?.id),choice=doses[index],position=positions[Math.max(0,index)];
    if(choice)state.dose={...choice};
    $('#doseActionTitle').textContent=actionTitle();
@@ -294,7 +296,7 @@ function renderDoses(){
 
    if(animate)reveal(preview,[{opacity:.7,transform:'translateY(5px)'},{opacity:1,transform:'none'}],{duration:320,easing:'ease-out'});
  };
- $$('.dose',wrap).forEach(btn=>btn.onclick=()=>{const next=doses[+btn.dataset.i];state.dose=next;update(true);show('plan')});update();
+ $$('.dose',wrap).forEach(btn=>btn.onclick=()=>{const next=doses[+btn.dataset.i];state.dose=next;update(true);persistDraft()});update();
 }
 
 const fitNotes={

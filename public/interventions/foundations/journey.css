@@ -165,3 +165,17 @@
 .screen[data-screen="scan"] .scale-point.confirming span {width:42px;height:42px;border-radius:50%;}
 .screen[data-screen="scan"] .scale-point.confirming span em {opacity:1;scale:1;}
 .screen[data-screen="scan"] .scale-point.confirming span b {display:none;}
+
+/* Stages are available on request; the current question keeps the visual focus. */
+.stage-navigation {flex:none;margin:0 18px;}
+.stage-navigation summary {min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:12px;color:var(--mist);}
+.stage-navigation .flow-nav {padding:0 0 8px;}
+.screen .footer {position:sticky;bottom:-24px;z-index:5;background:#0b192c;padding:12px 0 24px;}
+.choices-light .screen .footer {background:#f4efe7;}
+.screen[data-screen="scan"] .footer {bottom:-24px;}
+@media(max-height:650px) {
+ .screen[data-screen="intro"] .foundation-zone {height:160px;transform:scale(.6);transform-origin:center center;margin-block:-25px;}
+ .screen[data-screen="intro"] .intro-title {font-size:40px;}
+ .screen[data-screen="intro"] .intro-statement {font-size:21px;}
+}
+.app.choices-light .stage-navigation summary,.app.choices-light #progressLabel {color:#294d6e;}

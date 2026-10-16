@@ -54,3 +54,11 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 @media(max-width:420px){.dear-practice-reveal{padding:16px;gap:10px}.dear-reveal-mark{font-size:22px}.dear-practice-reveal dd{font-size:16px}.dear-practice-reveal dl{gap:12px}.dear-practice-reveal dl>div+div{padding-left:12px}}
 
 .threat-understanding-check .question-kicker,.threat-screen .dear-practice-reveal .question-kicker{color:#ead8bb}.threat-screen .dear-reveal-mark{color:#ead8bb}.dear-practice-reveal dt{font-size:13px;opacity:.85}
+
+/* Keep exploration and writing separate; the active action follows its content. */
+.flow-futures-section > .stage-local-next { display:flex;width:100%;min-height:52px;justify-content:center;margin-top:24px; }
+.flow-futures-section .choice-walk-ambition p { overflow-wrap:anywhere; }
+.sequential-question .guided-answer textarea { overflow-wrap:anywhere; }
+/* A focused question must not scroll its Back and pause controls away. */
+.flow-experience .flow-top {position:sticky;top:0;z-index:20;background:#f7f1e6;padding-block:8px;}
+.threat-screen .flow-top {background:#112b50;}

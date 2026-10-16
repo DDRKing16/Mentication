@@ -1,0 +1,60 @@
+[
+  {
+    "flow": "Foundations",
+    "width": 320,
+    "pass": true,
+    "checks": [
+      "17 actual ratings",
+      "repeat confirmation",
+      "browser back/forward",
+      "one explicit action and size confirmation",
+      "refresh resumes selection",
+      "cue and time retained",
+      "explanation Close",
+      "honest not-yet review",
+      "save and exit/resume"
+    ]
+  },
+  {
+    "flow": "Dear 2100",
+    "width": 320,
+    "pass": true,
+    "checks": [
+      "real entry and barrier",
+      "required threat visual and four answered questions",
+      "visual two roads retained",
+      "one reflection and one primary per screen",
+      "long text retained across back/forward/reload",
+      "explicit save and return Home"
+    ]
+  },
+  {
+    "flow": "Foundations",
+    "width": 390,
+    "pass": true,
+    "checks": [
+      "17 actual ratings",
+      "repeat confirmation",
+      "browser back/forward",
+      "one explicit action and size confirmation",
+      "refresh resumes selection",
+      "cue and time retained",
+      "explanation Close",
+      "honest not-yet review",
+      "save and exit/resume"
+    ]
+  },
+  {
+    "flow": "Dear 2100",
+    "width": 390,
+    "pass": true,
+    "checks": [
+      "real entry and barrier",
+      "required threat visual and four answered questions",
+      "visual two roads retained",
+      "one reflection and one primary per screen",
+      "long text retained across back/forward/reload",
+      "explicit save and return Home"
+    ]
+  }
+]

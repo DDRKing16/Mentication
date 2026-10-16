@@ -12,7 +12,7 @@
   <div class="choice-light-layer" aria-hidden="true"></div><div class="ambient a"></div><div class="ambient b"></div>
   <header class="topbar"><button class="navbtn" id="back" hidden aria-label="Previous step in Foundations">← Previous</button><span class="step" id="step">Foundations</span><button class="navbtn exit-button" id="exit">Exit</button></header>
   <div class="progress" role="progressbar" aria-label="Check-in answers confirmed" aria-valuemin="0" aria-valuemax="17" aria-valuenow="0"><i id="progress"></i></div>
-  <nav class="flow-nav" id="flowNav" aria-label="Foundations stages"></nav>
+  <details class="stage-navigation"><summary>View stages</summary><nav class="flow-nav" id="flowNav" aria-label="Foundations stages"></nav></details>
   <div class="journey-meta"><div><p id="progressLabel">Check-in: 0 of 17 answers confirmed</p><p id="draftStatus" role="status" aria-live="polite">Your answers stay on this device.</p></div><button id="soundToggle" type="button" aria-pressed="false">Sound on</button></div>
   <div class="screens">
     <section class="screen active" data-screen="intro">
@@ -26,7 +26,7 @@
         <div class="foundation-caption"><b id="foundationLabel">Sleep and rhythm</b></div>
         <div class="energy-thread" aria-hidden="true"><i></i></div>
       </div>
-      <p class="intro-guide">17 quick ratings. A new piece of your picture after each answer. You can pause and return.</p><div class="footer"><button class="primary" data-next="scan"><span>Start my check-in</span><span class="cta-track" aria-hidden="true"><i></i></span><span class="arrow">→</span></button><button class="ghost resume-plan" id="resumePlan" hidden>Open my saved weekly plan →</button><button class="ghost resume-plan" id="resumeReview" hidden>Review my saved plan →</button></div>
+      <p class="intro-guide">17 ratings. Pause and return whenever you need.</p><div class="footer"><button class="primary" data-next="scan"><span>Start my check-in</span><span class="cta-track" aria-hidden="true"><i></i></span><span class="arrow">→</span></button><button class="ghost resume-plan" id="resumePlan" hidden>Open my saved weekly plan →</button><button class="ghost resume-plan" id="resumeReview" hidden>Review my saved plan →</button></div>
     </section>
 
     <section class="screen" data-screen="scan">
@@ -78,7 +78,7 @@
     <section class="screen" data-screen="choices">
       <p class="eyebrow">One thing this week</p><h2>One small step for <em id="choiceDomain">the base.</em></h2><p class="small choice-guidance">Choose the easiest place to begin.</p>
       <div class="choice-sheet"><div class="choice-sheet-heading"><span>Pick one</span><strong id="choiceSheetDomain">Sleep and rhythm</strong></div><div class="minimal-choices" id="actionChoices"></div></div>
-      <div class="footer"><p class="small">Choose an action to see its three sizes.</p></div>
+      <div class="footer"><button class="primary" id="actionContinue" data-next="dose" disabled>Continue →</button></div>
     </section>
 
     <section class="screen" data-screen="dose">
@@ -89,7 +89,7 @@
         <div class="dose-list" id="doseList"></div>
         <div class="dose-preview" id="dosePreview" aria-live="polite"><span>Dose preview</span><strong>Select a distance</strong><p>Choose the version most likely to happen.</p></div>
       </div>
-      <div class="footer"><p class="small">Choose a size to see your complete plan. Nothing is saved until you choose Save.</p></div>
+      <div class="footer"><button class="primary" id="doseContinue" data-next="plan" disabled>See my plan →</button><p class="small">Nothing is saved until you choose Save.</p></div>
     </section>
 
     <section class="screen" data-screen="plan">
