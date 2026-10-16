@@ -1,0 +1,872 @@
+[
+  {
+    "id": "vectorShift",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 1132,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1907,
+        "label": "Begin visual task",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 2326,
+        "label": "Open Activity options",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2879,
+        "label": "Try an easier option",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3371,
+        "label": "I noticed a colour or shape — continue",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3816,
+        "label": "Collect a light at your pace (0/3)",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 4338,
+        "label": "Collect a light at your pace (1/3)",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4841,
+        "label": "Collect a light at your pace (2/3)",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 5354,
+        "label": "Z",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5367,
+        "label": "Repeat click on disabled Z",
+        "kind": "repeated choice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 5824,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "TWO MOMENTS OF ATTENTION\n\nZ is not in this word\n\nYou revealed A in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 7703,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "TWO MOMENTS OF ATTENTION\n\nZ is not in this word\n\nYou revealed A in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 9545,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed N in the word\n\nYou revealed C in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 14,
+        "elapsedMs": 11430,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed N in the word\n\nYou revealed C in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 15,
+        "elapsedMs": 13262,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 10,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 10,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed H in the word\n\nYou revealed O in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 16,
+        "elapsedMs": 15113,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 11,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 11,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed H in the word\n\nYou revealed O in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 17,
+        "elapsedMs": 16871,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 12,
+        "expectedPair": 6,
+        "receipts": [
+          {
+            "pair": 6,
+            "count": 12,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed R in the word\n\nYou revealed S in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 18,
+        "elapsedMs": 18715,
+        "label": "Notice LUNA — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 13,
+        "expectedPair": 6,
+        "receipts": [
+          {
+            "pair": 6,
+            "count": 13,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed R in the word\n\nYou revealed S in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 19,
+        "elapsedMs": 19156,
+        "label": "Notice SATURN RINGS — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 14,
+        "expectedPair": 7,
+        "receipts": [
+          {
+            "pair": 7,
+            "count": 14,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed LUNA\n\nYou noticed SATURN RINGS"
+          }
+        ]
+      },
+      {
+        "sequence": 20,
+        "elapsedMs": 19688,
+        "label": "Notice MARS ICE CAP — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 15,
+        "expectedPair": 7,
+        "receipts": [
+          {
+            "pair": 7,
+            "count": 15,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed LUNA\n\nYou noticed SATURN RINGS"
+          }
+        ]
+      },
+      {
+        "sequence": 21,
+        "elapsedMs": 20174,
+        "label": "Notice COMET — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 16,
+        "expectedPair": 8,
+        "receipts": [
+          {
+            "pair": 8,
+            "count": 16,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed MARS ICE CAP\n\nYou noticed COMET"
+          }
+        ]
+      },
+      {
+        "sequence": 22,
+        "elapsedMs": 20749,
+        "label": "Notice GREAT RED SPOT — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 17,
+        "expectedPair": 8,
+        "receipts": [
+          {
+            "pair": 8,
+            "count": 17,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed MARS ICE CAP\n\nYou noticed COMET"
+          }
+        ]
+      },
+      {
+        "sequence": 23,
+        "elapsedMs": 21196,
+        "label": "Notice PLEIADES — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 18,
+        "expectedPair": 9,
+        "receipts": [
+          {
+            "pair": 9,
+            "count": 18,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+          }
+        ]
+      },
+      {
+        "sequence": 24,
+        "elapsedMs": 22323,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 18,
+        "expectedPair": 9,
+        "receipts": [
+          {
+            "pair": 9,
+            "count": 18,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+          }
+        ]
+      },
+      {
+        "sequence": 25,
+        "elapsedMs": 22842,
+        "label": "Resume",
+        "kind": "navigation",
+        "progress": 18,
+        "expectedPair": 9,
+        "receipts": [
+          {
+            "pair": 9,
+            "count": 18,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 6,
+        "progress": 2,
+        "pair": 1,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 4,
+        "pair": 2,
+        "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+      },
+      {
+        "firstAppearanceAt": 11,
+        "progress": 6,
+        "pair": 3,
+        "text": "TWO MOMENTS OF ATTENTION\n\nZ is not in this word\n\nYou revealed A in the word"
+      },
+      {
+        "firstAppearanceAt": 13,
+        "progress": 8,
+        "pair": 4,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed N in the word\n\nYou revealed C in the word"
+      },
+      {
+        "firstAppearanceAt": 15,
+        "progress": 10,
+        "pair": 5,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed H in the word\n\nYou revealed O in the word"
+      },
+      {
+        "firstAppearanceAt": 17,
+        "progress": 12,
+        "pair": 6,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed R in the word\n\nYou revealed S in the word"
+      },
+      {
+        "firstAppearanceAt": 19,
+        "progress": 14,
+        "pair": 7,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed LUNA\n\nYou noticed SATURN RINGS"
+      },
+      {
+        "firstAppearanceAt": 21,
+        "progress": 16,
+        "pair": 8,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed MARS ICE CAP\n\nYou noticed COMET"
+      },
+      {
+        "firstAppearanceAt": 23,
+        "progress": 18,
+        "pair": 9,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+      }
+    ],
+    "screens": [
+      {
+        "name": "six-features",
+        "headings": [
+          "Solar scan",
+          "Tap a difference between the pictures."
+        ]
+      },
+      {
+        "name": "resumed-features",
+        "headings": [
+          "Solar scan",
+          "Tap a difference between the pictures."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "six-features",
+        "unnamedButtons": []
+      },
+      {
+        "name": "resumed-features",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "vectorShift",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 1020,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1594,
+        "label": "Begin visual task",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1718,
+        "label": "Open Activity options",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2238,
+        "label": "Try an easier option",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2756,
+        "label": "I noticed a colour or shape — continue",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3197,
+        "label": "Collect a light at your pace (0/3)",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3710,
+        "label": "Collect a light at your pace (1/3)",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4198,
+        "label": "Collect a light at your pace (2/3)",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4803,
+        "label": "Z",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 4817,
+        "label": "Repeat click on disabled Z",
+        "kind": "repeated choice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 5282,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "TWO MOMENTS OF ATTENTION\n\nZ is not in this word\n\nYou revealed G in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 7102,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "TWO MOMENTS OF ATTENTION\n\nZ is not in this word\n\nYou revealed G in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 8849,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed R in the word\n\nYou revealed O in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 14,
+        "elapsedMs": 10740,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed R in the word\n\nYou revealed O in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 15,
+        "elapsedMs": 12524,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 10,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 10,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed U in the word\n\nYou revealed N in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 16,
+        "elapsedMs": 14511,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 11,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 11,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed U in the word\n\nYou revealed N in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 17,
+        "elapsedMs": 16288,
+        "label": "Reveal a letter",
+        "kind": "decision or confirmed practice",
+        "progress": 12,
+        "expectedPair": 6,
+        "receipts": [
+          {
+            "pair": 6,
+            "count": 12,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed D in the word\n\nYou revealed S in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 18,
+        "elapsedMs": 18161,
+        "label": "Notice LUNA — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 13,
+        "expectedPair": 6,
+        "receipts": [
+          {
+            "pair": 6,
+            "count": 13,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed D in the word\n\nYou revealed S in the word"
+          }
+        ]
+      },
+      {
+        "sequence": 19,
+        "elapsedMs": 18625,
+        "label": "Notice SATURN RINGS — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 14,
+        "expectedPair": 7,
+        "receipts": [
+          {
+            "pair": 7,
+            "count": 14,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed LUNA\n\nYou noticed SATURN RINGS"
+          }
+        ]
+      },
+      {
+        "sequence": 20,
+        "elapsedMs": 19256,
+        "label": "Notice MARS ICE CAP — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 15,
+        "expectedPair": 7,
+        "receipts": [
+          {
+            "pair": 7,
+            "count": 15,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed LUNA\n\nYou noticed SATURN RINGS"
+          }
+        ]
+      },
+      {
+        "sequence": 21,
+        "elapsedMs": 19695,
+        "label": "Notice COMET — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 16,
+        "expectedPair": 8,
+        "receipts": [
+          {
+            "pair": 8,
+            "count": 16,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed MARS ICE CAP\n\nYou noticed COMET"
+          }
+        ]
+      },
+      {
+        "sequence": 22,
+        "elapsedMs": 20208,
+        "label": "Notice GREAT RED SPOT — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 17,
+        "expectedPair": 8,
+        "receipts": [
+          {
+            "pair": 8,
+            "count": 17,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed MARS ICE CAP\n\nYou noticed COMET"
+          }
+        ]
+      },
+      {
+        "sequence": 23,
+        "elapsedMs": 20658,
+        "label": "Notice PLEIADES — then tap here",
+        "kind": "decision or confirmed practice",
+        "progress": 18,
+        "expectedPair": 9,
+        "receipts": [
+          {
+            "pair": 9,
+            "count": 18,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+          }
+        ]
+      },
+      {
+        "sequence": 24,
+        "elapsedMs": 21869,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 18,
+        "expectedPair": 9,
+        "receipts": [
+          {
+            "pair": 9,
+            "count": 18,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+          }
+        ]
+      },
+      {
+        "sequence": 25,
+        "elapsedMs": 22392,
+        "label": "Resume",
+        "kind": "navigation",
+        "progress": 18,
+        "expectedPair": 9,
+        "receipts": [
+          {
+            "pair": 9,
+            "count": 18,
+            "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 6,
+        "progress": 2,
+        "pair": 1,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed a colour or shape\n\nLight 1 collected"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 4,
+        "pair": 2,
+        "text": "TWO MOMENTS OF ATTENTION\n\nLight 2 collected\n\nLight 3 collected"
+      },
+      {
+        "firstAppearanceAt": 11,
+        "progress": 6,
+        "pair": 3,
+        "text": "TWO MOMENTS OF ATTENTION\n\nZ is not in this word\n\nYou revealed G in the word"
+      },
+      {
+        "firstAppearanceAt": 13,
+        "progress": 8,
+        "pair": 4,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed R in the word\n\nYou revealed O in the word"
+      },
+      {
+        "firstAppearanceAt": 15,
+        "progress": 10,
+        "pair": 5,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed U in the word\n\nYou revealed N in the word"
+      },
+      {
+        "firstAppearanceAt": 17,
+        "progress": 12,
+        "pair": 6,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou revealed D in the word\n\nYou revealed S in the word"
+      },
+      {
+        "firstAppearanceAt": 19,
+        "progress": 14,
+        "pair": 7,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed LUNA\n\nYou noticed SATURN RINGS"
+      },
+      {
+        "firstAppearanceAt": 21,
+        "progress": 16,
+        "pair": 8,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed MARS ICE CAP\n\nYou noticed COMET"
+      },
+      {
+        "firstAppearanceAt": 23,
+        "progress": 18,
+        "pair": 9,
+        "text": "TWO MOMENTS OF ATTENTION\n\nYou noticed GREAT RED SPOT\n\nYou noticed PLEIADES"
+      }
+    ],
+    "screens": [
+      {
+        "name": "six-features",
+        "headings": [
+          "Solar scan",
+          "Tap a difference between the pictures."
+        ]
+      },
+      {
+        "name": "resumed-features",
+        "headings": [
+          "Solar scan",
+          "Tap a difference between the pictures."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "six-features",
+        "unnamedButtons": []
+      },
+      {
+        "name": "resumed-features",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  }
+]

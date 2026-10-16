@@ -1,0 +1,6 @@
+PASS Night 320: top-level app reload at timer/listening; native Back/Forward visibly restores source/timer/paused listening; final Back exits to Library and Forward returns; selected 30 minutes retained; only coarse cursor in host history
+PASS Signal 320: top-level reload paused; native Back visibly returns to Library; Forward restores the actual earned connection paused
+PASS Vector 320: real baseline and easy gameplay; whole-app reload paused; native Back visibly leaves iframe for host, Forward restores word gameplay and actual chosen letter
+PASS Night 390: top-level app reload at timer/listening; native Back/Forward visibly restores source/timer/paused listening; final Back exits to Library and Forward returns; selected 30 minutes retained; only coarse cursor in host history
+PASS Signal 390: top-level reload paused; native Back visibly returns to Library; Forward restores the actual earned connection paused
+PASS Vector 390: real baseline and easy gameplay; whole-app reload paused; native Back visibly leaves iframe for host, Forward restores word gameplay and actual chosen letter

@@ -1,0 +1,605 @@
+{
+  "results": [
+    "Night 320: top-level app reload at timer/listening; native Back/Forward visibly restores source/timer/paused listening; final Back exits to Library and Forward returns; selected 30 minutes retained; only coarse cursor in host history",
+    "Signal 320: top-level reload paused; native Back visibly returns to Library; Forward restores the actual earned connection paused",
+    "Vector 320: real baseline and easy gameplay; whole-app reload paused; native Back visibly leaves iframe for host, Forward restores word gameplay and actual chosen letter",
+    "Night 390: top-level app reload at timer/listening; native Back/Forward visibly restores source/timer/paused listening; final Back exits to Library and Forward returns; selected 30 minutes retained; only coarse cursor in host history",
+    "Signal 390: top-level reload paused; native Back visibly returns to Library; Forward restores the actual earned connection paused",
+    "Vector 390: real baseline and easy gameplay; whole-app reload paused; native Back visibly leaves iframe for host, Forward restores word gameplay and actual chosen letter"
+  ],
+  "errors": [],
+  "history": [
+    {
+      "label": "night-top-reload-timer-320",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "4icp7nvx",
+        "idx": 2,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "timer",
+          "cursors": {},
+          "depth": 1
+        }
+      }
+    },
+    {
+      "label": "night-top-back-source-320",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "4icp7nvx",
+        "idx": 1,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "source",
+          "cursors": {},
+          "depth": 0
+        }
+      }
+    },
+    {
+      "label": "night-top-forward-timer-320",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "4icp7nvx",
+        "idx": 2,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "timer",
+          "cursors": {},
+          "depth": 1
+        }
+      }
+    },
+    {
+      "label": "night-top-reload-listening-paused-320",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "4icp7nvx",
+        "idx": 3,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "listening",
+          "cursors": {},
+          "depth": 2
+        }
+      }
+    },
+    {
+      "label": "night-top-back-timer-320",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "4icp7nvx",
+        "idx": 2,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "timer",
+          "cursors": {},
+          "depth": 1
+        }
+      }
+    },
+    {
+      "label": "night-top-forward-listening-paused-320",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "4icp7nvx",
+        "idx": 3,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "listening",
+          "cursors": {},
+          "depth": 2
+        }
+      }
+    },
+    {
+      "label": "night-top-back-library-320",
+      "url": "http://127.0.0.1:5192/library",
+      "state": {
+        "idx": 0
+      }
+    },
+    {
+      "label": "night-top-forward-from-library-320",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "4icp7nvx",
+        "idx": 1,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "source",
+          "cursors": {},
+          "depth": 0
+        }
+      }
+    },
+    {
+      "label": "signal-top-reload-paused-320",
+      "url": "http://127.0.0.1:5192/signal-lock",
+      "state": {
+        "usr": null,
+        "key": "svbamv41",
+        "idx": 1,
+        "masked": null
+      }
+    },
+    {
+      "label": "signal-top-back-library-320",
+      "url": "http://127.0.0.1:5192/library",
+      "state": {
+        "idx": 0
+      }
+    },
+    {
+      "label": "signal-top-forward-retained-320",
+      "url": "http://127.0.0.1:5192/signal-lock",
+      "state": {
+        "usr": null,
+        "key": "svbamv41",
+        "idx": 1,
+        "masked": null
+      }
+    },
+    {
+      "label": "vector-top-reload-paused-320",
+      "url": "http://127.0.0.1:5192/reset?step=1",
+      "state": {
+        "usr": {
+          "direction": "ground",
+          "intensity": 4,
+          "distress": null,
+          "whereFelt": "both",
+          "timeMin": 5,
+          "audio": "yes",
+          "movement": "seated",
+          "location": "home",
+          "immediate": false,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "acute": false,
+          "disconnected": false,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "directionLabel": "Ground",
+          "goal_baseline": {
+            "question": "How intense is it right now?",
+            "scale": "disconnection",
+            "left": "Present",
+            "right": "Gone",
+            "higherIsBetter": false,
+            "direction": "ground",
+            "min": 0,
+            "max": 10,
+            "value": 4,
+            "answered": true
+          },
+          "prebuilt": true,
+          "pathway": [
+            "vectorShift"
+          ],
+          "unsure": false,
+          "reset_phase": "guiding",
+          "reset_session_id": "3f26d4fb-9487-49ed-8c4c-dc81377396f0",
+          "reset_started_at": 1792174341834
+        },
+        "key": "h1zpp5wb",
+        "idx": 2,
+        "masked": null
+      }
+    },
+    {
+      "label": "vector-top-back-host-320",
+      "url": "http://127.0.0.1:5192/reset",
+      "state": {
+        "usr": {
+          "direction": "ground",
+          "intensity": 4,
+          "distress": null,
+          "whereFelt": "both",
+          "timeMin": 5,
+          "audio": "yes",
+          "movement": "seated",
+          "location": "home",
+          "immediate": false,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "acute": false,
+          "disconnected": false,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "directionLabel": "Ground",
+          "goal_baseline": {
+            "question": "How intense is it right now?",
+            "scale": "disconnection",
+            "left": "Present",
+            "right": "Gone",
+            "higherIsBetter": false,
+            "direction": "ground",
+            "min": 0,
+            "max": 10,
+            "value": 4,
+            "answered": true
+          },
+          "prebuilt": true,
+          "pathway": [
+            "vectorShift"
+          ],
+          "unsure": false,
+          "reset_phase": "questions",
+          "reset_question": "goal",
+          "reset_session_id": "3f26d4fb-9487-49ed-8c4c-dc81377396f0",
+          "reset_started_at": 1792174341834
+        },
+        "key": "folldwmy",
+        "idx": 1,
+        "masked": null
+      }
+    },
+    {
+      "label": "vector-top-forward-word-retained-320",
+      "url": "http://127.0.0.1:5192/reset?step=1",
+      "state": {
+        "usr": {
+          "direction": "ground",
+          "intensity": 4,
+          "distress": null,
+          "whereFelt": "both",
+          "timeMin": 5,
+          "audio": "yes",
+          "movement": "seated",
+          "location": "home",
+          "immediate": false,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "acute": false,
+          "disconnected": false,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "directionLabel": "Ground",
+          "goal_baseline": {
+            "question": "How intense is it right now?",
+            "scale": "disconnection",
+            "left": "Present",
+            "right": "Gone",
+            "higherIsBetter": false,
+            "direction": "ground",
+            "min": 0,
+            "max": 10,
+            "value": 4,
+            "answered": true
+          },
+          "prebuilt": true,
+          "pathway": [
+            "vectorShift"
+          ],
+          "unsure": false,
+          "reset_phase": "guiding",
+          "reset_session_id": "3f26d4fb-9487-49ed-8c4c-dc81377396f0",
+          "reset_started_at": 1792174341834
+        },
+        "key": "h1zpp5wb",
+        "idx": 2,
+        "masked": null
+      }
+    },
+    {
+      "label": "night-top-reload-timer-390",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "fwiuwcsa",
+        "idx": 2,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "timer",
+          "cursors": {},
+          "depth": 1
+        }
+      }
+    },
+    {
+      "label": "night-top-back-source-390",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "fwiuwcsa",
+        "idx": 1,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "source",
+          "cursors": {},
+          "depth": 0
+        }
+      }
+    },
+    {
+      "label": "night-top-forward-timer-390",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "fwiuwcsa",
+        "idx": 2,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "timer",
+          "cursors": {},
+          "depth": 1
+        }
+      }
+    },
+    {
+      "label": "night-top-reload-listening-paused-390",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "fwiuwcsa",
+        "idx": 3,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "listening",
+          "cursors": {},
+          "depth": 2
+        }
+      }
+    },
+    {
+      "label": "night-top-back-timer-390",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "fwiuwcsa",
+        "idx": 2,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "timer",
+          "cursors": {},
+          "depth": 1
+        }
+      }
+    },
+    {
+      "label": "night-top-forward-listening-paused-390",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "fwiuwcsa",
+        "idx": 3,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "listening",
+          "cursors": {},
+          "depth": 2
+        }
+      }
+    },
+    {
+      "label": "night-top-back-library-390",
+      "url": "http://127.0.0.1:5192/library",
+      "state": {
+        "idx": 0
+      }
+    },
+    {
+      "label": "night-top-forward-from-library-390",
+      "url": "http://127.0.0.1:5192/night-channel",
+      "state": {
+        "usr": null,
+        "key": "fwiuwcsa",
+        "idx": 1,
+        "masked": null,
+        "menticationScreen:nightChannel": {
+          "id": "source",
+          "cursors": {},
+          "depth": 0
+        }
+      }
+    },
+    {
+      "label": "signal-top-reload-paused-390",
+      "url": "http://127.0.0.1:5192/signal-lock",
+      "state": {
+        "usr": null,
+        "key": "oh3rp06l",
+        "idx": 1,
+        "masked": null
+      }
+    },
+    {
+      "label": "signal-top-back-library-390",
+      "url": "http://127.0.0.1:5192/library",
+      "state": {
+        "idx": 0
+      }
+    },
+    {
+      "label": "signal-top-forward-retained-390",
+      "url": "http://127.0.0.1:5192/signal-lock",
+      "state": {
+        "usr": null,
+        "key": "oh3rp06l",
+        "idx": 1,
+        "masked": null
+      }
+    },
+    {
+      "label": "vector-top-reload-paused-390",
+      "url": "http://127.0.0.1:5192/reset?step=1",
+      "state": {
+        "usr": {
+          "direction": "ground",
+          "intensity": 4,
+          "distress": null,
+          "whereFelt": "both",
+          "timeMin": 5,
+          "audio": "yes",
+          "movement": "seated",
+          "location": "home",
+          "immediate": false,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "acute": false,
+          "disconnected": false,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "directionLabel": "Ground",
+          "goal_baseline": {
+            "question": "How intense is it right now?",
+            "scale": "disconnection",
+            "left": "Present",
+            "right": "Gone",
+            "higherIsBetter": false,
+            "direction": "ground",
+            "min": 0,
+            "max": 10,
+            "value": 4,
+            "answered": true
+          },
+          "prebuilt": true,
+          "pathway": [
+            "vectorShift"
+          ],
+          "unsure": false,
+          "reset_phase": "guiding",
+          "reset_session_id": "e9a7db75-34b0-4704-aca7-7914f45a7078",
+          "reset_started_at": 1792174347840
+        },
+        "key": "utdlzfwy",
+        "idx": 2,
+        "masked": null
+      }
+    },
+    {
+      "label": "vector-top-back-host-390",
+      "url": "http://127.0.0.1:5192/reset",
+      "state": {
+        "usr": {
+          "direction": "ground",
+          "intensity": 4,
+          "distress": null,
+          "whereFelt": "both",
+          "timeMin": 5,
+          "audio": "yes",
+          "movement": "seated",
+          "location": "home",
+          "immediate": false,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "acute": false,
+          "disconnected": false,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "directionLabel": "Ground",
+          "goal_baseline": {
+            "question": "How intense is it right now?",
+            "scale": "disconnection",
+            "left": "Present",
+            "right": "Gone",
+            "higherIsBetter": false,
+            "direction": "ground",
+            "min": 0,
+            "max": 10,
+            "value": 4,
+            "answered": true
+          },
+          "prebuilt": true,
+          "pathway": [
+            "vectorShift"
+          ],
+          "unsure": false,
+          "reset_phase": "questions",
+          "reset_question": "goal",
+          "reset_session_id": "e9a7db75-34b0-4704-aca7-7914f45a7078",
+          "reset_started_at": 1792174347840
+        },
+        "key": "fvewfxfe",
+        "idx": 1,
+        "masked": null
+      }
+    },
+    {
+      "label": "vector-top-forward-word-retained-390",
+      "url": "http://127.0.0.1:5192/reset?step=1",
+      "state": {
+        "usr": {
+          "direction": "ground",
+          "intensity": 4,
+          "distress": null,
+          "whereFelt": "both",
+          "timeMin": 5,
+          "audio": "yes",
+          "movement": "seated",
+          "location": "home",
+          "immediate": false,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "acute": false,
+          "disconnected": false,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "directionLabel": "Ground",
+          "goal_baseline": {
+            "question": "How intense is it right now?",
+            "scale": "disconnection",
+            "left": "Present",
+            "right": "Gone",
+            "higherIsBetter": false,
+            "direction": "ground",
+            "min": 0,
+            "max": 10,
+            "value": 4,
+            "answered": true
+          },
+          "prebuilt": true,
+          "pathway": [
+            "vectorShift"
+          ],
+          "unsure": false,
+          "reset_phase": "guiding",
+          "reset_session_id": "e9a7db75-34b0-4704-aca7-7914f45a7078",
+          "reset_started_at": 1792174347840
+        },
+        "key": "utdlzfwy",
+        "idx": 2,
+        "masked": null
+      }
+    }
+  ]
+}

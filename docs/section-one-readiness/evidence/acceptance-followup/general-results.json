@@ -1,0 +1,28 @@
+[
+  {
+    "width": 320,
+    "height": 640,
+    "generalNonPrebuilt20MinuteRoute": true,
+    "baselineTimeSeparate": true,
+    "backForwardRefreshInputs": true,
+    "overviewFirstPractice": true,
+    "alternativeReturn": true,
+    "practiceRefreshPaused": true,
+    "goalRefreshKeepsExplicitZero": true,
+    "onlyActualPracticeSaved": true,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "height": 640,
+    "generalNonPrebuilt20MinuteRoute": true,
+    "baselineTimeSeparate": true,
+    "backForwardRefreshInputs": true,
+    "overviewFirstPractice": true,
+    "alternativeReturn": true,
+    "practiceRefreshPaused": true,
+    "goalRefreshKeepsExplicitZero": true,
+    "onlyActualPracticeSaved": true,
+    "errors": []
+  }
+]

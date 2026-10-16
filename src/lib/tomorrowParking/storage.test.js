@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   CONSENT_KEY,
   LEGACY_PENDING_KEY,
@@ -43,9 +43,12 @@ const NIGHT = new Date("2026-09-13T22:30:00");
 
 describe("Tomorrow Parking Lot storage", () => {
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(NIGHT);
     globalThis.window = { localStorage: new MemoryStorage(), sessionStorage: new MemoryStorage() };
   });
   afterEach(() => {
+    vi.useRealTimers();
     delete globalThis.window;
   });
 

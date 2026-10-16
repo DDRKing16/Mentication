@@ -1,0 +1,4 @@
+PASS 320 actual 3-step selection, edit/done/skip, readable alternative, modal focus/Escape, interruption/refresh, genuine return, saved-ending failure, new-visit-only history and Back/forward.
+PASS 390 actual 3-step selection, edit/done/skip, readable alternative, modal focus/Escape, interruption/refresh, genuine return, saved-ending failure, new-visit-only history and Back/forward.
+PASS unreadable task preservation, dismiss without overwrite, deliberate new-task replacement.
+PASS original direct silent route does not start task click/success synthesis.

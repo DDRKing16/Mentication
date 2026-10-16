@@ -41,7 +41,7 @@ export function NextStepActive({ state, onDone, onSkip, onUndo, onReplace, onPau
         {editing ? <form onSubmit={event => { event.preventDefault(); if (draft.trim()) { onReplace(draft.trim()); setEditing(false); setAdapting(false); heading.current?.focus(); } }}><label htmlFor="nes-action-edit">Your small action</label><input id="nes-action-edit" autoFocus maxLength={200} value={draft} onChange={event => setDraft(event.target.value)} /><div><button type="submit" disabled={!draft.trim()}>Use this step</button><button type="button" onClick={() => setEditing(false)}>Cancel edit</button></div></form> : <button type="button" className="nes-practice-text" onClick={edit}>Write my own smaller step</button>}
       </div>}
     </section>
-    <div className="nes-practice-quiet-actions"><button type="button" onClick={onSkip}>Skip this step</button><button type="button" disabled={!state.currentStepIndex} onClick={onUndo}><CornerDownLeft size={15} aria-hidden="true" />Undo previous</button></div>
+    <div className="nes-practice-quiet-actions"><button type="button" onClick={onSkip}>Skip this step</button><button type="button" disabled={state.currentStepIndex <= (state.attemptStartIndex || 0) || state.submitted} onClick={onUndo}><CornerDownLeft size={15} aria-hidden="true" />Undo previous</button></div>
     {state.ladder.length > 1 && <details className="nes-task-outline"><summary>Your task at a glance</summary><TaskTrail steps={state.ladder} currentIndex={state.currentStepIndex} /></details>}
     <button type="button" className="nes-practice-finish" onClick={onReview}>Finish for now<ArrowRight size={17} aria-hidden="true" /></button>
   </main>;
@@ -63,7 +63,7 @@ export function NextStepReview({ state, onGettingStarted, onHelpfulness, onConti
       <header className="nes-practice-heading"><p className="nes-practice-eyebrow">Next Easiest Step · Your review</p><h1 ref={heading} tabIndex={-1}>Your task,<br />as it stands.</h1><p>{state.task}</p></header>
       <section className="nes-task-receipt" aria-label="What you recorded"><div className="nes-receipt-summary"><span><strong>{done}</strong>marked done</span><span><strong>{skipped}</strong>skipped</span>{unfinished > 0 && <span><strong>{unfinished}</strong>not done yet</span>}</div><TaskTrail steps={state.ladder} currentIndex={state.currentStepIndex} review />
         {unfinished > 0 && !state.submitted && <button type="button" className="nes-review-resume" onClick={onResume}>Return to the current step<ArrowRight size={17} aria-hidden="true" /></button>}
-        <button type="button" className="nes-practice-text" disabled={!state.currentStepIndex || state.submitted} onClick={onUndo}><CornerDownLeft size={15} aria-hidden="true" />Undo previous</button>
+        <button type="button" className="nes-practice-text" disabled={state.currentStepIndex <= (state.attemptStartIndex || 0) || state.submitted} onClick={onUndo}><CornerDownLeft size={15} aria-hidden="true" />Undo previous</button>
       </section>
     </>}
     <button type="button" className="nes-review-continue" disabled={!canContinue || state.submitted} onClick={onContinue}>Continue to final rating<ArrowRight size={18} aria-hidden="true" /></button>

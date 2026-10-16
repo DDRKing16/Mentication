@@ -1,0 +1,656 @@
+{
+  "production": true,
+  "base": "0561c90e538298023c583654a23db8834f6eed2d",
+  "passed": [
+    "390px full before/during/after: two-action checkpoints, five chosen steps, optional check-ins, two explicit practice tries, save/leave/resume, three immediate support buttons, Back/refresh, no inferred leaving or benefit, explicit outcome, archive choice, no duplicate/private host outcome",
+    "320px full before/during/after: two-action checkpoints, five chosen steps, optional check-ins, two explicit practice tries, save/leave/resume, three immediate support buttons, Back/refresh, no inferred leaving or benefit, explicit outcome, archive choice, no duplicate/private host outcome"
+  ],
+  "pageErrors": [],
+  "captures": [
+    {
+      "name": "01-plan-pause-390",
+      "prompt": "What could a break look like?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1166
+      },
+      "files": [
+        {
+          "file": "01-plan-pause-390-full.png",
+          "bytes": 227405,
+          "sha256": "3d3051a5e5bda027e50cc0b4628ae7a6542dd46362974f228a6f6c57f571cf13"
+        },
+        {
+          "file": "01-plan-pause-390-viewport.png",
+          "bytes": 170738,
+          "sha256": "6f659546ba6d4db1e0f594a5520bd8cbf21b8d0305ef7fdb1c4c7115a7699b92"
+        }
+      ]
+    },
+    {
+      "name": "02-plan-regulation-390",
+      "prompt": "What helps you find your footing?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1190
+      },
+      "files": [
+        {
+          "file": "02-plan-regulation-390-full.png",
+          "bytes": 181835,
+          "sha256": "98fbbb44dd373e88bc842343354b11308ca04229370334cb0255142cb9d0754a"
+        },
+        {
+          "file": "02-plan-regulation-390-viewport.png",
+          "bytes": 131081,
+          "sha256": "10bf93872dd725e6ec8edea7f9f948042e1bf8afecddf7020f38f59cf0a24414"
+        }
+      ]
+    },
+    {
+      "name": "03-plan-affirmation-390",
+      "prompt": "What words will you carry?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1204
+      },
+      "files": [
+        {
+          "file": "03-plan-affirmation-390-full.png",
+          "bytes": 244124,
+          "sha256": "35f9e9611587ed0e555008ddf63b52290d82d45f7c2b21eeae1adb76fdaebf49"
+        },
+        {
+          "file": "03-plan-affirmation-390-viewport.png",
+          "bytes": 174287,
+          "sha256": "bfeb29246533437c5e46e57e69324842ee052c9b80d6de1f890a0e4cc52b7828"
+        }
+      ]
+    },
+    {
+      "name": "04-plan-leave-390",
+      "prompt": "What if you need to leave?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 972
+      },
+      "files": [
+        {
+          "file": "04-plan-leave-390-full.png",
+          "bytes": 161396,
+          "sha256": "30b3cc3f40a866e37c2fa35a815f334a638150ead894dae04395da80643dcda6"
+        },
+        {
+          "file": "04-plan-leave-390-viewport.png",
+          "bytes": 154883,
+          "sha256": "dc7a351c1cdc8843ec55563e6a4ed740603ebead02c19dc88ff09d039c2a89b4"
+        }
+      ]
+    },
+    {
+      "name": "05-browser-check-ins-390",
+      "prompt": "Would check-ins help?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1135
+      },
+      "files": [
+        {
+          "file": "05-browser-check-ins-390-full.png",
+          "bytes": 201565,
+          "sha256": "a7618a5c1218b4a682e78434de81ec1714096c7bd6f2dbe5a26346952c439ed3"
+        },
+        {
+          "file": "05-browser-check-ins-390-viewport.png",
+          "bytes": 159266,
+          "sha256": "9fdcae0476b07f1de1110d71804dcc40d766a9e68272616b51ae7c790aaf0e5f"
+        }
+      ]
+    },
+    {
+      "name": "06-pocket-plan-390",
+      "prompt": "Your plan, close at hand.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1115
+      },
+      "files": [
+        {
+          "file": "06-pocket-plan-390-full.png",
+          "bytes": 178147,
+          "sha256": "941580e2a6f741e0737a06c576a8931442d6bee693b98124a639f41115cc0836"
+        },
+        {
+          "file": "06-pocket-plan-390-viewport.png",
+          "bytes": 143383,
+          "sha256": "70ebb703215210e9d83193c45d7c46516a8c6a877d107a8970f9f6be0390d3ce"
+        }
+      ]
+    },
+    {
+      "name": "07-live-390",
+      "prompt": "What do you need right now?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1391
+      },
+      "files": [
+        {
+          "file": "07-live-390-full.png",
+          "bytes": 314620,
+          "sha256": "4021895d94611889d3b589124e12f8b9e875951ae556d277026310d550e4b0ce"
+        },
+        {
+          "file": "07-live-390-viewport.png",
+          "bytes": 182993,
+          "sha256": "ae5252cb44df06f33ba6b1a65fbdbd062ebd01102330049cdcd9ef88a435dbec"
+        }
+      ]
+    },
+    {
+      "name": "08-break-390",
+      "prompt": "Make room for a pause.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1169
+      },
+      "files": [
+        {
+          "file": "08-break-390-full.png",
+          "bytes": 293594,
+          "sha256": "2e379e1802ed62cfab45456ba580d91e1dfeb436b4a58abf18aae93734e184a5"
+        },
+        {
+          "file": "08-break-390-viewport.png",
+          "bytes": 225076,
+          "sha256": "9bc6c10618e684f8106101ed0867c47123e7403526b024f9d3ea80092f74e847"
+        }
+      ]
+    },
+    {
+      "name": "09-regulate-390",
+      "prompt": "Find one steady thing.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1093
+      },
+      "files": [
+        {
+          "file": "09-regulate-390-full.png",
+          "bytes": 288979,
+          "sha256": "ca29c7ac31a65c4292d78d0eddfe67fe0fbc7723c51e6c54efbab2e39ba54801"
+        },
+        {
+          "file": "09-regulate-390-viewport.png",
+          "bytes": 243472,
+          "sha256": "bd6ca7fcd582ff061f78a6281830fa21d9fd2bc9e417914cfafe86e89d481527"
+        }
+      ]
+    },
+    {
+      "name": "10-leave-390",
+      "prompt": "Leaving, on your terms.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1081
+      },
+      "files": [
+        {
+          "file": "10-leave-390-full.png",
+          "bytes": 268560,
+          "sha256": "c445a2d3459149f2d1f3db846472409f2a0993cfb244665263d5017481b2d08d"
+        },
+        {
+          "file": "10-leave-390-viewport.png",
+          "bytes": 227815,
+          "sha256": "5b46ae35cc30cc194f76fd40b71c0bed74a5b40c67d0b5406242804ebcacee46"
+        }
+      ]
+    },
+    {
+      "name": "11-help-390",
+      "prompt": "You can ask for help.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 942
+      },
+      "files": [
+        {
+          "file": "11-help-390-full.png",
+          "bytes": 227530,
+          "sha256": "ca4fd0451b02328548ec82da3aaf0cca41ade62f4e668682f1be114c16f341c5"
+        },
+        {
+          "file": "11-help-390-viewport.png",
+          "bytes": 217526,
+          "sha256": "d645c46e9cb92ac0b7cf2413ee2ea470263f051fcbac7fa031586091d0e891bb"
+        }
+      ]
+    },
+    {
+      "name": "12-affirmation-390",
+      "prompt": "Words on your side.",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1009
+      },
+      "files": [
+        {
+          "file": "12-affirmation-390-full.png",
+          "bytes": 273671,
+          "sha256": "54e23afbb311ed2c57914b9e0bdccd63ef1455056e546c3849c3d87180a64e50"
+        },
+        {
+          "file": "12-affirmation-390-viewport.png",
+          "bytes": 251144,
+          "sha256": "350387401e9a2a58bea680f30ee797d780a12f498851bd058eddca5939632647"
+        }
+      ]
+    },
+    {
+      "name": "13-check-in-390",
+      "prompt": "How are you doing?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1018
+      },
+      "files": [
+        {
+          "file": "13-check-in-390-full.png",
+          "bytes": 197321,
+          "sha256": "a4a58f388a9b084351005b88d4cc5dd8cf8e210811e682b3b79e702734988a23"
+        },
+        {
+          "file": "13-check-in-390-viewport.png",
+          "bytes": 173274,
+          "sha256": "6fda8c6a1a5651c89a5a3149190835aed2cf0fad2727d4132b8c32e20e0b9718"
+        }
+      ]
+    },
+    {
+      "name": "14-reflection-390",
+      "prompt": "Keep a saved reflection?",
+      "dimensions": {
+        "width": 390,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 390,
+        "scrollHeight": 1038
+      },
+      "files": [
+        {
+          "file": "14-reflection-390-full.png",
+          "bytes": 198511,
+          "sha256": "e5565e8414c4c0a3f5a33df9b5cf5d78bcacf4c98bb6bd6455ca3d524ba34d84"
+        },
+        {
+          "file": "14-reflection-390-viewport.png",
+          "bytes": 182816,
+          "sha256": "bb7c345d88a90e0a4b125973e74f93f945fdc41cb869c74796bb54a7a7c48a2c"
+        }
+      ]
+    },
+    {
+      "name": "01-plan-pause-320",
+      "prompt": "What could a break look like?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1201
+      },
+      "files": [
+        {
+          "file": "01-plan-pause-320-full.png",
+          "bytes": 159384,
+          "sha256": "6e53c4b2761dfd4c077c2fe23e8674838359f3fa0525340f887c329ffddfef8b"
+        },
+        {
+          "file": "01-plan-pause-320-viewport.png",
+          "bytes": 110570,
+          "sha256": "165a9f1b0aceb8684409528af54359a8c1466dc5991a497c58a2d01be8d869a5"
+        }
+      ]
+    },
+    {
+      "name": "02-plan-regulation-320",
+      "prompt": "What helps you find your footing?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1286
+      },
+      "files": [
+        {
+          "file": "02-plan-regulation-320-full.png",
+          "bytes": 224000,
+          "sha256": "c7dba4485cdb2a68af733d55e2d433f10b0430fd41437d81c4522f72e6a14c24"
+        },
+        {
+          "file": "02-plan-regulation-320-viewport.png",
+          "bytes": 152868,
+          "sha256": "e0f3b0a501bf19cd7a0c4928fbd3aacb46e8e6ef19eebb3a130f47e81304ea88"
+        }
+      ]
+    },
+    {
+      "name": "03-plan-affirmation-320",
+      "prompt": "What words will you carry?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1280
+      },
+      "files": [
+        {
+          "file": "03-plan-affirmation-320-full.png",
+          "bytes": 228044,
+          "sha256": "dfc76d2b3c1c0f0678e44c27ede62b01751ef2122268e3a5e68772d93a188881"
+        },
+        {
+          "file": "03-plan-affirmation-320-viewport.png",
+          "bytes": 150111,
+          "sha256": "00809caabbe4849580a0865f895827a6b3055ef6d27c4ce0193b542beef205e3"
+        }
+      ]
+    },
+    {
+      "name": "04-plan-leave-320",
+      "prompt": "What if you need to leave?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1048
+      },
+      "files": [
+        {
+          "file": "04-plan-leave-320-full.png",
+          "bytes": 205098,
+          "sha256": "687cd1298a580b9c92ab5f33c90b63f77c4a6005b429df3b83fb434079d15038"
+        },
+        {
+          "file": "04-plan-leave-320-viewport.png",
+          "bytes": 188756,
+          "sha256": "c46caf51bb1f0abf025a5cf943a6258c66c7223ee7fab958bc9ace6528c1c89f"
+        }
+      ]
+    },
+    {
+      "name": "05-browser-check-ins-320",
+      "prompt": "Would check-ins help?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1193
+      },
+      "files": [
+        {
+          "file": "05-browser-check-ins-320-full.png",
+          "bytes": 190323,
+          "sha256": "926ce494a4efe3d5e24a136844f7710abeaa4357152a0ffec3084b26cfd466b0"
+        },
+        {
+          "file": "05-browser-check-ins-320-viewport.png",
+          "bytes": 136741,
+          "sha256": "5e7e38d26fc62e785df7c37157ca129274ce88e2e50ed053f582091c9a7b447f"
+        }
+      ]
+    },
+    {
+      "name": "06-pocket-plan-320",
+      "prompt": "Your plan, close at hand.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1149
+      },
+      "files": [
+        {
+          "file": "06-pocket-plan-320-full.png",
+          "bytes": 166290,
+          "sha256": "91d8e3af208728c20310366d9e911d3e174d98292792255cb8e1deb14f0664bf"
+        },
+        {
+          "file": "06-pocket-plan-320-viewport.png",
+          "bytes": 126938,
+          "sha256": "c31239b2c54d5e681734073f84eea09849e8a73d9fad5d2e122ca09d780aef23"
+        }
+      ]
+    },
+    {
+      "name": "07-live-320",
+      "prompt": "What do you need right now?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1482
+      },
+      "files": [
+        {
+          "file": "07-live-320-full.png",
+          "bytes": 273262,
+          "sha256": "8db8306a2b8d90b8edca1d8cf61f6df76a3f50f8c5945dd03b9ab794adf208aa"
+        },
+        {
+          "file": "07-live-320-viewport.png",
+          "bytes": 153438,
+          "sha256": "ad1f279daa6e4190c1fe6b2e84678e26eadcbbe02fbcd515bd4576cbd51cbed6"
+        }
+      ]
+    },
+    {
+      "name": "08-break-320",
+      "prompt": "Make room for a pause.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1218
+      },
+      "files": [
+        {
+          "file": "08-break-320-full.png",
+          "bytes": 246591,
+          "sha256": "0111212078dea10080ba2b0aa940c4266ffb812a02cbe21baee33224481850b3"
+        },
+        {
+          "file": "08-break-320-viewport.png",
+          "bytes": 182062,
+          "sha256": "b495fd707ebc98ce833e2d0085247f78a45deea90fdfa317e5afdcf049bebee3"
+        }
+      ]
+    },
+    {
+      "name": "09-regulate-320",
+      "prompt": "Find one steady thing.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1133
+      },
+      "files": [
+        {
+          "file": "09-regulate-320-full.png",
+          "bytes": 267223,
+          "sha256": "65b5f72de17bb3cf5858b6e98db3c54796ea252699897d4c674bb1c1953428af"
+        },
+        {
+          "file": "09-regulate-320-viewport.png",
+          "bytes": 213882,
+          "sha256": "3a1d4ff81b54c620e5c75ab9b5030c0a07f9f0a7641fe8cc70b270e95a0f2bc5"
+        }
+      ]
+    },
+    {
+      "name": "10-leave-320",
+      "prompt": "Leaving, on your terms.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1142
+      },
+      "files": [
+        {
+          "file": "10-leave-320-full.png",
+          "bytes": 232336,
+          "sha256": "1fa22b901c487d302b216de48a9829deb08dbb9ecebcbb0c33ca43b7f7b3d860"
+        },
+        {
+          "file": "10-leave-320-viewport.png",
+          "bytes": 182227,
+          "sha256": "23077e6ab70b4dc1247182a262e3a082bc519d647304143f66cec1d77646ba70"
+        }
+      ]
+    },
+    {
+      "name": "11-help-320",
+      "prompt": "You can ask for help.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 971
+      },
+      "files": [
+        {
+          "file": "11-help-320-full.png",
+          "bytes": 207400,
+          "sha256": "f07ecee07b3abc137d4b036c249bc74db9e5df399a752cb19605f3fe19326064"
+        },
+        {
+          "file": "11-help-320-viewport.png",
+          "bytes": 193990,
+          "sha256": "49e34387a87f2cdcd690a6f1f33d5fc98e47382bca3d7b519487561225c6369d"
+        }
+      ]
+    },
+    {
+      "name": "12-affirmation-320",
+      "prompt": "Words on your side.",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1020
+      },
+      "files": [
+        {
+          "file": "12-affirmation-320-full.png",
+          "bytes": 222028,
+          "sha256": "448ee357ed8ef5eb8e8297cfde8421323610d0cccffa2e4e777678c6d2bfaa55"
+        },
+        {
+          "file": "12-affirmation-320-viewport.png",
+          "bytes": 204185,
+          "sha256": "c3349c5606236cf923b28c5cefcf16dab02fb715f64421d4172376df4b4379cb"
+        }
+      ]
+    },
+    {
+      "name": "13-check-in-320",
+      "prompt": "How are you doing?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1034
+      },
+      "files": [
+        {
+          "file": "13-check-in-320-full.png",
+          "bytes": 165489,
+          "sha256": "82627ef1bbe4c601d5fae17c82300fd15089a73f49a3a7dd0fe54d4a67f4b1ab"
+        },
+        {
+          "file": "13-check-in-320-viewport.png",
+          "bytes": 145816,
+          "sha256": "b171eb24ca94491a28a6827011046e4cabb848f1fd1c22a9e031f3730993fb81"
+        }
+      ]
+    },
+    {
+      "name": "14-reflection-320",
+      "prompt": "Keep a saved reflection?",
+      "dimensions": {
+        "width": 320,
+        "height": 844,
+        "rootFontSize": "16px",
+        "scrollWidth": 320,
+        "scrollHeight": 1046
+      },
+      "files": [
+        {
+          "file": "14-reflection-320-full.png",
+          "bytes": 131432,
+          "sha256": "a80940179e7a694c4a054db9d0d9be63e7bb084518f4e10ff542810091997525"
+        },
+        {
+          "file": "14-reflection-320-viewport.png",
+          "bytes": 119189,
+          "sha256": "c10c2b7ccf6cb31a209836cdb4f4bb8a1bb9b46f1c0e1ba621319ff56da6a16a"
+        }
+      ]
+    }
+  ],
+  "provenance": "Synthetic user-authored examples and explicit choices. No real user outcomes, notifications or contacts. Native permission/scheduling verified separately with mocked approved adapter; physical OS delivery not tested."
+}

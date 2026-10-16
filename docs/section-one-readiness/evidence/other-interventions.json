@@ -1,0 +1,1868 @@
+[
+  {
+    "id": "factCheck",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 985,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1633,
+        "label": "I made a mistake.",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 2122,
+        "label": "Continue",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2678,
+        "label": "7",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3258,
+        "label": "Interpretation\nOne possible meaning",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3428,
+        "label": "Type in What makes it seem true?",
+        "kind": "typing",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3876,
+        "label": "Continue",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4159,
+        "label": "Type in What points another way?",
+        "kind": "typing",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4608,
+        "label": "Continue",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5215,
+        "label": "Yes, this fits",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nWhat points another way\nI can send the right one.\n\nWords you confirmed\nMy original thought: \u201cI made a mistake.\u201d Facts and supporting details I want to keep: I sent the wrong attachment. Other details to hold alongside it: I can send the right one. I can distinguish what is known from what is still uncertain."
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+      },
+      {
+        "firstAppearanceAt": 7,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+      },
+      {
+        "firstAppearanceAt": 10,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nWhat points another way\nI can send the right one.\n\nWords you confirmed\nMy original thought: \u201cI made a mistake.\u201d Facts and supporting details I want to keep: I sent the wrong attachment. Other details to hold alongside it: I can send the right one. I can distinguish what is known from what is still uncertain."
+      }
+    ],
+    "screens": [
+      {
+        "name": "evidence",
+        "headings": [
+          "Does this statement fit?"
+        ]
+      },
+      {
+        "name": "balanced",
+        "headings": [
+          "How true does the original thought feel right now?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "evidence",
+        "unnamedButtons": []
+      },
+      {
+        "name": "balanced",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "happyBump",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 945,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1400,
+        "label": "Start",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1854,
+        "label": "Confirm energy: 5",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2329,
+        "label": "I've had some water",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3005,
+        "label": "I did that",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3472,
+        "label": "1 min",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 4060,
+        "label": "Walk indoors",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4526,
+        "label": "I took a shorter walk",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 5173,
+        "label": "Skip ahead",
+        "kind": "navigation",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5626,
+        "label": "Put one thing away",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 6462,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 6952,
+        "label": "Done",
+        "kind": "decision or confirmed practice",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+          }
+        ]
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 7700,
+        "label": "I kept going",
+        "kind": "decision or confirmed practice",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+          }
+        ]
+      },
+      {
+        "sequence": 14,
+        "elapsedMs": 8161,
+        "label": "Confirm energy: 5",
+        "kind": "decision or confirmed practice",
+        "progress": 10,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 10,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 15,
+        "elapsedMs": 8837,
+        "label": "No change",
+        "kind": "decision or confirmed practice",
+        "progress": 11,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 11,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+      },
+      {
+        "firstAppearanceAt": 12,
+        "progress": 8,
+        "pair": 4,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+      },
+      {
+        "firstAppearanceAt": 14,
+        "progress": 10,
+        "pair": 5,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+      }
+    ],
+    "screens": [
+      {
+        "name": "unchanged-energy",
+        "headings": [
+          "A moment to check in."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "unchanged-energy",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "nextAction",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 936,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1416,
+        "label": "Tidy my desk",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1888,
+        "label": "Done \u2713",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "REAL STEPS, MADE VISIBLE\n\nThe task you chose\nTidy my desk\n\nYou marked this as done\nMove one item into place"
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2998,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "REAL STEPS, MADE VISIBLE\n\nThe task you chose\nTidy my desk\n\nYou marked this as done\nMove one item into place"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "REAL STEPS, MADE VISIBLE\n\nThe task you chose\nTidy my desk\n\nYou marked this as done\nMove one item into place"
+      }
+    ],
+    "screens": [
+      {
+        "name": "step-complete",
+        "headings": [
+          "Your task,as it stands."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "step-complete",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "tomorrowParking",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 1068,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1582,
+        "label": "It can wait",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1748,
+        "label": "Type in What can wait?",
+        "kind": "typing",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2215,
+        "label": "Ready to put it away",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3225,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+      }
+    ],
+    "screens": [
+      {
+        "name": "draft",
+        "headings": [
+          "Close it for tonight."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "draft",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "grounding54321V2",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 973,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1465,
+        "label": "Double tap noticed (one advancement)",
+        "kind": "confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1941,
+        "label": "I noticed \u2014 next sense",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2551,
+        "label": "I noticed \u2014 next sense",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3010,
+        "label": "I noticed \u2014 next sense",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nThree things you can hear\n\nYou marked as noticed\nTwo things you can smell"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 4264,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nThree things you can hear\n\nYou marked as noticed\nTwo things you can smell"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+      },
+      {
+        "firstAppearanceAt": 5,
+        "progress": 4,
+        "pair": 2,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nThree things you can hear\n\nYou marked as noticed\nTwo things you can smell"
+      }
+    ],
+    "screens": [
+      {
+        "name": "four-senses",
+        "headings": [
+          "One thing you can taste"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "four-senses",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "nightChannel",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 1035,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1509,
+        "label": "The Night Desk\nGenerated noise preview \u00b7 no voices",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1965,
+        "label": "15 minutes",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": null,
+            "text": "YOUR LISTENING CHOICE\n15\nmin\nThe Night Desk\n\n15 minutes \u00b7 Generated noise \u00b7 stops automatically\n\nReady when you are. Nothing is playing yet."
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2537,
+        "label": "Tune In",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": []
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR LISTENING CHOICE\n15\nmin\nThe Night Desk\n\n15 minutes \u00b7 Generated noise \u00b7 stops automatically\n\nReady when you are. Nothing is playing yet."
+      }
+    ],
+    "screens": [
+      {
+        "name": "listening",
+        "headings": [
+          "Night Channel",
+          "Rest your attention on the sound."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "listening",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "goodMap",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 987,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1473,
+        "label": "Start sorting",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 2147,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2806,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3609,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 4265,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nclose with my person\nEspecially important\n\nwork that matters\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 4873,
+        "label": "Undo",
+        "kind": "navigation",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4875,
+        "label": "Undo removed the fourth sort",
+        "kind": "undo",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR MAP IS TAKING SHAPE\n\nclose with my person\nEspecially important\n\nwork that matters\nEspecially important"
+      }
+    ],
+    "screens": [
+      {
+        "name": "undo",
+        "headings": []
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "undo",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "factCheck",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 938,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1469,
+        "label": "I made a mistake.",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1928,
+        "label": "Continue",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2469,
+        "label": "7",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3036,
+        "label": "Interpretation\nOne possible meaning",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3200,
+        "label": "Type in What makes it seem true?",
+        "kind": "typing",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3642,
+        "label": "Continue",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 3960,
+        "label": "Type in What points another way?",
+        "kind": "typing",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4442,
+        "label": "Continue",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5005,
+        "label": "Yes, this fits",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nWhat points another way\nI can send the right one.\n\nWords you confirmed\nMy original thought: \u201cI made a mistake.\u201d Facts and supporting details I want to keep: I sent the wrong attachment. Other details to hold alongside it: I can send the right one. I can distinguish what is known from what is still uncertain."
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nThe thought you brought\nI made a mistake.\n\nHow true it felt\n7 / 10"
+      },
+      {
+        "firstAppearanceAt": 7,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nInterpretation\nI made a mistake.\n\nWhat supports it\nI sent the wrong attachment."
+      },
+      {
+        "firstAppearanceAt": 10,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR THOUGHT, IN PERSPECTIVE\n\nWhat points another way\nI can send the right one.\n\nWords you confirmed\nMy original thought: \u201cI made a mistake.\u201d Facts and supporting details I want to keep: I sent the wrong attachment. Other details to hold alongside it: I can send the right one. I can distinguish what is known from what is still uncertain."
+      }
+    ],
+    "screens": [
+      {
+        "name": "evidence",
+        "headings": [
+          "Does this statement fit?"
+        ]
+      },
+      {
+        "name": "balanced",
+        "headings": [
+          "How true does the original thought feel right now?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "evidence",
+        "unnamedButtons": []
+      },
+      {
+        "name": "balanced",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "happyBump",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 998,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1456,
+        "label": "Start",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1901,
+        "label": "Confirm energy: 5",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2433,
+        "label": "I've had some water",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3155,
+        "label": "I did that",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3623,
+        "label": "1 min",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 4240,
+        "label": "Walk indoors",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4715,
+        "label": "I took a shorter walk",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 5380,
+        "label": "Skip ahead",
+        "kind": "navigation",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5842,
+        "label": "Put one thing away",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 6697,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 7165,
+        "label": "Done",
+        "kind": "decision or confirmed practice",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+          }
+        ]
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 7871,
+        "label": "I kept going",
+        "kind": "decision or confirmed practice",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+          }
+        ]
+      },
+      {
+        "sequence": 14,
+        "elapsedMs": 8348,
+        "label": "Confirm energy: 5",
+        "kind": "decision or confirmed practice",
+        "progress": 10,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 10,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+          }
+        ]
+      },
+      {
+        "sequence": 15,
+        "elapsedMs": 9104,
+        "label": "No change",
+        "kind": "decision or confirmed practice",
+        "progress": 11,
+        "expectedPair": 5,
+        "receipts": [
+          {
+            "pair": 5,
+            "count": 11,
+            "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nStarting energy\n5 / 10\n\nYou tried\nSome water"
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYou tried\nA change of light or air\n\nTime you chose\n1 minute"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour walk route\nIndoors\n\nYou reported\nA shorter walk"
+      },
+      {
+        "firstAppearanceAt": 12,
+        "progress": 8,
+        "pair": 4,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nYour small action\nPut one thing away\n\nYou reported\nAction done"
+      },
+      {
+        "firstAppearanceAt": 14,
+        "progress": 10,
+        "pair": 5,
+        "text": "YOUR COMBINATION, TAKING SHAPE\n\nSomething you chose to notice\nI kept going\n\nEnergy now\n5 / 10"
+      }
+    ],
+    "screens": [
+      {
+        "name": "unchanged-energy",
+        "headings": [
+          "A moment to check in."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "unchanged-energy",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "nextAction",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 934,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1436,
+        "label": "Tidy my desk",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1890,
+        "label": "Done \u2713",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "REAL STEPS, MADE VISIBLE\n\nThe task you chose\nTidy my desk\n\nYou marked this as done\nMove one item into place"
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2995,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "REAL STEPS, MADE VISIBLE\n\nThe task you chose\nTidy my desk\n\nYou marked this as done\nMove one item into place"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "REAL STEPS, MADE VISIBLE\n\nThe task you chose\nTidy my desk\n\nYou marked this as done\nMove one item into place"
+      }
+    ],
+    "screens": [
+      {
+        "name": "step-complete",
+        "headings": [
+          "Your task,as it stands."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "step-complete",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "tomorrowParking",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 952,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1446,
+        "label": "It can wait",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1613,
+        "label": "Type in What can wait?",
+        "kind": "typing",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2064,
+        "label": "Ready to put it away",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3042,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "READY FOR YOUR DECISION\n\nYou decided\nThis can safely wait\n\nYour note, still a draft\nCheck the project notes tomorrow"
+      }
+    ],
+    "screens": [
+      {
+        "name": "draft",
+        "headings": [
+          "Close it for tonight."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "draft",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "grounding54321V2",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 963,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1447,
+        "label": "Double tap noticed (one advancement)",
+        "kind": "confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1909,
+        "label": "I noticed \u2014 next sense",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2477,
+        "label": "I noticed \u2014 next sense",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2950,
+        "label": "I noticed \u2014 next sense",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nThree things you can hear\n\nYou marked as noticed\nTwo things you can smell"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 4056,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nThree things you can hear\n\nYou marked as noticed\nTwo things you can smell"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nFive things you can see\n\nYou marked as noticed\nFour things you can feel"
+      },
+      {
+        "firstAppearanceAt": 5,
+        "progress": 4,
+        "pair": 2,
+        "text": "A LITTLE MORE OF THE ROOM\n\nYou marked as noticed\nThree things you can hear\n\nYou marked as noticed\nTwo things you can smell"
+      }
+    ],
+    "screens": [
+      {
+        "name": "four-senses",
+        "headings": [
+          "One thing you can taste"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "four-senses",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "nightChannel",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 1021,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1478,
+        "label": "The Night Desk\nGenerated noise preview \u00b7 no voices",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1917,
+        "label": "15 minutes",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": null,
+            "text": "YOUR LISTENING CHOICE\n15\nmin\nThe Night Desk\n\n15 minutes \u00b7 Generated noise \u00b7 stops automatically\n\nReady when you are. Nothing is playing yet."
+          }
+        ]
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2462,
+        "label": "Tune In",
+        "kind": "navigation",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": []
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 3,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR LISTENING CHOICE\n15\nmin\nThe Night Desk\n\n15 minutes \u00b7 Generated noise \u00b7 stops automatically\n\nReady when you are. Nothing is playing yet."
+      }
+    ],
+    "screens": [
+      {
+        "name": "listening",
+        "headings": [
+          "Night Channel",
+          "Rest your attention on the sound."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "listening",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "goodMap",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 964,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1431,
+        "label": "Start sorting",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 2077,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2733,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3528,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 4194,
+        "label": "Sort: I need this",
+        "kind": "decision",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nclose with my person\nEspecially important\n\nwork that matters\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 5028,
+        "label": "Undo",
+        "kind": "navigation",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 5044,
+        "label": "Undo removed the fourth sort",
+        "kind": "undo",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR MAP IS TAKING SHAPE\n\nmoving my body\nEspecially important\n\na proper catch-up\nEspecially important"
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR MAP IS TAKING SHAPE\n\nclose with my person\nEspecially important\n\nwork that matters\nEspecially important"
+      }
+    ],
+    "screens": [
+      {
+        "name": "undo",
+        "headings": []
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "undo",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  }
+]

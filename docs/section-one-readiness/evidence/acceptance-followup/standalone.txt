@@ -1,0 +1,7 @@
+PASS Night 320: one sound/file/timer step, keyboard, browser Back, explicit Back, refresh paused, real generated playback, optional settings/save, invalidated file reattachment and honest unavailable provider
+PASS Signal 320: original scene/alternating targets, prominent one instruction, keyboard, pause/reload/repeat and retained optional closing feeling
+PASS Vector 320: original easy games, letters retained across reload, sequential actual questions, recoverable Back with actual answer retained, interruption paused, one optional ending question
+PASS Night 390: one sound/file/timer step, keyboard, browser Back, explicit Back, refresh paused, real generated playback, optional settings/save, invalidated file reattachment and honest unavailable provider
+PASS Signal 390: original scene/alternating targets, prominent one instruction, keyboard, pause/reload/repeat and retained optional closing feeling
+PASS Vector 390: original easy games, letters retained across reload, sequential actual questions, recoverable Back with actual answer retained, interruption paused, one optional ending question
+PASS all standalone one-question checks

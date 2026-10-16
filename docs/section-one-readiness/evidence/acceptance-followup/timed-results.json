@@ -1,0 +1,43 @@
+{
+  "checks": [
+    {
+      "practice": "Night Channel",
+      "width": 320,
+      "simulatedMinutes": 15,
+      "timerEnded": true
+    },
+    {
+      "practice": "Box Breathing",
+      "width": 320,
+      "simulatedClock": true,
+      "fullTimedPractice": true
+    },
+    {
+      "practice": "Signal Lock",
+      "width": 320,
+      "actualPairs": 12,
+      "completedScenes": 2,
+      "outcomeRetained": true
+    },
+    {
+      "practice": "Night Channel",
+      "width": 390,
+      "simulatedMinutes": 15,
+      "timerEnded": true
+    },
+    {
+      "practice": "Box Breathing",
+      "width": 390,
+      "simulatedClock": true,
+      "fullTimedPractice": true
+    },
+    {
+      "practice": "Signal Lock",
+      "width": 390,
+      "actualPairs": 12,
+      "completedScenes": 2,
+      "outcomeRetained": true
+    }
+  ],
+  "errors": []
+}

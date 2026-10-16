@@ -1,0 +1,3 @@
+PASS Happy Bump 320 6 3 paused walk restored, partial actions honest, saved cue/delete, blank shared endpoint
+PASS Happy Bump 390 6 6 paused walk restored, partial actions honest, saved cue/delete, blank shared endpoint
+PASS Happy Bump 320 None None paused walk restored, partial actions honest, saved cue/delete, blank shared endpoint

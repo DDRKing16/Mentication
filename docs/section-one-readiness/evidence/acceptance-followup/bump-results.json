@@ -1,0 +1,323 @@
+{
+  "checks": [
+    {
+      "width": 320,
+      "energyStart": 6,
+      "energyEnd": 3,
+      "record": {
+        "id": "8a97b5cd-22e8-4880-890f-e8c230aeb1df",
+        "created_date": "2026-10-16T18:13:14.607Z",
+        "state": "lift",
+        "state_label": "Lift",
+        "direction": "lift",
+        "direction_label": "Lift",
+        "intensity_start": 6,
+        "goal_baseline": {
+          "question": "How is your mood right now?",
+          "scale": "mood",
+          "left": "Very low",
+          "right": "Great",
+          "higherIsBetter": true,
+          "direction": "lift",
+          "min": 0,
+          "max": 10,
+          "value": 6,
+          "answered": true
+        },
+        "intensity_end": null,
+        "where_felt": "both",
+        "time_min": 5,
+        "audio": "no",
+        "movement": "seated",
+        "immediate": false,
+        "pathway": [
+          "happyBump"
+        ],
+        "completed_pathway": [
+          "happyBump"
+        ],
+        "attempts": [
+          {
+            "intervention_id": "happyBump",
+            "mechanism": "stacked-behavioural-activation",
+            "recommended_rank": 1,
+            "started_at": "2026-10-16T18:13:14.606Z",
+            "ended_at": "2026-10-16T18:13:14.606Z",
+            "completed_percentage": 1,
+            "response": "worse",
+            "exit_reason": "completed",
+            "context_key": "lift|both|4-6|both|home|standard|distress:4-6",
+            "helpfulness_response": "worse"
+          }
+        ],
+        "context_snapshot": {
+          "goal_baseline": {
+            "question": "How is your mood right now?",
+            "scale": "mood",
+            "left": "Very low",
+            "right": "Great",
+            "higherIsBetter": true,
+            "direction": "lift",
+            "min": 0,
+            "max": 10,
+            "value": 6,
+            "answered": true
+          },
+          "direction": "lift",
+          "directionLabel": "Lift",
+          "immediate": false,
+          "intensity": 6,
+          "whereFelt": "both",
+          "distress": 4,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "acute": false,
+          "disconnected": false,
+          "timeMin": 5,
+          "audio": "no",
+          "movement": "seated",
+          "location": "home",
+          "situation": null,
+          "awake_reason": null,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "where_felt": "both"
+        },
+        "recommendation_engine_version": "3.4.0-current-catalogue",
+        "duration_sec": 14,
+        "discreet": false,
+        "eyes_open": false,
+        "no_breathing": false,
+        "no_audio": false,
+        "bedtime": false,
+        "intervention_outcome": {
+          "scale": "energy",
+          "start": 6,
+          "end": 3,
+          "shift": -3,
+          "helpfulness": "worse"
+        },
+        "updated_date": "2026-10-16T18:13:14.609Z",
+        "storage_scope": "device"
+      }
+    },
+    {
+      "width": 390,
+      "energyStart": 6,
+      "energyEnd": 6,
+      "record": {
+        "id": "6ab68c74-33d1-492a-a340-412bcdfa07ed",
+        "created_date": "2026-10-16T18:13:30.353Z",
+        "state": "lift",
+        "state_label": "Lift",
+        "direction": "lift",
+        "direction_label": "Lift",
+        "intensity_start": 6,
+        "goal_baseline": {
+          "question": "How is your mood right now?",
+          "scale": "mood",
+          "left": "Very low",
+          "right": "Great",
+          "higherIsBetter": true,
+          "direction": "lift",
+          "min": 0,
+          "max": 10,
+          "value": 6,
+          "answered": true
+        },
+        "intensity_end": null,
+        "where_felt": "both",
+        "time_min": 5,
+        "audio": "no",
+        "movement": "seated",
+        "immediate": false,
+        "pathway": [
+          "happyBump"
+        ],
+        "completed_pathway": [
+          "happyBump"
+        ],
+        "attempts": [
+          {
+            "intervention_id": "happyBump",
+            "mechanism": "stacked-behavioural-activation",
+            "recommended_rank": 1,
+            "started_at": "2026-10-16T18:13:30.352Z",
+            "ended_at": "2026-10-16T18:13:30.352Z",
+            "completed_percentage": 1,
+            "response": "same",
+            "exit_reason": "completed",
+            "context_key": "lift|both|4-6|both|home|standard|distress:4-6",
+            "helpfulness_response": "same"
+          }
+        ],
+        "context_snapshot": {
+          "goal_baseline": {
+            "question": "How is your mood right now?",
+            "scale": "mood",
+            "left": "Very low",
+            "right": "Great",
+            "higherIsBetter": true,
+            "direction": "lift",
+            "min": 0,
+            "max": 10,
+            "value": 6,
+            "answered": true
+          },
+          "direction": "lift",
+          "directionLabel": "Lift",
+          "immediate": false,
+          "intensity": 6,
+          "whereFelt": "both",
+          "distress": 4,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "acute": false,
+          "disconnected": false,
+          "timeMin": 5,
+          "audio": "no",
+          "movement": "seated",
+          "location": "home",
+          "situation": null,
+          "awake_reason": null,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "where_felt": "both"
+        },
+        "recommendation_engine_version": "3.4.0-current-catalogue",
+        "duration_sec": 14,
+        "discreet": false,
+        "eyes_open": false,
+        "no_breathing": false,
+        "no_audio": false,
+        "bedtime": false,
+        "intervention_outcome": {
+          "scale": "energy",
+          "start": 6,
+          "end": 6,
+          "shift": 0,
+          "helpfulness": "same"
+        },
+        "updated_date": "2026-10-16T18:13:30.354Z",
+        "storage_scope": "device"
+      }
+    },
+    {
+      "width": 320,
+      "energyStart": null,
+      "energyEnd": null,
+      "record": {
+        "id": "afc23863-bc1e-4b10-abad-41d90e8a9f02",
+        "created_date": "2026-10-16T18:13:45.869Z",
+        "state": "lift",
+        "state_label": "Lift",
+        "direction": "lift",
+        "direction_label": "Lift",
+        "intensity_start": 6,
+        "goal_baseline": {
+          "question": "How is your mood right now?",
+          "scale": "mood",
+          "left": "Very low",
+          "right": "Great",
+          "higherIsBetter": true,
+          "direction": "lift",
+          "min": 0,
+          "max": 10,
+          "value": 6,
+          "answered": true
+        },
+        "intensity_end": null,
+        "where_felt": "both",
+        "time_min": 5,
+        "audio": "no",
+        "movement": "seated",
+        "immediate": false,
+        "pathway": [
+          "happyBump"
+        ],
+        "completed_pathway": [
+          "happyBump"
+        ],
+        "attempts": [
+          {
+            "intervention_id": "happyBump",
+            "mechanism": "stacked-behavioural-activation",
+            "recommended_rank": 1,
+            "started_at": "2026-10-16T18:13:45.868Z",
+            "ended_at": "2026-10-16T18:13:45.868Z",
+            "completed_percentage": 1,
+            "response": "same",
+            "exit_reason": "completed",
+            "context_key": "lift|both|4-6|both|home|standard|distress:4-6",
+            "helpfulness_response": "same"
+          }
+        ],
+        "context_snapshot": {
+          "goal_baseline": {
+            "question": "How is your mood right now?",
+            "scale": "mood",
+            "left": "Very low",
+            "right": "Great",
+            "higherIsBetter": true,
+            "direction": "lift",
+            "min": 0,
+            "max": 10,
+            "value": 6,
+            "answered": true
+          },
+          "direction": "lift",
+          "directionLabel": "Lift",
+          "immediate": false,
+          "intensity": 6,
+          "whereFelt": "both",
+          "distress": 4,
+          "contraindicationTags": [],
+          "unsuitableSubstates": [],
+          "requiredResources": [],
+          "acute": false,
+          "disconnected": false,
+          "timeMin": 5,
+          "audio": "no",
+          "movement": "seated",
+          "location": "home",
+          "situation": null,
+          "awake_reason": null,
+          "discreet": false,
+          "eyesOpen": false,
+          "noBreathing": false,
+          "noAudio": false,
+          "bedtime": false,
+          "subtype": null,
+          "where_felt": "both"
+        },
+        "recommendation_engine_version": "3.4.0-current-catalogue",
+        "duration_sec": 14,
+        "discreet": false,
+        "eyes_open": false,
+        "no_breathing": false,
+        "no_audio": false,
+        "bedtime": false,
+        "intervention_outcome": {
+          "scale": "energy",
+          "start": null,
+          "end": null,
+          "shift": null,
+          "helpfulness": "same"
+        },
+        "updated_date": "2026-10-16T18:13:45.870Z",
+        "storage_scope": "device"
+      }
+    }
+  ],
+  "errors": []
+}

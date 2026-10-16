@@ -1,0 +1,198 @@
+{
+  "status": "blocked",
+  "preset": {
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "model_id": "eleven_v3",
+    "stability": 0.35,
+    "style": 0.7,
+    "use_speaker_boost": false,
+    "delivery_cue": "[warmly, smiling, gently] ",
+    "playback_rate": 0.8
+  },
+  "uniqueRecordings": 18,
+  "cueKeys": 19,
+  "missingRecordings": 18,
+  "recordings": [
+    {
+      "keys": [
+        "place-hand"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-crown"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-brow"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-sideEye"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-underEye"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-nose"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-chin"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-collar"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "place-arm"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "tension-setup"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "tension-reminder"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "worry-setup"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "worry-reminder"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "overwhelm-setup"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "overwhelm-reminder"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "grounding-setup",
+        "grounding-reminder"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "tap"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    },
+    {
+      "keys": [
+        "rest"
+      ],
+      "scriptMatches": true,
+      "approvedEntry": false,
+      "assetExists": false,
+      "aligned": false,
+      "ready": false
+    }
+  ]
+}

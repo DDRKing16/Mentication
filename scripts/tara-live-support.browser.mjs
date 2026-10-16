@@ -32,8 +32,9 @@ async function firstMove(page) {
   assert.equal(await page.locator('[data-checkpoint]').count(), 0, 'One progress action is not a checkpoint');
   await click(page, 'Name this moment (optional)'); await page.getByRole('textbox', { name: 'Name this moment', exact: true }).fill('A difficult conversation about extra work'); await click(page, 'Keep this wording');
   await click(page, 'A conversation'); await screen(page, 'challenge');
-  assert.equal(await page.locator('[data-checkpoint="1"]').count(), 1, 'Two actual choices reveal a meaningful checkpoint');
+  assert.equal(await page.locator('[data-checkpoint]').count(), 0, 'Timing and editing a label do not earn practice credit');
   await click(page, 'Holding a boundary'); await screen(page, 'prediction');
+  assert.equal(await page.locator('[data-checkpoint="1"]').count(), 1, 'Situation and challenge reveal their actual pair');
   assert.equal(await page.getByRole('textbox').inputValue(), '', 'No assumed worry');
   await page.getByRole('textbox').fill('They may disagree with my boundary.'); await click(page, 'Continue'); await screen(page, 'move');
   await choice(page, 'Name one clear limit'); await screen(page, 'move-confirm');

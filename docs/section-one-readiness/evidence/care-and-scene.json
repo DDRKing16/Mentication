@@ -1,0 +1,1592 @@
+[
+  {
+    "id": "selfCompassion",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 994,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1567,
+        "label": "Begin",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 2009,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2463,
+        "label": "I messed everything up.",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR CARE, TAKING SHAPE\n\nYour starting point\n6 / 10\n\nYour words\nI messed everything up."
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 3033,
+        "label": "I made a mistake. I can care for myself and repair what I can.",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3503,
+        "label": "I tried saying these words",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR CARE, TAKING SHAPE\n\nA voice on your side\nI made a mistake. I can care for myself and repair what I can.\n\nYou marked this as tried\nSaying the caring words"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 4110,
+        "label": "Give myself a pause\nMake space for my capacity.",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR CARE, TAKING SHAPE\n\nA voice on your side\nI made a mistake. I can care for myself and repair what I can.\n\nYou marked this as tried\nSaying the caring words"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4626,
+        "label": "Keep this as my next step\nA plan for what comes next.",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR CARE, TAKING SHAPE\n\nYour next small step\nTake a two-minute pause\n\nPlanned or done\nA plan, ready when you are"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 5199,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "When the critic says\n\nI messed everything up.\n\nMy caring response\n\nI made a mistake. I can care for myself and repair what I can.\n\nOne act of care · Planned\n\nTake a two-minute pause"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5751,
+        "label": "Save my card on this device",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "When the critic says\n\nI messed everything up.\n\nMy caring response\n\nI made a mistake. I can care for myself and repair what I can.\n\nOne act of care · Planned\n\nTake a two-minute pause"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 6608,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": []
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 7085,
+        "label": "Resume practice",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "When the critic says\n\nI messed everything up.\n\nMy caring response\n\nI made a mistake. I can care for myself and repair what I can.\n\nOne act of care · Planned\n\nTake a two-minute pause"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR CARE, TAKING SHAPE\n\nYour starting point\n6 / 10\n\nYour words\nI messed everything up."
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR CARE, TAKING SHAPE\n\nA voice on your side\nI made a mistake. I can care for myself and repair what I can.\n\nYou marked this as tried\nSaying the caring words"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR CARE, TAKING SHAPE\n\nYour next small step\nTake a two-minute pause\n\nPlanned or done\nA plan, ready when you are"
+      }
+    ],
+    "screens": [
+      {
+        "name": "carry-card",
+        "headings": [
+          "Keep care close."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "carry-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "unhook",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 933,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1393,
+        "label": "Begin",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1828,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2287,
+        "label": "Something will go wrong.",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "A THOUGHT AND A CHOICE\n\nYour starting point\n6 / 10\n\nYour words\nSomething will go wrong."
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2784,
+        "label": "Predicting\nWhat might happen",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3221,
+        "label": "I tried saying it this way",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "A THOUGHT AND A CHOICE\n\nA different way to hear it\nMy mind is predicting: “Something will go wrong.”\n\nYou marked this as tried\nHearing the words as a thought"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3753,
+        "label": "Read one sentence\nReturn to the words in front of me.",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "A THOUGHT AND A CHOICE\n\nA different way to hear it\nMy mind is predicting: “Something will go wrong.”\n\nYou marked this as tried\nHearing the words as a thought"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4195,
+        "label": "Something I can see",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4754,
+        "label": "I tried returning attention",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5184,
+        "label": "Continue to my next step",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 5625,
+        "label": "Keep this as my next step\nA plan for what comes next.",
+        "kind": "decision or confirmed practice",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "A THOUGHT AND A CHOICE\n\nYou marked a return of attention\nRead the next sentence\n\nPlanned or done\nA plan, ready when you are"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 6153,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "When my mind says\n\nSomething will go wrong.\n\nMy noticing phrase\n\nMy mind is predicting: “Something will go wrong.”\n\nAn anchor I chose\n\nAn ordinary object\n\nWhere I return my attention · Planned\n\nRead the next sentence"
+          }
+        ]
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 6738,
+        "label": "Save my card on this device",
+        "kind": "navigation",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "When my mind says\n\nSomething will go wrong.\n\nMy noticing phrase\n\nMy mind is predicting: “Something will go wrong.”\n\nAn anchor I chose\n\nAn ordinary object\n\nWhere I return my attention · Planned\n\nRead the next sentence"
+          }
+        ]
+      },
+      {
+        "sequence": 14,
+        "elapsedMs": 7576,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": []
+      },
+      {
+        "sequence": 15,
+        "elapsedMs": 8020,
+        "label": "Resume practice",
+        "kind": "navigation",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "When my mind says\n\nSomething will go wrong.\n\nMy noticing phrase\n\nMy mind is predicting: “Something will go wrong.”\n\nAn anchor I chose\n\nAn ordinary object\n\nWhere I return my attention · Planned\n\nRead the next sentence"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "A THOUGHT AND A CHOICE\n\nYour starting point\n6 / 10\n\nYour words\nSomething will go wrong."
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "A THOUGHT AND A CHOICE\n\nA different way to hear it\nMy mind is predicting: “Something will go wrong.”\n\nYou marked this as tried\nHearing the words as a thought"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+      },
+      {
+        "firstAppearanceAt": 11,
+        "progress": 8,
+        "pair": 4,
+        "text": "A THOUGHT AND A CHOICE\n\nYou marked a return of attention\nRead the next sentence\n\nPlanned or done\nA plan, ready when you are"
+      }
+    ],
+    "screens": [
+      {
+        "name": "carry-card",
+        "headings": [
+          "A way back to what you choose."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "carry-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "makeRoom",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 930,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1383,
+        "label": "Begin",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1834,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2287,
+        "label": "Sadness",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "ROOM FOR BOTH\n\nYour starting point\n6 / 10\n\nYou named\nSadness"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2824,
+        "label": "Something I can see",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3258,
+        "label": "Try a gentle moment with this anchor",
+        "kind": "navigation",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3696,
+        "label": "I tried letting the feeling be here",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "ROOM FOR BOTH\n\nA place for attention\nOne ordinary object\n\nYou marked this as tried\nAllowing the feeling, with your anchor here"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4238,
+        "label": "Get a glass of water\nAn ordinary act of care.",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "ROOM FOR BOTH\n\nA place for attention\nOne ordinary object\n\nYou marked this as tried\nAllowing the feeling, with your anchor here"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4676,
+        "label": "Keep this as my next step\nA plan for what comes next.",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "ROOM FOR BOTH\n\nYour next small step\nGet a glass of water\n\nPlanned or done\nA plan, ready when you are"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5176,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "The feeling I noticed\n\nSadness\n\nA phrase to make room\n\nI can give sadness a little room and stay connected to what is around me.\n\nAn anchor I chose\n\nAn ordinary object\n\nWhat I choose with it here · Planned\n\nGet a glass of water"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 5718,
+        "label": "Save my card on this device",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "The feeling I noticed\n\nSadness\n\nA phrase to make room\n\nI can give sadness a little room and stay connected to what is around me.\n\nAn anchor I chose\n\nAn ordinary object\n\nWhat I choose with it here · Planned\n\nGet a glass of water"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 6556,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": []
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 6992,
+        "label": "Resume practice",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "The feeling I noticed\n\nSadness\n\nA phrase to make room\n\nI can give sadness a little room and stay connected to what is around me.\n\nAn anchor I chose\n\nAn ordinary object\n\nWhat I choose with it here · Planned\n\nGet a glass of water"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "ROOM FOR BOTH\n\nYour starting point\n6 / 10\n\nYou named\nSadness"
+      },
+      {
+        "firstAppearanceAt": 7,
+        "progress": 4,
+        "pair": 2,
+        "text": "ROOM FOR BOTH\n\nA place for attention\nOne ordinary object\n\nYou marked this as tried\nAllowing the feeling, with your anchor here"
+      },
+      {
+        "firstAppearanceAt": 9,
+        "progress": 6,
+        "pair": 3,
+        "text": "ROOM FOR BOTH\n\nYour next small step\nGet a glass of water\n\nPlanned or done\nA plan, ready when you are"
+      }
+    ],
+    "screens": [
+      {
+        "name": "carry-card",
+        "headings": [
+          "A feeling and a next step can both be here."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "carry-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "changeScene",
+    "width": 320,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 947,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1434,
+        "label": "Begin Change the Scene ▷",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1858,
+        "label": "I moved",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2310,
+        "label": "I had some water",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2856,
+        "label": "I spent time outside",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3279,
+        "label": "I sent a message",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR SCENE IS CHANGING\n\nA different view\nI spent time outside\n\nA small connection\nI sent a message"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3827,
+        "label": "I got comfortable",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR SCENE IS CHANGING\n\nA different view\nI spent time outside\n\nA small connection\nI sent a message"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4265,
+        "label": "I chose a plan",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR SCENE IS CHANGING\n\nFind a quiet corner\nI got comfortable\n\nPlan one thing\nI chose a plan"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 5293,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR SCENE IS CHANGING\n\nFind a quiet corner\nI got comfortable\n\nPlan one thing\nI chose a plan"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR SCENE IS CHANGING\n\nA different view\nI spent time outside\n\nA small connection\nI sent a message"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR SCENE IS CHANGING\n\nFind a quiet corner\nI got comfortable\n\nPlan one thing\nI chose a plan"
+      }
+    ],
+    "screens": [
+      {
+        "name": "six-actions",
+        "headings": [
+          "Was this useful?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "six-actions",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "selfCompassion",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 921,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1395,
+        "label": "Begin",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1831,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2343,
+        "label": "I messed everything up.",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR CARE, TAKING SHAPE\n\nYour starting point\n6 / 10\n\nYour words\nI messed everything up."
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2859,
+        "label": "I made a mistake. I can care for myself and repair what I can.",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3318,
+        "label": "I tried saying these words",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR CARE, TAKING SHAPE\n\nA voice on your side\nI made a mistake. I can care for myself and repair what I can.\n\nYou marked this as tried\nSaying the caring words"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3893,
+        "label": "Give myself a pause\nMake space for my capacity.",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR CARE, TAKING SHAPE\n\nA voice on your side\nI made a mistake. I can care for myself and repair what I can.\n\nYou marked this as tried\nSaying the caring words"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4350,
+        "label": "Keep this as my next step\nA plan for what comes next.",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR CARE, TAKING SHAPE\n\nYour next small step\nTake a two-minute pause\n\nPlanned or done\nA plan, ready when you are"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4869,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "When the critic says\n\nI messed everything up.\n\nMy caring response\n\nI made a mistake. I can care for myself and repair what I can.\n\nOne act of care · Planned\n\nTake a two-minute pause"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5377,
+        "label": "Save my card on this device",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "When the critic says\n\nI messed everything up.\n\nMy caring response\n\nI made a mistake. I can care for myself and repair what I can.\n\nOne act of care · Planned\n\nTake a two-minute pause"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 6235,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": []
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 6706,
+        "label": "Resume practice",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "When the critic says\n\nI messed everything up.\n\nMy caring response\n\nI made a mistake. I can care for myself and repair what I can.\n\nOne act of care · Planned\n\nTake a two-minute pause"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR CARE, TAKING SHAPE\n\nYour starting point\n6 / 10\n\nYour words\nI messed everything up."
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR CARE, TAKING SHAPE\n\nA voice on your side\nI made a mistake. I can care for myself and repair what I can.\n\nYou marked this as tried\nSaying the caring words"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR CARE, TAKING SHAPE\n\nYour next small step\nTake a two-minute pause\n\nPlanned or done\nA plan, ready when you are"
+      }
+    ],
+    "screens": [
+      {
+        "name": "carry-card",
+        "headings": [
+          "Keep care close."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "carry-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "unhook",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 976,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1430,
+        "label": "Begin",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1870,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2321,
+        "label": "Something will go wrong.",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "A THOUGHT AND A CHOICE\n\nYour starting point\n6 / 10\n\nYour words\nSomething will go wrong."
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2817,
+        "label": "Predicting\nWhat might happen",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3254,
+        "label": "I tried saying it this way",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "A THOUGHT AND A CHOICE\n\nA different way to hear it\nMy mind is predicting: “Something will go wrong.”\n\nYou marked this as tried\nHearing the words as a thought"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3817,
+        "label": "Read one sentence\nReturn to the words in front of me.",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "A THOUGHT AND A CHOICE\n\nA different way to hear it\nMy mind is predicting: “Something will go wrong.”\n\nYou marked this as tried\nHearing the words as a thought"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4254,
+        "label": "Something I can see",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4818,
+        "label": "I tried returning attention",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5254,
+        "label": "Continue to my next step",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 5692,
+        "label": "Keep this as my next step\nA plan for what comes next.",
+        "kind": "decision or confirmed practice",
+        "progress": 8,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 8,
+            "text": "A THOUGHT AND A CHOICE\n\nYou marked a return of attention\nRead the next sentence\n\nPlanned or done\nA plan, ready when you are"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 6200,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "When my mind says\n\nSomething will go wrong.\n\nMy noticing phrase\n\nMy mind is predicting: “Something will go wrong.”\n\nAn anchor I chose\n\nAn ordinary object\n\nWhere I return my attention · Planned\n\nRead the next sentence"
+          }
+        ]
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 6747,
+        "label": "Save my card on this device",
+        "kind": "navigation",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "When my mind says\n\nSomething will go wrong.\n\nMy noticing phrase\n\nMy mind is predicting: “Something will go wrong.”\n\nAn anchor I chose\n\nAn ordinary object\n\nWhere I return my attention · Planned\n\nRead the next sentence"
+          }
+        ]
+      },
+      {
+        "sequence": 14,
+        "elapsedMs": 7590,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": []
+      },
+      {
+        "sequence": 15,
+        "elapsedMs": 8036,
+        "label": "Resume practice",
+        "kind": "navigation",
+        "progress": 9,
+        "expectedPair": 4,
+        "receipts": [
+          {
+            "pair": 4,
+            "count": 9,
+            "text": "When my mind says\n\nSomething will go wrong.\n\nMy noticing phrase\n\nMy mind is predicting: “Something will go wrong.”\n\nAn anchor I chose\n\nAn ordinary object\n\nWhere I return my attention · Planned\n\nRead the next sentence"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "A THOUGHT AND A CHOICE\n\nYour starting point\n6 / 10\n\nYour words\nSomething will go wrong."
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "A THOUGHT AND A CHOICE\n\nA different way to hear it\nMy mind is predicting: “Something will go wrong.”\n\nYou marked this as tried\nHearing the words as a thought"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "A THOUGHT AND A CHOICE\n\nYour next small step\nRead the next sentence\n\nA place for attention\nOne ordinary object"
+      },
+      {
+        "firstAppearanceAt": 11,
+        "progress": 8,
+        "pair": 4,
+        "text": "A THOUGHT AND A CHOICE\n\nYou marked a return of attention\nRead the next sentence\n\nPlanned or done\nA plan, ready when you are"
+      }
+    ],
+    "screens": [
+      {
+        "name": "carry-card",
+        "headings": [
+          "A way back to what you choose."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "carry-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "makeRoom",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 972,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1441,
+        "label": "Begin",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1867,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2309,
+        "label": "Sadness",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "ROOM FOR BOTH\n\nYour starting point\n6 / 10\n\nYou named\nSadness"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2798,
+        "label": "Something I can see",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3229,
+        "label": "Try a gentle moment with this anchor",
+        "kind": "navigation",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": []
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3671,
+        "label": "I tried letting the feeling be here",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "ROOM FOR BOTH\n\nA place for attention\nOne ordinary object\n\nYou marked this as tried\nAllowing the feeling, with your anchor here"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4213,
+        "label": "Get a glass of water\nAn ordinary act of care.",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "ROOM FOR BOTH\n\nA place for attention\nOne ordinary object\n\nYou marked this as tried\nAllowing the feeling, with your anchor here"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 4652,
+        "label": "Keep this as my next step\nA plan for what comes next.",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "ROOM FOR BOTH\n\nYour next small step\nGet a glass of water\n\nPlanned or done\nA plan, ready when you are"
+          }
+        ]
+      },
+      {
+        "sequence": 10,
+        "elapsedMs": 5164,
+        "label": "6",
+        "kind": "decision or confirmed practice",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "The feeling I noticed\n\nSadness\n\nA phrase to make room\n\nI can give sadness a little room and stay connected to what is around me.\n\nAn anchor I chose\n\nAn ordinary object\n\nWhat I choose with it here · Planned\n\nGet a glass of water"
+          }
+        ]
+      },
+      {
+        "sequence": 11,
+        "elapsedMs": 5693,
+        "label": "Save my card on this device",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "The feeling I noticed\n\nSadness\n\nA phrase to make room\n\nI can give sadness a little room and stay connected to what is around me.\n\nAn anchor I chose\n\nAn ordinary object\n\nWhat I choose with it here · Planned\n\nGet a glass of water"
+          }
+        ]
+      },
+      {
+        "sequence": 12,
+        "elapsedMs": 6534,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": []
+      },
+      {
+        "sequence": 13,
+        "elapsedMs": 6965,
+        "label": "Resume practice",
+        "kind": "navigation",
+        "progress": 7,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 7,
+            "text": "The feeling I noticed\n\nSadness\n\nA phrase to make room\n\nI can give sadness a little room and stay connected to what is around me.\n\nAn anchor I chose\n\nAn ordinary object\n\nWhat I choose with it here · Planned\n\nGet a glass of water"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "ROOM FOR BOTH\n\nYour starting point\n6 / 10\n\nYou named\nSadness"
+      },
+      {
+        "firstAppearanceAt": 7,
+        "progress": 4,
+        "pair": 2,
+        "text": "ROOM FOR BOTH\n\nA place for attention\nOne ordinary object\n\nYou marked this as tried\nAllowing the feeling, with your anchor here"
+      },
+      {
+        "firstAppearanceAt": 9,
+        "progress": 6,
+        "pair": 3,
+        "text": "ROOM FOR BOTH\n\nYour next small step\nGet a glass of water\n\nPlanned or done\nA plan, ready when you are"
+      }
+    ],
+    "screens": [
+      {
+        "name": "carry-card",
+        "headings": [
+          "A feeling and a next step can both be here."
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "carry-card",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  },
+  {
+    "id": "changeScene",
+    "width": 390,
+    "actions": [
+      {
+        "sequence": 1,
+        "elapsedMs": 932,
+        "label": "Entry loaded",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 2,
+        "elapsedMs": 1395,
+        "label": "Begin Change the Scene ▷",
+        "kind": "navigation",
+        "progress": 0,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 3,
+        "elapsedMs": 1825,
+        "label": "I moved",
+        "kind": "decision or confirmed practice",
+        "progress": 1,
+        "expectedPair": 0,
+        "receipts": []
+      },
+      {
+        "sequence": 4,
+        "elapsedMs": 2279,
+        "label": "I had some water",
+        "kind": "decision or confirmed practice",
+        "progress": 2,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 2,
+            "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+          }
+        ]
+      },
+      {
+        "sequence": 5,
+        "elapsedMs": 2827,
+        "label": "I spent time outside",
+        "kind": "decision or confirmed practice",
+        "progress": 3,
+        "expectedPair": 1,
+        "receipts": [
+          {
+            "pair": 1,
+            "count": 3,
+            "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+          }
+        ]
+      },
+      {
+        "sequence": 6,
+        "elapsedMs": 3259,
+        "label": "I sent a message",
+        "kind": "decision or confirmed practice",
+        "progress": 4,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 4,
+            "text": "YOUR SCENE IS CHANGING\n\nA different view\nI spent time outside\n\nA small connection\nI sent a message"
+          }
+        ]
+      },
+      {
+        "sequence": 7,
+        "elapsedMs": 3806,
+        "label": "I got comfortable",
+        "kind": "decision or confirmed practice",
+        "progress": 5,
+        "expectedPair": 2,
+        "receipts": [
+          {
+            "pair": 2,
+            "count": 5,
+            "text": "YOUR SCENE IS CHANGING\n\nA different view\nI spent time outside\n\nA small connection\nI sent a message"
+          }
+        ]
+      },
+      {
+        "sequence": 8,
+        "elapsedMs": 4247,
+        "label": "I chose a plan",
+        "kind": "decision or confirmed practice",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR SCENE IS CHANGING\n\nFind a quiet corner\nI got comfortable\n\nPlan one thing\nI chose a plan"
+          }
+        ]
+      },
+      {
+        "sequence": 9,
+        "elapsedMs": 5292,
+        "label": "Refresh",
+        "kind": "navigation",
+        "progress": 6,
+        "expectedPair": 3,
+        "receipts": [
+          {
+            "pair": 3,
+            "count": 6,
+            "text": "YOUR SCENE IS CHANGING\n\nFind a quiet corner\nI got comfortable\n\nPlan one thing\nI chose a plan"
+          }
+        ]
+      }
+    ],
+    "checkpoints": [
+      {
+        "firstAppearanceAt": 4,
+        "progress": 2,
+        "pair": 1,
+        "text": "YOUR SCENE IS CHANGING\n\nMove, just a little\nI moved\n\nGet some water\nI had some water"
+      },
+      {
+        "firstAppearanceAt": 6,
+        "progress": 4,
+        "pair": 2,
+        "text": "YOUR SCENE IS CHANGING\n\nA different view\nI spent time outside\n\nA small connection\nI sent a message"
+      },
+      {
+        "firstAppearanceAt": 8,
+        "progress": 6,
+        "pair": 3,
+        "text": "YOUR SCENE IS CHANGING\n\nFind a quiet corner\nI got comfortable\n\nPlan one thing\nI chose a plan"
+      }
+    ],
+    "screens": [
+      {
+        "name": "six-actions",
+        "headings": [
+          "Was this useful?"
+        ]
+      }
+    ],
+    "accessibility": [
+      {
+        "name": "six-actions",
+        "unnamedButtons": []
+      }
+    ],
+    "errors": [],
+    "passed": true
+  }
+]

@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 OUT=Path(os.environ.get('FOUNDATIONS_EVIDENCE_DIR','/tmp/foundations-one-question'));OUT.mkdir(parents=True,exist_ok=True);BASE=os.environ.get('BASE_URL','http://127.0.0.1:5194');errors=[]
 with sync_playwright() as p:
- b=p.chromium.launch(executable_path='/usr/bin/chromium')
+ b=p.chromium.launch(executable_path='/usr/bin/chromium', args=['--mute-audio'])
  for width in [320,390]:
   ctx=b.new_context(viewport={'width':width,'height':640},reduced_motion='reduce');pg=ctx.new_page();pg.set_default_timeout(7000);pg.on('pageerror',lambda e:errors.append(str(e)));pg.goto(BASE+'/interventions/foundations/index.html')
   def click(text):

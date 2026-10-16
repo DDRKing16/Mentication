@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-16",
+  "baseCommit": "3974fb68f72d2fc0bdc5c8cec5b85625202bddcf",
+  "productChange": "NextStepPractice active/review Undo disabled at resumed visit boundary",
+  "browser": "Chromium --mute-audio",
+  "viewports": [
+    320,
+    390
+  ],
+  "runs": [
+    {
+      "name": "general",
+      "command": "python qa/one-question-general-route-browser.py --url http://127.0.0.1:5192 --out /tmp/section-acceptance/general",
+      "exitCode": 0
+    },
+    {
+      "name": "goodmap",
+      "command": "python qa/good-map-plan-return-browser.py --url http://127.0.0.1:5192/good-map/index.html --out /tmp/section-acceptance/goodmap",
+      "exitCode": 0
+    },
+    {
+      "name": "next",
+      "command": "python qa/next-step-return-browser.py --url http://127.0.0.1:5192 --out /tmp/section-acceptance/next",
+      "exitCode": 0
+    },
+    {
+      "name": "urge",
+      "command": "python qa/urge-practice-browser.py --url http://127.0.0.1:5192 --out /tmp/section-acceptance/urge",
+      "exitCode": 0
+    },
+    {
+      "name": "thought",
+      "command": "python qa/thought-review-return-browser.py --url http://127.0.0.1:5192 --out /tmp/section-acceptance/thought",
+      "exitCode": 0
+    },
+    {
+      "name": "grounding",
+      "command": "python qa/attention-practice-return-browser.py --grounding-only --url http://127.0.0.1:5192 --out /tmp/section-acceptance/grounding",
+      "exitCode": 0
+    },
+    {
+      "name": "standalone",
+      "command": "ONE_QUESTION_URL=http://127.0.0.1:5192 ONE_QUESTION_OUT=/tmp/section-acceptance/standalone python qa/one-question-standalone-browser.py",
+      "exitCode": 0
+    },
+    {
+      "name": "standalone-history",
+      "command": "ONE_QUESTION_URL=http://127.0.0.1:5192 ONE_QUESTION_OUT=/tmp/section-acceptance/standalone-history python qa/one-question-standalone-history-browser.py",
+      "exitCode": 0
+    },
+    {
+      "name": "sleep-current",
+      "command": "python qa/section-one-sleep-browser.py --out /tmp/section-acceptance/sleep-current",
+      "exitCode": 0
+    },
+    {
+      "name": "timed",
+      "command": "python qa/section-one-timed-browser.py --out /tmp/section-acceptance/timed",
+      "exitCode": 0
+    },
+    {
+      "name": "bump",
+      "command": "python qa/section-one-bump-browser.py --out /tmp/section-acceptance/bump",
+      "exitCode": 0
+    }
+  ],
+  "timingLimits": "Night 15 minutes and Box full four rounds use Playwright run_for simulation through production timers; no completion state injected. Urge full quick wave uses 60 seconds real elapsed time. No listening or physical haptics audition."
+}

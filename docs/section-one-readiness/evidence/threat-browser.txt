@@ -1,0 +1,7 @@
+PASS fear one MCQ, keyboard, refresh, fail, retry, 75%, downstream preserved
+PASS practical one MCQ, keyboard, refresh, fail, retry, 75%, downstream preserved
+PASS both one MCQ, keyboard, refresh, fail, retry, 75%, downstream preserved
+PASS legacy journey no inferred pass, overview/model guard, real 100%
+PASS legacy plan no inferred pass, overview/model guard, real 100%
+PASS legacy home no inferred pass, overview/model guard, real 100%
+PASS legacy book no inferred pass, overview/model guard, real 100%
