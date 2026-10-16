@@ -1,12 +1,12 @@
 /** Deterministic suggestions, never an assessment of the user's thought or feeling. */
 export const COMPASSION_STARTERS = [
-  { line: 'I messed everything up.', response: 'I made a mistake. I can care for myself and repair what I can.', need: 'repair' },
+  { line: 'I messed everything up.', response: 'This feels hard right now. I can offer myself care while I work out what I need.', need: 'repair' },
   { line: 'I should be doing more.', response: 'My capacity matters too. I can choose one realistic step.', need: 'rest' },
   { line: 'I am not good enough.', response: 'This is a painful thought. I do not have to earn basic kindness.', need: 'support' },
 ];
 export function compassionateSuggestions(line) {
   const match = COMPASSION_STARTERS.find(item => item.line === line);
-  return [...new Set([match?.response || 'This is hard. I can meet this moment without attacking myself.', 'I can take responsibility and still treat myself with care.', 'I would not speak to someone I care about this way. I can try a steadier voice.'])];
+  return [...new Set([match?.response || 'This is hard. I can meet this moment without attacking myself.', 'Struggling is part of being human. I can give myself a little kindness.', 'I would not speak to someone I care about this way. I can try a steadier voice.'])];
 }
 export const EXTERNAL_ANCHORS = {
   object: { label: 'Something I can see', short: 'the object', instruction: 'Look at one ordinary object. Notice its colour and edges.', prompt: 'An object or colour nearby', example: 'The blue mug' },
@@ -17,7 +17,7 @@ export const CARE_ACTIONS = {
   selfCompassion: [
     { label: 'Give myself a pause', action: 'Take a two-minute pause', kind: 'rest', detail: 'Make space for my capacity.' },
     { label: 'Ask for support', action: 'Ask someone safe for a little help', kind: 'support', detail: 'I do not have to carry everything alone.' },
-    { label: 'Repair one small thing', action: 'Take one small step to repair what I can', kind: 'repair', detail: 'Care and responsibility can go together.' },
+    { label: 'Repair one small thing', action: 'Take one small step to repair what I can', kind: 'repair', detail: 'Only if there is something I want to repair.' },
   ],
   unhook: [
     { label: 'Return to the task', action: 'Read the next sentence or open the next thing', detail: 'Give attention to one useful step.' },

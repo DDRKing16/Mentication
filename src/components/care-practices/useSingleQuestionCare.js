@@ -15,10 +15,13 @@ export default function useSingleQuestionCare(id, props) {
   const actions = (id === 'selfCompassion' ? CARE_ACTIONS.selfCompassion : id === 'unhook' ? UNHOOK_STEPS : ROOM_STEPS).map(item => item.action);
   const screen = flow.viewingSaved && flow.s.careScreen !== 'options' ? 'card' : careScreen(id, flow.s, { notices, actions });
   useJourneyScreenHistory(id, flow.returning ? null : screen, next => {
-    if (validCareScreenFor(id, next)) flow.go(CARE_SCREEN_STAGES[next], {careScreen:next});
+    if (!validCareScreenFor(id, next)) return screen;
+    const resolved = careScreen(id, { ...flow.s, careScreen: next });
+    flow.go(CARE_SCREEN_STAGES[resolved], { careScreen: resolved });
+    return resolved;
   });
   const advance = (next, values = {}) => {
-    if (!acceptProgress()) return;
+    if (next !== 'orient' && !acceptProgress()) return;
     const patch = careForwardPatch(id, flow.s, screen, next, values);
     flow.go(patch.stage, patch);
   };

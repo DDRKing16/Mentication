@@ -21,3 +21,17 @@
 .cq-screen .compassion-lantern{min-height:240px;padding:46px 36px 42px}.cq-screen .compassion-lantern-words p{font-size:clamp(25px,7vw,34px)}.cq-screen .unhook-field{min-height:245px;width:100%;margin:10px 0}.cq-screen .unhook-thought p{font-size:28px}.cq-screen .unhook-thought{border-radius:8px 25px 25px 25px}.cq-screen .unhook-field.is-beside{min-height:240px}.cq-screen .unhook-field.is-beside .unhook-thought p{display:block;font-size:20px;overflow:visible}.cq-screen .room-field{width:100%;margin:12px 0;min-height:280px}.cq-screen .room-rings i{max-width:100%}.cq-screen .room-anchor{left:0;right:0}.cq-tone-options{font-size:12px;color:var(--care-muted)}.cq-tone-options summary{padding:10px 0;cursor:pointer;min-height:44px}.cq-tone-choices{display:flex;gap:8px}.cq-tone-choices button{min-height:44px;border:1px solid var(--care-line);border-radius:12px;padding:8px 20px}.cq-tone-choices button[aria-pressed=true]{border-color:var(--care-accent)}
 .cq-privacy summary{min-height:44px;padding:12px 0;cursor:pointer}.cq-privacy p{margin:0}.cq-card{border-radius:4px 24px 24px 4px;border-left:3px solid var(--care-accent);box-shadow:0 20px 50px -35px #000a}
 @media(min-width:900px){.care-practice[data-focused] .care-main{padding-top:32px}.cq-screen[data-screen-kind=practice]{padding:0 20px}.cq-screen .compassion-lantern{min-height:290px}.cq-screen .unhook-field{min-height:285px}}
+
+.care-practice .practice-checkpoint-connection{font:400 13px/1.5 var(--font-body,sans-serif);margin:12px 0 0;color:inherit}
+.large-text .care-practice .practice-checkpoint-connection{font-size:18px}
+/* Keep full personal text in normal flow: absolute attention labels overlapped long thoughts. */
+.care-practice[data-focused] .cq-screen .unhook-field{flex-direction:column;gap:18px}
+.care-practice[data-focused] .cq-screen .unhook-attention{position:relative;left:auto;right:auto;bottom:auto;width:100%;min-height:80px}
+.care-practice[data-focused] .cq-screen .unhook-field-label{position:relative;bottom:auto;left:auto;right:auto}
+.care-practice[data-focused] .cq-screen .room-field[data-long]{flex-direction:column;gap:18px;padding:18px 0 0}
+.care-practice[data-focused] .cq-screen .room-field[data-long] .room-feeling{width:100%;height:auto;min-height:130px;padding:25px}
+.care-practice[data-focused] .cq-screen .room-field[data-long] .room-feeling span{display:block;max-height:none;overflow:visible}
+.care-practice[data-focused] .cq-screen .room-field[data-long] .room-field-label,.care-practice[data-focused] .cq-screen .room-field[data-long] .room-anchor{position:relative;inset:auto;width:100%}
+.care-practice[data-focused] .cq-screen .room-field[data-long] .room-anchor strong{display:block;overflow:visible}
+.care-practice[data-focused] .cq-screen .room-field[data-long] .room-feeling{background:var(--care-accent);border-radius:8px 28px 28px 28px}
+.care-practice[data-focused] .cq-screen .room-field[data-long] .room-feeling svg{display:none}

@@ -52,3 +52,10 @@ export function assessmentText(s) {
   if (s.before === null || s.after === null) return 'One or both ratings were blank, so there is no score comparison.';
   return `${s.before} → ${s.after} / 10 · ${s.after === s.before ? 'You reported no change.' : s.after < s.before ? 'You reported less difficulty.' : 'You reported more difficulty.'}`;
 }
+
+export function returnAttentionCue(s) {
+  const attention = actionAttention(s.action);
+  if (s.anchorText) return 'Notice one ordinary detail of your anchor. Then give your chosen step some attention.';
+  if (!s.anchorType || s.anchorType === attention.preferred) return attention.cue;
+  return `${OUTSIDE_ANCHORS[s.anchorType]?.cue || ''} Then return attention to your chosen step.`;
+}

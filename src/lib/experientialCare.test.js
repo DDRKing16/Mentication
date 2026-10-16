@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { freshCareState, restoreCareState, careOutcome } from './carePractices';
-import { MIND_PATTERNS, mindPhrase, mindPattern, unhookPhase, roomPhase, actionAttention, attentionTarget, assessmentText } from './experientialCare';
+import { MIND_PATTERNS, mindPhrase, mindPattern, unhookPhase, roomPhase, actionAttention, attentionTarget, assessmentText, returnAttentionCue } from './experientialCare';
 
 describe('new practices remain honest across the existing draft codec', () => {
   const thought = 'I might lose my place when I speak. '.repeat(10).slice(0, 300);
@@ -46,4 +46,10 @@ describe('personal cues support the chosen action and sense', () => {
   it('does not assume a person when the user chooses their own listening step', () => { expect(actionAttention('Listen to the fan').target).toBe('The sound I chose to hear'); });
   it('uses a general practical cue for unrecognised actions', () => { expect(actionAttention('Do something I chose').cue).toContain('ordinary detail'); });
   it('reports zero, blank and no-change accurately', () => { expect(assessmentText({ before: 0, after: 0 })).toContain('no change'); expect(assessmentText({ before: 6, after: null })).toContain('blank'); expect(assessmentText({ before: 6, after: 8 })).toContain('more difficulty'); });
+});
+
+it('uses the chosen action directly while retaining optional alternate attention cues', () => {
+ expect(returnAttentionCue({action:'Read my notes'})).toContain('Find the line');
+ expect(returnAttentionCue({action:'Read my notes',anchorType:'support'})).toContain('chair, floor');
+ expect(returnAttentionCue({action:'Read my notes',anchorText:'My cup'})).toContain('your anchor');
 });

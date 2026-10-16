@@ -8,7 +8,7 @@ describe.each(Object.keys(CARE_SCREEN_PATHS))('%s focused flow', id => {
     let screen = 'intro';
     for (const next of CARE_SCREEN_PATHS[id].slice(1)) {
       const previous = screen;
-      state = restoreCareState({ ...state, ...careForwardPatch(id, state, screen, next, next === 'outside' ? { anchorType: 'object' } : next === 'allow' ? { allowance: 'small' } : {}) });
+      state = restoreCareState({ ...state, ...careForwardPatch(id, state, screen, next, next === 'outside' ? { anchorType: 'object' } : next === 'room-ready' ? { anchorNoticed: true } : next === 'allow' ? { allowance: 'small' } : {}) });
       expect(careScreen(id, state)).toBe(next);
       const back = restoreCareState({ ...state, ...careBackPatch(id, state, next) });
       expect(careScreen(id, back)).toBe(previous);
@@ -56,7 +56,7 @@ it('resumes older version-1 drafts at a useful corresponding screen without inve
   const old = { ...freshCareState(), careScreen: null, stage: 'practice', notice: 'Original words', practiceTaken: false };
   expect(careScreen('selfCompassion', { ...old, perspective: 'My saved response' })).toBe('say');
   expect(careScreen('unhook', { ...old, perspective: 'My mind is predicting…', defusionStep: 2 })).toBe('frame');
-  expect(careScreen('makeRoom', { ...old, anchorType: 'object', allowance: 'small' })).toBe('allow');
+  expect(careScreen('makeRoom', { ...old, anchorType: 'object', allowance: 'small' })).toBe('outside');
   expect(careScreen('makeRoom', { ...old, stage: 'complete' })).toBe('card');
   expect(restoreCareState(old).practiceTaken).toBe(false);
 });
@@ -64,7 +64,7 @@ it('bounds repeated return history while retaining the immediate Back destinatio
   let state = freshCareState();
   for (let i = 0; i < 100; i++) state = { ...state, ...careForwardPatch('unhook', state, 'return-next', 're-hook') };
   expect(state.careTrail.length).toBe(64);
-  expect(careBackPatch('unhook', state, 're-hook').careScreen).toBe('return-next');
+  expect(careBackPatch('unhook', state, 're-hook').careScreen).toBe('status');
 });
 
 it('reopens a legacy unfinished custom notice or step as a visible editor', () => {
@@ -80,6 +80,24 @@ it('clears allowing consent on stop, so Back stays outside until an explicit new
   expect(careScreen('makeRoom', back)).toBe('outside');
   expect(back.practiceTaken).toBe(false);
   expect(back.careTrail).toEqual(['anchor']);
-  const consenting = { ...back, ...careForwardPatch('makeRoom', back, 'outside', 'allow', { allowance: 'small' }) };
+  const consenting = { ...back, ...careForwardPatch('makeRoom', back, 'room-ready', 'allow', { allowance: 'small', anchorNoticed: true }) };
   expect(careScreen('makeRoom', consenting)).toBe('allow');
+});
+
+it('migrates the removed Unhook continuation without inventing an attempt', () => {
+ const old = {...freshCareState(),careScreen:'return-next',action:'Read my notes'};
+ expect(careScreen('unhook',old)).toBe('status');
+ expect(careOutcome('unhook',restoreCareState(old)).practiceTaken).toBe(false);
+});
+it('requires anchor observation and fresh consent after stop, including browser-forward restoration', () => {
+ const stopped = {...freshCareState(),careScreen:'allow',anchorType:'object',anchorNoticed:true,allowance:null,practiceStopped:true};
+ expect(careScreen('makeRoom',stopped)).toBe('room-ready');
+ expect(careScreen('makeRoom',{...stopped,anchorNoticed:false})).toBe('outside');
+ expect(careScreen('makeRoom',{...stopped,allowance:'small'})).toBe('allow');
+ expect(careOutcome('makeRoom',restoreCareState(stopped))).toMatchObject({practiceTaken:false,practiceStopped:true});
+});
+it('does not count a generated neutral phrase as a separate chosen response', () => {
+ const patch=careForwardPatch('unhook',freshCareState(),'notice','frame',{notice:'A thought',perspective:'I am noticing the thought: A thought'});
+ expect(patch.noticeConfirmed).toBe(true);
+ expect(patch.responseConfirmed).toBeUndefined();
 });

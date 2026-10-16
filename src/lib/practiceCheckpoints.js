@@ -1,3 +1,5 @@
+import { attentionTarget, anchorName } from './experientialCare';
+
 /** A checkpoint is earned by two distinct, confirmed pieces of practice.
  * Navigation, typing, opening help and repeated clicks are never progress.
  * These views derive from existing session state; they do not claim a save or a benefit.
@@ -27,13 +29,26 @@ export function careCheckpoints(id, s) {
   return [
     e('before', 'Your starting point', `${s.before} / 10`, s.before !== null && s.before !== undefined),
     e('notice', id === 'makeRoom' ? 'You named' : 'Your words', s.notice || 'Held privately in mind', s.noticeConfirmed === true),
-    e('response', id === 'selfCompassion' ? 'A voice on your side' : 'A different way to hear it', s.perspective, id !== 'makeRoom' && s.responseConfirmed === true),
-    ...(id === 'makeRoom' ? [e('anchor', 'A place for attention', s.anchorText || {object:'One ordinary object',sound:'A sound nearby',support:'The surface supporting you'}[s.anchorType])] : []),
-    e('try', 'You marked this as tried', id === 'selfCompassion' ? 'Saying the caring words' : id === 'unhook' ? 'Hearing the words as a thought' : 'Allowing the feeling, with your anchor here', s.practiceTaken),
-    e('action', 'Your next small step', s.action, s.actionConfirmed === true),
-    ...(id === 'unhook' ? [e('anchor', 'A place for attention', s.anchorText || {object:'One ordinary object',sound:'A sound nearby',support:'The surface supporting you'}[s.anchorType])] : []),
-    e('return', 'You marked a return of attention', s.action || 'Your outside anchor', id === 'unhook' && s.anchorNoticed),
+    e('response', id === 'selfCompassion' ? 'Caring words you chose' : 'A noticing phrase you chose', s.perspective, id !== 'makeRoom' && s.responseConfirmed === true),
+    ...(id === 'makeRoom' ? [e('anchor', 'An outside anchor you chose', anchorName(s), !!s.anchorType), e('anchor-noticed', 'You marked a detail as noticed', anchorName(s), s.anchorNoticed === true)] : []),
+    e('try', 'You marked this as tried', id === 'selfCompassion' ? 'Saying the caring words' : id === 'unhook' ? 'Hearing the words as a thought' : 'Allowing the feeling, with your anchor here', id === 'selfCompassion' ? s.responseRead === true : id === 'unhook' ? s.defusionStep === 2 && s.practiceTaken === true : s.practiceTaken === true),
+    e('action', 'A step you chose', s.action, s.actionConfirmed === true),
+    e('return', 'You marked a return of attention', `${attentionTarget(s)} · ${s.action || 'Your chosen step'}`, id === 'unhook' && s.anchorNoticed),
     e('status', 'Planned or done', s.actionStatus === 'done' ? 'You marked the step as done' : 'A plan, ready when you are', ['planned','done'].includes(s.actionStatus)),
     e('after', 'Your check-in now', `${s.after} / 10`, s.after !== null && s.after !== undefined),
   ];
+}
+
+/** Connect the currently earned pair without turning a choice into a practice report. */
+export function careCheckpointConnection(id, items = []) {
+  const has = key => items.some(item => item.id === key);
+  if (has('after')) return 'This check-in describes your experience; it does not need to show improvement.';
+  if (has('return')) return 'The chosen step gives your attention somewhere to return. An attempted return does not mean the step is done.';
+  if (has('status')) return 'Your choice and its status belong together: a plan is different from doing the step.';
+  if (has('action')) return id === 'selfCompassion' ? 'Care can continue through the step you chose. Choosing it does not mean you have done it.' : 'This chosen step is a direction to try, even if the thought or feeling stays.';
+  if (has('try')) return id === 'makeRoom' ? 'You marked a gentle attempt with the feeling. It does not need to change.' : 'You marked an attempt with the words. Believing them or feeling better is not required.';
+  if (has('anchor-noticed')) return 'Choosing an anchor and noticing a detail are separate. You decide whether to approach the feeling next.';
+  if (has('anchor')) return 'An outside anchor gives you a place to attend while you decide how much of the feeling to notice.';
+  if (has('response')) return 'These are words to try alongside what you noticed. Selecting them does not mark them as tried.';
+  return 'Your check-in and what you noticed give this practice a starting point. No change is expected yet.';
 }
