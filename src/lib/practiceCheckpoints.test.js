@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { checkpointFor, practiceEvent, careCheckpoints, reconcilePracticeEvents, orderedPracticeEvents } from './practiceCheckpoints';
-import { freshCareState } from './carePractices';
+import { freshCareState, restoreCareState } from './carePractices';
 describe('earned practice checkpoints',()=>{
  it('does not treat a missing confirmation field as an earned default',()=>{
   expect(practiceEvent('duration','Time chosen','3 minutes',undefined)).toBeNull();
@@ -103,4 +103,10 @@ describe('saved checkpoint order', () => {
   expect(orderedPracticeEvents([e('a'),e('c')],['a','a','removed',null]).map(e=>e.id)).toEqual(['a','c']);
   expect(orderedPracticeEvents([e('a')],{})).toEqual([e('a')]);
  });
+});
+
+it('restores the confirmation order alongside care draft answers', () => {
+ const draft = {...freshCareState(),before:6,noticeConfirmed:true,action:'Read a page',actionConfirmed:true,checkpointOrder:['notice','action','before']};
+ const restored = restoreCareState(JSON.parse(JSON.stringify(draft)));
+ expect(orderedPracticeEvents(careCheckpoints('unhook',restored),restored.checkpointOrder).map(e=>e.id)).toEqual(['notice','action','before']);
 });
