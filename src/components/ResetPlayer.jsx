@@ -835,7 +835,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
             {running ? <Pause className="h-5 w-5" strokeWidth={1.7} /> : <Play className="h-5 w-5" strokeWidth={1.7} />}
           </CtrlButton>
           {isBoxV2 && <button type="button" className="min-h-11 rounded-full px-3 text-sm text-cream" onClick={skipToNext}>Finish here</button>}
-          <details className="relative"><summary className="min-h-11 cursor-pointer px-3 py-3 text-sm">{isBoxV2 ? 'Options' : 'Guidance options'}</summary><div className="intervention-themed-surface absolute bottom-full right-0 z-50 mb-3 flex max-w-[85vw] flex-wrap gap-1 rounded-2xl border p-2">
+          <details className="relative"><summary className="min-h-11 cursor-pointer px-3 py-3 text-sm">{isBoxV2 ? 'Options' : 'Guidance options'}</summary><div className="intervention-themed-surface absolute bottom-full right-0 z-50 mb-3 flex w-64 max-w-[85vw] flex-wrap gap-1 rounded-2xl border p-2">
           {(isGroundingV2 || isBoxV2) && <button type="button" className="min-h-11 px-3 text-sm" aria-pressed={a11y.prefs.reducedMotion} onClick={event => {
             a11y.setPref("reducedMotion", !a11y.prefs.reducedMotion);
             if (isBoxV2) {
