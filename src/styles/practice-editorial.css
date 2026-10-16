@@ -22,3 +22,5 @@
 /* Large type and short viewports retain all controls via a scrolling practice surface. */
 .large-text .box-v2-player,.large-text [data-grounding-player="true"]{overflow-y:auto!important;overflow-x:hidden!important}.large-text [data-grounding-player="true"]>.relative.flex-1{flex:none!important;min-height:350px}.large-text .box-v2-player .practice-checkpoint-pair strong{font-size:17px}
 @media(max-height:680px){.box-v2-player,[data-grounding-player="true"]{overflow-y:auto!important;overflow-x:hidden!important}[data-grounding-player="true"]>.relative.flex-1{flex:none!important;min-height:270px}}
+/* On short phones the phase and live count take priority over the repeated 4·4·4·4 heading. */
+@media(max-height:680px){.box-v2-player .box-v2-pacer-heading{display:none}}
