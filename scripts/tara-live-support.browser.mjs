@@ -109,7 +109,7 @@ try {
     for (const status of ['denied', 'error', 'unverified', 'ended']) {
       const next = await draft(page); next.phase = 'tackle'; next.flowScreen = 'live'; next.checkIns = { ...next.checkIns, preference: 'device', status, startedAt: Date.now(), endsAt: Date.now() + 3600000, nextAt: Date.now() + 1200000 };
       await page.evaluate(({key,next}) => localStorage.setItem(key, JSON.stringify({ schemaVersion: 1, draft: next, recaps: [] })), {key,next}); await page.reload(); await screen(page, 'live');
-      assert.ok((await page.locator('.tara-check-in-status').innerText()).includes(status === 'denied' ? 'not granted' : status === 'ended' ? 'window has ended' : 'not confirmed'));
+      assert.ok((await page.locator('.tara-check-in-status').innerText()).includes(status === 'denied' ? 'not allowed' : status === 'ended' ? 'window has ended' : 'not confirmed'));
       await click(page, 'Check in now'); await screen(page, 'check-in'); await click(page, 'I’m okay for now'); await screen(page, 'live');
       passed.push(`${status} persisted notification status: honest limitation and usable in-app check-in; no physical-device delivery claimed`);
     }
@@ -145,6 +145,6 @@ try {
     passed.push('Own wording survives interrupted planning, refresh and Back; app-wide clear cannot resurrect draft through history');
   }
   assert.deepEqual(errors, []);
-  writeFileSync(`${evidence}/results.json`, JSON.stringify({ production, base: '0561c90e538298023c583654a23db8834f6eed2d', passed, pageErrors: errors, captures, provenance: 'Synthetic user-authored examples and explicit choices. No real user outcomes, notifications or contacts. Native permission/scheduling verified separately with mocked approved adapter; physical OS delivery not tested.' }, null, 2));
+  writeFileSync(`${evidence}/results.json`, JSON.stringify({ production, base: process.env.TARA_BASE_COMMIT || 'unspecified', passed, pageErrors: errors, captures, provenance: 'Synthetic user-authored examples and explicit choices. No real user outcomes, notifications or contacts. Native permission/scheduling verified separately with mocked approved adapter; physical OS delivery not tested.' }, null, 2));
   console.log(JSON.stringify({passed:passed.length,scenarios:passed,pageErrors:errors,captures:captures.length},null,2));
 } finally { await Promise.all(contexts.map(context=>context.close())); await browser.close(); }

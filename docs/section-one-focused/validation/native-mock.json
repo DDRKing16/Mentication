@@ -1,0 +1,18 @@
+{
+  "passed": [
+    "Cold startup, refresh, outside-Tara and repeated taps, support, cancellation at 320px",
+    "Cold startup, refresh, outside-Tara and repeated taps, support, cancellation at 390px",
+    "Archived-plan deep link and refresh are read-only and preserve the current plan without completion",
+    "deleted notification target stays honest without resurrecting a plan or recording an outcome",
+    "completed notification target stays honest without resurrecting a plan or recording an outcome",
+    "expired notification target stays honest without resurrecting a plan or recording an outcome",
+    "corrupt notification target stays honest without resurrecting a plan or recording an outcome",
+    "Explicit consent schedules bounded discreet reminders; reflection cancels them before outcomes",
+    "Permission decline keeps manual support usable",
+    "App-wide deletion cancels reminders while Tara is unmounted; a late tap leaves data deleted",
+    "Failed native cancellation is visible outside Tara and clears only after successful retry; private data remains deleted"
+  ],
+  "pageErrors": [],
+  "provenance": "Synthetic local records and a mocked Capacitor native bridge exercising the real SDK proxy and app router. No OS notifications were delivered. Physical locked/background/closed-phone behavior remains untested.",
+  "executionBase": "1468a214ea06c9146150be5e7f3121c73035e6de"
+}

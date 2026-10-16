@@ -12,7 +12,7 @@ import { chooseTaraMove, tacticFor } from '@/lib/taraTactics';
 import { choosePracticeResponse, chooseTaraNextStep, confirmPracticeTry, guidanceFor, keepUnpractisedPlan, practiceOptions, startTaraPractice } from '@/lib/taraGuidance';
 import { clearTara, loadTara, saveTaraDraft, saveTaraRecap } from '@/lib/taraTacticianStorage';
 import { atScreen, GET_THROUGH_TITLE, previousScreen, resumeFromEntry, screenFor } from '@/lib/getThroughFlow';
-import { answerCheckIn, checkInDue, startCheckIns, SUPPORT_FIELDS } from '@/lib/taraSupportPlan';
+import { answerCheckIn, checkInDue, startCheckIns, supportWordPreview, SUPPORT_FIELDS } from '@/lib/taraSupportPlan';
 import { supportsTaraNotifications, watchTaraNotificationDeletion } from '@/lib/taraCheckInNotifications';
 import { startTaraCheckInDelivery, stopTaraCheckInDelivery as cancelTaraNotifications, verifyTaraCheckInDelivery as verifyTaraNotifications } from '@/lib/taraCheckInDelivery';
 import { webCheckInAvailability } from '@/lib/webCheckIns';
@@ -285,7 +285,7 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
       earned('challenge','What feels difficult',state.challenge),
       earned('forecast','Your prediction to test',state.prediction,state.predictionEdited && !['entry','timing','event','challenge','prediction'].includes(screen)),
       earned('move','Your chosen move',state.plan.do,!!state.selectedMoveId),
-      ...SUPPORT_FIELDS.map(field => earned('support-' + field, { pause: 'Your planned pause', regulation: 'Your grounding step', affirmation: 'Your chosen reminder', leave: 'Leaving or a safer alternative', help: 'Your help plan' }[field], state.supportPlan[field], state.supportPlan.confirmed.includes(field))),
+      ...SUPPORT_FIELDS.map(field => earned('support-' + field, { pause: 'Your planned pause', regulation: 'Your grounding step', affirmation: 'Your chosen reminder', leave: 'Leaving or a safer alternative', help: 'Your help plan' }[field], supportWordPreview(state.supportPlan[field]), state.supportPlan.confirmed.includes(field))),
       ...(state.practice.wordings || []).flatMap((words,i)=>[earned(`response-${i}`,i ? 'Your backup response' : 'Your practice response',words,!!state.practice.responses[i]),earned(`try-${i}`,i ? 'You tried a response to a harder moment' : 'You tried your first response',state.practice.triedWordings?.[i] || words,state.practice.tried[i])]),
       earned('usable','Your assessment',USABILITY.find(([key])=>key === state.practice.usability)?.[1]),
       earned('check-in-answer', 'Your check-in response', { okay: 'Okay for now', break: 'A break', regulate: 'Grounding support', leave: 'Leaving or another option', help: 'Help' }[state.checkIns.lastAnswer]),

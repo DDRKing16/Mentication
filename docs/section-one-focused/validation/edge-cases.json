@@ -1,0 +1,24 @@
+{
+  "production": false,
+  "passed": [
+    "390px full before/during/after: two-action checkpoints, five chosen steps, optional check-ins, two explicit practice tries, save/leave/resume, three immediate support buttons, Back/refresh, no inferred leaving or benefit, explicit outcome, archive choice, no duplicate/private host outcome",
+    "320px full before/during/after: two-action checkpoints, five chosen steps, optional check-ins, two explicit practice tries, save/leave/resume, three immediate support buttons, Back/refresh, no inferred leaving or benefit, explicit outcome, archive choice, no duplicate/private host outcome",
+    "Unprepared live access: immediate support, empty situation, no reminders, safe alternative if leaving is impossible",
+    "denied persisted notification status: honest limitation and usable in-app check-in; no physical-device delivery claimed",
+    "error persisted notification status: honest limitation and usable in-app check-in; no physical-device delivery claimed",
+    "unverified persisted notification status: honest limitation and usable in-app check-in; no physical-device delivery claimed",
+    "ended persisted notification status: honest limitation and usable in-app check-in; no physical-device delivery claimed",
+    "Elapsed-time return offers one overdue check-in and advances to next future slot without catch-up barrage",
+    "Quota failure retains immediate help; explicit retry confirms save; dialog Escape and verified full deletion",
+    "Unpractised plan and not-attempted/not-tested outcome; archive failure blocks completion until successful retry",
+    "Explicit actual action and prediction-result branch: Took part in all or some; It happened",
+    "Explicit actual action and prediction-result branch: Stepped out intentionally; Part of it happened",
+    "Explicit actual action and prediction-result branch: Did not attempt it; I did not test it",
+    "Explicit actual action and prediction-result branch: I\u2019m not sure yet; I\u2019m not sure yet",
+    "Explicit actual action and prediction-result branch: Took part in all or some; It did not happen",
+    "Own wording survives interrupted planning, refresh and Back; app-wide clear cannot resurrect draft through history"
+  ],
+  "pageErrors": [],
+  "provenance": "Synthetic user-authored examples and explicit choices. No real user outcomes, notifications or contacts. Native permission/scheduling verified separately with mocked approved adapter; physical OS delivery not tested.",
+  "executionBase": "1468a214ea06c9146150be5e7f3121c73035e6de"
+}
