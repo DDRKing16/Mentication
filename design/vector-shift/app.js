@@ -487,7 +487,7 @@ function Aa() {
   const n = (next) => { if(stageRef.current===2)alignmentPlace.current={align:M,hold:ee}; vectorClock.clear(); stageRef.current=next; ao(null); co(""); if(next!==2)qt(false); if(next===4)ju(false); setStage(next); };
   const finish = () => {if(sent.current)return;sent.current=true;
     window.parent.postMessage({type:"vector-shift:complete",sessionId:vectorSession,helpfulness,
-      exitReason,outcome:{skippedStages:skipped,easierMode:easy,gameplayOnly:true}},location.origin);
+      exitReason,practicedStages:[[/^alignment$/,2],[/^light-/,3],[/^letter-/,4],[/^feature-/,5]].filter(([pattern])=>practiceEvents.some(event=>pattern.test(event.id))).map(([,stage])=>stage),outcome:{skippedStages:skipped,easierMode:easy,gameplayOnly:true}},location.origin);
     if(window.parent===window)sent.current=false;
   };
   let
@@ -1277,12 +1277,11 @@ function Aa() {
         transition: "filter 0.7s ease"
       },
       children: [
-        practiceEvents.length>=2 && s("aside",{className:"vs-practice-reveal", "data-practice-count":practiceEvents.length,"data-checkpoint":Math.floor(practiceEvents.length/2),role:"status",children:practiceEvents.slice(Math.floor(practiceEvents.length/2)*2-2,Math.floor(practiceEvents.length/2)*2).map(event=>event.detail).join(" · ")}),
         e!==6 && e!==7 && s("section",{className:"vs-instructions",children:[
           !progressSaved && s("p",{role:"alert",children:["This tab could not save your place. Your activity is still here; refresh may lose progress. ",s("button",{onClick:retryProgress,children:"Retry saving place"})]}),
           e!==6 && e!==7 && s("h2",{className:"vs-current-instruction",tabIndex:-1,children:vectorInstructions[e]}),
           e===1 && s("p",{children:"Putting attention on colours, movement and simple choices may help you reconnect with what is around you. It may not change how you feel. These games do not measure your mood or nervous system."}),
-          e>=2 && e<=5 && s("details",{className:"vs-activity-options",children:[s("summary",{children:"Activity options"}),s("button",{"aria-pressed":easy,onClick:()=>{recordPractice("mode",easy?"You chose the original activity":"You chose an activity at your pace");setEasy(v=>!v)},children:easy?"Use original activity":"Try an easier option"})]}),
+          e>=2 && e<=5 && s("details",{className:"vs-activity-options",children:[s("summary",{children:"Activity options"}),s("button",{"aria-pressed":easy,onClick:()=>{setEasy(v=>!v)},children:easy?"Use original activity":"Try an easier option"})]}),
           easy && e===2 && s("button",{onClick:()=>{recordPractice("alignment","You noticed a colour or shape");n(3)},children:"I noticed a colour or shape — continue"}),
           easy && e===3 && s("button",{onClick:()=>{recordPractice(`light-${$e+1}`,`Light ${$e+1} collected`);Xa(v=>v+1);nc(np);if($e>=2)n(4)},children:`Collect a light at your pace (${$e}/3)`}),
           e===4 && s("button",{onClick:()=>{const letter=be.split("").find(v=>!en.has(v));if(letter)pp(letter)},children:"Reveal a letter"}),
@@ -1290,6 +1289,7 @@ function Aa() {
           easy && e===5 && s("div",{className:"vs-scan-list",children:Qa.filter(item=>!Hn.has(item.id)).slice(0,1).map(item=>s("button",{onClick:()=>{recordPractice(`feature-${item.id}`,`You noticed ${item.label}`);uo(v=>new Set([...v,item.id]));vt(`Noticed ${item.label}`)},children:`Notice ${item.label} — then tap here`},item.id))}),
           easy && e===5 && s("button",{onClick:()=>n(6),children:"I've looked — continue"})
         ]}),
+        practiceEvents.length>=2 && s("aside",{className:"vs-practice-reveal", "data-practice-count":practiceEvents.length,"data-checkpoint":Math.floor(practiceEvents.length/2),role:"status",children:[s("p",{className:"vs-reveal-label",children:"Two moments of attention"}),s("div",{className:"vs-reveal-pair",children:practiceEvents.slice(Math.floor(practiceEvents.length/2)*2-2,Math.floor(practiceEvents.length/2)*2).map(event=>s("p",{children:event.detail},event.id))})]}),
         e === 1 && _("div", {
         className: "flex flex-col w-full max-w-[760px] px-2 md:px-6 relative min-h-[78vh]",
         children: [_("div", {

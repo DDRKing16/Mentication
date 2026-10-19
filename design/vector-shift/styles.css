@@ -1,3 +1,5 @@
+.vs-practice-reveal{border-radius:20px!important;background:linear-gradient(120deg,#f6dc9420,#e6f2d708)!important;border:1px solid #e5d39260!important;text-align:left}.vs-reveal-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#e6d799;margin:0 0 8px}.vs-reveal-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}.vs-reveal-pair p{font-size:14px;line-height:1.5;margin:0}.vs-reveal-pair p+p{border-left:1px solid #e5d39250;padding-left:16px}
+
 /* Preserve the approved colours/art; readable controls sit outside game effects. */
 html {scrollbar-gutter:stable}
 body {margin:0;background:#0f2f23;color:#fff8e7}

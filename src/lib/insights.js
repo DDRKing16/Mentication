@@ -1,4 +1,5 @@
 // @ts-check
+import { ratedShift } from "./progressStory";
 import { computeEffectiveness, getIntervention } from "./interventions";
 
 // Moved to `./streak` (no intervention-data dependency) so screens that only
@@ -24,23 +25,19 @@ export function computeEffectivenessInsights(sessions = [], options = {}) {
         byDirection[s.direction] = { sessions: [], improvements: [] };
       }
       byDirection[s.direction].sessions.push(s);
-      const improvement = (s.intensity_start ?? 0) - (s.intensity_end ?? 0);
-      if (s.direction !== "lift") {
-        byDirection[s.direction].improvements.push(improvement);
-      } else {
-        byDirection[s.direction].improvements.push((s.intensity_end ?? 0) - (s.intensity_start ?? 0));
-      }
+      const improvement = ratedShift(s);
+      if (improvement !== null) byDirection[s.direction].improvements.push(improvement);
     }
   });
   
   const directionStats = Object.entries(byDirection).map(([direction, data]) => {
     const avgImprovement = data.improvements.length
       ? data.improvements.reduce((a, b) => a + b, 0) / data.improvements.length
-      : 0;
+      : null;
     return {
       direction,
       count: data.sessions.length,
-      avgImprovement: +avgImprovement.toFixed(1),
+      avgImprovement: avgImprovement === null ? null : +avgImprovement.toFixed(1),
       bestIntervention: interventionRanks.find((r) => {
         const ivSessions = data.sessions.filter((s) => s.pathway?.includes(r.id));
         return ivSessions.length > 0;
@@ -56,18 +53,18 @@ export function computeEffectivenessInsights(sessions = [], options = {}) {
       byLocation[loc] = { count: 0, improvements: [] };
     }
     byLocation[loc].count += 1;
-    const improvement = (s.intensity_start ?? 0) - (s.intensity_end ?? 0);
-    byLocation[loc].improvements.push(improvement);
+    const improvement = ratedShift(s);
+    if (improvement !== null) byLocation[loc].improvements.push(improvement);
   });
   
   const locationStats = Object.entries(byLocation).map(([location, data]) => {
     const avgImprovement = data.improvements.length
       ? data.improvements.reduce((a, b) => a + b, 0) / data.improvements.length
-      : 0;
+      : null;
     return {
       location,
       count: data.count,
-      avgImprovement: +avgImprovement.toFixed(1),
+      avgImprovement: avgImprovement === null ? null : +avgImprovement.toFixed(1),
     };
   }).sort((a, b) => b.count - a.count);
   

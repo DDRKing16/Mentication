@@ -42,3 +42,13 @@ describe("Your progress story", () => {
     expect(enough.bestTime).toMatchObject({ slot: "in the morning" });
   });
 });
+
+it('never counts selected or explicitly skipped pathways as finished practice', () => {
+  const skipped={...s(0,9,'happyBump',5,8,'lift'),completed_pathway:[],attempts:[{intervention_id:'happyBump',exit_reason:'skipped',completed_percentage:0}]};
+  expect(summariseProgress([skipped],now)).toMatchObject({total:0,helpers:[],avgShift:null});
+});
+it('rejects omitted, malformed and unmatched ratings without turning them into improvement', () => {
+  for (const end of [null,undefined,'0',false,-1,11]) expect(ratedShift({direction:'calm',intensity_start:8,intensity_end:end})).toBeNull();
+  expect(ratedShift({direction:'calm',intensity_start:8,intensity_end:0,goal_baseline:null})).toBeNull();
+  expect(ratedShift({direction:'lift',intensity_start:5,intensity_end:0})).toBe(-5);
+});

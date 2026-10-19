@@ -1,7 +1,8 @@
+import { ratedShift } from "@/lib/progressStory";
 import React, { useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { format } from "date-fns";
-import { History, TrendingDown } from "lucide-react";
+import { History } from "lucide-react";
 
 // A clean, simple history view: a line chart of activation level (0–10)
 // before and after each reset, followed by a chronological list of past
@@ -40,6 +41,7 @@ export default function ResetHistory({ sessions }) {
         start: s.intensity_start,
         end: s.intensity_end,
         duration: fmtDuration(s.duration_sec),
+        shift: ratedShift(s),
       })),
     [chrono]
   );
@@ -53,7 +55,7 @@ export default function ResetHistory({ sessions }) {
 
       {chartData.length > 1 && (
         <div className="mt-3 rounded-2xl border border-border bg-card p-4 soft-depth">
-          <p className="text-xs text-muted-foreground">Activation level (0–10) — before → after each reset</p>
+          <p className="text-xs text-muted-foreground">Goal ratings (0–10) — before → after. Different goals use different scales.</p>
           <div className="mt-3 h-[220px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
@@ -65,7 +67,7 @@ export default function ResetHistory({ sessions }) {
                   labelStyle={{ color: "hsl(var(--foreground))" }}
                 />
                 <Line type="monotone" dataKey="start" name="Before" stroke={START_COLOR} strokeWidth={2} dot={{ r: 3, fill: START_COLOR }} />
-                <Line type="monotone" dataKey="end" name="After" stroke={END_COLOR} strokeWidth={2} dot={{ r: 3, fill: END_COLOR }} connectNulls />
+                <Line type="monotone" dataKey="end" name="After" stroke={END_COLOR} strokeWidth={2} dot={{ r: 3, fill: END_COLOR }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -78,7 +80,7 @@ export default function ResetHistory({ sessions }) {
 
       <div className="mt-3 flex flex-col gap-2">
         {items.map((it) => {
-          const drop = it.start != null && it.end != null ? it.start - it.end : null;
+          const drop = it.shift;
           return (
             <div key={it.id} className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3">
               <div className="min-w-0">
@@ -89,9 +91,9 @@ export default function ResetHistory({ sessions }) {
                 <span className="tabular-nums text-primary">{it.start ?? "—"}</span>
                 <span className="text-muted-foreground">→</span>
                 <span className="tabular-nums text-accent">{it.end ?? "—"}</span>
-                {drop != null && drop > 0 && (
+                {drop != null && (
                   <span className="ml-1 inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                    <TrendingDown className="h-3 w-3" />{drop}
+                    {drop === 0 ? "No change" : `${Math.abs(drop)} ${drop > 0 ? "better" : "worse"}`}
                   </span>
                 )}
               </div>

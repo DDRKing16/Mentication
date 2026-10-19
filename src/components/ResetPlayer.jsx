@@ -1,3 +1,4 @@
+import { groundingPracticeCompletion } from '@/lib/practiceCompletionEvidence';
 import { useProgressGate } from '@/hooks/useProgressGate';
 import '@/styles/practice-editorial.css';
 import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
@@ -51,6 +52,7 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
   const [groundingPresence,setGroundingPresence] = useState(groundingResume?.presence || null);
   const [groundingHelpfulness,setGroundingHelpfulness] = useState(groundingResume?.helpfulness || null);
   const groundingContent = useRef(null);
+  const groundingCompletionSent = useRef(false);
   const [noticedSenses,setNoticedSenses] = useState(groundingResume?.noticed || []);
   const acceptSense = useProgressGate();
   const [remaining, setRemaining] = useState(pathway);
@@ -513,9 +515,11 @@ export default function ResetPlayer({ pathway, answers, sessionId, effectiveness
     setShowGroundingFeedback(true);
   };
   const completeGrounding = (presence, helpfulness) => {
+    if (groundingCompletionSent.current) return;
+    groundingCompletionSent.current = true;
     const outcome = { interventionId: iv.id, presence, stoppedEarly: !isLastStep };
     onAttemptEvent?.({ interventionId: iv.id, mechanism: iv.mechanism,
-      action: "completed", exitReason: isLastStep ? "completed" : "skipped", completedPercentage: isLastStep ? 1 : stepIndex / iv.steps.length, timestamp: Date.now() });
+      action: "completed", ...groundingPracticeCompletion(noticedSenses,isLastStep), timestamp: Date.now() });
     setShowGroundingFeedback(false);
     if (isLastIv) { onComplete({ requireGoalReassessment: true, helpfulness, outcome }); return; }
     setIvIndex((index) => index + 1);

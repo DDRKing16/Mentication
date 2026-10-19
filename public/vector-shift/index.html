@@ -615,7 +615,7 @@ function Aa() {
   const n = (next) => { if(stageRef.current===2)alignmentPlace.current={align:M,hold:ee}; vectorClock.clear(); stageRef.current=next; ao(null); co(""); if(next!==2)qt(false); if(next===4)ju(false); setStage(next); };
   const finish = () => {if(sent.current)return;sent.current=true;
     window.parent.postMessage({type:"vector-shift:complete",sessionId:vectorSession,helpfulness,
-      exitReason,outcome:{skippedStages:skipped,easierMode:easy,gameplayOnly:true}},location.origin);
+      exitReason,practicedStages:[[/^alignment$/,2],[/^light-/,3],[/^letter-/,4],[/^feature-/,5]].filter(([pattern])=>practiceEvents.some(event=>pattern.test(event.id))).map(([,stage])=>stage),outcome:{skippedStages:skipped,easierMode:easy,gameplayOnly:true}},location.origin);
     if(window.parent===window)sent.current=false;
   };
   let

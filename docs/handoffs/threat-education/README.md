@@ -35,6 +35,7 @@ All browser launches use `--mute-audio`; synthetic text only. No narration was g
 ## Coverage limits
 
 - Chromium mobile-sized viewports, not physical iPhones, native Capacitor or Safari/WebKit. No claim of App Store submission readiness or native audio/StoreKit validation.
+- Follow-up: the actual full Happy Bump → Lift → Dear browser route is now verified at both widths in [the completion audit](../completion-audit/README.md). The original limitation below describes the earlier evidence-only run.
 - Home and post-Lift handoffs converge on `/dear-2100` by source inspection; conditional post-Lift eligibility/navigation is covered by existing unit tests, not a new full Happy Bump → Lift → Dear browser run. Library, Restructure and direct URLs were exercised in the browser.
 - No external support site was opened; the link remains available with its existing URL. No production user data or hosting was touched.
 - Local checks are not remote CI. GitHub CLI reported invalid authentication; remote PR/CI availability is reported separately in the handoff.

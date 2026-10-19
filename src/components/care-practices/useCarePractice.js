@@ -1,3 +1,4 @@
+import { carePracticeCompletion } from '@/lib/practiceCompletionEvidence';
 import { useEffect, useRef, useState } from 'react';
 import { careClick, careOutcome, freshCareState, restoreCareState } from '@/lib/carePractices';
 import * as store from '@/lib/carePracticeStorage';
@@ -45,7 +46,7 @@ export default function useCarePractice(id, props) {
     if (!adapter.current.deleteDraft(id)) { setError('The draft could not be cleared. Try Finish again.'); return; }
     finished.current = true;
     if (viewingSaved) { props.onExit?.(); return; }
-    props.onAttemptEvent?.({ interventionId: id, mechanism: props.intervention?.mechanism, action: 'completed', completedPercentage: 1, timestamp: Date.now() });
+    props.onAttemptEvent?.({ interventionId: id, mechanism: props.intervention?.mechanism, action: 'completed', ...carePracticeCompletion(state), timestamp: Date.now() });
     props.onComplete?.({ requireGoalReassessment: true, outcome: careOutcome(id, state) });
   };
   const save = () => {

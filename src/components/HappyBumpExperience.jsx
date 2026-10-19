@@ -1,3 +1,4 @@
+import { happyBumpCompletion } from '@/lib/practiceCompletionEvidence';
 import { useProgressGate } from '@/hooks/useProgressGate';
 import { clearPracticeDraft } from '@/lib/practiceInteraction';
 import PracticeIllustration from '@/components/journey/PracticeIllustration';
@@ -118,11 +119,12 @@ export default function HappyBumpExperience({ intervention, answers, onComplete,
     if (!clearPracticeDraft(undefined,ID)) {setFinishError(true);return;}
     completionSent.current = true;
     const outcome = energyOutcome(s);
+    const completion = happyBumpCompletion(s);
     playComplete(); hapticPattern([10, 50, 14, 65, 20]);
-    rememberFlagshipEvent({ interventionId: ID, completed: true,
+    rememberFlagshipEvent({ interventionId: ID, completed: completion.exitReason === "completed",
       ...(s.helpfulness === "helpful" ? { worthwhile: true } : ["same", "worse"].includes(s.helpfulness) ? { worthwhile: false } : {}),
       options: { context: s.environment, contactLevel: s.contactStatus || "not_confirmed", actionSize: s.taskStatus || "not_confirmed", lifeArea: s.lifeArea, nextMode: s.nextMode, ...(outcome.shift == null ? {} : { energyShift: outcome.shift }), helpfulness: s.helpfulness || "not_answered" } });
-    onAttemptEvent?.({ interventionId: ID, mechanism: intervention.mechanism, action: "completed", completedPercentage: 1, helpfulness:s.helpfulness, timestamp: Date.now() });
+    onAttemptEvent?.({ interventionId: ID, mechanism: intervention.mechanism, action: "completed", ...completion, helpfulness:s.helpfulness, timestamp: Date.now() });
     onComplete?.({ interventionId: ID, skipReflection: true, outcome });
   };
   const nextPlanReady = s.nextActivity.trim();

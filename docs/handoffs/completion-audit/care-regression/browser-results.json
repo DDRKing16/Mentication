@@ -1,0 +1,66 @@
+{
+  "completed": false,
+  "results": [
+    {
+      "id": "selfCompassion",
+      "width": 320,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": false,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "unhook",
+      "width": 320,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": false,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "makeRoom",
+      "width": 320,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": false,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "selfCompassion",
+      "width": 390,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": true,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    },
+    {
+      "id": "unhook",
+      "width": 390,
+      "fullJourney": true,
+      "keyboard": true,
+      "refreshBackEdit": true,
+      "repeatDelete": true,
+      "saveFailures": true,
+      "privateHistory": true,
+      "deduplicated": true,
+      "blankUnchangedWorseUntried": true
+    }
+  ],
+  "errors": []
+}

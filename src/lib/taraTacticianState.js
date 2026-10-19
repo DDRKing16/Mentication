@@ -1,3 +1,4 @@
+import { taraPracticeCompletion } from './practiceCompletionEvidence';
 import { newTaraPractice } from './taraGuidance';
 import { FLOW_PHASES, screenFor } from './getThroughFlow';
 import { newSupportPlan, newTaraCheckIns, readSupportPlan, readTaraCheckIns } from './taraSupportPlan';
@@ -108,7 +109,7 @@ export function validateTaraState(raw) {
 }
 export function taraCompletion(state) {
   // Deliberate coarse fields only. Host integration must allowlist any new enums.
-  return { interventionId: TARA_ID, completion: 'completed', saved: state.saved,
+  return { interventionId: TARA_ID, completion: taraPracticeCompletion(state).exitReason, saved: state.saved,
     eventStatus: state.eventStatus, predictionComparison: state.comparison || null, predictionResult: state.predictionResult || null, rehearsed: state.rehearsed };
 }
 

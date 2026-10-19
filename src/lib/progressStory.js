@@ -5,18 +5,8 @@ import { getIntervention } from "@/lib/interventions";
 
 const DAY = 86400000;
 
-/**
- * How much better a session left someone, from their own ratings.
- * Positive = better. For "lift" a higher after-rating is better; for
- * everything else (calm, ground, sleep, focus) a lower one is.
- */
-export function ratedShift(session) {
-  const start = Number(session?.intensity_start);
-  const end = Number(session?.intensity_end);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
-  if (session?.intensity_end == null || session?.intensity_start == null) return null;
-  return session?.direction === "lift" ? end - start : start - end;
-}
+export { ratedShift, finishedPracticeIds } from "./sessionEvidence.js";
+import { ratedShift, finishedPracticeIds } from "./sessionEvidence.js";
 
 const slotFor = (date) => {
   const h = date.getHours();
@@ -32,6 +22,7 @@ const dayKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 export function summariseProgress(sessions = [], now = new Date()) {
   const dated = sessions
+    .filter(s => finishedPracticeIds(s).length > 0 || s.attempts?.some(a => a.exit_reason !== "skipped" && a.completed_percentage > 0))
     .map((s) => ({ s, at: new Date(s?.created_date) }))
     .filter(({ at }) => !Number.isNaN(at.getTime()));
 
@@ -42,7 +33,7 @@ export function summariseProgress(sessions = [], now = new Date()) {
   // What helps: credit each exercise finished in a rated session.
   const byExercise = new Map();
   for (const { s } of dated) {
-    const ids = s?.completed_pathway?.length ? s.completed_pathway : s?.pathway || [];
+    const ids = finishedPracticeIds(s);
     const shift = ratedShift(s);
     for (const id of new Set(ids)) {
       const entry = byExercise.get(id) || { id, uses: 0, shifts: [] };

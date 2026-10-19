@@ -145,6 +145,12 @@ describe("Tomorrow Parking Lot storage", () => {
     expect(readDraft(NIGHT)).toBeNull();expect(readParkingReturn(NIGHT)).toEqual({step:'quiet',record:note});
     expect([...window.sessionStorage.values.values()].join('')).not.toContain(note.text);
   });
+  it('keeps the originating completion session across a saved-note return without private words',()=>{
+    const note=parkNote({id:'synthetic-return',text:'Private note'},NIGHT);
+    expect(writeParkingReturn(note.id,'parked',NIGHT,{completionSessionId:'synthetic-session'})).toBe(true);
+    expect(readParkingReturn(NIGHT)).toMatchObject({completionSessionId:'synthetic-session'});
+    expect([...window.sessionStorage.values.values()].join('')).not.toContain(note.text);
+  });
   it('does not restore a deleted or expired parked note or an expired return pointer',()=>{
     const note=parkNote({id:'synthetic-return',text:'Synthetic parked words'},NIGHT);writeParkingReturn(note.id,'parked',NIGHT);
     expect(readParkingReturn(new Date(NIGHT.getTime()+25*3_600_000))).toBeNull();

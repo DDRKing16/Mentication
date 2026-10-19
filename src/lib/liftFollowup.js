@@ -29,7 +29,7 @@ export function moodResponse(before, after) {
 // Defaults and the experience's energy outcome are deliberately not inputs.
 export function withLiftCheckin(session, mood, distress, answeredAt = new Date().toISOString()) {
   if (!session?.id || session.direction !== 'lift' || !session.completed_pathway?.includes('happyBump')) return null;
-  if (!isAnsweredRating(mood) || !isAnsweredRating(distress)) return null;
+  if ((mood !== null && !isAnsweredRating(mood)) || (distress !== null && !isAnsweredRating(distress))) return null;
   return {
     ...session,
     intensity_end: mood,

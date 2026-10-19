@@ -1,0 +1,28 @@
+[
+  {
+    "width": 320,
+    "pass": true,
+    "checks": [
+      "honest unavailable voice",
+      "real-time playback with browser muted",
+      "pause/reload/resume",
+      "stop with missing rating",
+      "other next steps/back",
+      "finish"
+    ],
+    "limits": "Muted browser; no audio audition, native haptics or closed-phone claim"
+  },
+  {
+    "width": 390,
+    "pass": true,
+    "checks": [
+      "honest unavailable voice",
+      "real-time playback with browser muted",
+      "pause/reload/resume",
+      "stop with missing rating",
+      "other next steps/back",
+      "finish"
+    ],
+    "limits": "Muted browser; no audio audition, native haptics or closed-phone claim"
+  }
+]

@@ -19,7 +19,7 @@ import "@/styles/tomorrow-parking.css";
 
 const ID = "tomorrowParking";
 
-export default function TomorrowParkingExperience({ intervention, answers, onGoalBaseline, onAttemptEvent, onComplete, onExit }) {
+export default function TomorrowParkingExperience({ intervention, answers, sessionId, onGoalBaseline, onAttemptEvent, onComplete, onExit }) {
   const navigate = useNavigate();
   const { prefs } = useAccessibilityPrefs();
   const [restored] = useState(()=>{try{return {draft:readDraft(),parked:readParkingReturn(),error:false};}catch{return {draft:readDraft(),parked:null,error:true};}});
@@ -39,7 +39,9 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
   const [rating, setRating] = useState(5);
   const identity = useRef(restored.parked?.record.id || draft?.recordId || newId());
   const inFlight = useRef(false);
-  const completionReported = useRef(!!restored.parked);
+  const completionReported = useRef(false);
+  const completionOwner = useRef(restored.parked?.completionSessionId || null);
+  const finishSent = useRef(false);
   useJourneyScreenHistory(ID,step,next=>{
     if(['suitability','capture','baseline','seal','parked','quiet','feedback'].includes(next) && (!['parked','quiet','feedback'].includes(next)||saved))setStep(next);
   });
@@ -49,9 +51,9 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
   const reducedMotion = !!prefs.reducedMotion;
 
   useEffect(() => {
-    if(step==='seal' && saved?.text===text.trimEnd()) setReturnOk(writeParkingReturn(saved.id,'parked'));
+    if(step==='seal' && saved?.text===text.trimEnd()) setReturnOk(writeParkingReturn(saved.id,'parked',undefined,{completionSessionId:completionOwner.current}));
     else if (["suitability","capture","baseline","seal"].includes(step)) setDraftAvailable(writeDraft(text, identity.current,undefined,{step,canWait:suitability==='wait'}));
-    else if(saved) setReturnOk(writeParkingReturn(saved.id,step,undefined,{helpfulness}));
+    else if(saved) setReturnOk(writeParkingReturn(saved.id,step,undefined,{helpfulness,completionSessionId:completionOwner.current}));
   }, [text, step, suitability, saved, helpfulness]);
   useEffect(() => { title.current?.focus({ preventScroll: true }); window.scrollTo(0, 0); }, [step]);
   useEffect(()=>{
@@ -82,9 +84,10 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
     setSaveError(null);
     try {
       const record = parkNote({ id: identity.current, text });
+      completionOwner.current = sessionId;
       setSaved(record);
       clearDraft();
-      setReturnOk(writeParkingReturn(record.id,'parked'));
+      setReturnOk(writeParkingReturn(record.id,'parked',undefined,{completionSessionId:sessionId}));
       rememberFlagshipEvent({ interventionId: ID, completed: true, options: { parkingItem: "captured" } });
       clearActiveFlagship(ID);
       if (!completionReported.current) onAttemptEvent?.({ interventionId: ID, mechanism: intervention?.mechanism, action: "completed", completedPercentage: 1, timestamp: Date.now() });
@@ -96,9 +99,17 @@ export default function TomorrowParkingExperience({ intervention, answers, onGoa
       inFlight.current = false;
       return false;
     }
-  }, [text, intervention?.mechanism, onAttemptEvent]);
+  }, [text, intervention?.mechanism, onAttemptEvent, sessionId]);
 
   const finish = (navigateTo, reassess = false) => {
+    if (finishSent.current) return;
+    finishSent.current = true;
+    // Reopening a saved note is a return, not another performed practice.
+    if (saved && completionOwner.current !== sessionId) { navigate(navigateTo || "/"); return; }
+    if (saved && !completionReported.current) {
+      onAttemptEvent?.({ interventionId: ID, mechanism: intervention?.mechanism, action: "completed", completedPercentage: 1, timestamp: Date.now() });
+      completionReported.current = true;
+    }
     if (saved) onComplete?.({ interventionId: ID, skipReflection: true, requireGoalReassessment: reassess && !!baseline, helpfulness, outcome: { parked: true, durationSec: Math.round((Date.now() - startedAt.current) / 1000) }, navigateTo });
     else onExit?.();
   };

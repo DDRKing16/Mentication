@@ -1,3 +1,4 @@
+import { ratedShift, finishedPracticeIds } from "./sessionEvidence.js";
 import { dislikePenalty } from "./preferences.js";
 import {
   computeEffectivenessV3,
@@ -1481,10 +1482,10 @@ export function computeEffectiveness(sessions = []) {
 }
 
 export function pickLastWorked(sessions = []) {
-  const valid = sessions.filter((s) => (s.pathway || []).length && s.intensity_start != null && s.intensity_end != null);
-  const yes = valid.find((s) => s.would_use_again === "yes" && (improvementOf(s) ?? 0) > 0);
+  const valid = sessions.filter((s) => finishedPracticeIds(s).length && ratedShift(s) != null);
+  const yes = valid.find((s) => s.would_use_again === "yes" && (ratedShift(s) ?? 0) > 0);
   if (yes) return yes;
-  return valid.find((s) => (improvementOf(s) ?? 0) > 0) || null;
+  return valid.find((s) => (ratedShift(s) ?? 0) > 0) || null;
 }
 
 // "Use what works for you" — assemble a fresh pathway from the practices that
@@ -1518,15 +1519,15 @@ export function buildPersonalBest(sessions = []) {
 }
 
 export function buildProfile(sessions = []) {
-  const valid = sessions.filter((s) => s.intensity_start != null && s.intensity_end != null);
+  const valid = sessions.filter((s) => finishedPracticeIds(s).length > 0 && ratedShift(s) != null);
   const avg = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
   const avgStart = +avg(valid.map((s) => s.intensity_start)).toFixed(1);
   const avgEnd = +avg(valid.map((s) => s.intensity_end)).toFixed(1);
 
   const toolMap = {};
   valid.forEach((s) => {
-    const drop = improvementOf(s) ?? 0;
-    (s.pathway || []).forEach((n) => {
+    const drop = ratedShift(s) ?? 0;
+    finishedPracticeIds(s).forEach((n) => {
       const id = idFor(n);
       if (!id) return;
       if (!toolMap[id]) toolMap[id] = { id, uses: 0, dropSum: 0 };
@@ -1544,8 +1545,8 @@ export function buildProfile(sessions = []) {
   const topTools = (() => {
     const map = {};
     valid.forEach((s) => {
-      const drop = improvementOf(s) ?? 0;
-      (s.pathway || []).forEach((n) => {
+      const drop = ratedShift(s) ?? 0;
+      finishedPracticeIds(s).forEach((n) => {
         const id = idFor(n);
         if (!id) return;
         if (!map[id]) map[id] = { id, uses: 0, dropSum: 0 };
@@ -1554,29 +1555,30 @@ export function buildProfile(sessions = []) {
     });
     return Object.values(map)
       .map((t) => ({ id: t.id, name: (getIntervention(t.id) || {}).name || t.id, uses: t.uses, drop: +(t.dropSum / t.uses).toFixed(1) }))
-      .filter((t) => t.uses >= 1)
+      .filter((t) => t.uses >= 1 && t.drop > 0)
       .sort((a, b) => b.drop - a.drop || b.uses - a.uses)
       .slice(0, 5);
   })();
 
   const combos = {};
   valid.forEach((s) => {
-    const ids = (s.pathway || []).map(idFor).filter(Boolean);
+    const ids = finishedPracticeIds(s).map(idFor).filter(Boolean);
     if (!ids.length) return;
     const key = ids.join("→");
     if (!combos[key]) combos[key] = { ids, n: 0, dropSum: 0 };
     combos[key].n += 1;
-    combos[key].dropSum += (improvementOf(s) ?? 0);
+    combos[key].dropSum += (ratedShift(s) ?? 0);
   });
   const bestCombo = Object.values(combos)
     .map((c) => ({ ...c, drop: +(c.dropSum / c.n).toFixed(1), names: c.ids.map((id) => (getIntervention(id) || {}).name || id) }))
+    .filter((c) => c.drop > 0)
     .sort((a, b) => b.drop - a.drop)[0] || null;
 
   return {
     count: valid.length,
     avgStart,
     avgEnd,
-    change: +avg(valid.map((s) => (improvementOf(s) ?? 0))).toFixed(1),
+    change: +avg(valid.map((s) => (ratedShift(s) ?? 0))).toFixed(1),
     mostUsed,
     topTools,
     bestCombo,

@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 import { TrendingUp, Zap, MapPin, Loader } from "lucide-react";
 import { useDeviceSessions } from "@/hooks/useDeviceSessions";
 import { computeEffectivenessInsights } from "@/lib/insights";
-import { getBumpFunnel } from "@/lib/happyBumpFunnel";
+
 import FlowHomeButton from "@/components/FlowHomeButton";
 import ProgressStory from "@/components/insights/ProgressStory";
-import { summariseProgress } from "@/lib/progressStory";
+import { summariseProgress, finishedPracticeIds } from "@/lib/progressStory";
 
 export default function EffectivenessDashboard() {
   const {sessions,ready,error,reload}=useDeviceSessions(100);
   const insights=useMemo(()=>computeEffectivenessInsights(sessions),[sessions]);
   const story=useMemo(()=>summariseProgress(sessions),[sessions]);
-  const bumpRuns = getBumpFunnel().runs || [];
-  const completedBumps = bumpRuns.filter((run) => run.scenes?.includes("complete")).length;
+  const bumpRuns = sessions.filter(session => session.pathway?.includes("happyBump"));
+  const completedBumps = bumpRuns.filter(session => finishedPracticeIds(session).includes("happyBump")).length;
 
 
   if (!ready || !insights) {
@@ -98,7 +98,7 @@ export default function EffectivenessDashboard() {
           >
             <h2 className="font-heading text-lg font-medium text-primary">The Happy Bump flow</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {completedBumps} completed {completedBumps === 1 ? "run" : "runs"} from {bumpRuns.length} started.
+              {completedBumps} with confirmed practice from {bumpRuns.length} saved {bumpRuns.length === 1 ? "session" : "sessions"}.
             </p>
           </motion.div>
         )}
@@ -126,7 +126,7 @@ export default function EffectivenessDashboard() {
                       <p className="text-xs text-muted-foreground">{dir.count} sessions</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-emerald-600">↓ {dir.avgImprovement}</p>
+                      <p className="font-semibold text-primary">{dir.avgImprovement === null ? "Not measured" : dir.avgImprovement === 0 ? "No change" : `${Math.abs(dir.avgImprovement)} points ${dir.avgImprovement > 0 ? "better" : "worse"}`}</p>
                       <p className="text-xs text-muted-foreground">avg rated shift</p>
                     </div>
                   </div>
@@ -161,7 +161,7 @@ export default function EffectivenessDashboard() {
                 >
                   <div>
                     <p className="font-medium text-foreground capitalize">{loc.location}</p>
-                    <p className="text-xs text-muted-foreground">{loc.count} sessions • ↓ {loc.avgImprovement}</p>
+                    <p className="text-xs text-muted-foreground">{loc.count} sessions • {loc.avgImprovement === null ? "Change not measured" : loc.avgImprovement === 0 ? "No change" : `${Math.abs(loc.avgImprovement)} points ${loc.avgImprovement > 0 ? "better" : "worse"}`}</p>
                   </div>
                   <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center">
                     <MapPin className="h-4 w-4 text-blue-600" />

@@ -1,0 +1,38 @@
+[
+  {
+    "answer": "Did not attempt it",
+    "exit": "skipped",
+    "passed": true,
+    "checks": [
+      "no rehearsal",
+      "reload before finish",
+      "repeated finish",
+      "close saved recap without new session",
+      "no invented mood"
+    ]
+  },
+  {
+    "answer": "Stepped out intentionally",
+    "exit": "exited",
+    "passed": true,
+    "checks": [
+      "no rehearsal",
+      "reload before finish",
+      "repeated finish",
+      "close saved recap without new session",
+      "no invented mood"
+    ]
+  },
+  {
+    "answer": "Took part in all or some",
+    "exit": "completed",
+    "passed": true,
+    "checks": [
+      "no rehearsal",
+      "reload before finish",
+      "repeated finish",
+      "close saved recap without new session",
+      "no invented mood"
+    ]
+  }
+]
