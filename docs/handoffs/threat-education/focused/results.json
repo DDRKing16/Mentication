@@ -1,0 +1,32 @@
+[
+  {
+    "width": 320,
+    "passed": true,
+    "checks": [
+      "automatic original framework and illustrated phases",
+      "pause and support before pass",
+      "reload on visual and partial quiz",
+      "browser Back retains answer",
+      "double click cannot skip unanswered question",
+      "2/4 blocked; retry clears selections; 3/4 passes",
+      "save exit and reopen score",
+      "four unique quiz checkpoints after retry",
+      "no commitment or outcome evidence"
+    ]
+  },
+  {
+    "width": 390,
+    "passed": true,
+    "checks": [
+      "automatic original framework and illustrated phases",
+      "pause and support before pass",
+      "reload on visual and partial quiz",
+      "browser Back retains answer",
+      "double click cannot skip unanswered question",
+      "2/4 blocked; retry clears selections; 3/4 passes",
+      "save exit and reopen score",
+      "four unique quiz checkpoints after retry",
+      "no commitment or outcome evidence"
+    ]
+  }
+]
