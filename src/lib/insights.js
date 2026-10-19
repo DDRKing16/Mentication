@@ -1,6 +1,6 @@
 // @ts-check
-import { ratedShift } from "./progressStory";
-import { computeEffectiveness, getIntervention } from "./interventions";
+import { ratedShift, finishedPracticeIds } from "./sessionEvidence.js";
+import { getIntervention } from "./interventions";
 
 // Moved to `./streak` (no intervention-data dependency) so screens that only
 // need the streak don't have to load the recommendation engine; re-exported
@@ -9,14 +9,31 @@ export { computeLocalCalendarStreak } from "./streak";
 import { computeLocalCalendarStreak } from "./streak";
 
 export function computeEffectivenessInsights(sessions = [], options = {}) {
-  const eff = computeEffectiveness(sessions);
-  
-  // Top interventions by global effectiveness
-  const interventionRanks = Object.entries(eff)
-    .filter(([k]) => !["recentMap", "usageCount", "categoryUsage", "totalUses", "contextMap", "mechanismMap", "engineVersion"].includes(k))
-    .map(([id, score]) => ({ id, score, name: getIntervention(id)?.name || id }))
-    .sort((a, b) => b.score - a.score);
-  
+  // Recommendation priors are not observations. Only matched ratings after
+  // confirmed practice may support a claim of a helpful result.
+  const observed = new Map();
+  const contexts = new Map();
+  sessions.forEach(session => {
+    const shift = ratedShift(session);
+    if (shift == null) return;
+    for (const id of new Set(finishedPracticeIds(session))) {
+      const values = observed.get(id) || [];
+      observed.set(id, [...values, shift]);
+      const location = session.context_snapshot?.location || session.location;
+      if (session.direction && location) {
+        const key = JSON.stringify([session.direction, location, id]);
+        const entry = contexts.get(key) || { direction: session.direction, location, intervention: getIntervention(id)?.name || id, shifts: [] };
+        entry.shifts.push(shift);
+        contexts.set(key, entry);
+      }
+    }
+  });
+  const mean = values => +(values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1);
+  const interventionRanks = [...observed.entries()]
+    .map(([id, shifts]) => ({ id, avgShift: mean(shifts), ratedUses: shifts.length, name: getIntervention(id)?.name || id }))
+    .filter(result => result.avgShift > 0)
+    .sort((a, b) => b.avgShift - a.avgShift);
+
   // Group by direction to find "best direction" (most improvement, most use)
   const byDirection = {};
   sessions.forEach((s) => {
@@ -38,10 +55,7 @@ export function computeEffectivenessInsights(sessions = [], options = {}) {
       direction,
       count: data.sessions.length,
       avgImprovement: avgImprovement === null ? null : +avgImprovement.toFixed(1),
-      bestIntervention: interventionRanks.find((r) => {
-        const ivSessions = data.sessions.filter((s) => s.pathway?.includes(r.id));
-        return ivSessions.length > 0;
-      }),
+
     };
   }).sort((a, b) => b.count - a.count);
   
@@ -68,29 +82,11 @@ export function computeEffectivenessInsights(sessions = [], options = {}) {
     };
   }).sort((a, b) => b.count - a.count);
   
-  // Context patterns: interventions that work best in specific situations
-  const contextPatterns = [];
-  if (eff.contextMap) {
-    Object.entries(eff.contextMap).forEach(([contextKey, ivMap]) => {
-      const [direction, where, intensity, location] = contextKey.split("|");
-      const topIv = Object.entries(ivMap)
-        .filter(([, score]) => score > 0.6)
-        .sort(([, a], [, b]) => b - a)[0];
-      if (topIv) {
-        contextPatterns.push({
-          context: contextKey,
-          direction,
-          where,
-          intensity,
-          location,
-          intervention: topIv[0],
-          score: +(topIv[1]).toFixed(2),
-        });
-      }
-    });
-  }
-  contextPatterns.sort((a, b) => b.score - a.score);
-  
+  const contextPatterns = [...contexts.values()]
+    .map(({shifts, ...context}) => ({...context, avgShift: mean(shifts), ratedUses: shifts.length}))
+    .filter(result => result.ratedUses >= 2 && result.avgShift > 0)
+    .sort((a,b) => b.avgShift - a.avgShift);
+
   return {
     topInterventions: interventionRanks.slice(0, 5),
     directionStats,

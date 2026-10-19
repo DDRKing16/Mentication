@@ -12,7 +12,7 @@ Baseline: `f122c01db677ed5903e61efcfc14b66033a614ca` (PR27–31), following thre
 
 ## Checks
 
-Final local checks: **113 test files / 976 tests passed**; typecheck, lint, production build and `node scripts/verify-v3-algorithm.mjs` passed. The build retains the existing chunk-size warning. Exact outputs are in `checks/`. These are local results, not remote CI.
+Initial local checks: **113 test files / 976 tests passed**; typecheck, lint, production build and `node scripts/verify-v3-algorithm.mjs` passed. The build retains the existing chunk-size warning. Exact outputs are in `checks/`. These are local results, not remote CI.
 
 All 20 reachable journeys were loaded at 320×568 and 390×844: `inventory/routes.json` contains the actual URLs, frame text, overflow and page errors (40 captures, zero page errors). The following table distinguishes deeper interaction coverage from source inspection. Host journeys run through `/reset`, including direct aliases; standalone documents use their actual React wrapper/iframe, not obsolete similarly named components.
 
@@ -56,6 +56,19 @@ PLAYWRIGHT_MODULE=/tmp/threat-browser/node_modules/playwright node scripts/verif
 PLAYWRIGHT_MODULE=/tmp/threat-browser/node_modules/playwright node scripts/verify-completion-history.cjs
 BASE_URL=http://localhost:5181 PLAYWRIGHT_MODULE=/tmp/threat-browser/node_modules/playwright EVIDENCE_DIR=docs/handoffs/completion-audit/checkpoints node scripts/verify-two-action-checkpoints.cjs
 ```
+
+## Independent-review follow-up (PR32)
+
+The initial handoff missed positive-help claims in ProgressStory and presentation of recommendation priors as user ratings. This follow-up fixes those concrete findings:
+
+- `What helps you most` requires at least two actual matched ratings after confirmed completion and a positive average. Missing, zero and negative averages cannot qualify. Mixed results include worse ratings in the average; the UI shows the actual rated denominator rather than saying “usually.”
+- Best-time claims require a positive average as well as the existing sample/comparison threshold. A merely less-worse or unchanged time is not described as helpful.
+- Monthly summaries explicitly display negative and unchanged averages instead of hiding them behind a generic practice count.
+- Insights no longer reads recommendation scores for displayed results. Positive practice cards and situation patterns use actual matched ratings after confirmed practice; recommendation priors and engine behavior are unchanged. The misleading “Rated fit 50%” and usage claim inferred from score rank are removed.
+- Final full checks: **113 files / 984 tests passed**, typecheck, lint, production build and algorithm verification passed (`checks/review-*.txt`).
+- `review-insights/` contains ten passing rendered cases (missing, unchanged, worse, skipped/unrated, mixed × 320/390px). `review-history/` reruns the original omitted Calm / worse Lift-to-zero / unchanged Ground fixture, now asserting that no positive-help card appears. All synthetic, muted, zero page errors in the new matrix, no horizontal overflow. An initial new test-harness run attempted fixture setup in sandboxed child frames; restricting setup to the top frame fixed the harness before the passing run.
+- Reproduce: `PLAYWRIGHT_MODULE=/tmp/threat-browser/node_modules/playwright node scripts/verify-insights-evidence.cjs`.
+- Parent created draft PR32 using its connected GitHub access. Local API publication restrictions remain unchanged; parent will confirm CI on the updated head. No merge/deploy performed.
 
 ## Limits and publication
 

@@ -60,7 +60,7 @@ export default function EffectivenessDashboard() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Zap className="h-5 w-5 text-amber-500" />
-              <h2 className="font-heading text-lg font-medium text-primary">Most often useful</h2>
+              <h2 className="font-heading text-lg font-medium text-primary">Practices with better ratings</h2>
             </div>
             <div className="space-y-2">
               {insights.topInterventions.map((iv, idx) => (
@@ -71,17 +71,10 @@ export default function EffectivenessDashboard() {
                   <div>
                     <p className="font-medium text-foreground">{iv.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      Rated fit {(iv.score * 100).toFixed(0)}% — based on your check-ins, not a clinical score
+                      {iv.avgShift} points better on average across {iv.ratedUses} rated {iv.ratedUses === 1 ? "practice" : "practices"}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <div className="h-2 w-24 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-indigo to-violet"
-                        style={{ width: `${iv.score * 100}%` }}
-                      />
-                    </div>
-                  </div>
+
                 </div>
               ))}
             </div>
@@ -130,11 +123,7 @@ export default function EffectivenessDashboard() {
                       <p className="text-xs text-muted-foreground">avg rated shift</p>
                     </div>
                   </div>
-                  {dir.bestIntervention && (
-                    <p className="text-xs text-muted-foreground">
-                      You used most here: <span className="text-foreground font-medium">{dir.bestIntervention.name}</span>
-                    </p>
-                  )}
+
                 </div>
               ))}
             </div>
@@ -187,13 +176,10 @@ export default function EffectivenessDashboard() {
                   <p className="font-medium text-foreground mb-1">
                     When {pattern.direction} at {pattern.location}
                   </p>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Intensity {pattern.intensity} • {pattern.where}
-                  </p>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-foreground font-medium">{pattern.intervention}</p>
                     <div className="text-xs font-semibold text-indigo-600">
-                      {(pattern.score * 100).toFixed(0)}%
+                      {pattern.avgShift} points better · {pattern.ratedUses} rated practices
                     </div>
                   </div>
                 </div>

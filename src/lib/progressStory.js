@@ -43,8 +43,8 @@ export function summariseProgress(sessions = [], now = new Date()) {
     }
   }
   const helpers = [...byExercise.values()]
-    .map((e) => ({ id: e.id, name: getIntervention(e.id)?.name || null, uses: e.uses, avgShift: e.shifts.length >= 2 ? round1(average(e.shifts)) : null }))
-    .filter((e) => e.name)
+    .map((e) => ({ id: e.id, name: getIntervention(e.id)?.name || null, uses: e.uses, ratedUses: e.shifts.length, avgShift: e.shifts.length >= 2 ? round1(average(e.shifts)) : null }))
+    .filter((e) => e.name && e.avgShift != null && e.avgShift > 0)
     .sort((a, b) => (b.avgShift ?? -99) - (a.avgShift ?? -99) || b.uses - a.uses)
     .slice(0, 3);
 
@@ -68,7 +68,7 @@ export function summariseProgress(sessions = [], now = new Date()) {
   const slots = [...bySlot.entries()].filter(([, v]) => v.length >= 2).map(([slot, v]) => ({ slot, avgShift: round1(average(v)) }));
   slots.sort((a, b) => b.avgShift - a.avgShift);
   const ratedTotal = [...bySlot.values()].reduce((n, v) => n + v.length, 0);
-  const bestTime = ratedTotal >= 4 && slots.length >= 2 && slots[0].avgShift > slots[slots.length - 1].avgShift ? slots[0] : null;
+  const bestTime = ratedTotal >= 4 && slots.length >= 2 && slots[0].avgShift > 0 && slots[0].avgShift > slots[slots.length - 1].avgShift ? slots[0] : null;
 
   return {
     total: dated.length,

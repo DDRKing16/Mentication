@@ -4,6 +4,8 @@ Several journeys could record completion after every activity was skipped; Lift 
 
 Preserves PR27–31 artwork and checkpoint accounting. Vector's editable source is reconciled with its already-shipped PR31 build; the shipped document changes only its completion bridge. Compulsory Dear 2100 education was already correct and remains unchanged.
 
-Validation: 976 tests across 113 files; typecheck, lint, build and recommendation algorithm checks pass. All 20 active routes captured at 320/390px, targeted full journeys and completion regressions, Back/reload/repeated clicks, check-in save-failure retry, history dedup, and real Happy Bump → Lift → Dear compulsory visual. Muted Chromium and synthetic data only.
+Validation: 984 tests across 113 files; typecheck, lint, build and recommendation algorithm checks pass. All 20 active routes captured at 320/390px, targeted full journeys and completion regressions, Back/reload/repeated clicks, check-in save-failure retry, history dedup, and real Happy Bump → Lift → Dear compulsory visual. Muted Chromium and synthetic data only.
 
 See `docs/handoffs/completion-audit/README.md` for exact per-route coverage, initial failures/final reruns, screenshots, logs and limitations. Native iPhone/Safari, StoreKit and overnight/background audio are not validated. Historical data is not rewritten. No deployment or hosting changes.
+
+Independent-review follow-up removes positive-help claims for missing/unchanged/worse results and replaces prior-based “Rated fit” percentages with actual observed rating changes. Recommendation priors are untouched. Ten additional mobile fixture checks plus the original history fixtures pass.
