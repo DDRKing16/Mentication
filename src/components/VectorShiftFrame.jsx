@@ -1,3 +1,4 @@
+import { vectorPracticeCompletion } from '@/lib/practiceCompletionEvidence';
 import JourneyOptions from '@/components/journey/JourneyOptions';
 import { pauseJourneyFrame } from '@/lib/journeyBridge';
 import React, { useEffect, useRef } from 'react';
@@ -20,7 +21,7 @@ export default function VectorShiftFrame({ answers, sessionId, onComplete }) {
       complete.current?.({
         requireGoalReassessment: true,
         helpfulness,
-        exitReason: data.exitReason === 'stopped' ? 'stopped' : 'completed',
+        ...vectorPracticeCompletion(data),
         outcome: { skippedStages, easierMode: data.outcome?.easierMode === true, gameplayOnly: true },
       });
     }

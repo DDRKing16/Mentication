@@ -5,18 +5,8 @@ import { getIntervention } from "@/lib/interventions";
 
 const DAY = 86400000;
 
-/**
- * How much better a session left someone, from their own ratings.
- * Positive = better. For "lift" a higher after-rating is better; for
- * everything else (calm, ground, sleep, focus) a lower one is.
- */
-export function ratedShift(session) {
-  const start = Number(session?.intensity_start);
-  const end = Number(session?.intensity_end);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
-  if (session?.intensity_end == null || session?.intensity_start == null) return null;
-  return session?.direction === "lift" ? end - start : start - end;
-}
+export { ratedShift, finishedPracticeIds } from "./sessionEvidence.js";
+import { ratedShift, finishedPracticeIds } from "./sessionEvidence.js";
 
 const slotFor = (date) => {
   const h = date.getHours();
@@ -32,6 +22,7 @@ const dayKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 export function summariseProgress(sessions = [], now = new Date()) {
   const dated = sessions
+    .filter(s => finishedPracticeIds(s).length > 0 || s.attempts?.some(a => a.exit_reason !== "skipped" && a.completed_percentage > 0))
     .map((s) => ({ s, at: new Date(s?.created_date) }))
     .filter(({ at }) => !Number.isNaN(at.getTime()));
 
@@ -42,7 +33,7 @@ export function summariseProgress(sessions = [], now = new Date()) {
   // What helps: credit each exercise finished in a rated session.
   const byExercise = new Map();
   for (const { s } of dated) {
-    const ids = s?.completed_pathway?.length ? s.completed_pathway : s?.pathway || [];
+    const ids = finishedPracticeIds(s);
     const shift = ratedShift(s);
     for (const id of new Set(ids)) {
       const entry = byExercise.get(id) || { id, uses: 0, shifts: [] };
@@ -52,8 +43,8 @@ export function summariseProgress(sessions = [], now = new Date()) {
     }
   }
   const helpers = [...byExercise.values()]
-    .map((e) => ({ id: e.id, name: getIntervention(e.id)?.name || null, uses: e.uses, avgShift: e.shifts.length >= 2 ? round1(average(e.shifts)) : null }))
-    .filter((e) => e.name)
+    .map((e) => ({ id: e.id, name: getIntervention(e.id)?.name || null, uses: e.uses, ratedUses: e.shifts.length, avgShift: e.shifts.length >= 2 ? round1(average(e.shifts)) : null }))
+    .filter((e) => e.name && e.avgShift != null && e.avgShift > 0)
     .sort((a, b) => (b.avgShift ?? -99) - (a.avgShift ?? -99) || b.uses - a.uses)
     .slice(0, 3);
 
@@ -77,7 +68,7 @@ export function summariseProgress(sessions = [], now = new Date()) {
   const slots = [...bySlot.entries()].filter(([, v]) => v.length >= 2).map(([slot, v]) => ({ slot, avgShift: round1(average(v)) }));
   slots.sort((a, b) => b.avgShift - a.avgShift);
   const ratedTotal = [...bySlot.values()].reduce((n, v) => n + v.length, 0);
-  const bestTime = ratedTotal >= 4 && slots.length >= 2 && slots[0].avgShift > slots[slots.length - 1].avgShift ? slots[0] : null;
+  const bestTime = ratedTotal >= 4 && slots.length >= 2 && slots[0].avgShift > 0 && slots[0].avgShift > slots[slots.length - 1].avgShift ? slots[0] : null;
 
   return {
     total: dated.length,

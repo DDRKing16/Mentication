@@ -1,0 +1,50 @@
+[
+  {
+    "width": 390,
+    "did": "yes",
+    "rated": false,
+    "count": 55,
+    "pairs": 27,
+    "passed": true
+  },
+  {
+    "width": 390,
+    "did": "yes",
+    "rated": true,
+    "count": 56,
+    "pairs": 28,
+    "passed": true
+  },
+  {
+    "width": 390,
+    "did": "part",
+    "rated": false,
+    "count": 55,
+    "pairs": 27,
+    "passed": true
+  },
+  {
+    "width": 390,
+    "did": "part",
+    "rated": true,
+    "count": 56,
+    "pairs": 28,
+    "passed": true
+  },
+  {
+    "width": 390,
+    "did": "no",
+    "rated": false,
+    "count": 55,
+    "pairs": 27,
+    "passed": true
+  },
+  {
+    "width": 390,
+    "did": "no",
+    "rated": true,
+    "count": 56,
+    "pairs": 28,
+    "passed": true
+  }
+]

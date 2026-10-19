@@ -22,6 +22,7 @@ export default function LiftFollowup() {
   const [distress, setDistress] = useState(isAnsweredRating(draft.distress) ? draft.distress : null);
   const [saveError, setSaveError] = useState('');
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
   const [confirmed, setConfirmed] = useState(draft.confirmed === true);
   const heading = useRef(null);
   useJourneyScreenHistory('lift-followup', phase, next => { if (SCREENS.includes(next)) setPhase(next); });
@@ -33,14 +34,14 @@ export default function LiftFollowup() {
   if (!completedHappyBump) return <Navigate to="/" replace />;
   const options = liftJourneyOptions({ completedHappyBump, mood, distress, confirmed, hasMoreTime:true, answers:session.context_snapshot });
   const confirm = async (rating = distress) => {
-    if (saving) return;
+    if (savingRef.current) return;
     const updated = withLiftCheckin(session, mood, rating);
     setDistress(rating);
     if (updated) {
-      setSaving(true);setSaveError('');
+      savingRef.current = true;setSaving(true);setSaveError('');
       try { await sessionStore.create(updated); }
-      catch { setSaveError('This check-in was not saved on this device. Your answers still guide the choices below.'); }
-      finally { setSaving(false); }
+      catch { setSaveError('This check-in could not be saved. Your answers are still here. Try again, or finish here.'); return; }
+      finally { savingRef.current = false;setSaving(false); }
     }
     setConfirmed(true);setPhase('complete');
   };

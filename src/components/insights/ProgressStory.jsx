@@ -7,11 +7,11 @@ import { Sparkles } from "lucide-react";
 const fade = (delay) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay } });
 
 function Headline({ story }) {
-  if (story.avgShift != null && story.avgShift > 0) {
+  if (story.avgShift != null) {
     return (
       <>
-        <p className="font-heading text-[2.6rem] font-medium leading-none text-white">{story.avgShift} <span className="text-lg text-white/70">{story.avgShift === 1 ? "point" : "points"}</span></p>
-        <p className="mt-2 text-sm text-white/80">On average, that's how much better you rated yourself after a practice this month.</p>
+        <p className="font-heading text-[2.6rem] font-medium leading-none text-white">{Math.abs(story.avgShift)} <span className="text-lg text-white/70">{Math.abs(story.avgShift) === 1 ? "point" : "points"}</span></p>
+        <p className="mt-2 text-sm text-white/80">{story.avgShift > 0 ? "On average, that's how much better you rated yourself after a practice this month." : story.avgShift < 0 ? "On average, that's how much worse you rated yourself after a practice this month." : "Your before-and-after ratings were unchanged on average this month."}</p>
       </>
     );
   }
@@ -49,7 +49,7 @@ export default function ProgressStory({ story }) {
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium text-foreground">{h.name}</span>
                   <span className="block text-xs text-muted-foreground">
-                    {h.uses} {h.uses === 1 ? "time" : "times"}{h.avgShift != null && h.avgShift > 0 ? ` · usually ${h.avgShift} ${h.avgShift === 1 ? "point" : "points"} better after` : ""}
+                    {h.uses} {h.uses === 1 ? "time" : "times"}{h.avgShift != null && h.avgShift > 0 ? ` · on average ${h.avgShift} ${h.avgShift === 1 ? "point" : "points"} better across ${h.ratedUses} rated practices` : ""}
                   </span>
                 </span>
               </li>

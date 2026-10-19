@@ -1,0 +1,18 @@
+
+> mentation@0.0.0 test
+> vitest run --run
+
+
+ RUN  v4.1.11 /workspace/mentation-threat
+
+
+ Test Files  113 passed (113)
+      Tests  976 passed (976)
+   Start at  05:34:00
+   Duration  8.11s (transform 2.10s, setup 0ms, import 7.19s, tests 2.10s, environment 10ms)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice

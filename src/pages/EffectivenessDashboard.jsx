@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 import { TrendingUp, Zap, MapPin, Loader } from "lucide-react";
 import { useDeviceSessions } from "@/hooks/useDeviceSessions";
 import { computeEffectivenessInsights } from "@/lib/insights";
-import { getBumpFunnel } from "@/lib/happyBumpFunnel";
+
 import FlowHomeButton from "@/components/FlowHomeButton";
 import ProgressStory from "@/components/insights/ProgressStory";
-import { summariseProgress } from "@/lib/progressStory";
+import { summariseProgress, finishedPracticeIds } from "@/lib/progressStory";
 
 export default function EffectivenessDashboard() {
   const {sessions,ready,error,reload}=useDeviceSessions(100);
   const insights=useMemo(()=>computeEffectivenessInsights(sessions),[sessions]);
   const story=useMemo(()=>summariseProgress(sessions),[sessions]);
-  const bumpRuns = getBumpFunnel().runs || [];
-  const completedBumps = bumpRuns.filter((run) => run.scenes?.includes("complete")).length;
+  const bumpRuns = sessions.filter(session => session.pathway?.includes("happyBump"));
+  const completedBumps = bumpRuns.filter(session => finishedPracticeIds(session).includes("happyBump")).length;
 
 
   if (!ready || !insights) {
@@ -60,7 +60,7 @@ export default function EffectivenessDashboard() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Zap className="h-5 w-5 text-amber-500" />
-              <h2 className="font-heading text-lg font-medium text-primary">Most often useful</h2>
+              <h2 className="font-heading text-lg font-medium text-primary">Practices with better ratings</h2>
             </div>
             <div className="space-y-2">
               {insights.topInterventions.map((iv, idx) => (
@@ -71,17 +71,10 @@ export default function EffectivenessDashboard() {
                   <div>
                     <p className="font-medium text-foreground">{iv.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      Rated fit {(iv.score * 100).toFixed(0)}% — based on your check-ins, not a clinical score
+                      {iv.avgShift} points better on average across {iv.ratedUses} rated {iv.ratedUses === 1 ? "practice" : "practices"}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <div className="h-2 w-24 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-indigo to-violet"
-                        style={{ width: `${iv.score * 100}%` }}
-                      />
-                    </div>
-                  </div>
+
                 </div>
               ))}
             </div>
@@ -98,7 +91,7 @@ export default function EffectivenessDashboard() {
           >
             <h2 className="font-heading text-lg font-medium text-primary">The Happy Bump flow</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {completedBumps} completed {completedBumps === 1 ? "run" : "runs"} from {bumpRuns.length} started.
+              {completedBumps} with confirmed practice from {bumpRuns.length} saved {bumpRuns.length === 1 ? "session" : "sessions"}.
             </p>
           </motion.div>
         )}
@@ -126,15 +119,11 @@ export default function EffectivenessDashboard() {
                       <p className="text-xs text-muted-foreground">{dir.count} sessions</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-emerald-600">↓ {dir.avgImprovement}</p>
+                      <p className="font-semibold text-primary">{dir.avgImprovement === null ? "Not measured" : dir.avgImprovement === 0 ? "No change" : `${Math.abs(dir.avgImprovement)} points ${dir.avgImprovement > 0 ? "better" : "worse"}`}</p>
                       <p className="text-xs text-muted-foreground">avg rated shift</p>
                     </div>
                   </div>
-                  {dir.bestIntervention && (
-                    <p className="text-xs text-muted-foreground">
-                      You used most here: <span className="text-foreground font-medium">{dir.bestIntervention.name}</span>
-                    </p>
-                  )}
+
                 </div>
               ))}
             </div>
@@ -161,7 +150,7 @@ export default function EffectivenessDashboard() {
                 >
                   <div>
                     <p className="font-medium text-foreground capitalize">{loc.location}</p>
-                    <p className="text-xs text-muted-foreground">{loc.count} sessions • ↓ {loc.avgImprovement}</p>
+                    <p className="text-xs text-muted-foreground">{loc.count} sessions • {loc.avgImprovement === null ? "Change not measured" : loc.avgImprovement === 0 ? "No change" : `${Math.abs(loc.avgImprovement)} points ${loc.avgImprovement > 0 ? "better" : "worse"}`}</p>
                   </div>
                   <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center">
                     <MapPin className="h-4 w-4 text-blue-600" />
@@ -187,13 +176,10 @@ export default function EffectivenessDashboard() {
                   <p className="font-medium text-foreground mb-1">
                     When {pattern.direction} at {pattern.location}
                   </p>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Intensity {pattern.intensity} • {pattern.where}
-                  </p>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-foreground font-medium">{pattern.intervention}</p>
                     <div className="text-xs font-semibold text-indigo-600">
-                      {(pattern.score * 100).toFixed(0)}%
+                      {pattern.avgShift} points better · {pattern.ratedUses} rated practices
                     </div>
                   </div>
                 </div>

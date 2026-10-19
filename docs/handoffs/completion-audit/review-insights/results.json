@@ -1,0 +1,52 @@
+[
+  {
+    "scenario": "missing",
+    "width": 320,
+    "passed": true
+  },
+  {
+    "scenario": "unchanged",
+    "width": 320,
+    "passed": true
+  },
+  {
+    "scenario": "worse",
+    "width": 320,
+    "passed": true
+  },
+  {
+    "scenario": "skipped-unrated",
+    "width": 320,
+    "passed": true
+  },
+  {
+    "scenario": "mixed",
+    "width": 320,
+    "passed": true
+  },
+  {
+    "scenario": "missing",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "scenario": "unchanged",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "scenario": "worse",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "scenario": "skipped-unrated",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "scenario": "mixed",
+    "width": 390,
+    "passed": true
+  }
+]

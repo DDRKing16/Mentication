@@ -1,0 +1,86 @@
+[
+  {
+    "route": "/restructure",
+    "passed": true
+  },
+  {
+    "route": "/library",
+    "passed": true
+  },
+  {
+    "barrierFocus": "fear",
+    "view": "journey",
+    "seen": false,
+    "passed": true
+  },
+  {
+    "barrierFocus": "fear",
+    "view": "journey",
+    "seen": true,
+    "passed": true
+  },
+  {
+    "barrierFocus": "fear",
+    "view": "plan",
+    "seen": false,
+    "passed": true
+  },
+  {
+    "barrierFocus": "fear",
+    "view": "plan",
+    "seen": true,
+    "passed": true
+  },
+  {
+    "barrierFocus": "practical",
+    "view": "journey",
+    "seen": false,
+    "passed": true
+  },
+  {
+    "barrierFocus": "practical",
+    "view": "journey",
+    "seen": true,
+    "passed": true
+  },
+  {
+    "barrierFocus": "practical",
+    "view": "plan",
+    "seen": false,
+    "passed": true
+  },
+  {
+    "barrierFocus": "practical",
+    "view": "plan",
+    "seen": true,
+    "passed": true
+  },
+  {
+    "barrierFocus": "both",
+    "view": "journey",
+    "seen": false,
+    "passed": true
+  },
+  {
+    "barrierFocus": "both",
+    "view": "journey",
+    "seen": true,
+    "passed": true
+  },
+  {
+    "barrierFocus": "both",
+    "view": "plan",
+    "seen": false,
+    "passed": true
+  },
+  {
+    "barrierFocus": "both",
+    "view": "plan",
+    "seen": true,
+    "passed": true
+  },
+  {
+    "route": "/dear2100-updated/index.html",
+    "passed": true
+  }
+]

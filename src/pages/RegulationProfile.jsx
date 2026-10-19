@@ -133,7 +133,7 @@ export default function RegulationProfile() {
           </h1>
           {weekCount > 0 && (
             <p className="mt-3 text-sm text-muted-foreground">
-              {weekCount} reset{weekCount === 1 ? "" : "s"} this week · {profile.count} overall
+              {weekCount} reset{weekCount === 1 ? "" : "s"} this week · {profile.count} rated overall
             </p>
           )}
         </motion.div>
@@ -144,14 +144,11 @@ export default function RegulationProfile() {
             <TrendingDown className="h-4 w-4" />
             <span className="text-sm font-medium uppercase tracking-[0.15em]">Typical change</span>
           </div>
-          <div className="mt-4 flex items-end justify-center gap-3">
-            <span className="font-heading text-5xl font-medium tabular-nums text-primary">{profile.avgStart}</span>
-            <span className="mb-2 text-2xl text-muted-foreground">→</span>
-            <span className="font-heading text-5xl font-medium tabular-nums text-accent">{profile.avgEnd}</span>
-          </div>
+          <p className="mt-4 text-center font-heading text-3xl text-primary">
+            {profile.change > 0 ? `${profile.change} points better` : profile.change < 0 ? `${Math.abs(profile.change)} points worse` : "No change"}
+          </p>
           <p className="mt-3 text-center text-sm text-muted-foreground">
-            Across {profile.count} reset{profile.count === 1 ? "" : "s"}, you{" "}
-            {profile.change > 0 ? `improved ${profile.change} on average` : "held steady on average"}.
+            Average change across {profile.count} rated reset{profile.count === 1 ? "" : "s"}, using each goal’s rating direction.
           </p>
         </div>}
 
@@ -203,7 +200,7 @@ export default function RegulationProfile() {
         {isPremium && profile.mostUsed.length > 0 && (
           <Section title="Most-used tools" icon={<Layers className="h-4 w-4" />}>
             {profile.mostUsed.map((t) => (
-              <ToolRow key={t.id} name={t.name} right={`${t.uses}×`} sub={t.avgDrop > 0 ? `avg +${t.avgDrop}` : "—"} />
+              <ToolRow key={t.id} name={t.name} right={`${t.uses}×`} sub={t.avgDrop > 0 ? `${t.avgDrop} better` : t.avgDrop < 0 ? `${Math.abs(t.avgDrop)} worse` : "No change"} />
             ))}
           </Section>
         )}

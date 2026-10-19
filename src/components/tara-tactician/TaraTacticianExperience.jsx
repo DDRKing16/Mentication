@@ -1,3 +1,4 @@
+import { taraPracticeCompletion } from '@/lib/practiceCompletionEvidence';
 import { useProgressGate } from '@/hooks/useProgressGate';
 import PracticeIllustration from '@/components/journey/PracticeIllustration';
 import '@/styles/practice-editorial.css';
@@ -241,7 +242,7 @@ export default function TaraTacticianExperience({ intervention, sessionId, answe
     record = { ...record, completionReported: true };
     try { saveTaraDraft(record); } catch (error) { setSaveStatus('error');setError(error.message);return; }
     completedRef.current = true;setState(record);
-    onAttemptEvent?.({ interventionId: TARA_ID, action: 'completed', exitReason: 'completed', completedPercentage: 1, startedAt: startedRef.current, timestamp: Date.now() });
+    onAttemptEvent?.({ interventionId: TARA_ID, action: 'completed', ...taraPracticeCompletion(record), startedAt: startedRef.current, timestamp: Date.now() });
     onComplete?.({ interventionId: TARA_ID, skipReflection: true, outcome: taraCompletion(record) });
   };
   const remove = async () => { try { await cancelTaraNotifications(); clearTara(); setState(newTaraState()); setRecaps([]); setSaveStatus('idle'); setError(''); setNotificationError(''); setReviewOnly(false); completedRef.current = false; snapshotsRef.current.clear(); historyDepthRef.current = 0; setDeleting(false); setNewPlanMode(null); } catch (error) { setError(error.message || 'Data or phone check-ins could not be cleared. Please try again.'); setSaveStatus('error'); } };

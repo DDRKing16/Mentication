@@ -283,14 +283,14 @@ export function writeDraft(text, recordId, now = new Date(), position = {}) {
 export function writeParkingReturn(recordId, step, now = new Date(), position = {}) {
   const s=sessionStore();
   if(!s || typeof recordId!=='string' || !['parked','quiet','feedback'].includes(step)) return false;
-  try {writeVerified(s,DRAFT_KEY,JSON.stringify({kind:'parked-return',recordId,step,updatedAt:now.toISOString(),...(['helpful','same','worse','unsure'].includes(position.helpfulness)?{helpfulness:position.helpfulness}:{})}));return true;}catch{return false;}
+  try {writeVerified(s,DRAFT_KEY,JSON.stringify({kind:'parked-return',recordId,step,updatedAt:now.toISOString(),...(typeof position.completionSessionId==='string'&&/^[a-zA-Z0-9-]{1,100}$/.test(position.completionSessionId)?{completionSessionId:position.completionSessionId}:{}),...(['helpful','same','worse','unsure'].includes(position.helpfulness)?{helpfulness:position.helpfulness}:{})}));return true;}catch{return false;}
 }
 export function readParkingReturn(now = new Date()) {
   const s=sessionStore();if(!s)return null;
   let value;try{value=JSON.parse(s.getItem(DRAFT_KEY)||'null');}catch{return null;}
   if(!value || value.kind!=='parked-return' || !['parked','quiet','feedback'].includes(value.step) || typeof value.recordId!=='string' || !isIso(value.updatedAt) || now.getTime()-Date.parse(value.updatedAt)>DRAFT_TTL_HOURS*3_600_000)return null;
   const record=getRecord(value.recordId,now);
-  return record?{step:value.step,record,...(["helpful","same","worse","unsure"].includes(value.helpfulness)?{helpfulness:value.helpfulness}:{})}:null;
+  return record?{step:value.step,record,...(typeof value.completionSessionId==='string'&&/^[a-zA-Z0-9-]{1,100}$/.test(value.completionSessionId)?{completionSessionId:value.completionSessionId}:{}),...(["helpful","same","worse","unsure"].includes(value.helpfulness)?{helpfulness:value.helpfulness}:{})}:null;
 }
 
 export function clearDraft() {
