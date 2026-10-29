@@ -257,7 +257,7 @@ export default function Settings() {
           <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             <CloudUpload className="h-4 w-4" /> Backup
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">Everything lives only on this phone. Save a backup to iCloud Drive or Files, so you can bring it back on a new phone.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Your saved history, notes and plans are stored on this device. A backup may contain personal text; save or share it only somewhere you trust, such as Files or iCloud Drive. Optional website background check-ins use a server for delivery details, not your plan text. Browser notification ownership is not backed up. Deleting app data does not delete exported copies.</p>
           {pendingRestore ? (
             <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
               <p className="text-sm font-medium text-foreground">

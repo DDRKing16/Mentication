@@ -22,6 +22,7 @@
     }
   ],
   "backNavigation": true,
+  "settingsBackupDisclosure": true,
   "pageErrors": [],
   "provenance": "Local production Vite preview; DOM/layout checks, not physical-device accessibility evidence."
 }

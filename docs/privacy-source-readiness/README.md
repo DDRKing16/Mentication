@@ -3,9 +3,10 @@
 Based on remote main `bf171387009ce955e8fa60427a11a46b36b7fa24`.
 Reviewed the four documentation files in PR34 at
 `5bfcd5e09cd2d1d068c841d5f1db8d80d637df47` before implementing these fixes.
-PR34 is not merged or copied into this branch: its executor-failure account and
-pending-source-fix statements remain historical, while metadata/legal/contact
-and real-device assertions still need their owner's review. This document
+PR34's four documentation drafts are now included in this branch after review.
+Resolved source findings are updated; its executor failure is historical.
+Unverified date-sensitive submission specifications were replaced with explicit
+current-guidance checks. Metadata/legal/contact and device approval gates remain. This document
 records this branch's actual source work, not App Store submission readiness.
 
 ## Demonstrated fixes
@@ -15,7 +16,7 @@ records this branch's actual source work, not App Store submission readiness.
   stays available for cancellation. Tests cover ordinary notes/history export,
   legacy-file restore into an empty destination, and active/pending destination
   tokens. Existing rollback, malformed-file and merge tests remain passing.
-- The in-app privacy page now describes authored notes/plans/drafts, potentially
+- The in-app privacy page and Settings backup summary now describe authored notes/plans/drafts, potentially
   cloud-hosted backup destinations, optional website check-in server/provider
   metadata, pending cancellation, and retained Apple subscription management.
   It makes no blanket claim that nothing leaves the device or that schedule
@@ -74,7 +75,7 @@ identifiers, version/build or native privacy answers based on this Linux audit.
 - `npm run lint` and `npm run typecheck`: passed.
 - `npm run build`: passed, existing large-chunk warning only.
 - Production-preview privacy route: 320px/390px, default/200% text, horizontal
-  overflow and Back checks; see final browser result in this directory.
+  overflow, Settings backup disclosure and Back checks; see final browser result in this directory.
 - `git diff --check`: passed.
 
 Repeat the browser check after `npm run build` with `npm run preview -- --host
