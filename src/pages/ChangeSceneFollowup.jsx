@@ -2,7 +2,7 @@ import {useJourneyScreenHistory} from '@/hooks/useJourneyScreenHistory';
 import React,{useEffect,useState} from 'react';
 import {useLocation,useNavigate} from 'react-router-dom';
 import {sessionStore} from '@/lib/localData';
-import {sceneHandoff} from '@/lib/changeSceneHandoff';
+import {sceneHandoff,sceneFollowupMood} from '@/lib/changeSceneHandoff';
 import {recordHandoffDecision} from '@/lib/flagshipMemory';
 import {useFreeQuota} from '@/hooks/useFreeQuota';
 import IntensityDial from '@/components/IntensityDial';
@@ -13,15 +13,15 @@ export default function ChangeSceneFollowup(){
  const query=new URLSearchParams(location.search),token=query.get('session'),request=query.get('practice');
  const [session,setSession]=useState(null),[loaded,setLoaded]=useState(false);
  const initial=globalThis.history?.state?.scene_followup;
- const saved=initial?.token===token?initial:null;
+ const saved=initial?.token===token && initial?.ratingVersion===2?initial:null;
  const [step,setStep]=useState(['mood','distress','setting','time','longer','result'].includes(saved?.step)?saved.step:'distress');
 
  const [mood,setMood]=useState(saved?.mood??null),[distress,setDistress]=useState(saved?.distress??null),[setting,setSetting]=useState(saved?.setting||''),[time,setTime]=useState(saved?.time??null),[longerJourney,setLongerJourney]=useState(saved?.longerJourney===true),[confirmed,setConfirmed]=useState(saved?.confirmed===true);
  const [readError,setReadError]=useState(''),[retry,setRetry]=useState(0);
  const {allowed,isPremium,loading}=useFreeQuota();
- useEffect(()=>{let live=true;setReadError('');setLoaded(false);sessionStore.list('-created_date',100).then(records=>{if(live){const found=records.find(s=>s.intervention_outcome?.handoffToken===token&&s.pathway?.includes('changeScene'))||null;setSession(found);if(!saved){setMood(typeof found?.intensity_end==='number'?found.intensity_end:null);if(found?.intensity_end==null)setStep('mood');}setLoaded(true);}}).catch(()=>{if(live){setReadError("Your saved check-in could not be read. Nothing has been removed.");setLoaded(true);}});return()=>{live=false};},[token,retry]);
+ useEffect(()=>{let live=true;setReadError('');setLoaded(false);sessionStore.list('-created_date',100).then(records=>{if(live){const found=records.find(s=>s.intervention_outcome?.handoffToken===token&&s.pathway?.includes('changeScene'))||null;setSession(found);if(!saved){const previousMood=sceneFollowupMood(found);setMood(previousMood);if(previousMood==null)setStep('mood');}setLoaded(true);}}).catch(()=>{if(live){setReadError("Your saved check-in could not be read. Nothing has been removed.");setLoaded(true);}});return()=>{live=false};},[token,retry]);
  useJourneyScreenHistory('scene-followup',step,next=>{if(['mood','distress','setting','time','longer','result'].includes(next))setStep(next);});
- useEffect(()=>{const state=globalThis.history?.state;if(!state)return;try{globalThis.history.replaceState({...state,scene_followup:{token,step,mood,distress,setting,time,longerJourney,confirmed}},'');}catch{/* In-app answers remain available. */}},[token,step,mood,distress,setting,time,longerJourney,confirmed]);
+ useEffect(()=>{const state=globalThis.history?.state;if(!state)return;try{globalThis.history.replaceState({...state,scene_followup:{ratingVersion:2,token,step,mood,distress,setting,time,longerJourney,confirmed}},'');}catch{/* In-app answers remain available. */}},[token,step,mood,distress,setting,time,longerJourney,confirmed]);
  const next=sceneHandoff(session,request,{mood,distress,location:setting,timeMin:time,longerJourney,confirmed});
  const canAccess=!loading&&(isPremium||allowed>0);
  const resetConfirmation=()=>setConfirmed(false);

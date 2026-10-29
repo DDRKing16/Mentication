@@ -23,3 +23,11 @@ export const MATCHED_ASSESSMENT_IDS = new Set(['vectorShift', 'happyBump', 'boxV
 export function hasGoalBaseline(answers) {
   return goalPointChange(answers?.goal_baseline, answers?.direction, answers?.goal_baseline?.value) === 0;
 }
+
+// Old drafts need evidence of the end question, or a matching start question.
+export function restoredGoalRating(entry, completion) {
+  const value = completion?.goalRating;
+  if (!valid(value)) return null;
+  if (completion?.goalAssessment) return goalPointChange(completion.goalAssessment, entry?.direction, value) === 0 ? value : null;
+  return hasGoalBaseline(entry) ? value : null;
+}

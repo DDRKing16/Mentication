@@ -1512,7 +1512,7 @@ function useQuestionHistory(id,current,onCurrent) {
 }
 function DearPracticeReveal({events=[]}) {
   const pair=answerPair(events);if(!pair.length)return null;
-  return i.jsxs("aside",{className:"dear-practice-reveal",role:"status","aria-label":"Your two-answer reflection","data-checkpoint":Math.floor(events.length/2),children:[i.jsx("span",{className:"dear-reveal-mark","aria-hidden":true,children:"✦"}),i.jsxs("div",{children:[i.jsx("p",{className:"question-kicker",children:"Two pieces of your picture"}),i.jsx("dl",{children:pair.map(item=>i.jsxs("div",{children:[i.jsx("dt",{children:item.label}),i.jsx("dd",{children:item.detail})]},item.id))})]})]});
+  return i.jsxs("aside",{className:"dear-practice-reveal",style:{pointerEvents:"none"},role:"status","aria-label":"Your two-answer reflection","data-checkpoint":Math.floor(events.length/2),children:[i.jsx("span",{className:"dear-reveal-mark","aria-hidden":true,children:"✦"}),i.jsxs("div",{children:[i.jsx("p",{className:"question-kicker",children:"Two pieces of your picture"}),i.jsx("dl",{children:pair.map(item=>i.jsxs("div",{children:[i.jsx("dt",{children:item.label}),i.jsx("dd",{children:item.detail})]},item.id))})]})]});
 }
 function SequentialQuestions({id, steps, current, onCurrent, onDone, doneLabel="Continue", optionalStart=steps.length, blocked=false, onConfirm}) {
   useQuestionHistory(id,steps.some(step=>`${id}:${step.id}`===current)?current:`${id}:${steps[0].id}`,onCurrent);

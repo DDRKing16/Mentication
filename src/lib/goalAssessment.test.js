@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GOAL_ASSESSMENTS, captureGoalBaseline, goalPointChange } from './goalAssessment';
+import { GOAL_ASSESSMENTS, captureGoalBaseline, goalPointChange, restoredGoalRating } from './goalAssessment';
 import { withLiftCheckin } from './liftFollowup';
 
 describe('same-question goal baseline contract', () => {
@@ -33,4 +33,15 @@ describe('contextual wording and old measurements', () => {
     expect(goalPointChange(captureGoalBaseline(direction,0),direction,0)).toBe(0);
     expect(goalPointChange(captureGoalBaseline(direction,0),direction,null)).toBeNull();
   });
+});
+
+describe('resumed endpoint construct',()=>{
+ it.each([0,7])('does not relabel old wakefulness endpoint %s',goalRating=>{
+ const old={...captureGoalBaseline('sleep',5),question:'How intense is it right now?',scale:'wakefulness',left:'Drowsy',right:'Wide awake'};
+ expect(restoredGoalRating({direction:'sleep',goal_baseline:old},{goalRating})).toBeNull();
+ expect(restoredGoalRating({direction:'sleep'},{goalRating})).toBeNull();
+ expect(restoredGoalRating({direction:'sleep',goal_baseline:captureGoalBaseline('sleep',5)},{goalRating})).toBe(goalRating);
+ expect(restoredGoalRating({direction:'sleep'},{goalRating,goalAssessment:captureGoalBaseline('sleep',goalRating)})).toBe(goalRating);
+ expect(restoredGoalRating({direction:'sleep'},{goalRating,goalAssessment:captureGoalBaseline('calm',goalRating)})).toBeNull();
+ });
 });

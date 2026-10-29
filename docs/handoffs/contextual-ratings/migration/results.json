@@ -1,0 +1,150 @@
+[
+  {
+    "direction": "calm",
+    "oldStep": "time",
+    "prebuilt": true,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "direction": "calm",
+    "oldStep": "time",
+    "prebuilt": false,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "direction": "calm",
+    "oldStep": "distress",
+    "prebuilt": true,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "direction": "calm",
+    "oldStep": "distress",
+    "prebuilt": false,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "direction": "sleep",
+    "oldStep": "time",
+    "prebuilt": true,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "direction": "sleep",
+    "oldStep": "time",
+    "prebuilt": false,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "direction": "sleep",
+    "oldStep": "distress",
+    "prebuilt": true,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "direction": "sleep",
+    "oldStep": "distress",
+    "prebuilt": false,
+    "passed": true,
+    "checks": [
+      "old saved time/distress returns to unanswered goal",
+      "confirmed answer reload",
+      "practice starts without setup loop"
+    ]
+  },
+  {
+    "kind": "legacy",
+    "value": 0,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
+  },
+  {
+    "kind": "legacy",
+    "value": 7,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
+  },
+  {
+    "kind": "current",
+    "value": 0,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
+  },
+  {
+    "kind": "current",
+    "value": 7,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
+  },
+  {
+    "kind": "endpoint-metadata",
+    "value": 0,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
+  },
+  {
+    "kind": "endpoint-metadata",
+    "value": 7,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
+  }
+]
