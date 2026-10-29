@@ -3,12 +3,14 @@ import {readRecordList,writeVerified,removeVerified} from './verifiedStorage';
 // file the person keeps wherever they like (iCloud Drive, Files, AirDrop).
 // Nothing is sent anywhere by the app; the phone's own share sheet does it.
 //
-// Two things are deliberately left out: the Plus status (that always comes
+// Device-specific state is deliberately left out: the Plus status (that always comes
 // from Apple, so a file can't unlock it) and reminder settings (reminders are
 // scheduled on the phone itself, so they're set again after a restore).
+// Web check-in ownership is also excluded in BOTH directions: its bearer token
+// must remain on the originating device so another backup cannot take it over.
 
 const PREFIXES = ["mentation.", "mentication.", "mentication_", "haven.", "haven_", "dear2100", "goodmap-", "gm_"];
-const EXCLUDED = new Set(["mentication.plus.v1", "mentation.reminders.v1"]);
+const EXCLUDED = new Set(["mentication.plus.v1", "mentation.reminders.v1", "mentation.web-checkins.v1"]);
 const SESSION_KEY = "mentation.sessions.v1";
 const FORMAT = "mentication-backup";
 

@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "width": 320,
+      "textScale": 1,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 320,
+      "textScale": 2,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "textScale": 1,
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "textScale": 2,
+      "noHorizontalOverflow": true
+    }
+  ],
+  "backNavigation": true,
+  "settingsBackupDisclosure": true,
+  "pageErrors": [],
+  "provenance": "Local production Vite preview; DOM/layout checks, not physical-device accessibility evidence."
+}

@@ -80,3 +80,22 @@ describe('backup failures and Journal coverage',()=>{
     expect(()=>restoreBackup({format:'mentication-backup',version:1,data:{daybook:'new','dear2100-book-v1':'{}'}},phone)).toThrow('previous data');expect(phone.dump()).toEqual({daybook:'old'});
   });
 });
+
+describe('device-bound browser notification ownership', () => {
+  const key = 'mentation.web-checkins.v1';
+  const incoming = JSON.stringify({ token: 'synthetic-source-token', planId: 'source-plan', pendingCancel: true });
+  it('exports ordinary history and authored notes without the cancellation token', () => {
+    const storage = memoryStorage({ [key]: incoming, daybook: '[{"text":"synthetic note"}]', 'mentation.sessions.v1': '[]' });
+    const backup = createBackup(storage);
+    expect(backup.data).toEqual({ daybook: '[{"text":"synthetic note"}]', 'mentation.sessions.v1': '[]' });
+    expect(JSON.stringify(backup)).not.toContain('synthetic-source-token');
+    expect(storage.getItem(key)).toBe(incoming);
+  });
+  it.each([null, JSON.stringify({ token: 'synthetic-destination-token', pendingCancel: false }), JSON.stringify({ token: 'synthetic-destination-token', pendingCancel: true })])('ignores legacy ownership on restore and preserves destination %s', existing => {
+    const storage = memoryStorage(existing === null ? {} : { [key]: existing });
+    const legacy = { format: 'mentication-backup', version: 1, data: { [key]: incoming, daybook: '[{"text":"restored note"}]' } };
+    expect(restoreBackup(legacy, storage)).toBe(1);
+    expect(storage.getItem(key)).toBe(existing);
+    expect(storage.getItem('daybook')).toBe(legacy.data.daybook);
+  });
+});

@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 // AI step generation for tasks that have no hand-crafted steps in the app.
 //
 // Calls the small AI relay that runs alongside the dev server (VITE_AI_URL).
@@ -5,7 +7,9 @@
 // (AGENTS.md forbids private keys in frontend/native bundles). If the relay
 // is unreachable or has no key configured yet, this resolves null and the
 // caller falls back to the built-in generic ladder, so the app always works.
-const AI_URL = import.meta.env.VITE_AI_URL || "";
+// The relay is development-only and must never receive authored text from a
+// production build or native app, even if a build environment sets its URL.
+const AI_URL = import.meta.env.DEV && !Capacitor.isNativePlatform() ? import.meta.env.VITE_AI_URL || "" : "";
 
 export const aiStepsAvailable = () => Boolean(AI_URL);
 
