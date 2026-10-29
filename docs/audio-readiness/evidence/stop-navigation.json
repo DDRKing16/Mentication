@@ -1,0 +1,7 @@
+{
+  "stopConfirmed": true,
+  "backRestoredTimer": true,
+  "forwardRestoredListeningWithoutPlayback": true,
+  "sourceChangeReachedTimerWithoutPlayback": true,
+  "testAudio": "Existing labelled generated-noise preview, no replacement recording or live provider"
+}

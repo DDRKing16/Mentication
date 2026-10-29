@@ -63,12 +63,12 @@ export function useNight(channels) {
   if (!engines.current.local) engines.current.local = new LocalAudio((...args) => {
     if (active.current === 'local') update(...args);
   });
-  async function run(action) {
+  async function run(action, { mayPlay = false } = {}) {
     if (lock.current) return false;
     lock.current = true;
     setBusy(true);
     try {
-      const completed = await settlePlaybackAction(action, { isStopped: () => stopped.current, silenceAll });
+      const completed = await settlePlaybackAction(action, { isStopped: () => stopped.current, silenceAll, mayPlay });
       if (!completed) update('stopped', 'Stopped. Position and remaining time are kept.');
       return completed;
     } catch (error) {
@@ -178,7 +178,7 @@ export function useNight(channels) {
     await engines.current.local.play(channels.find(c => c.id === next), file);
     selected.current = next;
     update('playing');
-  });
+  }, { mayPlay: true });
   const changeTimer = value => {
     setTimerConfirmed(true);
     setMinutes(value);
@@ -245,7 +245,7 @@ export function useNight(channels) {
     selected.current = kind;
     update('playing');
     setPanel(null);
-  });
+  }, { mayPlay: true });
   const disconnect = kind => run(async () => {
     await engines.current[kind]?.disconnect();
     if (active.current === kind) {

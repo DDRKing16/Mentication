@@ -53,7 +53,7 @@ alignment checks and MP3 durations measured by ffprobe.
 
 ## Validation and limits
 
-The updated suite passes **114 files / 1013 tests**; lint, typecheck and production
+The updated suite passes **114 files / 1019 tests**; lint, typecheck and production
 build pass. Build retains the large-chunk advisory. Night regeneration also emits
 existing import.meta/IIFE warnings from imported web-check-in code; its rebuilt
 page renders without runtime exceptions in the browser check.
@@ -106,3 +106,19 @@ Cancellation generations also prevent a delayed pre-request token result from
 starting playback after disconnect. Tests cover requested/unrelated-track
 confirmation, delayed HTTP acceptance, rejection cleanup, unsuccessful cleanup,
 and pre-request cancellation. The generated standalone document is rebuilt.
+
+## Navigation after STOP
+
+Reproduced the `0ef18e3` result-semantics regression in Chromium: after confirmed
+STOP, Back remained on the listening screen. Actions now explicitly distinguish
+starting/resuming playback from pause/setup operations. STOP still cancels a
+stale play action after cleanup, while a successful confirmed pause, file/source
+change or other passive operation returns success. Failures remain failures;
+the persistent STOP flag is not cleared to enable navigation.
+
+Browser regression evidence in `evidence/stop-navigation.json` verifies STOP →
+Back reaches the timer, Forward returns to listening without playback, and
+Change → Rainy Day reaches the timer without playback. It uses only the existing
+labelled noise preview. Unit regressions also retain failed-pause and failed-
+cleanup refusal, plus the distinction between cancelled playback and confirmed
+pause under the same STOP flag. The standalone Night document was rebuilt.

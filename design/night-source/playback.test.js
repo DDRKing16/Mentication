@@ -289,3 +289,22 @@ describe('Night pending STOP settlement',()=>{
     const silenceAll=vi.fn();await expect(settlePlaybackAction(async()=>{throw Error('playback failed');},{isStopped:()=>false,silenceAll})).rejects.toThrow('playback failed');expect(silenceAll).not.toHaveBeenCalled();
   });
 });
+
+describe('Night actions after completed STOP',()=>{
+  it.each(['Back','Forward','source change'])('returns confirmed success for %s without clearing STOP',async()=>{
+    let stopped=true;const action=vi.fn();const silenceAll=vi.fn();
+    await expect(settlePlaybackAction(action,{isStopped:()=>stopped,silenceAll,mayPlay:false})).resolves.toBe(true);
+    expect(stopped).toBe(true);expect(action).toHaveBeenCalledOnce();expect(silenceAll).toHaveBeenCalledOnce();
+  });
+  it('preserves a failed navigation pause even if secondary cleanup succeeds',async()=>{
+    await expect(settlePlaybackAction(async()=>{throw Error('pause unconfirmed');},{isStopped:()=>true,silenceAll:vi.fn(),mayPlay:false})).rejects.toThrow('pause unconfirmed');
+  });
+  it('still rejects navigation when silence cannot be confirmed after STOP',async()=>{
+    await expect(settlePlaybackAction(vi.fn(),{isStopped:()=>true,silenceAll:async()=>{throw Error('still playing');},mayPlay:false})).rejects.toThrow('still playing');
+  });
+  it('keeps stale playback cancelled while confirmed pause succeeds under the same STOP flag',async()=>{
+    const state={isStopped:()=>true,silenceAll:vi.fn()};
+    await expect(settlePlaybackAction(vi.fn(),{...state,mayPlay:true})).resolves.toBe(false);
+    await expect(settlePlaybackAction(vi.fn(),{...state,mayPlay:false})).resolves.toBe(true);
+  });
+});

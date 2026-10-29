@@ -3,7 +3,7 @@
   "baselineTests": 984,
   "tests": {
     "files": 114,
-    "passed": 1013,
+    "passed": 1019,
     "command": "npm test -- --run"
   },
   "lint": "passed",
@@ -23,5 +23,9 @@
     "before": "f128a48 HTTP204 with outstanding confirmation: STOP rejected pending; SDK pause calls 0",
     "after": "STOP sends immediate SDK pause, cancels confirmation, re-pauses after delayed request settlement, waits for confirmed silence",
     "controller": "post-STOP cleanup on successful and rejected actions; failed cleanup blocks switching"
+  },
+  "navigationAfterStop": {
+    "before": "0ef18e3: confirmed STOP then Back remained on listening screen in Chromium",
+    "after": "Back/Forward/source change pass without playback; confirmed passive actions return true, cancelled starts return false"
   }
 }
