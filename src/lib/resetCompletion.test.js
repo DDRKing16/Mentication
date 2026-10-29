@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { attemptEventDisposition, resetCompletionSnapshot, coarseCompletionOutcome, finalAssessmentEvent } from './resetCompletion';
 import { resetNavigationEntry, freshResetEntry } from './resetNavigation';
-import { captureGoalBaseline, goalPointChange } from './goalAssessment';
+import { captureGoalBaseline, goalPointChange, restoredGoalRating } from './goalAssessment';
 
 const answers = { direction:'reset', intensity:7, goal_baseline:captureGoalBaseline('reset', 7) };
 const event = { interventionId:'factCheck', action:'completed', exitReason:'completed', completedPercentage:1, startedAt:1000, timestamp:2000, helpfulness:'same' };
@@ -139,4 +139,13 @@ describe('endpoint question metadata',()=>{
   expect(resetCompletionSnapshot({...entry.reset_completion,goalRating,goalAssessment:{...goalAssessment,value:7}},'factCheck')).not.toHaveProperty('goalAssessment');
   expect(resetCompletionSnapshot({...entry.reset_completion,goalRating,goalAssessment:{...goalAssessment,scale:'wakefulness'}},'factCheck')).not.toHaveProperty('goalAssessment');
  });
+});
+
+it('keeps explicit invalid endpoint metadata distinct from missing legacy metadata',()=>{
+ const context={direction:'sleep',goal_baseline:captureGoalBaseline('sleep',5)};
+ const bad=resetCompletionSnapshot({...entry.reset_completion,goalRating:0,goalAssessment:{...captureGoalBaseline('sleep',0),scale:'wakefulness'}},'factCheck');
+ expect(bad.goalAssessmentInvalid).toBe(true);
+ expect(restoredGoalRating(context,bad)).toBeNull();
+ expect(restoredGoalRating(context,resetCompletionSnapshot(bad,'factCheck'))).toBeNull();
+ expect(restoredGoalRating(context,resetCompletionSnapshot({...entry.reset_completion,goalRating:0},'factCheck'))).toBe(0);
 });

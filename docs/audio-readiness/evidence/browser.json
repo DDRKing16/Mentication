@@ -1,0 +1,66 @@
+{
+  "baseline": "f6cbdaa71535a4c99f42e0ec54e05e99b260040f",
+  "nightDocument": {
+    "rendered": true,
+    "overflow": false,
+    "exceptions": []
+  },
+  "existingUrgeRecordings": [
+    {
+      "keys": [
+        "name"
+      ],
+      "audio": "/audio/narration/a61decbcf2c84fe506a4dc83c4e11a529a02a644975648052f7a3b2d3b3eb4df.mp3",
+      "duration": 9.76,
+      "advanced": true,
+      "paused": false,
+      "rate": 1,
+      "preservesPitch": true
+    },
+    {
+      "keys": [
+        "anchor"
+      ],
+      "audio": "/audio/narration/cddc50779d17d0e48183384ac6142b3ea52de3afdc7aca7b18be572e0b29b552.mp3",
+      "duration": 8.88,
+      "advanced": true,
+      "paused": false,
+      "rate": 1,
+      "preservesPitch": true
+    },
+    {
+      "keys": [
+        "stages.0"
+      ],
+      "audio": "/audio/narration/4452d9700e73f21e712dba81183f87b8984c0f48be5a5cc4930751cf1548520e.mp3",
+      "duration": 4.24,
+      "advanced": true,
+      "paused": false,
+      "rate": 1,
+      "preservesPitch": true
+    }
+  ],
+  "nightLocalFilePlayback": {
+    "stable": true,
+    "resumed": true,
+    "disposed": true,
+    "reports": [
+      [
+        "loading",
+        "Buffering your file…"
+      ],
+      [
+        "playing"
+      ],
+      [
+        "playing"
+      ]
+    ],
+    "testInputOnly": true
+  },
+  "limitations": [
+    "Existing approved Urge recording used solely as local-file test input, not installed as Night content.",
+    "No provider sign-in or paid generation. Provider assertions use unit-test doubles, not live accounts.",
+    "Missing Tapping/revised Urge assets and physical-device playback remain unverified."
+  ]
+}

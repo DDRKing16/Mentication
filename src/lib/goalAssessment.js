@@ -27,7 +27,7 @@ export function hasGoalBaseline(answers) {
 // Old drafts need evidence of the end question, or a matching start question.
 export function restoredGoalRating(entry, completion) {
   const value = completion?.goalRating;
-  if (!valid(value)) return null;
+  if (!valid(value) || completion?.goalAssessmentInvalid === true) return null;
   if (completion?.goalAssessment) return goalPointChange(completion.goalAssessment, entry?.direction, value) === 0 ? value : null;
   return hasGoalBaseline(entry) ? value : null;
 }
