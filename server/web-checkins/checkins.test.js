@@ -50,9 +50,13 @@ describe('durable minimal check-in scheduler', () => {
     store.prune(now + 1800001); expect(store.get('owner')).toBeUndefined(); store.close();
   });
   it('removes a plan at its exact end without sending a zero-TTL expired push', async () => {
-    const store = createStore(); store.put('owner', plan(), now);
+    // The first occurrence is exactly at expiry, so it is due, not stale.
+    // The old inclusive end boundary would call the provider with TTL 0.
+    const endsAt = now + 600000;
+    const store = createStore(); store.put('owner', plan({ endsAt }), now);
+    expect(store.get('owner').nextAt).toBe(endsAt);
     let sends = 0;
-    await deliverDue(store, async () => sends++, now + 1200000);
+    await deliverDue(store, async () => sends++, endsAt);
     expect(sends).toBe(0); expect(store.get('owner')).toBeUndefined(); store.close();
   });
   it('authorizes by capability, rejects origins and serializes cancellation with sends', async () => {

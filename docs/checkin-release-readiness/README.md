@@ -73,9 +73,13 @@ node scripts/tara-web-notifications.browser.mjs
 ```
 
 Requires Chromium/Playwright already available; override `CHROME_PATH` and
-`PLAYWRIGHT_MODULE` if necessary. To test a production preview, first generate the
-fixture against Vite, then set `TARA_FIXTURE_FILE` to that generated JSON and
-`TARA_APP_ORIGIN` to the preview. Do not put fake public settings in a real deploy.
+`PLAYWRIGHT_MODULE` if necessary. These recipes require a Vite development server:
+the web offline-deletion scenario imports `/src/lib/localData.js`, which is absent
+from a production build. `TARA_FIXTURE_FILE` can reuse a synthetic fixture but does
+not make the web recipe compatible with a production preview. Production-preview
+and hosted-route verification remain separate pending checks; do not report this
+development-server suite as production evidence. Do not put fake public settings
+in a real deploy.
 
 ## Physical native release gate — execute on a consenting tester's iPhone
 
