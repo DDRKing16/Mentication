@@ -1,7 +1,9 @@
 {
   "source": "design/night-source/providers.js",
   "generated": "public/night-channel/index.html",
-  "sha256": "8d1bdd3e9ff9710e7b79e718ded43c2ccb2c0a0c5481e4c6eaeeb45bf6e9f298",
+  "sha256": "9edb9d541c8c8d2dddc480c4fd97253b93519696887f31f9f7093d74fd3253d7",
   "servedRecoveryGuards": true,
-  "providerLiveTest": false
+  "providerLiveTest": false,
+  "responsiveStopGuards": true,
+  "controllerCleanupOnRejection": true
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { SpotifyAdapter, AppleAdapter } from './providers.js';
-import { LocalAudio } from './playback.js';
+import { LocalAudio, settlePlaybackAction } from './playback.js';
 import { readNightSetup, writeNightSetup, clockForSetup } from './setup.js';
 import { loadRecords } from '../../src/lib/tomorrowParking/storage.js';
 export function useNight(channels) {
@@ -68,9 +68,9 @@ export function useNight(channels) {
     lock.current = true;
     setBusy(true);
     try {
-      await action();
-      if (stopped.current) await silenceAll();
-      return true;
+      const completed = await settlePlaybackAction(action, { isStopped: () => stopped.current, silenceAll });
+      if (!completed) update('stopped', 'Stopped. Position and remaining time are kept.');
+      return completed;
     } catch (error) {
       update('error', error.message || 'Playback failed. Please retry.');
       return false;

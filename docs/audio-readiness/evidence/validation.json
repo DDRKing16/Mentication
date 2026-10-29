@@ -3,7 +3,7 @@
   "baselineTests": 984,
   "tests": {
     "files": 114,
-    "passed": 1004,
+    "passed": 1013,
     "command": "npm test -- --run"
   },
   "lint": "passed",
@@ -18,5 +18,10 @@
     "before": "failed against f141d17: initial 403 then idle pause/disconnect rejected",
     "after": "passed; recovery and ambiguous/in-flight failure regressions included",
     "githubCI": "Not claimed; draft PR API request returned Forbidden and was not retried"
+  },
+  "stopRegression": {
+    "before": "f128a48 HTTP204 with outstanding confirmation: STOP rejected pending; SDK pause calls 0",
+    "after": "STOP sends immediate SDK pause, cancels confirmation, re-pauses after delayed request settlement, waits for confirmed silence",
+    "controller": "post-STOP cleanup on successful and rejected actions; failed cleanup blocks switching"
   }
 }

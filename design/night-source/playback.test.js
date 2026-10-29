@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { SleepClock, LocalAudio } from './playback.js';
+import { SleepClock, LocalAudio, settlePlaybackAction } from './playback.js';
 import { SpotifyAdapter, AppleAdapter, spotifyUri } from './providers.js';
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 describe('Night sleep timer', () => {
@@ -234,8 +234,18 @@ describe('Spotify recovery after a rejected first play', () => {
     const s=idle();let settle;vi.stubGlobal('fetch',vi.fn(()=>new Promise(resolve=>{settle=resolve;})));
     const attempt=expect(s.play(uri)).rejects.toThrow('subscription');
     await vi.waitFor(()=>expect(settle).toBeTypeOf('function'));
-    await expect(s.pause()).rejects.toThrow('still pending');await expect(s.disconnect()).rejects.toThrow('still pending');
-    settle({ok:false,status:403});await attempt;await s.pause();expect(s.pendingPlayCommands).toBe(0);
+    let silenced=false;const stopping=s.pause().then(()=>{silenced=true;});expect(s.player.pause).toHaveBeenCalledOnce();
+    await Promise.resolve();expect(silenced).toBe(false);
+    settle({ok:false,status:403});await attempt;await stopping;await s.disconnect();expect(s.pendingPlayCommands).toBe(0);
+  });
+  it('cancels a pre-request token wait even after disconnect resets the player',async()=>{
+    const s=idle();let tokenReady;s.accessToken=()=>new Promise(resolve=>{tokenReady=resolve;});const fetch=vi.fn();vi.stubGlobal('fetch',fetch);
+    const attempt=expect(s.play(uri)).rejects.toThrow('cancelled');await vi.waitFor(()=>expect(tokenReady).toBeTypeOf('function'));
+    await s.disconnect();tokenReady('test-only');await attempt;expect(fetch).not.toHaveBeenCalled();
+  });
+  it('still attempts STOP if an active SDK loses its device identifier',async()=>{
+    const s=idle();s.device=null;s.playbackMayBeActive=true;s.player.getCurrentState.mockResolvedValue({paused:true});
+    await s.pause();expect(s.player.pause).toHaveBeenCalledOnce();expect(s.playbackMayBeActive).toBe(false);
   });
   it('keeps accepted but unconfirmed playback blocked after a 204',async()=>{
     vi.useFakeTimers();const s=idle();vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,status:204}));
@@ -244,4 +254,38 @@ describe('Spotify recovery after a rejected first play', () => {
     expect(s.playbackMayBeActive).toBe(true);expect(s.pendingPlayCommands).toBe(0);
   });
 
+  it.each(['requested','unrelated'])('STOP pauses immediately during %s-track confirmation and suppresses late playing',async track=>{
+    vi.useFakeTimers();const s=idle();let observed=false;
+    s.player.getCurrentState.mockImplementation(async()=>{observed=true;return {paused:false,track_window:{current_track:{uri:track==='requested'?uri:'spotify:track:9999999999999999999999'}}};});
+    // Hold the first state response so STOP arrives inside confirmPlaying.
+    let stateReply;s.player.getCurrentState.mockImplementationOnce(()=>new Promise(resolve=>{observed=true;stateReply=resolve;}));
+    vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,status:204}));
+    const attempt=expect(s.play(uri)).rejects.toThrow('cancelled');await vi.advanceTimersByTimeAsync(0);expect(observed).toBe(true);
+    s.player.pause.mockImplementation(async()=>{s.player.getCurrentState.mockResolvedValue({paused:true});});
+    const stopping=s.pause();expect(s.player.pause).toHaveBeenCalledOnce();
+    stateReply({paused:false,track_window:{current_track:{uri:track==='requested'?uri:'spotify:track:9999999999999999999999'}}});await vi.runAllTimersAsync();await attempt;await stopping;
+    expect(s.player.pause.mock.calls.length).toBeGreaterThanOrEqual(2);expect(s.playbackMayBeActive).toBe(false);expect(s.report).not.toHaveBeenCalledWith('playing',expect.anything(),expect.anything());
+  });
+  it('re-pauses after a delayed HTTP acceptance so a late play cannot escape STOP',async()=>{
+    vi.useFakeTimers();const s=idle();let accept,playing=false;
+    vi.stubGlobal('fetch',vi.fn(()=>new Promise(resolve=>{accept=()=>{playing=true;resolve({ok:true,status:204});};})));
+    s.player.pause.mockImplementation(async()=>{playing=false;});s.player.getCurrentState.mockImplementation(async()=>({paused:!playing}));
+    const attempt=expect(s.play(uri)).rejects.toThrow('cancelled');await vi.advanceTimersByTimeAsync(0);
+    let complete=false;const stopping=s.pause().then(()=>{complete=true;});expect(s.player.pause).toHaveBeenCalledOnce();await vi.advanceTimersByTimeAsync(500);expect(complete).toBe(false);
+    accept();await vi.runAllTimersAsync();await attempt;await stopping;expect(playing).toBe(false);expect(s.player.pause.mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+});
+
+describe('Night pending STOP settlement',()=>{
+  it.each([false,true])('cleans up pending STOP after action rejection=%s',async rejected=>{
+    const silenceAll=vi.fn();const action=vi.fn(async()=>{if(rejected)throw Error('confirmation rejected');});
+    await expect(settlePlaybackAction(action,{isStopped:()=>true,silenceAll})).resolves.toBe(false);expect(silenceAll).toHaveBeenCalledOnce();
+  });
+  it('does not acknowledge STOP or permit switching when post-rejection cleanup fails',async()=>{
+    await expect(settlePlaybackAction(async()=>{throw Error('playback failed');},{isStopped:()=>true,silenceAll:async()=>{throw Error('pause unconfirmed');}})).rejects.toThrow('pause unconfirmed');
+  });
+  it('preserves normal errors when no STOP was requested',async()=>{
+    const silenceAll=vi.fn();await expect(settlePlaybackAction(async()=>{throw Error('playback failed');},{isStopped:()=>false,silenceAll})).rejects.toThrow('playback failed');expect(silenceAll).not.toHaveBeenCalled();
+  });
 });

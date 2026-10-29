@@ -53,7 +53,7 @@ alignment checks and MP3 durations measured by ffprobe.
 
 ## Validation and limits
 
-The updated suite passes **114 files / 1004 tests**; lint, typecheck and production
+The updated suite passes **114 files / 1013 tests**; lint, typecheck and production
 build pass. Build retains the large-chunk advisory. Night regeneration also emits
 existing import.meta/IIFE warnings from imported web-check-in code; its rebuilt
 page renders without runtime exceptions in the browser check.
@@ -88,3 +88,21 @@ served `public/night-channel/index.html` was rebuilt from the corrected source.
 Draft PR creation previously failed with `Post https://api.github.com/graphql:
 Forbidden`; no retry or alternative route was attempted. Local checks are the
 reported evidence; no GitHub CI success is claimed.
+
+## Responsive STOP follow-up
+
+Reproduced `f128a48`: after HTTP 204, STOP during an outstanding SDK state read
+rejected with "still pending" and made zero SDK pause calls. STOP now sends a
+best-effort SDK pause immediately, invalidates pending playback confirmation,
+waits for the issued command to settle, and sends a second pause if a delayed
+play may have arrived after the first. It acknowledges silence only after the
+pending command drains and paused state is observed (or a definitively rejected
+first request leaves known idle output). Source switching stays blocked until
+that same operation completes. Missing device identifiers do not suppress STOP.
+
+The controller now performs pending-STOP cleanup on both action success and
+rejection. Failed cleanup remains an error rather than a false stopped state.
+Cancellation generations also prevent a delayed pre-request token result from
+starting playback after disconnect. Tests cover requested/unrelated-track
+confirmation, delayed HTTP acceptance, rejection cleanup, unsuccessful cleanup,
+and pre-request cancellation. The generated standalone document is rebuilt.
