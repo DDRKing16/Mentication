@@ -3,7 +3,7 @@
   "baselineTests": 984,
   "tests": {
     "files": 114,
-    "passed": 993,
+    "passed": 1004,
     "command": "npm test -- --run"
   },
   "lint": "passed",
@@ -13,5 +13,10 @@
   "tappingStrictAudit": "expected exit 1: all 18 approved recordings missing",
   "providerRequests": 0,
   "generationRequests": 0,
-  "creditsSpent": 0
+  "creditsSpent": 0,
+  "recoveryRegression": {
+    "before": "failed against f141d17: initial 403 then idle pause/disconnect rejected",
+    "after": "passed; recovery and ambiguous/in-flight failure regressions included",
+    "githubCI": "Not claimed; draft PR API request returned Forbidden and was not retried"
+  }
 }

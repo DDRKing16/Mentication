@@ -1,0 +1,7 @@
+{
+  "source": "design/night-source/providers.js",
+  "generated": "public/night-channel/index.html",
+  "sha256": "8d1bdd3e9ff9710e7b79e718ded43c2ccb2c0a0c5481e4c6eaeeb45bf6e9f298",
+  "servedRecoveryGuards": true,
+  "providerLiveTest": false
+}

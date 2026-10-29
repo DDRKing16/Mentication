@@ -171,12 +171,12 @@ describe('provider playback evidence', () => {
     await s.pause();expect(s.player.pause).not.toHaveBeenCalled();
   });
   it('requires observed Spotify pause before a caller may switch sources', async () => {
-    const s=new SpotifyAdapter({},vi.fn());s.device='test-device';s.requestedUri='spotify:track:1234567890123456789012';
+    const s=new SpotifyAdapter({},vi.fn());s.device='test-device';s.requestedUri='spotify:track:1234567890123456789012';s.playbackMayBeActive=true;
     s.player={pause:vi.fn(),getCurrentState:vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce({paused:true})};
     await s.pause();expect(s.player.pause).toHaveBeenCalledOnce();expect(s.player.getCurrentState).toHaveBeenCalledTimes(2);
   });
   it.each([null,{paused:false}])('rejects unconfirmed Spotify pause (%j)', async state => {
-    vi.useFakeTimers();const s=new SpotifyAdapter({},vi.fn());s.device='test-device';s.requestedUri='spotify:track:1234567890123456789012';
+    vi.useFakeTimers();const s=new SpotifyAdapter({},vi.fn());s.device='test-device';s.requestedUri='spotify:track:1234567890123456789012';s.playbackMayBeActive=true;
     s.player={pause:vi.fn(),getCurrentState:vi.fn().mockResolvedValue(state)};
     const result=expect(s.pause()).rejects.toThrow('not confirmed pause');await vi.runAllTimersAsync();await result;
   });
@@ -186,4 +186,62 @@ describe('provider playback evidence', () => {
     const result=expect(a.pause()).rejects.toThrow('not confirmed pause');await vi.runAllTimersAsync();await result;
     a.music.pause.mockImplementation(()=>{a.music.playbackState=3;});await a.pause();
   });
+});
+
+describe('Spotify recovery after a rejected first play', () => {
+  const uri='spotify:track:1234567890123456789012';
+  const idle=()=>{
+    const s=new SpotifyAdapter({},vi.fn());s.device='test-device';s.token={access_token:'test-only',expires:Date.now()+100000};
+    s.player={activateElement:vi.fn(),pause:vi.fn(),disconnect:vi.fn(),getCurrentState:vi.fn().mockResolvedValue(null)};
+    return s;
+  };
+  it('allows switching and disconnect after a definitive first-play 403', async()=>{
+    vi.useFakeTimers();const s=idle();vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:false,status:403}));
+    await expect(s.play(uri)).rejects.toThrow('subscription');
+    const paused=expect(s.pause()).resolves.toBeUndefined();await vi.runAllTimersAsync();await paused;
+    expect(s.player.pause).not.toHaveBeenCalled();const player=s.player;await s.disconnect();expect(player.disconnect).toHaveBeenCalledOnce();
+  });
+  it.each(['activation','token'])('allows recovery when %s fails before sending a playback command',async failure=>{
+    const s=idle();const fetch=vi.fn();vi.stubGlobal('fetch',fetch);
+    if(failure==='activation')s.player.activateElement.mockRejectedValue(Error('gesture denied'));else s.accessToken=vi.fn().mockRejectedValue(Error('authorization expired'));
+    await expect(s.play(uri)).rejects.toThrow();await s.pause();expect(fetch).not.toHaveBeenCalled();expect(s.playbackMayBeActive).toBe(false);await s.disconnect();
+  });
+  it('can retry the same selection successfully after a 403',async()=>{
+    const s=idle();vi.stubGlobal('fetch',vi.fn().mockResolvedValueOnce({ok:false,status:403}).mockResolvedValueOnce({ok:true,status:204}));
+    await expect(s.play(uri)).rejects.toThrow();await s.pause();
+    s.player.getCurrentState.mockResolvedValue({paused:false,track_window:{current_track:{uri,name:'Requested'}}});
+    await s.play(uri);expect(s.requestedUri).toBe(uri);expect(s.playbackMayBeActive).toBe(true);
+    s.player.getCurrentState.mockResolvedValue({paused:true});await s.pause();expect(s.playbackMayBeActive).toBe(false);
+  });
+  it.each(['transport',408,500])('keeps ambiguous %s failures blocked until actual pause evidence',async failure=>{
+    vi.useFakeTimers();const s=idle();const fetch=vi.fn();
+    if(failure==='transport')fetch.mockRejectedValue(Error('connection lost'));else fetch.mockResolvedValue({ok:false,status:failure});vi.stubGlobal('fetch',fetch);
+    await expect(s.play(uri)).rejects.toThrow();expect(s.playbackMayBeActive).toBe(true);
+    const paused=expect(s.pause()).rejects.toThrow('not confirmed pause');await vi.runAllTimersAsync();await paused;
+    s.player.getCurrentState.mockResolvedValue({paused:true});await s.pause();expect(s.playbackMayBeActive).toBe(false);
+  });
+  it('does not erase earlier potentially active playback when a later request gets 403',async()=>{
+    vi.useFakeTimers();const s=idle();s.playbackMayBeActive=true;s.requestedUri=uri;
+    vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:false,status:403}));await expect(s.play(uri)).rejects.toThrow();
+    const paused=expect(s.pause()).rejects.toThrow('not confirmed pause');await vi.runAllTimersAsync();await paused;expect(s.playbackMayBeActive).toBe(true);
+  });
+  it('retains SDK activity observed while a rejected request was in flight',async()=>{
+    const s=idle();vi.stubGlobal('fetch',vi.fn().mockImplementation(async()=>{s.playbackEvidenceVersion+=1;return {ok:false,status:403};}));
+    await expect(s.play(uri)).rejects.toThrow();expect(s.playbackMayBeActive).toBe(true);
+  });
+
+  it('does not allow switching while a playback request remains in flight',async()=>{
+    const s=idle();let settle;vi.stubGlobal('fetch',vi.fn(()=>new Promise(resolve=>{settle=resolve;})));
+    const attempt=expect(s.play(uri)).rejects.toThrow('subscription');
+    await vi.waitFor(()=>expect(settle).toBeTypeOf('function'));
+    await expect(s.pause()).rejects.toThrow('still pending');await expect(s.disconnect()).rejects.toThrow('still pending');
+    settle({ok:false,status:403});await attempt;await s.pause();expect(s.pendingPlayCommands).toBe(0);
+  });
+  it('keeps accepted but unconfirmed playback blocked after a 204',async()=>{
+    vi.useFakeTimers();const s=idle();vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,status:204}));
+    const attempt=expect(s.play(uri)).rejects.toThrow('not confirmed playback');await vi.runAllTimersAsync();await attempt;
+    const paused=expect(s.pause()).rejects.toThrow('not confirmed pause');await vi.runAllTimersAsync();await paused;
+    expect(s.playbackMayBeActive).toBe(true);expect(s.pendingPlayCommands).toBe(0);
+  });
+
 });

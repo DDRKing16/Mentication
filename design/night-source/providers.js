@@ -4,7 +4,11 @@ const timeout = (promise, ms = 20000) => new Promise((resolve, reject) => {
   Promise.resolve(promise).then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
 });
 async function checked(response) {
-  if (!response.ok) throw new Error(response.status === 401 ? 'Authorization expired. Connect again.' : response.status === 403 ? 'Playback is unavailable for this account. Check subscription and app access.' : `Service request failed (${response.status}). Please retry.`);
+  if (!response.ok) {
+    const error = new Error(response.status === 401 ? 'Authorization expired. Connect again.' : response.status === 403 ? 'Playback is unavailable for this account. Check subscription and app access.' : `Service request failed (${response.status}). Please retry.`);
+    error.status = response.status;
+    throw error;
+  }
   return response.status === 204 ? null : response.json();
 }
 const request = (url, options = {}) => timeout(fetch(url, {
@@ -50,6 +54,9 @@ export class SpotifyAdapter {
     this.device = null;
     this.token = null;
     this.requestedUri = null;
+    this.playbackMayBeActive = false;
+    this.playbackEvidenceVersion = 0;
+    this.pendingPlayCommands = 0;
   }
   get configured() {
     return !!(this.config.clientId && this.config.redirectUri);
@@ -171,6 +178,7 @@ export class SpotifyAdapter {
       });
       player.addListener('autoplay_failed', () => this.report('error', 'Playback needs another tap on Play.'));
       player.addListener('player_state_changed', state => {
+        if (state && !state.paused) { this.playbackMayBeActive = true; this.playbackEvidenceVersion += 1; }
         if (state?.paused) this.report('paused');
         else if (state && this.requestedUri && state.track_window?.current_track?.uri === this.requestedUri) this.report('playing', '', state.track_window.current_track.name);
       });
@@ -181,25 +189,45 @@ export class SpotifyAdapter {
   async play(value) {
     if (!this.device) throw new Error('Connect Spotify before playing.');
     const uri = spotifyUri(value);
-    this.requestedUri = uri;
     await this.player.activateElement();
     const token = await this.accessToken();
-    await request(`https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(this.device)}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        uris: [uri]
-      })
-    });
-    // A successful HTTP command alone is not evidence of playback.
-    await this.confirmPlaying();
+    const previousUri = this.requestedUri;
+    const previousRisk = this.playbackMayBeActive;
+    const previousEvidence = this.playbackEvidenceVersion;
+    this.requestedUri = uri;
+    // Only an issued command can make idle playback uncertain. Preserve any
+    // earlier uncertainty and SDK evidence if this new command is rejected.
+    this.playbackMayBeActive = true;
+    this.pendingPlayCommands += 1;
+    try {
+      try {
+        await request(`https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(this.device)}`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            uris: [uri]
+          })
+        });
+      } catch (error) {
+        // These HTTP responses definitively reject the command. A transport
+        // timeout, 408 or server error may occur after playback began: fail closed.
+        if ([400, 401, 403, 404, 422, 429].includes(error.status)) {
+          this.playbackMayBeActive = previousRisk || this.playbackEvidenceVersion !== previousEvidence;
+          if (this.playbackEvidenceVersion === previousEvidence) this.requestedUri = previousUri;
+        }
+        throw error;
+      }
+      // A successful HTTP command alone is not evidence of playback.
+      await this.confirmPlaying();
+    } finally { this.pendingPlayCommands -= 1; }
   }
   async confirmPlaying() {
     for (let n = 0; n < 20; n++) {
       const state = await timeout(this.player.getCurrentState());
+      if (state && !state.paused) { this.playbackMayBeActive = true; this.playbackEvidenceVersion += 1; }
       if (state && !state.paused && state.track_window?.current_track?.uri === this.requestedUri) {
         this.report('playing', '', state.track_window?.current_track?.name);
         return;
@@ -209,22 +237,29 @@ export class SpotifyAdapter {
     throw new Error('Spotify has not confirmed playback. Tap Retry.');
   }
   async pause() {
+    if (this.pendingPlayCommands) throw new Error('Spotify playback is still pending. Wait for the request to finish before switching sources.');
     if (this.player && this.device) {
       const state = await timeout(this.player.getCurrentState());
-      if (state?.paused || (!state && !this.requestedUri)) return;
+      if (state?.paused) { this.playbackMayBeActive = false; return; }
+      if (!state && !this.playbackMayBeActive) return;
+      this.playbackMayBeActive = true;
       // A missing state or fulfilled command does not prove the output stopped.
       await timeout(this.player.pause());
       for (let n = 0; n < 20; n++) {
         const paused = await timeout(this.player.getCurrentState());
-        if (paused?.paused === true) return;
+        if (paused?.paused === true) { this.playbackMayBeActive = false; return; }
         await new Promise(resolve => setTimeout(resolve, 250));
       }
       throw new Error('Spotify has not confirmed pause. Stop playback in Spotify before switching sources.');
     }
   }
   async resume() {
-    await timeout(this.player.resume());
-    await this.confirmPlaying();
+    this.playbackMayBeActive = true;
+    this.pendingPlayCommands += 1;
+    try {
+      await timeout(this.player.resume());
+      await this.confirmPlaying();
+    } finally { this.pendingPlayCommands -= 1; }
   }
   async disconnect() {
     await this.pause();
@@ -233,6 +268,9 @@ export class SpotifyAdapter {
     this.device = null;
     this.token = null;
     this.requestedUri = null;
+    this.playbackMayBeActive = false;
+    this.playbackEvidenceVersion = 0;
+    this.pendingPlayCommands = 0;
     this.report(this.configured?'unauthorized':'config_missing');
   }
 }
