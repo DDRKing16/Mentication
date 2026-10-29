@@ -45,9 +45,9 @@ export function createStore(path = ':memory:') {
     get: owner => db.prepare('SELECT * FROM plans WHERE owner=?').get(owner),
     remove: owner => db.prepare('DELETE FROM plans WHERE owner=?').run(owner),
     prune(now) {
-      db.prepare('DELETE FROM plans WHERE endsAt < ? OR (json_extract(subscription, \'$.expirationTime\') IS NOT NULL AND json_extract(subscription, \'$.expirationTime\') <= ?)').run(now, now);
+      db.prepare('DELETE FROM plans WHERE endsAt <= ? OR (json_extract(subscription, \'$.expirationTime\') IS NOT NULL AND json_extract(subscription, \'$.expirationTime\') <= ?)').run(now, now);
     },
-    due: now => db.prepare('SELECT * FROM plans WHERE nextAt <= ? AND endsAt >= ?').all(now, now),
+    due: now => db.prepare('SELECT * FROM plans WHERE nextAt <= ? AND endsAt > ?').all(now, now),
     advance(row, now) {
       const next = row.startedAt + (Math.floor((now - row.startedAt) / row.intervalMs) + 1) * row.intervalMs;
       db.prepare('UPDATE plans SET nextAt=? WHERE owner=?').run(next, row.owner);

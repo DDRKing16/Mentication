@@ -1,0 +1,31 @@
+{
+  "native": {
+    "passed": [
+      "Cold startup, refresh, outside-Tara and repeated taps, support, cancellation at 320px",
+      "Cold startup, refresh, outside-Tara and repeated taps, support, cancellation at 390px",
+      "Archived-plan deep link and refresh are read-only and preserve the current plan without completion",
+      "deleted notification target stays honest without resurrecting a plan or recording an outcome",
+      "completed notification target stays honest without resurrecting a plan or recording an outcome",
+      "expired notification target stays honest without resurrecting a plan or recording an outcome",
+      "corrupt notification target stays honest without resurrecting a plan or recording an outcome",
+      "Explicit consent schedules bounded discreet reminders; reflection cancels them before outcomes",
+      "Permission decline keeps manual support usable",
+      "App-wide deletion cancels reminders while Tara is unmounted; a late tap leaves data deleted",
+      "Failed native cancellation is visible outside Tara and clears only after successful retry; private data remains deleted"
+    ],
+    "pageErrors": [],
+    "captureCount": 12,
+    "delivery": "mocked; physical-device delivery unverified"
+  },
+  "web": {
+    "passed": [
+      "Browser consent, private payload, rescheduling, cold web tap, refresh and completion cancellation at 320px",
+      "Offline clear deletes private data, disables local worker delivery, retains only cancellation ownership and retries on reconnect",
+      "Declined browser permission never registers a worker or server schedule and preserves manual check-in",
+      "In-app alternative does not request permission or transmit metadata"
+    ],
+    "pageErrors": [],
+    "captureCount": 5,
+    "delivery": "mocked; physical-device delivery unverified"
+  }
+}
