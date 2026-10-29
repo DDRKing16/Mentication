@@ -49,6 +49,7 @@ export class SpotifyAdapter {
     this.player = null;
     this.device = null;
     this.token = null;
+    this.requestedUri = null;
   }
   get configured() {
     return !!(this.config.clientId && this.config.redirectUri);
@@ -170,7 +171,8 @@ export class SpotifyAdapter {
       });
       player.addListener('autoplay_failed', () => this.report('error', 'Playback needs another tap on Play.'));
       player.addListener('player_state_changed', state => {
-        if (state) this.report(state.paused ? 'paused' : 'playing', '', state.track_window?.current_track?.name);
+        if (state?.paused) this.report('paused');
+        else if (state && this.requestedUri && state.track_window?.current_track?.uri === this.requestedUri) this.report('playing', '', state.track_window.current_track.name);
       });
     });
     if (!(await player.connect())) throw new Error('Spotify could not connect.');
@@ -179,6 +181,7 @@ export class SpotifyAdapter {
   async play(value) {
     if (!this.device) throw new Error('Connect Spotify before playing.');
     const uri = spotifyUri(value);
+    this.requestedUri = uri;
     await this.player.activateElement();
     const token = await this.accessToken();
     await request(`https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(this.device)}`, {
@@ -196,8 +199,8 @@ export class SpotifyAdapter {
   }
   async confirmPlaying() {
     for (let n = 0; n < 20; n++) {
-      const state = await this.player.getCurrentState();
-      if (state && !state.paused) {
+      const state = await timeout(this.player.getCurrentState());
+      if (state && !state.paused && state.track_window?.current_track?.uri === this.requestedUri) {
         this.report('playing', '', state.track_window?.current_track?.name);
         return;
       }
@@ -208,7 +211,15 @@ export class SpotifyAdapter {
   async pause() {
     if (this.player && this.device) {
       const state = await timeout(this.player.getCurrentState());
-      if (state && !state.paused) await timeout(this.player.pause());
+      if (state?.paused || (!state && !this.requestedUri)) return;
+      // A missing state or fulfilled command does not prove the output stopped.
+      await timeout(this.player.pause());
+      for (let n = 0; n < 20; n++) {
+        const paused = await timeout(this.player.getCurrentState());
+        if (paused?.paused === true) return;
+        await new Promise(resolve => setTimeout(resolve, 250));
+      }
+      throw new Error('Spotify has not confirmed pause. Stop playback in Spotify before switching sources.');
     }
   }
   async resume() {
@@ -221,6 +232,7 @@ export class SpotifyAdapter {
     this.player = null;
     this.device = null;
     this.token = null;
+    this.requestedUri = null;
     this.report(this.configured?'unauthorized':'config_missing');
   }
 }
@@ -286,7 +298,16 @@ export class AppleAdapter {
     this.report('playing', '', this.music.nowPlayingItem?.title);
   }
   async pause() {
-    if (this.music && ![window.MusicKit.PlaybackStates.paused, window.MusicKit.PlaybackStates.stopped, window.MusicKit.PlaybackStates.ended, window.MusicKit.PlaybackStates.none].includes(this.music.playbackState)) await timeout(this.music.pause());
+    if (!this.music) return;
+    const states = window.MusicKit.PlaybackStates;
+    const quiet = () => [states.paused, states.stopped, states.ended, states.none].filter(value => value !== undefined).includes(this.music.playbackState);
+    if (quiet()) return;
+    await timeout(this.music.pause());
+    for (let n = 0; n < 20; n++) {
+      if (quiet()) return;
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+    throw new Error('Apple Music has not confirmed pause. Stop playback in Apple Music before switching sources.');
   }
   async resume() {
     await timeout(this.music.play());

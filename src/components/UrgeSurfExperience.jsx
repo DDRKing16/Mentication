@@ -13,6 +13,7 @@ import UrgeWave from "@/components/UrgeWave";
 import { useGuideVoice } from "@/hooks/useGuideVoice";
 import { useUrgeSurfSoundscape } from "@/hooks/useUrgeSurfSoundscape";
 import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
+import { startUrgeGuide } from '@/lib/urgeSurfAudio';
 import { URGE_SURF_NARRATION } from "@/lib/urgeSurfNarration";
 import { createUrgeSession, reduceUrgeSession, urgePracticeCompletion, captureUrgeRuntime, restoreUrgeRuntime } from "@/lib/urgeSurfSession";
 import { buildUrgeSurfLearningRecord } from "@/lib/urgeSurfState";
@@ -239,15 +240,9 @@ function TimerStage({ session, dispatch, audioEnabled, runtimeAvailable }) {
   }, [dispatch, now, secondsLeft]);
 
   useEffect(() => {
-    if (!audioEnabled) {
-      setNarrationActive(false);
-      stopNarration();
-      return undefined;
-    }
-    setNarrationActive(true);
-    preload(stage.spoken);
-    speak(stage.spoken, { rate: 1, onEnd: () => setNarrationActive(false) });
-    return stopNarration;
+    return startUrgeGuide(stage.spoken, {
+      enabled: audioEnabled, preload, speak, stop: stopNarration, setActive: setNarrationActive,
+    });
   }, [audioEnabled, preload, speak, stage.spoken, stopNarration]);
 
   return (

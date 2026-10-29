@@ -1,0 +1,17 @@
+{
+  "baseline": "f6cbdaa71535a4c99f42e0ec54e05e99b260040f",
+  "baselineTests": 984,
+  "tests": {
+    "files": 114,
+    "passed": 993,
+    "command": "npm test -- --run"
+  },
+  "lint": "passed",
+  "typecheck": "passed",
+  "build": "passed; existing large-chunk advisory",
+  "nightRebuild": "passed; import.meta/IIFE warnings; browser renders without exceptions",
+  "tappingStrictAudit": "expected exit 1: all 18 approved recordings missing",
+  "providerRequests": 0,
+  "generationRequests": 0,
+  "creditsSpent": 0
+}

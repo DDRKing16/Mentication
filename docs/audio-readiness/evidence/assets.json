@@ -1,0 +1,440 @@
+{
+  "status": "recordings_incomplete",
+  "preset": {
+    "voice_id": "qKsErzZyZLoLSAUfEopJ",
+    "model_id": "eleven_v3",
+    "stability": 0.35,
+    "style": 0.7,
+    "use_speaker_boost": false,
+    "delivery_cue": "[warmly, smiling, gently] ",
+    "playback_rate": 0.8
+  },
+  "generation": "Not performed. Provider allowance/cost unverified; requires authorized access and specific approval before paid usage. Preserve the known preset; document provider defaults for unspecified options.",
+  "tapping": {
+    "uniqueRecordings": 18,
+    "verified": 0,
+    "missing": 18,
+    "missingRequestCharacters": 1455,
+    "recordings": [
+      {
+        "keys": [
+          "place-hand"
+        ],
+        "text": "Side of your hand. Place two fingertips on the soft outer edge, between your little finger and wrist. Use a light touch.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Side of your hand. Place two fingertips on the soft outer edge, between your little finger and wrist. Use a light touch.",
+        "requestCharacters": 146
+      },
+      {
+        "keys": [
+          "place-crown"
+        ],
+        "text": "Top of your head. Place two fingertips at the centre of your crown.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Top of your head. Place two fingertips at the centre of your crown.",
+        "requestCharacters": 93
+      },
+      {
+        "keys": [
+          "place-brow"
+        ],
+        "text": "Inner eyebrow. Where your eyebrow begins, beside the bridge of your nose.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Inner eyebrow. Where your eyebrow begins, beside the bridge of your nose.",
+        "requestCharacters": 99
+      },
+      {
+        "keys": [
+          "place-sideEye"
+        ],
+        "text": "Side of your eye. Find the bone beside the outer corner. Stay on the bone.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Side of your eye. Find the bone beside the outer corner. Stay on the bone.",
+        "requestCharacters": 100
+      },
+      {
+        "keys": [
+          "place-underEye"
+        ],
+        "text": "Under your eye. On the bone below your eye, in line with the pupil.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Under your eye. On the bone below your eye, in line with the pupil.",
+        "requestCharacters": 93
+      },
+      {
+        "keys": [
+          "place-nose"
+        ],
+        "text": "Under your nose. In the space between your nose and upper lip.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Under your nose. In the space between your nose and upper lip.",
+        "requestCharacters": 88
+      },
+      {
+        "keys": [
+          "place-chin"
+        ],
+        "text": "Chin crease. Below your lower lip, above your chin.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Chin crease. Below your lower lip, above your chin.",
+        "requestCharacters": 77
+      },
+      {
+        "keys": [
+          "place-collar"
+        ],
+        "text": "Below your collarbone. About an inch out from the centre, just below the bone.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Below your collarbone. About an inch out from the centre, just below the bone.",
+        "requestCharacters": 104
+      },
+      {
+        "keys": [
+          "place-arm"
+        ],
+        "text": "Under your arm. Reach across to your side, about four inches below your armpit.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Under your arm. Reach across to your side, about four inches below your armpit.",
+        "requestCharacters": 105
+      },
+      {
+        "keys": [
+          "tension-setup"
+        ],
+        "text": "Even with this tension, I can be kind to myself right now.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Even with this tension, I can be kind to myself right now.",
+        "requestCharacters": 84
+      },
+      {
+        "keys": [
+          "tension-reminder"
+        ],
+        "text": "This tension.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] This tension.",
+        "requestCharacters": 39
+      },
+      {
+        "keys": [
+          "worry-setup"
+        ],
+        "text": "Even with this worry, I can be kind to myself right now.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Even with this worry, I can be kind to myself right now.",
+        "requestCharacters": 82
+      },
+      {
+        "keys": [
+          "worry-reminder"
+        ],
+        "text": "This worry.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] This worry.",
+        "requestCharacters": 37
+      },
+      {
+        "keys": [
+          "overwhelm-setup"
+        ],
+        "text": "Even with this overwhelm, I can be kind to myself right now.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Even with this overwhelm, I can be kind to myself right now.",
+        "requestCharacters": 86
+      },
+      {
+        "keys": [
+          "overwhelm-reminder"
+        ],
+        "text": "This overwhelm.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] This overwhelm.",
+        "requestCharacters": 41
+      },
+      {
+        "keys": [
+          "grounding-setup",
+          "grounding-reminder"
+        ],
+        "text": "My feet. The room. This moment.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] My feet. The room. This moment.",
+        "requestCharacters": 57
+      },
+      {
+        "keys": [
+          "tap"
+        ],
+        "text": "Tap with me. A light touch.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Tap with me. A light touch.",
+        "requestCharacters": 53
+      },
+      {
+        "keys": [
+          "rest"
+        ],
+        "text": "Let your hands rest. Notice how you feel now.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Let your hands rest. Notice how you feel now.",
+        "requestCharacters": 71
+      }
+    ]
+  },
+  "urgeSurfing": {
+    "uniqueRecordings": 13,
+    "verified": 3,
+    "missing": 10,
+    "missingRequestCharacters": 1188,
+    "recordings": [
+      {
+        "keys": [
+          "name"
+        ],
+        "text": "You don't have to fight this feeling. Let's just notice what's here. How strong is the urge right now, from one to ten?",
+        "status": "existing_asset_verified",
+        "audio": "/audio/narration/a61decbcf2c84fe506a4dc83c4e11a529a02a644975648052f7a3b2d3b3eb4df.mp3",
+        "duration": 9.795918,
+        "aligned": true,
+        "approvedV3": true,
+        "requestText": null,
+        "requestCharacters": 0
+      },
+      {
+        "keys": [
+          "body"
+        ],
+        "text": "Where will you place your attention? Choose a comfortable starting point: a place in your body, something around you, or not sure.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Where will you place your attention? Choose a comfortable starting point: a place in your body, something around you, or not sure.",
+        "requestCharacters": 156
+      },
+      {
+        "keys": [
+          "sensation"
+        ],
+        "text": "What does it feel like? Choose the closest fit, or use something around you instead.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] What does it feel like? Choose the closest fit, or use something around you instead.",
+        "requestCharacters": 110
+      },
+      {
+        "keys": [
+          "choice"
+        ],
+        "text": "Did the pause give you more room to choose? More room, no change, or less room are all valid. You can leave this unanswered.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Did the pause give you more room to choose? More room, no change, or less room are all valid. You can leave this unanswered.",
+        "requestCharacters": 150
+      },
+      {
+        "keys": [
+          "anchor"
+        ],
+        "text": "What are you protecting by waiting? You can choose a thought below, write your own, or simply move on. This part is completely optional.",
+        "status": "existing_asset_verified",
+        "audio": "/audio/narration/cddc50779d17d0e48183384ac6142b3ea52de3afdc7aca7b18be572e0b29b552.mp3",
+        "duration": 8.907755,
+        "aligned": true,
+        "approvedV3": true,
+        "requestText": null,
+        "requestCharacters": 0
+      },
+      {
+        "keys": [
+          "stages.0"
+        ],
+        "text": "Here comes the wave. Gently notice the pull.",
+        "status": "existing_asset_verified",
+        "audio": "/audio/narration/4452d9700e73f21e712dba81183f87b8984c0f48be5a5cc4930751cf1548520e.mp3",
+        "duration": 4.284082,
+        "aligned": true,
+        "approvedV3": true,
+        "requestText": null,
+        "requestCharacters": 0
+      },
+      {
+        "keys": [
+          "stages.1"
+        ],
+        "text": "Allow whatever you notice, if comfortable. You can stop at any time.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Allow whatever you notice, if comfortable. You can stop at any time.",
+        "requestCharacters": 94
+      },
+      {
+        "keys": [
+          "stages.2"
+        ],
+        "text": "Whether steady or changing, take one comfortable breath. You can feel the urge without following it.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Whether steady or changing, take one comfortable breath. You can feel the urge without following it.",
+        "requestCharacters": 126
+      },
+      {
+        "keys": [
+          "stages.3"
+        ],
+        "text": "The urge may rise, stay steady, or ease. Notice what is true for you.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] The urge may rise, stay steady, or ease. Notice what is true for you.",
+        "requestCharacters": 95
+      },
+      {
+        "keys": [
+          "stages.4"
+        ],
+        "text": "If it helps, loosen your jaw, shoulders, or hands. The urge does not have to soften.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] If it helps, loosen your jaw, shoulders, or hands. The urge does not have to soften.",
+        "requestCharacters": 110
+      },
+      {
+        "keys": [
+          "stages.5"
+        ],
+        "text": "Notice the urge as this practice ends. Choose a next step even if it is still strong.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] Notice the urge as this practice ends. Choose a next step even if it is still strong.",
+        "requestCharacters": 111
+      },
+      {
+        "keys": [
+          "postRating"
+        ],
+        "text": "How strong is the urge? Softer, stronger or unchanged are all valid. You can leave this unanswered.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] How strong is the urge? Softer, stronger or unchanged are all valid. You can leave this unanswered.",
+        "requestCharacters": 125
+      },
+      {
+        "keys": [
+          "complete"
+        ],
+        "text": "This pause has ended. Choose a next step that fits. The urge does not have to change.",
+        "status": "missing_or_unverified",
+        "audio": null,
+        "duration": null,
+        "aligned": false,
+        "approvedV3": false,
+        "requestText": "[warmly, smiling, gently] This pause has ended. Choose a next step that fits. The urge does not have to change.",
+        "requestCharacters": 111
+      }
+    ]
+  },
+  "nightChannel": {
+    "spotifyPublicClientIdConfigured": false,
+    "spotifyRedirectConfigured": false,
+    "appleTokenEndpointConfigured": false,
+    "recordings": "No intended channel recordings supplied. Six labelled generated-noise previews; podcast, documentary and audiobook slots require user files. No substitutes installed.",
+    "providerPlayback": "Not verified live. Requires owner-approved provider configuration, eligible listener account and explicit user connection. No new service or credentials created."
+  }
+}

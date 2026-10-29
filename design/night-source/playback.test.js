@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { SleepClock, LocalAudio } from './playback.js';
 import { SpotifyAdapter, AppleAdapter, spotifyUri } from './providers.js';
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 describe('Night sleep timer', () => {
   it('freezes pause/STOP position, resumes remainder, and catches background wall time', () => {
     let now = 0;
@@ -71,7 +71,7 @@ describe('real provider transports', () => {
         paused: false,
         track_window: {
           current_track: {
-            name: 'Test track'
+            name: 'Test track', uri: 'spotify:track:1234567890123456789012'
           }
         }
       })
@@ -154,5 +154,36 @@ describe('local file readiness', () => {
     expect(element.currentTime).toBe(37);
     expect(element.loop).toBe(false);
     expect(element.play).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('provider playback evidence', () => {
+  it('rejects an unrelated Spotify track even when the SDK is playing', async () => {
+    vi.useFakeTimers();const report=vi.fn(),s=new SpotifyAdapter({},report);
+    s.requestedUri='spotify:track:1234567890123456789012';
+    s.player={getCurrentState:vi.fn().mockResolvedValue({paused:false,track_window:{current_track:{uri:'spotify:track:9999999999999999999999'}}})};
+    const result=expect(s.confirmPlaying()).rejects.toThrow('not confirmed');
+    await vi.runAllTimersAsync();await result;expect(report).not.toHaveBeenCalled();
+  });
+  it('allows the first selection on an idle newly connected Spotify device', async () => {
+    const s=new SpotifyAdapter({},vi.fn());s.device='test-device';
+    s.player={pause:vi.fn(),getCurrentState:vi.fn().mockResolvedValue(null)};
+    await s.pause();expect(s.player.pause).not.toHaveBeenCalled();
+  });
+  it('requires observed Spotify pause before a caller may switch sources', async () => {
+    const s=new SpotifyAdapter({},vi.fn());s.device='test-device';s.requestedUri='spotify:track:1234567890123456789012';
+    s.player={pause:vi.fn(),getCurrentState:vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce({paused:true})};
+    await s.pause();expect(s.player.pause).toHaveBeenCalledOnce();expect(s.player.getCurrentState).toHaveBeenCalledTimes(2);
+  });
+  it.each([null,{paused:false}])('rejects unconfirmed Spotify pause (%j)', async state => {
+    vi.useFakeTimers();const s=new SpotifyAdapter({},vi.fn());s.device='test-device';s.requestedUri='spotify:track:1234567890123456789012';
+    s.player={pause:vi.fn(),getCurrentState:vi.fn().mockResolvedValue(state)};
+    const result=expect(s.pause()).rejects.toThrow('not confirmed pause');await vi.runAllTimersAsync();await result;
+  });
+  it('requires observed Apple pause instead of a fulfilled pause command', async () => {
+    vi.useFakeTimers();vi.stubGlobal('window',{MusicKit:{PlaybackStates:{playing:2,paused:3,stopped:4,ended:5,none:0}}});
+    const a=new AppleAdapter({},vi.fn());a.music={playbackState:2,pause:vi.fn()};
+    const result=expect(a.pause()).rejects.toThrow('not confirmed pause');await vi.runAllTimersAsync();await result;
+    a.music.pause.mockImplementation(()=>{a.music.playbackState=3;});await a.pause();
   });
 });
