@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {sceneHandoff} from './changeSceneHandoff';
+import {sceneHandoff,sceneFollowupMood} from './changeSceneHandoff';
 const session={pathway:['changeScene'],context_snapshot:{direction:'lift',location:'home',movement:'seated',audio:'yes',contraindicationTags:[],unsuitableSubstates:[]}};
 const check={mood:5,distress:2,location:'home',timeMin:5,confirmed:true};
 describe('Change Scene guarded onward practice',()=>{
@@ -14,3 +14,8 @@ describe('Change Scene guarded onward practice',()=>{
  it('different mechanism uses existing eligible suggestion',()=>{const result=sceneHandoff(session,'different',{...check,timeMin:10});expect(result.intervention.id).not.toBe('changeScene');expect(result.intervention.mechanism).not.toBe('environment-shift');});
  it('does not accept another journey as a completed Change Scene source',()=>expect(sceneHandoff({...session,pathway:['other']},'happyBump',check)).toBeNull());
 });
+
+ describe('saved Scene endpoint domain',()=>{
+ it('preserves an explicitly recorded mood zero',()=>expect(sceneFollowupMood({direction:'lift',intensity_end:0})).toBe(0));
+ it.each([{direction:'calm',intensity_end:0},{direction:'sleep',intensity_end:5},{intensity_end:5},{direction:'lift',intensity_end:null},{direction:'lift',intensity_end:'5'},{direction:'lift',intensity_end:11}])('requires a new mood answer for %j',record=>expect(sceneFollowupMood(record)).toBeNull());
+ });

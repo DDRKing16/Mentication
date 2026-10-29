@@ -1,0 +1,92 @@
+[
+  {
+    "route": "scene-followup",
+    "width": 320,
+    "direction": "lift",
+    "checks": [
+      "only Lift endpoint reused as mood",
+      "zero and missing separate",
+      "distress reload",
+      "onward matched mood baseline"
+    ],
+    "passed": true
+  },
+  {
+    "route": "scene-followup",
+    "width": 320,
+    "direction": "calm",
+    "checks": [
+      "only Lift endpoint reused as mood",
+      "zero and missing separate",
+      "distress reload",
+      "onward matched mood baseline"
+    ],
+    "passed": true
+  },
+  {
+    "route": "scene-followup",
+    "width": 390,
+    "direction": "lift",
+    "checks": [
+      "only Lift endpoint reused as mood",
+      "zero and missing separate",
+      "distress reload",
+      "onward matched mood baseline"
+    ],
+    "passed": true
+  },
+  {
+    "route": "scene-followup",
+    "width": 390,
+    "direction": "calm",
+    "checks": [
+      "only Lift endpoint reused as mood",
+      "zero and missing separate",
+      "distress reload",
+      "onward matched mood baseline"
+    ],
+    "passed": true
+  },
+  {
+    "route": "tomorrowParking",
+    "width": 320,
+    "checks": [
+      "optional sleep baseline zero",
+      "reload",
+      "matching endpoint zero",
+      "saved domain"
+    ],
+    "passed": true
+  },
+  {
+    "route": "tomorrowParking",
+    "width": 390,
+    "checks": [
+      "optional sleep baseline zero",
+      "reload",
+      "matching endpoint zero",
+      "saved domain"
+    ],
+    "passed": true
+  },
+  {
+    "route": "scene-followup",
+    "request": "different",
+    "passed": true,
+    "checks": [
+      "missing endpoint asks explicit mood",
+      "separate distress zero",
+      "alternate destination consent and suitability"
+    ]
+  },
+  {
+    "route": "scene-followup",
+    "request": "dear2100",
+    "passed": true,
+    "checks": [
+      "missing endpoint asks explicit mood",
+      "separate distress zero",
+      "alternate destination consent and suitability"
+    ]
+  }
+]

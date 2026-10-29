@@ -1,0 +1,68 @@
+[
+  {
+    "width": 320,
+    "score": null,
+    "passed": true,
+    "checks": [
+      "persisted reflection draft",
+      "all three contextual anchors",
+      "0–10 vs 0–100 endpoints",
+      "save/reload retains missing and zero"
+    ]
+  },
+  {
+    "width": 320,
+    "score": 0,
+    "passed": true,
+    "checks": [
+      "persisted reflection draft",
+      "all three contextual anchors",
+      "0–10 vs 0–100 endpoints",
+      "save/reload retains missing and zero"
+    ]
+  },
+  {
+    "width": 320,
+    "score": 10,
+    "passed": true,
+    "checks": [
+      "persisted reflection draft",
+      "all three contextual anchors",
+      "0–10 vs 0–100 endpoints",
+      "save/reload retains missing and zero"
+    ]
+  },
+  {
+    "width": 390,
+    "score": null,
+    "passed": true,
+    "checks": [
+      "persisted reflection draft",
+      "all three contextual anchors",
+      "0–10 vs 0–100 endpoints",
+      "save/reload retains missing and zero"
+    ]
+  },
+  {
+    "width": 390,
+    "score": 0,
+    "passed": true,
+    "checks": [
+      "persisted reflection draft",
+      "all three contextual anchors",
+      "0–10 vs 0–100 endpoints",
+      "save/reload retains missing and zero"
+    ]
+  },
+  {
+    "width": 390,
+    "score": 10,
+    "passed": true,
+    "checks": [
+      "persisted reflection draft",
+      "all three contextual anchors",
+      "0–10 vs 0–100 endpoints",
+      "save/reload retains missing and zero"
+    ]
+  }
+]

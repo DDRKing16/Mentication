@@ -6,7 +6,7 @@ import {appBackTarget} from '@/lib/appBack';
 import JourneyTakeaway from '@/components/journey/JourneyTakeaway';
 import { attemptEventDisposition, resetCompletionSnapshot, finalAssessmentEvent } from '@/lib/resetCompletion';
 import { resetNavigationEntry, freshResetEntry, appendResetFlowSnapshot, resetFlowHistorySnapshot } from "@/lib/resetNavigation";
-import { captureGoalBaseline, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
+import { captureGoalBaseline, restoredGoalRating, GOAL_ASSESSMENTS, goalPointChange, hasGoalBaseline, MATCHED_ASSESSMENT_IDS } from "@/lib/goalAssessment";
 import { withAttemptHelpfulness } from "@/lib/attemptFeedback";
 // @ts-check
 import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
@@ -81,17 +81,18 @@ export default function ResetFlow() {
 
   const directEntryPathway = entry?.prebuilt ? pathwayByIds(entry.pathway) : [];
   const usablePrebuiltEntry = Boolean(entry?.prebuilt && directEntryPathway.length);
-  const needsAnsweredBaseline = directEntryPathway.some((item) => MATCHED_ASSESSMENT_IDS.has(item.id)) && !hasGoalBaseline(entry);
+  const incompatibleBaseline = Boolean(entry?.goal_baseline && !hasGoalBaseline(entry));
+  const needsAnsweredBaseline = incompatibleBaseline || directEntryPathway.some((item) => MATCHED_ASSESSMENT_IDS.has(item.id)) && !hasGoalBaseline(entry);
   const startsDirectFlagship = !needsAnsweredBaseline && directEntryPathway.length === 1 && isInteractiveFlagship(directEntryPathway[0]?.id);
   const restoredCompletion = entry?.reset_phase === "goalReassessment" ? resetCompletionSnapshot(entry.reset_completion, directEntryPathway[0]?.id) : null;
   const initialPhase = restoredCompletion ? "goalReassessment" : needsAnsweredBaseline ? "questions" : ["questions", "pathway", "guiding"].includes(entry?.reset_phase) ? entry.reset_phase : startsDirectFlagship ? "guiding" : (usablePrebuiltEntry ? "pathway" : (entry?.unsure || needsGuidedResetEntry({ ...entry, prebuilt: usablePrebuiltEntry }) ? "unsure" : (entry?.immediate ? "pathway" : "questions")));
-  const [questionStep, setQuestionStep] = useState(() => ["goal", "distress", "time"].includes(entry?.reset_question) ? entry.reset_question : "goal");
+  const [questionStep, setQuestionStep] = useState(() => needsAnsweredBaseline ? "goal" : ["goal", "distress", "time"].includes(entry?.reset_question) ? entry.reset_question : "goal");
   const [phase, setPhase] = useState(initialPhase); // unsure | questions | building | pathway | guiding | reflect | done
   const [building, setBuilding] = useState(!!entry?.immediate);
   // iOS back-gesture support: each forward setup step pushes a history entry so
   // swipe-back steps chronologically through the flow instead of exiting.
   const stepParam = useMemo(() => parseInt(new URLSearchParams(location.search).get("step") || "0", 10) || 0, [location.search]);
-  const flowStack = useRef(Object.assign([], { [stepParam]: { phase: initialPhase, unsureStep: 0, questionStep: entry?.reset_question || "goal" } }));
+  const flowStack = useRef(Object.assign([], { [stepParam]: { phase: initialPhase, unsureStep: 0, questionStep } }));
   const restoredStepRef = useRef(stepParam);
   const buildingTimer = useRef(null);
   const [answers, setAnswers] = useState(() => createInitialResetAnswers(entry));
@@ -158,12 +159,12 @@ export default function ResetFlow() {
   const attemptLogRef = useRef([]);
   const pendingCompletionRef = useRef(restoredCompletion ? { ...restoredCompletion.event, mechanism:directEntryPathway[0]?.mechanism } : null);
   const goalCompletionRef = useRef(restoredCompletion?.result || null);
-  const [goalEndRating, setGoalEndRating] = useState(restoredCompletion?.goalRating ?? null);
+  const [goalEndRating, setGoalEndRating] = useState(() => restoredGoalRating(entry, restoredCompletion));
   useEffect(() => {
     if (phase !== "goalReassessment" || !pendingCompletionRef.current) return;
     const state=globalThis.history?.state;
     if (!state) return;
-    try { globalThis.history.replaceState({...state,usr:resetNavigationEntry({...entry,reset_completion:{event:pendingCompletionRef.current,result:goalCompletionRef.current,goalRating:goalEndRating}},answers,"goalReassessment",{id:sessionIdRef.current,startedAt:startTimeRef.current})},""); } catch { /* Current answer remains available in this screen. */ }
+    try { globalThis.history.replaceState({...state,usr:resetNavigationEntry({...entry,reset_completion:{event:pendingCompletionRef.current,result:goalCompletionRef.current,goalRating:goalEndRating,goalAssessment:captureGoalBaseline(answers.direction,goalEndRating)}},answers,"goalReassessment",{id:sessionIdRef.current,startedAt:startTimeRef.current})},""); } catch { /* Current answer remains available in this screen. */ }
   }, [phase,goalEndRating]);
   const sessionSavedRef = useRef(false);
   const [weekCount, setWeekCount] = useState(0);
@@ -410,7 +411,7 @@ export default function ResetFlow() {
   const commitPendingPulse = (afterValue = checkinValue ?? lastValue) => {
     const event = pendingCompletionRef.current;
     if (!event?.interventionId) return effectiveness;
-    const response = pulseResponse(lastValue, afterValue);
+    const response = pulseResponse(hasGoalBaseline(answers) ? lastValue : null, afterValue);
     const record = buildAttemptRecord({
       interventionId: event.interventionId,
       mechanism: event.mechanism,
@@ -433,7 +434,7 @@ export default function ResetFlow() {
     setSaving(false);
     const first = pathway[0];
     if (!first) return;
-    if (MATCHED_ASSESSMENT_IDS.has(first.id) && !hasGoalBaseline(answers)) { setPhase("questions"); return; }
+    if (MATCHED_ASSESSMENT_IDS.has(first.id) && !hasGoalBaseline(answers)) { setQuestionStep("goal"); setPhase("questions"); return; }
     pauseHomeAmbient();
     attemptLogRef.current = [];
     pendingCompletionRef.current = null;
@@ -466,13 +467,14 @@ export default function ResetFlow() {
     const nextIntensity = checkinValue ?? lastValue ?? answers.intensity ?? 5;
     const resolvedDirection = opts.direction || answers.direction;
     const resolvedWhereFelt = opts.whereFelt || answers.whereFelt;
-    if (resolvedDirection !== answers.direction && (resolvedDirection === "lift" || answers.direction === "lift")) {
+    if (resolvedDirection !== answers.direction) {
       // Save the completed work under its original scale before asking for a
-      // fresh rating in another goal. Never relabel mood as distress or erase
+      // fresh rating in another goal. Never relabel any goal as another construct or erase
       // the attempts when Begin starts the newly checked-in reset.
       const fresh = createInitialResetAnswers({ ...answers, goal_baseline:null, direction: resolvedDirection, directionLabel: DIRECTIONS.find((item) => item.id === resolvedDirection)?.label, intensity: null, distress: null, whereFelt: resolvedWhereFelt, immediate: false });
-      completeSession({ silent: true, endIntensityOverride: nextIntensity, onFinished: () => {
+      completeSession({ silent: true, endIntensityOverride: checkinValue, onFinished: () => {
         setAnswers(fresh);
+        setQuestionStep("goal");
         setPhase("questions");
         setActivePathway(null);
         setUsedIds([]);
@@ -741,7 +743,7 @@ export default function ResetFlow() {
       const event = pendingCompletionRef.current;
       const completedAt = restoredCompletion?.completedAt ?? Date.now();
       if (event) {
-        const confirmedEntry = resetNavigationEntry({...entry,reset_completion:{event,result,goalRating:rating,completedAt}},answers,"goalReassessment",{id:sessionIdRef.current,startedAt:startTimeRef.current});
+        const confirmedEntry = resetNavigationEntry({...entry,reset_completion:{event,result,goalRating:rating,goalAssessment:captureGoalBaseline(answers.direction,rating),completedAt}},answers,"goalReassessment",{id:sessionIdRef.current,startedAt:startTimeRef.current});
         navigate(`${location.pathname}${location.search}`,{replace:true,state:confirmedEntry});
       }
       setGoalEndRating(rating);
@@ -865,7 +867,7 @@ export default function ResetFlow() {
     const obstacle=checkpointScreen==="obstacle";
     return <main className="calmbg min-h-[100dvh]"><div className="mx-auto flex max-w-lg flex-col gap-5 px-5 py-6">
       <div className="flex items-center justify-between">{!rating && <button type="button" className="min-h-11 underline" onClick={()=>setCheckpointScreen(obstacle?"next":"rating")}>Back</button>}<FlowHomeButton /></div>
-      <h1 className="font-heading text-4xl leading-tight text-primary">{rating ? assessment?.question || "How intense is it right now?" : obstacle ? "What’s still in the way?" : "What would help you now?"}</h1>
+      <h1 className="font-heading text-4xl leading-tight text-primary">{rating ? assessment?.question || "How distressed are you right now?" : obstacle ? "What’s still in the way?" : "What would help you now?"}</h1>
       {rating ? <>
         <p className="text-muted-foreground">Optional. You can skip this check-in.</p>
         <IntensityDial value={checkinValue} onChange={setCheckinValue} direction={answers.direction} />
@@ -901,9 +903,8 @@ export default function ResetFlow() {
   // ---------- DONE ----------
   if (phase === "done") {
     const isLift = answers.direction === "lift";
-    const imp = answers.intensity != null && endIntensity != null
-      ? (isLift ? endIntensity - answers.intensity : answers.intensity - endIntensity)
-      : null;
+    const change = goalPointChange(answers.goal_baseline, answers.direction, endIntensity);
+    const imp = change == null ? null : (isLift ? change : -change);
     const outcome = imp == null ? "neutral"
       : imp >= 3 ? "clear"
       : imp > 0 ? "small"

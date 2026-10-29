@@ -1,5 +1,6 @@
+import { hasGoalBaseline } from './goalAssessment.js';
 export const INTENSITY_QUESTION = Object.freeze({
-  title: "How intense is it right now?",
+  title: "How distressed are you right now?",
   description: "There’s no wrong number. Just an honest first read.",
 });
 
@@ -75,7 +76,7 @@ export function createInitialResetAnswers(entry) {
     direction: entry?.direction ?? (entry?.immediate ? "calm" : null),
     directionLabel: entry?.directionLabel ?? (entry?.immediate ? "Calm down" : ""),
     immediate: Boolean(entry?.immediate),
-    intensity: entry?.intensity ?? (entry?.immediate ? 9 : null),
+    intensity: entry?.goal_baseline && !hasGoalBaseline(entry) ? null : entry?.intensity ?? (entry?.immediate ? 9 : null),
     whereFelt: entry?.whereFelt ?? (entry?.direction ? (WHERE_FELT_DEFAULT[entry.direction] || "both") : null),
     // For Lift, intensity remains positive mood; never infer distress from it.
     distress: typeof entry?.distress === "number" ? entry.distress : null,

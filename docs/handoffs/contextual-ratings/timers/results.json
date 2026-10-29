@@ -1,0 +1,24 @@
+[
+  {
+    "id": "eftTapping",
+    "passed": true,
+    "elapsedSeconds": 129,
+    "checks": [
+      "unaccelerated full timer",
+      "practice-specific end scale",
+      "separate optional host endpoint",
+      "missing host remains missing"
+    ]
+  },
+  {
+    "id": "urgeSurf",
+    "passed": true,
+    "elapsedSeconds": 61,
+    "checks": [
+      "unaccelerated full timer",
+      "practice-specific end scale",
+      "separate optional host endpoint",
+      "missing host remains missing"
+    ]
+  }
+]

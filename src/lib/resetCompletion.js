@@ -1,3 +1,4 @@
+import { captureGoalBaseline, hasGoalBaseline } from './goalAssessment.js';
 // Only terminal events are learning observations. Mount/progress telemetry is not
 // a skipped attempt, and an explicit exit must remain an exit.
 export function attemptEventDisposition(event) {
@@ -136,6 +137,7 @@ export function resetCompletionSnapshot(snapshot, interventionId) {
     }
   }
   return { event:cleanEvent, result,
+    ...(hasGoalBaseline({direction:snapshot.goalAssessment?.direction,goal_baseline:snapshot.goalAssessment}) && snapshot.goalAssessment.value === snapshot.goalRating ? {goalAssessment:captureGoalBaseline(snapshot.goalAssessment.direction,snapshot.goalRating)} : {}),
     ...(snapshot.goalRating === null || bounded(snapshot.goalRating,0,10) ? {goalRating:snapshot.goalRating} : {}),
     ...(bounded(snapshot.completedAt,0,8640000000000000) ? {completedAt:snapshot.completedAt} : {}),
   };

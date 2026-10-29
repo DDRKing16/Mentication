@@ -1,0 +1,56 @@
+[
+  {
+    "flow": "Happy Bump one performed action, Lift optional ratings, reload and one history record",
+    "mood": null,
+    "passed": true
+  },
+  {
+    "flow": "Happy Bump one performed action, Lift optional ratings, reload and one history record",
+    "mood": 0,
+    "passed": true
+  },
+  {
+    "flow": "Happy Bump one performed action, Lift optional ratings, reload and one history record",
+    "mood": 5,
+    "passed": true
+  },
+  {
+    "flow": "real Happy Bump → Lift → Dear 2100 required visual",
+    "passed": true
+  },
+  {
+    "flow": "Happy Bump one performed action, Lift optional ratings, reload and one history record",
+    "mood": 8,
+    "passed": true
+  },
+  {
+    "flow": "Happy Bump entirely skipped, no completed practice or Lift eligibility",
+    "passed": true
+  },
+  {
+    "flow": "selfCompassion unperformed/planned or stopped; final assessment reload and no completion",
+    "passed": true
+  },
+  {
+    "flow": "unhook unperformed/planned or stopped; final assessment reload and no completion",
+    "passed": true
+  },
+  {
+    "flow": "makeRoom unperformed/planned or stopped; final assessment reload and no completion",
+    "passed": true
+  },
+  {
+    "flow": "Grounding end after skips",
+    "noticed": false,
+    "passed": true
+  },
+  {
+    "flow": "Grounding end after skips",
+    "noticed": true,
+    "passed": true
+  },
+  {
+    "flow": "Vector all gameplay skipped; no quiz-only completion",
+    "passed": true
+  }
+]

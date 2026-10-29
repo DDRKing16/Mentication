@@ -5,7 +5,7 @@ import React from "react";
 // distressed; high end = most stuck. Lift inverts (low = very low mood,
 // high = radiant) and so uses a reversed gradient. Each scale's language is
 // specific to the direction the user selected — focus reads as concentration,
-// ground as presence, reset as rumination, sleep as wakefulness.
+// ground as presence, reset as rumination, sleep as difficulty sleeping.
 const SCALES = {
   calm: {
     words: ["Calm", "Steady", "A little rattled", "Unsettled", "On edge", "Tense", "Rising", "High", "Surging", "Overwhelming", "Maxed out"],
@@ -33,8 +33,8 @@ const SCALES = {
     gradient: "from-teal/60 via-indigo/50 to-destructive/70",
   },
   sleep: {
-    words: ["Drowsy", "Heavy", "Settling", "Neutral", "A bit alert", "Awake", "Wired", "Buzzing", "Wide awake", "Racing mind", "Fully wired"],
-    left: "Drowsy", right: "Wide awake",
+    words: ["Not struggling", "Very little difficulty", "A little difficulty", "Some difficulty", "Moderate difficulty", "Quite difficult", "Difficult", "Very difficult", "Extremely difficult", "Almost as difficult as possible", "Struggling a lot"],
+    left: "Not struggling", right: "Struggling a lot",
     gradient: "from-teal/60 via-indigo/50 to-destructive/70",
   },
 };

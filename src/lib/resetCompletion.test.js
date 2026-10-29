@@ -131,3 +131,12 @@ it('retains Next Easiest Step coarse progress without task or ladder text', () =
   const snapshot = resetCompletionSnapshot({event:{...event,interventionId:'nextAction'},result:{outcome}},'nextAction');
   expect(snapshot.result.outcome).toEqual({type:'next-easiest-step',completedSteps:1,skippedSteps:2,gettingStarted:'same'});
 });
+
+describe('endpoint question metadata',()=>{
+ it('preserves only validated endpoint metadata matching the selected answer',()=>{
+  const goalRating=0, goalAssessment=captureGoalBaseline('sleep',goalRating);
+  expect(resetCompletionSnapshot({...entry.reset_completion,goalRating,goalAssessment},'factCheck').goalAssessment).toEqual(goalAssessment);
+  expect(resetCompletionSnapshot({...entry.reset_completion,goalRating,goalAssessment:{...goalAssessment,value:7}},'factCheck')).not.toHaveProperty('goalAssessment');
+  expect(resetCompletionSnapshot({...entry.reset_completion,goalRating,goalAssessment:{...goalAssessment,scale:'wakefulness'}},'factCheck')).not.toHaveProperty('goalAssessment');
+ });
+});
