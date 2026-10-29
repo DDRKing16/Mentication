@@ -42,12 +42,22 @@ describe('durable minimal check-in scheduler', () => {
     const store = createStore(); store.put('owner', plan(), now);
     await deliverDue(store, async () => { throw { statusCode: 410 }; }, now + 600000);
     expect(store.get('owner')).toBeUndefined();
-    store.put('owner', plan(), now);
+    store.put('owner', plan({ endsAt: now + 1800000 }), now);
     let calls = 0;
     await deliverDue(store, async () => calls++, now + 700000); expect(calls).toBe(0);
     await deliverDue(store, async () => { calls++; throw { statusCode: 503 }; }, now + 1200000);
     await deliverDue(store, async () => calls++, now + 1200000); expect(calls).toBe(1);
-    store.prune(now + 1200001); expect(store.get('owner')).toBeUndefined(); store.close();
+    store.prune(now + 1800001); expect(store.get('owner')).toBeUndefined(); store.close();
+  });
+  it('removes a plan at its exact end without sending a zero-TTL expired push', async () => {
+    // The first occurrence is exactly at expiry, so it is due, not stale.
+    // The old inclusive end boundary would call the provider with TTL 0.
+    const endsAt = now + 600000;
+    const store = createStore(); store.put('owner', plan({ endsAt }), now);
+    expect(store.get('owner').nextAt).toBe(endsAt);
+    let sends = 0;
+    await deliverDue(store, async () => sends++, endsAt);
+    expect(sends).toBe(0); expect(store.get('owner')).toBeUndefined(); store.close();
   });
   it('authorizes by capability, rejects origins and serializes cancellation with sends', async () => {
     const store = createStore(); let clock = now, unblock, entered;

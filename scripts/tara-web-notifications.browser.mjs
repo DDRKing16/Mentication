@@ -3,9 +3,20 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { browserFor, captureFor, key } from './tara-tactician.browser-support.mjs';
 const origin = process.env.TARA_APP_ORIGIN || 'http://127.0.0.1:5227';
 const evidence = process.env.TARA_EVIDENCE_DIR || '/tmp/tara-web-notifications';
-const fresh = JSON.parse(readFileSync(process.env.TARA_FIXTURE_FILE || '/workspace/tara-background-evidence/dev/fresh-fixture.json', 'utf8'));
+let fresh;
 mkdirSync(evidence, { recursive: true });
 const browser = await browserFor(), passed = [], captures = [], errors = [];
+if (process.env.TARA_FIXTURE_FILE) fresh = JSON.parse(readFileSync(process.env.TARA_FIXTURE_FILE, 'utf8'));
+else {
+  // Generate from the current Vite source; no prior executor's fixture is needed.
+  const context = await browser.newContext(); const page = await context.newPage();
+  try {
+    await page.goto(origin + '/tara-tactician');
+    fresh = await page.evaluate(async () => (await import('/src/lib/taraTacticianState.js')).newTaraState());
+    writeFileSync(evidence + '/fresh-fixture.json', JSON.stringify(fresh));
+  } finally { await context.close(); }
+}
+
 const take = captureFor(evidence, captures);
 const screen = async (page, name) => { await page.locator(`[data-flow-screen="${name}"]`).waitFor(); assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true); };
 const click = async (page, name) => { await page.getByRole('button', { name, exact: true }).click(); await page.waitForTimeout(300); };
