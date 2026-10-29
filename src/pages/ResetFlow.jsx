@@ -410,7 +410,7 @@ export default function ResetFlow() {
   const commitPendingPulse = (afterValue = checkinValue ?? lastValue) => {
     const event = pendingCompletionRef.current;
     if (!event?.interventionId) return effectiveness;
-    const response = pulseResponse(lastValue, afterValue);
+    const response = pulseResponse(hasGoalBaseline(answers) ? lastValue : null, afterValue);
     const record = buildAttemptRecord({
       interventionId: event.interventionId,
       mechanism: event.mechanism,
@@ -865,7 +865,7 @@ export default function ResetFlow() {
     const obstacle=checkpointScreen==="obstacle";
     return <main className="calmbg min-h-[100dvh]"><div className="mx-auto flex max-w-lg flex-col gap-5 px-5 py-6">
       <div className="flex items-center justify-between">{!rating && <button type="button" className="min-h-11 underline" onClick={()=>setCheckpointScreen(obstacle?"next":"rating")}>Back</button>}<FlowHomeButton /></div>
-      <h1 className="font-heading text-4xl leading-tight text-primary">{rating ? assessment?.question || "How intense is it right now?" : obstacle ? "What’s still in the way?" : "What would help you now?"}</h1>
+      <h1 className="font-heading text-4xl leading-tight text-primary">{rating ? assessment?.question || "How distressed are you right now?" : obstacle ? "What’s still in the way?" : "What would help you now?"}</h1>
       {rating ? <>
         <p className="text-muted-foreground">Optional. You can skip this check-in.</p>
         <IntensityDial value={checkinValue} onChange={setCheckinValue} direction={answers.direction} />
@@ -901,9 +901,8 @@ export default function ResetFlow() {
   // ---------- DONE ----------
   if (phase === "done") {
     const isLift = answers.direction === "lift";
-    const imp = answers.intensity != null && endIntensity != null
-      ? (isLift ? endIntensity - answers.intensity : answers.intensity - endIntensity)
-      : null;
+    const change = goalPointChange(answers.goal_baseline, answers.direction, endIntensity);
+    const imp = change == null ? null : (isLift ? change : -change);
     const outcome = imp == null ? "neutral"
       : imp >= 3 ? "clear"
       : imp > 0 ? "small"

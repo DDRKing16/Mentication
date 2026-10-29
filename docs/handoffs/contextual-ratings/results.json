@@ -1,0 +1,221 @@
+[
+  {
+    "direction": "calm",
+    "width": 320,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How distressed are you right now?",
+    "anchors": [
+      "Calm",
+      "Extreme"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "lift",
+    "width": 320,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How is your mood right now?",
+    "anchors": [
+      "Very low",
+      "Great"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "focus",
+    "width": 320,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How hard is it to focus right now?",
+    "anchors": [
+      "Focused",
+      "Can't focus"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "ground",
+    "width": 320,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How disconnected do you feel right now?",
+    "anchors": [
+      "Present",
+      "Gone"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "reset",
+    "width": 320,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How caught up in repeating thoughts are you right now?",
+    "anchors": [
+      "Clear",
+      "Consuming"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "sleep",
+    "width": 320,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How much are you struggling to sleep right now?",
+    "anchors": [
+      "Not struggling",
+      "Struggling a lot"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "calm",
+    "width": 390,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How distressed are you right now?",
+    "anchors": [
+      "Calm",
+      "Extreme"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "lift",
+    "width": 390,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How is your mood right now?",
+    "anchors": [
+      "Very low",
+      "Great"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "focus",
+    "width": 390,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How hard is it to focus right now?",
+    "anchors": [
+      "Focused",
+      "Can't focus"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "ground",
+    "width": 390,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How disconnected do you feel right now?",
+    "anchors": [
+      "Present",
+      "Gone"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "reset",
+    "width": 390,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How caught up in repeating thoughts are you right now?",
+    "anchors": [
+      "Clear",
+      "Consuming"
+    ],
+    "passed": true
+  },
+  {
+    "direction": "sleep",
+    "width": 390,
+    "branch": "entry, explicit zero, browser reload",
+    "question": "How much are you struggling to sleep right now?",
+    "anchors": [
+      "Not struggling",
+      "Struggling a lot"
+    ],
+    "passed": true
+  },
+  {
+    "route": "/night-channel",
+    "branch": "optional starting check with zero",
+    "passed": true
+  },
+  {
+    "route": "/dear-2100",
+    "width": 320,
+    "branch": "persisted plan discomfort reload with zero",
+    "question": "How much discomfort do you expect?",
+    "anchors": [
+      "No discomfort",
+      "Extreme discomfort"
+    ],
+    "max": 10,
+    "passed": true
+  },
+  {
+    "route": "/dear-2100",
+    "width": 320,
+    "branch": "persisted plan goalState reload with zero",
+    "question": "How able do you feel to take this step?",
+    "anchors": [
+      "Not at all able",
+      "Completely able"
+    ],
+    "max": 10,
+    "passed": true
+  },
+  {
+    "route": "/dear-2100",
+    "width": 320,
+    "branch": "persisted plan likelihood reload with zero",
+    "question": "How likely does your prediction feel?",
+    "anchors": [
+      "Unlikely",
+      "Very likely"
+    ],
+    "max": 100,
+    "passed": true
+  },
+  {
+    "route": "/dear-2100",
+    "width": 390,
+    "branch": "persisted plan discomfort reload with zero",
+    "question": "How much discomfort do you expect?",
+    "anchors": [
+      "No discomfort",
+      "Extreme discomfort"
+    ],
+    "max": 10,
+    "passed": true
+  },
+  {
+    "route": "/dear-2100",
+    "width": 390,
+    "branch": "persisted plan goalState reload with zero",
+    "question": "How able do you feel to take this step?",
+    "anchors": [
+      "Not at all able",
+      "Completely able"
+    ],
+    "max": 10,
+    "passed": true
+  },
+  {
+    "route": "/dear-2100",
+    "width": 390,
+    "branch": "persisted plan likelihood reload with zero",
+    "question": "How likely does your prediction feel?",
+    "anchors": [
+      "Unlikely",
+      "Very likely"
+    ],
+    "max": 100,
+    "passed": true
+  },
+  {
+    "direction": "calm",
+    "branch": "old saved baseline cannot bypass fresh contextual answer; zero and reload",
+    "passed": true
+  },
+  {
+    "direction": "sleep",
+    "branch": "old saved baseline cannot bypass fresh contextual answer; zero and reload",
+    "passed": true
+  }
+]

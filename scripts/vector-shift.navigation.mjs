@@ -17,7 +17,7 @@ try{
  await f.getByRole('button',{name:'Resume',exact:true}).click();await f.getByRole('button',{name:'Skip step'}).click();await f.getByRole('button',{name:'Try an easier option'}).click();await f.getByRole('button',{name:'Reveal a letter'}).click();
  await p.screenshot({path:'evidence/vector-shift/phone-word-easy.png',fullPage:true});
  await f.getByRole('button',{name:'Skip step'}).click();await f.getByRole('button',{name:/Notice LUNA/}).click();await p.screenshot({path:'evidence/vector-shift/phone-solar-easy.png',fullPage:true});
- await f.getByRole('button',{name:'Stop',exact:true}).click();await f.getByRole('button',{name:'Finish here'}).click();await f.getByRole('button',{name:'Continue to check-in'}).click();await p.getByRole('heading',{name:'How intense is it right now?',exact:true}).waitFor();
+ await f.getByRole('button',{name:'Stop',exact:true}).click();await f.getByRole('button',{name:'Finish here'}).click();await f.getByRole('button',{name:'Continue to check-in'}).click();await p.getByRole('heading',{name:'How distressed are you right now?',exact:true}).waitFor();
  await p.reload();
  // Until the separately owned shared patch is integrated, this returns to the
  // saved final iframe screen. It must never invent a rating or restart games.

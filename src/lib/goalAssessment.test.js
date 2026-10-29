@@ -21,3 +21,16 @@ describe('same-question goal baseline contract', () => {
     expect(withLiftCheckin(session,7,5).attempts[0].response).toBe('not_answered');
   });
 });
+
+describe('contextual wording and old measurements', () => {
+  it('measures sleep difficulty, not alertness, without changing the domain', () => {
+    expect(captureGoalBaseline('sleep',0)).toMatchObject({question:'How much are you struggling to sleep right now?',scale:'sleep difficulty',left:'Not struggling',right:'Struggling a lot',min:0,max:10,higherIsBetter:false,value:0});
+  });
+  it.each(['calm','focus','ground','reset','sleep'])('does not relabel an old %s baseline or compare it to a new question', direction => {
+    const old={...captureGoalBaseline(direction,0),question:'How intense is it right now?',...(direction==='sleep'?{scale:'wakefulness',left:'Drowsy',right:'Wide awake'}:{})};
+    expect(goalPointChange(old,direction,0)).toBeNull();
+    expect(old.question).toBe('How intense is it right now?');
+    expect(goalPointChange(captureGoalBaseline(direction,0),direction,0)).toBe(0);
+    expect(goalPointChange(captureGoalBaseline(direction,0),direction,null)).toBeNull();
+  });
+});

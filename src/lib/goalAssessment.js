@@ -1,11 +1,11 @@
 // A baseline exists only after an explicit answer, never from a display default.
 export const GOAL_ASSESSMENTS = Object.freeze({
   lift: { question:'How is your mood right now?', scale:'mood', left:'Very low', right:'Great', higherIsBetter:true },
-  calm: { question:'How intense is it right now?', scale:'distress', left:'Calm', right:'Extreme', higherIsBetter:false },
-  focus: { question:'How intense is it right now?', scale:'focus difficulty', left:'Focused', right:"Can't focus", higherIsBetter:false },
-  ground: { question:'How intense is it right now?', scale:'disconnection', left:'Present', right:'Gone', higherIsBetter:false },
-  reset: { question:'How intense is it right now?', scale:'rumination', left:'Clear', right:'Consuming', higherIsBetter:false },
-  sleep: { question:'How intense is it right now?', scale:'wakefulness', left:'Drowsy', right:'Wide awake', higherIsBetter:false },
+  calm: { question:'How distressed are you right now?', scale:'distress', left:'Calm', right:'Extreme', higherIsBetter:false },
+  focus: { question:'How hard is it to focus right now?', scale:'focus difficulty', left:'Focused', right:"Can't focus", higherIsBetter:false },
+  ground: { question:'How disconnected do you feel right now?', scale:'disconnection', left:'Present', right:'Gone', higherIsBetter:false },
+  reset: { question:'How caught up in repeating thoughts are you right now?', scale:'rumination', left:'Clear', right:'Consuming', higherIsBetter:false },
+  sleep: { question:'How much are you struggling to sleep right now?', scale:'sleep difficulty', left:'Not struggling', right:'Struggling a lot', higherIsBetter:false },
 });
 const valid = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 10;
 export function captureGoalBaseline(direction, value) {

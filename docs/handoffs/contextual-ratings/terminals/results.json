@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tomorrowParking",
+    "passed": true,
+    "checks": [
+      "draft not complete",
+      "verified save",
+      "reload before first completion",
+      "double click finish",
+      "reopen saved note does not add session"
+    ]
+  },
+  {
+    "id": "factCheck",
+    "passed": true,
+    "checks": [
+      "classification actually performed",
+      "unresolved conclusion allowed",
+      "belief ratings omitted",
+      "goal zero preserved",
+      "final reload and repeated finish no duplicate"
+    ]
+  },
+  {
+    "id": "changeScene",
+    "passed": true,
+    "checks": [
+      "all six skipped",
+      "no completed practice",
+      "no goal rating fabricated"
+    ]
+  },
+  {
+    "id": "boxV2",
+    "passed": true,
+    "checks": [
+      "finish early",
+      "worse helpfulness retained",
+      "omitted goal",
+      "no full completion"
+    ]
+  },
+  {
+    "id": "urgeSurf",
+    "passed": true,
+    "checks": [
+      "real elapsed time",
+      "stop early",
+      "no invented endpoint rating or full completion"
+    ]
+  }
+]
