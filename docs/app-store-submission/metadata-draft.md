@@ -4,8 +4,10 @@ No metadata was uploaded. Keep the existing product audience, free-access policy
 
 ## Prepared copy
 
-**Name:** Mentication  
-**Subtitle:** A little space to reset  
+**Name:** Mentication
+
+**Subtitle:** A little space to reset
+
 **Promotional text:** Make room for a pause, reconnect with your surroundings, or find one manageable next step. Explore guided practices at your own pace.
 
 **Description:**
@@ -20,8 +22,10 @@ Your practice history and saved notes are stored on your device. No account is r
 
 Mentication is a wellbeing aid, not a medical diagnosis, treatment or emergency service. If you need urgent help, use the support options in the app or contact local emergency services.
 
-**Keywords draft:** wellbeing,grounding,breathing,reflection,focus,calm,habits,journal  
-**Category candidate:** Health & Fitness — confirm existing category; do not change automatically.  
+**Keywords draft:** wellbeing,grounding,breathing,reflection,focus,calm,habits,journal
+
+**Category candidate:** Health & Fitness — confirm existing category; do not change automatically.
+
 **What's New:** For a first submission, use only if required. For an update, describe the actual integrated changes after audio/push/rating work is accepted; do not claim unverified locked-screen behavior.
 
 Do not add “clinically proven,” guaranteed improvement, complete audio coverage, background delivery guarantees, full VoiceOver support, or a numerical intervention count until the exact release evidence supports it.
