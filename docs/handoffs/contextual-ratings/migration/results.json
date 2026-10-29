@@ -146,5 +146,25 @@
       "compatible selected endpoint preserved",
       "new confirmed endpoint metadata survives reload without starting baseline"
     ]
+  },
+  {
+    "kind": "invalid-metadata",
+    "value": 0,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
+  },
+  {
+    "kind": "invalid-metadata",
+    "value": 7,
+    "passed": true,
+    "checks": [
+      "legacy endpoint not relabelled",
+      "compatible selected endpoint preserved",
+      "new confirmed endpoint metadata survives reload without starting baseline"
+    ]
   }
 ]

@@ -1,0 +1,30 @@
+[
+  {
+    "width": 320,
+    "passed": true,
+    "checks": [
+      "contextual sleep baseline and anchors",
+      "real generated noise play",
+      "confirmed STOP",
+      "Back restores timer",
+      "Forward restores listening without playback",
+      "source change after STOP",
+      "matching zero endpoint and unchanged comparison",
+      "no overflow or page exceptions"
+    ]
+  },
+  {
+    "width": 390,
+    "passed": true,
+    "checks": [
+      "contextual sleep baseline and anchors",
+      "real generated noise play",
+      "confirmed STOP",
+      "Back restores timer",
+      "Forward restores listening without playback",
+      "source change after STOP",
+      "matching zero endpoint and unchanged comparison",
+      "no overflow or page exceptions"
+    ]
+  }
+]
