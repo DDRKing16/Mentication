@@ -111,3 +111,17 @@ export class LocalAudio {
     this.gain = null;
   }
 }
+
+// A pending STOP must settle on both action success and rejection. Never return
+// cancellation success until all sources have acknowledged silence.
+export async function settlePlaybackAction(action, { isStopped, silenceAll, mayPlay = true }) {
+  let failure;
+  try { await action(); } catch (error) { failure = error; }
+  if (isStopped()) {
+    await silenceAll();
+    // STOP cancels a start/resume, not a successful pause or setup change.
+    if (mayPlay) return false;
+  }
+  if (failure) throw failure;
+  return true;
+}

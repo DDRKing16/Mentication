@@ -1,11 +1,11 @@
 // A baseline exists only after an explicit answer, never from a display default.
 export const GOAL_ASSESSMENTS = Object.freeze({
   lift: { question:'How is your mood right now?', scale:'mood', left:'Very low', right:'Great', higherIsBetter:true },
-  calm: { question:'How intense is it right now?', scale:'distress', left:'Calm', right:'Extreme', higherIsBetter:false },
-  focus: { question:'How intense is it right now?', scale:'focus difficulty', left:'Focused', right:"Can't focus", higherIsBetter:false },
-  ground: { question:'How intense is it right now?', scale:'disconnection', left:'Present', right:'Gone', higherIsBetter:false },
-  reset: { question:'How intense is it right now?', scale:'rumination', left:'Clear', right:'Consuming', higherIsBetter:false },
-  sleep: { question:'How intense is it right now?', scale:'wakefulness', left:'Drowsy', right:'Wide awake', higherIsBetter:false },
+  calm: { question:'How distressed are you right now?', scale:'distress', left:'Calm', right:'Extreme', higherIsBetter:false },
+  focus: { question:'How hard is it to focus right now?', scale:'focus difficulty', left:'Focused', right:"Can't focus", higherIsBetter:false },
+  ground: { question:'How disconnected do you feel right now?', scale:'disconnection', left:'Present', right:'Gone', higherIsBetter:false },
+  reset: { question:'How caught up in repeating thoughts are you right now?', scale:'rumination', left:'Clear', right:'Consuming', higherIsBetter:false },
+  sleep: { question:'How much are you struggling to sleep right now?', scale:'sleep difficulty', left:'Not struggling', right:'Struggling a lot', higherIsBetter:false },
 });
 const valid = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 10;
 export function captureGoalBaseline(direction, value) {
@@ -22,4 +22,12 @@ export function goalPointChange(baseline, direction, after) {
 export const MATCHED_ASSESSMENT_IDS = new Set(['vectorShift', 'happyBump', 'boxV2', 'progressive-muscle-relaxation-v2', 'grounding54321V2', 'urgeSurf', 'factCheck', 'changeScene', 'nextAction']);
 export function hasGoalBaseline(answers) {
   return goalPointChange(answers?.goal_baseline, answers?.direction, answers?.goal_baseline?.value) === 0;
+}
+
+// Old drafts need evidence of the end question, or a matching start question.
+export function restoredGoalRating(entry, completion) {
+  const value = completion?.goalRating;
+  if (!valid(value) || completion?.goalAssessmentInvalid === true) return null;
+  if (completion?.goalAssessment) return goalPointChange(completion.goalAssessment, entry?.direction, value) === 0 ? value : null;
+  return hasGoalBaseline(entry) ? value : null;
 }

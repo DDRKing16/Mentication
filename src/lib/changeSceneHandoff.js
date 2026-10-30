@@ -2,6 +2,10 @@ import { captureGoalBaseline } from './goalAssessment.js';
 import { getIntervention, suggestAdaptiveAlternative } from './interventions.js';
 import { hardEligibleV3 } from './recommendationV3.js';
 const answered=value=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=10;
+// A saved distress/other goal endpoint must never become an answered mood.
+export function sceneFollowupMood(session) {
+  return session?.direction === 'lift' && answered(session.intensity_end) ? session.intensity_end : null;
+}
 export function sceneHandoff(session,request,checkin) {
   if(!session?.pathway?.includes('changeScene') || !['happyBump','dear2100','different'].includes(request))return null;
   if(!answered(checkin?.mood)||!answered(checkin?.distress)||!checkin.confirmed)return null;

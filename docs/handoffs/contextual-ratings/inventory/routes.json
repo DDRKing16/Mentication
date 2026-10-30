@@ -1,0 +1,612 @@
+[
+  {
+    "id": "boxV2",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nBREATHE\n\nFind your seat\n\nFeet on the floor, hands soft. We’ll breathe a calm square — in, hold, out, hold.\nFeet on the floor, hands soft. We’ll breathe a calm square — in, hold, out, hold.\n\nIf holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.\n\nFinish here\nOptions\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "progressive-muscle-relaxation-v2",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "Exit\nProgressive Muscle Relaxation\nHow would you like to practise?\n\nIf an area is painful, injured or unsafe to tense, choose release only. You can skip any area or stop.\n\nPractice style\nRelease only\nNotice and soften, without tensing.\nGentle tense and release\nOnly where tensing feels comfortable and safe.\nContinue\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "factCheck",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nThought or Fact?\n\nThought capture. Enter one thought in your own words.\nAbout your private draft\nWhat’s the thought?\nType your own, or tap a starting point and edit it if needed.\nNeed a starting point?\n\nPrivate on this device\n\nContinue\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "urgeSurf",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nEXIT\n\nURGE SURFING\n\nMake a little space before acting.\n\nNotice one neutral detail around you. You do not have to focus on your body or change the urge.\n\nStart a 60-second pause\n\nThe wave guides you; it does not measure your urge. Pause or stop any time.\n\nPersonalise my pause · optional\nWhat this tab remembers\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "selfCompassion",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION\n\nSelf-Compassion\n\nYOUR PRACTICE\n\nTry a voice on your side.\n\nBring one harsh line. Try believable words, then one supportive action.\n\nCARE CAN START HERE\n\nI do not have to attack myself to take a next step.\n\nBegin\nYour private draft\nPractice options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "makeRoom",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION\n\nMake Room\n\nYOUR PRACTICE\n\nRoom for a feeling. Room for your life.\n\nBegin with your surroundings. Try a gentle moment of allowing, then an everyday step.\n\nA feeling\nNotice only as much as feels workable.\nBegin\nYour private draft\nPractice options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "happyBump",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · LIFT\n\nThe Happy Bump\n\nStart with one small thing.\n\nWater, light, a short walk. Follow what feels useful and skip the rest.\n\nStart\nYour private draft\nSkip ahead\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "changeScene",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "←\nMentication · Lift\nChange the Scene\n•••\n×\n✦\n1\n2\n3\n4\n5\n6\n7\n\nONE SMALL SHIFT AT A TIME\n\nChange the Scene\n\nTry a small change around you. Skip anything that does not fit.\n\nAbout 2 minutes · go at your own pace\n\nBegin Change the Scene ▷\nAudio off\nThis is not helping\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "goodMap",
+    "width": 320,
+    "height": 568,
+    "route": "/good-map",
+    "frames": [
+      {
+        "url": "http://localhost:5181/good-map",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/good-map/index.html",
+        "text": "Back\nUndo\nMenu\nSave and exit\nSaved on this device · 12:25 PM\nTHE GOOD MAP\nWhat matters\nto you?\n\nSort 16 moments. Choose what matters, then one small step.\n\nYour private map\nStart sorting\n🔇",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "grounding54321V2",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nSEE\n\nFive things you can see\n\n12S SUGGESTED TIME\n\nNotice five things around you.\n\nTake as long as you need. You can move on without finding every item.\n\nHow to practise · optional\nTry another sense instead\nI noticed — next sense\nSkip this sense\nFinish grounding early\nGuidance options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "vectorShift",
+    "width": 320,
+    "height": 568,
+    "route": "/vector-shift",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": " Back\nHome\n\nTHE PRACTICE YOU CHOSE\n\nVector Shift\n\nAbout 5 min\n\nHow disconnected do you feel right now?\n\nChoose an honest first rating.\n\n—\n/10\nChoose a rating\nPresent\nGone\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\nStart Vector Shift",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "signalLock",
+    "width": 320,
+    "height": 568,
+    "route": "/signal-lock",
+    "frames": [
+      {
+        "url": "http://localhost:5181/signal-lock",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/signal-lock/index.html",
+        "text": "⌁\nMENTICATION\n\nEXTERNAL FOCUS\n\nSignal Lock.\n◷\n\nFollow a small signal. Let the room come into view.\n\nTap two signals. See what appears.\n\nNo rush. Nothing to get wrong.\n\nFollow the signal\nNot now\nTHE WINDOW ROOM\n01\n+\n\nOne small connection\nat a time.\n\nA place to put your attention\nProgress saved on this device.\nStill scene on",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "eftTapping",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "CALM + GROUND\n\nGENTLE TAPPING · EFT-STYLE\n\nWhat’s here\nright now?\n\nChoose a starting point. We’ll show you the way.\n\nJust help me ground\n→\nBody tension\n→\nA worry\n→\nToo much at once\n→\nTWO FINGERTIPS · A LIGHT TOUCH\nNine small places\nAbout 3 minutes\nAbout this practice\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "nextAction",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "Task choices stay on this device.\n\nNEXT EASIEST STEP\n\nWhat would you like to start?\n\nChoose a task or use your own words. We will show just one small action.\n\nTidy my desk\nReply to emails\nRead a chapter\nMy task\nShow my small step\nBrowse more tasks\nChange number of steps · 1\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "taraTactician",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "Mentication\n\nDIFFICULT SITUATIONS\n\nLet’s get through this\n\nMake a small plan for a difficult situation. Keep support close while you get through it.\n\nGet started\n\nYour words stay on this device.\n\nYour pace. Your words.\n\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "unhook",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION\n\nUnhook\n\nYOUR PRACTICE\n\nHear the thought. Choose your next move.\n\nTry noticing a thought as words, then return attention to a useful step.\n\nA thought might sound like…\n\nWhat if it all goes wrong?\n\nWords your mind is offering.\nBegin\nYour private draft\nPractice options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "tomorrowParking",
+    "width": 320,
+    "height": 568,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "TOMORROW PARKING LOT\n\nCan this wait until tomorrow?\n\nPark something unfinished only if it can safely wait.\n\nCan this wait until tomorrow?\nIt can wait\nNot sure / urgent\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "nightChannel",
+    "width": 320,
+    "height": 568,
+    "route": "/night-channel",
+    "frames": [
+      {
+        "url": "http://localhost:5181/night-channel",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/night-channel/index.html",
+        "text": "• • •\n✦\n✦ • ✦\n•\nNight Channel\nWhat would you like to listen to?\n\nChoose one sound. Nothing starts yet.\n\nThe Night Desk\nGenerated noise preview · no voices\nThe Laundromat After Hours\nGenerated noise preview · no voices\nSunny Field\nGenerated noise preview · no voices\nRainy Day\nGenerated noise preview · no voices\nWaterfall Mist\nGenerated noise preview · no voices\nBeach at Night\nGenerated noise preview · no voices\nThe Sleepy Podcast Shelf\nAdd your own recording\nDocumentary Drift\nAdd your own recording\nYour Audible\nAdd your own recording\nUse a music app instead\nHow this works\nOptional starting check",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "dear2100",
+    "width": 320,
+    "height": 568,
+    "route": "/dear-2100",
+    "frames": [
+      {
+        "url": "http://localhost:5181/dear-2100",
+        "text": "Save & return Home\nAnother way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/dear2100-updated/index.html",
+        "text": "A LITTLE DISTANCE. A CLEARER VIEW.\n\nDear 2100.\n\nWhat have you always\nwanted to do?\n\nBegin",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "foundations",
+    "width": 320,
+    "height": 568,
+    "route": "/foundations",
+    "frames": [
+      {
+        "url": "http://localhost:5181/foundations",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/interventions/foundations/index.html",
+        "text": "FOUNDATIONS\nExit\nView stages\n\nCheck-in: 0 of 17 answers confirmed\n\nDraft saved on this device.\n\nSound on\nFoundations\n\nEight everyday areas. One small plan for your week.\n\nSleep and rhythm\n\n17 ratings. Pause and return whenever you need.\n\nStart my check-in\n→",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "boxV2",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nBREATHE\n\nFind your seat\n\nFeet on the floor, hands soft. We’ll breathe a calm square — in, hold, out, hold.\nFeet on the floor, hands soft. We’ll breathe a calm square — in, hold, out, hold.\n\nIf holds feel uncomfortable, breathe naturally. Choose Another way for a different practice, or Exit to stop.\n\nFinish here\nOptions\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "progressive-muscle-relaxation-v2",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "Exit\nProgressive Muscle Relaxation\nHow would you like to practise?\n\nIf an area is painful, injured or unsafe to tense, choose release only. You can skip any area or stop.\n\nPractice style\nRelease only\nNotice and soften, without tensing.\nGentle tense and release\nOnly where tensing feels comfortable and safe.\nContinue\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "factCheck",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nThought or Fact?\n\nThought capture. Enter one thought in your own words.\nAbout your private draft\nWhat’s the thought?\nType your own, or tap a starting point and edit it if needed.\nNeed a starting point?\n\nPrivate on this device\n\nContinue\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "urgeSurf",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nEXIT\n\nURGE SURFING\n\nMake a little space before acting.\n\nNotice one neutral detail around you. You do not have to focus on your body or change the urge.\n\nStart a 60-second pause\n\nThe wave guides you; it does not measure your urge. Pause or stop any time.\n\nPersonalise my pause · optional\nWhat this tab remembers\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "selfCompassion",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION\n\nSelf-Compassion\n\nYOUR PRACTICE\n\nTry a voice on your side.\n\nBring one harsh line. Try believable words, then one supportive action.\n\nCARE CAN START HERE\n\nI do not have to attack myself to take a next step.\n\nBegin\nYour private draft\nPractice options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "makeRoom",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION\n\nMake Room\n\nYOUR PRACTICE\n\nRoom for a feeling. Room for your life.\n\nBegin with your surroundings. Try a gentle moment of allowing, then an everyday step.\n\nA feeling\nNotice only as much as feels workable.\nBegin\nYour private draft\nPractice options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "happyBump",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · LIFT\n\nThe Happy Bump\n\nStart with one small thing.\n\nWater, light, a short walk. Follow what feels useful and skip the rest.\n\nStart\nYour private draft\nSkip ahead\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "changeScene",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "←\nMentication · Lift\nChange the Scene\n•••\n×\n✦\n1\n2\n3\n4\n5\n6\n7\n\nONE SMALL SHIFT AT A TIME\n\nChange the Scene\n\nTry a small change around you. Skip anything that does not fit.\n\nAbout 2 minutes · go at your own pace\n\nBegin Change the Scene ▷\nAudio off\nThis is not helping\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "goodMap",
+    "width": 390,
+    "height": 844,
+    "route": "/good-map",
+    "frames": [
+      {
+        "url": "http://localhost:5181/good-map",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/good-map/index.html",
+        "text": "Back\nUndo\nMenu\nSave and exit\nSaved on this device · 12:26 PM\nTHE GOOD MAP\nWhat matters\nto you?\n\nSort 16 moments. Choose what matters, then one small step.\n\nYour private map\nStart sorting\n🔇",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "grounding54321V2",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION · CALM\n\nSEE\n\nFive things you can see\n\n11S SUGGESTED TIME\n\nNotice five things around you.\n\nTake as long as you need. You can move on without finding every item.\n\nHow to practise · optional\nTry another sense instead\nI noticed — next sense\nSkip this sense\nFinish grounding early\nGuidance options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "vectorShift",
+    "width": 390,
+    "height": 844,
+    "route": "/vector-shift",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": " Back\nHome\n\nTHE PRACTICE YOU CHOSE\n\nVector Shift\n\nAbout 5 min\n\nHow disconnected do you feel right now?\n\nChoose an honest first rating.\n\n—\n/10\nChoose a rating\nPresent\nGone\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\nStart Vector Shift",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "signalLock",
+    "width": 390,
+    "height": 844,
+    "route": "/signal-lock",
+    "frames": [
+      {
+        "url": "http://localhost:5181/signal-lock",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/signal-lock/index.html",
+        "text": "⌁\nMENTICATION / A LITTLE ROOM TO FOCUS\n\nEXTERNAL FOCUS\n\nSignal Lock.\n◷\n\nFollow a small signal. Let the room come into view.\n\nTap two signals. See what appears.\n\nNo rush. Nothing to get wrong.\n\nFollow the signal\nNot now\nTHE WINDOW ROOM\n01\n+\n\nOne small connection\nat a time.\n\nA place to put your attention\nProgress saved on this device.\nStill scene on",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "eftTapping",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "CALM + GROUND\n\nGENTLE TAPPING · EFT-STYLE\n\nWhat’s here\nright now?\n\nChoose a starting point. We’ll show you the way.\n\nJust help me ground\n→\nBody tension\n→\nA worry\n→\nToo much at once\n→\nTWO FINGERTIPS · A LIGHT TOUCH\nNine small places\nAbout 3 minutes\nAbout this practice\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "nextAction",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "Task choices stay on this device.\n\nNEXT EASIEST STEP\n\nWhat would you like to start?\n\nChoose a task or use your own words. We will show just one small action.\n\nTidy my desk\nReply to emails\nRead a chapter\nMy task\nShow my small step\nBrowse more tasks\nChange number of steps · 1\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "taraTactician",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "Mentication\n\nDIFFICULT SITUATIONS\n\nLet’s get through this\n\nMake a small plan for a difficult situation. Keep support close while you get through it.\n\nGet started\n\nYour words stay on this device.\n\nYour pace. Your words.\n\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "unhook",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "MENTICATION\n\nUnhook\n\nYOUR PRACTICE\n\nHear the thought. Choose your next move.\n\nTry noticing a thought as words, then return attention to a useful step.\n\nA thought might sound like…\n\nWhat if it all goes wrong?\n\nWords your mind is offering.\nBegin\nYour private draft\nPractice options\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "tomorrowParking",
+    "width": 390,
+    "height": 844,
+    "route": "/reset",
+    "frames": [
+      {
+        "url": "http://localhost:5181/reset",
+        "text": "TOMORROW PARKING LOT\n\nCan this wait until tomorrow?\n\nPark something unfinished only if it can safely wait.\n\nCan this wait until tomorrow?\nIt can wait\nNot sure / urgent\nAnother way",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "nightChannel",
+    "width": 390,
+    "height": 844,
+    "route": "/night-channel",
+    "frames": [
+      {
+        "url": "http://localhost:5181/night-channel",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/night-channel/index.html",
+        "text": "• • •\n✦\n✦ • ✦\n•\nNight Channel\nWhat would you like to listen to?\n\nChoose one sound. Nothing starts yet.\n\nThe Night Desk\nGenerated noise preview · no voices\nThe Laundromat After Hours\nGenerated noise preview · no voices\nSunny Field\nGenerated noise preview · no voices\nRainy Day\nGenerated noise preview · no voices\nWaterfall Mist\nGenerated noise preview · no voices\nBeach at Night\nGenerated noise preview · no voices\nThe Sleepy Podcast Shelf\nAdd your own recording\nDocumentary Drift\nAdd your own recording\nYour Audible\nAdd your own recording\nUse a music app instead\nHow this works\nOptional starting check",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "dear2100",
+    "width": 390,
+    "height": 844,
+    "route": "/dear-2100",
+    "frames": [
+      {
+        "url": "http://localhost:5181/dear-2100",
+        "text": "Save & return Home\nAnother way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/dear2100-updated/index.html",
+        "text": "DEAR 2100\nVOL. 03\n\nA LITTLE DISTANCE. A CLEARER VIEW.\n\nDear 2100.\n\nWhat have you always\nwanted to do?\n\nBegin",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "id": "foundations",
+    "width": 390,
+    "height": 844,
+    "route": "/foundations",
+    "frames": [
+      {
+        "url": "http://localhost:5181/foundations",
+        "text": "Another way",
+        "overflow": false
+      },
+      {
+        "url": "http://localhost:5181/interventions/foundations/index.html",
+        "text": "FOUNDATIONS\nExit\nView stages\n\nCheck-in: 0 of 17 answers confirmed\n\nDraft saved on this device.\n\nSound on\nFoundations\n\nEight everyday areas. One small plan for your week.\n\nSleep and rhythm\n\n17 ratings. Pause and return whenever you need.\n\nStart my check-in\n→",
+        "overflow": false
+      }
+    ],
+    "errors": []
+  }
+]

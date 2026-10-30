@@ -4,7 +4,11 @@ const timeout = (promise, ms = 20000) => new Promise((resolve, reject) => {
   Promise.resolve(promise).then(value => { clearTimeout(timer); resolve(value); }, error => { clearTimeout(timer); reject(error); });
 });
 async function checked(response) {
-  if (!response.ok) throw new Error(response.status === 401 ? 'Authorization expired. Connect again.' : response.status === 403 ? 'Playback is unavailable for this account. Check subscription and app access.' : `Service request failed (${response.status}). Please retry.`);
+  if (!response.ok) {
+    const error = new Error(response.status === 401 ? 'Authorization expired. Connect again.' : response.status === 403 ? 'Playback is unavailable for this account. Check subscription and app access.' : `Service request failed (${response.status}). Please retry.`);
+    error.status = response.status;
+    throw error;
+  }
   return response.status === 204 ? null : response.json();
 }
 const request = (url, options = {}) => timeout(fetch(url, {
@@ -49,6 +53,11 @@ export class SpotifyAdapter {
     this.player = null;
     this.device = null;
     this.token = null;
+    this.requestedUri = null;
+    this.playbackMayBeActive = false;
+    this.playbackEvidenceVersion = 0;
+    this.pendingPlayCommands = 0;
+    this.playbackGeneration = 0;
   }
   get configured() {
     return !!(this.config.clientId && this.config.redirectUri);
@@ -170,7 +179,9 @@ export class SpotifyAdapter {
       });
       player.addListener('autoplay_failed', () => this.report('error', 'Playback needs another tap on Play.'));
       player.addListener('player_state_changed', state => {
-        if (state) this.report(state.paused ? 'paused' : 'playing', '', state.track_window?.current_track?.name);
+        if (state && !state.paused) { this.playbackMayBeActive = true; this.playbackEvidenceVersion += 1; }
+        if (state?.paused) this.report('paused');
+        else if (state && this.requestedUri && state.track_window?.current_track?.uri === this.requestedUri) this.report('playing', '', state.track_window.current_track.name);
       });
     });
     if (!(await player.connect())) throw new Error('Spotify could not connect.');
@@ -179,25 +190,50 @@ export class SpotifyAdapter {
   async play(value) {
     if (!this.device) throw new Error('Connect Spotify before playing.');
     const uri = spotifyUri(value);
+    const generation = this.playbackGeneration;
     await this.player.activateElement();
     const token = await this.accessToken();
-    await request(`https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(this.device)}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        uris: [uri]
-      })
-    });
-    // A successful HTTP command alone is not evidence of playback.
-    await this.confirmPlaying();
+    if (generation !== this.playbackGeneration) throw new Error('Spotify playback cancelled.');
+    const previousUri = this.requestedUri;
+    const previousRisk = this.playbackMayBeActive;
+    const previousEvidence = this.playbackEvidenceVersion;
+    this.requestedUri = uri;
+    // Only an issued command can make idle playback uncertain. Preserve any
+    // earlier uncertainty and SDK evidence if this new command is rejected.
+    this.playbackMayBeActive = true;
+    this.pendingPlayCommands += 1;
+    try {
+      try {
+        await request(`https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(this.device)}`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            uris: [uri]
+          })
+        });
+      } catch (error) {
+        // These HTTP responses definitively reject the command. A transport
+        // timeout, 408 or server error may occur after playback began: fail closed.
+        if ([400, 401, 403, 404, 422, 429].includes(error.status)) {
+          this.playbackMayBeActive = previousRisk || this.playbackEvidenceVersion !== previousEvidence;
+          if (this.playbackEvidenceVersion === previousEvidence) this.requestedUri = previousUri;
+        }
+        throw error;
+      }
+      // A successful HTTP command alone is not evidence of playback.
+      await this.confirmPlaying(generation);
+    } finally { this.pendingPlayCommands -= 1; }
   }
-  async confirmPlaying() {
+  async confirmPlaying(generation = this.playbackGeneration) {
     for (let n = 0; n < 20; n++) {
-      const state = await this.player.getCurrentState();
-      if (state && !state.paused) {
+      if (generation !== this.playbackGeneration) throw new Error('Spotify playback cancelled.');
+      const state = await timeout(this.player.getCurrentState());
+      if (generation !== this.playbackGeneration) throw new Error('Spotify playback cancelled.');
+      if (state && !state.paused) { this.playbackMayBeActive = true; this.playbackEvidenceVersion += 1; }
+      if (state && !state.paused && state.track_window?.current_track?.uri === this.requestedUri) {
         this.report('playing', '', state.track_window?.current_track?.name);
         return;
       }
@@ -206,14 +242,51 @@ export class SpotifyAdapter {
     throw new Error('Spotify has not confirmed playback. Tap Retry.');
   }
   async pause() {
-    if (this.player && this.device) {
-      const state = await timeout(this.player.getCurrentState());
-      if (state && !state.paused) await timeout(this.player.pause());
+    this.playbackGeneration += 1;
+    if (!this.player) {
+      if (this.playbackMayBeActive || this.pendingPlayCommands) throw new Error('Spotify player is unavailable. Stop playback in Spotify before switching sources.');
+      return;
     }
+    const pending = this.pendingPlayCommands > 0;
+    // STOP must reach the SDK immediately, including while HTTP/confirmation is
+    // pending. Source switching still waits for the entire cancellation below.
+    let pauseError = null;
+    if (pending || this.playbackMayBeActive) {
+      try { await timeout(this.player.pause()); } catch (error) { pauseError = error; }
+    }
+    if (pending) {
+      for (let n = 0; this.pendingPlayCommands && n < 80; n++) {
+        await new Promise(resolve => setTimeout(resolve, 250));
+      }
+      if (this.pendingPlayCommands) throw new Error('Spotify playback cancellation is still pending. Use Spotify controls; do not switch sources yet.');
+      // A delayed play command may have landed after the first pause. Re-pause
+      // after it settles, before acknowledging STOP or allowing another source.
+      if (this.playbackMayBeActive) {
+        await timeout(this.player.pause());
+        pauseError = null;
+      }
+    }
+    const state = await timeout(this.player.getCurrentState());
+    if (state?.paused) { this.playbackMayBeActive = false; return; }
+    if (!state && !this.playbackMayBeActive) return;
+    this.playbackMayBeActive = true;
+    if (pauseError) throw pauseError;
+    if (!pending && state && !state.paused) await timeout(this.player.pause());
+    for (let n = 0; n < 20; n++) {
+      const paused = await timeout(this.player.getCurrentState());
+      if (paused?.paused === true) { this.playbackMayBeActive = false; return; }
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+    throw new Error('Spotify has not confirmed pause. Stop playback in Spotify before switching sources.');
   }
   async resume() {
-    await timeout(this.player.resume());
-    await this.confirmPlaying();
+    const generation = this.playbackGeneration;
+    this.playbackMayBeActive = true;
+    this.pendingPlayCommands += 1;
+    try {
+      await timeout(this.player.resume());
+      await this.confirmPlaying(generation);
+    } finally { this.pendingPlayCommands -= 1; }
   }
   async disconnect() {
     await this.pause();
@@ -221,6 +294,11 @@ export class SpotifyAdapter {
     this.player = null;
     this.device = null;
     this.token = null;
+    this.requestedUri = null;
+    this.playbackMayBeActive = false;
+    this.playbackEvidenceVersion = 0;
+    this.pendingPlayCommands = 0;
+    this.playbackGeneration += 1;
     this.report(this.configured?'unauthorized':'config_missing');
   }
 }
@@ -286,7 +364,16 @@ export class AppleAdapter {
     this.report('playing', '', this.music.nowPlayingItem?.title);
   }
   async pause() {
-    if (this.music && ![window.MusicKit.PlaybackStates.paused, window.MusicKit.PlaybackStates.stopped, window.MusicKit.PlaybackStates.ended, window.MusicKit.PlaybackStates.none].includes(this.music.playbackState)) await timeout(this.music.pause());
+    if (!this.music) return;
+    const states = window.MusicKit.PlaybackStates;
+    const quiet = () => [states.paused, states.stopped, states.ended, states.none].filter(value => value !== undefined).includes(this.music.playbackState);
+    if (quiet()) return;
+    await timeout(this.music.pause());
+    for (let n = 0; n < 20; n++) {
+      if (quiet()) return;
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+    throw new Error('Apple Music has not confirmed pause. Stop playback in Apple Music before switching sources.');
   }
   async resume() {
     await timeout(this.music.play());
