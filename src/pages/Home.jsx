@@ -10,6 +10,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
 import { hasParkedNotes } from "@/lib/tomorrowParking/storage";
+import { useWellness } from "@/hooks/useWellness";
 import HomeFrame from "@/components/home/HomeFrame";
 import StreakBadge from "@/components/home/StreakBadge";
 import { sessionStore } from "@/lib/localData";
@@ -62,6 +63,7 @@ async function readWeekState() {
 
 export default function Home() {
   const navigate = useNavigate();
+  const { wellness, onWellnessAction } = useWellness();
   const {sessions:deviceSessions}=useDeviceSessions(500);
   const [parking, setParking] = useState(() => hasParkedNotes());
   useEffect(() => {
@@ -213,6 +215,7 @@ export default function Home() {
     if (route === "profile") { navigate("/profile"); return; }
     if (route === "insights") { navigate("/insights"); return; }
     if (route === "settings") { navigate("/settings"); return; }
+    if (route === "restore") { navigate("/restore"); return; }
     if (route === "guide") { navigate("/start"); return; }
     if (route === "return-points") { navigate("/return-points"); return; }
     if (DIRECTION_LABELS[route]) {
@@ -236,7 +239,7 @@ export default function Home() {
       >
         {musicMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
       </button>
-      {!todayLoaded ? <p role="status" className="p-5">Loading home…</p> : <HomeFrame parking={parking} onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />}
+      {!todayLoaded ? <p role="status" className="p-5">Loading home…</p> : <HomeFrame wellness={wellness} onWellnessAction={onWellnessAction} parking={parking} onNavigate={onNavigate} week={week} today={today} palace={palace} journal={journal} more={more} />}
     </div>
   );
 }

@@ -9,7 +9,7 @@ const homeSrc = `${import.meta.env.BASE_URL}home.html`;
 const ambientResetRoutes = new Set(['lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'begin', 'recommended']);
 
 const routes = new Set([
-  'lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'begin',
+  'lift', 'focus', 'calm', 'ground', 'sleep', 'guide', 'restore', 'begin',
   'seven-calmer-days', 'restructure', 'foundations', 'journal', 'good-map', 'dear-2100', 'palace',
   'library', 'my-plan', 'profile', 'insights', 'settings', 'recommended', 'parking-lot', 'return-points'
 ]);
@@ -21,11 +21,12 @@ const routes = new Set([
  * and — for returning users — the "Your reset for today" card payload.
  * No database, authentication, router package, or page names are assumed.
  */
-export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null, more = null, parking = false }) {
+export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null, more = null, parking = false, wellness = null, onWellnessAction = null }) {
   const frame = useRef(null);
-  const callbacks = useRef({ onNavigate, week, today, palace, journal, more, parking });
-  callbacks.current = { onNavigate, week, today, palace, journal, more, parking };
+  const callbacks = useRef({ onNavigate, week, today, palace, journal, more, parking, wellness, onWellnessAction });
+  callbacks.current = { onNavigate, week, today, palace, journal, more, parking, wellness, onWellnessAction };
   const bridgeId = useRef(null);
+  const loaded = useRef(false);
   const [height, setHeight] = useState(1700);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
@@ -60,6 +61,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
           data.bridgeId !== bridgeId.current) return;
       if (data.type === 'ready') {
         // Show controls after the document reports its hydrated layout.
+        if (callbacks.current.wellness) send('wellness', { wellness: callbacks.current.wellness });
         send('parking', { parking: callbacks.current.parking });
         send('week', { week: callbacks.current.week });
         if (callbacks.current.today) send('today', { today: callbacks.current.today });
@@ -69,7 +71,15 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         reportViewport();
       } else if (data.type === 'height' && Number.isFinite(data.height) && data.height > 0 && data.height < 20000) {
         setHeight(Math.ceil(data.height));
-        setReady(true);
+        // The child can measure itself before its load event. Wait until the
+        // load handshake so that a late onLoad cannot disable a first tap.
+        if (loaded.current) setReady(true);
+      } else if (data.type === 'wellness-action' &&
+          ['connect', 'sync', 'disconnect'].includes(data.action) &&
+          callbacks.current.wellness?.sources?.some(source => source.id === data.provider && source.status !== 'setup')) {
+        Promise.resolve(callbacks.current.onWellnessAction?.({
+          action: data.action, provider: data.provider, consent: data.consent === true,
+        })).catch(() => setError('Your wellness connection could not be updated.'));
       } else if (data.type === 'home') {
         frame.current?.scrollIntoView({ block: 'start', behavior: data.reduceMotion ? 'instant' : 'smooth' });
       } else if (data.type === 'ambient-start') {
@@ -119,6 +129,8 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
     if (ready && more) send('more', { more });
   }, [more, ready]);
 
+  useEffect(() => { if (ready && wellness) send('wellness', { wellness }); }, [wellness, ready]);
+
   useEffect(() => { if (ready) send('parking', { parking }); }, [parking, ready]);
 
   if (typeof onNavigate !== 'function') {
@@ -136,7 +148,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         src={homeSrc}
         allow="autoplay"
         sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
-        onLoad={() => { setReady(false); send('connect'); }}
+        onLoad={() => { loaded.current = true; setReady(false); send('connect'); }}
         style={{ opacity: ready ? 1 : 0, pointerEvents: ready ? 'auto' : 'none', display: 'block', width: '100%', height, border: 0, maxWidth: 949, margin: '0 auto' }}
       />
     </section>

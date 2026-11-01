@@ -577,7 +577,7 @@ main:focus {
   gap:5px 9px;
   margin:0 -7px;
 }
-.goal[data-route="calm"]{order:1}.goal[data-route="lift"]{order:2}.goal[data-route="focus"]{order:3}.goal[data-route="ground"]{order:4}.goal[data-route="sleep"]{order:5}.goal[data-route="guide"]{order:6}
+.goal[data-route="calm"]{order:1}.goal[data-route="lift"]{order:2}.goal[data-route="focus"]{order:3}.goal[data-route="ground"]{order:4}.goal[data-route="sleep"]{order:5}.goal[data-route="restore"]{order:6}
 
 
 .art-control {
@@ -2157,3 +2157,28 @@ body:has(dialog[open]) {
 
 /* Host-provided visibility must win over the authored card display rules. */
 [hidden] { display:none !important; }
+
+/* Optional wellness sources share the existing weekly card. */
+[hidden] { display:none !important; }
+.wellness-toolbar { grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; z-index:1; }
+.wellness-toolbar select,.wellness-toolbar button,.wellness-button { color:inherit; font:inherit; border:1px solid #efddd56d; border-radius:16px; background:#30251d55; min-height:44px; padding:7px 12px; cursor:pointer; }
+.wellness-toolbar select { max-width:55%; font-size:13px; }
+.wellness-toolbar select option { background:#49392f; color:#fff4e9; }
+.wellness-toolbar button { font-size:12px; }
+.wellness-summary { grid-column:1 / -1; width:100%; position:relative; z-index:1; }
+.wellness-summary h2 { font:inherit; font-size:15px; margin:0 0 8px; }
+.wellness-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
+.wellness-metric { display:flex; flex-direction:column; gap:5px; padding:10px 6px; border-radius:14px; background:#fff4e90c; }
+.wellness-metric span { font-size:12px; overflow-wrap:anywhere; }
+.wellness-metric strong { font-size:21px; font-weight:500; }
+.wellness-metric small { font-size:10px; }
+.wellness-note { display:block; font-size:12px; line-height:1.5; margin:6px 0; }
+.wellness-source { padding:16px 0; border-top:1px solid #efddd533; }
+.wellness-source h3 { font:inherit; font-size:18px; margin:0 0 6px; }
+.wellness-source p,#wellness-privacy { font-size:14px; line-height:1.6; margin:6px 0; }
+.wellness-consent { display:flex; align-items:flex-start; gap:10px; font-size:14px; line-height:1.5; margin:12px 0; }
+.wellness-consent input { width:22px; height:22px; flex-shrink:0; }
+.wellness-button:disabled { opacity:.6; cursor:default; }
+.wellness-sheet { width:min(520px,calc(100vw - 32px)); }
+[data-large-text=true] .wellness-note,[data-large-text=true] .wellness-metric span { font-size:16px; }
+@media (max-width:360px) { .wellness-metric strong { font-size:17px; } .wellness-metric { padding:8px 4px; } }
