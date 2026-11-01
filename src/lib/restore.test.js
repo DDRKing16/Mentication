@@ -13,6 +13,9 @@ describe('Restore activity registry', () => {
   it('distinguishes planning from completing an activity', () => {
     expect(RESTORE_ACTIVITIES.filter(item => item.planning).map(item => item.id)).toEqual(['recovery-day','sleep-routine']);
     expect(restoreActivity('recovery-day').steps[1][1]).toContain('does not switch Oura Rest Mode');
+    const store = memory();
+    expect(saveRestoreOutcome(store,{ id:'recovery-day',outcome:'completed',attemptId:'bad-completed',elapsed:0 })).toBe(false);
+    expect(saveRestoreOutcome(store,{ id:'breathing',outcome:'planned',attemptId:'bad-planned',elapsed:0 })).toBe(false);
   });
 });
 describe('Restore local progress and explicit outcomes', () => {
@@ -23,7 +26,7 @@ describe('Restore local progress and explicit outcomes', () => {
     store.setItem(RESTORE_DRAFT_KEY,'bad json'); expect(readRestoreDraft(store)).toBeNull();
   });
   it('records only explicit outcomes, strips unrecognised feedback and discards drafts', () => {
-    const store = memory(); writeRestoreDraft(store,{ id:'reading',step:2,elapsed:9 });
+    const store = memory(); writeRestoreDraft(store,{ id:'reading',step:2,elapsed:9,attemptId:'attempt-one' });
     expect(saveRestoreOutcome(store,{ id:'reading',outcome:'stopped',attemptId:'attempt-one',elapsed:9,feedback:'not-a-rating',now:'2026-11-01T10:00:00Z' })).toBe(true);
     expect(JSON.parse(store.getItem(RESTORE_HISTORY_KEY))).toEqual([{ id:'reading',outcome:'stopped',attemptId:'attempt-one',elapsed:9,feedback:null,at:'2026-11-01T10:00:00Z',plan:'' }]);
     expect(store.getItem(RESTORE_DRAFT_KEY)).toBeNull();
@@ -37,5 +40,22 @@ describe('Restore local progress and explicit outcomes', () => {
     expect(writeRestoreDraft(null,{})).toBe(false); expect(saveRestoreOutcome(null,{ id:'tea',outcome:'completed',attemptId:'attempt-one',elapsed:0 })).toBe(false);
   });
   it('keeps bounded plans on device and separate from completed breaks', () => { const store = memory(); saveRestoreOutcome(store,{ id:'recovery-day',outcome:'planned',attemptId:'attempt-plan',elapsed:0,plan:'Leave the optional errand for tomorrow' }); expect(readRestorePlans(store)).toEqual([{ id:'recovery-day',plan:'Leave the optional errand for tomorrow' }]); });
+  it('preserves a different attempt draft when an older reflection is saved', () => {
+    const store = memory();
+    const draft = { id:'reading', step:1, elapsed:4, target:300, attemptId:'new-attempt' };
+    writeRestoreDraft(store, draft);
+    expect(saveRestoreOutcome(store,{ id:'breathing', outcome:'completed', elapsed:5, attemptId:'old-attempt' })).toBe(true);
+    expect(readRestoreDraft(store)).toMatchObject(draft);
+    writeRestoreDraft(store, { ...draft, id:'breathing' });
+    saveRestoreOutcome(store,{ id:'breathing', outcome:'completed', elapsed:5, attemptId:'old-attempt' });
+    expect(readRestoreDraft(store).attemptId).toBe('new-attempt');
+  });
+  it('records plan manageability separately from rest feedback', () => {
+    const store = memory();
+    saveRestoreOutcome(store,{ id:'recovery-day', outcome:'planned', attemptId:'plan-attempt', elapsed:0, feedback:'manageable' });
+    expect(JSON.parse(store.getItem(RESTORE_HISTORY_KEY))[0].feedback).toBe('manageable');
+    saveRestoreOutcome(store,{ id:'sleep-routine', outcome:'planned', attemptId:'sleep-attempt', elapsed:0, feedback:'more-rested' });
+    expect(JSON.parse(store.getItem(RESTORE_HISTORY_KEY))[0].feedback).toBeNull();
+  });
   it('formats active timer time safely', () => { expect(restoreClock(61.8)).toBe('1:01'); expect(restoreClock(-1)).toBe('0:00'); });
 });

@@ -67,13 +67,17 @@ export function writeRestoreDraft(storage, draft) {
   try { storage.setItem(RESTORE_DRAFT_KEY, JSON.stringify(draft)); return true; } catch { return false; }
 }
 export function saveRestoreOutcome(storage, { id, outcome, elapsed, attemptId, plan = '', feedback = null, now = new Date().toISOString() }) {
-  if (!restoreActivity(id) || !['completed', 'stopped', 'planned'].includes(outcome) || !Number.isFinite(elapsed) || elapsed < 0 || typeof attemptId !== 'string' || !/^[a-zA-Z0-9-]{8,80}$/.test(attemptId)) return false;
+  const activity = restoreActivity(id);
+  if (!activity || (outcome === 'planned' && !activity.planning) || (outcome === 'completed' && activity.planning) || !['completed', 'stopped', 'planned'].includes(outcome) || !Number.isFinite(elapsed) || elapsed < 0 || typeof attemptId !== 'string' || !/^[a-zA-Z0-9-]{8,80}$/.test(attemptId)) return false;
   try {
     let history; try { history = JSON.parse(storage.getItem(RESTORE_HISTORY_KEY) || '[]'); } catch { history = []; }
     if (!Array.isArray(history)) history = [];
-    const record = { id, attemptId, outcome, elapsed: Math.round(elapsed), feedback: ['more-rested','same','less-rested'].includes(feedback) ? feedback : null, at: now, plan: restoreActivity(id).planning && typeof plan === 'string' ? plan.slice(0, 300) : '' };
+    const record = { id, attemptId, outcome, elapsed: Math.round(elapsed), feedback: (activity.planning ? ['manageable','adjust','unsure'] : ['more-rested','same','less-rested']).includes(feedback) ? feedback : null, at: now, plan: restoreActivity(id).planning && typeof plan === 'string' ? plan.slice(0, 300) : '' };
     storage.setItem(RESTORE_HISTORY_KEY, JSON.stringify([record, ...history.filter(item => item?.attemptId !== attemptId)].slice(0, 50)));
-    storage.removeItem(RESTORE_DRAFT_KEY);
+    // Saving an older reflection must not remove a newer break (another tab
+    // or a browser-history entry may still own that draft).
+    const draft = readRestoreDraft(storage);
+    if (draft?.id === id && draft.attemptId === attemptId) storage.removeItem(RESTORE_DRAFT_KEY);
     return true;
   } catch { return false; }
 }

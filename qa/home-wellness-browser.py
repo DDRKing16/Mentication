@@ -1,5 +1,6 @@
 """Local Home QA. Synthetic fixtures exercise rendering, never provider APIs."""
 import json, os
+from urllib.parse import urlparse
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 OUT=Path(os.environ.get('EVIDENCE_DIR','/tmp/wellness-evidence')); OUT.mkdir(parents=True,exist_ok=True)
@@ -10,6 +11,7 @@ with sync_playwright() as p:
  for width in [320,390,768,1280]:
   context=browser.new_context(viewport={'width':width,'height':844},reduced_motion='reduce')
   context.add_init_script("try{localStorage.setItem('haven_onboarded','1')}catch{}")
+  provider_requests=[]; context.on('request',lambda request:provider_requests.append(request.url) if urlparse(request.url).hostname and any(domain in urlparse(request.url).hostname for domain in ['ouraring.com','whoop.com','fitbit.com','garmin.com','health.googleapis.com']) else None)
   page=context.new_page(); errors=[]; page.on('pageerror',lambda e: errors.append(str(e)))
   page.goto(BASE+'/'); iframe=page.frame_locator('iframe'); expect(iframe.locator('#wellness-open')).to_be_visible(timeout=20000)
   expect(page.get_by_role('status',name='Loading Mentication',exact=True)).to_be_hidden()
@@ -54,7 +56,8 @@ with sync_playwright() as p:
   assert frame.evaluate('document.documentElement.scrollWidth <= innerWidth'),f'overflow {width}'
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),f'host overflow {width}'
   assert not errors,errors
+  assert not provider_requests,provider_requests
   print('PASS width',width,flush=True)
-  reports.append({'width':width,'checks':'setup gate, defaults, consent, scores, missing, stale, loading, error, disconnect fallback, forged token, no overflow','pageErrors':errors})
+  reports.append({'width':width,'checks':'setup gate, defaults, consent, scores, missing, stale, loading, error, disconnect fallback, forged token, no overflow','pageErrors':errors,'providerRequests':len(provider_requests)})
   context.close()
  (OUT/'report.json').write_text(json.dumps(reports,indent=2)); print(json.dumps(reports,indent=2)); browser.close()

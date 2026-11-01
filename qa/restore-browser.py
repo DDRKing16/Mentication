@@ -26,7 +26,7 @@ with sync_playwright() as p:
    expect(page.get_by_role('button',name='Start timer',exact=True)).to_be_visible()
    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),f'overflow {width} {title}'
    page.get_by_role('button',name='Finish planning' if title in ACTIVITIES[-2:] else 'Finish this break',exact=True).click()
-   expect(page.get_by_role('heading',name='How was that pause?',exact=True)).to_be_visible()
+   expect(page.get_by_role('heading',name='How does this plan feel?' if title in ACTIVITIES[-2:] else 'How was that pause?',exact=True)).to_be_visible()
 
    if title==ACTIVITIES[0]:
     page.get_by_role('button',name='More rested',exact=True).click()

@@ -63,7 +63,9 @@ No denied hosted-site access was retried. No personal health data was requested 
 
 ## Local verification
 
-- Full suite: 120 files, 1,067 tests passed (1,048 existing + 12 wellness + 7 Restore).
+- Full suite: 120 files, 1,069 tests passed (1,048 existing + 12 wellness + 9 Restore).
 - Lint, typecheck, production build and V3 algorithm verification passed. Build retains its existing large-chunk warning.
 - `python qa/home-wellness-browser.py`: Chromium at 320/390/768/1280 px. Exercises actual hosted Home iframe plus standalone synthetic render-only fixtures: setup gates/no connect buttons, week default, consent, zero/missing scores, dated stale data, loading/error, fallback after disconnection, forged bridge token rejection, dialog focus return and no horizontal overflow. The iframe also waits for its load handshake before enabling controls. No real provider connection is implied by these fixtures.
 - Browser screenshots/report: `/tmp/wellness-evidence/` (synthetic score images explicitly QA-only). Native device/Xcode and real-account integration tests remain blocked by the dependencies above.
+
+Independent pre-publication findings, fixes and backend options: see [review.md](review.md).
