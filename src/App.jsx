@@ -27,6 +27,7 @@ import { validTaraPlanId } from '@/lib/taraNotificationRouting';
 // Route page components are loaded on demand to keep the initial bundle small.
 // The tab pages (Home, Onboarding, RegulationProfile, Settings) are lazy-loaded
 // inside AppShell so they can be kept mounted across tab switches.
+const Restore = lazy(() => import('@/pages/Restore'));
 const NeedStart = lazy(() => import('@/pages/NeedStart'));
 const ReturnPoints = lazy(() => import('@/pages/ReturnPoints'));
 const ResetFlow = lazy(() => import('@/pages/ResetFlow'));
@@ -112,6 +113,7 @@ const MenticationRoutes = () => {
                   <Route path="/settings" element={<></>} />
                 </Route>
                 <Route path="/welcome" element={<Welcome />} />
+                <Route path="/restore" element={<OnboardingGate><Restore /></OnboardingGate>} />
                 <Route path="/start" element={<NeedStart />} />
                 <Route path="/return-points" element={<ReturnPoints />} />
                 <Route path="/reset" element={<ResetFlow key={location.state?.taraNotificationRequestId || 'reset'} />} />

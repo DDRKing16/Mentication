@@ -4,7 +4,7 @@
   const root = document.documentElement;
   const ROUTES = Object.freeze({
     home: 'Home', lift: 'Lift', focus: 'Focus', calm: 'Calm', ground: 'Ground', sleep: 'Sleep',
-    guide: 'Guide me', begin: 'Begin', 'seven-calmer-days': '7 calmer days',
+    guide: 'Guide me', restore: 'Restore', begin: 'Begin', 'seven-calmer-days': '7 calmer days',
     restructure: 'Restructure', foundations: 'Foundations', journal: 'Check in with yourself',
     palace: 'Peace Palace',
     'good-map': 'See what makes life feel good', 'dear-2100': 'Go after what you’ve avoided',
@@ -166,7 +166,7 @@
   // Each card's balls take a deep shade of the card's own colour, via multiply.
   const BALL_COLOURS = {
     lift: '#c96a2e', focus: '#3f6fd1', calm: '#7d55bd',
-    ground: '#3f8f52', sleep: '#4a7fd9', guide: '#c08a2d'
+    ground: '#3f8f52', sleep: '#4a7fd9', guide: '#c08a2d', restore: '#577c70'
   };
   document.querySelectorAll('.goal .artwork g[clip-path]').forEach(group => {
     const { width, height } = group.ownerSVGElement.viewBox.baseVal;
@@ -214,6 +214,93 @@
     if (event.target !== track || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
     event.preventDefault(); scrollCards(event.key === 'ArrowRight' ? 1 : -1);
   });
+
+  // The host owns connections. Only a small token-free view model crosses the
+  // existing window/origin/per-mount-token bridge. Never fetch health APIs here.
+  let wellnessSources = [];
+  let selectedSource = 'week';
+  const sourceSelect = document.getElementById('home-source');
+  const sourceList = document.getElementById('wellness-sources');
+  const summary = document.getElementById('wellness-summary');
+  function element(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  }
+  function wellnessAction(action, provider, consent = false) {
+    sendBridge('wellness-action', { action, provider, consent });
+  }
+  function renderWellness() {
+    const source = wellnessSources.find(item => item.id === selectedSource && item.connected);
+    if (!source) selectedSource = 'week';
+    sourceSelect.replaceChildren(new Option('Your week', 'week'));
+    wellnessSources.filter(item => item.connected).forEach(item => sourceSelect.add(new Option(item.name, item.id)));
+    sourceSelect.value = selectedSource;
+    document.querySelector('.week-info').hidden = !!source;
+    document.querySelector('.week-actions').hidden = !!source;
+    // Keep the accessible heading when the programme contents are hidden.
+    summary.setAttribute('aria-label', source ? `${source.name} wellness summary` : 'Wellness summary');
+    document.querySelector('.week-panel').setAttribute('aria-labelledby', source ? 'wellness-summary-heading' : 'week-heading');
+    summary.hidden = !source;
+    summary.replaceChildren();
+    if (source) {
+      const heading = element('h2', `${source.name} · Daily summary`);
+      heading.id = 'wellness-summary-heading'; summary.append(heading);
+      if (source.status === 'loading') summary.append(element('p', 'Syncing…', 'wellness-note'));
+      if (source.error) summary.append(element('p', source.error, 'wellness-note'));
+      const snapshot = source.snapshot;
+      if (snapshot) {
+        const sync = new Date(snapshot.syncedAt);
+        const stale = Date.now() - sync.getTime() > 36 * 3600000;
+        summary.append(element('p', `Last sync ${sync.toLocaleString()}${stale ? ' · Update needed' : ''}`, 'wellness-note'));
+        const metrics = element('div', undefined, 'wellness-metrics');
+        snapshot.metrics.forEach(metric => {
+          const tile = element('div', undefined, 'wellness-metric');
+          const units = { score: '/100', percent: '%', hours: 'h', steps: 'steps', bpm: 'bpm', ms: 'ms', strain: '/21' };
+          tile.append(element('span', metric.label), element('strong', metric.value === null ? '—' : `${metric.value} ${units[metric.unit] || ''}`), element('small', metric.day));
+          if (metric.value === null) tile.append(element('small', 'Not shared'));
+          metrics.append(tile);
+        });
+        summary.append(metrics);
+        if (!snapshot.metrics.length || snapshot.metrics.every(metric => metric.value === null)) summary.append(element('p', 'No summaries shared yet. Check your source app and permissions.', 'wellness-note'));
+        else if (snapshot.metrics.some(metric => metric.day < new Date().toLocaleDateString('en-CA'))) summary.append(element('p', 'Some readings are from an earlier day. Check the dates above.', 'wellness-note'));
+      } else if (source.status !== 'loading') summary.append(element('p', 'No summaries shared yet. Sync when your source app has data.', 'wellness-note'));
+      const refresh = element('button', 'Sync now', 'wellness-button');
+      refresh.type = 'button'; refresh.disabled = source.status === 'loading';
+      refresh.addEventListener('click', () => wellnessAction('sync', source.id)); summary.append(refresh);
+    }
+    sourceList.replaceChildren();
+    wellnessSources.forEach(item => {
+      const row = element('section', undefined, 'wellness-source');
+      row.append(element('h3', item.name), element('p', item.detail));
+      if (item.error) row.append(element('p', item.error, 'wellness-note'));
+      if (item.status === 'setup') row.append(element('span', 'Setup required · Not available yet', 'wellness-note'));
+      else if (item.connected) {
+        const disconnect = element('button', 'Disconnect & remove summaries', 'wellness-button');
+        disconnect.type = 'button'; disconnect.disabled = item.status === 'loading';
+        disconnect.addEventListener('click', () => wellnessAction('disconnect', item.id)); row.append(disconnect);
+      } else {
+        const label = element('label', undefined, 'wellness-consent');
+        const consent = document.createElement('input'); consent.type = 'checkbox';
+        label.append(consent, element('span', item.consent));
+        const connect = element('button', item.status === 'loading' ? 'Connecting…' : `Connect ${item.name}`, 'wellness-button');
+        connect.type = 'button'; connect.disabled = true;
+        consent.addEventListener('change', () => { connect.disabled = !consent.checked || item.status === 'loading'; });
+        connect.addEventListener('click', () => { if (consent.checked) wellnessAction('connect', item.id, true); });
+        row.append(label, connect);
+      }
+      sourceList.append(row);
+    });
+    reportHeight();
+  }
+  function setWellness(wellness) {
+    if (!wellness || !Array.isArray(wellness.sources) || wellness.sources.length > 12) return;
+    wellnessSources = wellness.sources.filter(source => source && typeof source.id === 'string' && typeof source.name === 'string');
+    renderWellness();
+  }
+  sourceSelect.addEventListener('change', () => { selectedSource = sourceSelect.value; renderWellness(); });
+  document.getElementById('wellness-open').addEventListener('click', event => openDialog('wellness-dialog', event.currentTarget));
 
   function setWeek({ currentDay = null, completedDays = [] } = {}) {
     if (!(currentDay === null || Number.isInteger(currentDay) && currentDay >= 0 && currentDay <= 6)) throw new TypeError('currentDay must be null or an integer from 0 through 6.');
@@ -339,6 +426,8 @@
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'viewport' && Number.isFinite(data.top) && data.top >= 0 && Number.isFinite(data.height) && data.height >= 1 && data.height <= 20000) {
       root.style.setProperty('--dialog-top', `${data.top + data.height / 2}px`);
       root.style.setProperty('--dialog-max-height', `${Math.max(100, data.height - 32)}px`);
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'wellness') {
+      setWellness(data.wellness);
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'week') {
       try { setWeek(data.week); } catch { sendBridge('error', { code: 'INVALID_WEEK' }); }
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'today') {
@@ -357,7 +446,7 @@
   window.MenticationHome = Object.freeze({
     version: '1.0.0',
     routes: ROUTES,
-    configure({ navigate: handler, week, today, palace, journal, more } = {}) {
+    configure({ navigate: handler, week, today, palace, journal, more, wellness } = {}) {
       if (handler !== undefined && typeof handler !== 'function') throw new TypeError('navigate must be a function.');
       if (handler) navigateHandler = handler;
       if (week !== undefined) setWeek(week);
@@ -365,7 +454,9 @@
       if (palace !== undefined) setPalace(palace);
       if (journal !== undefined) setJournal(journal);
       if (more !== undefined) setMore(more);
+      if (wellness !== undefined) setWellness(wellness);
     },
+    setWellness,
     setWeek,
     setToday,
     setPalace,
