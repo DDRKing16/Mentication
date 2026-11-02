@@ -16,8 +16,18 @@ with sync_playwright() as p:
   page.goto(BASE+'/'); iframe=page.frame_locator('iframe'); expect(iframe.locator('#wellness-open')).to_be_visible(timeout=20000)
   expect(page.get_by_role('status',name='Loading Mentication',exact=True)).to_be_hidden()
   expect(page.locator('iframe')).to_have_attribute('aria-hidden','false')
-  expect(iframe.locator('#home-source')).to_have_value('week'); expect(iframe.locator('.week-track')).to_be_visible()
-  iframe.locator('#wellness-open').click(); expect(iframe.locator('#wellness-dialog')).to_be_visible()
+  expect(iframe.locator('#home-source')).to_have_count(0); expect(iframe.locator('.week-track')).to_be_visible()
+  expect(iframe.locator('#week-heading')).to_have_text('Your week')
+  expect(iframe.locator('#wellness-status')).to_have_text('Setup required')
+  page.screenshot(path=str(OUT/f'home-{width}.png'))
+  baseline={320:153,390:153,768:153,1280:135.25}
+  card=page.frames[1].locator('.week-panel').bounding_box()
+  if width in [320,390,1280]: assert card['height']<baseline[width],card
+  assert page.frames[1].locator('.wellness-region').bounding_box()['y']<page.frames[1].locator('.week-track').bounding_box()['y']
+  iframe.locator('#wellness-open').focus(); page.keyboard.press('Enter'); expect(iframe.locator('#wellness-dialog')).to_be_visible()
+  page.keyboard.press('Escape'); expect(iframe.locator('#wellness-dialog')).to_be_hidden()
+  expect(iframe.locator('#wellness-open')).to_be_focused()
+  page.keyboard.press('Enter'); expect(iframe.locator('#wellness-dialog')).to_be_visible()
   expect(iframe.locator('#wellness-sources .wellness-source')).to_have_count(1)
   expect(iframe.locator('#wellness-sources button')).to_have_count(0)
   expect(iframe.locator('#wellness-sources')).to_contain_text('Setup required')
@@ -34,13 +44,31 @@ with sync_playwright() as p:
   iframe=fixture; frame=fixture
   source={'id':'oura','name':'Oura','detail':'Synthetic QA fixture','consent':'Read daily summaries','status':'connected','connected':True,'snapshot':{'syncedAt':'2020-01-01T10:00:00Z','metrics':[{'id':'sleep','label':'Sleep','unit':'score','value':0,'day':'2020-01-01'},{'id':'readiness','label':'Readiness','unit':'score','value':None,'day':'2020-01-01'},{'id':'activity','label':'Activity','unit':'score','value':91,'day':'2020-01-01'}]}}
   frame.evaluate('(source)=>MenticationHome.setWellness({sources:[source]})',source)
-  iframe.locator('#home-source').select_option('oura')
-  expect(iframe.locator('#wellness-summary')).to_be_visible(); expect(iframe.locator('.week-track')).to_be_hidden()
+  frame.evaluate('MenticationHome.setWeek({currentDay:2,completedDays:[0,1]})')
+  expect(iframe.locator('#wellness-summary')).to_be_visible(); expect(iframe.locator('.week-track')).to_be_visible()
+  expect(iframe.locator('.week-day.is-complete')).to_have_count(2)
+  expect(iframe.locator('.week-day.is-current')).to_have_attribute('data-day','2')
+  metrics=iframe.locator('.wellness-metrics').bounding_box(); track=iframe.locator('.week-track').bounding_box()
+  assert metrics['y']+metrics['height']<=track['y']
+  assert frame.locator('#wellness-open').bounding_box()['height']>=44
+  for selector in ['.begin-button','.seven-days','.palace-badge-icon']:
+   assert frame.locator(selector).bounding_box()['height']>=44,selector
   expect(iframe.locator('#wellness-summary')).to_contain_text('0 /100'); expect(iframe.locator('#wellness-summary')).to_contain_text('Not shared')
   expect(iframe.locator('#wellness-summary')).to_contain_text('Update needed'); expect(iframe.locator('#wellness-summary')).to_contain_text('2020-01-01')
   fixture.screenshot(path=str(OUT/f'scores-{width}.png'))
+  controls=['#wellness-open','.begin-button','.seven-days','.palace-badge-icon']
+  boxes=[frame.locator(selector).bounding_box() for selector in controls]
+  for i,left in enumerate(boxes):
+   for right in boxes[i+1:]:
+    overlap_x=min(left['x']+left['width'],right['x']+right['width'])-max(left['x'],right['x'])
+    overlap_y=min(left['y']+left['height'],right['y']+right['height'])-max(left['y'],right['y'])
+    assert overlap_x<=0 or overlap_y<=0,'overlapping card controls'
+  frame.evaluate("document.documentElement.dataset.largeText='true';document.documentElement.dataset.highContrast='true'")
+  assert frame.evaluate('document.documentElement.scrollWidth <= innerWidth'),'large-text overflow'
+  expect(frame.locator('.week-track')).to_be_visible()
+  frame.evaluate("document.documentElement.dataset.largeText='false';document.documentElement.dataset.highContrast='false'")
   source['status']='loading'; frame.evaluate('(source)=>MenticationHome.setWellness({sources:[source]})',source)
-  expect(iframe.get_by_role('button',name='Sync now')).to_be_disabled(); expect(iframe.locator('#wellness-summary')).to_contain_text('Syncing')
+  expect(iframe.get_by_role('button',name='Sync now')).to_be_disabled(); expect(iframe.locator('#wellness-status')).to_contain_text('Syncing')
   source['status']='error'; source['error']='Could not update this connection. Please try again.'
   frame.evaluate('(source)=>MenticationHome.setWellness({sources:[source]})',source); expect(iframe.locator('#wellness-summary')).to_contain_text('Please try again')
   source['snapshot']=None; frame.evaluate('(source)=>MenticationHome.setWellness({sources:[source]})',source)
@@ -48,16 +76,17 @@ with sync_playwright() as p:
   # Browser consent and action messages remain token-bound; use QA-only public harness.
   source['status']='disconnected'; source['connected']=False; source.pop('error')
   frame.evaluate('(source)=>MenticationHome.setWellness({sources:[source]})',source)
-  expect(iframe.locator('#home-source')).to_have_value('week'); expect(iframe.locator('.week-track')).to_be_visible()
+  expect(iframe.locator('#wellness-summary')).to_be_hidden(); expect(iframe.locator('.week-track')).to_be_visible()
+  expect(iframe.locator('.week-day.is-complete')).to_have_count(2)
   iframe.locator('#wellness-open').click(); connect=iframe.get_by_role('button',name='Connect Oura',exact=True)
   expect(connect).to_be_disabled(); iframe.locator('.wellness-consent input').check(); expect(connect).to_be_enabled()
   iframe.get_by_role('button',name='Close wellness apps').click()
-  iframe.locator('#home-source').select_option('week'); expect(iframe.locator('[data-route="begin"]')).to_be_visible()
+  expect(iframe.locator('[data-route="begin"]')).to_be_visible()
   assert frame.evaluate('document.documentElement.scrollWidth <= innerWidth'),f'overflow {width}'
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),f'host overflow {width}'
   assert not errors,errors
   assert not provider_requests,provider_requests
   print('PASS width',width,flush=True)
-  reports.append({'width':width,'checks':'setup gate, defaults, consent, scores, missing, stale, loading, error, disconnect fallback, forged token, no overflow','pageErrors':errors,'providerRequests':len(provider_requests)})
+  reports.append({'width':width,'checks':'compact setup, single title, Oura above persistent weekdays, 44px targets, consent, scores, missing, stale, loading, error, disconnect retains progress, forged token, no overflow','pageErrors':errors,'providerRequests':len(provider_requests),'setupHeightPx':card['height']})
   context.close()
  (OUT/'report.json').write_text(json.dumps(reports,indent=2)); print(json.dumps(reports,indent=2)); browser.close()

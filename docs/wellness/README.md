@@ -6,9 +6,9 @@ Implemented on `codex/home-wellness`, based on main `cfb14c4b15c2cd6a93a89b2c69f
 
 Latest scope focuses on Oura first and defers other production providers.
 
-- The existing Your week card keeps its programme summary as the default. A compact source control can switch to a connected provider; Oura scores opens connection/privacy details. Returning to Your week preserves its live programme progress.
+- The compact Your week card now stacks Oura above the weekday progress, keeping both visible. The duplicate source selector is removed. A secondary Oura connection settings control opens consent/disconnect details; see `layout-revision.md`.
 - No providers are connected or enabled in this version. Only Oura is shown in this release, explicitly marked as requiring setup. Other source definitions remain extension points; no other production connector was added. There are no nonfunctional connect buttons, external health requests, sample scores, new services or added packages.
-- Provider-neutral controller, trusted adapter contract, explicit consent, loading/error/disconnect lifecycle and token-free summaries. No health summaries or credentials are persisted in web storage. Summaries are held in memory; source selection returns to Your week on remount.
+- Provider-neutral controller, trusted adapter contract, explicit consent, loading/error/disconnect lifecycle and token-free summaries. No health summaries or credentials are persisted in web storage. Summaries are held in memory; weekly progress remains visible in every wellness state.
 - Summary metrics preserve provider, label, unit, measurement day and sync timestamp. Oura maps Sleep/Readiness/Activity from the same requested day. Zero remains zero; absent data stays absent. Older syncs/readings, empty data and errors are labelled. No proprietary score is inferred from another provider's measurements.
 - The iframe's existing sandbox, source window, opaque origin and per-mount token checks remain. Wellness actions are allowlisted and restricted to known configured providers. The host sends only the sanitized display model. The iframe uses textContent rather than HTML for provider data.
 
