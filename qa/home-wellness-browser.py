@@ -16,6 +16,10 @@ with sync_playwright() as p:
   page.goto(BASE+'/'); iframe=page.frame_locator('iframe'); expect(iframe.locator('#wellness-open')).to_be_visible(timeout=20000)
   expect(page.get_by_role('status',name='Loading Mentication',exact=True)).to_be_hidden()
   expect(page.locator('iframe')).to_have_attribute('aria-hidden','false')
+  expect(iframe.locator('.seven-days')).to_have_count(0)
+  badge=page.frames[1].locator('#palace-badge').bounding_box(); icon=page.frames[1].locator('#palace-badge-icon').bounding_box()
+  assert abs(badge['x']+badge['width']/2-icon['x']-icon['width']/2)<1,'level artwork is not centred'
+  assert abs(icon['width']-icon['height'])<1,'level artwork aspect ratio changed'
   expect(iframe.locator('#home-source')).to_have_count(0); expect(iframe.locator('.week-track')).to_be_visible()
   expect(iframe.locator('#week-heading')).to_have_text('Your week')
   expect(iframe.locator('#wellness-status')).to_have_text('Setup required')
@@ -48,15 +52,23 @@ with sync_playwright() as p:
   expect(iframe.locator('#wellness-summary')).to_be_visible(); expect(iframe.locator('.week-track')).to_be_visible()
   expect(iframe.locator('.week-day.is-complete')).to_have_count(2)
   expect(iframe.locator('.week-day.is-current')).to_have_attribute('data-day','2')
+  for level in [0,3,6]:
+   frame.evaluate('(level)=>MenticationHome.setPalace({level,name:"QA stage",nextName:level<6?"Next stage":"",stonesToNext:4,progress:.5})',level)
+   expect(frame.locator('#palace-badge-level')).to_have_text(f'Level {level+1} of 7')
+   expect(frame.locator('#palace-badge-icon')).to_have_attribute('aria-label',f'Your Peace Palace, level {level+1} of 7')
+   badge=frame.locator('#palace-badge').bounding_box(); icon=frame.locator('#palace-badge-icon').bounding_box()
+   assert abs(badge['x']+badge['width']/2-icon['x']-icon['width']/2)<1,'progression artwork moved off centre'
+   expect(frame.locator('#palace-badge-art svg')).to_have_count(1)
+  frame.evaluate('MenticationHome.setPalace({level:0,name:"The quiet clearing",nextName:"The shack",stonesToNext:4,progress:0})')
   metrics=iframe.locator('.wellness-metrics').bounding_box(); track=iframe.locator('.week-track').bounding_box()
   assert metrics['y']+metrics['height']<=track['y']
   assert frame.locator('#wellness-open').bounding_box()['height']>=44
-  for selector in ['.begin-button','.seven-days','.palace-badge-icon']:
+  for selector in ['.begin-button','.palace-badge-icon']:
    assert frame.locator(selector).bounding_box()['height']>=44,selector
   expect(iframe.locator('#wellness-summary')).to_contain_text('0 /100'); expect(iframe.locator('#wellness-summary')).to_contain_text('Not shared')
   expect(iframe.locator('#wellness-summary')).to_contain_text('Update needed'); expect(iframe.locator('#wellness-summary')).to_contain_text('2020-01-01')
   fixture.screenshot(path=str(OUT/f'scores-{width}.png'))
-  controls=['#wellness-open','.begin-button','.seven-days','.palace-badge-icon']
+  controls=['#wellness-open','.begin-button','.palace-badge-icon']
   boxes=[frame.locator(selector).bounding_box() for selector in controls]
   for i,left in enumerate(boxes):
    for right in boxes[i+1:]:

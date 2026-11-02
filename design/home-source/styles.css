@@ -1731,9 +1731,7 @@ body:has(dialog[open]) {
   justify-content:space-between;
   gap:12px;
 }
-/* L-shaped piece: a tall square icon fills the open space left of the
-   "or try 7 calmer days" link, and a thin one-line strip runs the full
-   width beneath it. */
+/* Live Peace Palace level artwork with its progression details below. */
 .palace-badge {
   display:grid;
   grid-template-columns:auto 1fr;
@@ -2192,8 +2190,10 @@ body:has(dialog[open]) {
 .week-panel .begin-button::before,.week-panel .seven-days::before { content:none; }
 .week-panel .palace-badge-icon { width:44px; height:44px; }
 .week-panel .seven-days { min-height:44px; }
-.week-panel .palace-badge { grid-template-areas:"icon seven" "strip strip"; grid-template-columns:44px minmax(0,1fr); grid-template-rows:auto auto; }
-.week-panel .palace-badge-strip { flex-direction:row; align-items:center; flex-wrap:wrap; column-gap:4px; }
+.week-panel .palace-badge { grid-template-areas:"icon" "strip"; grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; justify-items:center; }
+.week-panel .palace-badge-strip { flex-direction:row; align-items:center; justify-content:center; flex-wrap:wrap; column-gap:4px; text-align:center; }
+.week-panel .palace-badge-icon { justify-self:center; }
+.week-panel .palace-badge-line { justify-content:center; }
 .week-panel .palace-badge-title { display:none; }
 @media(max-width:700px) {
   .week-panel { grid-template-columns:minmax(0,1fr) 118px; column-gap:7px; }
@@ -2206,5 +2206,4 @@ body:has(dialog[open]) {
   #wellness-open { width:58px; min-width:58px; height:58px; }
   .week-panel .begin-button,.week-panel .seven-days,.wellness-button { min-height:58px; }
   .week-panel .palace-badge-icon,.wellness-sheet .round-button { width:58px; height:58px; }
-  .week-panel .palace-badge { grid-template-columns:58px minmax(0,1fr); }
 }

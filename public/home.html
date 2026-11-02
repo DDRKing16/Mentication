@@ -1740,9 +1740,7 @@ body:has(dialog[open]) {
   justify-content:space-between;
   gap:12px;
 }
-/* L-shaped piece: a tall square icon fills the open space left of the
-   "or try 7 calmer days" link, and a thin one-line strip runs the full
-   width beneath it. */
+/* Live Peace Palace level artwork with its progression details below. */
 .palace-badge {
   display:grid;
   grid-template-columns:auto 1fr;
@@ -2201,8 +2199,10 @@ body:has(dialog[open]) {
 .week-panel .begin-button::before,.week-panel .seven-days::before { content:none; }
 .week-panel .palace-badge-icon { width:44px; height:44px; }
 .week-panel .seven-days { min-height:44px; }
-.week-panel .palace-badge { grid-template-areas:"icon seven" "strip strip"; grid-template-columns:44px minmax(0,1fr); grid-template-rows:auto auto; }
-.week-panel .palace-badge-strip { flex-direction:row; align-items:center; flex-wrap:wrap; column-gap:4px; }
+.week-panel .palace-badge { grid-template-areas:"icon" "strip"; grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; justify-items:center; }
+.week-panel .palace-badge-strip { flex-direction:row; align-items:center; justify-content:center; flex-wrap:wrap; column-gap:4px; text-align:center; }
+.week-panel .palace-badge-icon { justify-self:center; }
+.week-panel .palace-badge-line { justify-content:center; }
 .week-panel .palace-badge-title { display:none; }
 @media(max-width:700px) {
   .week-panel { grid-template-columns:minmax(0,1fr) 118px; column-gap:7px; }
@@ -2215,7 +2215,6 @@ body:has(dialog[open]) {
   #wellness-open { width:58px; min-width:58px; height:58px; }
   .week-panel .begin-button,.week-panel .seven-days,.wellness-button { min-height:58px; }
   .week-panel .palace-badge-icon,.wellness-sheet .round-button { width:58px; height:58px; }
-  .week-panel .palace-badge { grid-template-columns:58px minmax(0,1fr); }
 }
 
 </style>
@@ -2239,7 +2238,7 @@ body:has(dialog[open]) {
 <div class="week-track-wrap"><svg class="week-path" viewBox="0 0 322 48" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M 23 22 C 38.3 18.7 53.7 13.8 69 12 C 84.3 10.2 107.3 9.5 115 11 C 123 12.5 145.7 18 161 21 C 176.3 24 191.7 27 207 29 C 222.3 31 237.7 33.3 253 33 C 268.3 32.7 283.7 25 299 27" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="0.1 8.4"/></svg><ol class="week-track" aria-label="Your seven-day week"><li class="week-day" data-day="0" data-letter="M" aria-label="Day 1, not completed" ><span class="week-flag" aria-hidden="true"><svg viewBox="0 0 14 18" aria-hidden="true" focusable="false"><path d="M3 1v16" stroke="#d97a45" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M3.8 2 12 4.9 3.8 7.9Z" fill="#d97a45"/></svg></span><span class="week-circle" aria-hidden="true"></span></li><li class="week-day" data-day="1" data-letter="T" aria-label="Day 2, not completed" ><span class="week-flag" aria-hidden="true"><svg viewBox="0 0 14 18" aria-hidden="true" focusable="false"><path d="M3 1v16" stroke="#d97a45" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M3.8 2 12 4.9 3.8 7.9Z" fill="#d97a45"/></svg></span><span class="week-circle" aria-hidden="true"></span></li><li class="week-day" data-day="2" data-letter="W" aria-label="Day 3, not completed" ><span class="week-flag" aria-hidden="true"><svg viewBox="0 0 14 18" aria-hidden="true" focusable="false"><path d="M3 1v16" stroke="#d97a45" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M3.8 2 12 4.9 3.8 7.9Z" fill="#d97a45"/></svg></span><span class="week-circle" aria-hidden="true"></span></li><li class="week-day" data-day="3" data-letter="T" aria-label="Day 4, not completed" ><span class="week-flag" aria-hidden="true"><svg viewBox="0 0 14 18" aria-hidden="true" focusable="false"><path d="M3 1v16" stroke="#d97a45" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M3.8 2 12 4.9 3.8 7.9Z" fill="#d97a45"/></svg></span><span class="week-circle" aria-hidden="true"></span></li><li class="week-day" data-day="4" data-letter="F" aria-label="Day 5, not completed" ><span class="week-flag" aria-hidden="true"><svg viewBox="0 0 14 18" aria-hidden="true" focusable="false"><path d="M3 1v16" stroke="#d97a45" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M3.8 2 12 4.9 3.8 7.9Z" fill="#d97a45"/></svg></span><span class="week-circle" aria-hidden="true"></span></li><li class="week-day" data-day="5" data-letter="S" aria-label="Day 6, not completed" ><span class="week-flag" aria-hidden="true"><svg viewBox="0 0 14 18" aria-hidden="true" focusable="false"><path d="M3 1v16" stroke="#d97a45" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M3.8 2 12 4.9 3.8 7.9Z" fill="#d97a45"/></svg></span><span class="week-circle" aria-hidden="true"></span></li><li class="week-day" data-day="6" data-letter="S" aria-label="Day 7, not completed" ><span class="week-flag" aria-hidden="true"><svg viewBox="0 0 14 18" aria-hidden="true" focusable="false"><path d="M3 1v16" stroke="#d97a45" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M3.8 2 12 4.9 3.8 7.9Z" fill="#d97a45"/></svg></span><span class="week-circle" aria-hidden="true"></span></li></ol></div>
 <p>Start whenever you’re ready.</p></div>
 <div class="week-actions"><button type="button" class="begin-button" data-route="begin"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 4 12 8-12 8Z" fill="currentColor" stroke-linejoin="round"/></svg><span>Begin</span></button>
-<div class="palace-badge" id="palace-badge"><button type="button" class="palace-badge-icon" data-route="palace" id="palace-badge-icon" aria-label="Your Peace Palace, level 1 of 7"><span class="palace-badge-art" id="palace-badge-art" aria-hidden="true"></span></button><button type="button" class="seven-days" data-route="seven-calmer-days">or try 7 calmer days <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button><span class="palace-badge-strip" id="palace-badge-strip" aria-hidden="true"><span class="palace-badge-title">Peace Palace</span><span class="palace-badge-line"><strong id="palace-badge-level">Level 1 of 7</strong><span class="palace-badge-sep" aria-hidden="true">·</span><em id="palace-badge-next">4 stones to level 2</em></span></span></div></div>
+<div class="palace-badge" id="palace-badge"><button type="button" class="palace-badge-icon" data-route="palace" id="palace-badge-icon" aria-label="Your Peace Palace, level 1 of 7"><span class="palace-badge-art" id="palace-badge-art" aria-hidden="true"></span></button><span class="palace-badge-strip" id="palace-badge-strip" aria-hidden="true"><span class="palace-badge-title">Peace Palace</span><span class="palace-badge-line"><strong id="palace-badge-level">Level 1 of 7</strong><span class="palace-badge-sep" aria-hidden="true">·</span><em id="palace-badge-next">4 stones to level 2</em></span></span></div></div>
 </section>
 <section class="parking-return" id="parking-return" hidden><button type="button" data-route="parking-lot"><span>Your parking lot</span><span>Saved on this device · Review when ready →</span></button></section>
 <section class="today" id="today-card" hidden><button type="button" class="today-button" data-route="recommended" aria-labelledby="today-title" aria-describedby="today-meta"><span class="today-copy"><span class="today-eyebrow">Your reset for today</span><span class="today-title" id="today-title"></span><span class="today-meta" id="today-meta"></span></span><span class="today-play" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 4 12 8-12 8Z" fill="currentColor" stroke-linejoin="round"/></svg></span></button></section>
