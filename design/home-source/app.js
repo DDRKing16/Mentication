@@ -218,8 +218,6 @@
   // The host owns connections. Only a small token-free view model crosses the
   // existing window/origin/per-mount-token bridge. Never fetch health APIs here.
   let wellnessSources = [];
-  let selectedSource = 'week';
-  const sourceSelect = document.getElementById('home-source');
   const sourceList = document.getElementById('wellness-sources');
   const summary = document.getElementById('wellness-summary');
   function element(tag, text, className) {
@@ -232,22 +230,16 @@
     sendBridge('wellness-action', { action, provider, consent });
   }
   function renderWellness() {
-    const source = wellnessSources.find(item => item.id === selectedSource && item.connected);
-    if (!source) selectedSource = 'week';
-    sourceSelect.replaceChildren(new Option('Your week', 'week'));
-    wellnessSources.filter(item => item.connected).forEach(item => sourceSelect.add(new Option(item.name, item.id)));
-    sourceSelect.value = selectedSource;
-    document.querySelector('.week-info').hidden = !!source;
-    document.querySelector('.week-actions').hidden = !!source;
-    // Keep the accessible heading when the programme contents are hidden.
-    summary.setAttribute('aria-label', source ? `${source.name} wellness summary` : 'Wellness summary');
-    document.querySelector('.week-panel').setAttribute('aria-labelledby', source ? 'wellness-summary-heading' : 'week-heading');
-    summary.hidden = !source;
+    const source = wellnessSources.find(item => item.id === 'oura');
+    const connected = source?.connected === true;
+    document.querySelector('.week-panel').classList.toggle('has-wellness-connection', connected);
+    const state = document.getElementById('wellness-status');
+    state.textContent = source?.status === 'loading' ? (connected ? 'Syncing…' : 'Connecting…')
+      : source?.status === 'error' ? 'Connection needs attention'
+      : connected ? 'Connected' : source?.status === 'setup' || !source ? 'Setup required' : 'Not connected';
+    summary.hidden = !(connected || source?.error);
     summary.replaceChildren();
-    if (source) {
-      const heading = element('h2', `${source.name} · Daily summary`);
-      heading.id = 'wellness-summary-heading'; summary.append(heading);
-      if (source.status === 'loading') summary.append(element('p', 'Syncing…', 'wellness-note'));
+    if (connected) {
       if (source.error) summary.append(element('p', source.error, 'wellness-note'));
       const snapshot = source.snapshot;
       if (snapshot) {
@@ -269,7 +261,7 @@
       const refresh = element('button', 'Sync now', 'wellness-button');
       refresh.type = 'button'; refresh.disabled = source.status === 'loading';
       refresh.addEventListener('click', () => wellnessAction('sync', source.id)); summary.append(refresh);
-    }
+    } else if (source?.error) summary.append(element('p', source.error, 'wellness-note'));
     sourceList.replaceChildren();
     wellnessSources.forEach(item => {
       const row = element('section', undefined, 'wellness-source');
@@ -299,7 +291,6 @@
     wellnessSources = wellness.sources.filter(source => source && typeof source.id === 'string' && typeof source.name === 'string');
     renderWellness();
   }
-  sourceSelect.addEventListener('change', () => { selectedSource = sourceSelect.value; renderWellness(); });
   document.getElementById('wellness-open').addEventListener('click', event => openDialog('wellness-dialog', event.currentTarget));
 
   function setWeek({ currentDay = null, completedDays = [] } = {}) {

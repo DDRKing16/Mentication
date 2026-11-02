@@ -2158,15 +2158,19 @@ body:has(dialog[open]) {
 /* Host-provided visibility must win over the authored card display rules. */
 [hidden] { display:none !important; }
 
-/* Optional wellness sources share the existing weekly card. */
-[hidden] { display:none !important; }
-.wellness-toolbar { grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; z-index:1; }
-.wellness-toolbar select,.wellness-toolbar button,.wellness-button { color:inherit; font:inherit; border:1px solid #efddd56d; border-radius:16px; background:#30251d55; min-height:44px; padding:7px 12px; cursor:pointer; }
-.wellness-toolbar select { max-width:55%; font-size:13px; }
-.wellness-toolbar select option { background:#49392f; color:#fff4e9; }
-.wellness-toolbar button { font-size:12px; }
-.wellness-summary { grid-column:1 / -1; width:100%; position:relative; z-index:1; }
-.wellness-summary h2 { font:inherit; font-size:15px; margin:0 0 8px; }
+/* Oura stays above the weekday row; weekly progress never swaps out. */
+.week-panel { grid-template-areas:"oura actions" "week actions"; row-gap:0; padding-top:4px; padding-bottom:4px; }
+.week-info { grid-area:week; min-width:0; }
+.week-actions { grid-area:actions; }
+.wellness-region { grid-area:oura; min-width:0; position:relative; z-index:1; }
+.wellness-head { display:flex; align-items:center; justify-content:space-between; gap:4px; min-height:44px; }
+.wellness-head h3 { margin:0; font:inherit; font-size:12px; font-weight:500; }
+.wellness-head .wellness-note { margin:2px 0 0; font-size:11px; line-height:1.2; }
+#wellness-open { display:grid; place-items:center; width:44px; min-width:44px; height:44px; padding:0; color:inherit; background:transparent; border:0; border-radius:12px; cursor:pointer; }
+#wellness-open .icon { width:17px; height:17px; }
+.wellness-summary { width:100%; position:relative; z-index:1; }
+.week-panel.has-wellness-connection { grid-template-areas:"oura oura" "week actions"; row-gap:4px; }
+.wellness-button { color:inherit; font:inherit; border:1px solid #efddd56d; border-radius:16px; background:#30251d55; min-height:44px; padding:7px 12px; cursor:pointer; }
 .wellness-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
 .wellness-metric { display:flex; flex-direction:column; gap:5px; padding:10px 6px; border-radius:14px; background:#fff4e90c; }
 .wellness-metric span { font-size:12px; overflow-wrap:anywhere; }
@@ -2182,3 +2186,25 @@ body:has(dialog[open]) {
 .wellness-sheet { width:min(520px,calc(100vw - 32px)); }
 [data-large-text=true] .wellness-note,[data-large-text=true] .wellness-metric span { font-size:16px; }
 @media (max-width:360px) { .wellness-metric strong { font-size:17px; } .wellness-metric { padding:8px 4px; } }
+
+/* Secondary weekly controls keep full touch targets inside the compact card. */
+.week-panel .begin-button { min-height:44px; }
+.week-panel .begin-button::before,.week-panel .seven-days::before { content:none; }
+.week-panel .palace-badge-icon { width:44px; height:44px; }
+.week-panel .seven-days { min-height:44px; }
+.week-panel .palace-badge { grid-template-areas:"icon seven" "strip strip"; grid-template-columns:44px minmax(0,1fr); grid-template-rows:auto auto; }
+.week-panel .palace-badge-strip { flex-direction:row; align-items:center; flex-wrap:wrap; column-gap:4px; }
+.week-panel .palace-badge-title { display:none; }
+@media(max-width:700px) {
+  .week-panel { grid-template-columns:minmax(0,1fr) 118px; column-gap:7px; }
+  .week-panel .palace-badge-line { flex-wrap:wrap; }
+}
+@media(prefers-reduced-motion:reduce) { #wellness-open { transition:none; } }
+/* Match the shell's existing .78 desktop zoom without shrinking hit areas. */
+@media(min-width:949px) {
+  .wellness-head { min-height:58px; }
+  #wellness-open { width:58px; min-width:58px; height:58px; }
+  .week-panel .begin-button,.week-panel .seven-days,.wellness-button { min-height:58px; }
+  .week-panel .palace-badge-icon,.wellness-sheet .round-button { width:58px; height:58px; }
+  .week-panel .palace-badge { grid-template-columns:58px minmax(0,1fr); }
+}
