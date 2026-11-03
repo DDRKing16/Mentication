@@ -18,15 +18,16 @@ with sync_playwright() as p:
   expect(page.locator('iframe')).to_have_attribute('aria-hidden','false')
   expect(iframe.locator('.seven-days')).to_have_count(0)
   badge=page.frames[1].locator('#palace-badge').bounding_box(); icon=page.frames[1].locator('#palace-badge-icon').bounding_box()
-  assert abs(badge['x']+badge['width']/2-icon['x']-icon['width']/2)<1,'level artwork is not centred'
+  panel=page.frames[1].locator('.week-panel').bounding_box(); begin=page.frames[1].locator('.begin-button').bounding_box()
+  assert abs(panel['x']+panel['width']/2-icon['x']-icon['width']/2)<1,'house is not at full-card centre'
+  assert icon['y']>=begin['y']+begin['height'],'house must sit below Begin'
   assert abs(icon['width']-icon['height'])<1,'level artwork aspect ratio changed'
   expect(iframe.locator('#home-source')).to_have_count(0); expect(iframe.locator('.week-track')).to_be_visible()
   expect(iframe.locator('#week-heading')).to_have_text('Your week')
   expect(iframe.locator('#wellness-status')).to_have_text('Setup required')
   page.screenshot(path=str(OUT/f'home-{width}.png'))
-  baseline={320:153,390:153,768:153,1280:135.25}
   card=page.frames[1].locator('.week-panel').bounding_box()
-  if width in [320,390,1280]: assert card['height']<baseline[width],card
+  # The requested full-width house row takes natural height; never clip it to the old column layout.
   assert page.frames[1].locator('.wellness-region').bounding_box()['y']<page.frames[1].locator('.week-track').bounding_box()['y']
   iframe.locator('#wellness-open').focus(); page.keyboard.press('Enter'); expect(iframe.locator('#wellness-dialog')).to_be_visible()
   page.keyboard.press('Escape'); expect(iframe.locator('#wellness-dialog')).to_be_hidden()
@@ -57,7 +58,8 @@ with sync_playwright() as p:
    expect(frame.locator('#palace-badge-level')).to_have_text(f'Level {level+1} of 7')
    expect(frame.locator('#palace-badge-icon')).to_have_attribute('aria-label',f'Your Peace Palace, level {level+1} of 7')
    badge=frame.locator('#palace-badge').bounding_box(); icon=frame.locator('#palace-badge-icon').bounding_box()
-   assert abs(badge['x']+badge['width']/2-icon['x']-icon['width']/2)<1,'progression artwork moved off centre'
+   panel=frame.locator('.week-panel').bounding_box()
+   assert abs(panel['x']+panel['width']/2-icon['x']-icon['width']/2)<1,'progression house moved off full-card centre'
    expect(frame.locator('#palace-badge-art svg')).to_have_count(1)
   frame.evaluate('MenticationHome.setPalace({level:0,name:"The quiet clearing",nextName:"The shack",stonesToNext:4,progress:0})')
   metrics=iframe.locator('.wellness-metrics').bounding_box(); track=iframe.locator('.week-track').bounding_box()
@@ -99,6 +101,6 @@ with sync_playwright() as p:
   assert not errors,errors
   assert not provider_requests,provider_requests
   print('PASS width',width,flush=True)
-  reports.append({'width':width,'checks':'compact setup, single title, Oura above persistent weekdays, 44px targets, consent, scores, missing, stale, loading, error, disconnect retains progress, forged token, no overflow','pageErrors':errors,'providerRequests':len(provider_requests),'setupHeightPx':card['height']})
+  reports.append({'width':width,'checks':'stacked setup, full-card centred house, single title, Oura above persistent weekdays, 44px targets, consent, scores, missing, stale, loading, error, disconnect retains progress, forged token, no overflow','pageErrors':errors,'providerRequests':len(provider_requests),'setupHeightPx':card['height']})
   context.close()
  (OUT/'report.json').write_text(json.dumps(reports,indent=2)); print(json.dumps(reports,indent=2)); browser.close()

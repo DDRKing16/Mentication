@@ -2207,3 +2207,11 @@ body:has(dialog[open]) {
   .week-panel .begin-button,.week-panel .seven-days,.wellness-button { min-height:58px; }
   .week-panel .palace-badge-icon,.wellness-sheet .round-button { width:58px; height:58px; }
 }
+
+/* The house occupies the full card's centre, below the Begin action. */
+.week-panel { grid-template-areas:"oura actions" "week actions" "palace palace"; padding-inline:21px; }
+.week-panel.has-wellness-connection { grid-template-areas:"oura oura" "week actions" "palace palace"; }
+.week-panel .week-actions { align-self:start; }
+.week-panel .palace-badge { grid-area:palace; width:100%; margin-top:4px; }
+@media(max-width:700px) { .week-panel { padding-inline:9px; } }
+@media(min-width:701px) and (max-width:948px) { .week-panel { padding-inline:2.215cqw; } }
