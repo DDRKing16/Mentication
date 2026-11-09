@@ -8,7 +8,7 @@ import { goalPointChange } from "./goalAssessment.js";
 export function ratedShift(session) {
   const start = session?.intensity_start, end = session?.intensity_end;
   if (![start,end].every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 10)) return null;
-  if (Object.hasOwn(session, 'goal_baseline') && goalPointChange(session.goal_baseline,session.direction,end) === null) return null;
+  if (Object.prototype.hasOwnProperty.call(session, 'goal_baseline') && goalPointChange(session.goal_baseline,session.direction,end) === null) return null;
   return session?.direction === "lift" ? end - start : start - end;
 }
 

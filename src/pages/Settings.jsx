@@ -1,3 +1,4 @@
+import { AMBIENT_OPTIONS } from "@/hooks/useAmbientSound";
 import {useAppBack} from '@/hooks/useAppBack';
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import { usePlus } from "@/lib/subscription";
 import { backupSessionCount, parseBackup, restoreBackup, saveBackup } from "@/lib/backup";
-import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, remindersSupported, setReminderTime } from "@/lib/reminders";
+import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, getReminderWarning, remindersSupported, setReminderTime } from "@/lib/reminders";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -36,7 +37,9 @@ export default function Settings() {
   const plus = usePlus();
   const [reminder, setReminder] = useState(getReminderPrefs);
   const [memoryError, setMemoryError] = useState("");
-  const [reminderNote, setReminderNote] = useState("");
+  const [reminderNote, setReminderNote] = useState(getReminderWarning);
+  const [reminderBusy, setReminderBusy] = useState(false);
+  const reminderInFlight = useRef(false);
   const [backupNote, setBackupNote] = useState("");
   const [pendingRestore, setPendingRestore] = useState(null);
   const restoreInput = useRef(null);
@@ -67,17 +70,28 @@ export default function Settings() {
       window.location.assign("/");
     } catch(error) { setBackupNote(error.message); }
   };
-  const setReminderOn = async (on, hour = reminder.hour, minute = reminder.minute) => {
-    setReminderNote("");
-    if (on) {
-      const result = await enableDailyReminder(hour, minute);
+  const changeReminder = async (operation) => {
+    if (reminderInFlight.current) return;
+    reminderInFlight.current = true;
+    setReminderBusy(true);
+    setReminderNote(getReminderWarning());
+    try {
+      const result = await operation();
       if (!result.ok) setReminderNote("Notifications are turned off for Mentication. You can allow them in your iPhone's Settings → Notifications.");
       else if (result.reason === "preview") setReminderNote("Saved. Reminders appear in the iPhone app.");
-    } else {
-      await disableDailyReminder();
+    } catch (error) {
+      setReminderNote(error instanceof Error ? error.message : "The reminder could not be changed. Please try again.");
+    } finally {
+      setReminder(getReminderPrefs());
+      const warning = getReminderWarning();
+      if (warning) setReminderNote(warning);
+      reminderInFlight.current = false;
+      setReminderBusy(false);
     }
-    setReminder(getReminderPrefs());
   };
+  const setReminderOn = (on) => changeReminder(() => on
+    ? enableDailyReminder(reminder.hour, reminder.minute)
+    : disableDailyReminder());
   const a11y = useAccessibility() || {};
   const { update } = a11y;
   const amb = useAccessibilityPrefs();
@@ -133,15 +147,15 @@ export default function Settings() {
           <div className="mt-3 rounded-2xl border border-border bg-card p-5">
             <p className="text-sm font-medium text-muted-foreground">Soundscape</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              {[{ v: "rain", label: "Soft rain" }, { v: "whitenoise", label: "Soft white noise" }].map((o) => (
+              {AMBIENT_OPTIONS.map((o) => (
                 <button
-                  key={o.v}
+                  key={o.id}
                   type="button"
-                  aria-pressed={amb.prefs.ambientType === o.v}
-                  onClick={() => amb.setPref("ambientType", o.v)}
+                  aria-pressed={amb.prefs.ambientType === o.id}
+                  onClick={() => amb.setPref("ambientType", o.id)}
                   className={
                     "no-tap rounded-2xl border py-3 text-sm font-medium transition-all active:scale-95 " +
-                    (amb.prefs.ambientType === o.v
+                    (amb.prefs.ambientType === o.id
                       ? "border-primary/0 bg-primary text-primary-foreground soft-depth"
                       : "border-border bg-card text-foreground hover:border-primary/30")
                   }
@@ -218,22 +232,19 @@ export default function Settings() {
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Daily reminder</p>
           <p className="mt-2 text-sm text-muted-foreground">A gentle nudge once a day. It's scheduled on this phone, never sent from anywhere.</p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Button variant={reminder.enabled ? "default" : "outline"} onClick={() => void setReminderOn(!reminder.enabled)} className="rounded-full" aria-pressed={reminder.enabled}>
+            <Button variant={reminder.enabled ? "default" : "outline"} onClick={() => void setReminderOn(!reminder.enabled)} className="rounded-full" disabled={reminderBusy} aria-busy={reminderBusy} aria-pressed={reminder.enabled}>
               {reminder.enabled ? "On" : "Off"}
             </Button>
             <label className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>at</span>
               <input
                 type="time"
+                disabled={reminderBusy}
                 value={`${String(reminder.hour).padStart(2, "0")}:${String(reminder.minute).padStart(2, "0")}`}
                 onChange={(event) => {
                   const [h, m] = event.target.value.split(":").map(Number);
                   if (!Number.isInteger(h) || !Number.isInteger(m)) return;
-                  // Only reschedule if reminders are already on. If they're
-                  // off, just remember the time for when they're turned on -
-                  // touching the picker shouldn't silently enable notifications.
-                  if (reminder.enabled) void setReminderOn(true, h, m);
-                  else { setReminderTime(h, m); setReminder(getReminderPrefs()); }
+                  void changeReminder(() => setReminderTime(h, m));
                 }}
                 className="min-h-11 rounded-full border border-border bg-background px-3 text-foreground"
                 aria-label="Reminder time"

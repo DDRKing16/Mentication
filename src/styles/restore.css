@@ -12,3 +12,9 @@
 .restore-sources { margin:28px 0; font-size:13px; line-height:1.6; }
 .restore-sources summary { min-height:44px; cursor:pointer; }
 .restore-sources a { display:block; min-height:44px; text-decoration:underline; }
+
+.restore-history-record h2 { font:400 25px/1.25 Georgia,serif; margin-bottom:12px; }
+.restore-history-record p,.restore-history-record time { display:block; margin:12px 0; line-height:1.6; }
+.restore-history-plan { white-space:pre-wrap; overflow-wrap:anywhere; }
+.restore-history-actions { display:flex; flex-wrap:wrap; gap:12px 24px; }
+.restore-history-actions a,.restore-history-actions button { min-height:44px; }

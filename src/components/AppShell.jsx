@@ -1,10 +1,11 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import TabBar from "@/components/TabBar";
-import Home from "@/pages/Home";
+
 
 // Each tab is mounted once and kept alive (hidden via display:none) so state
 // survives tab switches.
+const Home = lazy(() => import("@/pages/Home"));
 const InterventionLibrary = lazy(() => import("@/pages/InterventionLibrary"));
 const RegulationProfile = lazy(() => import("@/pages/RegulationProfile"));
 const MyPlan = lazy(() => import("@/pages/MyPlan"));
@@ -35,9 +36,9 @@ export default function AppShell() {
 
   return (
     <div className="relative min-h-full">
-      <div style={pathname === "/" ? visible : hidden} className="min-h-full">
-        <Home />
-      </div>
+      {shouldMount("/") && <div style={pathname === "/" ? visible : hidden} className="min-h-full">
+        <Suspense fallback={<PageSpinner />}><Home /></Suspense>
+      </div>}
       {shouldMount("/library") && (
         <div style={pathname === "/library" ? visible : hidden} className="min-h-full">
           <Suspense fallback={<PageSpinner />}>

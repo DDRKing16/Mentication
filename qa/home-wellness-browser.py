@@ -24,7 +24,7 @@ with sync_playwright() as p:
   assert abs(icon['width']-icon['height'])<1,'level artwork aspect ratio changed'
   expect(iframe.locator('#home-source')).to_have_count(0); expect(iframe.locator('.week-track')).to_be_visible()
   expect(iframe.locator('#week-heading')).to_have_text('Your week')
-  expect(iframe.locator('#wellness-status')).to_have_text('Setup required')
+  expect(iframe.locator('#wellness-status')).to_have_text('Not available yet')
   page.screenshot(path=str(OUT/f'home-{width}.png'))
   card=page.frames[1].locator('.week-panel').bounding_box()
   # The requested full-width house row takes natural height; never clip it to the old column layout.
@@ -35,7 +35,7 @@ with sync_playwright() as p:
   page.keyboard.press('Enter'); expect(iframe.locator('#wellness-dialog')).to_be_visible()
   expect(iframe.locator('#wellness-sources .wellness-source')).to_have_count(1)
   expect(iframe.locator('#wellness-sources button')).to_have_count(0)
-  expect(iframe.locator('#wellness-sources')).to_contain_text('Setup required')
+  expect(iframe.locator('#wellness-sources')).to_contain_text('Not available in this version')
   page.screenshot(path=str(OUT/f'setup-{width}.png'))
   iframe.get_by_role('button',name='Close wellness apps').click()
   expect(iframe.locator('#wellness-open')).to_be_focused()

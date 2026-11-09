@@ -99,7 +99,7 @@ export function validateTaraState(raw) {
   state.comparison = COMPARISONS.some(([value]) => value === raw.comparison) ? raw.comparison : '';
   state.support = ['racing', 'overwhelmed', 'step-out'].includes(raw.support) ? raw.support : '';
   state.plan = Object.fromEntries(['mind', 'notice', 'do', 'spikes'].map(key => [key, text(raw.plan?.[key])]));
-  if (raw.flowScreen !== undefined && !Object.hasOwn(FLOW_PHASES, raw.flowScreen)) return null;
+  if (raw.flowScreen !== undefined && !Object.prototype.hasOwnProperty.call(FLOW_PHASES, raw.flowScreen)) return null;
   state.flowScreen = FLOW_PHASES[raw.flowScreen] === state.phase ? raw.flowScreen : screenFor({ ...state, flowScreen: undefined });
   state.savePreference = ['save', 'skip'].includes(raw.savePreference) ? raw.savePreference : '';
   state.actionChoice = ['finished', 'stepped-out', 'not-attempted', 'unknown'].includes(raw.actionChoice) ? raw.actionChoice : '';
@@ -116,7 +116,7 @@ export function taraCompletion(state) {
 /** Draft edits cannot borrow the confirmation of different prediction words. */
 export function editTaraDraft(state, patch) {
   return { ...state, ...patch,
-    ...(Object.hasOwn(patch, 'prediction') && patch.prediction !== state.prediction ? { predictionConfirmed: false } : {}),
+    ...(Object.prototype.hasOwnProperty.call(patch, 'prediction') && patch.prediction !== state.prediction ? { predictionConfirmed: false } : {}),
     saved: false,
   };
 }

@@ -1,3 +1,4 @@
+import { createSecureId } from './secureId';
 // Source-only integration adapter. No registration/network activity at module load.
 const KEY = 'mentation.web-checkins.v1';
 const ID = /^[a-f0-9-]{36}$/;
@@ -76,7 +77,7 @@ export function startWebCheckIns(draftId, checkIns) {
       write(record); // Persist ownership BEFORE registering anything on the server.
     }
     // Each schedule gets a fresh opaque ID; late deliveries from old schedules are suppressed.
-    record = { ...record, planId: crypto.randomUUID(), draftId, endsAt: checkIns.endsAt, pendingCancel: true };
+    record = { ...record, planId: createSecureId(), draftId, endsAt: checkIns.endsAt, pendingCancel: true };
     write(record);
     await setActive(registration, null);
     try {

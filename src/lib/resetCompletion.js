@@ -138,7 +138,7 @@ export function resetCompletionSnapshot(snapshot, interventionId) {
   }
   const endpointMetadataValid = hasGoalBaseline({direction:snapshot.goalAssessment?.direction,goal_baseline:snapshot.goalAssessment}) && snapshot.goalAssessment.value === snapshot.goalRating;
   return { event:cleanEvent, result,
-    ...(snapshot.goalAssessmentInvalid === true || Object.hasOwn(snapshot, 'goalAssessment') && !endpointMetadataValid ? {goalAssessmentInvalid:true} : {}),
+    ...(snapshot.goalAssessmentInvalid === true || Object.prototype.hasOwnProperty.call(snapshot, 'goalAssessment') && !endpointMetadataValid ? {goalAssessmentInvalid:true} : {}),
     ...(endpointMetadataValid ? {goalAssessment:captureGoalBaseline(snapshot.goalAssessment.direction,snapshot.goalRating)} : {}),
     ...(snapshot.goalRating === null || bounded(snapshot.goalRating,0,10) ? {goalRating:snapshot.goalRating} : {}),
     ...(bounded(snapshot.completedAt,0,8640000000000000) ? {completedAt:snapshot.completedAt} : {}),

@@ -1,12 +1,16 @@
 # Mentication
 
 Mentication is a standalone, local-first wellbeing application built with
-React, Vite and Capacitor. V1 contains 25 interventions and requires no user
-account or application backend.
+React, Vite and Capacitor. Core practices require no user account or
+application backend. The Library also discovers the separate Restore pathway;
+Foundations and other reflective experiences have their own entry points.
 
 ## Architecture
 
 - The web application lives in `src/`.
+- Editable Home content lives in `design/home-source/`. The generated
+  `public/home.html` is recreated automatically before dev, test and build;
+  do not edit it directly.
 - Session history and personalisation data stay on the device through
   `src/lib/localData.js`.
 - Narration resolves only from the checked-in manifest and bundled audio.
@@ -16,6 +20,9 @@ account or application backend.
   are bundled in `public/signal-lock/` so its focus flow has no network or
   third-party runtime dependency.
 - `ios/` is the native Xcode project used for App Store builds.
+- Optional website check-ins use a separately configured delivery service. Core
+  practice content and saved reflections remain local; Oura is not available
+  until a real integration is configured.
 - No hosted application platform, remote database, analytics SDK or external
   checkout is required at runtime.
 
@@ -60,8 +67,9 @@ if a different registered identifier is required.
 
 ## Release model
 
-V1 is complete and account-free: all 25 interventions and local insights are
-available without payment. If subscriptions are introduced later, digital
+The current practice catalogue and local insights are account-free and
+available without payment. Launch readiness is tracked in the release checklist,
+not inferred from the catalogue size. If subscriptions are introduced later, digital
 feature unlocks in the iOS build must use Apple In-App Purchase; do not restore
 the retired web checkout inside the native application.
 

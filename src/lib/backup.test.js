@@ -99,3 +99,89 @@ describe('device-bound browser notification ownership', () => {
     expect(storage.getItem('daybook')).toBe(legacy.data.daybook);
   });
 });
+
+
+describe("full practice history backup and restore", () => {
+  const sessionKey = "mentation.sessions.v1";
+  const practices = (start, length) => Array.from({ length }, (_, index) => ({
+    id: `practice-${start + index}`,
+    created_date: new Date(Date.UTC(2024, 0, start + index + 1)).toISOString(),
+  }));
+
+  it("round-trips more than 500 practices without truncation", () => {
+    const history = practices(0, 750);
+    const backup = parseBackup(JSON.stringify(createBackup(memoryStorage({ [sessionKey]: JSON.stringify(history) }))));
+    expect(backupSessionCount(backup)).toBe(750);
+    const destination = memoryStorage();
+    restoreBackup(backup, destination);
+    expect(JSON.parse(destination.getItem(sessionKey))).toEqual([...history].reverse());
+  });
+
+  it("merges all unique practices, preserves backup precedence for duplicate IDs, and is repeatable", () => {
+    const current = practices(0, 700);
+    const incoming = practices(500, 700).map(record => ({ ...record, direction: "calm" }));
+    const backup = createBackup(memoryStorage({ [sessionKey]: JSON.stringify([...incoming, incoming[0]]) }));
+    const destination = memoryStorage({ [sessionKey]: JSON.stringify(current) });
+    restoreBackup(backup, destination);
+    const restored = JSON.parse(destination.getItem(sessionKey));
+    expect(restored).toHaveLength(1200);
+    expect(restored.map(record => record.id)).toEqual(practices(0, 1200).reverse().map(record => record.id));
+    expect(restored.find(record => record.id === "practice-500").direction).toBe("calm");
+    expect(restored.find(record => record.id === "practice-0")).toEqual(current[0]);
+    restoreBackup(backup, destination);
+    expect(JSON.parse(destination.getItem(sessionKey))).toEqual(restored);
+  });
+
+  it("does not silently discard a legacy record with an empty string ID", () => {
+    const destination = memoryStorage({ [sessionKey]: JSON.stringify([{ id: "", direction: "calm" }]) });
+    restoreBackup(createBackup(memoryStorage({ [sessionKey]: JSON.stringify(practices(0, 1)) })), destination);
+    expect(JSON.parse(destination.getItem(sessionKey))).toContainEqual({ id: "", direction: "calm" });
+  });
+
+  it("keeps existing history and rolls back earlier values when a full-history merge exceeds quota", () => {
+    const original = { daybook: "old notes", [sessionKey]: JSON.stringify(practices(0, 750)) };
+    const destination = memoryStorage(original);
+    const setItem = destination.setItem;
+    destination.setItem = (key, value) => {
+      if (key === sessionKey) throw new DOMException("Storage full", "QuotaExceededError");
+      setItem(key, value);
+    };
+    const backup = createBackup(memoryStorage({ daybook: "restored notes", "mentation.preference": "new", [sessionKey]: JSON.stringify(practices(750, 750)) }));
+    expect(() => restoreBackup(backup, destination)).toThrow("Your previous data has been kept");
+    expect(destination.dump()).toEqual(original);
+  });
+
+  it("restores the entire old history when a later backup write exceeds quota", () => {
+    const original = { [sessionKey]: JSON.stringify(practices(0, 750)), daybook: "old notes" };
+    const destination = memoryStorage(original);
+    const setItem = destination.setItem;
+    destination.setItem = (key, value) => {
+      if (key === "daybook") throw new DOMException("Storage full", "QuotaExceededError");
+      setItem(key, value);
+    };
+    const backup = createBackup(memoryStorage({ [sessionKey]: JSON.stringify(practices(750, 750)), daybook: "new notes" }));
+    expect(() => restoreBackup(backup, destination)).toThrow("Your previous data has been kept");
+    expect(destination.dump()).toEqual(original);
+  });
+});
+
+describe("device-bound uncertain reminder state", () => {
+  const key = "mentation.reminders.uncertain.v1";
+  it("does not export the source device's uncertain scheduling marker", () => {
+    const source = memoryStorage({ [key]: "true", daybook: "notes" });
+    expect(createBackup(source).data).toEqual({ daybook: "notes" });
+    expect(source.getItem(key)).toBe("true");
+  });
+  it("does not import a legacy marker onto a different device", () => {
+    const destination = memoryStorage();
+    const backup = { format: "mentication-backup", version: 1, data: { [key]: "true", daybook: "notes" } };
+    expect(restoreBackup(backup, destination)).toBe(1);
+    expect(destination.dump()).toEqual({ daybook: "notes" });
+  });
+  it("does not let an incoming backup clear the destination device's marker", () => {
+    const destination = memoryStorage({ [key]: "true" });
+    const backup = { format: "mentication-backup", version: 1, data: { [key]: "false", daybook: "notes" } };
+    expect(restoreBackup(backup, destination)).toBe(1);
+    expect(destination.dump()).toEqual({ [key]: "true", daybook: "notes" });
+  });
+});

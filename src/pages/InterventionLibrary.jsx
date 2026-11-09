@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { PRACTICE_PREVIEWS, practiceDuration, practiceDestination, practiceSearchMatches, PRACTICE_CATEGORIES } from "@/lib/practiceDiscovery";
+import { PRACTICE_PREVIEWS, practiceDuration, practiceDestination, practiceSearchMatches, PRACTICE_CATEGORIES, RESTORE_DISCOVERY } from "@/lib/practiceDiscovery";
 import "@/styles/discovery.css";
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ const CATEGORY_SHORT = {
   focus: "Focus",
   sleep: "Sleep",
   reset: "Reset",
+  restore: "Restore",
 };
 
 // User-friendly filters mapped to existing intervention metadata.
@@ -136,7 +137,7 @@ export default function InterventionLibrary() {
   const grouped = useMemo(() => {
     const term = q.trim().toLowerCase();
     const activeFilters = FILTERS.filter((f) => filters[f.key]);
-    const allItems = [...INTERVENTIONS, DEAR_2100_INTERVENTION];
+    const allItems = [...INTERVENTIONS, DEAR_2100_INTERVENTION, ...RESTORE_DISCOVERY];
     let list = allItems.filter((iv) => {
       if (cat && iv.primaryDirection !== cat && !(iv.directions || []).includes(cat)) return false;
       if (activeFilters.length && !activeFilters.every((f) => f.test(iv))) return false;
@@ -153,15 +154,15 @@ export default function InterventionLibrary() {
   return (
     <main className="discovery-page discovery-page--tab">
       <div className="discovery-shell library-shell">
-        <header className="discovery-header"><p className="discovery-eyebrow">Intervention Library · {INTERVENTIONS.length + 1} practices</p><h1>Find your way in.</h1><p>A small action, a different perspective, a place to pause.</p></header>
+        <header className="discovery-header"><p className="discovery-eyebrow">Intervention Library · {INTERVENTIONS.length + 1} practices · {RESTORE_DISCOVERY.length} restoring activities</p><h1>Find your way in.</h1><p>A small action, a different perspective, a place to pause.</p></header>
         <Link to="/start" className="library-guide"><span>Not sure? Choose what you need</span><ArrowRight size={18} aria-hidden="true" /></Link>
         <div className="relative mt-5">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search practices…"
-            aria-label="Search practices"
+            placeholder="Search practices and restoring activities…"
+            aria-label="Search practices and restoring activities"
             className="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-11 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
           {q && (
@@ -214,15 +215,17 @@ export default function InterventionLibrary() {
             {FILTERS.map(f => <button type="button" key={f.key} aria-pressed={!!filters[f.key]} onClick={() => toggleFilter(f.key)}>{f.label}</button>)}
           </div>
         </details>
-        <div className="library-result-line"><p role="status">{resultCount} {resultCount === 1 ? 'practice' : 'practices'}{cat ? ` · ${CATEGORY_LABELS[cat]}` : ''}{activeCount ? ` · ${activeCount} ${activeCount === 1 ? 'filter' : 'filters'}` : ''}</p>{hasRefinement && <button type="button" onClick={() => setParams({}, { replace: true, preventScrollReset: true })}>Clear all</button>}</div>
+        <div className="library-result-line"><p role="status">{resultCount} {resultCount === 1 ? 'option' : 'options'}{cat ? ` · ${CATEGORY_LABELS[cat]}` : ''}{activeCount ? ` · ${activeCount} ${activeCount === 1 ? 'filter' : 'filters'}` : ''}</p>{hasRefinement && <button type="button" onClick={() => setParams({}, { replace: true, preventScrollReset: true })}>Clear all</button>}</div>
         <div className="mt-8 flex flex-col gap-10">
           {grouped.map((g) => (
             <section key={g.category}>
               <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                 {CATEGORY_LABELS[g.category] || g.category} · {g.items.length}
               </h2>
+              {g.category === 'restore' && <p className="mt-2 text-sm text-muted-foreground">General rest and recovery ideas, separate from clinical practices and recommendation scoring.</p>}
               <div className="mt-3 flex flex-col gap-2">
                 {g.items.map((iv) => {
+                  if (iv.restoreId) return <button key={iv.id} type="button" className="discovery-choice" onClick={() => launch(iv)}><span><strong>{iv.name}</strong><small>{practiceDuration(iv)}</small><small>{iv.why}</small></span><ArrowRight size={19} aria-hidden="true" /></button>;
                   const isKing = iv.isKing;
                   if (!isKing) {
                     return <WorldCard key={iv.id} id={iv.id} name={iv.name} meta={practiceDuration(iv)} why={PRACTICE_PREVIEWS[iv.id] || iv.why} iv={iv} onClick={() => launch(iv)} />;

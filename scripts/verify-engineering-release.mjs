@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+assert(readFileSync('public/home.html').equals(readFileSync('dist/home.html')), 'Production Home must match the freshly generated source artifact');
+const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+const versions = ['core', 'ios', 'cli'].map(name => lock.packages[`node_modules/@capacitor/${name}`]?.version);
+assert(versions.every(version => version && version === versions[0]), 'Capacitor core, iOS and CLI must resolve to the same tested version');
+const [major, minor, patch] = versions[0].split('.').map(Number);
+assert(major > 8 || major === 8 && (minor > 5 || minor === 5 && patch >= 1), 'Use a patched Capacitor release (8.5.1 or later)');
+assert(readFileSync('ios/App/CapApp-SPM/Package.swift', 'utf8').includes(`exact: "${versions[0]}"`), 'Run ios:sync: the native Capacitor pin differs from the lockfile');
+const files = directory => readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
+  const path = join(directory, entry.name);
+  return entry.isDirectory() ? files(path) : [{ path, bytes: statSync(path).size }];
+});
+const javascript = files('dist/assets').filter(file => file.path.endsWith('.js'));
+const oversized = javascript.filter(file => file.bytes > 512000);
+assert.equal(oversized.length, 0, `JavaScript chunks exceed500 KiB: ${oversized.map(file => `${file.path} (${file.bytes} bytes)`).join(', ')}`);
+const publicBytes = files('public').reduce((total, file) => total + file.bytes, 0);
+assert(publicBytes <= 200 * 1024 * 1024, 'Public assets exceed the200 MiB review budget.');
+console.log(JSON.stringify({ capacitor: versions[0], largestJavaScriptBytes: Math.max(...javascript.map(file => file.bytes)), bundledPublicBytes: publicBytes }));

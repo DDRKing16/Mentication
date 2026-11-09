@@ -16,13 +16,15 @@
     "test": "vitest run",
     "narration:audit": "node scripts/final50-narration.mjs --audit",
     "narration:generate-final50": "node scripts/final50-narration.mjs --generate",
-    "prebuild": "node scripts/build-home-document.mjs && node scripts/build-dear2100.mjs"
+    "prebuild": "node scripts/build-home-document.mjs && node scripts/build-dear2100.mjs",
+    "predev": "node scripts/build-home-document.mjs",
+    "pretest": "node scripts/build-home-document.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.1",
-    "@capacitor/core": "^8.5.0",
+    "@capacitor/core": "^8.5.1",
     "@capacitor/haptics": "^8.0.2",
-    "@capacitor/ios": "^8.5.0",
+    "@capacitor/ios": "^8.5.1",
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
@@ -46,7 +48,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.0",
+    "@capacitor/cli": "^8.5.1",
     "@eslint/js": "^9.19.0",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",
@@ -63,7 +65,7 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.2",
-    "vite": "^6.1.0",
-    "vitest": "^4.1.11"
+    "vite": "^6.4.5",
+    "vitest": "^4.1.12"
   }
 }

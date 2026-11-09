@@ -2124,8 +2124,8 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
         <dialog ref={pauseDialog} className="pause-overlay" aria-labelledby="nes-pause-title" onClose={() => setShowPause(false)} onCancel={() => setShowPause(false)} onClick={event => { if (event.target === event.currentTarget) setShowPause(false); }} onKeyDown={event => {
           if (event.key !== 'Tab') return;
           const buttons = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled)'));
-          if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons.at(-1)?.focus(); }
-          else if (!event.shiftKey && document.activeElement === buttons.at(-1)) { event.preventDefault(); buttons[0]?.focus(); }
+          if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons[buttons.length - 1]?.focus(); }
+          else if (!event.shiftKey && document.activeElement === buttons[buttons.length - 1]) { event.preventDefault(); buttons[0]?.focus(); }
         }}>
           <div className="pause-card" onClick={(e) => e.stopPropagation()} style={{ borderRadius: "32px" }}>
             <div className="emoji-badge" style={{

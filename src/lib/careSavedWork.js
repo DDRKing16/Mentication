@@ -9,11 +9,11 @@ const LABELS = {
 const words = value => typeof value === 'string' ? value.trim() : '';
 /** One presentation contract for the native card and its saved-work preview. */
 export function careSavedWorkRows(id,state) {
-  if (!Object.hasOwn(LABELS,id) || !state) return [];
+  if (!Object.prototype.hasOwnProperty.call(LABELS,id) || !state) return [];
   const labels = LABELS[id], rows=[];
   if (words(state.notice)) rows.push({kind:'notice',label:labels[0],value:words(state.notice)});
   if (words(state.perspective) && (id !== 'makeRoom' || state.practiceTaken === true)) rows.push({kind:'response',label:labels[1],value:words(state.perspective)});
-  if (Object.hasOwn(EXTERNAL_ANCHORS,state.anchorType)) {
+  if (Object.prototype.hasOwnProperty.call(EXTERNAL_ANCHORS,state.anchorType)) {
     const fallback={object:'An ordinary object',sound:'A sound in the room',support:'The surface supporting me'};
     rows.push({kind:'anchor',label:id === 'unhook' ? 'Attention for my chosen step' : state.anchorNoticed ? 'An anchor I noticed' : 'An anchor I chose',value:id === 'unhook' ? attentionTarget(state) : words(state.anchorText)||fallback[state.anchorType]});
   }

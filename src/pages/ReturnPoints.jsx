@@ -110,6 +110,7 @@ export default function ReturnPoints() {
       <Link className="min-h-11 inline-block underline mr-4" to="/reset" state={{ prebuilt: true, pathway: [id], direction: INTERVENTIONS.find(iv => iv.id === id)?.primaryDirection, intensity: null, timeMin: 3, audio: "no" }}>Open practice and saved card</Link>
       <button className="min-h-11 underline" onClick={() => { if (deleteCareSaved(id)) { setCards(current => current.filter(card => card.id !== id)); setError(""); } else setError("Could not delete this saved card. Try again."); }}>Delete saved card</button>
     </article>)}
+    <Link className="discovery-choice my-6" to="/restore?view=history"><span><strong>Restore · saved breaks and plans</strong><small>Review completed breaks, stopped activities and plans saved on this device.</small></span><ArrowRight size={18} aria-hidden="true" /></Link>
     <details className="mt-8 rounded-2xl border border-border bg-card p-5"><summary className="min-h-11 cursor-pointer font-heading text-xl">Saved work inside your practices</summary>
     <p className="my-3">Open a practice to review or manage what you saved there. These links do not mean a record already exists.</p>
     <div className="grid gap-3">{archives.map(([id, meta]) => <Link key={id} className="min-h-14 rounded-2xl border border-border p-4 underline" to={meta.archive}>{meta.name}</Link>)}</div>

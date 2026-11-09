@@ -49,8 +49,8 @@ function Dialog({ title, onClose, children, description }) {
     if (event.key === 'Escape') onClose();
     if (event.key !== 'Tab') return;
     const items = Array.from(root.current.querySelectorAll('button:not(:disabled), textarea, select, summary, input, [tabindex="0"]'));
-    if (event.shiftKey && document.activeElement === items[0]) { event.preventDefault(); items.at(-1)?.focus(); }
-    else if (!event.shiftKey && document.activeElement === items.at(-1)) { event.preventDefault(); items[0]?.focus(); }
+    if (event.shiftKey && document.activeElement === items[0]) { event.preventDefault(); items[items.length - 1]?.focus(); }
+    else if (!event.shiftKey && document.activeElement === items[items.length - 1]) { event.preventDefault(); items[0]?.focus(); }
   }}><section ref={root} className="tara-dialog" role="dialog" aria-modal="true" aria-labelledby="tara-dialog-title"><div className="tara-dialog-header"><h2 id="tara-dialog-title">{title}</h2><button className="tara-icon" onClick={onClose} aria-label="Close dialog"><X size={19} /></button></div>{description && <p className="tara-muted">{description}</p>}{children}</section></div>;
 }
 function Editor({ label, value, onSave, onClose }) {

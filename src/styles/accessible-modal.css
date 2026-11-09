@@ -1,0 +1,5 @@
+.mcn-accessible-modal { width:min(28rem,calc(100vw - 2rem)); max-width:calc(100vw - 2rem); max-height:calc(100vh - 2rem); max-height:calc(100dvh - 2rem); margin:auto; padding:0; border:0; border-radius:1.5rem; background:transparent; color:inherit; overflow:auto; overscroll-behavior:contain; }
+.mcn-accessible-modal::backdrop { background:rgb(0 0 0 / .5); backdrop-filter:blur(4px); }
+.mcn-accessible-modal :focus-visible { outline:3px solid currentColor; outline-offset:3px; }
+.mcn-modal-layer[data-fallback=true] { position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center; padding:1rem; background:rgba(0,0,0,.5); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+.mcn-modal-layer[data-fallback=true] .mcn-accessible-modal { display:block; position:relative; inset:auto; margin:0; flex:none; }

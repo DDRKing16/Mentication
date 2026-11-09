@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import FlowHomeButton from "@/components/FlowHomeButton";
@@ -24,7 +25,7 @@ export function BuildingResetScreen() {
       >
         Building your reset…
       </motion.p>
-      <p className="text-muted-foreground">Finding a starting practice from your answers.</p>
+      <p className="text-muted-foreground">Preparing a starting practice.</p>
     </div>
   );
 }
@@ -54,12 +55,16 @@ export function ResetOverview({ answers, isPrebuilt, pathway, setAnswers, onBegi
             {["happyBump", "progressive-muscle-relaxation-v2"].includes(pathway[0]?.id) ? "Your flexible reset" : `Your ${answers.timeMin}-minute reset`}
           </h1>
           <p className="mt-2 max-w-lg text-[0.98rem] leading-relaxed text-muted-foreground text-balance">
-            {isPrebuilt
+            {answers.immediate
+              ? "A suggested calm practice for a quick start. You can choose a different goal or time before beginning."
+              : isPrebuilt
               ? `${pathway.length} practice${pathway.length === 1 ? "" : "s"}, one at a time.`
               : "A starting practice based on your answers. The next step can change after your check-in."}
           </p>
 
-          {!isPrebuilt && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">You chose {answers.directionLabel || answers.direction}{Number.isFinite(answers.timeMin) ? ` and ${answers.timeMin} minutes` : ''}. Your current answers and any saved local feedback guide this starting suggestion. You can adapt it or stop.</p>}
+          {!isPrebuilt && !answers.immediate && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">You chose {answers.directionLabel || answers.direction}{Number.isFinite(answers.timeMin) ? ` and ${answers.timeMin} minutes` : ''}. Your current answers and any saved local feedback guide this starting suggestion. You can adapt it or stop.</p>}
+
+          {answers.immediate && <Link to="/start" className="mt-3 inline-flex min-h-11 items-center self-start font-medium text-primary underline underline-offset-4">Choose my goal and time</Link>}
 
           <motion.section
             initial={{ opacity: 0, y: 10 }}

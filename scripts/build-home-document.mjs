@@ -15,7 +15,11 @@ const css = readFileSync(resolve(dir, 'styles.css'), 'utf8');
 // The Peace Palace drawing is shared with the React app: inline it (minus
 // its `export`) ahead of app.js so both show the identical building.
 const palaceArt = readFileSync(resolve(root, 'src/lib/palaceArt.js'), 'utf8').replace(/^export /gm, '');
-const js = `${palaceArt}\n${readFileSync(resolve(dir, 'app.js'), 'utf8')}`;
+const dialogSource = readFileSync(resolve(root, 'src/lib/accessibleDialog.js'), 'utf8').replace(/^export /gm, '');
+const homeSource = readFileSync(resolve(dir, 'app.js'), 'utf8').replace(/^import \{ openAccessibleDialog as openHomeDialog \} from [^\n]+\n/, '');
+// Share the tested fallback without a package dependency or global focus override.
+const dialogCode = `const openHomeDialog = (() => {\n${dialogSource}\nreturn openAccessibleDialog;\n})();`;
+const js = `${palaceArt}\n${dialogCode}\n${homeSource}`;
 const dataUri = (file, mime) => `data:${mime};base64,${readFileSync(resolve(dir, file)).toString('base64')}`;
 
 html = html.replaceAll('assets/images/approved-homescreen.png', dataUri('assets/images/approved-homescreen.png', 'image/png'));
@@ -25,7 +29,7 @@ for (const shot of ['journal', 'good-map', 'dear2100', 'premium-felt']) {
   html = html.replaceAll(`assets/preview/${shot}.jpg`, dataUri(`assets/preview/${shot}.jpg`, 'image/jpeg'));
 }
 html = html.replace('<link rel="stylesheet" href="styles.css">', `<style>\n${css}\n</style>`);
-html = html.replace('<script defer src="app.js"></script>', '');
+html = html.replace('<script type="module" src="app.js"></script>', '');
 html = html.replace('</body>', `<script>\n${js.replaceAll('</script', '<\\/script')}\n</script>\n</body>`);
 
 writeFileSync(resolve(root, 'public/home.html'), html);

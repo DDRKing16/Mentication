@@ -6,7 +6,7 @@ const LABELS = { hands: 'Hands & forearms', shoulders: 'Arms & shoulders', face:
 // is navigation, never evidence that a muscle relaxed or a user felt better.
 export function pmrRouteGroups(steps = []) {
   return steps.reduce((groups, step, index) => {
-    const previous = groups.at(-1);
+    const previous = groups[groups.length - 1];
     if (previous?.region === step.region) previous.end = index;
     else groups.push({ region: step.region, label: step.region === 'whole' ? index === 0 ? 'Settle in' : 'Rest & return' : LABELS[step.region] || step.title, start: index, end: index });
     return groups;

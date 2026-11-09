@@ -10,7 +10,7 @@ import {readRecordList,writeVerified,removeVerified} from './verifiedStorage';
 // must remain on the originating device so another backup cannot take it over.
 
 const PREFIXES = ["mentation.", "mentication.", "mentication_", "haven.", "haven_", "dear2100", "goodmap-", "gm_"];
-const EXCLUDED = new Set(["mentication.plus.v1", "mentation.reminders.v1", "mentation.web-checkins.v1"]);
+const EXCLUDED = new Set(["mentication.plus.v1", "mentation.reminders.v1", "mentation.reminders.uncertain.v1", "mentation.web-checkins.v1"]);
 const SESSION_KEY = "mentation.sessions.v1";
 const FORMAT = "mentication-backup";
 
@@ -60,9 +60,9 @@ function mergeSessions(current, incoming) {
   const parse = raw => readRecordList({getItem:()=>raw}, SESSION_KEY);
   const byId = new Map();
   for (const session of [...parse(incoming), ...parse(current)]) {
-    if (session?.id && !byId.has(session.id)) byId.set(session.id, session);
+    if (!byId.has(session.id)) byId.set(session.id, session);
   }
-  return JSON.stringify([...byId.values()].sort((a, b) => Date.parse(b.created_date || 0) - Date.parse(a.created_date || 0)).slice(0, 500));
+  return JSON.stringify([...byId.values()].sort((a, b) => Date.parse(b.created_date || 0) - Date.parse(a.created_date || 0)));
 }
 
 /**
@@ -79,7 +79,13 @@ export function restoreBackup(backup, storage = globalThis.localStorage) {
   } catch {
     let recovered=true;
     for(const change of attempted.reverse()) {
-      try { if(change.previous===null)removeVerified(storage,change.key);else writeVerified(storage,change.key,change.previous); }
+      try {
+        // Failed setItem calls (including quota errors) leave the old value in
+        // place. Do not retry an unnecessary write against an unavailable store.
+        if (storage.getItem(change.key) === change.previous) continue;
+        if(change.previous===null)removeVerified(storage,change.key);
+        else writeVerified(storage,change.key,change.previous);
+      }
       catch { recovered=false; }
     }
     throw new Error(recovered?'Restore could not be saved. Your previous data has been kept. Try again.':'Restore did not finish and some data could not be recovered. Keep your backup and try again when device storage is available.');

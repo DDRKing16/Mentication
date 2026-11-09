@@ -12,7 +12,7 @@ export const CARE_SCREEN_PATHS = Object.freeze({
   unhook: ['intro','before','notice','frame','action','return','status','after','card'],
   makeRoom: ['intro','before','notice','anchor','outside','room-ready','allow','action','status','after','card'],
 });
-export const validCareScreen = value => typeof value === 'string' && Object.hasOwn(CARE_SCREEN_STAGES, value);
+export const validCareScreen = value => typeof value === 'string' && Object.prototype.hasOwnProperty.call(CARE_SCREEN_STAGES, value);
 export function validCareScreenFor(id, screen) {
   const extra = ['save',...(id === 'selfCompassion' ? ['tone'] : []),'notice-own','action-own','options','orient', ...(id === 'selfCompassion' ? ['response-own'] : id === 'unhook' ? ['pattern','anchor','anchor-own','re-hook','return-next'] : ['anchor-own'])];
   return !!CARE_SCREEN_PATHS[id] && (CARE_SCREEN_PATHS[id].includes(screen) || extra.includes(screen));
@@ -47,12 +47,12 @@ export function careScreen(id, state, choices = {}) {
 export function careForwardPatch(id, state, from, to, values = {}) {
   if (!validCareScreenFor(id, to)) throw new Error('Unknown care screen');
   const history = Array.isArray(state.careTrail) ? state.careTrail : [];
-  const confirmed = { ...(Object.hasOwn(values,'notice') && !to.endsWith('-own') ? {noticeConfirmed:true} : {}), ...(Object.hasOwn(values,'perspective') && ['say','tone','frame'].includes(to) && !(id === 'unhook' && ['notice','notice-own'].includes(from)) ? {responseConfirmed:true} : {}), ...(Object.hasOwn(values,'action') && ['status','anchor','return'].includes(to) ? {actionConfirmed:true} : {}) };
+  const confirmed = { ...(Object.prototype.hasOwnProperty.call(values,'notice') && !to.endsWith('-own') ? {noticeConfirmed:true} : {}), ...(Object.prototype.hasOwnProperty.call(values,'perspective') && ['say','tone','frame'].includes(to) && !(id === 'unhook' && ['notice','notice-own'].includes(from)) ? {responseConfirmed:true} : {}), ...(Object.prototype.hasOwnProperty.call(values,'action') && ['status','anchor','return'].includes(to) ? {actionConfirmed:true} : {}) };
   return { ...values, ...confirmed, stage: CARE_SCREEN_STAGES[to], careScreen: to, careTrail: from === to ? history : [...history, from].slice(-64) };
 }
 export function careBackPatch(id, state, from) {
   const history = (state.careTrail || []).filter(step => validCareScreenFor(id, step));
-  let to = history.at(-1);
+  let to = history[history.length - 1];
   if (id === 'unhook' && to === 'return-next') to = 'status';
   if (!to) {
     const custom = { tone:'response',save:'after','notice-own': 'notice', 'response-own': 'response', 'action-own': 'action', 'anchor-own': 'anchor', 're-hook': 'status', pattern:'frame', anchor: id === 'unhook' ? 'return' : 'notice', options: 'card', orient: id === 'selfCompassion' ? 'say' : id === 'unhook' ? 'return' : 'outside' };
@@ -62,7 +62,7 @@ export function careBackPatch(id, state, from) {
   const trail = history.slice(0, -1);
   if (id === 'makeRoom' && from === 'orient' && to === 'allow' && !state.allowance) {
     to = state.anchorType ? 'outside' : 'anchor';
-    if (trail.at(-1) === to) trail.pop();
+    if (trail[trail.length - 1] === to) trail.pop();
   }
   return { stage: CARE_SCREEN_STAGES[to], careScreen: to, careTrail: trail };
 }
@@ -74,7 +74,7 @@ export function careSavedMatches(state, saved) {
 export function careScreenProgress(id, state, screen) {
   const related = { pattern:'frame', ...(id === 'unhook' ? {anchor:'return','return-next':'status'} : {}), tone:'response',save:'card','notice-own': 'notice', 'response-own': 'response', 'action-own': 'action', 'anchor-own': id === 'unhook' ? 'return' : 'anchor', 're-hook': 'return',  };
   const path = CARE_SCREEN_PATHS[id];
-  const context = ['options','orient'].includes(screen) ? state.careTrail?.at(-1) || 'intro' : screen;
+  const context = ['options','orient'].includes(screen) ? state.careTrail?.[state.careTrail.length - 1] || 'intro' : screen;
   return Math.max(0, path.indexOf(related[context] || context)) / (path.length - 1) * 7;
 }
 
