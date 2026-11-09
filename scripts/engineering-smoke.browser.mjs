@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
+import { checkPracticeDialogs } from './practice-dialog-smoke.browser.mjs';
+import { checkJourneyDialogs } from './journey-dialog-smoke.browser.mjs';
 const playwright = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',');
 const port = Number(process.env.SMOKE_PORT ||4179);
@@ -9,9 +11,16 @@ const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'previe
 let serverLog = '';
 server.stdout.on('data', data => { serverLog += data; });
 server.stderr.on('data', data => { serverLog += data; });
-async function context(browser) {
+async function context(browser, legacyDialog = false) {
   const value = await browser.newContext({ viewport: { width:390, height:844 }, hasTouch:true });
-  await value.addInitScript(() => { if(window === window.top) localStorage.setItem('haven_onboarded','1'); });
+  await value.addInitScript(legacy => {
+    if(window === window.top) localStorage.setItem('haven_onboarded','1');
+    if (legacy && window.HTMLDialogElement) {
+      for (const method of ['showModal', 'close']) {
+        Object.defineProperty(HTMLDialogElement.prototype, method, { configurable:true, value:undefined });
+      }
+    }
+  }, legacyDialog);
   return value;
 }
 async function ready(page) {
@@ -20,6 +29,25 @@ async function ready(page) {
     return home?.getAttribute('aria-busy') === 'false' && home.querySelector('iframe')?.getAttribute('aria-hidden') === 'false';
   }, null, { timeout:20000 });
 }
+async function checkHomeDialog(page, base) {
+  await page.goto(base); await ready(page);
+  const home = page.frameLocator('iframe[title="MentiCation home"]');
+  const opener = home.locator('#accessibility-open'), dialog = home.locator('#accessibility-dialog');
+  const before = await home.locator('body').evaluate(node => node.style.overflow);
+  await opener.click(); await dialog.waitFor({ state:'visible' });
+  // A native close event is queued: reopening in the same task must not allow
+  // that stale event to tear down the new modal instance.
+  await dialog.evaluate(async node => {
+    node.querySelector('[data-close]').click();
+    document.getElementById('accessibility-open').click();
+    await new Promise(resolve => setTimeout(resolve,50));
+  });
+  assert(await dialog.isVisible(), 'Queued close must not dismiss the reopened Home dialog');
+  await page.keyboard.press('Escape'); await dialog.waitFor({ state:'hidden' });
+  assert.equal(await home.locator('body').evaluate(node => node.style.overflow), before);
+  assert(await opener.evaluate(node => document.activeElement === node && !node.closest('[inert]')));
+}
+
 try {
   let listening = false;
   for(let attempt=0;attempt<100;attempt++) {
@@ -60,6 +88,21 @@ try {
       assert.equal(await recovery.getByRole('button',{name:'Retry home',exact:true}).count(),0,'Successful retry must remove fallback');
       await failed.close();
       console.log(`PASS ${name}: Home handshake, phone fit, direct Library isolation, privacy, fallback, Back and retry`);
+      for (const legacy of [false, true]) {
+        for (const [suite, check] of [['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog]]) {
+          const dialogs = await context(browser, legacy), dialogPage = await dialogs.newPage(), dialogErrors = [];
+          dialogPage.on('pageerror', error => dialogErrors.push(error.message));
+          try {
+            await check(dialogPage, origin);
+            assert.deepEqual(dialogErrors, [], `${suite} produced browser exceptions`);
+            console.log(`PASS ${name} ${legacy ? 'without native dialog APIs' : 'native dialog APIs'}: ${suite}`);
+          } catch (error) {
+            console.error(`FAIL ${name} ${legacy ? 'legacy' : 'native'} ${suite} at ${dialogPage.url()}`);
+            console.error((await dialogPage.locator('body').innerText().catch(() => '')).slice(0,4000));
+            throw error;
+          } finally { await dialogs.close(); }
+        }
+      }
     } finally { await browser.close(); }
   }
 } finally { server.kill('SIGTERM'); }

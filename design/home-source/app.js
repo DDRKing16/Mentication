@@ -90,7 +90,7 @@ import { openAccessibleDialog as openHomeDialog } from '../../src/lib/accessible
         if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) closeDialog(dialog);
       }
     });
-    dialog.addEventListener('close', () => closeDialog(dialog));
+    dialog.addEventListener('close', () => { if (!dialog.open) closeDialog(dialog); });
   });
   document.getElementById('menu-open').addEventListener('click', event => openDialog('menu-dialog', event.currentTarget));
   document.getElementById('accessibility-open').addEventListener('click', event => openDialog('accessibility-dialog', event.currentTarget));

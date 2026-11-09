@@ -9,13 +9,13 @@ function fixture() {
     defaultView:{ MutationObserver:class { constructor(callback) { this.callback=callback; observers.push(this); } observe() {} disconnect() { this.disconnected=true; } } },
   };
   const make = () => { const attrs=new Map(); return {
-    ownerDocument:doc,isConnected:true,style:{pointerEvents:''},dataset:{},children:[],items:[],tabIndex:0,classList:{contains:()=>false},
-    getAttribute:name=>attrs.get(name)??null,
-    setAttribute(name,value) { attrs.set(name,value); if(name==='open')this.open=true; },
-    removeAttribute(name) { attrs.delete(name); if(name==='open')this.open=false; },
+    ownerDocument:doc,isConnected:true,style:{pointerEvents:'',zIndex:''},dataset:{},children:[],items:[],tabIndex:0,classList:{contains:()=>false},
+    getAttribute(name) { return name==='data-fallback' ? this.dataset.fallback??null : attrs.get(name)??null; },
+    setAttribute(name,value) { attrs.set(name,value); if(name==='data-fallback')this.dataset.fallback=value; if(name==='open')this.open=true; },
+    removeAttribute(name) { attrs.delete(name); if(name==='data-fallback')delete this.dataset.fallback; if(name==='open')this.open=false; },
     append(child) { child.parentElement=this;this.children.push(child); },
     contains(child) { return child===this || this.children.some(item=>item.contains(child)); },
-    querySelectorAll() { return this.items; },getClientRects() { return [1]; },
+    querySelectorAll(selector) { return this.items.filter(item=>!item.isSummary||selector.split(',').includes('summary')); },getClientRects() { return [1]; },
     closest() { for(let p=this;p;p=p.parentElement)if(p.getAttribute('hidden')!==null||p.getAttribute('inert')!==null||p.getAttribute('aria-hidden')==='true')return p;return null; },
     focus:vi.fn(function(){doc.activeElement=this;doc.fire('focusin',{target:this});}),
   }; };
@@ -34,4 +34,123 @@ describe('accessible dialog compatibility lifecycle',()=>{
  it('falls back when a partial native implementation throws',()=>{const f=fixture(),m=f.modal();m.node.showModal=()=>{throw new Error('unsupported');};m.node.close=vi.fn();const cleanup=openAccessibleDialog(m.node,m.layer,{opener:f.opener,onClose:vi.fn()});expect(m.layer.dataset.fallback).toBe('true');cleanup();expect(m.node.close).not.toHaveBeenCalled();});
  it('isolates new portals and preserves hidden sibling attributes',()=>{const f=fixture(),m=f.modal();f.root.setAttribute('aria-hidden','true');f.root.setAttribute('inert','original');const cleanup=openAccessibleDialog(m.node,m.layer,{opener:f.opener,onClose:vi.fn()});const portal=f.make();f.body.append(portal);f.observers[0].callback();expect(portal.getAttribute('aria-hidden')).toBe('true');cleanup();expect(portal.getAttribute('aria-hidden')).toBeNull();expect(f.root.getAttribute('aria-hidden')).toBe('true');expect(f.root.getAttribute('inert')).toBe('original');});
  it('keeps newer modals usable and restores the underlying modal',()=>{const f=fixture(),one=f.modal(),closeOne=vi.fn(),cleanupOne=openAccessibleDialog(one.node,one.layer,{opener:f.opener,onClose:closeOne});const two=f.modal(),closeTwo=vi.fn();f.observers[0].callback();expect(two.layer.getAttribute('inert')).toBeNull();const cleanupTwo=openAccessibleDialog(two.node,two.layer,{opener:one.first,onClose:closeTwo});f.observers[0].callback();expect(two.layer.getAttribute('inert')).toBeNull();expect(one.layer.getAttribute('inert')).toBe('');f.key('Escape');expect(closeTwo).toHaveBeenCalledOnce();expect(closeOne).not.toHaveBeenCalled();cleanupTwo();expect(f.doc.activeElement).toBe(one.first);expect(one.layer.getAttribute('inert')).toBeNull();f.key('Escape');expect(closeOne).toHaveBeenCalledOnce();cleanupOne();});
+});
+
+describe('nested dialog ownership', () => {
+  const open = (modal, opener) => openAccessibleDialog(modal.node, modal.layer, { opener, onClose: vi.fn() });
+  const native = modal => {
+    modal.node.showModal = vi.fn(() => { modal.node.open = true; });
+    modal.node.close = vi.fn(() => { modal.node.open = false; });
+    return modal;
+  };
+
+  it('keeps isolation and scroll locked when the parent cleans up before its child', () => {
+    const f = fixture(), one = f.modal(), cleanupOne = open(one, f.opener);
+    const two = f.modal(), cleanupTwo = open(two, one.first);
+    cleanupOne();
+    expect(f.doc.activeElement).toBe(two.first);
+    expect(f.root.getAttribute('inert')).toBe('');
+    expect(f.body.style.overflow).toBe('hidden');
+    const portal = f.make(); f.body.append(portal); f.observers[0].callback();
+    expect(portal.getAttribute('inert')).toBe('');
+    cleanupTwo();
+    expect(f.root.getAttribute('inert')).toBeNull();
+    expect(portal.getAttribute('inert')).toBeNull();
+    expect(f.body.style.overflow).toBe('auto');
+    expect(f.doc.activeElement).toBe(f.opener);
+    expect(f.observers[0].disconnected).toBe(true);
+  });
+
+  it('makes repeated cleanup harmless while another modal remains and after reopening', () => {
+    const f = fixture(), one = f.modal(), cleanupOne = open(one, f.opener);
+    const two = f.modal(), cleanupTwo = open(two, one.first);
+    cleanupOne(); cleanupOne();
+    f.opener.focus(); expect(f.doc.activeElement).toBe(two.first);
+    cleanupTwo();
+    const three = f.modal(), cleanupThree = open(three, f.opener);
+    cleanupTwo(); cleanupOne();
+    expect(f.body.style.overflow).toBe('hidden');
+    f.opener.focus(); expect(f.doc.activeElement).toBe(three.first);
+    cleanupThree(); expect(f.body.style.overflow).toBe('auto');
+  });
+
+  it('restores the outer opener across three out-of-order removals', () => {
+    const f = fixture(), one = f.modal(), cleanupOne = open(one, f.opener);
+    const two = f.modal(), cleanupTwo = open(two, one.first);
+    const three = f.modal(), cleanupThree = open(three, two.first);
+    cleanupTwo(); cleanupOne(); cleanupThree();
+    expect(f.doc.activeElement).toBe(f.opener);
+    expect(f.root.getAttribute('aria-hidden')).toBeNull();
+    expect(f.body.style.overflow).toBe('auto');
+  });
+
+  it('orders fallback layers by opening order, not persistent portal DOM order', () => {
+    const f = fixture(), child = f.modal(), parent = f.modal();
+    parent.layer.style.zIndex = '52'; child.layer.style.zIndex = '17';
+    const closeParent = open(parent, f.opener), closeChild = open(child, parent.first);
+    expect(Number(child.layer.style.zIndex)).toBeGreaterThan(Number(parent.layer.style.zIndex));
+    closeChild(); expect(child.layer.style.zIndex).toBe('17');
+    closeParent(); expect(parent.layer.style.zIndex).toBe('52');
+  });
+
+  it('keeps native dialogs in top tracking and shared scroll-lock ownership', () => {
+    const f = fixture(), one = f.modal(), cleanupOne = open(one, f.opener);
+    const two = native(f.modal()), cleanupTwo = open(two, one.first);
+    two.first.focus();
+    expect(f.doc.activeElement).toBe(two.first);
+    expect(f.key('Escape').preventDefault).not.toHaveBeenCalled();
+    cleanupOne();
+    expect(f.body.style.overflow).toBe('hidden');
+    cleanupTwo(); cleanupTwo();
+    expect(two.node.close).toHaveBeenCalledOnce();
+    expect(f.body.style.overflow).toBe('auto');
+    expect(f.doc.activeElement).toBe(f.opener);
+  });
+
+  it('locks native-only nesting until its last owner cleans up', () => {
+    const f = fixture(), one = native(f.modal()), cleanupOne = open(one, f.opener);
+    const two = native(f.modal()), cleanupTwo = open(two, one.first);
+    expect(f.body.style.overflow).toBe('hidden');
+    cleanupOne(); expect(f.body.style.overflow).toBe('hidden');
+    cleanupTwo(); expect(f.body.style.overflow).toBe('auto');
+  });
+
+  it('demotes native ancestors when a partial native child requires fallback', () => {
+    const f = fixture(), one = native(f.modal()), cleanupOne = open(one, f.opener);
+    const two = native(f.modal()); two.node.showModal.mockImplementation(() => { throw new Error('unsupported'); });
+    const cleanupTwo = open(two, one.first);
+    expect(one.node.close).toHaveBeenCalledOnce();
+    expect(one.node.open).toBe(true);
+    expect(one.layer.dataset.fallback).toBe('true');
+    expect(f.doc.activeElement).toBe(two.first);
+    cleanupTwo(); expect(f.doc.activeElement).toBe(one.first);
+    f.opener.focus(); expect(f.doc.activeElement).toBe(one.first);
+    cleanupOne();
+    expect(one.node.getAttribute('open')).toBeNull();
+    expect(one.layer.dataset.fallback).toBeUndefined();
+    expect(f.body.style.overflow).toBe('auto');
+  });
+
+  it('restores prior dialog attributes and includes summary in keyboard cycling', () => {
+    const f = fixture(), m = f.modal();
+    m.first.isSummary = true;
+    m.node.setAttribute('tabindex', '3');
+    m.layer.setAttribute('data-fallback', 'original');
+    const cleanup = open(m, f.opener);
+    expect(f.doc.activeElement).toBe(m.first);
+    f.key('Tab', true); expect(f.doc.activeElement).toBe(m.last);
+    f.key('Tab'); expect(f.doc.activeElement).toBe(m.first);
+    cleanup();
+    expect(m.node.getAttribute('tabindex')).toBe('3');
+    expect(m.layer.getAttribute('data-fallback')).toBe('original');
+  });
+
+  it('keeps separate documents independently locked and focused', () => {
+    const a = fixture(), b = fixture(), one = a.modal(), two = b.modal();
+    const cleanupOne = open(one, a.opener), cleanupTwo = open(two, b.opener);
+    a.opener.focus(); expect(a.doc.activeElement).toBe(one.first);
+    cleanupOne(); expect(b.body.style.overflow).toBe('hidden');
+    b.opener.focus(); expect(b.doc.activeElement).toBe(two.first);
+    cleanupTwo(); expect(b.body.style.overflow).toBe('auto');
+  });
 });

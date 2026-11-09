@@ -1,3 +1,4 @@
+import PracticeDialog from '@/components/PracticeDialog';
 import PracticeIllustration from '@/components/journey/PracticeIllustration';
 import '@/styles/practice-editorial.css';
 import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
@@ -231,7 +232,5 @@ function StorageDetail() {
 }
 
 function LeaveDraftDialog({ draftAvailable, onCancel, onLeave, onDiscard }) {
-  const dialog = useRef(null);
-  useEffect(() => { const el = dialog.current; el.showModal(); return () => el.close(); }, []);
-  return <dialog ref={dialog} onCancel={(event) => { event.preventDefault(); onCancel(); }} aria-labelledby="tpl-leave-title" className="tpl-leave tpl-card"><h2 id="tpl-leave-title" className="tpl-display">Leave this draft?</h2><p>Your latest words have not been saved. {draftAvailable ? "They can be recovered in this tab for up to 24 hours." : "They may be lost if you leave."}</p><div className="tpl-stack"><button autoFocus className="tpl-btn tpl-btn--primary tpl-btn--block" onClick={onCancel}>Keep writing</button><button className="tpl-link" onClick={onLeave}>Leave without saving changes</button><button className="tpl-link" onClick={onDiscard}>Discard draft and leave</button></div></dialog>;
+  return <PracticeDialog theme="tpl" titleId="tpl-leave-title" className="tpl-leave tpl-card" onClose={onCancel}><h2 id="tpl-leave-title" className="tpl-display">Leave this draft?</h2><p>Your latest words have not been saved. {draftAvailable ? "They can be recovered in this tab for up to 24 hours." : "They may be lost if you leave."}</p><div className="tpl-stack"><button autoFocus className="tpl-btn tpl-btn--primary tpl-btn--block" onClick={onCancel}>Keep writing</button><button className="tpl-link" onClick={onLeave}>Leave without saving changes</button><button className="tpl-link" onClick={onDiscard}>Discard draft and leave</button></div></PracticeDialog>;
 }

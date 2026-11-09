@@ -1,40 +1,94 @@
-const activeFallbacks = [];
-const FOCUSABLE = 'a[href],area[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),iframe,[contenteditable="true"],[tabindex]';
+// A document owns one isolation snapshot, not one per modal. Nested sheets can
+// unmount in either order without restoring another sheet's temporary state.
+const dialogDocuments = new WeakMap();
+const FOCUSABLE = 'a[href],area[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),summary,iframe,[contenteditable="true"],[tabindex]';
 
 function focus(element) {
   if (!element?.isConnected || typeof element.focus !== 'function') return;
   try { element.focus({ preventScroll: true }); } catch { element.focus(); }
 }
 
+function restoreAttribute(element, name, value) {
+  if (value === null) element.removeAttribute(name); else element.setAttribute(name, value);
+}
+
+function createDialogState(doc) {
+  const body = doc.body;
+  const state = { stack: [], hidden: new Map(), overflow: body.style.overflow, observer: null };
+  state.sync = () => {
+    const top = state.stack[state.stack.length - 1];
+    const isolate = state.stack.some(item => item.fallback);
+    // A native modal's top layer makes an ordinary fallback above it inert.
+    // Keep the remaining stack in fallback mode if a partial native API fails.
+    if (top?.fallback) {
+      for (const item of state.stack) {
+        if (!item.fallback) {
+          item.fallback = true;
+          if (item.node.open) item.node.close();
+          item.enableFallback();
+        }
+      }
+    }
+    state.stack.forEach((item, index) => {
+      if (item.fallback) item.layer.style.zIndex = String(10000 + index);
+    });
+    const shouldHide = sibling => {
+      if (!isolate || sibling === top?.layer || sibling.contains(top?.node)) return false;
+      // A portal can mount before its opening effect. Leave it available until
+      // it joins the stack, rather than snapshotting an already-hidden modal.
+      return !sibling.classList.contains('mcn-modal-layer') || state.stack.some(item => item.layer === sibling);
+    };
+    for (const [sibling, previous] of state.hidden) {
+      if (shouldHide(sibling)) continue;
+      restoreAttribute(sibling, 'aria-hidden', previous.aria);
+      restoreAttribute(sibling, 'inert', previous.inert);
+      sibling.style.pointerEvents = previous.pointerEvents;
+      state.hidden.delete(sibling);
+    }
+    for (const sibling of body.children) {
+      if (!shouldHide(sibling) || state.hidden.has(sibling)) continue;
+      state.hidden.set(sibling, { aria: sibling.getAttribute('aria-hidden'), inert: sibling.getAttribute('inert'), pointerEvents: sibling.style.pointerEvents });
+      sibling.setAttribute('aria-hidden', 'true');
+      sibling.setAttribute('inert', '');
+      sibling.style.pointerEvents = 'none';
+    }
+    body.style.overflow = state.stack.length ? 'hidden' : state.overflow;
+  };
+  const Observer = doc.defaultView?.MutationObserver;
+  state.observer = Observer ? new Observer(state.sync) : null;
+  state.observer?.observe(body, { childList: true });
+  return state;
+}
+
 // Native <dialog> arrived in iOS 15.4. Keep the same accessible sheet on earlier
 // supported WebKit, without relaxing focus/background isolation or device support.
 export function openAccessibleDialog(node, layer, { opener, onClose }) {
-  if (typeof node.showModal === 'function' && typeof node.close === 'function') {
-    try {
-      node.showModal();
-      return () => { if (node.open) node.close(); focus(opener); };
-    } catch { /* A partial implementation still gets the keyboard-safe fallback. */ }
-  }
-
   const doc = node.ownerDocument;
-  const body = doc.body;
-  const overflow = body.style.overflow;
+  let state = dialogDocuments.get(doc);
+  if (!state) { state = createDialogState(doc); dialogDocuments.set(doc, state); }
   const previousTabIndex = node.getAttribute('tabindex');
-  const hidden = new Map();
-  const identity = { layer };
-  activeFallbacks.push(identity);
-  layer.dataset.fallback = 'true';
-  node.setAttribute('open', '');
-  node.setAttribute('tabindex', '-1');
-  body.style.overflow = 'hidden';
+  const previousOpen = node.getAttribute('open');
+  const previousZIndex = layer.style.zIndex;
+  const previousFallback = layer.getAttribute('data-fallback');
+  const identity = { node, layer, opener, fallback: false, enableFallback: () => {
+    layer.dataset.fallback = 'true';
+    node.setAttribute('open', '');
+    node.setAttribute('tabindex', '-1');
+  } };
+  state.stack.push(identity);
+  if (typeof node.showModal === 'function' && typeof node.close === 'function') {
+    try { node.showModal(); } catch { identity.fallback = true; }
+  } else identity.fallback = true;
+  if (identity.fallback) identity.enableFallback();
 
   const candidates = () => [...node.querySelectorAll(FOCUSABLE)].filter(element =>
     element.tabIndex >= 0 && !element.closest('[hidden],[inert],[aria-hidden="true"]') && element.getClientRects().length > 0);
   const focusFirst = () => focus(candidates()[0] || node);
-  const isTop = () => activeFallbacks[activeFallbacks.length - 1] === identity;
-  const containFocus = event => { if (isTop() && !node.contains(event.target)) focusFirst(); };
+  identity.focusFirst = focusFirst;
+  const isTop = () => state.stack[state.stack.length - 1] === identity;
+  const containFocus = event => { if (identity.fallback && isTop() && !node.contains(event.target)) focusFirst(); };
   const keydown = event => {
-    if (!isTop()) return;
+    if (!identity.fallback || !isTop()) return;
     if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onClose(); return; }
     if (event.key !== 'Tab') return;
     const items = candidates();
@@ -46,43 +100,44 @@ export function openAccessibleDialog(node, layer, { opener, onClose }) {
     }
   };
   // Move focus before hiding the opener's tree from assistive technology.
-  focusFirst();
-  const isolateBackground = () => {
-    for (const sibling of body.children) {
-      if (sibling === layer || hidden.has(sibling)) continue;
-      // Do not hide a newer modal while React mounts it or while it is on top.
-      const siblingModal = activeFallbacks.findIndex(item => item.layer === sibling);
-      if (sibling.classList.contains('mcn-modal-layer') &&
-          (siblingModal < 0 || siblingModal > activeFallbacks.indexOf(identity))) continue;
-      hidden.set(sibling, { aria: sibling.getAttribute('aria-hidden'), inert: sibling.getAttribute('inert'), pointerEvents: sibling.style.pointerEvents });
-      sibling.setAttribute('aria-hidden', 'true');
-      sibling.setAttribute('inert', '');
-      // The overlay and focus handlers also work where `inert` is unsupported.
-      sibling.style.pointerEvents = 'none';
-    }
-  };
-  isolateBackground();
-  const Observer = doc.defaultView?.MutationObserver;
-  const observer = Observer ? new Observer(isolateBackground) : null;
-  observer?.observe(body, { childList: true });
+  if (identity.fallback) focusFirst();
+  state.sync();
+  // Demoting a native ancestor can move focus back to its opener.
+  if (!node.contains(doc.activeElement)) focusFirst();
   doc.addEventListener('keydown', keydown, true);
   doc.addEventListener('focusin', containFocus, true);
 
+  let cleaned = false;
   return () => {
-    observer?.disconnect();
+    if (cleaned) return;
+    cleaned = true;
+    const wasTop = isTop();
     doc.removeEventListener('keydown', keydown, true);
     doc.removeEventListener('focusin', containFocus, true);
-    activeFallbacks.splice(activeFallbacks.indexOf(identity), 1);
-    for (const [sibling, previous] of hidden) {
-      for (const [name, value] of [['aria-hidden', previous.aria], ['inert', previous.inert]]) {
-        if (value === null) sibling.removeAttribute(name); else sibling.setAttribute(name, value);
-      }
-      sibling.style.pointerEvents = previous.pointerEvents;
+    // If an ancestor disappears first, its descendants must eventually return
+    // focus to that ancestor's opener, not a control in the removed sheet.
+    for (const item of state.stack) {
+      if (item !== identity && node.contains(item.opener)) item.opener = identity.opener;
     }
-    body.style.overflow = overflow;
-    node.removeAttribute('open');
-    if (previousTabIndex === null) node.removeAttribute('tabindex'); else node.setAttribute('tabindex', previousTabIndex);
-    delete layer.dataset.fallback;
-    focus(opener);
+    state.stack.splice(state.stack.indexOf(identity), 1);
+    if (!identity.fallback && node.open) node.close();
+    if (identity.fallback) {
+      restoreAttribute(node, 'open', previousOpen);
+      restoreAttribute(node, 'tabindex', previousTabIndex);
+      restoreAttribute(layer, 'data-fallback', previousFallback);
+      layer.style.zIndex = previousZIndex;
+    }
+    state.sync();
+    const top = state.stack[state.stack.length - 1];
+    if (!top) {
+      state.observer?.disconnect();
+      dialogDocuments.delete(doc);
+    }
+    if (wasTop) {
+      const opener = identity.opener;
+      if (!top || top.node.contains(opener)) focus(opener);
+      else top.focusFirst();
+    }
+    if (top && !top.node.contains(doc.activeElement)) top.focusFirst();
   };
 }

@@ -1,3 +1,4 @@
+import PracticeDialog from '@/components/PracticeDialog';
 import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
 import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
 import { useJourneyScreenHistory } from '@/hooks/useJourneyScreenHistory';
@@ -1166,15 +1167,6 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
   useJourneyScreenHistory('nextAction', `${gameState.screen}:${expandedCategory || ''}:${selectedSubcategory || ''}`, screen => {const [page,category,subcategory]=screen.split(':');if (['landing','newTask','intent','routeLength','focus','dashboard','gettingStarted','helpfulness'].includes(page)) {setGameState(prev=>({...prev,screen:page}));setExpandedCategory(category||null);setSelectedSubcategory(subcategory||null);}});
   const [customTaskInput, setCustomTaskInput] = useState(() => consumeNextStepHandoff() ?? "");
   const [showPause, setShowPause] = useState(false);
-  const pauseDialog = useRef(null);
-  useEffect(() => {
-    if (!showPause) return;
-    const previous = document.activeElement;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    pauseDialog.current?.showModal();
-    return () => { document.body.style.overflow = overflow; if (previous?.isConnected) previous.focus(); };
-  }, [showPause]);
   const aiGenerating = false;
 
   const canvasRef = useRef(null);
@@ -2121,12 +2113,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
 
       {/* ==================== 7. PAUSE OVERLAY ==================== */}
       {showPause && (
-        <dialog ref={pauseDialog} className="pause-overlay" aria-labelledby="nes-pause-title" onClose={() => setShowPause(false)} onCancel={() => setShowPause(false)} onClick={event => { if (event.target === event.currentTarget) setShowPause(false); }} onKeyDown={event => {
-          if (event.key !== 'Tab') return;
-          const buttons = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled)'));
-          if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons[buttons.length - 1]?.focus(); }
-          else if (!event.shiftKey && document.activeElement === buttons[buttons.length - 1]) { event.preventDefault(); buttons[0]?.focus(); }
-        }}>
+        <PracticeDialog theme="nes-v2-wrap" className="pause-overlay" titleId="nes-pause-title" onClose={() => setShowPause(false)} dismissBackdrop>
           <div className="pause-card" onClick={(e) => e.stopPropagation()} style={{ borderRadius: "32px" }}>
             <div className="emoji-badge" style={{
               background: "rgba(214, 223, 171, 0.5)",
@@ -2169,7 +2156,8 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
             </div>
 
             <button 
-              className="btn-primary" 
+              className="btn-primary"
+              autoFocus
               style={{ marginTop: "24px", minHeight: "56px" }}
               onClick={() => {
                 playClick();
@@ -2198,7 +2186,7 @@ export default function NextEasiestStepExperience({ intervention, onComplete, on
               Start over
             </button>
           </div>
-        </dialog>
+        </PracticeDialog>
       )}
       <div className="nes-journey-tools"><PracticeCheckpoint order={gameState.checkpointOrder} onOrderChange={checkpointOrder => setGameState(value => ({...value, checkpointOrder}))} variant="step" title="Real steps, made visible" events={[
         earned('task','The task you chose',gameState.task),

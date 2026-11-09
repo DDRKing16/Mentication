@@ -3,24 +3,24 @@ import { Link } from 'react-router-dom';
 import { JOURNEY_EXPERIENCES } from '@/lib/journeyExperience';
 import { takeawayStore } from '@/lib/localData';
 import { journeyTakeawayId } from '@/lib/confirmedJourneyTakeaway';
+import JourneyDialog from './JourneyDialog';
+import { bindJourneyNoteHistory } from './journeyNoteHistory';
 import '@/styles/journey-tools.css';
 
 export default function JourneyTakeaway({ id, initialText = '' }) {
   const meta = JOURNEY_EXPERIENCES[id];
   const fieldId = useId();
-  const noteDialog = useRef(null);
   const noteTrigger = useRef(null);
   const [editing, setEditing] = useState(false);
   const historyKey = useRef(globalThis.crypto?.randomUUID?.() || fieldId);
+  const noteHistory = useRef(null);
   useEffect(() => {
     if (!editing) return;
-    try { noteDialog.current?.showModal(); } catch { setEditing(false); return; }
-    const state = window.history.state || {};
-    try { window.history.pushState({...state,journey_note:historyKey.current,idx:Number.isInteger(state.idx)?state.idx+1:state.idx},''); } catch { /* Native close remains available. */ }
-    const back = () => { if (window.history.state?.journey_note !== historyKey.current) noteDialog.current?.close(); };
-    window.addEventListener('popstate',back);
-    return () => window.removeEventListener('popstate',back);
+    const binding = bindJourneyNoteHistory(historyKey.current, () => setEditing(false));
+    noteHistory.current = binding;
+    return () => { binding.dispose(); noteHistory.current = null; };
   }, [editing]);
+  const closeNote = () => noteHistory.current?.close();
   const [scope] = useState(() => journeyTakeawayId(id, window.history.state));
   const [text, setText] = useState(initialText.slice(0,1500));
   const [saved, setSaved] = useState(null);
@@ -59,12 +59,8 @@ export default function JourneyTakeaway({ id, initialText = '' }) {
   if (meta.archive) return <aside className="journey-takeaway"><p>{meta.prompt}</p><Link to={meta.archive}>Return to saved work</Link></aside>;
   return <details className="journey-takeaway" open={editing}>
     <summary ref={noteTrigger} onClick={event => { event.preventDefault(); setEditing(true); }}><span>{saved ? 'Review my saved note' : initialText ? 'Keep these practice choices' : 'Keep a cue for next time'}</span><small>Optional · in your own words</small></summary>
-    <dialog ref={noteDialog} className="journey-note-screen" aria-labelledby={`${fieldId}-title`} onClose={() => {
-      setEditing(false);
-      if (window.history.state?.journey_note === historyKey.current) window.history.back();
-      noteTrigger.current?.focus({preventScroll:true});
-    }}>
-    <button type="button" className="takeaway-return" onClick={() => noteDialog.current?.close()}>Back to practice</button>
+    <JourneyDialog open={editing} opener={noteTrigger} onClose={closeNote} className="journey-note-screen" aria-labelledby={`${fieldId}-title`}>
+    <button type="button" className="takeaway-return" onClick={closeNote}>Back to practice</button>
     <h1 id={`${fieldId}-title`}>{meta.prompt}</h1>
     <label className="sr-only" htmlFor={fieldId}>{meta.prompt}</label>
     {initialText && !saved && <p>Edit or clear these confirmed choices before saving.</p>}
@@ -82,6 +78,6 @@ export default function JourneyTakeaway({ id, initialText = '' }) {
     {error && <p role="alert">{error}</p>}
     {error.startsWith('Could not read') && <button type="button" onClick={() => setReadVersion(value => value + 1)}>Try reading saved note again</button>}
     <Link to="/return-points">Read or delete saved notes</Link>
-    </dialog>
+    </JourneyDialog>
   </details>;
 }

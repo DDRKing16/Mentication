@@ -1,3 +1,4 @@
+import PracticeDialog from '@/components/PracticeDialog';
 import '@/styles/practice-editorial.css';
 import PracticeCheckpoint from '@/components/journey/PracticeCheckpoint';
 import { practiceEvent as earned } from '@/lib/practiceCheckpoints';
@@ -195,7 +196,6 @@ function formatDuration(totalSeconds) {
 function TimerStage({ session, dispatch, audioEnabled, runtimeAvailable }) {
   const [now, setNow] = useState(Date.now());
   const [confirmExit, setConfirmExit] = useState(false);
-  const endDialog = useRef(null);
   const [narrationActive, setNarrationActive] = useState(false);
   const { prefs } = useAccessibilityPrefs();
   const paused = session.status === "timer_paused";
@@ -213,8 +213,6 @@ function TimerStage({ session, dispatch, audioEnabled, runtimeAvailable }) {
   const breathLabel = elapsed % 10 < 5 ? "Inhale slowly" : "Exhale slowly";
   const { speak, stop: stopNarration, pause: pauseNarration, resume: resumeNarration, preload } = useGuideVoice();
   useUrgeSurfSoundscape({ active: true, enabled: audioEnabled && !paused, narrationActive, stageIndex });
-
-  useEffect(() => { if (confirmExit) endDialog.current?.showModal(); }, [confirmExit]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -282,14 +280,14 @@ function TimerStage({ session, dispatch, audioEnabled, runtimeAvailable }) {
           <button type="button" onClick={() => { dispatch({ type: "TIMER_PAUSED", nowEpochMs: Date.now() }); pauseNarration(); setConfirmExit(true); }}><X aria-hidden="true" /> End early</button>
         </div>
         {confirmExit && (
-          <dialog ref={endDialog} className="urge-lovable__overlay" aria-labelledby="urge-end-title" onCancel={()=>setConfirmExit(false)}>
+          <PracticeDialog theme="urge-lovable" className="urge-lovable__overlay" titleId="urge-end-title" onClose={()=>setConfirmExit(false)}>
             <section>
               <h2 id="urge-end-title">Leave the wave?</h2>
               <p>You can stop whenever you need to. The time you have already made still counts.</p>
               <PrimaryButton autoFocus onClick={() => { setConfirmExit(false); setNow(Date.now()); dispatch({ type: "TIMER_RESUMED", nowEpochMs: Date.now() }); resumeNarration(); }}>Keep surfing</PrimaryButton>
               <button type="button" className="urge-lovable__text-button" onClick={() => dispatch({ type: "TIMER_STOPPED", nowEpochMs: Date.now() })}>End gently</button>
             </section>
-          </dialog>
+          </PracticeDialog>
         )}
       </div>
     </Shell>
