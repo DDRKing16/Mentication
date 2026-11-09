@@ -68,7 +68,36 @@ export async function checkJourneyDialogs(page, origin) {
   await page.goBack();
   await noteClosed();
   assert.equal(await page.evaluate(() => history.state?.idx), initialIndex, 'Browser Back must not go back twice');
+  const modalIsolation = () => page.evaluate(() => ({
+    overflow: document.body.style.overflow,
+    rootInert: document.querySelector('#root').getAttribute('inert'),
+    rootHidden: document.querySelector('#root').getAttribute('aria-hidden'),
+    optionsInert: document.querySelector('.journey-options-dialog-layer').getAttribute('inert'),
+    optionsHidden: document.querySelector('.journey-options-dialog-layer').getAttribute('aria-hidden'),
+    activeFallbacks: document.querySelectorAll('.journey-dialog-layer[data-fallback="true"]').length,
+  }));
+  const outerIsolation = await modalIsolation();
+  const historyLength = await page.evaluate(() => history.length);
+  await page.goForward();
+  await page.waitForFunction(() => Boolean(history.state?.journey_note));
+  assert.equal(await page.evaluate(() => history.state?.idx), initialIndex + 1, 'Forward returns to the existing note entry');
+  assert.equal(await note.isVisible(), false, 'Forward alone retains the existing dismissed-note behavior');
+  assert(await options.isVisible(), 'Forward must retain the underlying Options sheet');
+  assert.deepEqual(await modalIsolation(), outerIsolation, 'Forward must not add hidden-note isolation or scroll locks');
   await openNote();
+  assert.equal(await page.evaluate(() => history.length), historyLength, 'Reopening a forwarded note must reuse its history entry');
+  assert.equal(await page.evaluate(() => history.state?.idx), initialIndex + 1, 'Reopening must not increment the forwarded entry');
+  await note.getByRole('button', { name: 'Back to practice', exact: true }).click();
+  await noteClosed();
+  assert.equal(await page.evaluate(() => history.state?.idx), initialIndex, 'Reopened forwarded note closes with exactly one Back');
+  assert.deepEqual(await modalIsolation(), outerIsolation, 'Closing the forwarded note must release only its own isolation');
+  await options.getByRole('button', { name: 'Return to Night Channel', exact: true }).click();
+  await options.waitFor({ state: 'hidden' });
+  await focused('.journey-options-button');
+  assert.equal(await page.locator('#root').getAttribute('inert'), null, 'Closing Options after Forward must restore root interactivity');
+  assert.notEqual(await page.locator('#root').getAttribute('aria-hidden'), 'true', 'Closing Options after Forward must restore accessibility');
+  assert.notEqual(await page.locator('body').evaluate(element => element.style.overflow), 'hidden', 'Closing Options after Forward must release scroll locks');
+  await openOptions(); await openNote();
   await note.getByRole('button', { name: 'Save changes on this device', exact: true }).click();
   await note.getByRole('status').filter({ hasText: 'Saved on this device.' }).waitFor();
   await note.getByRole('button', { name: 'Delete saved note', exact: true }).click();

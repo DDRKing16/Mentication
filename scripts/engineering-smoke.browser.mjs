@@ -6,6 +6,7 @@ import { checkJourneyDialogs } from './journey-dialog-smoke.browser.mjs';
 const playwright = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',');
 const port = Number(process.env.SMOKE_PORT ||4179);
+const dialogFailures = [];
 const origin = `http://127.0.0.1:${port}`;
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], { stdio: 'pipe' });
 let serverLog = '';
@@ -99,10 +100,11 @@ try {
           } catch (error) {
             console.error(`FAIL ${name} ${legacy ? 'legacy' : 'native'} ${suite} at ${dialogPage.url()}`);
             console.error((await dialogPage.locator('body').innerText().catch(() => '')).slice(0,4000));
-            throw error;
+            dialogFailures.push(`${name} ${legacy ? 'legacy' : 'native'} ${suite}: ${error.message}`);
           } finally { await dialogs.close(); }
         }
       }
     } finally { await browser.close(); }
   }
+  assert.deepEqual(dialogFailures, [], 'Dialog smoke checks failed');
 } finally { server.kill('SIGTERM'); }

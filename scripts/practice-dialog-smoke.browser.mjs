@@ -6,6 +6,16 @@ async function openFromLibrary(page, origin, name) {
   await page.getByRole('textbox', { name: 'Search practices and restoring activities', exact: true }).fill(name);
   await page.getByRole('button', { name: new RegExp(`^${name}`) }).click();
 }
+// Next and Urge are matched-assessment practices. Enter via the same explicit
+// baseline controls as a user, rather than seeding answers or bypassing setup.
+async function startMatchedPractice(page, name, question) {
+  await page.getByRole('heading', { name: question, exact: true }).waitFor();
+  const start = button(page, `Start ${name}`);
+  assert(await start.isDisabled(), 'An unanswered baseline must not start a practice');
+  await button(page, '5').click();
+  assert.equal(await button(page, '5').getAttribute('aria-pressed'), 'true');
+  await start.click();
+}
 async function background(page) {
   return page.evaluate(() => ({
     overflow: document.body.style.overflow,
@@ -34,6 +44,7 @@ async function activate(control) { await control.focus(); await control.click();
 // The caller owns browser startup, onboarding and native/forced-legacy mode.
 export async function checkPracticeDialogs(page, origin) {
   await page.goto(`${origin}/next-easiest-step`);
+  await startMatchedPractice(page, 'Next Easiest Step', 'How hard is it to focus right now?');
   await button(page, 'Tidy my desk').click();
   const pause = button(page, 'Pause'); await pause.waitFor();
   const nextBackground = await background(page);
@@ -49,6 +60,8 @@ export async function checkPracticeDialogs(page, origin) {
   await page.getByRole('heading', { name: 'Your task is here.', exact: true }).waitFor();
 
   await openFromLibrary(page, origin, 'Tomorrow Parking Lot');
+  // Tomorrow has no mandatory matched baseline; its safety gate is suitability.
+  await page.getByRole('heading', { name: 'Can this wait until tomorrow?', exact: true }).waitFor();
   await button(page, 'It can wait').click();
   const note = page.locator('#tpl-note'), draft = 'Browser regression draft';
   await note.fill(draft);
@@ -71,6 +84,7 @@ export async function checkPracticeDialogs(page, origin) {
   assert.equal(await page.evaluate(() => localStorage.getItem('mentication.tomorrowParking.records.v1')), null, 'Leaving a draft must not park or save it');
 
   await openFromLibrary(page, origin, 'Urge Surfing');
+  await startMatchedPractice(page, 'Urge Surfing', 'How distressed are you right now?');
   await page.getByRole('button', { name: /^Start a \d+-second pause$/ }).click();
   const end = button(page, 'End early'); await end.waitFor();
   const urgeBackground = await background(page);
