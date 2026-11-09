@@ -38,7 +38,7 @@ try {
       await page.goto(origin); await ready(page);
       assert.equal(await page.locator('html').evaluate(element=>element.scrollWidth>innerWidth+1),false,'Home overflows phone width');
       await page.goto(`${origin}/library`);
-      await page.locator('input[placeholder="Search practices…"]').waitFor();
+      await page.getByRole('textbox', { name: 'Search practices and restoring activities', exact: true }).waitFor();
       assert.equal(await page.locator('iframe[title="MentiCation home"]').count(),0,'Direct Library must not load hidden Home media');
       await page.goto(`${origin}/privacy`);
       await page.getByRole('heading',{name:'Privacy in Mentication',exact:true}).waitFor();
@@ -51,7 +51,7 @@ try {
       await recovery.clock.fastForward(13000);
       await recovery.getByRole('button',{name:'Retry home',exact:true}).waitFor();
       await recovery.getByRole('button',{name:'Open practices',exact:true}).click();
-      await recovery.locator('input[placeholder="Search practices…"]').waitFor();
+      await recovery.getByRole('textbox', { name: 'Search practices and restoring activities', exact: true }).waitFor();
       await recovery.goBack();
       await recovery.getByRole('button',{name:'Retry home',exact:true}).waitFor();
       await recovery.unroute('**/home.html*');
