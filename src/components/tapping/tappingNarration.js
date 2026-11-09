@@ -27,6 +27,7 @@ export function hasTappingNarration(concern, lookup = getApprovedNarration) {
 }
 export function tappingNarrationDuration(key) {
   const clip = tappingNarration(key);
-  const end = clip?.alignment?.at(-1)?.end;
+  const alignment = clip?.alignment;
+  const end = alignment?.[alignment.length - 1]?.end;
   return Number.isFinite(end) && end > 0 ? end / TAPPING_VOICE_RATE : manifest[key]?.duration || 0;
 }

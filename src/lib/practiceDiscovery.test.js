@@ -76,3 +76,28 @@ describe('practice discovery contracts', () => {
     expect(practiceDestination('boxV2', 'yes').state.audio).toBe('yes');
   });
 });
+
+import { RESTORE_DISCOVERY } from './practiceDiscovery';
+import { RESTORE_ACTIVITIES } from './restore';
+describe('Restore discovery is separate from recommendations', () => {
+  it('finds and opens all ten activities through their authored titles', () => {
+    expect(RESTORE_DISCOVERY).toHaveLength(10);
+    for (const activity of RESTORE_ACTIVITIES) {
+      const entry = RESTORE_DISCOVERY.find(item => item.restoreId === activity.id);
+      expect(practiceSearchMatches(entry, activity.title)).toBe(true);
+      expect(practiceSearchMatches(entry, 'restore')).toBe(true);
+      expect(practiceSearchMatches(entry, 'depleted')).toBe(true);
+      expect(practiceDestination(entry.id)).toEqual({ to: `/restore?activity=${activity.id}` });
+      expect(INTERVENTIONS.some(item => item.id === entry.id)).toBe(false);
+      expect(practiceTimeLabel(entry)).not.toContain('undefined');
+    }
+    expect(practiceDestination('restore/missing')).toBeNull();
+  });
+  it('offers depleted/rest needs without changing existing need mappings or adding clinical ratings', () => {
+    expect(NEED_GROUPS.find(group => group.id === 'rest')).toMatchObject({ to: '/restore', needs: [] });
+    for (const entry of RESTORE_DISCOVERY) {
+      expect(practiceDestination(entry.id).state).toBeUndefined();
+      expect(entry.primaryDirection).toBe('restore');
+    }
+  });
+});

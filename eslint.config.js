@@ -12,7 +12,6 @@ export default [
       ".claude/**",
       "**/generate-pmr-narration-direct*.mjs",
       "**/generate-pmr-narration-direct*.js",
-      "src/lib/**/*",
       "src/components/ui/**/*",
     ],
   },

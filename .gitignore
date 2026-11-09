@@ -12,3 +12,6 @@ coverage/
 dist/
 tmp/
 .claude/
+
+# Rebuilt from design/home-source before dev, test and build
+/public/home.html

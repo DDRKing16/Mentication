@@ -16,7 +16,7 @@ export default function NeedStart() {
   const practice = need && INTERVENTIONS.find(item => item.id === need.practice);
   const stage = practice ? 3 : group ? 2 : 1;
   useEffect(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' }); }, [params]);
-  const chooseGroup = item => setParams(item.needs.length === 1 ? { group: item.id, need: item.needs[0] } : { group: item.id });
+  const chooseGroup = item => item.to ? navigate(item.to) : setParams(item.needs.length === 1 ? { group: item.id, need: item.needs[0] } : { group: item.id });
   const begin = () => { const destination = practiceDestination(need.practice); if (destination) navigate(destination.to, { state: destination.state }); };
   return <main className="discovery-page"><div className="discovery-shell">
     <nav className="discovery-topline" aria-label="Page navigation">

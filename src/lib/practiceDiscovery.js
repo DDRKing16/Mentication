@@ -1,7 +1,8 @@
+import { RESTORE_ACTIVITIES, restoreActivity } from './restore';
 import { NEED_ENTRIES } from './journeyExperience';
 export const PRACTICE_CATEGORIES = Object.freeze([
   ['calm', 'Calm'], ['lift', 'Lift'], ['ground', 'Ground'],
-  ['focus', 'Focus'], ['reset', 'Reset'], ['sleep', 'Sleep'],
+  ['focus', 'Focus'], ['reset', 'Reset'], ['sleep', 'Sleep'], ['restore', 'Restore'],
 ]);
 function normalise(value) {
   return String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -10,10 +11,11 @@ function normalise(value) {
 export function practiceSearchMatches(practice, query) {
   const tokens = normalise(query).split(/\s+/).filter(Boolean);
   const needs = NEED_ENTRIES.filter(need=>need.practice===practice.id).map(need=>`${need.label} ${need.reason}`);
-  const text = normalise([practice.name, practice.why, practice.category, practice.primaryDirection, ...(practice.directions || []), practice.id?.replace(/([a-z])([A-Z])/g,'$1 $2'), ...needs].join(' '));
+  const text = normalise([practice.name, practice.why, practice.searchTerms, practice.category, practice.primaryDirection, ...(practice.directions || []), practice.id?.replace(/([a-z])([A-Z])/g,'$1 $2'), ...needs].join(' '));
   return tokens.every(token=>text.includes(token));
 }
 export function practiceTimeLabel(practice) {
+  if (practice.restoreId) return `About ${practice.durationMin} min · ${practice.planning ? 'planning' : 'optional pause'}`;
   if (practice.id === 'dear2100') return 'Self-paced reflection';
   if (practice.id === 'taraTactician') return 'About 5 min to prepare';
   if (practice.id === 'nextAction') return 'Self-paced steps';
@@ -30,11 +32,20 @@ import { INTERVENTIONS } from './interventions';
 import { practiceLaunchEntry } from './practiceLaunch';
 import { standaloneRouteFor } from './standaloneInterventions';
 
+// Discovery-only adapters: never added to INTERVENTIONS or recommendation scoring.
+export const RESTORE_DISCOVERY = RESTORE_ACTIVITIES.map(item => ({
+  id: `restore/${item.id}`, restoreId: item.id, name: item.title, why: item.detail,
+  primaryDirection: 'restore', directions: ['restore'], durationMin: item.minutes,
+  searchTerms: 'Rest replenish depleted gentler moment',
+  category: ['breathing', 'meditation'].includes(item.id) ? 'breathing' : 'rest', planning: Boolean(item.planning),
+}));
+
 export const NEED_GROUPS = [
   { id: 'body', title: 'Settle & reconnect', description: 'Overwhelm, tension or a difficult feeling', needs: ['overwhelmed', 'tense', 'feeling-struggle'], mark: '01' },
   { id: 'mind', title: 'Meet a busy mind', description: 'Looping thoughts or a harsh inner voice', needs: ['thought', 'sticky-thought', 'harsh-self-talk'], mark: '02' },
   { id: 'action', title: 'Find a next step', description: 'Getting started, making a change or preparing', needs: ['starting', 'flat', 'prepare-situation'], mark: '03' },
   { id: 'night', title: 'Leave it for tonight', description: 'Unfinished thoughts at bedtime', needs: ['bedtime'], mark: '04' },
+  { id: 'rest', title: 'Rest & replenish', description: 'Feeling depleted or needing a gentler moment', needs: [], to: '/restore', mark: '05' },
 ];
 
 // Describe the activity, rather than promising a particular psychological effect.
@@ -63,6 +74,7 @@ export const PRACTICE_PREVIEWS = {
 export const practiceDuration = practiceTimeLabel;
 
 export function practiceDestination(id, audio = 'no') {
+  if (typeof id === 'string' && id.startsWith('restore/') && restoreActivity(id.slice(8))) return { to: `/restore?activity=${id.slice(8)}` };
   if (id === 'dear2100') return { to: '/dear-2100' };
   const iv = INTERVENTIONS.find(item => item.id === id);
   if (!iv) return null;

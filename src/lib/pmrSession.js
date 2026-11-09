@@ -14,7 +14,7 @@ export const PMR_OUTCOMES = [
 export function pmrTiming(step) {
   const narration = getNarration(step.speak || step.body);
   const alignment = narration?.alignment || [];
-  const last = alignment.at(-1)?.end || 0;
+  const last = alignment[alignment.length - 1]?.end || 0;
   return { narration, alignment, duration: Math.max(step.holdSec || 1, PMR_LEAD + last / PMR_RATE + 0.2) };
 }
 

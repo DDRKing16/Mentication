@@ -216,6 +216,7 @@ export default function Home() {
     if (route === "insights") { navigate("/insights"); return; }
     if (route === "settings") { navigate("/settings"); return; }
     if (route === "restore") { navigate("/restore"); return; }
+    if (route === "support") { navigate("/support"); return; }
     if (route === "guide") { navigate("/start"); return; }
     if (route === "return-points") { navigate("/return-points"); return; }
     if (DIRECTION_LABELS[route]) {

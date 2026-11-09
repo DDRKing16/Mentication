@@ -88,7 +88,7 @@ function Anchor({ flow }) {
   return <Prompt flow={flow} title="What can you stay connected to?" body="Choose something ordinary outside the thought or feeling."><Choices flow={flow} items={Object.entries(OUTSIDE_ANCHORS).map(([key, anchor]) => ({ label: anchor.name, selected: flow.s.anchorType === key, choose: () => flow.advance(flow.id === 'unhook' ? 'return' : 'outside', { anchorType: key, anchorText: flow.s.anchorType === key ? flow.s.anchorText : '', anchorNoticed: false }) }))}/></Prompt>;
 }
 function AnchorOwn({ flow }) {
-  const origin = flow.s.careTrail.at(-1), next = ['return','outside','re-hook'].includes(origin) ? origin : flow.id === 'unhook' ? 'return' : 'outside';
+  const origin = flow.s.careTrail[flow.s.careTrail.length - 1], next = ['return','outside','re-hook'].includes(origin) ? origin : flow.id === 'unhook' ? 'return' : 'outside';
   return <Prompt flow={flow} title={flow.s.anchorType === 'sound' ? 'Which sound will you notice?' : flow.s.anchorType === 'support' ? 'What is supporting you?' : 'Which object or colour will you notice?'} body="A few words are enough."><Editor max={140} label="My outside anchor" value={flow.s.anchorText} change={anchorText => flow.patch({ anchorText, anchorNoticed: false })}/><Primary disabled={!flow.s.anchorText.trim()} onClick={() => flow.advance(next)}>Use this anchor</Primary></Prompt>;
 }
 function Outside({ flow }) {

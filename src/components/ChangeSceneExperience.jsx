@@ -233,7 +233,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   useEffect(()=>{setShowAlternatives(false);heading.current?.focus();},[step]);
   useEffect(()=>{stop();if(audioOn)speak(prompt,{voice:voiceFor('lift')});return ()=>stop();},[prompt,audioOn,speak,stop]);
   useEffect(()=>{
-    if(!showAdapt&&!showAccessibility)return;
+    if(!showAdapt)return;
     restoreFocus.current=document.activeElement;
     const node=dialog.current;
     const focusable=()=>Array.from(node.querySelectorAll('button:not(:disabled),[tabindex="0"]'));
@@ -241,14 +241,14 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
     const handle=(event)=>{
       if(event.key==='Escape'){event.preventDefault();setShowAdapt(false);setShowAccessibility(false);}
       if(event.key==='Tab'){
-        const items=focusable(),first=items[0],last=items.at(-1);
+        const items=focusable(),first=items[0],last=items[items.length - 1];
         if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
         if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
       }
     };
     node.addEventListener('keydown',handle);
     return ()=>{node.removeEventListener('keydown',handle);restoreFocus.current?.focus();};
-  },[showAdapt,showAccessibility]);
+  },[showAdapt]);
   const go=(next)=>setSession(s=>({...s,step:Math.max(0,Math.min(7,next))}));
   const record=(event)=>setSession(s=>sceneAction(s,step,event));
   const finish=(target)=>{
@@ -303,7 +303,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
     <footer className="scene-controls"><button aria-label={audioOn?'Mute audio':'Enable audio'} aria-pressed={audioOn} onClick={()=>setAudioOn(!audioOn)}>{audioOn?'Audio on':'Audio off'}</button>{audioOn&&!narrationAvailable&&<span className="scene-caption">This instruction is text-only.</span>}<button onClick={()=>setShowAdapt(true)}>This is not helping</button></footer>
     <div className="mx-auto w-full max-w-xl px-5"><JourneyOptions id={ID} onOpen={() => { stop(); setAudioOn(false); }} /></div>
     {showAdapt && <div className="scene-modal" onClick={e=>{if(e.target===e.currentTarget)setShowAdapt(false);}}><section ref={dialog} role="dialog" aria-modal="true" aria-labelledby="scene-adapt-heading"><h2 id="scene-adapt-heading">What would fit better?</h2>{step>0&&step<7&&<button onClick={()=>{record(choice==='primary'?'alternative':'primary');setShowAdapt(false);}}>Try the other action</button>}{<button onClick={changeMechanism}>Use a different mechanism</button>}<button onClick={()=>{clearActiveFlagship(ID);stop();onExit?.();}}>Stop deliberately</button><button onClick={()=>setShowAdapt(false)}>Continue here</button></section></div>}
-    {showAccessibility&&<div ref={dialog} className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Accessibility options"><AccessibilityPanel onClose={()=>setShowAccessibility(false)} dark /></div>}
+    {showAccessibility&&<AccessibilityPanel onClose={()=>setShowAccessibility(false)} dark />}
   </div>;
 }
 const SCENE_STYLES=`

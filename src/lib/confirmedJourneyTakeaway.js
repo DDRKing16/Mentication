@@ -22,15 +22,15 @@ export function confirmedJourneyTakeaway(id, outcome) {
   }
   if(id === 'progressive-muscle-relaxation-v2' && outcome.type === 'pmr') {
     if(['release','contrast'].includes(outcome.mode)) lines.push(`My PMR setup: ${outcome.mode === 'release' ? 'release only' : 'gentle tense and release'}${['short','full'].includes(outcome.length) ? ` · ${outcome.length} session` : ''}.`);
-    const skipped=Array.isArray(outcome.skippedRegions) ? [...new Set(outcome.skippedRegions.filter(key=>Object.hasOwn(PMR_REGIONS,key)))].map(key=>PMR_REGIONS[key]) : [];
+    const skipped=Array.isArray(outcome.skippedRegions) ? [...new Set(outcome.skippedRegions.filter(key=>Object.prototype.hasOwnProperty.call(PMR_REGIONS,key)))].map(key=>PMR_REGIONS[key]) : [];
     if(skipped.length) lines.push(`Areas I chose to skip: ${skipped.join(', ')}.`);
-    if(Object.hasOwn(PMR_RESPONSES,outcome.tensionResponse)) lines.push(`My tension check-in: ${PMR_RESPONSES[outcome.tensionResponse]}.`);
+    if(Object.prototype.hasOwnProperty.call(PMR_RESPONSES,outcome.tensionResponse)) lines.push(`My tension check-in: ${PMR_RESPONSES[outcome.tensionResponse]}.`);
   }
   if(id === 'grounding54321V2') {
     const responses={more_present:'More present',unchanged:'Unchanged',more_unsettled:'More unsettled'};
-    if(Object.hasOwn(responses,outcome.presence)) lines.push(`My grounding feedback: ${responses[outcome.presence]}.`);
+    if(Object.prototype.hasOwnProperty.call(responses,outcome.presence)) lines.push(`My grounding feedback: ${responses[outcome.presence]}.`);
   }
-  if(id === 'urgeSurf' && Object.hasOwn(URGE_ACTIONS,outcome.action)) lines.push(`My chosen next step: ${URGE_ACTIONS[outcome.action]}`);
+  if(id === 'urgeSurf' && Object.prototype.hasOwnProperty.call(URGE_ACTIONS,outcome.action)) lines.push(`My chosen next step: ${URGE_ACTIONS[outcome.action]}`);
   if(id === 'eftTapping') {
     if(['eft','grounding'].includes(outcome.mode)) lines.push(`My tapping choice: ${outcome.mode === 'grounding' ? 'grounding, without focusing on a concern' : 'a gentle EFT-style round'}.`);
     if(Number.isInteger(outcome.skippedPoints) && outcome.skippedPoints > 0 && outcome.skippedPoints <= 1000) lines.push(`Points I chose to skip: ${outcome.skippedPoints}.`);
@@ -61,7 +61,7 @@ export function happyBumpTakeaway(state) {
 export function journeyTakeawayId(id, navigationState) {
   const entry=navigationState?.usr;
   const session=entry?.reset_session_id;
-  if(!Object.hasOwn(JOURNEY_EXPERIENCES,id) || typeof session !== 'string'
+  if(!Object.prototype.hasOwnProperty.call(JOURNEY_EXPERIENCES,id) || typeof session !== 'string'
     || !/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|session-\d{10,16})$/i.test(session)
     || !['guiding','goalReassessment','reflect','done'].includes(entry.reset_phase)
     || !Array.isArray(entry.pathway) || !entry.pathway.includes(id)) return null;

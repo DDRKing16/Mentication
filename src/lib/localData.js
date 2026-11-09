@@ -11,7 +11,6 @@ import { WEB_CHECKIN_CANCELLATION_KEY } from './taraWebCheckInLifecycle';
 
 const SESSION_KEY = "mentation.sessions.v1";
 const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr", "mentication.foundations.", "mentication.tomorrowParking.", "dear2100"];
-const MAX_SESSIONS = 500;
 
 const storage = () => (typeof window === "undefined" ? null : window.localStorage);
 
@@ -20,10 +19,11 @@ function readSessions() {
 }
 
 function writeSessions(sessions) {
-  const next = sessions.slice(0, MAX_SESSIONS);
-  writeVerified(storage(),SESSION_KEY,JSON.stringify(next));
+  // Keep the complete history. A storage quota failure must reject this save,
+  // not silently evict older practices to make room. setItem is atomic.
+  writeVerified(storage(),SESSION_KEY,JSON.stringify(sessions));
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: next.length } }));
+    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: sessions.length } }));
   }
 }
 

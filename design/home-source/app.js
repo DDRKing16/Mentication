@@ -1,9 +1,10 @@
+import { openAccessibleDialog as openHomeDialog } from '../../src/lib/accessibleDialog.js';
 /* MentiCation home. No dependencies, tracking, remote fonts, or account data. */
 (() => {
   'use strict';
   const root = document.documentElement;
   const ROUTES = Object.freeze({
-    home: 'Home', lift: 'Lift', focus: 'Focus', calm: 'Calm', ground: 'Ground', sleep: 'Sleep',
+    home: 'Home', support: 'Urgent support', lift: 'Lift', focus: 'Focus', calm: 'Calm', ground: 'Ground', sleep: 'Sleep',
     guide: 'Guide me', restore: 'Restore', begin: 'Begin', 'seven-calmer-days': '7 calmer days',
     restructure: 'Restructure', foundations: 'Foundations', journal: 'Check in with yourself',
     palace: 'Peace Palace',
@@ -19,7 +20,8 @@
   let pendingNavigation = null;
   let parentOrigin = null;
   let bridgeId = null;
-  let activeOpener = null;
+  const dialogCleanups = new Map();
+  const dialogLayers = new Map();
   let resizeFrame = 0;
   const prefersStillness = () => root.dataset.reduceMotion === 'true' || matchMedia('(prefers-reduced-motion: reduce)').matches;
   const status = document.getElementById('status');
@@ -37,12 +39,18 @@
       root.setAttribute(`data-${name}`, String(value));
       document.getElementById(name).checked = value;
     });
+    root.dataset.textScale = [1, 1.15, 1.3].includes(preferences.textScale) ? String(preferences.textScale) : (preferences['large-text'] ? '1.15' : '1');
     refreshCarousel();
     reportHeight();
   }
-  function savePreferences() {
+  function savePreferences(event) {
     const preferences = Object.fromEntries(preferenceNames.map(name => [name, document.getElementById(name).checked]));
     applyPreferences(preferences);
+    if (bridgeConnected) {
+      document.getElementById('preference-note').textContent = 'Saving your preference…';
+      sendBridge('accessibility-change', { name: event.target.id, value: event.target.checked });
+      return;
+    }
     try { localStorage.setItem(preferenceKey, JSON.stringify(preferences)); }
     catch {
       storageAvailable = false;
@@ -50,14 +58,31 @@
     }
   }
   function openDialog(id, opener) {
-    document.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
-    activeOpener = opener || document.activeElement;
-    document.getElementById(id).showModal();
+    document.querySelectorAll('dialog[open]').forEach(closeDialog);
+    const dialog = document.getElementById(id);
+    const cleanup = openHomeDialog(dialog, dialogLayers.get(dialog), {
+      opener: opener || document.activeElement, onClose: () => closeDialog(dialog),
+    });
+    dialogCleanups.set(dialog, cleanup);
   }
   function closeDialog(dialog) {
-    if (dialog.open) dialog.close();
+    const cleanup = dialogCleanups.get(dialog);
+    dialogCleanups.delete(dialog);
+    cleanup?.();
+    reportHeight();
   }
   document.querySelectorAll('dialog').forEach(dialog => {
+    const layer = document.createElement('div');
+    layer.className = 'mcn-modal-layer home-modal-layer';
+    dialog.before(layer);
+    layer.append(dialog);
+    dialogLayers.set(dialog, layer);
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    layer.addEventListener('click', event => {
+      if (event.target === layer && layer.dataset.fallback === 'true') closeDialog(dialog);
+    });
+    dialog.addEventListener('cancel', event => { event.preventDefault(); closeDialog(dialog); });
     dialog.addEventListener('click', event => {
       if (event.target.closest('[data-close]')) closeDialog(dialog);
       if (event.target === dialog) {
@@ -65,10 +90,7 @@
         if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) closeDialog(dialog);
       }
     });
-    dialog.addEventListener('close', () => {
-      if (!document.querySelector('dialog[open]') && activeOpener?.isConnected) activeOpener.focus({ preventScroll: true });
-      reportHeight();
-    });
+    dialog.addEventListener('close', () => closeDialog(dialog));
   });
   document.getElementById('menu-open').addEventListener('click', event => openDialog('menu-dialog', event.currentTarget));
   document.getElementById('accessibility-open').addEventListener('click', event => openDialog('accessibility-dialog', event.currentTarget));
@@ -116,15 +138,15 @@
     openDialog('destination-dialog', opener);
   }
   function navigate(route, opener) {
-    if (!Object.hasOwn(ROUTES, route)) return;
+    if (!Object.prototype.hasOwnProperty.call(ROUTES, route)) return;
     if (route === 'home') {
-      document.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
+      document.querySelectorAll('dialog[open]').forEach(closeDialog);
       window.scrollTo({ top: 0, behavior: prefersStillness() ? 'instant' : 'smooth' });
       if (bridgeConnected) sendBridge('home', { reduceMotion: prefersStillness() });
       status.textContent = 'Home';
       return;
     }
-    document.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
+    document.querySelectorAll('dialog[open]').forEach(closeDialog);
     // Host callbacks own the destination. Opening an experience never completes a day.
     if (navigateHandler) {
       try {
@@ -236,7 +258,7 @@
     const state = document.getElementById('wellness-status');
     state.textContent = source?.status === 'loading' ? (connected ? 'Syncing…' : 'Connecting…')
       : source?.status === 'error' ? 'Connection needs attention'
-      : connected ? 'Connected' : source?.status === 'setup' || !source ? 'Setup required' : 'Not connected';
+      : connected ? 'Connected' : source?.status === 'setup' || !source ? 'Not available yet' : 'Not connected';
     summary.hidden = !(connected || source?.error);
     summary.replaceChildren();
     if (connected) {
@@ -267,7 +289,7 @@
       const row = element('section', undefined, 'wellness-source');
       row.append(element('h3', item.name), element('p', item.detail));
       if (item.error) row.append(element('p', item.error, 'wellness-note'));
-      if (item.status === 'setup') row.append(element('span', 'Setup required · Not available yet', 'wellness-note'));
+      if (item.status === 'setup') row.append(element('span', 'Not available in this version. No connection action is needed from you.', 'wellness-note'));
       else if (item.connected) {
         const disconnect = element('button', 'Disconnect & remove summaries', 'wellness-button');
         disconnect.type = 'button'; disconnect.disabled = item.status === 'loading';
@@ -417,6 +439,11 @@
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'viewport' && Number.isFinite(data.top) && data.top >= 0 && Number.isFinite(data.height) && data.height >= 1 && data.height <= 20000) {
       root.style.setProperty('--dialog-top', `${data.top + data.height / 2}px`);
       root.style.setProperty('--dialog-max-height', `${Math.max(100, data.height - 32)}px`);
+    } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'accessibility') {
+      if (!data.preferences || !preferenceNames.every(name => typeof data.preferences[name] === 'boolean')) return;
+      applyPreferences(data.preferences);
+      if (data.saved === false) document.getElementById('preference-note').textContent = 'Could not save this change. Your previous preferences have been restored. Please try again.';
+      else document.getElementById('preference-note').textContent = 'These preferences are saved on this device and apply across Mentication.';
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'wellness') {
       setWellness(data.wellness);
     } else if (bridgeConnected && event.origin === parentOrigin && data.bridgeId === bridgeId && data.type === 'week') {

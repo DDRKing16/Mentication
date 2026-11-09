@@ -56,7 +56,7 @@ export default function Crisis() {
           ))}
         </div>
 
-        <p className="mt-3 text-center text-xs text-cream/40">
+        <p className="mt-4 text-center text-sm text-cream/80">
           Outside Australia? Find a local line at{" "}
           <a className="inline-flex min-h-11 items-center underline underline-offset-2" href="https://findahelpline.com" target="_blank" rel="noreferrer">
             findahelpline.com
@@ -74,12 +74,14 @@ export default function Crisis() {
           </p>
         </div>
 
+        <p className="mt-8 text-sm leading-relaxed text-cream/80">A practice can support you while you seek help. It does not replace urgent care or contacting someone who can help keep you safe.</p>
         <Button
+          variant="outline"
           size="lg"
           onClick={() => navigate("/reset", { state: { immediate: true, direction: "calm", directionLabel: "Calm down" } })}
-          className="mt-8 h-14 w-full rounded-full bg-[var(--mcn-gold)] text-base font-medium text-[#102827] active:scale-95"
+          className="mt-3 h-14 w-full rounded-full border-cream/40 bg-transparent text-base font-medium text-cream hover:bg-white/10 hover:text-cream active:scale-95"
         >
-          Try a calming reset instead
+          Optional calming practice
         </Button>
       </div>
     </div>

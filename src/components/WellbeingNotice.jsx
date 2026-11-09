@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import AccessibleModal from "@/components/AccessibleModal";
 import { X, HeartPulse, ShieldCheck, Lock } from "lucide-react";
 
 export default function WellbeingNotice({ onClose, dark = false }) {
@@ -8,20 +8,15 @@ export default function WellbeingNotice({ onClose, dark = false }) {
   const inner = dark ? "border-cream/10 bg-white/5" : "border-border bg-background/60";
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-5 backdrop-blur-sm" onClick={onClose}>
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 20 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        onClick={(e) => e.stopPropagation()}
+    <AccessibleModal titleId="WellbeingNotice-title" onClose={onClose}>
+      <div
         className={"w-full max-w-md rounded-3xl border p-6 pb-8 soft-depth " + card}
       >
         <div className="flex items-center justify-between">
-          <span className="flex items-center gap-2 font-heading text-xl font-medium tracking-tight">
+          <h2 id="WellbeingNotice-title" className="flex items-center gap-2 font-heading text-xl font-medium tracking-tight">
             <HeartPulse className="h-5 w-5 text-destructive" /> Keeping you safe
-          </span>
-          <button onClick={onClose} aria-label="Close" className="no-tap opacity-60 transition-opacity hover:opacity-100">
+          </h2>
+          <button type="button" autoFocus onClick={onClose} aria-label="Close keeping you safe" className="no-tap flex h-11 w-11 shrink-0 items-center justify-center rounded-full opacity-80 transition-opacity hover:opacity-100">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -50,14 +45,14 @@ export default function WellbeingNotice({ onClose, dark = false }) {
         <div className={"mt-4 flex items-start gap-2 text-sm leading-relaxed " + sub}>
           <Lock className="mt-0.5 h-4 w-4 shrink-0" />
           <p>
-            Privacy-first: we store only the shifts you log, the practices you try, and your ratings — never the content of your reflections. You can delete everything any time from your profile.
+            Your practice history, ratings, saved notes and plans stay on this device. Some practices also keep unfinished drafts. Delete app data from Profile; manage any exported backups separately. Optional website check-ins use delivery metadata, not your plan text.
           </p>
         </div>
 
         <button onClick={onClose} className="no-tap mt-6 w-full rounded-full bg-primary py-3 text-sm font-medium text-primary-foreground active:scale-95">
           Got it
         </button>
-      </motion.div>
-    </div>
+      </div>
+    </AccessibleModal>
   );
 }

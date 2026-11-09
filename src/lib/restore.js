@@ -63,21 +63,31 @@ export function readRestoreDraft(storage) {
     return { id: value.id, step: value.step, elapsed: value.elapsed, target: [120,180,300,600].includes(value.target) ? value.target : 300, plan: typeof value.plan === 'string' ? value.plan.slice(0, 300) : '', attemptId: typeof value.attemptId === 'string' && /^[a-zA-Z0-9-]{8,80}$/.test(value.attemptId) ? value.attemptId : null };
   } catch { return null; }
 }
+function writeVerified(storage, key, value) {
+  const encoded = JSON.stringify(value);
+  storage.setItem(key, encoded);
+  return storage.getItem(key) === encoded;
+}
 export function writeRestoreDraft(storage, draft) {
-  try { storage.setItem(RESTORE_DRAFT_KEY, JSON.stringify(draft)); return true; } catch { return false; }
+  try { return writeVerified(storage, RESTORE_DRAFT_KEY, draft); } catch { return false; }
+}
+export function deleteRestoreDraft(storage) {
+  try { storage.removeItem(RESTORE_DRAFT_KEY); return storage.getItem(RESTORE_DRAFT_KEY) === null; }
+  catch { return false; }
 }
 export function saveRestoreOutcome(storage, { id, outcome, elapsed, attemptId, plan = '', feedback = null, now = new Date().toISOString() }) {
   const activity = restoreActivity(id);
-  if (!activity || (outcome === 'planned' && !activity.planning) || (outcome === 'completed' && activity.planning) || !['completed', 'stopped', 'planned'].includes(outcome) || !Number.isFinite(elapsed) || elapsed < 0 || typeof attemptId !== 'string' || !/^[a-zA-Z0-9-]{8,80}$/.test(attemptId)) return false;
+  if (!activity || typeof now !== 'string' || !Number.isFinite(Date.parse(now)) || (outcome === 'planned' && !activity.planning) || (outcome === 'completed' && activity.planning) || !['completed', 'stopped', 'planned'].includes(outcome) || !Number.isFinite(elapsed) || elapsed < 0 || typeof attemptId !== 'string' || !/^[a-zA-Z0-9-]{8,80}$/.test(attemptId)) return false;
   try {
-    let history; try { history = JSON.parse(storage.getItem(RESTORE_HISTORY_KEY) || '[]'); } catch { history = []; }
-    if (!Array.isArray(history)) history = [];
+    const history = readRestoreRecords(storage);
     const record = { id, attemptId, outcome, elapsed: Math.round(elapsed), feedback: (activity.planning ? ['manageable','adjust','unsure'] : ['more-rested','same','less-rested']).includes(feedback) ? feedback : null, at: now, plan: restoreActivity(id).planning && typeof plan === 'string' ? plan.slice(0, 300) : '' };
-    storage.setItem(RESTORE_HISTORY_KEY, JSON.stringify([record, ...history.filter(item => item?.attemptId !== attemptId)].slice(0, 50)));
+    if (!writeVerified(storage, RESTORE_HISTORY_KEY, [record, ...history.filter(item => item?.attemptId !== attemptId)])) return false;
     // Saving an older reflection must not remove a newer break (another tab
     // or a browser-history entry may still own that draft).
     const draft = readRestoreDraft(storage);
-    if (draft?.id === id && draft.attemptId === attemptId) storage.removeItem(RESTORE_DRAFT_KEY);
+    // The history write already succeeded. A failed draft cleanup must not
+    // report that the outcome was not saved.
+    if (draft?.id === id && draft.attemptId === attemptId) deleteRestoreDraft(storage);
     return true;
   } catch { return false; }
 }
@@ -86,18 +96,46 @@ export function restoreClock(seconds) {
   return `${Math.floor(safe / 60)}:${String(safe % 60).padStart(2, '0')}`;
 }
 
-export function readRestorePlans(storage) {
-  try {
-    const values = JSON.parse(storage?.getItem(RESTORE_HISTORY_KEY) || '[]');
-    return Array.isArray(values) ? values.filter(value => restoreActivity(value?.id)?.planning && value.outcome === 'planned' && typeof value.plan === 'string' && value.plan.trim()).slice(0, 3).map(value => ({ id: value.id, plan: value.plan.slice(0, 300) })) : [];
-  } catch { return []; }
+// Read failures are distinct from an empty collection. Never overwrite unreadable
+// history while saving/deleting an individual record.
+function readRestoreRecords(storage) {
+  if (!storage) throw new Error('Device storage is unavailable');
+  const values = JSON.parse(storage.getItem(RESTORE_HISTORY_KEY) || '[]');
+  if (!Array.isArray(values)) throw new Error('Restore history could not be read');
+  return values;
 }
-
-export function readRestoreOutcome(storage, attemptId) {
-  if (typeof attemptId !== 'string' || !/^[a-zA-Z0-9-]{8,80}$/.test(attemptId)) return null;
+function validOutcome(value) {
+  const activity = restoreActivity(value?.id);
+  return activity && typeof value.attemptId === 'string' && /^[a-zA-Z0-9-]{8,80}$/.test(value.attemptId)
+    && ['completed', 'stopped', 'planned'].includes(value.outcome)
+    && !(value.outcome === 'planned' && !activity.planning)
+    && !(value.outcome === 'completed' && activity.planning)
+    && Number.isFinite(value.elapsed) && value.elapsed >= 0;
+}
+export const RESTORE_FEEDBACK = Object.freeze({
+  manageable: 'Manageable', adjust: 'Needs adjusting', unsure: 'Not sure yet',
+  'more-rested': 'More rested', same: 'About the same', 'less-rested': 'Less rested',
+});
+export function readRestoreHistory(storage) {
+  return readRestoreRecords(storage).filter(validOutcome).map(value => ({
+    id: value.id, attemptId: value.attemptId, outcome: value.outcome, elapsed: value.elapsed,
+    at: typeof value.at === 'string' && Number.isFinite(Date.parse(value.at)) ? value.at : null,
+    plan: restoreActivity(value.id).planning && typeof value.plan === 'string' ? value.plan.slice(0, 300) : '',
+    feedback: (restoreActivity(value.id).planning ? ['manageable', 'adjust', 'unsure'] : ['more-rested', 'same', 'less-rested']).includes(value.feedback) ? value.feedback : null,
+  }));
+}
+export function deleteRestoreOutcome(storage, attemptId) {
+  if (typeof attemptId !== 'string' || !/^[a-zA-Z0-9-]{8,80}$/.test(attemptId)) return false;
   try {
-    const values = JSON.parse(storage?.getItem(RESTORE_HISTORY_KEY) || '[]');
-    const value = Array.isArray(values) ? values.find(item => item?.attemptId === attemptId) : null;
-    return value && restoreActivity(value.id) && ['completed','stopped','planned'].includes(value.outcome) && Number.isFinite(value.elapsed) && value.elapsed >= 0 ? value : null;
-  } catch { return null; }
+    const records = readRestoreRecords(storage);
+    return writeVerified(storage, RESTORE_HISTORY_KEY, records.filter(item => item?.attemptId !== attemptId));
+  } catch { return false; }
+}
+export function readRestorePlans(storage) {
+  try { return readRestoreHistory(storage).filter(value => value.outcome === 'planned' && value.plan.trim()).map(value => ({ id: value.id, plan: value.plan })); }
+  catch { return []; }
+}
+export function readRestoreOutcome(storage, attemptId) {
+  try { return readRestoreHistory(storage).find(item => item.attemptId === attemptId) || null; }
+  catch { return null; }
 }

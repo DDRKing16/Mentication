@@ -1731,9 +1731,7 @@ body:has(dialog[open]) {
   justify-content:space-between;
   gap:12px;
 }
-/* L-shaped piece: a tall square icon fills the open space left of the
-   "or try 7 calmer days" link, and a thin one-line strip runs the full
-   width beneath it. */
+/* Live Peace Palace level artwork with its progression details below. */
 .palace-badge {
   display:grid;
   grid-template-columns:auto 1fr;
@@ -2192,8 +2190,10 @@ body:has(dialog[open]) {
 .week-panel .begin-button::before,.week-panel .seven-days::before { content:none; }
 .week-panel .palace-badge-icon { width:44px; height:44px; }
 .week-panel .seven-days { min-height:44px; }
-.week-panel .palace-badge { grid-template-areas:"icon seven" "strip strip"; grid-template-columns:44px minmax(0,1fr); grid-template-rows:auto auto; }
-.week-panel .palace-badge-strip { flex-direction:row; align-items:center; flex-wrap:wrap; column-gap:4px; }
+.week-panel .palace-badge { grid-template-areas:"icon" "strip"; grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; justify-items:center; }
+.week-panel .palace-badge-strip { flex-direction:row; align-items:center; justify-content:center; flex-wrap:wrap; column-gap:4px; text-align:center; }
+.week-panel .palace-badge-icon { justify-self:center; }
+.week-panel .palace-badge-line { justify-content:center; }
 .week-panel .palace-badge-title { display:none; }
 @media(max-width:700px) {
   .week-panel { grid-template-columns:minmax(0,1fr) 118px; column-gap:7px; }
@@ -2206,5 +2206,29 @@ body:has(dialog[open]) {
   #wellness-open { width:58px; min-width:58px; height:58px; }
   .week-panel .begin-button,.week-panel .seven-days,.wellness-button { min-height:58px; }
   .week-panel .palace-badge-icon,.wellness-sheet .round-button { width:58px; height:58px; }
-  .week-panel .palace-badge { grid-template-columns:58px minmax(0,1fr); }
 }
+
+/* The house occupies the full card's centre, below the Begin action. */
+.week-panel { grid-template-areas:"oura actions" "week actions" "palace palace"; padding-inline:21px; }
+.week-panel.has-wellness-connection { grid-template-areas:"oura oura" "week actions" "palace palace"; }
+.week-panel .week-actions { align-self:start; }
+.week-panel .palace-badge { grid-area:palace; width:100%; margin-top:4px; }
+@media(max-width:700px) { .week-panel { padding-inline:9px; } }
+@media(min-width:701px) and (max-width:948px) { .week-panel { padding-inline:2.215cqw; } }
+
+/* Settings' extra-large text also reaches the isolated Home document. */
+[data-text-scale="1.3"] .accessible-caption { font-size: 25px; }
+[data-text-scale="1.3"] .accessible-caption span { font-size: 17px; }
+[data-text-scale="1.3"] .wellness-note,
+[data-text-scale="1.3"] .wellness-metric span { font-size: 18px; }
+[data-text-scale="1.3"] .nav-item { font-size: 20px; }
+@media (max-width: 600px) {
+  [data-text-scale="1.3"] .accessible-caption { font-size: 23px; }
+  [data-text-scale="1.3"] .nav-item { font-size: 15px; }
+}
+
+/* Shared dialog behavior also supports WebKit before native dialog shipped. */
+.sheet:not([open]) { display:none; }
+.sheet { max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px); }
+.home-modal-layer[data-fallback=true] { position:fixed; inset:0; z-index:10000; background:#111419aa; -webkit-backdrop-filter:blur(9px); backdrop-filter:blur(9px); }
+.home-modal-layer[data-fallback=true] .sheet { display:block; position:absolute; top:var(--dialog-top,50%); left:50%; bottom:auto; margin:0; transform:translate(-50%,-50%); max-height:var(--dialog-max-height,calc(100vh - 32px)); }
