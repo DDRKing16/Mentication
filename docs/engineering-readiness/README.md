@@ -17,9 +17,9 @@ This release preserves approved Home candidate 33fdfe6080f5d6e9298e15cdc5402c96d
 
 ## Fresh combined checks
 
-129 test files and 1,161 tests passed, including 28 reminder cases and backup/storage/compatibility regressions. Lint, typecheck, production build, V3 verification, native sync and diff checks passed.
+131 test files and 1,189 tests passed, including 28 reminder cases and backup/storage/compatibility regressions. Lint, typecheck, production build, V3 verification, native sync and diff checks passed.
 
-Capacitor pin 8.5.1; largest JS chunk 469,992 bytes (153.42 kB gzip), versus baseline 743.42 kB (225.56 kB gzip). Public assets 186,301,196 bytes. These are bundle sizes, not device-performance measurements. Rebuilt Home matches the preserved approved product asset byte for byte.
+Capacitor pin 8.5.1; largest JS chunk 470,070 bytes, versus baseline 743.42 kB (225.56 kB gzip). Public assets 186,304,242 bytes. These are bundle sizes, not device-performance measurements. Rebuilt Home includes the shared dialog lifecycle fixes; approved artwork and content remain unchanged.
 
 Dependency audit: zero production findings; complete tree has six moderate tooling findings and no high/critical findings. No forced-major overrides.
 
@@ -27,7 +27,7 @@ Dependency audit: zero production findings; complete tree has six moderate tooli
 
 Check the new CI jobs on the exact pushed commit before release sign-off. Local Chromium launch was blocked by socket restrictions; cloud-browser local-preview access was blocked by URL policy. No local interactive browser pass is claimed. Simulator checks do not replace physical-device notification delivery, audio interruptions, accessibility, signing, archive/privacy validation or App Store review.
 
-Five pre-existing early-iOS native-dialog flows still require refactoring and interactive testing: Next Easiest Step pause, Tomorrow Parking leave-draft, Urge Surf end-early, Journey Options and Journey Takeaway. Full iOS 15.0–15.3 behavior is not certified for these pause/history/nested-dialog flows.
+The five previously native-only flows now share the compatible dialog lifecycle: Next Easiest Step pause, Tomorrow Parking leave-draft, Urge Surf end-early, Journey Options and Journey Takeaway. Added coverage exercises nested focus, repeated dismissal, draft retention/discard, save/delete, browser Back and navigation teardown, plus out-of-order cleanup and legacy viewport/color fallbacks. CI runs real UI flows in Chromium and WebKit with native dialog APIs available and disabled. This simulates the missing API surface; it does not certify an actual iOS 15.0–15.3 device.
 
 Reminder uncertainty deliberately has no automatic timer/snapshot reset because the plugin cannot prove native completion after an unconfirmed schedule. The warning directs affected users to turn off Mentication notifications in phone Settings. If marker storage fails, only the in-memory warning survives reliably. Mocked notification tests are not physical-device evidence.
 

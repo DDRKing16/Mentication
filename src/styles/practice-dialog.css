@@ -1,0 +1,35 @@
+/* Theme classes on the portal retain the practice's fonts and colour tokens. */
+.mcn-modal-layer.mcn-practice-layer:not([data-fallback]) { display: contents; }
+.mcn-modal-layer.mcn-practice-layer[data-fallback=true] {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  background: rgba(0, 0, 0, .5);
+}
+.mcn-practice-layer dialog:not([open]) { display: none; }
+.mcn-practice-layer dialog { box-sizing: border-box; }
+.mcn-practice-layer dialog :focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+/* vh remains usable before dynamic viewport units arrived in WebKit. */
+.mcn-practice-layer.nes-v2-wrap dialog.pause-overlay,
+.mcn-practice-layer .urge-lovable__overlay { height: 100vh; height: 100dvh; }
+.mcn-practice-layer.nes-v2-wrap .pause-card { max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px); overflow: auto; }
+.mcn-practice-layer .urge-lovable__overlay { overflow: auto; }
+.mcn-practice-layer .urge-lovable__overlay section { max-height: calc(100vh - 3.5rem); max-height: calc(100dvh - 3.5rem); overflow: auto; }
+.mcn-practice-layer .tpl-leave { max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow: auto; }
+/* Earlier supported WebKit cannot resolve oklch custom-property colours. */
+@supports not (color: oklch(0.5 0 0)) {
+  .mcn-practice-layer.tpl {
+    --tpl-fg: #ded4e4;
+    --tpl-card: #211a28;
+    --tpl-primary: #bd8278;
+    --tpl-primary-fg: #1b1010;
+    --tpl-muted-fg: #b9a8c2;
+    --tpl-border: #504158;
+    --tpl-ring: #bd8278;
+  }
+}
