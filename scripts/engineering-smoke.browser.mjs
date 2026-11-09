@@ -99,6 +99,7 @@ try {
             console.log(`PASS ${name} ${legacy ? 'without native dialog APIs' : 'native dialog APIs'}: ${suite}`);
           } catch (error) {
             console.error(`FAIL ${name} ${legacy ? 'legacy' : 'native'} ${suite} at ${dialogPage.url()}`);
+            if (dialogErrors.length) console.error('Browser exceptions:', dialogErrors);
             console.error((await dialogPage.locator('body').innerText().catch(() => '')).slice(0,4000));
             dialogFailures.push(`${name} ${legacy ? 'legacy' : 'native'} ${suite}: ${error.message}`);
           } finally { await dialogs.close(); }

@@ -12,9 +12,15 @@ function restoreAttribute(element, name, value) {
   if (value === null) element.removeAttribute(name); else element.setAttribute(name, value);
 }
 
+// CSSOM assignment leaves style="" after its last declaration is removed.
+// Remove only that empty shell, never styles added by another owner while open.
+function restoreEmptyStyle(element, previousStyle) {
+  if (previousStyle === null && element.getAttribute('style') === '') element.removeAttribute('style');
+}
+
 function createDialogState(doc) {
   const body = doc.body;
-  const state = { stack: [], hidden: new Map(), overflow: body.style.overflow, observer: null };
+  const state = { stack: [], hidden: new Map(), overflow: body.style.overflow, style: body.getAttribute('style'), observer: null };
   state.sync = () => {
     const top = state.stack[state.stack.length - 1];
     const isolate = state.stack.some(item => item.fallback);
@@ -43,16 +49,18 @@ function createDialogState(doc) {
       restoreAttribute(sibling, 'aria-hidden', previous.aria);
       restoreAttribute(sibling, 'inert', previous.inert);
       sibling.style.pointerEvents = previous.pointerEvents;
+      restoreEmptyStyle(sibling, previous.style);
       state.hidden.delete(sibling);
     }
     for (const sibling of body.children) {
       if (!shouldHide(sibling) || state.hidden.has(sibling)) continue;
-      state.hidden.set(sibling, { aria: sibling.getAttribute('aria-hidden'), inert: sibling.getAttribute('inert'), pointerEvents: sibling.style.pointerEvents });
+      state.hidden.set(sibling, { aria: sibling.getAttribute('aria-hidden'), inert: sibling.getAttribute('inert'), pointerEvents: sibling.style.pointerEvents, style: sibling.getAttribute('style') });
       sibling.setAttribute('aria-hidden', 'true');
       sibling.setAttribute('inert', '');
       sibling.style.pointerEvents = 'none';
     }
     body.style.overflow = state.stack.length ? 'hidden' : state.overflow;
+    if (!state.stack.length) restoreEmptyStyle(body, state.style);
   };
   const Observer = doc.defaultView?.MutationObserver;
   state.observer = Observer ? new Observer(state.sync) : null;
@@ -68,6 +76,7 @@ export function openAccessibleDialog(node, layer, { opener, onClose }) {
   if (!state) { state = createDialogState(doc); dialogDocuments.set(doc, state); }
   const previousTabIndex = node.getAttribute('tabindex');
   const previousOpen = node.getAttribute('open');
+  const previousStyle = layer.getAttribute('style');
   const previousZIndex = layer.style.zIndex;
   const previousFallback = layer.getAttribute('data-fallback');
   const identity = { node, layer, opener, fallback: false, enableFallback: () => {
@@ -88,8 +97,8 @@ export function openAccessibleDialog(node, layer, { opener, onClose }) {
   const isTop = () => state.stack[state.stack.length - 1] === identity;
   const containFocus = event => { if (identity.fallback && isTop() && !node.contains(event.target)) focusFirst(); };
   const keydown = event => {
-    if (!identity.fallback || !isTop()) return;
-    if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onClose(); return; }
+    if (!isTop()) return;
+    if (event.key === 'Escape' && identity.fallback) { event.preventDefault(); event.stopPropagation(); onClose(); return; }
     if (event.key !== 'Tab') return;
     const items = candidates();
     const first = items[0], last = items[items.length - 1];
@@ -128,6 +137,7 @@ export function openAccessibleDialog(node, layer, { opener, onClose }) {
       layer.style.zIndex = previousZIndex;
     }
     state.sync();
+    if (identity.fallback) restoreEmptyStyle(layer, previousStyle);
     const top = state.stack[state.stack.length - 1];
     if (!top) {
       state.observer?.disconnect();

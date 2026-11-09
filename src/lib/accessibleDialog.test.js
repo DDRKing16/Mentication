@@ -9,7 +9,7 @@ function fixture() {
     defaultView:{ MutationObserver:class { constructor(callback) { this.callback=callback; observers.push(this); } observe() {} disconnect() { this.disconnected=true; } } },
   };
   const make = () => { const attrs=new Map(); return {
-    ownerDocument:doc,isConnected:true,style:{pointerEvents:'',zIndex:''},dataset:{},children:[],items:[],tabIndex:0,classList:{contains:()=>false},
+    ownerDocument:doc,isConnected:true,style:new Proxy({pointerEvents:'',zIndex:''}, { set(target, name, value) { target[name]=value; attrs.set('style',Object.entries(target).filter(([,v])=>v).map(([key,v])=>`${key}: ${v};`).join(' ')); return true; } }),dataset:{},children:[],items:[],tabIndex:0,classList:{contains:()=>false},
     getAttribute(name) { return name==='data-fallback' ? this.dataset.fallback??null : attrs.get(name)??null; },
     setAttribute(name,value) { attrs.set(name,value); if(name==='data-fallback')this.dataset.fallback=value; if(name==='open')this.open=true; },
     removeAttribute(name) { attrs.delete(name); if(name==='data-fallback')delete this.dataset.fallback; if(name==='open')this.open=false; },
@@ -48,6 +48,7 @@ describe('nested dialog ownership', () => {
     const f = fixture(), one = f.modal(), cleanupOne = open(one, f.opener);
     const two = f.modal(), cleanupTwo = open(two, one.first);
     cleanupOne();
+    expect(one.layer.getAttribute('style')).toBeNull();
     expect(f.doc.activeElement).toBe(two.first);
     expect(f.root.getAttribute('inert')).toBe('');
     expect(f.body.style.overflow).toBe('hidden');
@@ -152,5 +153,66 @@ describe('nested dialog ownership', () => {
     cleanupOne(); expect(b.body.style.overflow).toBe('hidden');
     b.opener.focus(); expect(b.doc.activeElement).toBe(two.first);
     cleanupTwo(); expect(b.body.style.overflow).toBe('auto');
+  });
+});
+
+describe('native keyboard wrapping and exact style cleanup', () => {
+  it('wraps native Tab and Shift-Tab but leaves Escape to native cancel handling', () => {
+    const f = fixture(), m = f.modal(), onClose = vi.fn();
+    m.node.showModal = () => { m.node.open = true; };
+    m.node.close = () => { m.node.open = false; };
+    const cleanup = openAccessibleDialog(m.node, m.layer, { opener: f.opener, onClose });
+    m.last.focus();
+    expect(f.key('Tab').preventDefault).toHaveBeenCalledOnce();
+    expect(f.doc.activeElement).toBe(m.first);
+    expect(f.key('Tab', true).preventDefault).toHaveBeenCalledOnce();
+    expect(f.doc.activeElement).toBe(m.last);
+    const escape = f.key('Escape');
+    expect(escape.preventDefault).not.toHaveBeenCalled();
+    expect(escape.stopPropagation).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+    cleanup();
+  });
+
+  it('wraps only the top native dialog and handles a native dialog without controls', () => {
+    const f = fixture(), one = f.modal(), two = f.modal();
+    for (const m of [one, two]) {
+      m.node.showModal = () => { m.node.open = true; };
+      m.node.close = () => { m.node.open = false; };
+    }
+    const cleanupOne = openAccessibleDialog(one.node, one.layer, { opener: f.opener, onClose: vi.fn() });
+    const cleanupTwo = openAccessibleDialog(two.node, two.layer, { opener: one.first, onClose: vi.fn() });
+    two.last.focus();
+    expect(f.key('Tab').preventDefault).toHaveBeenCalledOnce();
+    expect(f.doc.activeElement).toBe(two.first);
+    two.node.items = [];
+    expect(f.key('Tab').preventDefault).toHaveBeenCalledOnce();
+    expect(f.doc.activeElement).toBe(two.node);
+    cleanupTwo(); cleanupOne();
+  });
+
+  it('removes empty style attributes only when they were originally absent', () => {
+    const f = fixture(), m = f.modal(), empty = f.make();
+    empty.setAttribute('style', ''); f.body.append(empty);
+    f.body.style.overflow = ''; f.body.removeAttribute('style');
+    const cleanup = openAccessibleDialog(m.node, m.layer, { opener: f.opener, onClose: vi.fn() });
+    expect(f.root.getAttribute('style')).not.toBeNull();
+    cleanup();
+    expect(f.root.getAttribute('style')).toBeNull();
+    expect(m.layer.getAttribute('style')).toBeNull();
+    expect(f.body.getAttribute('style')).toBeNull();
+    expect(empty.getAttribute('style')).toBe('');
+  });
+
+  it('retains unrelated inline styles added during isolation', () => {
+    const f = fixture(), m = f.modal();
+    f.body.style.overflow = ''; f.body.removeAttribute('style');
+    const cleanup = openAccessibleDialog(m.node, m.layer, { opener: f.opener, onClose: vi.fn() });
+    for (const element of [f.root, f.body, m.layer]) element.style.color = 'red';
+    cleanup();
+    for (const element of [f.root, f.body, m.layer]) {
+      expect(element.style.color).toBe('red');
+      expect(element.getAttribute('style')).toContain('color: red');
+    }
   });
 });

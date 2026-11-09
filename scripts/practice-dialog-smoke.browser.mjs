@@ -42,7 +42,7 @@ async function opened(page, id) {
 async function activate(control) { await control.focus(); await control.click(); }
 
 // The caller owns browser startup, onboarding and native/forced-legacy mode.
-export async function checkPracticeDialogs(page, origin) {
+async function checkNextStepDialog(page, origin) {
   await page.goto(`${origin}/next-easiest-step`);
   await startMatchedPractice(page, 'Next Easiest Step', 'How hard is it to focus right now?');
   await button(page, 'Tidy my desk').click();
@@ -59,6 +59,9 @@ export async function checkPracticeDialogs(page, origin) {
   await button(page, 'Back to tasks').click(); await closed(page, nextBackground);
   await page.getByRole('heading', { name: 'Your task is here.', exact: true }).waitFor();
 
+}
+
+async function checkTomorrowParkingDialog(page, origin) {
   await openFromLibrary(page, origin, 'Tomorrow Parking Lot');
   // Tomorrow has no mandatory matched baseline; its safety gate is suitability.
   await page.getByRole('heading', { name: 'Can this wait until tomorrow?', exact: true }).waitFor();
@@ -83,6 +86,9 @@ export async function checkPracticeDialogs(page, origin) {
   assert.equal(await page.evaluate(() => sessionStorage.getItem('mentication.tomorrowParking.draft.v1')), null);
   assert.equal(await page.evaluate(() => localStorage.getItem('mentication.tomorrowParking.records.v1')), null, 'Leaving a draft must not park or save it');
 
+}
+
+async function checkUrgeSurfDialog(page, origin) {
   await openFromLibrary(page, origin, 'Urge Surfing');
   await startMatchedPractice(page, 'Urge Surfing', 'How distressed are you right now?');
   await page.getByRole('button', { name: /^Start a \d+-second pause$/ }).click();
@@ -97,4 +103,29 @@ export async function checkPracticeDialogs(page, origin) {
   await activate(end); await opened(page, 'urge-end-title');
   await button(page, 'End gently').click(); await closed(page, urgeBackground);
   await page.getByText('Practice ended early', { exact: true }).waitFor();
+}
+
+// A failure in one practice must not hide coverage of the other two. Each
+// scenario begins with ordinary navigation, which also unmounts any failed
+// scenario's open dialog without modifying storage or bypassing application UI.
+export async function checkPracticeDialogs(page, origin) {
+  const failures = [];
+  for (const [name, check] of [
+    ['Next Easiest Step', checkNextStepDialog],
+    ['Tomorrow Parking Lot', checkTomorrowParkingDialog],
+    ['Urge Surfing', checkUrgeSurfDialog],
+  ]) {
+    try {
+      await check(page, origin);
+      console.log(`PASS practice dialog: ${name}`);
+    } catch (error) {
+      let body;
+      try { body = await page.locator('body').innerText({ timeout: 5000 }); }
+      catch (captureError) { body = `Body capture unavailable: ${captureError.message}`; }
+      const failure = `${name}: ${error.stack || error.message || String(error)}\nURL: ${page.url()}\nCurrent page body:\n${body}`;
+      failures.push(failure);
+      console.error(`FAIL practice dialog: ${failure}`);
+    }
+  }
+  assert.equal(failures.length, 0, `Practice dialog failures (${failures.length}/3):\n\n${failures.join('\n\n')}`);
 }

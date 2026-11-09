@@ -17,9 +17,9 @@ This release preserves approved Home candidate 33fdfe6080f5d6e9298e15cdc5402c96d
 
 ## Fresh combined checks
 
-131 test files and 1,185 tests passed, including 28 reminder cases and backup/storage/compatibility regressions. Lint, typecheck, production build, V3 verification, native sync and diff checks passed.
+131 test files and 1,189 tests passed, including 28 reminder cases and backup/storage/compatibility regressions. Lint, typecheck, production build, V3 verification, native sync and diff checks passed.
 
-Capacitor pin 8.5.1; largest JS chunk 470,070 bytes, versus baseline 743.42 kB (225.56 kB gzip). Public assets 186,303,616 bytes. These are bundle sizes, not device-performance measurements. Rebuilt Home includes the shared dialog lifecycle fixes; approved artwork and content remain unchanged.
+Capacitor pin 8.5.1; largest JS chunk 470,070 bytes, versus baseline 743.42 kB (225.56 kB gzip). Public assets 186,304,242 bytes. These are bundle sizes, not device-performance measurements. Rebuilt Home includes the shared dialog lifecycle fixes; approved artwork and content remain unchanged.
 
 Dependency audit: zero production findings; complete tree has six moderate tooling findings and no high/critical findings. No forced-major overrides.
 
