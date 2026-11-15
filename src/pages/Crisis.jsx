@@ -15,7 +15,7 @@ export default function Crisis() {
   const navigate = useNavigate();
   const goBack=useAppBack();
   return (
-    <div style={{ '--cream': '37 41% 87%' }} className="min-h-full bg-gradient-to-b from-[hsl(178_40%_9%)] via-[hsl(178_36%_13%)] to-[hsl(178_42%_7%)] text-cream">
+    <div style={{ '--cream': '37 41% 87%' }} className="min-h-full break-words bg-gradient-to-b from-[hsl(178_40%_9%)] via-[hsl(178_36%_13%)] to-[hsl(178_42%_7%)] text-cream">
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-16">
         <button
           onClick={goBack}
@@ -52,12 +52,12 @@ export default function Crisis() {
             <a
               key={n.label}
               href={`tel:${n.number.replace(/\s/g, "")}`}
-              className="no-tap flex items-center gap-4 rounded-2xl border border-cream/10 bg-white/5 p-5 transition-all hover:border-[var(--mcn-gold)]/55 hover:bg-white/10 active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB977]"
+              className="no-tap flex flex-wrap items-center gap-4 rounded-2xl border border-cream/10 bg-white/5 p-5 transition-all hover:border-[var(--mcn-gold)]/55 hover:bg-white/10 active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB977]"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--mcn-gold)]/15 text-[#DDB977]">
                 <Phone aria-hidden="true" className="h-5 w-5" strokeWidth={1.7} />
               </span>
-              <span className="min-w-0 flex-1">
+              <span className="min-w-0 flex-1 basis-48">
                 <span className="block font-heading text-lg font-medium text-cream">{n.label}</span>
                 <span className="block text-sm text-cream/80">{n.note}</span>
                 <span className="mt-2 block font-heading text-lg font-medium tabular-nums text-[#DDB977]">{n.number}</span>
@@ -68,8 +68,8 @@ export default function Crisis() {
         </section>
 
         <div className="mt-10 rounded-2xl border border-cream/10 bg-white/5 p-5">
-          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-cream/60">
-            <HeartPulse aria-hidden="true" className="h-4 w-4" /> Wellbeing disclaimer
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cream/60">
+            <HeartPulse aria-hidden="true" className="mr-2 inline h-4 w-4" /> Wellbeing disclaimer
           </p>
           <p className="mt-3 text-sm leading-relaxed text-cream/70">
             Mentication is a self-regulation and wellbeing tool. It is not a medical device, a crisis service, or a substitute

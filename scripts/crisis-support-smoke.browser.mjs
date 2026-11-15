@@ -27,6 +27,7 @@ export async function checkCrisisSupport(page, base) {
   for (const [width, fontSize] of [[390, '100%'], [320, '100%'], [320, '200%']]) {
     await page.setViewportSize({ width, height: 844 });
     await page.evaluate(size => { document.documentElement.style.fontSize = size; }, fontSize);
+    await page.screenshot({ path:`${screenshotDir}/${page.context().browser().browserType().name()}-${colorScheme}-${width}-${fontSize.replace('%','')}.png`, fullPage:true });
     assert.equal(await page.locator('html').evaluate(node => node.scrollWidth > innerWidth + 1), false, `Support overflows at ${width}px / ${fontSize}`);
     for (const control of [directory, ...await page.locator('a[href^="tel:"]').all(), page.getByRole('button', { name: 'Optional calming practice', exact: true })]) {
       const box = await control.boundingBox();
@@ -34,7 +35,6 @@ export async function checkCrisisSupport(page, base) {
       assert(await control.evaluate(node => node.scrollHeight <= node.clientHeight + 1), 'Support text is clipped');
     }
     assert(await international.evaluate(node => node.getBoundingClientRect().bottom <= document.querySelector('#australian-support-heading').getBoundingClientRect().top), 'International and Australian sections overlap');
-    await page.screenshot({ path:`${screenshotDir}/${page.context().browser().browserType().name()}-${colorScheme}-${width}-${fontSize.replace('%','')}.png`, fullPage:true });
   }
   }
   await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
