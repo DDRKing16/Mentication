@@ -50,6 +50,8 @@ export async function checkCrisisSupport(page, base) {
   await page.goto(`${base}/settings`);
   await page.getByRole('button', { name: 'Crisis support', exact: true }).click();
   await page.getByRole('heading', { name: 'If you’re in crisis right now', exact: true }).waitFor();
+  // Wait for the exiting Settings page so its own Back control is gone.
+  await page.getByRole('button', { name: 'Crisis support', exact: true }).waitFor({ state:'hidden' });
   await page.getByRole('button', { name: 'Back', exact: true }).click();
   await page.getByRole('button', { name: 'Crisis support', exact: true }).waitFor();
 }

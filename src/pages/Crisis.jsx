@@ -16,7 +16,7 @@ export default function Crisis() {
   const goBack=useAppBack();
   return (
     <div style={{ '--cream': '37 41% 87%' }} className="min-h-full break-words bg-gradient-to-b from-[hsl(178_40%_9%)] via-[hsl(178_36%_13%)] to-[hsl(178_42%_7%)] text-cream">
-      <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 pt-10 pb-16">
+      <div className="mx-auto flex min-h-full max-w-lg flex-col px-[20px] pt-10 pb-16">
         <button
           onClick={goBack}
           className="no-tap flex min-h-11 items-center gap-1 rounded-full text-sm font-medium text-cream/70 transition-colors hover:text-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB977]"
@@ -36,7 +36,7 @@ export default function Crisis() {
           </p>
         </div>
 
-        <section aria-labelledby="international-support-heading" className="mt-6 rounded-2xl border border-cream/20 bg-white/5 p-5">
+        <section aria-labelledby="international-support-heading" className="mt-6 rounded-2xl border border-cream/20 bg-white/5 p-[20px]">
           <h2 id="international-support-heading" className="font-heading text-xl font-medium">Outside Australia?</h2>
           <p className="mt-2 text-sm leading-relaxed text-cream/80">Choose a support service for the country you’re in.</p>
           <a className="mt-2 inline-flex min-h-11 items-center rounded-md text-base font-medium text-[#DDB977] underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB977]" href="https://findahelpline.com" target="_blank" rel="noreferrer">
@@ -52,7 +52,7 @@ export default function Crisis() {
             <a
               key={n.label}
               href={`tel:${n.number.replace(/\s/g, "")}`}
-              className="no-tap flex flex-wrap items-center gap-4 rounded-2xl border border-cream/10 bg-white/5 p-5 transition-all hover:border-[var(--mcn-gold)]/55 hover:bg-white/10 active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB977]"
+              className="no-tap flex flex-wrap items-center gap-[16px] rounded-2xl border border-cream/10 bg-white/5 p-[20px] transition-all hover:border-[var(--mcn-gold)]/55 hover:bg-white/10 active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#DDB977]"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--mcn-gold)]/15 text-[#DDB977]">
                 <Phone aria-hidden="true" className="h-5 w-5" strokeWidth={1.7} />
@@ -67,7 +67,7 @@ export default function Crisis() {
           </div>
         </section>
 
-        <div className="mt-10 rounded-2xl border border-cream/10 bg-white/5 p-5">
+        <div className="mt-10 rounded-2xl border border-cream/10 bg-white/5 p-[20px]">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cream/60">
             <HeartPulse aria-hidden="true" className="mr-2 inline h-4 w-4" /> Wellbeing disclaimer
           </p>
