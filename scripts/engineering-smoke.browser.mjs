@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { checkPracticeDialogs } from './practice-dialog-smoke.browser.mjs';
 import { checkJourneyDialogs } from './journey-dialog-smoke.browser.mjs';
+import { checkCrisisSupport } from './crisis-support-smoke.browser.mjs';
 const playwright = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',');
 const port = Number(process.env.SMOKE_PORT ||4179);
@@ -90,7 +91,7 @@ try {
       await failed.close();
       console.log(`PASS ${name}: Home handshake, phone fit, direct Library isolation, privacy, fallback, Back and retry`);
       for (const legacy of [false, true]) {
-        for (const [suite, check] of [['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog]]) {
+        for (const [suite, check] of [['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog], ['crisis support guidance', checkCrisisSupport]]) {
           const dialogs = await context(browser, legacy), dialogPage = await dialogs.newPage(), dialogErrors = [];
           dialogPage.on('pageerror', error => dialogErrors.push(error.message));
           try {
