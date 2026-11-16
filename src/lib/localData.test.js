@@ -49,6 +49,10 @@ describe("device-local application data", () => {
     window.localStorage.setItem("mentation.sessions.v1", JSON.stringify(history));
     await sessionStore.create({ id: "newest", created_date: "2028-01-01T00:00:00Z" });
     expect(await sessionStore.list()).toHaveLength(100);
+    const all = await sessionStore.listAll();
+    expect(all).toHaveLength(751);
+    expect(all[0].id).toBe("newest");
+    expect((await sessionStore.listAll("created_date"))[0].id).toBe("practice-0");
     expect(await sessionStore.list("-created_date", 1000)).toHaveLength(751);
     expect(exportLocalAppData().sessions.map(record => record.id)).toEqual(["newest", ...history.map(record => record.id)]);
 
@@ -109,6 +113,7 @@ describe('storage failures remain truthful',()=>{
     await expect(sessionStore.create({id:'new'})).rejects.toThrow();
     expect(window.localStorage.getItem('mentation.sessions.v1')).toBe('{broken');
     await expect(sessionStore.list()).rejects.toThrow();
+    await expect(sessionStore.listAll()).rejects.toThrow();
   });
   it('does not report a silent write as a saved session',async()=>{
     window.localStorage.setItem=()=>{};

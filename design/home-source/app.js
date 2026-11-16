@@ -343,6 +343,19 @@ import { openAccessibleDialog as openHomeDialog } from '../../src/lib/accessible
   // Peace Palace: the same drawing as the app's Palace page (palaceSvg is
   // inlined from src/lib/palaceArt.js by scripts/build-home-document.mjs).
   function setPalace(palace) {
+    // Unknown history is not an empty palace. Keep a route to the retry screen
+    // without claiming a level while the host is loading or cannot read storage.
+    if (palace === null) {
+      for (const id of ['palace-card-art', 'palace-badge-art', 'palace-card-stages']) document.getElementById(id).innerHTML = '';
+      document.getElementById('palace-card-chip').textContent = 'Open palace';
+      document.getElementById('palace-badge-level').textContent = 'History not checked';
+      document.getElementById('palace-badge-next').textContent = '';
+      document.getElementById('palace-card-name').textContent = 'Your saved practice visits';
+      document.getElementById('palace-card-next').textContent = 'Open to check your history';
+      document.getElementById('palace-card').setAttribute('aria-label', 'PEACE PALACE. Open to check saved history');
+      document.getElementById('palace-badge-icon').setAttribute('aria-label', 'Your Peace Palace. Open to check saved history');
+      return;
+    }
     if (!palace || typeof palace !== 'object') throw new TypeError('palace must be an object.');
     const level = palace.level;
     if (!Number.isInteger(level) || level < 0 || level > 6) throw new TypeError('palace.level must be an integer from 0 through 6.');
@@ -481,7 +494,7 @@ import { openAccessibleDialog as openHomeDialog } from '../../src/lib/accessible
     setJournal,
     setMore
   });
-  setPalace({ level: 0, name: 'The quiet clearing', nextName: 'The shack', stonesToNext: 4, progress: 0 });
+  setPalace(null);
   applyPreferences(readPreferences());
   // Timezone-aware greeting. The crisp HTML overlay replaces the erased
   // baked-in text, so it always renders sharp above the ambient blur.

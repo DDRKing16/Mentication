@@ -88,7 +88,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
         send('parking', { parking: callbacks.current.parking });
         send('week', { week: callbacks.current.week });
         if (callbacks.current.today) send('today', { today: callbacks.current.today });
-        if (callbacks.current.palace) send('palace', { palace: callbacks.current.palace });
+        send('palace', { palace: callbacks.current.palace });
         if (callbacks.current.journal) send('journal', { journal: callbacks.current.journal });
         if (callbacks.current.more) send('more', { more: callbacks.current.more });
         reportViewport();
@@ -147,7 +147,7 @@ export default function HomeFrame({ onNavigate, week = { currentDay: null, compl
   }, [today, ready]);
 
   useEffect(() => {
-    if (ready && palace) send('palace', { palace });
+    if (ready) send('palace', { palace });
   }, [palace, ready]);
 
   useEffect(() => {
