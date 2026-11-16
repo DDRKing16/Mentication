@@ -8,7 +8,8 @@ async function startScene(page,base) {
   await page.getByRole('textbox',{name:'Search practices and restoring activities',exact:true}).fill('Change the Scene');
   await page.getByRole('button',{name:/^Change the Scene About/}).click();
   await page.getByRole('heading',{name:'How is your mood right now?',exact:true}).waitFor();
-  await button(page,'5').click();await button(page,'Start Change the Scene').click();
+  await button(page,'5').click();await button(page,'Continue').click();
+  await page.getByLabel('Current distress',{exact:true}).selectOption('2');await button(page,'Start Change the Scene').click();
   await button(page,'Begin Change the Scene').click();
   // Actual practice confirmations, not an injected completion/token fixture.
   for(const name of ['I moved','I had some water','I spent time outside','I sent a message','I got comfortable','I chose a plan']) {
