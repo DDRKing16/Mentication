@@ -213,15 +213,16 @@ export default function TodayStrip({ sessions, onOpenWeek, onOpenProgramme, onSt
 
   const [programmeState, setProgrammeState] = useState(null);
   useEffect(() => {
-    const id = activeProgrammeId();
-    const programme = id ? getProgramme(id) : null;
-    if (!programme) { setProgrammeState(null); return undefined; }
     let cancelled = false;
-    import("@/lib/programmes").then(({ programmeProgress }) => {
+    (async () => {
+      const id = activeProgrammeId();
+      const programme = id ? getProgramme(id) : null;
+      if (!programme) { if (!cancelled) setProgrammeState(null); return; }
+      const { programmeProgress } = await import("@/lib/programmes");
       if (cancelled) return;
       const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
       setProgrammeState(progress.finished ? null : { programme, progress });
-    });
+    })().catch(() => { if (!cancelled) setProgrammeState(null); });
     return () => { cancelled = true; };
   }, [sessions]);
 

@@ -6,13 +6,16 @@ import { activeProgrammeId, getProgramme, programmeProgress, programmeStartedAt 
 
 export default function ProgrammeCard({ sessions, onOpen, onStartDay }) {
   const state = useMemo(() => {
+    try {
     const id = activeProgrammeId();
     const programme = id ? getProgramme(id) : null;
     if (!programme) return null;
     const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
     return { programme, progress };
+    } catch { return { error: true }; }
   }, [sessions]);
 
+  if (state?.error) return <section className="px-5 pt-4"><button type="button" onClick={onOpen} className="min-h-11 text-left underline">Open programmes to check saved progress</button></section>;
   if (!state || state.progress.finished) {
     return (
       <section className="px-5 pt-4">

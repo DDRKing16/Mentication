@@ -1,3 +1,4 @@
+import { useProgrammeStore } from '@/hooks/useProgrammeStore';
 import { useAllDeviceSessions } from '@/hooks/useDeviceSessions';
 import { suggestionLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
@@ -44,19 +45,20 @@ const DIRECTION_LABELS = {
 // The document's weekly panel is the seven calmer days, so its circles show
 // that programme's real progress: completed day indexes and the current day
 // (never marked complete by touching Home — read-only here).
-async function readWeekState() {
-  const id = activeProgrammeId();
-  if (id !== WEEK_PROGRAMME_ID) return { currentDay: null, completedDays: [] };
-  const sessions = await sessionStore.list("-created_date", 200);
+async function readWeekState(sessions, store) {
+  const id = activeProgrammeId(store);
+  const startedAt = programmeStartedAt(WEEK_PROGRAMME_ID, store);
+  if (!startedAt || (id && id !== WEEK_PROGRAMME_ID)) return { currentDay: null, completedDays: [], available: true };
   const { programmeProgress } = await import("@/lib/programmes");
   const programme = getProgramme(WEEK_PROGRAMME_ID);
   if (!programme) return { currentDay: null, completedDays: [] };
-  const progress = programmeProgress(programme, sessions, programmeStartedAt(id));
+  const progress = programmeProgress(programme, sessions, startedAt);
   const completedDays = progress.days
     .map((day, index) => (day.status === "done" ? index : null))
     .filter((index) => index !== null);
   return {
-    currentDay: progress.finished ? null : Math.max(progress.todayIndex, 0),
+    currentDay: !progress.finished && progress.days[progress.todayIndex].status === "today" ? progress.todayIndex : null,
+    available: true,
     completedDays,
   };
 }
@@ -72,7 +74,8 @@ export default function Home() {
     window.addEventListener("storage", refresh);
     return () => { window.removeEventListener("focus", refresh); window.removeEventListener("storage", refresh); };
   }, []);
-  const [week, setWeek] = useState({ currentDay: null, completedDays: [] });
+  const programmeState = useProgrammeStore();
+  const [week, setWeek] = useState({ currentDay: null, completedDays: [], available: false });
   // "Your reset for today" appears only for returning users: onboarding done
   // and at least one session in history. Payload matches My Plan's card.
   const [today, setToday] = useState(null);
@@ -146,11 +149,15 @@ export default function Home() {
 
   useEffect(() => {
     let live = true;
-    readWeekState()
+    if (!historyReady || historyError || !programmeState.ready || programmeState.error) {
+      setWeek({ currentDay: null, completedDays: [], available: false });
+      return () => { live = false; };
+    }
+    readWeekState(deviceSessions, programmeState.store)
       .then((state) => { if (live) setWeek(state); })
-      .catch(() => {});
+      .catch(() => { if (live) setWeek({ currentDay: null, completedDays: [], available: false }); });
     return () => { live = false; };
-  }, [deviceSessions]);
+  }, [deviceSessions, historyReady, historyError, programmeState.store, programmeState.ready, programmeState.error]);
 
   useEffect(() => {
     let live = true;
@@ -178,20 +185,21 @@ export default function Home() {
   // practice the same way the Programmes page does. If the week is finished
   // or today's day hasn't opened yet, it shows the programme itself.
   const beginWeek = useCallback(async () => {
-    const programme = getProgramme(WEEK_PROGRAMME_ID);
-    if (!programme) return;
-    if (!programmeStartedAt(WEEK_PROGRAMME_ID)) startProgramme(WEEK_PROGRAMME_ID);
-    const { programmeProgress, launchStateFor } = await import("@/lib/programmes");
-    const sessions = await sessionStore.list("-created_date", 200);
-    const progress = programmeProgress(programme, sessions, programmeStartedAt(WEEK_PROGRAMME_ID));
-    const today = progress.finished ? null : progress.days[progress.todayIndex];
-    if (!today || today.status !== "today") {
-      navigate("/programmes/calmer-seven");
-      return;
-    }
-    const state = launchStateFor(today.id, programme);
-    if (state) navigate("/reset", { state });
-    else navigate("/programmes/calmer-seven");
+    try {
+      const programme = getProgramme(WEEK_PROGRAMME_ID);
+      if (!programme) return;
+      // Verify history before saving a new start or choosing a day. A failed
+      // read must route to the retry screen, never launch guessed progress.
+      const sessions = await sessionStore.listAll();
+      if (!programmeStartedAt(WEEK_PROGRAMME_ID)) startProgramme(WEEK_PROGRAMME_ID);
+      const { programmeProgress, launchStateFor } = await import("@/lib/programmes");
+      const progress = programmeProgress(programme, sessions, programmeStartedAt(WEEK_PROGRAMME_ID));
+      const today = progress.finished ? null : progress.days[progress.todayIndex];
+      if (!today || today.status !== "today") { navigate("/programmes/calmer-seven"); return; }
+      const state = launchStateFor(today.id, programme);
+      if (state) navigate("/reset", { state });
+      else navigate("/programmes/calmer-seven");
+    } catch { navigate("/programmes/calmer-seven"); }
   }, [navigate]);
 
   const onNavigate = useCallback((route) => {

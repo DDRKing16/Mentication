@@ -27,7 +27,7 @@ const routes = new Set([
  * and — for returning users — the "Your reset for today" card payload.
  * No database, authentication, router package, or page names are assumed.
  */
-export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [] }, today = null, palace = null, journal = null, more = null, parking = false, wellness = null, onWellnessAction = null }) {
+export default function HomeFrame({ onNavigate, week = { currentDay: null, completedDays: [], available: false }, today = null, palace = null, journal = null, more = null, parking = false, wellness = null, onWellnessAction = null }) {
   const { prefs } = useAccessibilityPrefs();
   const textSize = useAccessibility();
   const accessibility = useMemo(() => homeAccessibilityState(prefs, textSize?.textScale), [prefs, textSize?.textScale]);
