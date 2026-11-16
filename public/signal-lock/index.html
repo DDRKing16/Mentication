@@ -13,6 +13,10 @@
     <div class="heading"><div><p class="eyebrow">EXTERNAL FOCUS</p><h1 id="title">Signal Lock<span aria-hidden="true">.</span></h1></div><button id="time-toggle" class="quiet icon" aria-pressed="false" aria-label="Show elapsed time">◷</button></div>
     <p id="intro" class="intro">Follow a small signal. Let the room come into view.</p>
     <section class="guidance" aria-label="Next step"><span class="guide-mark" aria-hidden="true"><span class="arrow"></span></span><div><h2 id="instruction" tabindex="-1">Tap two signals. See what appears.</h2><p id="detail">No rush. Nothing to get wrong.</p></div></section>
+    <section id="session-error" class="session-error" hidden aria-label="Session unavailable">
+      <p id="session-error-message" role="alert" tabindex="-1"></p>
+      <button id="retry-session" class="primary">Try again</button>
+    </section>
     <div id="start-controls" class="controls"><button id="start" class="primary">Follow the signal <span class="arrow" aria-hidden="true"></span></button><button id="skip" class="quiet">Not now</button></div>
     <div id="paused-controls" class="controls" hidden><button id="resume" class="primary">Continue the signal <span class="arrow" aria-hidden="true"></span></button><button id="end-paused" class="quiet">End here</button></div>
     <section class="scene" aria-label="A softly lit room with a growing signal path">

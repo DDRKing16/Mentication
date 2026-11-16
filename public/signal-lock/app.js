@@ -1,4 +1,5 @@
 import { createSession, advance, durationText, PAIRS_PER_SCENE, TERMINAL, FEELINGS, readSaved, saveSession } from './session.js';
+import { createSecureId } from './secure-id.js';
 const $ = id => document.getElementById(id);
 // Coordinates keep both large targets inside the scene, including narrow phones.
 const PATHS = [
@@ -14,7 +15,8 @@ const SCENES = ['THE WINDOW ROOM', 'LIGHT THROUGH LEAVES', 'A QUIET CORNER'];
 let storage;
 try { storage = window.localStorage; } catch { /* A private browser can deny storage. */ }
 const saved = readSaved(storage);
-let session = saved.current || createSession(crypto.randomUUID());
+let session = saved.current;
+let sessionError = '';
 let history = saved.history;
 let lastTick = performance.now();
 let showTime = false;
@@ -36,6 +38,7 @@ function preferences() {
   $('motion').textContent = still ? 'Still scene on' : 'Still scene';
 }
 function persist() {
+  if (!session) return;
   const result = saveSession(storage, session, history);
   history = result.history;
   saveOK = result.saved;
@@ -43,6 +46,7 @@ function persist() {
 }
 function announce(text) { $('announcement').textContent = text; }
 function tick() {
+  if (!session) return;
   const now = performance.now();
   const wasActive = session.status === 'active';
   session = advance(session, { type: 'tick', ms: now - lastTick });
@@ -54,6 +58,7 @@ function tick() {
   $('elapsed').textContent = durationText(session.elapsedMs);
 }
 function act(action, focus = false) {
+  if (!session) return;
   tick();
   session = advance(session, action);
   lastTick = performance.now();
@@ -105,6 +110,17 @@ function drawScene() {
   });
 }
 function render() {
+  $('session-error').hidden = !sessionError;
+  $('session-error-message').textContent = sessionError;
+  $('time-toggle').disabled = !session;
+  if (!session) {
+    for (const id of ['start-controls', 'play-controls', 'paused-controls', 'summary', 'targets', 'elapsed']) $(id).hidden = true;
+    $('scene-overlay').hidden = false;
+    $('instruction').textContent = 'This scene could not start.';
+    $('detail').textContent = 'Try again, or use Home to choose another practice.';
+    $('save-status').textContent = 'No new session has been created.';
+    return;
+  }
   const { boundary } = sceneProgress();
   const active = session.status === 'active';
   const paused = session.status === 'paused';
@@ -155,11 +171,28 @@ for (const [id, target] of [['target-one', 1], ['target-two', 2]]) {
     else if (session.status === 'active') announce('Now tap signal 2.');
   };
 }
-$('again').onclick = () => {
-  session = createSession(crypto.randomUUID());
+function startNewSession(focus = false) {
+  if (session && !TERMINAL.includes(session.status)) return;
+  let next;
+  try {
+    // Prepare the identifier before replacing any current scene or history.
+    next = createSession(createSecureId());
+  } catch {
+    sessionError = session
+      ? 'Another scene could not be started securely. Your previous scene is unchanged. Try again or return Home.'
+      : 'A secure session could not be started in this browser. Try again or use Home to choose another practice.';
+    render();
+    if (focus) $('session-error-message').focus({ preventScroll: true });
+    return;
+  }
+  session = next;
+  sessionError = '';
   renderedScene = '';
-  persist(); render(); $('start').focus();
-};
+  lastTick = performance.now();
+  persist(); render();
+  if (focus) $('start').focus({ preventScroll: true });
+}
+$('again').onclick = $('retry-session').onclick = () => startNewSession(true);
 $('time-toggle').onclick = () => {
   showTime = !showTime;
   $('time-toggle').setAttribute('aria-pressed', String(showTime));
@@ -179,7 +212,7 @@ for (const feeling of FEELINGS) {
   $('feelings').append(button);
 }
 function interrupt() {
-  if (session.status !== 'active') return;
+  if (session?.status !== 'active') return;
   act({ type: 'pause' });
   announce('Paused while you were away. Continue when you want.');
 }
@@ -189,7 +222,8 @@ window.addEventListener('blur', interrupt);
 window.addEventListener('pageshow', () => { lastTick = performance.now(); render(); });
 window.addEventListener('storage', preferences);
 motionQuery.addEventListener('change', preferences);
-preferences(); persist(); render();
+preferences();
+if (session) { persist(); render(); } else startNewSession();
 setInterval(tick, 500);
 
 window.addEventListener('message', event => {
