@@ -182,7 +182,7 @@ function startNewSession(focus = false) {
       ? 'Another scene could not be started securely. Your previous scene is unchanged. Try again or return Home.'
       : 'A secure session could not be started in this browser. Try again or use Home to choose another practice.';
     render();
-    if (focus) $('session-error-message').focus({ preventScroll: true });
+    if (focus) $('session-error-message').focus();
     return;
   }
   session = next;
@@ -190,7 +190,7 @@ function startNewSession(focus = false) {
   renderedScene = '';
   lastTick = performance.now();
   persist(); render();
-  if (focus) $('start').focus({ preventScroll: true });
+  if (focus) $('start').focus();
 }
 $('again').onclick = $('retry-session').onclick = () => startNewSession(true);
 $('time-toggle').onclick = () => {

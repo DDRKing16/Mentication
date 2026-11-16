@@ -4,6 +4,7 @@ const key = 'mentation.signal-lock.grounding.v1';
 const modeKey = '__signal_smoke_crypto_mode';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const frame = page => page.frameLocator('iframe[title="Signal Lock"]');
+const inView = element => element.evaluate(node => { const rect = node.getBoundingClientRect(); return rect.top >= -1 && rect.bottom <= innerHeight + 1; });
 const record = page => page.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
 async function open(page, base, mode, fresh = true) {
   await page.goto(`${base}/library`);
@@ -98,6 +99,7 @@ export async function checkSignalLock(page, base) {
     const completed = await fullScene(page);
     await frame(page).locator('#again').click();
     await frame(page).locator('#start').waitFor({state:'visible'});
+    assert(await inView(frame(page).locator('#start')), 'Restarted scene scrolls its focused start control into view');
     const next = await record(page);
     assert.match(next.current.id, uuid);
     assert.notEqual(next.current.id, completed.current.id, 'Repeating creates a distinct secure identifier');
@@ -142,9 +144,11 @@ export async function checkSignalLock(page, base) {
     await frame(page).locator('#session-error').waitFor({state:'visible'});
     assert(await frame(page).getByRole('heading', {name:'Scene completed', exact:true}).isVisible());
     assert(await frame(page).locator('#session-error-message').evaluate(node => document.activeElement === node), 'Repeat failure moves focus to its explanation');
+    assert(await inView(frame(page).locator('#session-error-message')), 'Repeat failure scrolls its explanation into view');
     assert.deepEqual(await record(page), completed, 'Repeat failure must preserve the completed session and history');
     await restoreRandom(page); await frame(page).locator('#retry-session').click();
     await frame(page).locator('#start').waitFor({state:'visible'});
+    assert(await inView(frame(page).locator('#start')), 'Restarted scene scrolls its focused start control into view');
     const next = await record(page);
     assert.match(next.current.id, uuid); assert.notEqual(next.current.id, completed.current.id);
     assert.deepEqual(next.history, completed.history);
