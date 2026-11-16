@@ -37,6 +37,13 @@ jobs:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/browser/node_modules/playwright/index.mjs
           SMOKE_BROWSERS: chromium,webkit
         run: node scripts/engineering-smoke.browser.mjs
+      - name: Preserve support-screen mobile checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: support-region-mobile-checks
+          path: output/support-region-qa/
+          if-no-files-found: ignore
   ios-simulator:
     runs-on: macos-latest
     timeout-minutes: 30
