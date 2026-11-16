@@ -40,6 +40,12 @@ function sortSessions(sessions, sort = "-created_date") {
 }
 
 export const sessionStore = Object.freeze({
+  // Lifetime totals must not inherit the deliberately bounded list() window.
+  // This uses the same verified reader and never writes or repairs history.
+  async listAll(sort = "-created_date") {
+    return sortSessions(readSessions(), sort);
+  },
+
   async list(sort = "-created_date", limit = 100) {
     return sortSessions(readSessions(), sort).slice(0, Math.max(0, Number(limit) || 0));
   },

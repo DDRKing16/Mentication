@@ -7,7 +7,7 @@ export function useDeviceSessions(limit=100) {
   const reload=useCallback(async()=>{
     const current=++request.current;
     try {
-      const next=await sessionStore.list('-created_date',limit);
+      const next=limit===null ? await sessionStore.listAll() : await sessionStore.list('-created_date',limit);
       if(current===request.current){setSessions(next);setError('');setReady(true);}
     }catch{
       if(current===request.current){setError('Your local history could not be read. Try again; nothing has been removed.');setReady(true);}
@@ -18,4 +18,9 @@ export function useDeviceSessions(limit=100) {
     return ()=>{request.current+=1;unsubscribe();};
   },[reload]);
   return {sessions,ready,error,reload};
+}
+
+// Explicit opt-in for lifetime and date-based summaries; recent windows keep list limits.
+export function useAllDeviceSessions() {
+  return useDeviceSessions(null);
 }

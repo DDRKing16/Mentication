@@ -22,7 +22,7 @@ export default function Palace() {
     const read = event => {
       if(event?.type==='storage' && event.key!==null && event.key!=='mentation.sessions.v1')return;
       const current=++request;
-      sessionStore.list("-created_date",500).then(sessions=>{
+      sessionStore.listAll().then(sessions=>{
         if(alive && current===request){setPalace(derivePeacePalace(sessions));setReadError(false);}
       }).catch(()=>{if(alive && current===request){setPalace(null);setReadError(true);}});
     };

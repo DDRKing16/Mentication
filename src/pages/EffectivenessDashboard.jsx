@@ -2,7 +2,8 @@
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, MapPin, Loader } from "lucide-react";
-import { useDeviceSessions } from "@/hooks/useDeviceSessions";
+import { useAllDeviceSessions } from "@/hooks/useDeviceSessions";
+import { computeLocalCalendarStreak } from "@/lib/streak";
 import { computeEffectivenessInsights } from "@/lib/insights";
 
 import FlowHomeButton from "@/components/FlowHomeButton";
@@ -10,9 +11,12 @@ import ProgressStory from "@/components/insights/ProgressStory";
 import { summariseProgress, finishedPracticeIds } from "@/lib/progressStory";
 
 export default function EffectivenessDashboard() {
-  const {sessions,ready,error,reload}=useDeviceSessions(100);
+  const {sessions:allSessions,ready,error,reload}=useAllDeviceSessions();
+  // Keep recent pattern summaries bounded; streaks are not session windows.
+  const sessions=useMemo(()=>allSessions.slice(0,100),[allSessions]);
+  const currentStreak=useMemo(()=>computeLocalCalendarStreak(allSessions),[allSessions]);
   const insights=useMemo(()=>computeEffectivenessInsights(sessions),[sessions]);
-  const story=useMemo(()=>summariseProgress(sessions),[sessions]);
+  const story=useMemo(()=>summariseProgress(allSessions),[allSessions]);
   const bumpRuns = sessions.filter(session => session.pathway?.includes("happyBump"));
   const completedBumps = bumpRuns.filter(session => finishedPracticeIds(session).includes("happyBump")).length;
 
@@ -44,8 +48,8 @@ export default function EffectivenessDashboard() {
           <div className="mb-6 border-t border-border pt-6">
             <h2 className="font-heading text-xl font-medium text-primary">The detail</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Based on what you chose and rated in {insights.totalSessions} {insights.totalSessions === 1 ? 'session' : 'sessions'}
-              {insights.currentStreak > 0 && ` • ${insights.currentStreak}-day streak`}
+              Based on what you chose and rated in your latest {insights.totalSessions} {insights.totalSessions === 1 ? 'session' : 'sessions'}
+              {currentStreak > 0 && ` • ${currentStreak}-day streak`}
             </p>
           </div>
         )}

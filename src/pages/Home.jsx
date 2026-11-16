@@ -1,4 +1,4 @@
-import { useDeviceSessions } from '@/hooks/useDeviceSessions';
+import { useAllDeviceSessions } from '@/hooks/useDeviceSessions';
 import { suggestionLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
 // Home — the approved MentiCation home screen, delivered as the isolated
@@ -64,7 +64,7 @@ async function readWeekState() {
 export default function Home() {
   const navigate = useNavigate();
   const { wellness, onWellnessAction } = useWellness();
-  const {sessions:deviceSessions}=useDeviceSessions(500);
+  const {sessions:deviceSessions,ready:historyReady,error:historyError}=useAllDeviceSessions();
   const [parking, setParking] = useState(() => hasParkedNotes());
   useEffect(() => {
     const refresh = () => setParking(hasParkedNotes());
@@ -110,6 +110,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!historyReady || historyError) { setPalace(null); setMore(null); return; }
     const sessions=deviceSessions;
         const p = derivePeacePalace(sessions);
         setPalace({
@@ -141,7 +142,7 @@ export default function Home() {
           palace: { show: !practicedToday },
           premium: { show: premiumImminent, title: PREMIUM_PIECE.title },
         });
-  }, [deviceSessions]);
+  }, [deviceSessions, historyReady, historyError]);
 
   useEffect(() => {
     let live = true;
@@ -226,7 +227,7 @@ export default function Home() {
 
   return (
     <div className="relative">
-      <StreakBadge />
+      <StreakBadge sessions={deviceSessions} available={historyReady && !historyError} />
       <button
         type="button"
         aria-label={musicMuted ? "Unmute home music" : "Mute home music"}

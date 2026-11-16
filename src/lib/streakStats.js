@@ -1,31 +1,32 @@
 // @ts-check
-// Longest-streak bookkeeping, layered on top of the existing
-// `computeLocalCalendarStreak` (src/lib/streak.js), which already derives
-// the *current* streak straight from session history — no separate
-// "currentStreak" state to keep in sync. Longest-ever streak isn't derivable
-// cheaply on every read, so it's cached locally and only ever grows.
-import { computeLocalCalendarStreak } from "./streak";
+// Recover both streaks from retained history, while preserving a historical
+// best recorded by earlier versions. The optional cache is not a prerequisite
+// for showing accurate statistics from readable sessions.
+import { computeLocalCalendarStreakStats } from './streak';
 
-const KEY = "mentation.longestStreak.v1";
-const storage = () => (typeof window === "undefined" ? null : window.localStorage);
+const KEY = 'mentation.longestStreak.v1';
+const storage = () => (typeof window === 'undefined' ? null : window.localStorage);
 
 function readLongest() {
-  const raw = Number(storage()?.getItem(KEY));
-  return Number.isFinite(raw) && raw > 0 ? raw : 0;
+  try {
+    const raw = Number(storage()?.getItem(KEY));
+    return Number.isSafeInteger(raw) && raw > 0 ? raw : 0;
+  } catch {
+    return 0;
+  }
 }
 
-/**
- * Current streak (from session history) plus the longest ever recorded.
- * Call whenever session history changes; this both reads and — if the
- * current streak is a new high — updates the cached longest streak.
- */
+/** Current streak and longest retained/cached streak. Full data deletion removes the cache. */
 export function getStreakStats(sessions = [], now = new Date()) {
-  const currentStreak = computeLocalCalendarStreak(sessions, { now });
-  const longestStreak = Math.max(readLongest(), currentStreak);
-  try {
-    storage()?.setItem(KEY, String(longestStreak));
-  } catch {
-    // storage unavailable — longest just won't persist this session
+  const derived = computeLocalCalendarStreakStats(sessions, { now });
+  const cached = readLongest();
+  const longestStreak = Math.max(cached, derived.longestStreak);
+  if (longestStreak > cached) {
+    try {
+      storage()?.setItem(KEY, String(longestStreak));
+    } catch {
+      // Storage unavailable: the full-history result is still valid this read.
+    }
   }
-  return { currentStreak, longestStreak };
+  return { currentStreak: derived.currentStreak, longestStreak };
 }

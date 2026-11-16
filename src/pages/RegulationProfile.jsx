@@ -1,5 +1,5 @@
 import {disableDailyReminder} from '@/lib/reminders';
-import { useDeviceSessions } from '@/hooks/useDeviceSessions';
+import { useAllDeviceSessions } from '@/hooks/useDeviceSessions';
 import { repeatLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
 import React, { useMemo, useState, lazy, Suspense } from "react";
@@ -34,9 +34,12 @@ function ResetHistoryFallback() {
 
 export default function RegulationProfile() {
   const navigate = useNavigate();
-  const {sessions,ready,error,reload:loadSessions}=useDeviceSessions(100);
-  const profile=useMemo(()=>buildProfile(sessions),[sessions]);
-  const lastWorked=useMemo(()=>pickLastWorked(sessions),[sessions]);
+  const {sessions,ready,error,reload:loadSessions}=useAllDeviceSessions();
+  // Pattern suggestions intentionally describe the latest 100 resets. Palace
+  // growth, date-based counts and retained-history totals use every session.
+  const recentSessions=useMemo(()=>sessions.slice(0,100),[sessions]);
+  const profile=useMemo(()=>buildProfile(recentSessions),[recentSessions]);
+  const lastWorked=useMemo(()=>pickLastWorked(recentSessions),[recentSessions]);
   const [confirming,setConfirming]=useState(false),[deleting,setDeleting]=useState(false),[deleteError,setDeleteError]=useState('');
   const weekCount=sessions.filter(s=>new Date(s.created_date).getTime()>=Date.now()-7*86400000).length;
   const { isPremium } = usePremium();
@@ -133,7 +136,7 @@ export default function RegulationProfile() {
           </h1>
           {weekCount > 0 && (
             <p className="mt-3 text-sm text-muted-foreground">
-              {weekCount} reset{weekCount === 1 ? "" : "s"} this week · {profile.count} rated overall
+              {weekCount} reset{weekCount === 1 ? "" : "s"} this week · {profile.count} rated in the latest {recentSessions.length} resets
             </p>
           )}
         </motion.div>
@@ -148,7 +151,7 @@ export default function RegulationProfile() {
             {profile.change > 0 ? `${profile.change} points better` : profile.change < 0 ? `${Math.abs(profile.change)} points worse` : "No change"}
           </p>
           <p className="mt-3 text-center text-sm text-muted-foreground">
-            Average change across {profile.count} rated reset{profile.count === 1 ? "" : "s"}, using each goal’s rating direction.
+            Average change across {profile.count} rated reset{profile.count === 1 ? "" : "s"} in the latest {recentSessions.length}, using each goal’s rating direction.
           </p>
         </div>}
 
@@ -186,7 +189,8 @@ export default function RegulationProfile() {
         </button>
 
         <Suspense fallback={<ResetHistoryFallback />}>
-          <ResetHistory sessions={sessions} />
+          <p className="mt-8 text-sm text-muted-foreground">Showing your latest {recentSessions.length} resets below. Older saved practices still count toward your palace and streak.</p>
+          <ResetHistory sessions={recentSessions} />
         </Suspense>
 
         {isPremium && profile.topTools.length > 0 && (

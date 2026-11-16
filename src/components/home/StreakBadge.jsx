@@ -1,7 +1,6 @@
 // @ts-check
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { sessionStore } from "@/lib/localData";
 import { getStreakStats } from "@/lib/streakStats";
 
 /**
@@ -11,21 +10,14 @@ import { getStreakStats } from "@/lib/streakStats";
  * history (see computeLocalCalendarStreak), so it always agrees with
  * whatever else on the device reads the same streak.
  */
-export default function StreakBadge() {
+export default function StreakBadge({ sessions = [], available = true }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    let live = true;
-    const refresh = () => {
-      sessionStore.list("-created_date", 500).then((sessions) => {
-        if (!live) return;
-        setCount(getStreakStats(sessions).currentStreak);
-      }).catch(() => {});
-    };
-    refresh();
-    window.addEventListener("mentation:sessions-changed", refresh);
-    return () => { live = false; window.removeEventListener("mentation:sessions-changed", refresh); };
-  }, []);
+    // Share Home's complete, lifecycle-refreshed history instead of loading a
+    // separate capped window. Hide an unverified count on read failure.
+    setCount(available ? getStreakStats(sessions).currentStreak : 0);
+  }, [sessions, available]);
 
   if (count <= 0) return null;
 
