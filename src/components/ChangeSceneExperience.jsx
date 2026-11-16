@@ -1,3 +1,4 @@
+import { createSceneDestination } from '@/lib/changeSceneDestination';
 import { useProgressGate } from '@/hooks/useProgressGate';
 import { clearPracticeDraft } from '@/lib/practiceInteraction';
 import '@/styles/practice-editorial.css';
@@ -205,7 +206,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const [session,setSession]=useState(()=>restoreSceneSession(getActiveFlagship()?.interventionId===ID ? getActiveFlagship().experience : null));
   const [showAlternatives,setShowAlternatives]=useState(false);
   const acceptProgress = useProgressGate();
-  const [finishError,setFinishError] = useState(false);
+  const [finishError,setFinishError] = useState('');
   const [draftOk,setDraftOk]=useState(true);
   const [showAdapt,setShowAdapt]=useState(false);
   const [showAccessibility,setShowAccessibility]=useState(false);
@@ -227,7 +228,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const status=session.actions[step]?.status || 'chosen';
   const prompt=action ? action[choice] : step===0 ? STEPS[0].prompt : 'Optional. There is no expected result.';
   const outcome=sceneOutcome(session);
-  const handoffToken=useRef(globalThis.crypto?.randomUUID?.() || `scene-${Date.now()}`);
+  const handoffToken=useRef(null);
   const narrationAvailable=Boolean(getNarration(prompt)?.url);
   useEffect(()=>{if(!completed.current) setDraftOk(saveActiveFlagship({interventionId:ID,experience:session}));},[session]);
   useEffect(()=>{setShowAlternatives(false);heading.current?.focus();},[step]);
@@ -253,12 +254,18 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
   const record=(event)=>setSession(s=>sceneAction(s,step,event));
   const finish=(target)=>{
     if(completed.current)return;
-    if (!clearPracticeDraft(undefined,ID)) {setFinishError(true);return;}
+    let followup;
+    if (target) {
+      try { followup=createSceneDestination(target,handoffToken.current);handoffToken.current=followup.handoffToken; }
+      catch { setFinishError('The next practice could not be prepared securely. Your choices are still here. Try again or continue this practice.');return; }
+    }
+    if (!clearPracticeDraft(undefined,ID)) {setFinishError('Progress could not be cleared. Try Finish again; this review is still here.');return;}
+    setFinishError('');
     completed.current=true;
     stop();
     rememberFlagshipEvent({interventionId:ID,completed:outcome.confirmedActions>0,options:{confirmedActions:outcome.confirmedActions,skippedActions:outcome.skippedActions}});
     onAttemptEvent?.({interventionId:ID,mechanism:intervention.mechanism,action:'completed',startedAt:startedAt.current,exitReason:outcome.confirmedActions?'completed':'skipped',completedPercentage:outcome.confirmedActions/6,timestamp:Date.now()});
-    onComplete?.({requireGoalReassessment:true,exitReason:outcome.confirmedActions?'completed':'skipped',helpfulness:session.helpfulness,outcome:{...outcome,...(target?{handoffToken:handoffToken.current}:{})},navigateTo:target?`/scene-followup?practice=${target}&session=${handoffToken.current}`:undefined});
+    onComplete?.({requireGoalReassessment:true,exitReason:outcome.confirmedActions?'completed':'skipped',helpfulness:session.helpfulness,outcome:{...outcome,...(followup?{handoffToken:followup.handoffToken}:{})},navigateTo:followup?.navigateTo});
   };
   const changeMechanism=()=>{setShowAdapt(false);finish('different');};
   return <div className={`scene-experience scene-step-${step}`} data-reduced-motion={prefs.reducedMotion || undefined}>
@@ -270,7 +277,7 @@ export default function ChangeSceneExperience({ intervention, answers, onComplet
       <button aria-label="Exit intervention" onClick={onExit}>×</button>
     </header>
     <main className="scene-card">
-      {finishError && <p role="alert">Progress could not be cleared. Try Finish again; this review is still here.</p>}
+      {finishError && <p role="alert">{finishError}</p>}
       {!draftOk&&<p role="status" className="scene-caption">Progress could not be saved in this tab. Keep it open to retain these choices; refreshing may lose them.</p>}
       <nav className="scene-progress" aria-label="Journey progress">
         {['Start','Move','Water','View','Connect','Rest','Plan','Review'].map((label,i)=><div key={label} role="img" aria-label={`${label}: ${session.actions[i]?.status==='done'?'confirmed':session.actions[i]?.status==='skipped'?'skipped':i>0&&i<7?'not confirmed':''}${i===step?', current step':''}`} aria-current={i===step?'step':undefined}><span aria-hidden="true">{i===0?'✦':session.actions[i]?.status==='done'?'✓':session.actions[i]?.status==='skipped'?'−':i}</span><small>{label}</small></div>)}
