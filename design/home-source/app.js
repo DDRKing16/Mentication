@@ -315,20 +315,24 @@ import { openAccessibleDialog as openHomeDialog } from '../../src/lib/accessible
   }
   document.getElementById('wellness-open').addEventListener('click', event => openDialog('wellness-dialog', event.currentTarget));
 
-  function setWeek({ currentDay = null, completedDays = [] } = {}) {
+  function setWeek({ currentDay = null, completedDays = [], available = true } = {}) {
     if (!(currentDay === null || Number.isInteger(currentDay) && currentDay >= 0 && currentDay <= 6)) throw new TypeError('currentDay must be null or an integer from 0 through 6.');
     if (!Array.isArray(completedDays) || completedDays.some(day => !Number.isInteger(day) || day < 0 || day > 6)) throw new TypeError('completedDays must contain zero-based day indexes from 0 through 6.');
-    const completed = new Set(completedDays);
+    if (typeof available !== 'boolean') throw new TypeError('available must be a boolean.');
+    const completed = new Set(available ? completedDays : []);
+    document.getElementById('week-status').hidden = available;
+    document.querySelector('.week-track').setAttribute('aria-label', available ? 'Your seven-day week' : 'Programme progress not checked');
     document.querySelectorAll('.week-day').forEach((day, index) => {
-      const isCurrent = currentDay === index;
+      const isCurrent = available && currentDay === index;
       day.classList.toggle('is-current', isCurrent);
       day.classList.toggle('is-complete', completed.has(index));
       if (isCurrent) day.setAttribute('aria-current', 'step'); else day.removeAttribute('aria-current');
-      day.setAttribute('aria-label', `Day ${index + 1}, ${completed.has(index) ? 'completed' : 'not completed'}${isCurrent ? ', current' : ''}`);
+      day.setAttribute('aria-label', `Day ${index + 1}, ${!available ? 'progress not checked' : completed.has(index) ? 'completed' : 'not completed'}${isCurrent ? ', current' : ''}`);
     });
     let contiguous = 0;
     while (completed.has(contiguous)) contiguous++;
     document.querySelector('.week-track').style.setProperty('--progress', `${Math.max(0, contiguous - 1) / 6 * 100}%`);
+    reportHeight();
   }
   function setToday(today) {
     if (!today || typeof today !== 'object' || Array.isArray(today)) throw new TypeError('today must be an object.');

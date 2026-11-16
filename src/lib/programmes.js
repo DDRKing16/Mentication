@@ -11,14 +11,21 @@
 // two functions below (`programmeProgress`, `launchStateFor`) need it, so
 // this file is the one to load lazily wherever that's worth doing.
 import { getIntervention } from "@/lib/interventions";
+import { finishedPracticeIds } from "./sessionEvidence";
 
 export * from "@/lib/programmeStore";
 
 const startOfNextDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
 function sessionIds(session) {
-  const ids = [...(session?.completed_pathway || []), ...(session?.pathway || [])];
-  return new Set(ids);
+  // A selected pathway is not completion evidence, including in legacy records.
+  // Modern attempts are authoritative; only records without attempts may use
+  // their explicit completed_pathway. Ignore malformed attempt entries safely.
+  if (session && Object.prototype.hasOwnProperty.call(session, 'attempts')) {
+    if (!Array.isArray(session.attempts)) return new Set();
+    return new Set(finishedPracticeIds({ ...session, attempts: session.attempts.filter(attempt => attempt && typeof attempt === 'object') }));
+  }
+  return new Set(finishedPracticeIds(session));
 }
 
 /**
@@ -27,11 +34,12 @@ function sessionIds(session) {
  * status: "done" | "today" | "tomorrow" (done today's; next opens tomorrow) | "later".
  */
 export function programmeProgress(programme, sessions = [], startedAt, now = new Date()) {
-  const start = startedAt ? new Date(startedAt) : null;
+  const parsedStart = startedAt ? new Date(startedAt) : null;
+  const start = parsedStart && Number.isFinite(parsedStart.getTime()) ? parsedStart : null;
   const ordered = start
     ? [...sessions]
-        .map((s) => ({ s, at: new Date(s?.created_date) }))
-        .filter(({ at }) => !Number.isNaN(at.getTime()) && at >= start)
+        .map((s) => ({ ids: sessionIds(s), at: s?.created_date ? new Date(s.created_date) : new Date(NaN) }))
+        .filter(({ at }) => !Number.isNaN(at.getTime()) && at >= start && at <= now)
         .sort((a, b) => a.at - b.at)
     : [];
   const used = new Set();
@@ -40,7 +48,7 @@ export function programmeProgress(programme, sessions = [], startedAt, now = new
 
   for (const day of days) {
     if (!opensAt) break;
-    const match = ordered.find(({ s, at }, index) => !used.has(index) && at >= opensAt && sessionIds(s).has(day.id));
+    const match = ordered.find(({ ids, at }, index) => !used.has(index) && at >= opensAt && ids.has(day.id));
     if (!match) break;
     used.add(ordered.indexOf(match));
     day.status = "done";

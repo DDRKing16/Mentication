@@ -3,7 +3,8 @@ import {useAppBack} from '@/hooks/useAppBack';
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, Lock, Moon, Sun, Wind } from "lucide-react";
-import { sessionStore } from "@/lib/localData";
+import { useAllDeviceSessions } from "@/hooks/useDeviceSessions";
+import { useProgrammeStore } from "@/hooks/useProgrammeStore";
 import { getIntervention } from "@/lib/interventions";
 import { usePlus } from "@/lib/subscription";
 import {
@@ -20,10 +21,18 @@ import {
 
 const ICONS = { calm: Wind, lift: Sun, sleep: Moon };
 
-function useSessions() {
-  const [sessions, setSessions] = useState([]);
-  useEffect(() => { sessionStore.list("-created_date", 200).then(setSessions).catch(() => {}); }, []);
-  return sessions;
+function useProgressSources() {
+  const history = useAllDeviceSessions();
+  const metadata = useProgrammeStore();
+  const ready = history.ready && metadata.ready;
+  const error = history.error || metadata.error;
+  return { sessions: history.sessions, store: metadata.store, ready, error,
+    reload: () => { void history.reload(); metadata.reload(); } };
+}
+function ProgressStatus({ ready, error, onRetry }) {
+  if (error) return <div role="alert" className="mt-5 rounded-2xl border border-border bg-card p-4"><p>Programme progress could not be checked. Nothing has been replaced.</p><button type="button" className="mt-2 min-h-11 underline" onClick={onRetry}>Try programme history again</button></div>;
+  if (!ready) return <p role="status" className="mt-5">Reading your saved programme progress…</p>;
+  return null;
 }
 
 function Shell({ children, onBack }) {
@@ -43,17 +52,19 @@ export function ProgrammeList() {
   const navigate = useNavigate();
   const goBack=useAppBack();
   const plus = usePlus();
-  const sessions = useSessions();
-  const active = activeProgrammeId();
+  const { sessions, store, ready, error, reload } = useProgressSources();
+  const checked = ready && !error;
+  const active = checked ? activeProgrammeId(store) : null;
   return (
     <Shell onBack={goBack}>
       <p className="mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Programmes</p>
       <h1 className="mt-2 font-heading text-3xl font-medium tracking-tight text-primary">A little each day.</h1>
       <p className="mt-2 text-muted-foreground">Short journeys made of the practices you already know. One opens each day.</p>
+      <ProgressStatus ready={ready} error={error} onRetry={reload} />
       <ul className="mt-7 space-y-4">
         {PROGRAMMES.map((programme) => {
           const Icon = ICONS[programme.goal] || Wind;
-          const startedAt = programmeStartedAt(programme.id);
+          const startedAt = checked ? programmeStartedAt(programme.id, store) : null;
           const progress = startedAt ? programmeProgress(programme, sessions, startedAt) : null;
           const locked = programme.plus && !plus.hasAccess;
           return (
@@ -91,14 +102,19 @@ export function ProgrammeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const plus = usePlus();
-  const sessions = useSessions();
+  const { sessions, store, ready, error, reload } = useProgressSources();
   const programme = getProgramme(id);
-  const [startedAt, setStartedAt] = useState(() => (programme ? programmeStartedAt(programme.id) : null));
+  const checked = ready && !error;
+  const startedAt = programme && checked ? programmeStartedAt(programme.id, store) : null;
   const progress = programme && startedAt ? programmeProgress(programme, sessions, startedAt) : null;
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
-    if (programme && progress?.finished) markProgrammeFinished(programme.id);
-  }, [programme, progress?.finished]);
+    if (programme && checked && progress?.finished) {
+      try { markProgrammeFinished(programme.id); }
+      catch { setActionError('Your completion could not be confirmed. Your practice history has not been removed. Try reading programme state again.'); }
+    }
+  }, [programme, progress?.finished, checked, store]);
 
   if (!programme) {
     return <Shell onBack={() => navigate("/programmes")}><p className="mt-8 text-muted-foreground">That programme isn't available.</p></Shell>;
@@ -107,10 +123,12 @@ export function ProgrammeDetail() {
   const locked = programme.plus && !plus.hasAccess;
   const begin = () => {
     if (locked) { navigate(`/plus?from=programmes/${programme.id}`); return; }
-    startProgramme(programme.id);
-    setStartedAt(programmeStartedAt(programme.id));
+    if (!checked) return;
+    try { startProgramme(programme.id); setActionError(''); reload(); }
+    catch { setActionError('The programme start could not be confirmed. Try reading programme state again.'); }
   };
   const openDay = (day) => {
+    if (!checked || actionError || day.status !== "today") return;
     const state = launchStateFor(day.id, programme);
     if (state) navigate("/reset", { state });
   };
@@ -121,6 +139,8 @@ export function ProgrammeDetail() {
       <h1 className="mt-2 font-heading text-3xl font-medium tracking-tight text-primary">{programme.title}</h1>
       <p className="mt-2 text-muted-foreground">{programme.promise}</p>
 
+      <ProgressStatus ready={ready} error={error} onRetry={reload} />
+      {actionError && <div role="alert" className="mt-5 rounded-2xl border border-border p-4"><p>{actionError}</p><button type="button" className="min-h-11 underline" onClick={() => { setActionError(''); reload(); }}>Try programme state again</button></div>}
       {progress?.finished && (
         <div className="mt-6 rounded-[22px] border border-[#E0715C]/30 bg-[#E0715C]/10 p-5">
           <p className="font-heading text-xl text-primary">You finished it. Well done.</p>
@@ -134,6 +154,7 @@ export function ProgrammeDetail() {
           return (
             <li
               key={index}
+              aria-label={`Day ${index + 1}, ${checked ? day.status : "progress not checked"}`}
               className={`rounded-[20px] border p-4 transition ${isToday ? "border-[#E0715C] bg-card shadow-[0_0_0_4px_rgba(224,113,92,0.14),0_14px_30px_-20px_rgba(224,113,92,0.6)]" : "border-border bg-card/70"}`}
             >
               <div className="flex items-center gap-3">
@@ -149,7 +170,7 @@ export function ProgrammeDetail() {
                 </span>
               </div>
               {isToday && (
-                <button onClick={() => openDay(day)} className="mt-4 min-h-12 w-full rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                <button disabled={Boolean(actionError)} onClick={() => openDay(day)} className="mt-4 min-h-12 w-full rounded-full bg-primary text-sm font-semibold text-primary-foreground">
                   Start day {index + 1}
                 </button>
               )}
@@ -158,7 +179,7 @@ export function ProgrammeDetail() {
         })}
       </ol>
 
-      {!startedAt && (
+      {checked && !startedAt && (
         <button onClick={begin} className="mt-7 min-h-[3.25rem] w-full rounded-full bg-primary text-base font-semibold text-primary-foreground">
           {locked ? "Try it free with Plus" : "Start this programme"}
         </button>
@@ -168,7 +189,10 @@ export function ProgrammeDetail() {
       )}
       {startedAt && (
         <button
-          onClick={() => { leaveProgramme(programme.id); setStartedAt(null); }}
+          onClick={() => {
+            try { leaveProgramme(programme.id); setActionError(''); reload(); }
+            catch { setActionError('Leaving the programme could not be confirmed. Try reading programme state again.'); }
+          }}
           className="mt-6 block w-full text-center text-sm text-muted-foreground underline underline-offset-4"
         >
           {progress?.finished ? "Start it again from day 1" : "Leave this programme"}

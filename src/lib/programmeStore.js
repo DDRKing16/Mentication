@@ -1,3 +1,5 @@
+import { writeVerified } from './verifiedStorage';
+
 // Programme data and the on-device "which programme is active" bookkeeping.
 //
 // Nothing here needs the intervention data (narration, steps, etc.), so
@@ -54,45 +56,91 @@ export const PROGRAMMES = Object.freeze([
 
 export const getProgramme = (id) => PROGRAMMES.find((p) => p.id === id) || null;
 
-const STORE_KEY = "mentation.programmes.v1";
+export const PROGRAMME_STORE_KEY = "mentation.programmes.v1";
+export const PROGRAMME_CHANGED_EVENT = "mentation:programmes-changed";
+const storage = () => globalThis.window?.localStorage ?? globalThis.localStorage;
+const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+const validDate = value => typeof value === 'string' && value.trim() !== '' && Number.isFinite(Date.parse(value));
 
-function readStore() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-    return raw && typeof raw === "object" ? raw : {};
-  } catch {
-    return {};
+/** Read without repairing or replacing malformed data. Missing storage is not an empty programme. */
+export function readProgrammeStore() {
+  const local = storage();
+  if (!local) throw new Error('Device storage is unavailable.');
+  const encoded = local.getItem(PROGRAMME_STORE_KEY);
+  if (encoded === null) return {};
+  const raw = JSON.parse(encoded);
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw) ||
+      Object.values(raw).some(record => !record || typeof record !== 'object' || Array.isArray(record) ||
+        !validDate(record.startedAt) || (own(record, 'finishedAt') && !validDate(record.finishedAt)))) {
+    throw new Error('Saved programme progress could not be read. Nothing has been replaced.');
   }
+  return raw;
 }
 
 function writeStore(store) {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch { /* storage unavailable */ }
+  writeVerified(storage(), PROGRAMME_STORE_KEY, JSON.stringify(store));
+  // Notify only after storage confirms the write; failed saves cannot unlock UI.
+  globalThis.window?.dispatchEvent(new CustomEvent(PROGRAMME_CHANGED_EVENT));
 }
 
 /** When this person started a programme (ISO string), or null. */
-export const programmeStartedAt = (id) => readStore()[id]?.startedAt || null;
+export const programmeStartedAt = (id, store = readProgrammeStore()) => own(store, id) ? store[id].startedAt : null;
 
 /** The programme currently in progress (most recently started), if any. */
-export function activeProgrammeId() {
-  const store = readStore();
-  const started = Object.entries(store).filter(([, v]) => v?.startedAt && !v?.finishedAt);
+export function activeProgrammeId(store = readProgrammeStore()) {
+  const started = Object.entries(store).filter(([, value]) => !value.finishedAt);
   started.sort((a, b) => Date.parse(b[1].startedAt) - Date.parse(a[1].startedAt));
   return started[0]?.[0] || null;
 }
 
+function requireProgramme(id) {
+  if (!getProgramme(id)) throw new Error('That programme is not available.');
+}
+
 export function startProgramme(id, now = new Date()) {
-  const store = readStore();
-  store[id] = { startedAt: now.toISOString() };
+  requireProgramme(id);
+  const store = readProgrammeStore();
+  // Starting again must not erase history, even from a stale screen.
+  // Restarting is explicit: leave the programme, then start it.
+  if (own(store, id)) return store[id];
+  const record = { startedAt: now.toISOString() };
+  store[id] = record;
   writeStore(store);
+  return record;
 }
 
 export function markProgrammeFinished(id, now = new Date()) {
-  const store = readStore();
-  if (store[id]) { store[id].finishedAt = now.toISOString(); writeStore(store); }
+  requireProgramme(id);
+  const store = readProgrammeStore();
+  if (!own(store, id)) return null;
+  // The completion effect may run again after its own storage event.
+  if (store[id].finishedAt) return store[id];
+  store[id] = { ...store[id], finishedAt: now.toISOString() };
+  writeStore(store);
+  return store[id];
 }
 
 export function leaveProgramme(id) {
-  const store = readStore();
+  requireProgramme(id);
+  const store = readProgrammeStore();
+  if (!own(store, id)) return null;
   delete store[id];
   writeStore(store);
+  return null;
+}
+
+/** Subscribe to actual lifecycle changes, without polling or writing. */
+export function subscribeProgrammeStore(refresh, target = globalThis.window, page = globalThis.document) {
+  const changed = event => { if (event.key === null || event.key === PROGRAMME_STORE_KEY) refresh(); };
+  const visible = () => { if (page.visibilityState === 'visible') refresh(); };
+  target.addEventListener(PROGRAMME_CHANGED_EVENT, refresh);
+  target.addEventListener('storage', changed);
+  target.addEventListener('focus', refresh);
+  page.addEventListener('visibilitychange', visible);
+  return () => {
+    target.removeEventListener(PROGRAMME_CHANGED_EVENT, refresh);
+    target.removeEventListener('storage', changed);
+    target.removeEventListener('focus', refresh);
+    page.removeEventListener('visibilitychange', visible);
+  };
 }
