@@ -1,4 +1,6 @@
 import {createSessionCompletion} from '@/lib/sessionCompletion';
+import {countRecentResets} from '@/lib/resetWeekCount';
+import {useAllDeviceSessions} from '@/hooks/useDeviceSessions';
 import {confirmedJourneyTakeaway} from '@/lib/confirmedJourneyTakeaway';
 import SessionSaveRecovery from '@/components/reset-flow/SessionSaveRecovery';
 import SelectedPracticeContext from '@/components/reset-flow/SelectedPracticeContext';
@@ -167,15 +169,16 @@ export default function ResetFlow() {
     try { globalThis.history.replaceState({...state,usr:resetNavigationEntry({...entry,reset_completion:{event:pendingCompletionRef.current,result:goalCompletionRef.current,goalRating:goalEndRating,goalAssessment:captureGoalBaseline(answers.direction,goalEndRating)}},answers,"goalReassessment",{id:sessionIdRef.current,startedAt:startTimeRef.current})},""); } catch { /* Current answer remains available in this screen. */ }
   }, [phase,goalEndRating]);
   const sessionSavedRef = useRef(false);
-  const [weekCount, setWeekCount] = useState(0);
+  // The weekly summary is date-based, unlike the deliberately bounded
+  // recommendation input below. Use verified, retained history, never +1.
+  const {sessions: weekSessions, ready: weekReady, error: weekError, reload: reloadWeek} = useAllDeviceSessions();
+  const weekCount = phase === "done" && weekReady && !weekError ? countRecentResets(weekSessions) : null;
   useEffect(() => {
     let mounted = true;
     sessionStore.list("-created_date", 50).then((sessions) => {
       if (!mounted) return;
       sessionHistoryRef.current = sessions;
       setEffectiveness(computeEffectiveness(sessions));
-      const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      setWeekCount(sessions.filter((s) => new Date(s.created_date).getTime() >= since).length);
     }).catch(() => {});
     return () => { mounted = false; };
   }, []);
@@ -234,10 +237,11 @@ export default function ResetFlow() {
   // screen, gently auto-advance to home. Any tap cancels by changing the phase
   // or navigating.
   useEffect(() => {
-    if (phase !== "done") return;
+    // Leave time to retry an unavailable count rather than silently returning Home.
+    if (phase !== "done" || !weekReady || weekError) return;
     const t = setTimeout(() => navigate("/", { replace: true }), 4500);
     return () => clearTimeout(t);
-  }, [phase, navigate]);
+  }, [phase, navigate, weekReady, weekError]);
 
   const pathway = useMemo(() => {
     return entry?.prebuilt ? pathwayByIds(entry.pathway) : buildPathway(answers, effectiveness);
@@ -573,6 +577,10 @@ export default function ResetFlow() {
       if (!completionMountedRef.current || pending !== completionTransactionRef.current) return;
       sessionSavedRef.current = true;
       setCompletionSaveFailed(false);
+      // A successful write emits a history event, but explicitly await a fresh
+      // read before showing completion. A read error must not retry the save.
+      await reloadWeek();
+      if (!completionMountedRef.current || pending !== completionTransactionRef.current) return;
       if (!pending.silent && !answers.discreet && !answers.noAudio) playComplete();
       setClosing({id:pending.brandId,onDone:pending.finish});
     } catch {
@@ -972,12 +980,17 @@ export default function ResetFlow() {
         </div>
 
         <JourneyTakeaway id={usedIds[usedIds.length - 1] || pathway[0]?.id} />
-        {weekCount > 0 && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground/80">
+        {weekCount !== null ? (
+          <div data-testid="reset-week-count" role="status" className="flex items-center gap-2 text-sm text-muted-foreground/80">
             <span className="h-1.5 w-1.5 rounded-full bg-teal/70" />
             {weekCount} reset{weekCount === 1 ? "" : "s"} this week
           </div>
-        )}
+        ) : weekError ? (
+          <div className="flex max-w-sm flex-col items-center gap-2 text-center text-sm text-muted-foreground">
+            <p role="status">Your reset was saved, but the weekly count couldn’t be read.</p>
+            <Button variant="outline" className="min-h-12 h-auto whitespace-normal rounded-full px-5 py-3" onClick={() => void reloadWeek()}>Try weekly count again</Button>
+          </div>
+        ) : <p role="status" className="text-sm text-muted-foreground">Reading your weekly count…</p>}
 
         <div className="flex w-full max-w-sm flex-col gap-3">
           <Button size="lg" onClick={() => navigate("/", { replace: true })} className="h-14 rounded-full bg-primary px-8 text-base font-medium text-primary-foreground soft-depth active:scale-95">
