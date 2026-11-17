@@ -78,6 +78,7 @@ async function reproduceBaseline(page, base) {
 }
 export async function checkSignalLock(page, base) {
   await reproduceBaseline(page, base);
+  console.log("PASS Signal Lock stage: exact baseline initial and repeat faults reproduced");
   // Scope compatibility faults to the actual standalone iframe, not the host.
   await page.addInitScript(modeKey => {
     if (!location.pathname.endsWith('/signal-lock/index.html')) return;
@@ -121,6 +122,7 @@ export async function checkSignalLock(page, base) {
     const ended = await record(page);
     assert.equal(ended.current.pairs, 1); assert.equal(ended.history.length, 2);
     assert.equal(await frame(page).locator('html').evaluate(node => node.scrollWidth > innerWidth + 1), false, 'Signal Lock fits phone width');
+    console.log(`PASS Signal Lock stage: ${mode} completion, repeat and partial reload/resume`);
   }
 
   for (const failure of ['missing', 'throwing']) {
@@ -162,9 +164,11 @@ export async function checkSignalLock(page, base) {
     await frame(page).locator('#stop').click();
     await frame(page).getByRole('heading', {name:'Session ended', exact:true}).waitFor();
     assert.equal((await record(page)).current.pairs, 1);
+    console.log(`PASS Signal Lock stage: ${failure} entropy startup/retry, repeat preservation and saved resume`);
   }
 
-  // Exercise actual Profile deletion in another tab while the iframe is mounted.
+  // A full Profile wipe also clears onboarding. The host correctly leaves the
+  // intervention for Welcome; it must not be expected to keep a mounted iframe.
   await open(page, base, 'fallback');
   await frame(page).locator('#start').click(); await frame(page).locator('#target-one').click();
   const deletedId = (await record(page)).current.id;
@@ -173,20 +177,52 @@ export async function checkSignalLock(page, base) {
     await other.goto(`${base}/profile`);
     await other.getByRole('button', {name:'Delete all my data', exact:true}).click();
     await other.getByRole('button', {name:'Yes, delete everything', exact:true}).click();
-    await page.waitForFunction(({key, deletedId}) => {
-      const saved = JSON.parse(localStorage.getItem(key));
-      return saved?.current?.status === 'ready' && saved.current.id !== deletedId;
-    }, {key, deletedId});
+    await page.waitForURL(url => url.pathname === '/welcome');
+    await page.locator('iframe[title="Signal Lock"]').waitFor({state:'detached'});
+    assert.equal(await record(page), null, 'Profile wipe removes the old identity, progress and history');
+    console.log('PASS Signal Lock stage: Profile deletion clears data and exits to Welcome');
+
+    // Re-enter through the real Welcome action, without clearing or replacing
+    // storage in the test; a new blank scene is the only permitted outcome.
+    await page.getByRole('button', {name:'Explore first', exact:true}).click();
+    await page.waitForURL(url => url.pathname === '/');
+    await page.goto(`${base}/signal-lock`);
     await frame(page).locator('#start').waitFor({state:'visible'});
+    const restarted = await record(page);
+    assert.match(restarted.current.id, uuid); assert.notEqual(restarted.current.id, deletedId);
+    assert.equal(restarted.current.pairs, 0); assert.equal(restarted.current.halfPair, false);
+    assert.deepEqual(restarted.history, []);
+    console.log('PASS Signal Lock stage: Explore first re-entry creates only a new empty scene');
+
+    // A targeted key deletion keeps onboarding intact and exercises the mounted
+    // iframe disposal/double-clear/remount hook separately from full app reset.
+    await frame(page).locator('#start').click(); await frame(page).locator('#target-one').click();
+    const targetedId = (await record(page)).current.id;
+    await other.evaluate(key => localStorage.removeItem(key), key);
+    await page.waitForFunction(({key, targetedId}) => {
+      const saved = JSON.parse(localStorage.getItem(key));
+      return saved?.current?.status === 'ready' && saved.current.id !== targetedId;
+    }, {key, targetedId});
+    await frame(page).locator('#start').waitFor({state:'visible'});
+    assert.equal(new URL(page.url()).pathname, '/signal-lock');
     const cleared = await record(page);
-    assert.equal(cleared.current.pairs, 0); assert.deepEqual(cleared.history, []);
-    assert.match(cleared.current.id, uuid);
-    // Delete again with entropy unavailable. No stale pagehide save may revive it.
+    assert.match(cleared.current.id, uuid); assert.equal(cleared.current.pairs, 0);
+    assert.equal(cleared.current.halfPair, false); assert.deepEqual(cleared.history, []);
+    await page.reload(); await frame(page).locator('#start').waitFor({state:'visible'});
+    assert.equal((await record(page)).current.id, cleared.current.id);
+    assert.deepEqual((await record(page)).history, []);
+    console.log('PASS Signal Lock stage: targeted deletion remounts securely and reload cannot resurrect progress');
+
+    // Delete active partial progress with entropy unavailable. No stale pagehide
+    // save may revive the deleted session, including on a subsequent reload.
+    await frame(page).locator('#start').click(); await frame(page).locator('#target-one').click();
     await page.evaluate(({modeKey}) => sessionStorage.setItem(modeKey, 'missing'), {modeKey});
     await other.evaluate(key => localStorage.removeItem(key), key);
     await frame(page).locator('#session-error').waitFor({state:'visible'});
+    assert.equal(new URL(page.url()).pathname, '/signal-lock');
     assert.equal(await record(page), null);
     await page.reload(); await frame(page).locator('#session-error').waitFor({state:'visible'});
     assert.equal(await record(page), null);
+    console.log('PASS Signal Lock stage: targeted deletion and reload without entropy preserve deletion');
   } finally { await other.close(); }
 }
