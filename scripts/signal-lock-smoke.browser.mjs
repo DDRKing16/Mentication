@@ -167,6 +167,18 @@ export async function checkSignalLock(page, base) {
     console.log(`PASS Signal Lock stage: ${failure} entropy startup/retry, repeat preservation and saved resume`);
   }
 
+  // Exercise the teardown order deterministically: deletion and a late pagehide
+  // run in the old frame before its parent can process the storage event.
+  await open(page, base, 'fallback');
+  await frame(page).locator('#start').click(); await frame(page).locator('#target-one').click();
+  const afterLateHide = await frame(page).locator('body').evaluate((_, key) => {
+    localStorage.removeItem(key);
+    window.dispatchEvent(new Event('pagehide'));
+    return localStorage.getItem(key);
+  }, key);
+  assert.equal(afterLateHide, null, 'A late real-frame pagehide must not resurrect a removed session');
+  console.log('PASS Signal Lock stage: deterministic deleted-before-pagehide order writes no old progress');
+
   // A full Profile wipe also clears onboarding. The host correctly leaves the
   // intervention for Welcome; it must not be expected to keep a mounted iframe.
   await open(page, base, 'fallback');

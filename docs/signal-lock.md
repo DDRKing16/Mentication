@@ -120,3 +120,13 @@ lint now includes the standalone Signal Lock JavaScript. These synthetic browser
 checks do not establish behavior on a physical older iPhone or a screen reader.
 The scene mechanics, artwork, completion semantics, storage keys and existing
 history policy are unchanged.
+
+The compatibility regression also exposed a late-autosave deletion race: Profile
+could unmount the host before the iframe's second-clear callback ran, allowing a
+pagehide checkpoint to recreate the old partial scene. Before subsequent writes,
+Signal Lock now checks that its last saved session identity still owns the stored
+record. A removed/replaced record retires the old in-memory session and requires
+an explicit reload; an unreadable record is left intact with unsaved-memory
+feedback. Deterministic pagehide/blur/timer/action tests and strict Profile/targeted
+browser deletion checks cover this ordering. This is a guard against stale writes,
+not a claim that localStorage provides atomic transactions across tabs.

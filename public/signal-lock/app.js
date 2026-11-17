@@ -1,4 +1,4 @@
-import { createSession, advance, durationText, PAIRS_PER_SCENE, TERMINAL, FEELINGS, readSaved, saveSession } from './session.js';
+import { createSession, advance, durationText, PAIRS_PER_SCENE, TERMINAL, FEELINGS, readSaved, saveSession, STORAGE_KEY } from './session.js';
 import { createSecureId } from './secure-id.js';
 const $ = id => document.getElementById(id);
 // Coordinates keep both large targets inside the scene, including narrow phones.
@@ -17,6 +17,8 @@ try { storage = window.localStorage; } catch { /* A private browser can deny sto
 const saved = readSaved(storage);
 let session = saved.current;
 let sessionError = '';
+let savedId = saved.current?.id ?? null;
+let retired = false;
 let history = saved.history;
 let lastTick = performance.now();
 let showTime = false;
@@ -37,12 +39,38 @@ function preferences() {
   $('motion').disabled = motionQuery.matches || prefs.reducedMotion === true;
   $('motion').textContent = still ? 'Still scene on' : 'Still scene';
 }
+function forgetRemovedSession() {
+  session = null;
+  history = [];
+  savedId = null;
+  retired = true;
+  sessionError = 'The saved scene was removed or changed in another window. Reload to continue, or return Home.';
+  renderedScene = '';
+  $('lines').replaceChildren();
+  $('reveals').replaceChildren();
+  $('reveal-label').textContent = 'A place to put your attention';
+  render();
+}
 function persist() {
-  if (!session) return;
-  const result = saveSession(storage, session, history);
+  if (!session) return false;
+  let writeStorage = storage;
+  if (savedId !== null) {
+    // A full app wipe can unmount the host before its queued storage event runs.
+    // Do not let a late blur/pagehide/timer checkpoint recreate a removed record.
+    try {
+      const latest = JSON.parse(storage.getItem(STORAGE_KEY));
+      if (latest?.current?.id !== savedId) { forgetRemovedSession(); return false; }
+    } catch {
+      // Do not overwrite an unreadable record. Keep this session in memory.
+      writeStorage = undefined;
+    }
+  }
+  const result = saveSession(writeStorage, session, history);
   history = result.history;
   saveOK = result.saved;
+  if (result.saved) savedId = session.id;
   $('save-status').textContent = saveOK ? 'Progress saved on this device.' : 'Progress is available in this open session only.';
+  return true;
 }
 function announce(text) { $('announcement').textContent = text; }
 function tick() {
@@ -52,19 +80,21 @@ function tick() {
   session = advance(session, { type: 'tick', ms: now - lastTick });
   lastTick = now;
   if (wasActive) {
-    persist();
+    if (!persist()) return;
     if (session.status === 'paused') { render(); announce('Paused while you were away. Continue when you want.'); }
   }
   $('elapsed').textContent = durationText(session.elapsedMs);
 }
 function act(action, focus = false) {
-  if (!session) return;
+  if (!session) return false;
   tick();
+  if (!session) return false;
   session = advance(session, action);
   lastTick = performance.now();
-  persist();
+  if (!persist()) return false;
   render();
   if (focus) (TERMINAL.includes(session.status) ? $('summary-title') : session.halfPair ? $('target-two') : $('target-one')).focus({ preventScroll: true });
+  return true;
 }
 function sceneProgress() {
   const boundary = session.pairs > 0 && session.pairs % PAIRS_PER_SCENE === 0 && !session.halfPair;
@@ -112,8 +142,11 @@ function drawScene() {
 function render() {
   $('session-error').hidden = !sessionError;
   $('session-error-message').textContent = sessionError;
+  $('retry-session').textContent = retired ? 'Reload scene' : 'Try again';
   $('time-toggle').disabled = !session;
   if (!session) {
+    document.body.classList.toggle('at-summary', false);
+    document.querySelector('.guidance').hidden = false;
     for (const id of ['start-controls', 'play-controls', 'paused-controls', 'summary', 'targets', 'elapsed']) $(id).hidden = true;
     $('scene-overlay').hidden = false;
     $('instruction').textContent = 'This scene could not start.';
@@ -156,22 +189,24 @@ function render() {
   drawScene();
 }
 $('start').onclick = $('resume').onclick = () => {
-  act({ type: 'start' }, true);
+  if (!act({ type: 'start' }, true)) return;
   announce(session.halfPair ? 'Now tap signal 2.' : 'Tap signal 1.');
 };
-$('pause').onclick = () => { act({ type: 'pause' }); $('resume').focus(); announce('Paused. Your place is kept.'); };
+$('pause').onclick = () => { if (!act({ type: 'pause' })) return; $('resume').focus(); announce('Paused. Your place is kept.'); };
 function finish(complete = false) { act({ type: 'finish', complete, now: Date.now() }, true); }
 $('stop').onclick = $('end-paused').onclick = $('skip').onclick = () => finish();
 $('complete').onclick = () => finish(true);
 for (const [id, target] of [['target-one', 1], ['target-two', 2]]) {
   $(id).onclick = () => {
+    if (!session) return;
     const pairsBefore = session.pairs;
-    act({ type: 'tap', target }, true);
+    if (!act({ type: 'tap', target }, true)) return;
     if (session.pairs > pairsBefore) announce(`${GIFTS[(session.pairs - 1) % PAIRS_PER_SCENE][1]}. ${$('instruction').textContent}`);
     else if (session.status === 'active') announce('Now tap signal 2.');
   };
 }
 function startNewSession(focus = false) {
+  if (retired) return;
   if (session && !TERMINAL.includes(session.status)) return;
   let next;
   try {
@@ -189,10 +224,12 @@ function startNewSession(focus = false) {
   sessionError = '';
   renderedScene = '';
   lastTick = performance.now();
-  persist(); render();
+  if (!persist()) return;
+  render();
   if (focus) $('start').focus();
 }
-$('again').onclick = $('retry-session').onclick = () => startNewSession(true);
+$('again').onclick = () => startNewSession(true);
+$('retry-session').onclick = () => { if (retired) window.location.reload(); else startNewSession(true); };
 $('time-toggle').onclick = () => {
   showTime = !showTime;
   $('time-toggle').setAttribute('aria-pressed', String(showTime));
@@ -208,19 +245,22 @@ for (const feeling of FEELINGS) {
   const button = document.createElement('button');
   button.textContent = feeling;
   button.setAttribute('aria-pressed', 'false');
-  button.onclick = () => { act({ type: 'feeling', value: feeling }); announce($('feeling-note').textContent); };
+  button.onclick = () => { if (!act({ type: 'feeling', value: feeling })) return; announce($('feeling-note').textContent); };
   $('feelings').append(button);
 }
 function interrupt() {
   if (session?.status !== 'active') return;
-  act({ type: 'pause' });
+  if (!act({ type: 'pause' })) return;
   announce('Paused while you were away. Continue when you want.');
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) interrupt(); });
 window.addEventListener('pagehide', interrupt);
 window.addEventListener('blur', interrupt);
 window.addEventListener('pageshow', () => { lastTick = performance.now(); render(); });
-window.addEventListener('storage', preferences);
+window.addEventListener('storage', event => {
+  if (savedId !== null && event.storageArea === storage && event.newValue === null && (event.key === STORAGE_KEY || event.key === null)) forgetRemovedSession();
+  preferences();
+});
 motionQuery.addEventListener('change', preferences);
 preferences();
 if (session) { persist(); render(); } else startNewSession();

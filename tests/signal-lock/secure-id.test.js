@@ -22,13 +22,14 @@ function boot(provider, saved = null) {
   const storage = { getItem: key => values.get(key) ?? null, setItem: vi.fn((key, value) => values.set(key, value)) };
   const document = { getElementById: get, documentElement: node(), body: node(),
     querySelector: get, createElement: node, createElementNS: node, addEventListener() {} };
-  const window = { localStorage: storage, addEventListener() {}, parent: { postMessage() {} }, location: { origin: 'http://test' } };
+  const handlers = new Map();
+  const window = { localStorage: storage, addEventListener(type, handler) { handlers.set(type, handler); }, parent: { postMessage() {} }, location: { origin: 'http://test', reload: vi.fn() } };
   const matchMedia = () => ({ matches: false, addEventListener() {} });
   let crypto = provider;
   const execute = new Function('model', 'createSecureId', 'document', 'window', 'performance', 'matchMedia', 'setInterval',
-    `const { createSession, advance, durationText, PAIRS_PER_SCENE, TERMINAL, FEELINGS, readSaved, saveSession } = model;\n${appSource.replace(/^import .*;\n/gm, '')}\nreturn { read: () => ({ session, history }), tick, interrupt };`);
+    `const { createSession, advance, durationText, PAIRS_PER_SCENE, TERMINAL, FEELINGS, readSaved, saveSession, STORAGE_KEY } = model;\n${appSource.replace(/^import .*;\n/gm, '')}\nreturn { read: () => ({ session, history }), tick, interrupt };`);
   const app = execute(model, () => createSecureId(crypto), document, window, { now: () => 100 }, matchMedia, vi.fn());
-  return { ...app, get, storage, values, setCrypto: value => { crypto = value; } };
+  return { ...app, get, storage, values, dispatch: type => handlers.get(type)?.({ storageArea: storage, key: model.STORAGE_KEY, newValue: null }), reload: window.location.reload, setCrypto: value => { crypto = value; } };
 }
 
 const savedSession = status => ({ version: 1, current: { ...model.createSession('legacy-saved-id', 1), status, pairs: status === 'completed' ? 6 : 2, halfPair: status === 'active' }, history: [{ ...model.createSession('prior-history-id', 0), status: 'ended' }] });
@@ -93,6 +94,41 @@ describe('Signal Lock actual initialization and restart handlers', () => {
     app.get('resume').onclick(); app.get('target-two').onclick();
     expect(app.read().session).toMatchObject({ id: 'legacy-saved-id', status: 'active', pairs: 3, halfPair: false });
     expect(app.get('session-error').hidden).toBe(true);
+  });
+
+  it.each(['tick', 'interrupt', 'tap', 'finish', 'pagehide', 'blur', 'storage'])('does not resurrect a deleted active record through a late %s', action => {
+    const app = boot(randomBytes());
+    app.get('start').onclick(); app.get('target-one').onclick();
+    app.values.delete(model.STORAGE_KEY); app.storage.setItem.mockClear();
+    if (action === 'tick' || action === 'interrupt') app[action]();
+    else if (['pagehide', 'blur', 'storage'].includes(action)) app.dispatch(action);
+    else app.get(action === 'tap' ? 'target-two' : 'stop').onclick();
+    expect(app.values.has(model.STORAGE_KEY)).toBe(false);
+    expect(app.storage.setItem).not.toHaveBeenCalled();
+    expect(app.read()).toEqual({ session: null, history: [] });
+    expect(app.get('session-error').hidden).toBe(false);
+    expect(app.get('retry-session').textContent).toBe('Reload scene');
+    app.get('retry-session').onclick();
+    expect(app.reload).toHaveBeenCalledOnce();
+    expect(app.storage.setItem).not.toHaveBeenCalled();
+  });
+  it("never replaces a different window's newer saved session on repeat", () => {
+    const app = boot(randomBytes(), savedSession('completed'));
+    const newer = { ...savedSession('paused'), current: { ...model.createSession('other-window-id'), status: 'paused' } };
+    app.values.set(model.STORAGE_KEY, JSON.stringify(newer)); app.storage.setItem.mockClear();
+    app.get('again').onclick();
+    expect(JSON.parse(app.values.get(model.STORAGE_KEY))).toEqual(newer);
+    expect(app.storage.setItem).not.toHaveBeenCalled();
+    expect(app.read().session).toBeNull();
+  });
+  it('keeps unreadable storage intact and preserves unsaved in-memory progress', () => {
+    const app = boot(randomBytes());
+    app.values.set(model.STORAGE_KEY, '{broken'); app.storage.setItem.mockClear();
+    app.get('start').onclick(); app.get('target-one').onclick();
+    expect(app.values.get(model.STORAGE_KEY)).toBe('{broken');
+    expect(app.storage.setItem).not.toHaveBeenCalled();
+    expect(app.read().session).toMatchObject({ status: 'active', halfPair: true });
+    expect(app.get('save-status').textContent).toMatch(/open session only/);
   });
   it('does not overwrite current, history or storage when a repeated scene cannot generate an ID', () => {
     const app = boot({}, savedSession('completed'));
