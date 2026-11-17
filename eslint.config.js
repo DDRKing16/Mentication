@@ -16,6 +16,11 @@ export default [
     ],
   },
   {
+    ...pluginJs.configs.recommended,
+    files: ["public/signal-lock/*.js"],
+    languageOptions: { ecmaVersion: 2022, sourceType: "module", globals: globals.browser },
+  },
+  {
     files: [
       "src/**/*.{js,mjs,cjs,jsx}",
       "src/**/*.jsx",

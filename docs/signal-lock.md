@@ -95,3 +95,38 @@ screen-reader testing on a device, and user assessment of whether the reveal is
 absorbing enough during distress. `ios:sync`, publication, and app-wide reward or
 shared return-flow integration are outside this branch. The parent owns those
 integration decisions.
+
+## Secure session compatibility (16 November 2026)
+
+The standalone app uses `secure-id.js`, a byte-identical offline copy of the
+canonical `src/lib/secureId.js` guarded by a parity regression test. It uses native
+`randomUUID` when available, otherwise Web Crypto `getRandomValues` to construct a
+UUID with correct version and variant bits. No timestamp or weak random fallback
+is used. This standalone module is delivered locally with the existing app.
+
+A saved session resumes without generating a new identifier, including legacy
+saved IDs. A new identifier is prepared before replacing the current scene. If
+secure randomness is absent or fails, an accessible error and **Try again** remain
+available, and no new session is saved. A repeat failure keeps the previous scene,
+optional feeling and history intact. Home remains available through the host.
+Retry after the provider is available starts a new scene normally.
+
+Regression coverage includes the actual initialization/handlers, secure UUID
+fallback and failure paths, saved partial progress, completion, repeats, reloads
+and cross-tab deletion. `scripts/signal-lock-smoke.browser.mjs` runs the real
+host iframe through release CI in Chromium and WebKit; it also reproduces the
+previous startup/repeat failure with the exact pre-fix module fixture. Standard
+lint now includes the standalone Signal Lock JavaScript. These synthetic browser
+checks do not establish behavior on a physical older iPhone or a screen reader.
+The scene mechanics, artwork, completion semantics, storage keys and existing
+history policy are unchanged.
+
+The compatibility regression also exposed a late-autosave deletion race: Profile
+could unmount the host before the iframe's second-clear callback ran, allowing a
+pagehide checkpoint to recreate the old partial scene. Before subsequent writes,
+Signal Lock now checks that its last saved session identity still owns the stored
+record. A removed/replaced record retires the old in-memory session and requires
+an explicit reload; an unreadable record is left intact with unsaved-memory
+feedback. Deterministic pagehide/blur/timer/action tests and strict Profile/targeted
+browser deletion checks cover this ordering. This is a guard against stale writes,
+not a claim that localStorage provides atomic transactions across tabs.

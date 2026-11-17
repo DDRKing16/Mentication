@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { checkPracticeDialogs } from './practice-dialog-smoke.browser.mjs';
 import { checkJourneyDialogs } from './journey-dialog-smoke.browser.mjs';
+import { checkSignalLock } from './signal-lock-smoke.browser.mjs';
 import { checkSceneHandoff } from './scene-handoff-smoke.browser.mjs';
 import { checkProgrammeProgress } from './programme-progress-smoke.browser.mjs';
 import { checkLifetimeProgress } from './lifetime-progress-smoke.browser.mjs';
@@ -94,7 +95,7 @@ try {
       await failed.close();
       console.log(`PASS ${name}: Home handshake, phone fit, direct Library isolation, privacy, fallback, Back and retry`);
       for (const legacy of [false, true]) {
-        for (const [suite, check] of [['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog], ['crisis support guidance', checkCrisisSupport], ['lifetime progress', checkLifetimeProgress], ['programme progress', checkProgrammeProgress], ['Scene follow-up', checkSceneHandoff]]) {
+        for (const [suite, check] of [['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog], ['crisis support guidance', checkCrisisSupport], ['lifetime progress', checkLifetimeProgress], ['programme progress', checkProgrammeProgress], ['Scene follow-up', checkSceneHandoff], ['Signal Lock secure sessions', checkSignalLock]]) {
           const dialogs = await context(browser, legacy), dialogPage = await dialogs.newPage(), dialogErrors = [];
           dialogPage.on('pageerror', error => dialogErrors.push(error.message));
           try {
@@ -103,6 +104,7 @@ try {
             console.log(`PASS ${name} ${legacy ? 'without native dialog APIs' : 'native dialog APIs'}: ${suite}`);
           } catch (error) {
             console.error(`FAIL ${name} ${legacy ? 'legacy' : 'native'} ${suite} at ${dialogPage.url()}`);
+            console.error(error.stack || error.message);
             if (dialogErrors.length) console.error('Browser exceptions:', dialogErrors);
             console.error((await dialogPage.locator('body').innerText().catch(() => '')).slice(0,4000));
             dialogFailures.push(`${name} ${legacy ? 'legacy' : 'native'} ${suite}: ${error.message}`);
