@@ -8,4 +8,7 @@ it('discloses authored data, optional web processing, backup destinations and pe
   for (const text of ['journal entries', 'unfinished drafts', 'cloud service', 'browser’s notification provider', 'random token', 'not your situation, answers or plan text', 'minimum cancellation information', 'Free access does not cancel an existing subscription']) expect(html).toContain(text);
   expect(html).not.toContain('Mentication never uploads');
   expect(html).not.toContain('Mentication has no');
+  expect(html).toContain('before-restore copy');
+  expect(html).toContain('not included inside ordinary backups');
+  expect(html).toContain('Deleting all app data also deletes these on-device copies');
 });

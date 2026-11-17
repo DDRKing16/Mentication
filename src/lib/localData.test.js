@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { deleteAllLocalAppData, exportLocalAppData, sessionStore } from "./localData.js";
+import { RESTORE_COPIES_KEY } from "./backup.js";
 
 class MemoryStorage {
   constructor() { this.values = new Map(); }
@@ -30,6 +31,14 @@ describe("device-local application data", () => {
   afterEach(() => {
     delete globalThis.window;
     delete globalThis.CustomEvent;
+  });
+
+  it("erases on-device before-restore copies with all app data", () => {
+    window.localStorage.setItem(RESTORE_COPIES_KEY, JSON.stringify({version: 1, copies: [{format: 'mentication-backup', version: 1, data: {daybook: 'synthetic private note'}}]}));
+    window.localStorage.setItem('unrelated.product', 'keep');
+    deleteAllLocalAppData();
+    expect(window.localStorage.getItem(RESTORE_COPIES_KEY)).toBeNull();
+    expect(window.localStorage.getItem('unrelated.product')).toBe('keep');
   });
 
   it("creates, orders and limits session records without a remote service", async () => {
