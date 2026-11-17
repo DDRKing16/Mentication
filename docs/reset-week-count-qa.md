@@ -33,13 +33,16 @@ unavailable. A newer failed read cannot leave an old success number visible.
   partial/skipped/completed semantics, failed and uncertain writes, stable retry,
   repeated completion and unreadable storage.
 - `scripts/reset-week-smoke.browser.mjs`: actual shared ResetFlow controls from a
-  supported prebuilt Good Map entry; first/second save, same-mount Do it again,
+  legacy prebuilt Box Breathing/sleep entry via real baseline and sleep-timer
+  controls; first/second save, same-mount Do it again,
   actual browser Back and Forward, duplicate completion, more than 50 recent
   records, failed/unverified saves, count-read failures and read-only recovery.
   Integrated into release CI's Chromium/WebKit native and legacy-dialog modes.
-  Good Map's standalone Library journey has different routing; the fixture tests
-  the supported shared ResetFlow entry rather than pretending all practices use
-  this completion screen.
+  Current ordinary single-practice finishes use direct completion or standalone
+  routes and bypass this shared badge. The fixture covers an accepted legacy
+  sleep-timer completion path, not current recommendation eligibility. The first
+  CI run caught an incorrect Good Map fixture because it correctly redirected to
+  its standalone journey; no product routing was changed to accommodate a test.
 - Full package tests, lint, typecheck, build, V3 verification and engineering-release
   verification are required on the candidate. The release CI also builds an
   unsigned iOS simulator candidate.

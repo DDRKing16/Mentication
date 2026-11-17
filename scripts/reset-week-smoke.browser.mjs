@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 
+const stage = name => console.log(`Reset weekly count: ${name}`);
 const KEY = 'mentation.sessions.v1';
 const NOW = new Date('2026-11-17T12:00:00Z');
 const button = (page, name) => page.getByRole('button', { name, exact: true });
@@ -10,26 +11,44 @@ const count = async (page, value) => {
   assert.equal((await badge.innerText()).trim(), `${value} reset${value === 1 ? '' : 's'} this week`);
 };
 
-// Good Map remains a curated ResetPlayer pathway. Its standalone Library route
-// is a different experience; seed only the supported prebuilt routing entry,
-// never a done phase or fabricated completion. Every save below uses real UI.
+// Legacy prebuilt sleep resets remain accepted by ResetFlow. Modern catalogue
+// finishes return directly Home, and Good Map redirects to its standalone build.
+// Use the existing Box Breathing sleep-timer path: actual baseline and timer
+// controls, then timer expiry emits the shared checkpoint. No route interception,
+// fabricated completion event or seeded done phase is involved. This explicitly
+// covers legacy shared-done behaviour, not current recommendation eligibility.
+async function startSleepReset(page) {
+  await page.getByRole('heading', { name: 'How much are you struggling to sleep right now?', exact: true }).waitFor();
+  await button(page, '5').click();
+  await button(page, 'Start Box Breathing').click();
+  await button(page, 'Pause').click();
+  stage('Box Breathing started and paused via UI');
+}
 async function openReset(page, base, sessions = []) {
   await page.goto(`${base}/library`);
   await page.evaluate(({ key, sessions }) => {
     localStorage.setItem(key, JSON.stringify(sessions));
     localStorage.setItem('haven.a11y.v2', JSON.stringify({ reducedMotion: true, ambientSoundscape: false }));
     history.replaceState({ ...history.state, usr: {
-      prebuilt: true, pathway: ['goodMap'], direction: 'lift', intensity: 5,
-      distress: 2, timeMin: 10, audio: 'no', noAudio: true,
-      whereFelt: 'both', reset_phase: 'pathway',
+      prebuilt: true, pathway: ['boxV2'], direction: 'sleep', intensity: null,
+      distress: null, timeMin: 5, audio: 'no', noAudio: true,
+      whereFelt: 'body', reset_phase: 'questions',
     } }, '', '/reset?step=0');
   }, { key: KEY, sessions });
   await page.reload();
-  await button(page, 'Begin').click();
-  await button(page, 'Finish here').waitFor();
+  await startSleepReset(page);
 }
 async function reflection(page) {
-  await button(page, 'Finish here').click();
+  await page.locator('summary').filter({ hasText: /^Options$/ }).click();
+  await button(page, 'Sleep timer').click();
+  await page.getByRole('dialog', { name: 'Sleep timer', exact: true }).getByRole('button', { name: '5 min', exact: true }).click();
+  // The player is paused, but its explicit sleep timer continues independently.
+  // Advance elapsed time, not component state or completion callbacks.
+  stage('five-minute sleep timer armed via UI');
+  await page.clock.fastForward(300_001);
+  await page.clock.fastForward(19_001);
+  await button(page, 'Skip check-in').waitFor();
+  stage('timer expiry reached shared checkpoint');
   await button(page, 'Skip check-in').click();
   await button(page, 'Finish for now').click();
   await page.getByRole('heading', { name: 'Would you use this reset again?', exact: true }).waitFor();
@@ -78,7 +97,8 @@ async function failStorage(page, mode) {
 }
 
 export async function checkResetWeek(page, base) {
-  await page.clock.setFixedTime(NOW);
+  await page.clock.install({ time: NOW });
+  stage('legacy sleep entry, real timer expiry and first save');
   await openReset(page, base);
   await reflection(page);
   await finish(page);
@@ -89,6 +109,7 @@ export async function checkResetWeek(page, base) {
 
   // Real browser Back AND Forward retain the same completed session. Back to
   // reflection and pressing Done again must not create another history record.
+  stage('same-session duplicate completion and real Back/Forward');
   await page.goBack();
   await button(page, 'Done').waitFor();
   await button(page, 'Done').click();
@@ -100,12 +121,9 @@ export async function checkResetWeek(page, base) {
 
   // No goto/reload between these saves: restart exercises the same mounted
   // ResetFlow and beginGuided must release its previous saved-session guard.
+  stage('second reset through same-mount Do it again');
   await button(page, 'Do it again').click();
-  await page.getByRole('heading', { name: 'How is your mood right now?', exact: true }).waitFor();
-  await button(page, '5').click();
-  await button(page, 'Continue').click();
-  await page.getByRole('combobox', { name: 'Current distress', exact: true }).selectOption('2');
-  await button(page, 'Start The Good Map').click();
+  await startSleepReset(page);
   await reflection(page);
   await finish(page);
   await count(page, 2);
@@ -113,16 +131,18 @@ export async function checkResetWeek(page, base) {
   assert.equal(second.length, 2);
   assert.equal(new Set(second.map(item => item.id)).size, 2, 'Restart must use a distinct session ID');
 
+  stage('61 recent records plus one old record');
   const many = Array.from({ length: 61 }, (_, index) => ({
     id: `synthetic-week-${index}`, created_date: new Date(NOW.getTime() - index * 60000).toISOString(),
-    pathway: ['goodMap'], completed_pathway: [], attempts: [],
+    pathway: ['boxV2'], completed_pathway: [], attempts: [],
   }));
-  many.push({ id: 'synthetic-old', created_date: '2026-11-01T12:00:00Z', pathway: ['goodMap'] });
+  many.push({ id: 'synthetic-old', created_date: '2026-11-01T12:00:00Z', pathway: ['boxV2'] });
   await openReset(page, base, many);
   await reflection(page); await finish(page); await count(page, 62);
   assert.equal((await records(page)).length, 63, 'Old records must remain stored but outside the weekly count');
 
   for (const mode of ['write', 'verify']) {
+    stage(`${mode} failure and history-save retry`);
     await openReset(page, base);
     await reflection(page);
     await failStorage(page, mode);
@@ -139,6 +159,7 @@ export async function checkResetWeek(page, base) {
     if (uncertain.length) assert.equal(saved[0].id, uncertain[0].id, 'Retry must verify/upsert the same uncertain session');
   }
 
+  stage('verified save followed by failed weekly read');
   await openReset(page, base);
   await reflection(page);
   await failStorage(page, 'after-save');
@@ -158,6 +179,7 @@ export async function checkResetWeek(page, base) {
 
   // A later read failure must hide a previously known number, not replace it
   // with zero or leave a stale success badge. Retry is read-only.
+  stage('later read failure hides old count and pauses auto-return');
   await failStorage(page, 'read');
   await page.evaluate(() => window.dispatchEvent(new CustomEvent('mentation:sessions-changed')));
   await page.getByRole('status').filter({ hasText: 'Your reset was saved, but the weekly count couldn’t be read.' }).waitFor();
@@ -169,4 +191,5 @@ export async function checkResetWeek(page, base) {
   await count(page, 1);
   assert.equal((await records(page)).length, 1, 'Count retry must never create another session');
   await page.goto(`${base}/library`);
+  stage('all legacy shared-done cases passed');
 }
