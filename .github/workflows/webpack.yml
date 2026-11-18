@@ -12,7 +12,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   web:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    # Official browsers/system libraries avoid slow per-run apt mirrors. Keep
+    # this 1.65.1 image and the isolated npm Playwright pin below in sync.
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble@sha256:1507cbfc550a63a6b7396791ca4f00df17beb56342d2447b3f106c306f525579
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -27,16 +31,25 @@ jobs:
       - run: node scripts/verify-v3-algorithm.mjs
       - run: npm run build
       - run: node scripts/verify-engineering-release.mjs
-      - run: npm audit --audit-level=high
+      # Includes the upstream Linux WebKit networking fix (playwright#42803).
       - name: Install isolated browser test tools
         run: |
-          npm install --prefix "$RUNNER_TEMP/browser" --no-save --package-lock=false playwright@1.63.0
-          "$RUNNER_TEMP/browser/node_modules/.bin/playwright" install --with-deps chromium webkit
+          npm install --prefix "$RUNNER_TEMP/browser" --no-save --package-lock=false playwright@1.65.1
       - name: Check Home and dialog flows in Chromium and WebKit
         env:
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/browser/node_modules/playwright/index.mjs
           SMOKE_BROWSERS: chromium,webkit
         run: node scripts/engineering-smoke.browser.mjs
+      # Keep the audit release-blocking without hiding browser regression results.
+      - run: npm audit --audit-level=high
+      - name: Preserve failed browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-release-diagnostics
+          path: output/browser-release-qa/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Preserve support-screen mobile checks
         if: always()
         uses: actions/upload-artifact@v4

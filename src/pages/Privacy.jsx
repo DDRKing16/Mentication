@@ -24,6 +24,7 @@ export default function Privacy() {
           <section>
             <h2 className="font-heading text-xl font-medium text-primary">Backups you choose</h2>
             <p className="mt-2 text-muted-foreground">A backup can contain your personal notes and plans. You choose where to save or share the file, which may be a cloud service with its own privacy terms. Keep it somewhere you trust. Browser notification ownership is not included in new backups and is not imported from older backups. Deleting data in Mentication does not delete copies you exported.</p>
+            <p className="mt-2 text-muted-foreground">If you choose to replace conflicting data during a restore, a before-restore copy of affected data is kept on this device. These copies can contain personal text. Export them separately in Settings; they are not included inside ordinary backups. Deleting all app data also deletes these on-device copies.</p>
           </section>
           <section>
             <h2 className="font-heading text-xl font-medium text-primary">Optional notifications</h2>

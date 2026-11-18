@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import { mkdir } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 import { checkPracticeDialogs } from './practice-dialog-smoke.browser.mjs';
 import { checkJourneyDialogs } from './journey-dialog-smoke.browser.mjs';
+import { checkBackupRestore } from './backup-restore-smoke.browser.mjs';
 import { checkResetWeek } from './reset-week-smoke.browser.mjs';
 import { checkSignalLock } from './signal-lock-smoke.browser.mjs';
 import { checkSceneHandoff } from './scene-handoff-smoke.browser.mjs';
@@ -13,6 +15,8 @@ const playwright = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',');
 const port = Number(process.env.SMOKE_PORT ||4179);
 const dialogFailures = [];
+const diagnosticsDir = 'output/browser-release-qa';
+await mkdir(diagnosticsDir, { recursive:true });
 const origin = `http://127.0.0.1:${port}`;
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], { stdio: 'pipe' });
 let serverLog = '';
@@ -96,20 +100,40 @@ try {
       await failed.close();
       console.log(`PASS ${name}: Home handshake, phone fit, direct Library isolation, privacy, fallback, Back and retry`);
       for (const legacy of [false, true]) {
-        for (const [suite, check] of [['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog], ['crisis support guidance', checkCrisisSupport], ['lifetime progress', checkLifetimeProgress], ['programme progress', checkProgrammeProgress], ['Scene follow-up', checkSceneHandoff], ['Signal Lock secure sessions', checkSignalLock], ['Reset weekly count', checkResetWeek]]) {
+        for (const [suite, check] of [['backup restore', checkBackupRestore], ['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog], ['crisis support guidance', checkCrisisSupport], ['lifetime progress', checkLifetimeProgress], ['programme progress', checkProgrammeProgress], ['Scene follow-up', checkSceneHandoff], ['Signal Lock secure sessions', checkSignalLock], ['Reset weekly count', checkResetWeek]]) {
           const dialogs = await context(browser, legacy), dialogPage = await dialogs.newPage(), dialogErrors = [];
           dialogPage.on('pageerror', error => dialogErrors.push(error.message));
+          const networkIssues = [], browserConsole = [];
+          dialogPage.on('requestfailed', request => networkIssues.push({url:request.url(), failure:request.failure()?.errorText}));
+          dialogPage.on('response', response => { if(response.status() >= 400) networkIssues.push({url:response.url(), status:response.status()}); });
+          dialogPage.on('console', message => { if(['error','warning'].includes(message.type())) browserConsole.push(message.text()); });
+          await dialogs.tracing.start({ screenshots:true, snapshots:true, sources:true });
+          let failedSuite = false;
           try {
             await check(dialogPage, origin);
             assert.deepEqual(dialogErrors, [], `${suite} produced browser exceptions`);
             console.log(`PASS ${name} ${legacy ? 'without native dialog APIs' : 'native dialog APIs'}: ${suite}`);
           } catch (error) {
+            failedSuite = true;
             console.error(`FAIL ${name} ${legacy ? 'legacy' : 'native'} ${suite} at ${dialogPage.url()}`);
             console.error(error.stack || error.message);
             if (dialogErrors.length) console.error('Browser exceptions:', dialogErrors);
+            console.error('Failed requests/responses:', JSON.stringify(networkIssues.slice(-30)));
+            console.error('Browser warnings/errors:', JSON.stringify(browserConsole.slice(-20)));
+            console.error('Document diagnostics:', JSON.stringify(await dialogPage.evaluate(() => ({
+              readyState:document.readyState, visibility:document.visibilityState,
+              root:document.getElementById('root')?.outerHTML.slice(0,4000),
+              scripts:[...document.scripts].map(script => ({src:script.src,type:script.type})),
+              resources:performance.getEntriesByType('resource').filter(entry => /\.js(?:$|\?)/.test(entry.name)).slice(-20).map(entry => ({name:entry.name,duration:entry.duration,transferSize:entry.transferSize}))
+            })).catch(error => ({error:error.message}))));
             console.error((await dialogPage.locator('body').innerText().catch(() => '')).slice(0,4000));
             dialogFailures.push(`${name} ${legacy ? 'legacy' : 'native'} ${suite}: ${error.message}`);
-          } finally { await dialogs.close(); }
+          } finally {
+            // Synthetic-only contexts. Preserve failed-run evidence, never retry
+            // or reload a failed page into a passing result.
+            await dialogs.tracing.stop(failedSuite ? {path:`${diagnosticsDir}/${name}-${legacy ? 'legacy' : 'native'}-${suite.replaceAll(' ', '-')}.zip`} : {});
+            await dialogs.close();
+          }
         }
       }
     } finally { await browser.close(); }

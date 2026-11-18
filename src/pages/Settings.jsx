@@ -1,6 +1,6 @@
 import { AMBIENT_OPTIONS } from "@/hooks/useAmbientSound";
 import {useAppBack} from '@/hooks/useAppBack';
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CloudUpload, LifeBuoy, Trash2, ShieldCheck } from "lucide-react";
 import { useAccessibility } from "@/lib/accessibility";
@@ -8,7 +8,7 @@ import { useAccessibilityPrefs } from "@/hooks/useAccessibilityPrefs";
 import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import { usePlus } from "@/lib/subscription";
-import { backupSessionCount, parseBackup, restoreBackup, saveBackup } from "@/lib/backup";
+import { parseBackup, previewBackup, readRestoreCopies, removeRestoreCopy, RESTORE_COPIES_KEY, restoreBackup, saveBackup } from "@/lib/backup";
 import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, getReminderWarning, remindersSupported, setReminderTime } from "@/lib/reminders";
 
 function Toggle({ label, desc, on, onToggle }) {
@@ -31,6 +31,30 @@ function Toggle({ label, desc, on, onToggle }) {
   );
 }
 
+const RESTORE_RECEIPT_KEY = "mentation.backup-restore.receipt.v1";
+
+function backupDate(value) {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toLocaleString(undefined, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "an unknown date";
+}
+
+function RestoreCopies({ copies, error, busy, onExport, onRetry, onRemove }) {
+  if (!copies.length && !error) return null;
+  return <section aria-label="Before-restore copies" className="mt-5 rounded-xl border border-border p-4">
+    <h2 className="font-heading text-lg text-foreground">Before-restore copies</h2>
+    <p className="mt-2 text-sm text-muted-foreground">These copies keep the earlier values that a restore replaced. They are not an automatic Undo and do not remove newly added items. Save a copy, then use Restore from a backup to review it.</p>
+    <p className="mt-2 text-sm text-muted-foreground">They stay on this device and are not included in a normal backup. Export them separately. Deleting app data removes them.</p>
+    {error && <><p role="status" className="mt-2 text-sm">{error}</p><Button variant="outline" disabled={busy} onClick={onRetry} className="mt-2 min-h-11 rounded-full">Try reading copies again</Button></>}
+    <ol className="mt-3 flex flex-col gap-3">
+      {copies.map((copy, index) => <li key={index} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <span>Copy {index + 1} · {backupDate(copy.createdAt)}</span>
+        <Button variant="outline" disabled={busy} onClick={() => onExport(index, copy)} className="min-h-11 rounded-full">Save copy {index + 1}</Button>
+        <Button variant="outline" disabled={busy} onClick={() => onRemove(index, copy)} className="min-h-11 rounded-full">Remove copy {index + 1}</Button>
+      </li>)}
+    </ol>
+  </section>;
+}
+
 export default function Settings() {
   const navigate = useNavigate();
   const goBack=useAppBack();
@@ -42,33 +66,162 @@ export default function Settings() {
   const reminderInFlight = useRef(false);
   const [backupNote, setBackupNote] = useState("");
   const [pendingRestore, setPendingRestore] = useState(null);
+  const [restoreReloadRequired, setRestoreReloadRequired] = useState(false);
+  const [restorePolicy, setRestorePolicy] = useState("keep-current");
+  const [backupAction, setBackupAction] = useState("");
+  const [restoreResult, setRestoreResult] = useState(null);
+  const [restoreCopies, setRestoreCopies] = useState([]);
+  const [copiesError, setCopiesError] = useState("");
   const restoreInput = useRef(null);
+  const restoreHeading = useRef(null);
+  const backupOperation = useRef(0);
+  const backupBusy = useRef(false);
+  const backupMounted = useRef(true);
+  const refreshCopies = () => {
+    try { setRestoreCopies(readRestoreCopies()); setCopiesError(""); }
+    catch { setRestoreCopies([]); setCopiesError("Before-restore copies could not be read. Nothing has been removed. Try again when device storage is available."); }
+  };
+  useEffect(() => {
+    backupMounted.current = true;
+    refreshCopies();
+    const changed = event => { if (event.key === RESTORE_COPIES_KEY || event.key === null) refreshCopies(); };
+    window.addEventListener("storage", changed);
+    // A receipt describes only a verified local result, never backup content.
+    // Read/remove in an effect, not a StrictMode-rendered state initializer.
+    try {
+      const receipt = JSON.parse(window.sessionStorage.getItem(RESTORE_RECEIPT_KEY) || "null");
+      if (Number.isInteger(receipt?.changed) && receipt.changed >= 0) {
+        setBackupNote(receipt.changed === 0 ? "Nothing needed changing. Your selected versions are already in place." : "Restore saved on this device. The app has reloaded with the selected versions.");
+      }
+      window.sessionStorage.removeItem(RESTORE_RECEIPT_KEY);
+    } catch { /* Receipt delivery is optional; storage verification decided restore success. */ }
+    return () => { backupMounted.current = false; backupOperation.current += 1; window.removeEventListener("storage", changed); };
+  }, []);
+  useEffect(() => { if (pendingRestore || restoreResult !== null) restoreHeading.current?.focus(); }, [pendingRestore, restoreResult]);
 
-  const onSaveBackup = async () => {
+  const onSaveBackup = async (backup, name) => {
+    if (backupBusy.current) return;
+    backupBusy.current = true;
+    const operation = ++backupOperation.current;
+    setBackupAction("exporting");
     setBackupNote("");
-    const result = await saveBackup().catch(() => "failed");
-    if (result === "shared") setBackupNote("Backup saved.");
-    else if (result === "downloaded") setBackupNote("Backup saved to your downloads.");
-    else if (result === "failed") setBackupNote("That didn't work. Please try again.");
+    const result = await saveBackup(backup, name).catch(() => "failed");
+    if (!backupMounted.current || operation !== backupOperation.current) return;
+    if (result === "shared") setBackupNote("Backup handed to the share destination. Check that you kept the file somewhere safe.");
+    else if (result === "downloaded") setBackupNote("Backup download requested. Check your downloads or Files before relying on it.");
+    else if (result === "cancelled") setBackupNote("Sharing was cancelled. No backup save was confirmed.");
+    else setBackupNote("The backup could not be handed off. Please try again.");
+    backupBusy.current = false;
+    setBackupAction("");
+  };
+  const onExportCopy = async (index, copy) => {
+    if (backupBusy.current) return;
+    try {
+      const latest = readRestoreCopies();
+      if (JSON.stringify(latest[index]) !== JSON.stringify(copy)) {
+        setRestoreCopies(latest);
+        setBackupNote("Before-restore copies changed. Review the refreshed list before choosing a copy to save.");
+        return;
+      }
+    } catch {
+      setRestoreCopies([]);
+      setCopiesError("Before-restore copies could not be read. Nothing has been removed. Try again when device storage is available.");
+      return;
+    }
+    await onSaveBackup(copy, `Mentication before-restore copy ${index + 1}.json`);
+  };
+  const onRemoveCopy = (index, copy) => {
+    if (backupBusy.current) return;
+    if (!window.confirm(`Permanently remove before-restore copy ${index + 1} from this device? Keep an exported copy first if you may need it. A share or download handoff does not confirm that the file was saved. Exported files are not deleted.`)) return;
+    backupBusy.current = true;
+    setBackupAction("removing");
+    try {
+      removeRestoreCopy(index, copy);
+      setBackupNote("Before-restore copy removed from this device. Exported files are unchanged.");
+    } catch (error) {
+      setBackupNote(error.code === "RESTORE_COPY_CHANGED" ? "Before-restore copies changed. Review the refreshed list before choosing a copy to remove." : error.message);
+    } finally {
+      refreshCopies();
+      backupBusy.current = false;
+      setBackupAction("");
+    }
   };
   const onPickBackup = async (event) => {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file) return;
+    if (!file || backupBusy.current || restoreReloadRequired) return;
+    backupBusy.current = true;
+    const operation = ++backupOperation.current;
+    setBackupAction("reading");
+    setPendingRestore(null);
+    setBackupNote("");
+    setRestorePolicy("keep-current");
     try {
-      setPendingRestore(parseBackup(await file.text()));
-      setBackupNote("");
+      const backup = parseBackup(await file.text());
+      if (!backupMounted.current || operation !== backupOperation.current) return;
+      setPendingRestore({ backup, preview: previewBackup(backup) });
     } catch (error) {
-      setPendingRestore(null);
+      if (backupMounted.current && operation === backupOperation.current) setBackupNote(error.message);
+    } finally {
+      if (backupMounted.current && operation === backupOperation.current) {
+        backupBusy.current = false;
+        setBackupAction("");
+      }
+    }
+  };
+  const cancelRestore = () => {
+    if (restoreReloadRequired) return;
+    backupOperation.current += 1;
+    backupBusy.current = false;
+    setBackupAction("");
+    setPendingRestore(null);
+    setRestorePolicy("keep-current");
+    setBackupNote("Restore review closed. No further changes were made.");
+  };
+  const reviewAgain = () => {
+    if (!pendingRestore || backupBusy.current || restoreReloadRequired) return;
+    setRestorePolicy("keep-current");
+    try {
+      setPendingRestore({ backup: pendingRestore.backup, preview: previewBackup(pendingRestore.backup) });
+      setBackupNote("Review the updated preview before restoring.");
+    } catch (error) {
+      setPendingRestore({ backup: pendingRestore.backup, preview: null });
       setBackupNote(error.message);
     }
   };
   const confirmRestore = () => {
+    if (!pendingRestore?.preview || backupBusy.current || restoreReloadRequired) return;
+    backupBusy.current = true;
+    setBackupAction("restoring");
+    setBackupNote("");
     try {
-      restoreBackup(pendingRestore);
+      const changed = restoreBackup(pendingRestore.backup, undefined, { policy: restorePolicy, preview: pendingRestore.preview });
       setPendingRestore(null);
-      window.location.assign("/");
-    } catch(error) { setBackupNote(error.message); }
+      setRestoreResult(changed);
+      refreshCopies();
+      try { window.sessionStorage.setItem(RESTORE_RECEIPT_KEY, JSON.stringify({ changed })); }
+      catch { /* Do not turn a confirmed restore into a failure if its receipt is unavailable. */ }
+      try { window.location.reload(); }
+      catch { setBackupNote("The restore was saved, but the app could not reload automatically. Use Reload app before continuing."); }
+    } catch (error) {
+      if (error.code === "RESTORE_REVIEW_CHANGED") {
+        setRestorePolicy("keep-current");
+        try { setPendingRestore({ backup: pendingRestore.backup, preview: previewBackup(pendingRestore.backup) }); }
+        catch { setPendingRestore({ backup: pendingRestore.backup, preview: null }); }
+        setBackupNote("Data changed since this preview. Nothing was restored. Review the updated preview and choose again.");
+      } else {
+        if (error.code === "RESTORE_UNCERTAIN") {
+          setRestoreReloadRequired(true);
+          setPendingRestore({ backup: pendingRestore.backup, preview: null });
+          setRestorePolicy("keep-current");
+        }
+        setBackupNote(error.message);
+      }
+      refreshCopies();
+    } finally {
+      backupBusy.current = false;
+      setBackupAction("");
+    }
   };
   const changeReminder = async (operation) => {
     if (reminderInFlight.current) return;
@@ -96,6 +249,16 @@ export default function Settings() {
   const { update } = a11y;
   const amb = useAccessibilityPrefs();
   const [memoryCleared, setMemoryCleared] = useState(false);
+
+  if (restoreResult !== null) return <main className="settings-page calmbg min-h-full px-5 py-10">
+    <div className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-5">
+      <h1 ref={restoreHeading} tabIndex={-1} className="font-heading text-3xl text-primary outline-none">{restoreResult === 0 ? "Nothing needed changing." : "Restore saved on this device."}</h1>
+      <p className="mt-3 text-muted-foreground">{restoreResult === 0 ? "Your selected versions are already in place." : "The selected changes were verified in device storage."} Reload the app to use the current settings and journeys.</p>
+      <Button onClick={() => window.location.reload()} disabled={!!backupAction} className="mt-5 min-h-12 rounded-full">Reload app</Button>
+      <RestoreCopies copies={restoreCopies} error={copiesError} busy={!!backupAction} onExport={onExportCopy} onRetry={refreshCopies} onRemove={onRemoveCopy} />
+      {backupNote && <p role="status" className="mt-3 text-sm">{backupNote}</p>}
+    </div>
+  </main>;
 
   return (
     <div className="settings-page calmbg min-h-full">
@@ -270,26 +433,42 @@ export default function Settings() {
           </p>
           <p className="mt-2 text-sm text-muted-foreground">Your saved history, notes and plans are stored on this device. A backup may contain personal text; save or share it only somewhere you trust, such as Files or iCloud Drive. Optional website background check-ins use a server for delivery details, not your plan text. Browser notification ownership is not backed up. Deleting app data does not delete exported copies.</p>
           {pendingRestore ? (
-            <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
-              <p className="text-sm font-medium text-foreground">
-                Restore the backup from {new Date(pendingRestore.createdAt).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}?
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                It holds {backupSessionCount(pendingRestore)} {backupSessionCount(pendingRestore) === 1 ? "practice" : "practices"}. Practices already on this phone are kept; your journeys and settings take the backup's version.
-              </p>
+            <section aria-labelledby="restore-preview-title" className="mt-4 rounded-xl border border-border bg-background/60 p-4">
+              <h2 id="restore-preview-title" ref={restoreHeading} tabIndex={-1} className="font-heading text-lg text-foreground outline-none">Review this restore</h2>
+              <p className="mt-2 text-sm text-muted-foreground">Backup from {backupDate(pendingRestore.backup.createdAt)}.</p>
+              {restoreReloadRequired ? <p role="alert" className="mt-3 text-sm">Keep your original backup file and any before-restore copies. Reload the app, then select the original backup again to review the current device data before trying another restore.</p> : pendingRestore.preview ? <>
+                <p data-testid="restore-preview-summary" className="mt-2 text-sm text-muted-foreground">{pendingRestore.preview.addedSessions} backup-only practices and {pendingRestore.preview.addedDataGroups} missing data groups will be added. {pendingRestore.preview.sessionConflicts} matching practice records and {pendingRestore.preview.dataConflicts} existing data groups have different versions.</p>
+                <fieldset disabled={!!backupAction} className="mt-4 flex flex-col gap-3">
+                  <legend className="mb-2 text-sm font-medium">When versions differ</legend>
+                  <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-border p-3">
+                    <input type="radio" name="restore-policy" value="keep-current" checked={restorePolicy === "keep-current"} onChange={() => setRestorePolicy("keep-current")} className="mt-1" />
+                    <span><span className="block font-medium">Keep this device’s versions</span><span className="block text-sm text-muted-foreground">Keep matching practices and existing notes, plans, journeys and settings unchanged. Add only backup-only practices and missing data groups.</span></span>
+                  </label>
+                  <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border border-border p-3">
+                    <input type="radio" name="restore-policy" value="use-backup" checked={restorePolicy === "use-backup"} onChange={() => setRestorePolicy("use-backup")} className="mt-1" />
+                    <span><span className="block font-medium">Use the backup’s versions</span><span className="block text-sm text-muted-foreground">Replace differing matching practice records and entire existing data groups. This can replace newer notes or plans; entries inside those groups are not merged. A group can contain many notes, cards or plans.</span></span>
+                  </label>
+                </fieldset>
+                <p className="mt-3 text-sm text-muted-foreground">Neither option removes practices found only on this device. Dates alone do not decide which version wins. Keep the original backup file for versions you do not import.</p>
+                {restorePolicy === "use-backup" && <p role="status" className="mt-3 text-sm text-foreground">Before replacing existing values, a before-restore copy must be saved and verified on this device. Earlier copies are retained. If there is not enough space, the restore will stop.</p>}
+                <p className="mt-3 text-sm text-muted-foreground">Subscriptions, on-device reminders and browser notification ownership are not restored.</p>
+              </> : <p className="mt-3 text-sm">The preview could not be refreshed. Try reviewing again before making changes.</p>}
               <div className="mt-4 flex flex-wrap gap-3">
-                <Button onClick={confirmRestore} className="rounded-full">Restore</Button>
-                <Button variant="outline" onClick={() => setPendingRestore(null)} className="rounded-full">Cancel</Button>
+                {restoreReloadRequired ? <Button disabled={!!backupAction} onClick={() => window.location.reload()} className="min-h-11 rounded-full">Reload app</Button> : pendingRestore.preview ? <Button disabled={!!backupAction} onClick={confirmRestore} className="min-h-11 rounded-full">Restore selected versions</Button> : <Button disabled={!!backupAction} onClick={reviewAgain} className="min-h-11 rounded-full">Review again</Button>}
+                {!restoreReloadRequired && <Button disabled={!!backupAction} variant="outline" onClick={cancelRestore} className="min-h-11 rounded-full">Cancel restore</Button>}
               </div>
-            </div>
+            </section>
           ) : (
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button variant="outline" onClick={onSaveBackup} className="rounded-full">Save a backup</Button>
-              <Button variant="outline" onClick={() => restoreInput.current?.click()} className="rounded-full">Restore from a backup</Button>
+              <Button disabled={!!backupAction} variant="outline" onClick={() => void onSaveBackup()} className="min-h-11 rounded-full">Save a backup</Button>
+              <Button disabled={!!backupAction} variant="outline" onClick={() => restoreInput.current?.click()} className="min-h-11 rounded-full">Restore from a backup</Button>
             </div>
           )}
-          <input ref={restoreInput} type="file" accept="application/json,.json" onChange={onPickBackup} className="hidden" aria-hidden="true" tabIndex={-1} />
+          {backupAction === "reading" && <div className="mt-3"><p role="status">Reading the backup file…</p><Button variant="outline" onClick={cancelRestore} className="mt-2 min-h-11 rounded-full">Cancel reading</Button></div>}
+          {backupAction === "exporting" && <p role="status" className="mt-3 text-sm">Preparing the backup handoff…</p>}
+          <input ref={restoreInput} type="file" accept="application/json,.json" onChange={onPickBackup} disabled={!!backupAction || restoreReloadRequired} className="hidden" aria-hidden="true" tabIndex={-1} />
           {backupNote && <p role="status" className="mt-3 text-sm text-muted-foreground">{backupNote}</p>}
+          <RestoreCopies copies={restoreCopies} error={copiesError} busy={!!backupAction} onExport={onExportCopy} onRetry={refreshCopies} onRemove={onRemoveCopy} />
         </div>
 
         <div className="mt-6 rounded-2xl border border-border bg-card p-5">
