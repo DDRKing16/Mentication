@@ -28,9 +28,10 @@ jobs:
       - run: node scripts/verify-v3-algorithm.mjs
       - run: npm run build
       - run: node scripts/verify-engineering-release.mjs
+      # Includes the upstream Linux WebKit networking fix (playwright#42803).
       - name: Install isolated browser test tools
         run: |
-          npm install --prefix "$RUNNER_TEMP/browser" --no-save --package-lock=false playwright@1.63.0
+          npm install --prefix "$RUNNER_TEMP/browser" --no-save --package-lock=false playwright@1.65.1
           "$RUNNER_TEMP/browser/node_modules/.bin/playwright" install --with-deps chromium webkit
       - name: Check Home and dialog flows in Chromium and WebKit
         env:
