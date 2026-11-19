@@ -20,7 +20,7 @@ import { useAccessibilityPrefs } from '@/hooks/useAccessibilityPrefs';
 import { useSystemDarkMode } from '@/hooks/useSystemDarkMode';
 import { installFeedback } from '@/lib/feedback';
 import { DirectionContext, useNavigationDirection } from '@/lib/navigationDirection';
-import { hasCompletedOnboarding } from '@/lib/onboarding';
+import OnboardingGate from '@/components/OnboardingGate';
 import TaraNotificationBridge, { taraEntryState } from '@/components/tara-tactician/TaraNotificationBridge';
 import { validTaraPlanId } from '@/lib/taraNotificationRouting';
 
@@ -58,9 +58,6 @@ const PageSpinner = () => (
   </div>
 );
 
-const OnboardingGate = ({ children }) => (
-  hasCompletedOnboarding() ? children : <Navigate to="/welcome" replace />
-);
 function TaraEntry() {
   const location = useLocation();
   const planId = new URLSearchParams(location.search).get('taraCheckIn');

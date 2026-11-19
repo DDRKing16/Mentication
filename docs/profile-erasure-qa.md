@@ -11,6 +11,11 @@ observed the generic deletion error and no navigation.
 Separate failing-before/fixed-after storage tests reproduced omitted app-owned
 metadata and the first failed removal preventing later keys from being erased.
 
+The first browser run also caught onboarding erasure redirecting Profile before
+its result stayed visible. The fix retains only an already-admitted Profile
+history entry; it does not bypass onboarding for a fresh visit, another route,
+history entry or reload. Gate tests cover each case.
+
 ## Correction
 
 - Explicitly confirmed in-app erasure runs immediately, independently of native

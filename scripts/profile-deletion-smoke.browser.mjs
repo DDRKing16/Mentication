@@ -77,5 +77,5 @@ export async function checkProfileDeletion(page, base) {
   assert.equal(await page.evaluate(()=>localStorage.getItem('daybook')),null);
   assert.equal(await warning(page).count(),0);
   await button(page,'Back to start').click();
-  await page.waitForURL(url=>url.pathname === '/' || url.pathname === '/welcome');
+  await page.waitForURL(url=>url.pathname === '/welcome');
 }
