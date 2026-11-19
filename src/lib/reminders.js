@@ -4,7 +4,7 @@
 // nothing is sent to or from a server. One reminder per weekday, each with its
 // own wording, so it never feels like the same nag every day.
 import { Capacitor } from "@capacitor/core";
-import { writeVerified } from "./verifiedStorage.js";
+import { removeVerified, writeVerified } from "./verifiedStorage.js";
 
 const PREFS_KEY = "mentation.reminders.v1";
 // One id per weekday (Sunday = 1 … Saturday = 7), kept clear of other ids.
@@ -63,7 +63,9 @@ function notificationsFor({ hour, minute }) {
     schedule: { on: { weekday, hour, minute }, repeats: true, allowWhileIdle: true },
   }));
 }
+let nativeScheduling = false;
 async function applyQueue(api, prefs) {
+  if (prefs.enabled) nativeScheduling = true;
   try {
     if (prefs.enabled) {
       // Matching IDs replace existing requests. Do not erase a working queue
@@ -92,16 +94,32 @@ async function applyQueue(api, prefs) {
     throw Object.assign(new Error("The phone did not confirm the reminder schedule.", { cause }), {
       unsettledSchedule: prefs.enabled,
     });
+  } finally {
+    if (prefs.enabled) nativeScheduling = false;
   }
 }
-const UNCERTAIN_KEY = "mentation.reminders.uncertain.v1";
+export const REMINDER_UNCERTAIN_KEY = "mentation.reminders.uncertain.v1";
+export const REMINDER_DELETION_PENDING_KEY = "mentation.reminders.delete-pending.v1";
+export const REMINDER_DELETION_WARNING = "Daily reminder cleanup has not been confirmed. Pending notifications may still arrive. Turn off notifications for Mentication in your phone's Settings to prevent alerts.";
+let deletionPending = false;
+let deletionGeneration = 0;
+let deletionCleanup = null;
+
+function hasDeletionPending() {
+  return deletionPending || localStorage.getItem(REMINDER_DELETION_PENDING_KEY) === "1";
+}
+
+function guardReminderChange(generation) {
+  if (generation !== deletionGeneration || hasDeletionPending()) throw new Error(REMINDER_DELETION_WARNING);
+}
 const UNCERTAIN_QUEUE_MESSAGE = "Saved reminder settings may differ from this phone's schedule, and pending notifications may still arrive. Turning reminders off here attempts cleanup but cannot confirm it. Turn off notifications for Mentication in your phone's Settings to prevent alerts.";
 // Snapshots and elapsed time cannot prove settlement. Preserve the latch across
 // operations/reloads. The current plugin has no API that safely resets it.
 let uncertainSchedule = false;
 export function getReminderWarning() {
   try {
-    if (localStorage.getItem(UNCERTAIN_KEY) === "1") uncertainSchedule = true;
+    if (localStorage.getItem(REMINDER_UNCERTAIN_KEY) === "1") uncertainSchedule = true;
+    if (hasDeletionPending()) return REMINDER_DELETION_WARNING;
   } catch {
     return "Reminder status could not be read. " + UNCERTAIN_QUEUE_MESSAGE;
   }
@@ -109,12 +127,48 @@ export function getReminderWarning() {
 }
 function latchUncertainty() {
   uncertainSchedule = true;
-  try { writeVerified(localStorage, UNCERTAIN_KEY, "1"); }
+  try { writeVerified(localStorage, REMINDER_UNCERTAIN_KEY, "1"); }
   catch { /* Retain the in-memory warning if persistence is unavailable. */ }
 }
-async function changeReminder(enabled, hour, minute) {
+// Capture erase intent before the caller wipes app data. Cleanup joins the
+// native queue but does not gate or write back any erased preferences.
+export function startReminderDeletion() {
+  if (deletionCleanup) return deletionCleanup;
+  deletionGeneration += 1;
+  try {
+    if (!remindersSupported()) return Promise.resolve({ ok: !getReminderWarning() });
+  } catch {
+    return Promise.resolve({ ok: false });
+  }
+
+  // An identical pre-existing request can satisfy the pending snapshot while
+  // a new native addition is still in flight, including during rollback.
+  if (nativeScheduling) latchUncertainty();
+  deletionPending = true;
+  try { writeVerified(localStorage, REMINDER_DELETION_PENDING_KEY, "1"); }
+  catch { /* Keep the warning in memory even when the marker cannot be written. */ }
+
+  deletionCleanup = serialize(async () => {
+    try {
+      await applyQueue(await plugin(), DEFAULT_REMINDER);
+      removeVerified(localStorage, REMINDER_DELETION_PENDING_KEY);
+      deletionPending = false;
+      // A successful snapshot does not settle earlier asynchronous additions.
+      return { ok: !getReminderWarning() };
+    } catch {
+      return { ok: false };
+    } finally {
+      deletionGeneration += 1;
+      deletionCleanup = null;
+    }
+  });
+  return deletionCleanup;
+}
+
+async function changeReminder(enabled, hour, minute, generation) {
   try { localStorage.getItem(PREFS_KEY); }
   catch { throw new Error("Reminder settings could not be read on this device. Please try again."); }
+  guardReminderChange(generation);
   const warning = getReminderWarning();
   const previous = getReminderPrefs();
   const prefs = { enabled, hour: hour ?? previous.hour, minute: minute ?? previous.minute };
@@ -125,6 +179,7 @@ async function changeReminder(enabled, hour, minute) {
     if (!enabled && remindersSupported()) {
       try { await applyQueue(await plugin(), { ...prefs, enabled: false }); }
       catch { /* Best effort only: keep the uncertainty warning. */ }
+      guardReminderChange(generation);
       try { savePrefs({ ...prefs, enabled: false }); }
       catch { /* Warning also discloses possible saved-state disagreement. */ }
     }
@@ -139,21 +194,30 @@ async function changeReminder(enabled, hour, minute) {
   let api;
   try {
     api = await plugin();
+    guardReminderChange(generation);
     if (enabled) {
       let permission = await api.checkPermissions();
-      if (permission.display !== "granted") permission = await api.requestPermissions();
+      if (permission.display !== "granted") {
+        guardReminderChange(generation);
+        permission = await api.requestPermissions();
+      }
       if (permission.display !== "granted") return { ok: false, reason: "denied" };
     }
   } catch {
+    guardReminderChange(generation);
     throw new Error("This phone's notification service could not be reached. Your saved reminder settings were kept. Please try again.");
   }
+  guardReminderChange(generation);
   try {
     await applyQueue(api, prefs);
+    guardReminderChange(generation);
     savePrefs(prefs);
   } catch (error) {
     if (error.unsettledSchedule) latchUncertainty();
+    guardReminderChange(generation);
     try {
       await applyQueue(api, previous);
+      guardReminderChange(generation);
       // A failed write may have changed storage before throwing. Verify both
       // sides of rollback before claiming prior settings were restored.
       savePrefs(previous);
@@ -168,24 +232,34 @@ async function changeReminder(enabled, hour, minute) {
 }
 /** Change time without opting in; reschedule only when already enabled. */
 export function setReminderTime(hour, minute) {
+  const generation = deletionGeneration;
   return serialize(async () => {
     validateTime(hour, minute);
+    try { localStorage.getItem(PREFS_KEY); }
+    catch { throw new Error("Reminder settings could not be read on this device. Please try again."); }
+    guardReminderChange(generation);
     if (!getReminderPrefs().enabled) {
-      try { localStorage.getItem(PREFS_KEY); }
-      catch { throw new Error("Reminder settings could not be read on this device. Please try again."); }
       savePrefs({ enabled: false, hour, minute });
       const warning = getReminderWarning();
       if (warning) throw new Error(warning);
       return { ok: true };
     }
-    return changeReminder(true, hour, minute);
+    return changeReminder(true, hour, minute, generation);
   });
 }
 export function enableDailyReminder(hour, minute) {
-  return serialize(() => changeReminder(true, hour, minute));
+  const generation = deletionGeneration;
+  return serialize(() => changeReminder(true, hour, minute, generation));
 }
 export function disableDailyReminder() {
-  return serialize(() => changeReminder(false));
+  try {
+    if (hasDeletionPending()) return startReminderDeletion().then(result => {
+      if (!result.ok) throw new Error(getReminderWarning() || REMINDER_DELETION_WARNING);
+      return result;
+    });
+  } catch { /* The ordinary storage check will report this failure. */ }
+  const generation = deletionGeneration;
+  return serialize(() => changeReminder(false, undefined, undefined, generation));
 }
 
 export function formatReminderTime(hour, minute) {

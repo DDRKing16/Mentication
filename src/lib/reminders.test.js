@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-let DEFAULT_REMINDER, disableDailyReminder, enableDailyReminder, getReminderPrefs, getReminderWarning, setReminderTime;
+let startReminderDeletion, REMINDER_DELETION_PENDING_KEY, DEFAULT_REMINDER, disableDailyReminder, enableDailyReminder, getReminderPrefs, getReminderWarning, setReminderTime;
 const native = vi.hoisted(() => ({ supported: true, pending: new Map() }));
 const api = vi.hoisted(() => ({ checkPermissions: vi.fn(), requestPermissions: vi.fn(), schedule: vi.fn(), cancel: vi.fn(), getPending: vi.fn() }));
 vi.mock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: () => native.supported } }));
@@ -11,6 +11,7 @@ class LocalStorageStub {
   constructor() { this.values = new Map(); }
   getItem(key) { return this.values.get(key) ?? null; }
   setItem(key, value) { this.values.set(key, String(value)); }
+  removeItem(key) { this.values.delete(key); }
 }
 function expectQueue(hour, minute) {
   expect([...native.pending.keys()].filter(id => IDS.includes(id))).toEqual(IDS);
@@ -18,7 +19,7 @@ function expectQueue(hour, minute) {
 }
 beforeEach(async () => {
   vi.resetModules();
-  ({ DEFAULT_REMINDER, disableDailyReminder, enableDailyReminder, getReminderPrefs, getReminderWarning, setReminderTime } = await import("./reminders.js"));
+  ({ startReminderDeletion, REMINDER_DELETION_PENDING_KEY, DEFAULT_REMINDER, disableDailyReminder, enableDailyReminder, getReminderPrefs, getReminderWarning, setReminderTime } = await import("./reminders.js"));
   vi.resetAllMocks();
   global.localStorage = new LocalStorageStub();
   native.supported = true;
@@ -314,4 +315,136 @@ describe("Daily reminders", () => {
     await expect(enableDailyReminder(8, 0)).resolves.toEqual({ ok: true, reason: "preview" });
     expect(api.schedule).not.toHaveBeenCalled();
   });
+});
+
+describe("Profile reminder cleanup", () => {
+  it("sets a pending marker synchronously and cancels only owned IDs without recreating erased prefs", async () => {
+    await enableDailyReminder(7, 0);
+    native.pending.set(999, { id: 999 });
+    const deletion = startReminderDeletion();
+    expect(localStorage.getItem(REMINDER_DELETION_PENDING_KEY)).toBe("1");
+    expect(getReminderWarning()).toContain("has not been confirmed");
+    localStorage.removeItem(KEY);
+    await expect(deletion).resolves.toEqual({ ok: true });
+    expect([...native.pending.keys()]).toEqual([999]);
+    expect(localStorage.getItem(KEY)).toBeNull();
+    expect(localStorage.getItem(REMINDER_DELETION_PENDING_KEY)).toBeNull();
+    expect(getReminderWarning()).toBe("");
+  });
+
+  it("keeps earlier schedule uncertainty across cleanup and module reload", async () => {
+    localStorage.setItem(UNCERTAIN, "1");
+    await expect(startReminderDeletion()).resolves.toEqual({ ok: false });
+    expect(api.cancel).toHaveBeenCalledOnce();
+    expect(api.schedule).not.toHaveBeenCalled();
+    expect(localStorage.getItem(UNCERTAIN)).toBe("1");
+    vi.resetModules();
+    const reloaded = await import("./reminders.js");
+    expect(reloaded.getReminderWarning()).toContain("may differ");
+  });
+
+  it("keeps failed cancellation pending across reload and allows cleanup-only opt-out retry", async () => {
+    await enableDailyReminder(7, 0);
+    api.cancel.mockRejectedValueOnce(new Error("Synthetic native cancel failure"));
+    const deletion = startReminderDeletion();
+    localStorage.removeItem(KEY);
+    await expect(deletion).resolves.toEqual({ ok: false });
+    expect(api.schedule).toHaveBeenCalledOnce();
+    expect(localStorage.getItem(REMINDER_DELETION_PENDING_KEY)).toBe("1");
+    vi.resetModules();
+    const reloaded = await import("./reminders.js");
+    expect(reloaded.getReminderWarning()).toContain("has not been confirmed");
+    await expect(reloaded.enableDailyReminder()).rejects.toThrow("has not been confirmed");
+    await expect(reloaded.setReminderTime(7, 30)).rejects.toThrow("has not been confirmed");
+    await expect(reloaded.disableDailyReminder()).resolves.toEqual({ ok: true });
+    expect(native.pending.size).toBe(0);
+    expect(localStorage.getItem(KEY)).toBeNull();
+    expect(localStorage.getItem(REMINDER_DELETION_PENDING_KEY)).toBeNull();
+    expect(api.schedule).toHaveBeenCalledOnce();
+  });
+
+  it("keeps a synchronous warning when cleanup hangs and deduplicates simultaneous requests", async () => {
+    let release;
+    api.cancel.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    const deletion = startReminderDeletion();
+    expect(startReminderDeletion()).toBe(deletion);
+    await vi.waitFor(() => expect(release).toBeTypeOf("function"));
+    expect(getReminderWarning()).toContain("has not been confirmed");
+    expect(localStorage.getItem(REMINDER_DELETION_PENDING_KEY)).toBe("1");
+    const attemptedEnable = expect(enableDailyReminder()).rejects.toThrow("has not been confirmed");
+    release();
+    await expect(deletion).resolves.toEqual({ ok: true });
+    await attemptedEnable;
+    expect(api.cancel).toHaveBeenCalledOnce();
+    expect(api.schedule).not.toHaveBeenCalled();
+    expect(localStorage.getItem(KEY)).toBeNull();
+  });
+
+  it("invalidates an in-flight scheduling failure and queued edits, with no old rollback or preference write", async () => {
+    await enableDailyReminder(7, 0);
+    let rejectSchedule;
+    api.schedule.mockImplementationOnce(() => new Promise((_, reject) => { rejectSchedule = reject; }));
+    const active = expect(setReminderTime(8, 0)).rejects.toThrow("has not been confirmed");
+    await vi.waitFor(() => expect(rejectSchedule).toBeTypeOf("function"));
+    const queued = expect(setReminderTime(9, 0)).rejects.toThrow("has not been confirmed");
+    const deletion = startReminderDeletion();
+    localStorage.removeItem(KEY);
+    rejectSchedule(new Error("Synthetic unsettled scheduling failure"));
+    await Promise.all([active, queued]);
+    await expect(deletion).resolves.toEqual({ ok: false });
+    expect(api.schedule).toHaveBeenCalledTimes(2);
+    expect(api.cancel).toHaveBeenCalledOnce();
+    expect(localStorage.getItem(KEY)).toBeNull();
+    expect(localStorage.getItem(UNCERTAIN)).toBe("1");
+  });
+
+  it("still attempts native cleanup if persisting its marker fails", async () => {
+    vi.spyOn(localStorage, "setItem").mockImplementation(() => { throw new Error("full"); });
+    api.cancel.mockRejectedValueOnce(new Error("Synthetic native cancel failure"));
+    const deletion = startReminderDeletion();
+    expect(getReminderWarning()).toContain("has not been confirmed");
+    await expect(deletion).resolves.toEqual({ ok: false });
+    expect(api.cancel).toHaveBeenCalledOnce();
+    expect(api.schedule).not.toHaveBeenCalled();
+    expect(getReminderWarning()).toContain("has not been confirmed");
+  });
+
+  it("does not write or access native queues on a regular browser", async () => {
+    native.supported = false;
+    const pendingEdit = expect(enableDailyReminder()).rejects.toThrow("has not been confirmed");
+    await expect(startReminderDeletion()).resolves.toEqual({ ok: true });
+    await pendingEdit;
+    expect(localStorage.getItem(KEY)).toBeNull();
+    expect(localStorage.getItem(REMINDER_DELETION_PENDING_KEY)).toBeNull();
+    expect(api.cancel).not.toHaveBeenCalled();
+    expect(api.schedule).not.toHaveBeenCalled();
+  });
+});
+
+it.each([false, true])("keeps deletion unconfirmed after a matching snapshot overlaps native additions (rollback: %s)", async rollback => {
+  await enableDailyReminder(7, 0);
+  let addLate, resolveSnapshot;
+  if (rollback) api.cancel.mockRejectedValueOnce(new Error("Synthetic failure requiring rollback"));
+  api.schedule.mockImplementationOnce(async ({ notifications }) => {
+    addLate = () => { for (const item of notifications) native.pending.set(item.id, item); };
+  });
+  api.getPending.mockImplementationOnce(() => new Promise(resolve => {
+    const snapshot = { notifications: [...native.pending.values()] };
+    resolveSnapshot = () => resolve(snapshot);
+  }));
+  const interrupted = (rollback ? disableDailyReminder() : setReminderTime(7, 0)).catch(error => error);
+  await vi.waitFor(() => expect(resolveSnapshot).toBeTypeOf("function"));
+  const deletion = startReminderDeletion();
+  expect(localStorage.getItem(UNCERTAIN)).toBe("1");
+  localStorage.removeItem(KEY);
+  resolveSnapshot();
+  expect(await interrupted).toBeInstanceOf(Error);
+  await expect(deletion).resolves.toEqual({ ok: false });
+  expect(native.pending.size).toBe(0);
+  expect(localStorage.getItem(KEY)).toBeNull();
+  addLate();
+  expectQueue(7, 0);
+  vi.resetModules();
+  const reloaded = await import("./reminders.js");
+  expect(reloaded.getReminderWarning()).toContain("pending notifications may still arrive");
 });

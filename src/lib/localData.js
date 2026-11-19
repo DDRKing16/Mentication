@@ -12,6 +12,26 @@ import { WEB_CHECKIN_CANCELLATION_KEY } from './taraWebCheckInLifecycle';
 const SESSION_KEY = "mentation.sessions.v1";
 const APP_DATA_PREFIXES = ["mentation.", "haven.", "haven_", "goodmap-", "gm_narr", "mentication.foundations.", "mentication.tomorrowParking.", "dear2100"];
 
+const APP_LOCAL_METADATA_KEYS = new Set([
+  "mentication.firstwin.v1",
+  "mentication.heroWordmarkSeen.v1",
+  "mentication.whatsNewSeen.v1",
+  "mentication.lastStreak.v1",
+  "mentication.bestStreak.v1",
+  "mentication.startGlowSeen.v1",
+  "mentication.fullWeekCelebrated.v1",
+  "mentication.home.accessibility.v1",
+  "mentication.plus.notify.v1",
+  "mentication.plus.v1", // Local cache only; this cannot cancel a StoreKit purchase.
+]);
+const NOTIFICATION_CLEANUP_KEYS = new Set([
+  WEB_CHECKIN_CANCELLATION_KEY,
+  "mentation.reminders.uncertain.v1",
+  "mentation.reminders.delete-pending.v1",
+]);
+const isOwnedAppKey = (key) => key === "mentication_nes_v2_app_state" ||
+  APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix));
+
 const storage = () => (typeof window === "undefined" ? null : window.localStorage);
 
 function readSessions() {
@@ -70,24 +90,58 @@ export const sessionStore = Object.freeze({
 });
 
 export function deleteAllLocalAppData() {
-  const local = storage();
-  if (!local) throw new Error("Device storage is unavailable.");
-  const keys = Array.from({ length: local.length }, (_, index) => local.key(index)).filter(Boolean);
-  for (const key of keys) {
-    // Keep only opaque cancellation ownership until remote deletion is confirmed.
-    // No authored words are stored here; the boot/online observer retries deletion.
-    if (key === WEB_CHECKIN_CANCELLATION_KEY) continue;
-    if (key === "mentication_nes_v2_app_state" || key === "daybook" || APP_DATA_PREFIXES.some((prefix) => key.startsWith(prefix))) removeVerified(local,key);
-  }
-  const temporary=window.sessionStorage;
-  if(temporary) {
-    const draftKeys=Array.from({length:temporary.length},(_,index)=>temporary.key(index)).filter(Boolean);
-    for(const key of draftKeys) if(key === "mentication_nes_v2_app_state" || APP_DATA_PREFIXES.some(prefix=>key.startsWith(prefix))) removeVerified(temporary,key);
-  }
+  if (typeof window === "undefined") throw new Error("Local data deletion requires device storage.");
+  let failed = false;
+  let sessionsCleared = false;
+  const clearedLocalKeys = new Set();
+  const attempt = (operation) => {
+    try { return operation(); }
+    catch { failed = true; return undefined; }
+  };
+  const erase = (target, ownsKey, clearedKeys) => {
+    // Snapshot the key names before removal so indexes don't shift. Do not
+    // let a failed read or deletion stop cleanup of other owned keys.
+    const length = attempt(() => target.length);
+    const keys = [];
+    for (let index = 0; index < (length ?? 0); index += 1) {
+      const key = attempt(() => target.key(index));
+      if (typeof key !== "string") { failed = true; continue; }
+      if (ownsKey(key)) keys.push(key);
+    }
+    for (const key of keys) attempt(() => {
+      removeVerified(target, key);
+      clearedKeys?.add(key);
+    });
+  };
+
+  attempt(() => {
+    const local = storage();
+    if (!local) throw new Error("Device storage is unavailable.");
+    // Keep only opaque notification cleanup ownership, not preferences or
+    // personal content, until the responsible cancellation flow can resolve it.
+    erase(local, (key) => !NOTIFICATION_CLEANUP_KEYS.has(key) &&
+      (isOwnedAppKey(key) || key === "daybook" || APP_LOCAL_METADATA_KEYS.has(key)), clearedLocalKeys);
+    sessionsCleared = attempt(() => local.getItem(SESSION_KEY)) === null;
+  });
+  attempt(() => {
+    const temporary = window.sessionStorage;
+    if (temporary) erase(temporary, (key) => isOwnedAppKey(key) || key.startsWith("vector-shift:v2:"), undefined);
+  });
+
+  // Readers (including Tara's cancellation observers) can reconcile what
+  // actually changed even if a different local key could not be removed.
   resetOnboardingSession();
-  window.dispatchEvent(new CustomEvent("mentation:sessions-changed", { detail: { count: 0 } }));
-  window.dispatchEvent(new CustomEvent('mentation:takeaways-changed'));
-  notifyAccessibilityPreferencesChanged();
+  if (!failed || clearedLocalKeys.has(SESSION_KEY) || clearedLocalKeys.has("mentation.tara-tactician.v1")) {
+    window.dispatchEvent(new CustomEvent("mentation:sessions-changed", sessionsCleared ? { detail: { count: 0 } } : undefined));
+  }
+  if (!failed || clearedLocalKeys.has(TAKEAWAY_KEY)) {
+    window.dispatchEvent(new CustomEvent("mentation:takeaways-changed"));
+  }
+  if (!failed || ["haven_a11y", "haven.a11y.v2"].some((key) => clearedLocalKeys.has(key))) {
+    notifyAccessibilityPreferencesChanged();
+  }
+
+  if (failed) throw new Error("Device storage could not confirm all local data deletion.");
 }
 
 export function exportLocalAppData() {
