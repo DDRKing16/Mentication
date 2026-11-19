@@ -53,9 +53,11 @@ export async function checkProfileDeletion(page, base) {
   await button(page,'Retry reminder cleanup').click(); await warning(page).waitFor();
   assert.equal(await page.evaluate(()=>localStorage.getItem('daybook')), 'synthetic new note after erasure');
   await page.goto(`${base}/settings`);
-  await page.getByRole('status').filter({hasText:'phone'}).waitFor();
+  await page.getByRole('status').filter({hasText:'Daily reminder cleanup has not been confirmed'}).waitFor();
+  assert.equal(await page.getByText("Notifications are turned off for Mentication. You can allow them in your iPhone's Settings → Notifications.", {exact:true}).count(),0);
   await button(page,'Retry reminder cleanup').click();
-  await page.getByRole('status').filter({hasText:'phone'}).waitFor();
+  await page.getByRole('status').filter({hasText:'Daily reminder cleanup has not been confirmed'}).waitFor();
+  assert.equal(await page.getByText("Notifications are turned off for Mentication. You can allow them in your iPhone's Settings → Notifications.", {exact:true}).count(),0);
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),UNCERTAIN),'1');
 
   console.log('Profile deletion: silent partial removal failure and real retry');
