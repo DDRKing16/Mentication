@@ -11,7 +11,7 @@ import {readRecordList,writeVerified,removeVerified} from './verifiedStorage';
 
 const PREFIXES = ["mentation.", "mentication.", "mentication_", "haven.", "haven_", "dear2100", "goodmap-", "gm_"];
 export const RESTORE_COPIES_KEY = "mentation.restore-copies.v1";
-const EXCLUDED = new Set([RESTORE_COPIES_KEY,"mentication.plus.v1", "mentation.reminders.v1", "mentation.reminders.uncertain.v1", "mentation.web-checkins.v1"]);
+const EXCLUDED = new Set([RESTORE_COPIES_KEY,"mentication.plus.v1", "mentation.reminders.v1", "mentation.reminders.uncertain.v1", "mentation.reminders.delete-pending.v1", "mentation.web-checkins.v1"]);
 const SESSION_KEY = "mentation.sessions.v1";
 const FORMAT = "mentication-backup";
 

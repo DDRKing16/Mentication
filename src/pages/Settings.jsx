@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import { usePlus } from "@/lib/subscription";
 import { parseBackup, previewBackup, readRestoreCopies, removeRestoreCopy, RESTORE_COPIES_KEY, restoreBackup, saveBackup } from "@/lib/backup";
-import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, getReminderWarning, remindersSupported, setReminderTime } from "@/lib/reminders";
+import { disableDailyReminder, enableDailyReminder, formatReminderTime, getReminderPrefs, getReminderWarning, remindersSupported, setReminderTime, startReminderDeletion } from "@/lib/reminders";
 
 function Toggle({ label, desc, on, onToggle }) {
   return (
@@ -232,6 +232,7 @@ export default function Settings() {
       const result = await operation();
       if (!result.ok) setReminderNote("Notifications are turned off for Mentication. You can allow them in your iPhone's Settings → Notifications.");
       else if (result.reason === "preview") setReminderNote("Saved. Reminders appear in the iPhone app.");
+      else setReminderNote("");
     } catch (error) {
       setReminderNote(error instanceof Error ? error.message : "The reminder could not be changed. Please try again.");
     } finally {
@@ -416,6 +417,7 @@ export default function Settings() {
           </div>
           {reminder.enabled && <p className="mt-2 text-sm text-muted-foreground">Every day at {formatReminderTime(reminder.hour, reminder.minute)}.</p>}
           {reminderNote && <p role="status" className="mt-2 text-sm text-muted-foreground">{reminderNote}</p>}
+          {getReminderWarning() && <Button variant="outline" className="mt-3 rounded-full" disabled={reminderBusy} onClick={() => void changeReminder(startReminderDeletion)}>Retry reminder cleanup</Button>}
           {!remindersSupported() && !reminderNote && <p className="mt-2 text-xs text-muted-foreground">Reminders appear in the iPhone app, not this preview.</p>}
         </div>
 

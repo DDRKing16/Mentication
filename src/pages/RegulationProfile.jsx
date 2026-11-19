@@ -1,8 +1,8 @@
-import {disableDailyReminder} from '@/lib/reminders';
+import {startReminderDeletion} from '@/lib/reminders';
 import { useAllDeviceSessions } from '@/hooks/useDeviceSessions';
 import { repeatLaunchEntry } from '@/lib/practiceLaunch';
 // @ts-check
-import React, { useMemo, useState, lazy, Suspense } from "react";
+import React, { useMemo, useState, useRef, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { deleteAllLocalAppData } from "@/lib/localData";
 import { buildProfile, pickLastWorked } from "@/lib/interventions";
 import { derivePeacePalace } from "@/lib/peacePalace";
 import { usePremium } from "@/hooks/usePremium";
-import { deleteFlagshipMemory } from "@/lib/flagshipMemory";
 import SafetyFooter from "@/components/SafetyFooter";
 import PullToRefresh from "@/components/PullToRefresh";
 
@@ -41,19 +40,40 @@ export default function RegulationProfile() {
   const profile=useMemo(()=>buildProfile(recentSessions),[recentSessions]);
   const lastWorked=useMemo(()=>pickLastWorked(recentSessions),[recentSessions]);
   const [confirming,setConfirming]=useState(false),[deleting,setDeleting]=useState(false),[deleteError,setDeleteError]=useState('');
+  const [deleted, setDeleted] = useState(false);
+  const [reminderCleanup, setReminderCleanup] = useState('');
+  const deletionRunning = useRef(false);
+  const deletionComplete = useRef(false);
+  const deletionAttempt = useRef(0);
   const weekCount=sessions.filter(s=>new Date(s.created_date).getTime()>=Date.now()-7*86400000).length;
   const { isPremium } = usePremium();
   const palace = useMemo(() => derivePeacePalace(sessions), [sessions]);
 
-  const deleteAll = async () => {
-    setDeleting(true);setDeleteError('');
+  const trackReminderCleanup = () => {
+    const attempt = ++deletionAttempt.current;
+    setReminderCleanup('pending');
+    const cleanup = startReminderDeletion();
+    void cleanup.then(result => {
+      if (deletionAttempt.current === attempt) setReminderCleanup(result.ok ? 'confirmed' : 'uncertain');
+    });
+  };
+
+  const deleteAll = () => {
+    // Native cleanup is independent of the user's already-confirmed local
+    // erasure. A rejected or hanging bridge must never gate deleting notes.
+    if (deletionRunning.current || deletionComplete.current) return;
+    deletionRunning.current = true;
+    setDeleting(true); setDeleteError('');
+    trackReminderCleanup();
     try {
-      await disableDailyReminder();
-      deleteFlagshipMemory("all");
       deleteAllLocalAppData();
-      navigate("/");
-    } catch { setDeleteError("Deletion did not finish. Some data may remain on this device. Try again."); }
-    finally { setDeleting(false); }
+      deletionComplete.current = true;
+      setDeleted(true); setConfirming(false);
+    } catch {
+      setDeleteError('Some app data could not be verified as deleted. Try again. Reminder cleanup is separate.');
+    } finally {
+      setDeleting(false); deletionRunning.current = false;
+    }
   };
 
 
@@ -69,15 +89,27 @@ export default function RegulationProfile() {
         <div className="mt-10 rounded-2xl border border-destructive/20 bg-destructive/5 p-5">
           <p className="font-heading text-lg font-medium tracking-tight text-foreground">Your data, your control</p>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Your session history stays on this device. Delete it and your intervention memory at any time.
+            Delete saved practices, notes, plans and preferences from this app on this device. Files saved outside the app and App Store purchases are not deleted.
           </p>
           {deleteError && <p role="alert" className="mt-3">{deleteError}</p>}
-          {confirming ? (
-            <div className="mt-4 flex flex-wrap gap-2">
+          {reminderCleanup && reminderCleanup !== 'confirmed' && <p role="status" className="mt-3 text-sm leading-relaxed">
+            Daily reminder cleanup {reminderCleanup === 'pending' ? 'is still being checked' : 'could not be confirmed'}. Pending notifications may still arrive. Turn off notifications for Mentication in your phone’s Settings to prevent alerts. Minimal cleanup status may remain until it is safe to remove.
+          </p>}
+          {reminderCleanup === 'uncertain' && <Button variant="outline" onClick={trackReminderCleanup} className="mt-3 rounded-full">Retry reminder cleanup</Button>}
+          {deleted ? (
+            <div className="mt-4">
+              <p role="status">App data deleted from this device.</p>
+              <Button onClick={() => navigate("/")} className="mt-3 rounded-full">Back to start</Button>
+            </div>
+          ) : confirming ? (
+            <div className="mt-4">
+              <p className="mb-3 text-sm">This cannot be undone. Reminder cancellation is separate and will not stop local erasure; unresolved cleanup status may be kept.</p>
+              <div className="flex flex-wrap gap-2">
               <Button variant="destructive" onClick={deleteAll} disabled={deleting} className="rounded-full">
                 {deleting ? "Deleting…" : "Yes, delete everything"}
               </Button>
               <Button variant="ghost" onClick={() => setConfirming(false)} disabled={deleting} className="rounded-full">Cancel</Button>
+              </div>
             </div>
           ) : (
             <Button variant="outline" onClick={() => setConfirming(true)} className="mt-4 rounded-full border-destructive/30 text-destructive hover:bg-destructive/10">
@@ -95,7 +127,7 @@ export default function RegulationProfile() {
     );
   }
 
-  if ((!profile || profile.count === 0) && !confirming) {
+  if ((!profile || profile.count === 0) && !confirming && !deleted) {
     return (
       <div className="calmbg min-h-full">
         <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 pt-10 pb-28 sm:px-8">

@@ -168,8 +168,7 @@ describe("full practice history backup and restore", () => {
   });
 });
 
-describe("device-bound uncertain reminder state", () => {
-  const key = "mentation.reminders.uncertain.v1";
+describe.each(["mentation.reminders.uncertain.v1", "mentation.reminders.delete-pending.v1"])("device-bound reminder state: %s", key => {
   it("does not export the source device's uncertain scheduling marker", () => {
     const source = memoryStorage({ [key]: "true", daybook: "notes" });
     expect(createBackup(source).data).toEqual({ daybook: "notes" });

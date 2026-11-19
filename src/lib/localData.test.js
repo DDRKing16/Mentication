@@ -17,6 +17,7 @@ describe("device-local application data", () => {
     const events = [];
     globalThis.window = {
       localStorage: new MemoryStorage(),
+      sessionStorage: new MemoryStorage(),
       dispatchEvent: (event) => events.push(event.type),
       __events: events,
     };
@@ -39,6 +40,71 @@ describe("device-local application data", () => {
     deleteAllLocalAppData();
     expect(window.localStorage.getItem(RESTORE_COPIES_KEY)).toBeNull();
     expect(window.localStorage.getItem('unrelated.product')).toBe('keep');
+  });
+
+  it("erases owned Home metadata and Vector Shift drafts without touching unrelated keys or cancellation ownership", () => {
+    const metadata = [
+      'mentication.firstwin.v1', 'mentication.heroWordmarkSeen.v1',
+      'mentication.whatsNewSeen.v1', 'mentication.lastStreak.v1',
+      'mentication.bestStreak.v1', 'mentication.startGlowSeen.v1',
+      'mentication.fullWeekCelebrated.v1', 'mentication.home.accessibility.v1',
+      'mentication.plus.notify.v1', 'mentication.plus.v1',
+    ];
+    const cancellation = [
+      'mentation.web-checkins.v1', 'mentation.reminders.uncertain.v1',
+      'mentation.reminders.delete-pending.v1',
+    ];
+    for (const key of metadata) window.localStorage.setItem(key, 'synthetic');
+    for (const key of cancellation) window.localStorage.setItem(key, 'opaque');
+    window.localStorage.setItem('mentication.unrelated', 'keep');
+    window.localStorage.setItem('vector-shift:v2:local', 'keep');
+    window.sessionStorage.setItem('vector-shift:v2:synthetic', '{"reflectionAnswers":{"0":1}}');
+    window.sessionStorage.setItem('mentation.backup-restore.receipt.v1', 'synthetic');
+    window.sessionStorage.setItem('vector-shift:v3:unowned', 'keep');
+
+    deleteAllLocalAppData();
+
+    for (const key of metadata) expect(window.localStorage.getItem(key), key).toBeNull();
+    for (const key of cancellation) expect(window.localStorage.getItem(key), key).toBe('opaque');
+    expect(window.localStorage.getItem('mentication.unrelated')).toBe('keep');
+    expect(window.localStorage.getItem('vector-shift:v2:local')).toBe('keep');
+    expect(window.sessionStorage.getItem('vector-shift:v2:synthetic')).toBeNull();
+    expect(window.sessionStorage.getItem('mentation.backup-restore.receipt.v1')).toBeNull();
+    expect(window.sessionStorage.getItem('vector-shift:v3:unowned')).toBe('keep');
+  });
+
+  it("continues after a silent storage failure, refreshes cleared portions and permits retry", () => {
+    const {localStorage, sessionStorage} = window;
+    localStorage.setItem('mentation.sessions.v1', 'synthetic');
+    localStorage.setItem('daybook', 'synthetic');
+    localStorage.setItem('mentation.tara-tactician.v1', 'synthetic');
+    localStorage.setItem('mentation.takeaways.v1', 'synthetic');
+    localStorage.setItem('haven_a11y', 'synthetic');
+    sessionStorage.setItem('vector-shift:v2:synthetic', 'synthetic');
+    const remove = localStorage.removeItem.bind(localStorage);
+    localStorage.removeItem = key => { if (key !== 'mentation.sessions.v1') remove(key); };
+    expect(() => deleteAllLocalAppData()).toThrow(/deletion/i);
+    expect(localStorage.getItem('mentation.sessions.v1')).toBe('synthetic');
+    expect(localStorage.getItem('daybook')).toBeNull();
+    expect(localStorage.getItem('mentation.tara-tactician.v1')).toBeNull();
+    expect(localStorage.getItem('mentation.takeaways.v1')).toBeNull();
+    expect(localStorage.getItem('haven_a11y')).toBeNull();
+    expect(sessionStorage.getItem('vector-shift:v2:synthetic')).toBeNull();
+    expect(window.__events).toEqual(expect.arrayContaining([
+      'mentation:sessions-changed', 'mentation:takeaways-changed', 'mentation:accessibility-changed',
+    ]));
+
+    localStorage.removeItem = remove;
+    expect(() => deleteAllLocalAppData()).not.toThrow();
+    expect(localStorage.getItem('mentation.sessions.v1')).toBeNull();
+  });
+
+  it("still attempts session drafts when local storage is unreadable", () => {
+    window.sessionStorage.setItem('vector-shift:v2:synthetic', 'synthetic');
+    Object.defineProperty(window, 'localStorage', {get() { throw new Error('unreadable'); }});
+
+    expect(() => deleteAllLocalAppData()).toThrow(/deletion/i);
+    expect(window.sessionStorage.getItem('vector-shift:v2:synthetic')).toBeNull();
   });
 
   it("creates, orders and limits session records without a remote service", async () => {
