@@ -24,7 +24,9 @@ history entry or reload. Gate tests cover each case.
   requests permission or opts in. Queued/in-flight older changes cannot recreate
   deleted preferences. A persistent one-bit pending marker and the existing
   uncertainty marker survive erasure; an old uncertainty latch is not cleared by
-  a single successful cancellation snapshot. Both markers are excluded from backups.
+  a single successful cancellation snapshot. Deletion during active native scheduling
+  (including rollback) also latches uncertainty: an identical old snapshot must
+  not hide delayed native additions. Both markers are excluded from backups.
 - Success stays visible with any separate reminder warning. Retrying cleanup
   never repeats erasure. Settings also offers cleanup retry after reload.
 - Local removal attempts every identifiable owned key in both stores, verifies

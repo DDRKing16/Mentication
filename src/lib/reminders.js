@@ -63,7 +63,9 @@ function notificationsFor({ hour, minute }) {
     schedule: { on: { weekday, hour, minute }, repeats: true, allowWhileIdle: true },
   }));
 }
+let nativeScheduling = false;
 async function applyQueue(api, prefs) {
+  if (prefs.enabled) nativeScheduling = true;
   try {
     if (prefs.enabled) {
       // Matching IDs replace existing requests. Do not erase a working queue
@@ -92,6 +94,8 @@ async function applyQueue(api, prefs) {
     throw Object.assign(new Error("The phone did not confirm the reminder schedule.", { cause }), {
       unsettledSchedule: prefs.enabled,
     });
+  } finally {
+    if (prefs.enabled) nativeScheduling = false;
   }
 }
 export const REMINDER_UNCERTAIN_KEY = "mentation.reminders.uncertain.v1";
@@ -137,6 +141,9 @@ export function startReminderDeletion() {
     return Promise.resolve({ ok: false });
   }
 
+  // An identical pre-existing request can satisfy the pending snapshot while
+  // a new native addition is still in flight, including during rollback.
+  if (nativeScheduling) latchUncertainty();
   deletionPending = true;
   try { writeVerified(localStorage, REMINDER_DELETION_PENDING_KEY, "1"); }
   catch { /* Keep the warning in memory even when the marker cannot be written. */ }

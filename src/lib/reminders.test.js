@@ -420,3 +420,31 @@ describe("Profile reminder cleanup", () => {
     expect(api.schedule).not.toHaveBeenCalled();
   });
 });
+
+it.each([false, true])("keeps deletion unconfirmed after a matching snapshot overlaps native additions (rollback: %s)", async rollback => {
+  await enableDailyReminder(7, 0);
+  let addLate, resolveSnapshot;
+  if (rollback) api.cancel.mockRejectedValueOnce(new Error("Synthetic failure requiring rollback"));
+  api.schedule.mockImplementationOnce(async ({ notifications }) => {
+    addLate = () => { for (const item of notifications) native.pending.set(item.id, item); };
+  });
+  api.getPending.mockImplementationOnce(() => new Promise(resolve => {
+    const snapshot = { notifications: [...native.pending.values()] };
+    resolveSnapshot = () => resolve(snapshot);
+  }));
+  const interrupted = (rollback ? disableDailyReminder() : setReminderTime(7, 0)).catch(error => error);
+  await vi.waitFor(() => expect(resolveSnapshot).toBeTypeOf("function"));
+  const deletion = startReminderDeletion();
+  expect(localStorage.getItem(UNCERTAIN)).toBe("1");
+  localStorage.removeItem(KEY);
+  resolveSnapshot();
+  expect(await interrupted).toBeInstanceOf(Error);
+  await expect(deletion).resolves.toEqual({ ok: false });
+  expect(native.pending.size).toBe(0);
+  expect(localStorage.getItem(KEY)).toBeNull();
+  addLate();
+  expectQueue(7, 0);
+  vi.resetModules();
+  const reloaded = await import("./reminders.js");
+  expect(reloaded.getReminderWarning()).toContain("pending notifications may still arrive");
+});
