@@ -254,7 +254,6 @@ import { openAccessibleDialog as openHomeDialog } from '../../src/lib/accessible
   function renderWellness() {
     const source = wellnessSources.find(item => item.id === 'oura');
     const connected = source?.connected === true;
-    document.querySelector('.week-panel').classList.toggle('has-wellness-connection', connected);
     const state = document.getElementById('wellness-status');
     state.textContent = source?.status === 'loading' ? (connected ? 'Syncing…' : 'Connecting…')
       : source?.status === 'error' ? 'Connection needs attention'

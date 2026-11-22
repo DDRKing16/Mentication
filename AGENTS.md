@@ -47,7 +47,7 @@ Start with `README.md` for setup, validation and iOS workflow.
 - The Peace Palace drawing (`src/lib/palaceArt.js`, a plain SVG-string
   function) is shared: the Palace page renders it, and the home build script
   inlines it into home.html. Home.jsx sends the live level over the bridge
-  (`palace` message) for the "More for you" card and the Your week badge.
+  (`palace` message) for the "More for you" card and the daily shortcut button.
   Rebuild home.html after editing palaceArt.js.
 - Because the document carries its own bottom navigation, AppShell hides the
   host `TabBar` on `/`.

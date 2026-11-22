@@ -81,7 +81,7 @@ export default function Home() {
   const [today, setToday] = useState(null);
   const [todayLoaded, setTodayLoaded] = useState(false);
   // The user's current Peace Palace level, shown on the More for you card
-  // and the Your week badge.
+  // and the daily shortcut button.
   const [palace, setPalace] = useState(null);
   // A quiet, on-device-only read of the daybook for the Journal card's
   // "last entry" line — never anything about what was written.

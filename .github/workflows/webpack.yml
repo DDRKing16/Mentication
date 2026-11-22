@@ -57,6 +57,14 @@ jobs:
           name: support-region-mobile-checks
           path: output/support-region-qa/
           if-no-files-found: ignore
+      - name: Preserve Home layout checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-week-responsive-checks
+          path: output/home-week-qa/
+          if-no-files-found: ignore
+          retention-days: 7
   ios-simulator:
     runs-on: macos-latest
     timeout-minutes: 30
