@@ -2156,18 +2156,10 @@ body:has(dialog[open]) {
 /* Host-provided visibility must win over the authored card display rules. */
 [hidden] { display:none !important; }
 
-/* Oura stays above the weekday row; weekly progress never swaps out. */
-.week-panel { grid-template-areas:"oura actions" "week actions"; row-gap:0; padding-top:4px; padding-bottom:4px; }
+/* Weekly progress is independent of the daily shortcuts and Oura state. */
 .week-info { grid-area:week; min-width:0; }
 .week-actions { grid-area:actions; }
-.wellness-region { grid-area:oura; min-width:0; position:relative; z-index:1; }
-.wellness-head { display:flex; align-items:center; justify-content:space-between; gap:4px; min-height:44px; }
-.wellness-head h3 { margin:0; font:inherit; font-size:12px; font-weight:500; }
-.wellness-head .wellness-note { margin:2px 0 0; font-size:11px; line-height:1.2; }
-#wellness-open { display:grid; place-items:center; width:44px; min-width:44px; height:44px; padding:0; color:inherit; background:transparent; border:0; border-radius:12px; cursor:pointer; }
-#wellness-open .icon { width:17px; height:17px; }
 .wellness-summary { width:100%; position:relative; z-index:1; }
-.week-panel.has-wellness-connection { grid-template-areas:"oura oura" "week actions"; row-gap:4px; }
 .wellness-button { color:inherit; font:inherit; border:1px solid #efddd56d; border-radius:16px; background:#30251d55; min-height:44px; padding:7px 12px; cursor:pointer; }
 .wellness-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
 .wellness-metric { display:flex; flex-direction:column; gap:5px; padding:10px 6px; border-radius:14px; background:#fff4e90c; }
@@ -2185,36 +2177,81 @@ body:has(dialog[open]) {
 [data-large-text=true] .wellness-note,[data-large-text=true] .wellness-metric span { font-size:16px; }
 @media (max-width:360px) { .wellness-metric strong { font-size:17px; } .wellness-metric { padding:8px 4px; } }
 
-/* Secondary weekly controls keep full touch targets inside the compact card. */
-.week-panel .begin-button { min-height:44px; }
-.week-panel .begin-button::before,.week-panel .seven-days::before { content:none; }
-.week-panel .palace-badge-icon { width:44px; height:44px; }
-.week-panel .seven-days { min-height:44px; }
-.week-panel .palace-badge { grid-template-areas:"icon" "strip"; grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; justify-items:center; }
-.week-panel .palace-badge-strip { flex-direction:row; align-items:center; justify-content:center; flex-wrap:wrap; column-gap:4px; text-align:center; }
-.week-panel .palace-badge-icon { justify-self:center; }
-.week-panel .palace-badge-line { justify-content:center; }
-.week-panel .palace-badge-title { display:none; }
-@media(max-width:700px) {
-  .week-panel { grid-template-columns:minmax(0,1fr) 118px; column-gap:7px; }
-  .week-panel .palace-badge-line { flex-wrap:wrap; }
+/* Your Week contains only its weekly progress and Begin action. */
+.week-panel {
+  grid-template-areas:"week actions" "status status";
+  grid-template-columns:minmax(0,1fr) 42%;
+  padding:14px 21px;
+  gap:0 18px;
 }
-@media(prefers-reduced-motion:reduce) { #wellness-open { transition:none; } }
+.week-panel .week-actions { align-self:center; }
+.week-panel .begin-button { min-height:44px; }
+.week-panel .begin-button::before { content:none; }
+#week-status { grid-area:status; margin-bottom:0; }
+@media(max-width:700px) {
+  .week-panel { grid-template-columns:minmax(0,1fr) 100px; padding:12px 9px; column-gap:10px; }
+}
+/* The recommendation remains conditional; the two other shortcuts are always
+   available. Flex lets the remaining pair fill the row for first-time users. */
+.home-shortcuts { display:flex; align-items:stretch; gap:10px; margin-top:16px; }
+.home-shortcuts > * { flex:1 1 0; min-width:0; }
+.home-shortcuts .today { margin:0; display:flex; }
+.home-shortcuts .today-button,
+.home-shortcuts .home-shortcut {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  min-width:0;
+  min-height:64px;
+  height:auto;
+  padding:10px 12px;
+  border:1.5px solid #efddd56d;
+  border-radius:22px;
+  color:inherit;
+  background:linear-gradient(125deg,#c5a79657,#5b514f63);
+  box-shadow:inset 0 1px 1px #ffffff16,0 15px 40px #22171412;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  text-align:center;
+  cursor:pointer;
+}
+.home-shortcuts .today-button::after { content:none; }
+.home-shortcuts .home-shortcut { flex-direction:column; gap:3px; }
+.home-shortcuts .today-title,
+.home-shortcuts .shortcut-title { font:400 19px/1.2 Georgia,"Times New Roman",serif; letter-spacing:0; overflow-wrap:anywhere; }
+.home-shortcuts .shortcut-note { font-size:12px; line-height:1.25; overflow-wrap:anywhere; }
+.home-shortcuts .today-play { width:20px; height:20px; margin:0; }
+.home-shortcuts .today-play .icon { width:12px; height:12px; }
+.home-shortcuts .palace-badge-art { width:28px; height:28px; box-shadow:none; }
+.home-shortcuts .palace-badge-art:empty { display:none; }
+.shortcut-detail { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.home-shortcuts .home-shortcut:hover { box-shadow:inset 0 1px 1px #ffffff16,0 0 20px #ffd9a84d; }
+[data-high-contrast=true] .home-shortcuts button { background:#211b17; border-color:#fff4e9; }
+[data-large-text=true] .home-shortcuts .today-title,
+[data-large-text=true] .home-shortcuts .shortcut-title { font-size:22px; }
+[data-text-scale="1.3"] .home-shortcuts .today-title,
+[data-text-scale="1.3"] .home-shortcuts .shortcut-title { font-size:25px; }
+@media(max-width:700px) {
+  .home-shortcuts { gap:6px; margin-top:12px; }
+  .home-shortcuts .today-button,.home-shortcuts .home-shortcut { padding:9px 6px; border-radius:18px; gap:4px; }
+  .home-shortcuts .today-title,.home-shortcuts .shortcut-title { font-size:15px; }
+  .home-shortcuts .shortcut-note { font-size:11px; }
+  .home-shortcuts .today-play { width:16px; height:16px; }
+  [data-large-text=true] .home-shortcuts .today-title,
+  [data-large-text=true] .home-shortcuts .shortcut-title { font-size:18px; }
+  [data-text-scale="1.3"] .home-shortcuts .today-title,
+  [data-text-scale="1.3"] .home-shortcuts .shortcut-title { font-size:20px; }
+  [data-large-text=true] .home-shortcuts .today-button { flex-direction:column; }
+}
+@media(max-width:359px) { .home-shortcuts .today-button { flex-direction:column; } }
 /* Match the shell's existing .78 desktop zoom without shrinking hit areas. */
 @media(min-width:949px) {
-  .wellness-head { min-height:58px; }
-  #wellness-open { width:58px; min-width:58px; height:58px; }
-  .week-panel .begin-button,.week-panel .seven-days,.wellness-button { min-height:58px; }
-  .week-panel .palace-badge-icon,.wellness-sheet .round-button { width:58px; height:58px; }
+  .week-panel .begin-button,.wellness-button { min-height:58px; }
+  .wellness-sheet .round-button { width:58px; height:58px; }
 }
-
-/* The house occupies the full card's centre, below the Begin action. */
-.week-panel { grid-template-areas:"oura actions" "week actions" "palace palace"; padding-inline:21px; }
-.week-panel.has-wellness-connection { grid-template-areas:"oura oura" "week actions" "palace palace"; }
-.week-panel .week-actions { align-self:start; }
-.week-panel .palace-badge { grid-area:palace; width:100%; margin-top:4px; }
-@media(max-width:700px) { .week-panel { padding-inline:9px; } }
-@media(min-width:701px) and (max-width:948px) { .week-panel { padding-inline:2.215cqw; } }
 
 /* Settings' extra-large text also reaches the isolated Home document. */
 [data-text-scale="1.3"] .accessible-caption { font-size: 25px; }

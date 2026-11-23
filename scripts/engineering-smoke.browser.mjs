@@ -12,6 +12,7 @@ import { checkSceneHandoff } from './scene-handoff-smoke.browser.mjs';
 import { checkProgrammeProgress } from './programme-progress-smoke.browser.mjs';
 import { checkLifetimeProgress } from './lifetime-progress-smoke.browser.mjs';
 import { checkCrisisSupport } from './crisis-support-smoke.browser.mjs';
+import { checkHomeWeek } from './home-week-smoke.browser.mjs';
 const playwright = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',');
 const port = Number(process.env.SMOKE_PORT ||4179);
@@ -101,7 +102,7 @@ try {
       await failed.close();
       console.log(`PASS ${name}: Home handshake, phone fit, direct Library isolation, privacy, fallback, Back and retry`);
       for (const legacy of [false, true]) {
-        for (const [suite, check] of [['Profile deletion', checkProfileDeletion], ['backup restore', checkBackupRestore], ['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog], ['crisis support guidance', checkCrisisSupport], ['lifetime progress', checkLifetimeProgress], ['programme progress', checkProgrammeProgress], ['Scene follow-up', checkSceneHandoff], ['Signal Lock secure sessions', checkSignalLock], ['Reset weekly count', checkResetWeek]]) {
+        for (const [suite, check] of [['Profile deletion', checkProfileDeletion], ['backup restore', checkBackupRestore], ['practice dialogs', checkPracticeDialogs], ['Journey dialogs', checkJourneyDialogs], ['Home dialog lifecycle', checkHomeDialog], ['Home weekly layout', checkHomeWeek], ['crisis support guidance', checkCrisisSupport], ['lifetime progress', checkLifetimeProgress], ['programme progress', checkProgrammeProgress], ['Scene follow-up', checkSceneHandoff], ['Signal Lock secure sessions', checkSignalLock], ['Reset weekly count', checkResetWeek]]) {
           const dialogs = await context(browser, legacy), dialogPage = await dialogs.newPage(), dialogErrors = [];
           dialogPage.on('pageerror', error => dialogErrors.push(error.message));
           const networkIssues = [], browserConsole = [];
